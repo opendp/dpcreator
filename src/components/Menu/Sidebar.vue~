@@ -1,0 +1,6 @@
+<template>
+  <div class="sidebar">
+    <div class="sidebar-backdrop" @click="closeSidebarPanel" v-if="isPanelOpen" class="sidebar-panel"><slot></slot>
+    </div>
+  </div>
+</template>
