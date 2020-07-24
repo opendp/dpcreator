@@ -10,16 +10,19 @@
   </div>
 </template>
 <script>
-  export default {
-    data: () => ({
-    isBurgerActive: false
-    }),
+import { store, mutations } from '@/store.js'
+export default {
+    computed: {
+	isBurgerActive() {
+return store.isNavOpen
+	}
+    },
     methods: {
-      toggle() {
-        this.isBurgerActive = !this.isBurgerActive
-      }
+	toggle() {
+mutations.toggleNav()
+	}
     }
-  }
+}
 </script>
 <style>
    .hidden {
