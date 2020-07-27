@@ -62,8 +62,7 @@ html {
    border: 0; margin: 0; padding: 0;
    font-family: 'Lato';
    height: 100%;
-   background: rgb(101,31,87);
-   background: linear-gradient(45deg, rgba(101,31,87,1) 0%, rgba(225,113,87,1) 48%, rgba(249,248,113,1) 100%);
+   background: rgba(255,255,255,0.5);
  }
 
  .logo {
@@ -84,10 +83,11 @@ html {
  }
 
  ul.sidebar-panel-nav > li > a {
-   color: #fff;
+   color: rgba(8,8,8,0.5);
    text-decoration: none;
    font-size: 1.5rem;
-   display: block;
+   font-weight: bold;
+   Display: block;
    padding-bottom: 0.5em;
 }
 
@@ -96,7 +96,7 @@ html {
  }
 
  ul.sidebar-panel-subnav > li > a {
-   color: #fff;
+   color: rgba(86,86,86,0.5);
    text-decoration: none;
    font-size: 1.5rem;
    display: block;

@@ -1,7 +1,7 @@
 import Vue from "vue";
 
 export const store = Vue.observable({
-    isNavOpen: false
+    isNavOpen: true
 });
 
 export const mutations = {
