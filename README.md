@@ -1,4 +1,4 @@
-# odsys
+# opendp-ux
 
 ## Project setup
 ```
