@@ -49,6 +49,7 @@ export default {
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 html {
    height: 100%;
    overflow:hidden;
@@ -68,6 +69,7 @@ html {
  ul.sidebar-panel-nav > li {
    color: rgba(8,8,8,0.5);
    text-decoration: none;
+   font-family: 'Roboto', sans-serif;
    font-size: 1.5rem;
    font-weight: bold;
    Display: block;
@@ -81,6 +83,7 @@ html {
  ul.sidebar-panel-subnav > li > a {
    color: rgba(86,86,86,0.5);
    text-decoration: none;
+   font-family: 'Roboto', sans-serif;
    font-size: 1.5rem;
    display: block;
    padding-bottom: 0.5em;
