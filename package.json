@@ -10,6 +10,7 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "vue": "^2.6.11",
+    "vue-form-generator": "^2.3.4",
     "vue-sidebar-menu": "^4.6.2"
   },
   "devDependencies": {
