@@ -1,49 +1,116 @@
 <template>
-<div id="app"><FormWizard @on-complete="onComplete">
-    <TabContent title="Personal details" icon="ti-user">
-      <!-- :before-change="validateFirstTab" -->
-      <!-- > -->
-      <!-- <VueFormGenerator :model="model"  -->
-      <!--                   :schema="firstTabSchema" -->
-      <!--                   :options="formOptions" -->
-      <!--                   ref="firstTabForm" -->
-      <!--                   > -->
-        <!-- </VueFormGenerator> -->
-      What is your name?
+<div id="app">
+<div id="navigation">
+    <Sidebar>
+      <ul class="sidebar-panel-nav">
+	<li>Introduction</li>
+	<ul class="sidebar-panel-subnav">
+          <li><a href="#background">Background</a></li>
+	</ul>
+	<li>Import Data</li>
+	<ul class="sidebar-panel-subnav">
+          <li><a href="#upload-dataset">Upload dataset</a></li>
+          <li><a href="#confirm-dataset">Confirm dataset</a></li>
+          <li><a href="#select-dataset-type">Select dataset type</a></li>
+          <li><a href="#confirm-dataset-contents">Confirm contents of dataset</a></li>
+          <li><a href="#specify-dataset-info">Specify dataset information</a></li>                </ul>
+	<li>Specify Metadata</li>
+	<ul class="sidebar-panel-subnav">
+          <li><a href="#create-custom-vars">Create custom variables</a></li>
+          <li><a href="#confirm-var-types">Confirm variable types</a></li>
+          <li><a href="#set-var-ranges">Set variable ranges</a></li>
+          <li><a href="#confirm-vars-of-interest">Confirm variables of interest</a></li>
+	</ul>
+	<li>Set Parameters</li>
+	<ul class="sidebar-panel-subnav">
+          <li><a href="#set-priv-loss-params">Set privacy loss parameters</a></li>
+	</ul>
+	<li>Create Statistics</li>
+	<ul class="sidebar-panel-subnav">
+          <li><a href="#create-stats">Create statistics</a></li>
+	</ul>
+	<li>Generate Report</li>
+	<ul class="sidebar-panel-subnav">
+          <li><a href="#confirm-err-and-submit">Confirm error and submit</a></li>
+          <li><a href="#view-report">View report</a></li>
+	</ul>
+      </ul>
+    </Sidebar>
+</div>
+<div id="canvas">
+  <FormWizard @on-complete="onComplete">
+    <TabContent title="Welcome" icon="ti-user">
+      screen-welcome-accept
     </TabContent>
-    <TabContent title="Additional Info"
+    <TabContent title="Data"
                 icon="ti-settings">
-      <!-- :before-change="validateSecondTab" -->
-      <!-- > -->
-      <!-- <VueFormGenerator :model="model"  -->
-      <!--                   :schema="secondTabSchema" -->
-      <!--                   :options="formOptions" -->
-      <!--                   ref="secondTabForm" -->
-      <!--                   >                   -->
-        <!-- </VueFormGenerator> -->
-      Where did you go to high school?
+      screen-data-choose
     </TabContent>
-    <TabContent title="Last step"
+    <TabContent title="Confirm Data"
+                icon="ti-settings">
+      screen-data-confirm
+    </TabContent>
+    <TabContent title="Classify Data Privacy"
+                icon="ti-settings">
+      screen-data-privacy-classification
+    </TabContent>
+    <TabContent title="Data Sample Details"
+                icon="ti-settings">
+      screen-data-sample-population-details
+    </TabContent>
+    <TabContent title="Create Custom Variables"
+                icon="ti-settings">
+      screen-data-custom-variables-create
+    </TabContent>
+    <TabContent title="Confirm Custom Variables"
+                icon="ti-settings">
+      screen-data-custom-variables-confirm
+    </TabContent>
+    <TabContent title="Provide Variable Bounds"
+                icon="ti-settings">
+      screen-data-custom-variables-bounds
+    </TabContent>
+    <TabContent title="Provide Variable Categories"
+                icon="ti-settings">
+      screen-data-variables-categories
+    </TabContent>
+    <TabContent title="Provide Variable Visibilities"
+                icon="ti-settings">
+      screen-data-variables-visibility
+    </TabContent>
+    <TabContent title="Provide Privacy Loss Parameters"
+                icon="ti-settings">
+      screen-data-privacy-loss-parameters
+    </TabContent>
+    <TabContent title="Create Statistics"
+                icon="ti-settings">
+      screen-data-create-statistic-list
+      screen-data-create-statistic-add
+      screen-data-create-statistic-edit
+    </TabContent>
+    <TabContent title="Review Selections"
+                icon="ti-settings">
+      screen-submit-accept
+    </TabContent>    
+    <TabContent title="View Report"
                 icon="ti-check">
-      <!-- <h4>Your json is ready!</h4> -->
-      <!-- <div class="panel-body"> -->
-	<!--   <pre v-if="model" v-html="prettyJSON(model)"></pre> -->
-        <!-- </div> -->
-      This seems pretty simple
+      screen-report-view
     </TabContent>
   </FormWizard>
+  </div>
 </div>
 </template>
 <script>
 import {FormWizard, TabContent} from 'vue-form-wizard'
 //import {VueFormGenerator} from "vue-form-generator"
 import 'vue-form-wizard/dist/vue-form-wizard.min.css'
+import Sidebar from './components/Menu/Sidebar.vue';
 export default {
   name: 'app',
   components: {
     FormWizard,
     TabContent,
-//    VueFormGenerator
+    Sidebar
   },
   methods: {
     onComplete: function(){
@@ -100,7 +167,6 @@ export default {
           label: "First name",
           model: "firstName",
           required:true,
-//          validator:VueFormGenerator.validators.string,
           styleClasses:'col-xs-6'
         },
                 {
@@ -109,7 +175,6 @@ export default {
                   label: "Last name",
                   model: "lastName",
                   required:true,
-//                  validator:VueFormGenerator.validators.string,
                   styleClasses:'col-xs-6'
                 },
                 {
@@ -118,7 +183,6 @@ export default {
                   label: "Email",
                   model: "email",
                   required:true,
-//                  validator:VueFormGenerator.validators.email,
                   styleClasses:'col-xs-12'
                 }
                ]
@@ -131,7 +195,6 @@ export default {
             label: "Street name",
             model: "streetName",
             required:true,
-//            validator:VueFormGenerator.validators.string,
             styleClasses:'col-xs-9'
           },
           {
@@ -140,7 +203,6 @@ export default {
             label: "Street number",
             model: "streetNumber",
             required:true,
-//            validator:VueFormGenerator.validators.string,
             styleClasses:'col-xs-3'
           },
           {
@@ -149,7 +211,6 @@ export default {
             label: "City",
             model: "city",
             required:true,
-//            validator:VueFormGenerator.validators.string,
             styleClasses:'col-xs-6'
           },
           {
@@ -157,7 +218,6 @@ export default {
             label: "Country",
             model: "country",
             required:true,
-//            validator:VueFormGenerator.validators.string,
             values:['United Kingdom','Romania','Germany'],
             styleClasses:'col-xs-6'
           },
@@ -169,12 +229,51 @@ export default {
 </script>
 
 <style>
-pre {
-    overflow: auto;
+  @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+html {
+    height: 100%;
+    overflow:hidden;
 }
-pre .string { color: #885800; }
-pre .number { color: blue; }
-pre .boolean { color: magenta; }
-pre .null { color: red; }
-pre .key { color: green; }
+body {
+    border: 0; margin: 0; padding: 0;
+    color: black;
+    text-decoration: none;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.5rem;
+    font-weight: bold;
+    Display: block;
+    padding-bottom: 0.5em;
+    height: 100%;
+    background: rgba(255,255,255,0.5);
+    float: right;
+    width: 60%
+}
+ul.sidebar-panel-nav {
+    list-style-type: none;
+}
+ul.sidebar-panel-nav > li {
+    color: rgba(8,8,8,0.5);
+    text-decoration: none;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.5rem;
+    font-weight: bold;
+    Display: block;
+    padding-bottom: 0.5em;
+}
+ul.sidebar-panel-subnav {
+    list-style-type: none;
+}
+ul.sidebar-panel-subnav > li > a {
+    color: rgba(86,86,86,0.5);
+    text-decoration: none;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.5rem;
+    display: block;
+    padding-bottom: 0.5em;
+}
+button, input[type=button] {
+    background: blue;
+    color: white;
+}
+
 </style>
