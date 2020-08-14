@@ -38,7 +38,7 @@
     </Sidebar>
 </div>
 <div id="canvas">
-  <FormWizard @on-complete="onComplete">
+  <FormWizard @on-complete="onComplete" title="OpenDP" subtitle="form screens">
     <TabContent title="Welcome" icon="ti-user">
       screen-welcome-accept
     </TabContent>
@@ -91,7 +91,7 @@
     <TabContent title="Review Selections"
                 icon="ti-settings">
       screen-submit-accept
-    </TabContent>    
+    </TabContent>
     <TabContent title="View Report"
                 icon="ti-check">
       screen-report-view
