@@ -40,7 +40,9 @@
 <div id="canvas">
   <FormWizard @on-complete="onComplete" title="OpenDP" subtitle="form screens">
     <TabContent title="Welcome" icon="ti-user">
-      screen-welcome-accept
+      <Formlet></Formlet>
+     <VueFormGenerator :model="model" :schema="firstTabSchema" :options="formOptions" ref="firstTabForm"></VueFormGenerator>
+     <div id=screen-welcome-accept><p>Welcome to WhiteNoise, a tool that helps generate statistics (such as means or histograms) that are privacy perserving by distributing a "privacy budget" across different calculations.</p></div>
     </TabContent>
     <TabContent title="Data"
                 icon="ti-settings">
@@ -101,16 +103,22 @@
 </div>
 </template>
 <script>
+//import Vue from 'vue'
 import {FormWizard, TabContent} from 'vue-form-wizard'
-//import {VueFormGenerator} from "vue-form-generator"
+import VueFormGenerator from "vue-form-generator"
 import 'vue-form-wizard/dist/vue-form-wizard.min.css'
+import 'vue-form-generator/dist/vfg.css'
 import Sidebar from './components/Menu/Sidebar.vue';
+import Formlet from './components/Formlet.vue';
+//Vue.use(VueFormGenerator)
 export default {
   name: 'app',
   components: {
     FormWizard,
     TabContent,
-    Sidebar
+    VueFormGenerator,
+    Sidebar,
+    Formlet
   },
   methods: {
     onComplete: function(){
@@ -169,24 +177,23 @@ export default {
           required:true,
           styleClasses:'col-xs-6'
         },
-                {
-                  type: "input",
-                  inputType: "text",
-                  label: "Last name",
-                  model: "lastName",
-                  required:true,
-                  styleClasses:'col-xs-6'
-                },
-                {
-                  type: "input",
-                  inputType: "text",
-                  label: "Email",
-                  model: "email",
-                  required:true,
-                  styleClasses:'col-xs-12'
-                }
-               ]
-      },
+        {
+          type: "input",
+          inputType: "text",
+          label: "Last name",
+          model: "lastName",
+          required:true,
+          styleClasses:'col-xs-6'
+        },
+        {
+          type: "input",
+          inputType: "text",
+          label: "Email",
+          model: "email",
+          required:true,
+          styleClasses:'col-xs-12'
+        }
+      ]},
       secondTabSchema: {
         fields:[
           {
