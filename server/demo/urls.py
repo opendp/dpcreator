@@ -18,6 +18,7 @@ from django.urls import path, re_path, include
 from django.contrib.auth.models import User
 from django.views.generic import TemplateView
 from rest_framework import routers, serializers, viewsets
+from demo.views import UserViewSet, GroupViewSet
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -30,10 +31,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
+router.register(r'groups', GroupViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    re_path(r'^.*$', TemplateView.as_view(template_name='index.html'), name='index'),
+    path('api-auth/', include('rest_framework.urls')),    
     path('', include(router.urls)),
-    path('api-auth/', include('rest_framework.urls'))
+    re_path(r'^.*$', TemplateView.as_view(template_name='index.html'), name='index'),
 ]
