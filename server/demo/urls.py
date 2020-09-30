@@ -36,6 +36,6 @@ router.register(r'groups', GroupViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),    
-    path('', include(router.urls)),
+    path('api/', include(router.urls)),
     re_path(r'^.*$', TemplateView.as_view(template_name='index.html'), name='index'),
 ]
