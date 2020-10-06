@@ -1,4 +1,4 @@
-"""demo URL Configuration
+"""opendp_server URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/3.0/topics/http/urls/
@@ -14,20 +14,18 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, re_path, include
-from django.contrib.auth.models import User
+from django.urls import path, include
 from django.views.generic import TemplateView
-from rest_framework import routers, serializers, viewsets
-from demo.views import UserViewSet, GroupViewSet
+from rest_framework import routers, serializers
+from .views import UserViewSet, GroupViewSet
+from .models import DataverseUser
+
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = User
+        model = DataverseUser
         fields = ['url', 'username', 'email', 'is_staff']
 
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
@@ -37,5 +35,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),    
     path('api/', include(router.urls)),
-    re_path(r'^.*$', TemplateView.as_view(template_name='index.html'), name='index'),
+
+    # Putting all vue-related views under "ui/" for now to separate from the api.
+    path('ui/', TemplateView.as_view(template_name='index.html'), name='index'),
 ]
