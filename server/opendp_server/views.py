@@ -1,8 +1,12 @@
 from django.contrib.auth.models import Group
-from rest_framework import viewsets
-from rest_framework import permissions
-from .serializers import UserSerializer, GroupSerializer
-from .models import DataverseUser
+from rest_framework import permissions, viewsets
+from .serializers import UserSerializer, GroupSerializer, SessionSerializer
+from .models import DataverseUser, Session
+
+
+class SessionViewSet(viewsets.ModelViewSet):
+    queryset = Session.objects.all()
+    serializer_class = SessionSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):

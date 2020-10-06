@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 from rest_framework import routers, serializers
-from .views import UserViewSet, GroupViewSet
+from .views import UserViewSet, GroupViewSet, SessionViewSet
 from .models import DataverseUser
 
 
@@ -30,6 +30,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
+router.register(r'sessions', SessionViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
