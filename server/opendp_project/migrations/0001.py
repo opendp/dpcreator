@@ -46,8 +46,8 @@ class Migration(migrations.Migration):
                 ('terms_of_use_accepted', models.BooleanField(default=False)),
                 ('request_parameters', models.JSONField()),
                 ('token_parameters_key', models.TextField()),
-                ('dataverse_file', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='opendp_server.dataversefile')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='opendp_server.dataverseuser')),
+                ('dataverse_file', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='opendp_project.dataversefile')),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='opendp_project.dataverseuser')),
             ],
         ),
     ]
