@@ -17,8 +17,9 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 from rest_framework import routers, serializers
-from .views import UserViewSet, GroupViewSet, SessionViewSet
-from .models import DataverseUser
+
+from opendp_apps.user.models import DataverseUser
+from opendp_apps.user.views import UserViewSet, SessionViewSet
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -29,7 +30,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
-router.register(r'groups', GroupViewSet)
 router.register(r'sessions', SessionViewSet)
 
 urlpatterns = [
