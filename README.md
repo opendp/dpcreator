@@ -1,6 +1,4 @@
-# Django + Vue CLI + Webpack branch
-
-This is based on an [existing project](https://github.com/EugeneDae/django-vue-cli-webpack-demo) by EugeneDae. See his project for original documentation.
+# The OpenDP Web Application
 
 ## Running
 
@@ -29,3 +27,5 @@ This is based on an [existing project](https://github.com/EugeneDae/django-vue-c
 curl http://127.0.0.1:8000/api/
 curl http://127.0.0.1:8000/api/users/
 ```
+
+(This is based on an [existing project](https://github.com/EugeneDae/django-vue-cli-webpack-demo) by EugeneDae. See his project for original documentation.)
