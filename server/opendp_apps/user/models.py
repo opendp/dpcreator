@@ -31,6 +31,28 @@ class DataverseUser(User):
         super(DataverseUser, self).save(*args, **kwargs)
 
 
+class Group(models.Model):
+    """
+    Organize DataverseUsers into (potentially multiple)
+    permission groups, to manage access of releases.
+    """
+    name = models.CharField(max_length=128)
+    created = models.DateTimeField(auto_now_add=True, blank=True)
+
+
+class GroupMembership(models.Model):
+    """
+    Specify the nature of the User's membership in the group
+    """
+    user = models.ForeignKey(DataverseUser, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+
+    class MembershipTypes(models.TextChoices):
+        ADMIN = 'AD', 'Admin'
+        MEMBER = 'ME', 'Member'
+    membership_type = models.CharField(max_length=128, choices=MembershipTypes.choices)
+
+
 class Session(models.Model):
     """
     Track user interactions with the system coming from Dataverse.
@@ -55,6 +77,7 @@ class Session(models.Model):
 
     session_type = models.CharField(max_length=2, choices=SessionTypes.choices)
 
+    # TODO: Should this be moved out of this class to be reused in "analysis"?
     # The status will be updated as each step is completed.
     class Statuses(models.IntegerChoices):
         PREPARATION = 1, 'Preparation'
