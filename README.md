@@ -1,6 +1,29 @@
 # The OpenDP Web Application
 
-## Running
+## Building with Docker Compose
+1. Clone the repo and `cd` into the directory.
+
+    `git clone https://github.com/opendifferentialprivacy/opendp-ux.git && cd opendp-ux`
+
+1. `cd server`
+
+2. Tell Docker to turn on the webserver and database: 
+
+    `docker-compose up`
+
+3. The first time you run (or anytime schema changes have been made) 
+you need to run migrate manually:
+
+    `docker-compose run opendp_server python manage.py migrate`
+
+    (In general, any command can be run by adding "docker-compose run opendp_server" to the beginning, 
+such as:
+
+    `docker-compose run opendp_server python manage.py shell`
+    
+which will drop you into the Django shell on the Docker container.)
+
+## Running without Containers
 
 1. Clone the repo and `cd` into the directory. `git clone https://github.com/opendifferentialprivacy/opendp-ux.git && cd opendp-ux`
 1. Create virtual environment: `python3 -m venv venv`

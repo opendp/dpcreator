@@ -2,16 +2,17 @@ asgiref==3.2.10
 bleach==3.2.1
 certifi==2020.6.20
 chardet==3.0.4
-dataverse @ git+https://github.com/IQSS/dataverse-client-python.git@5cdaadc2c3882d6fe23d3cb7cef5280fe83ba909
 Django==3.1.2
 django-rest-framework==0.1.0
 djangorestframework==3.12.1
 idna==2.10
 lxml==4.5.2
 packaging==20.4
+psycopg2-binary==2.8.6
 pyDataverse==0.2.1
 pyparsing==2.4.7
 pytz==2020.1
+redis==3.5.3
 requests==2.24.0
 six==1.15.0
 sqlparse==0.3.1
