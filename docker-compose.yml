@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  db:
+   image: postgres
+   environment:
+     - POSTGRES_DB=postgres
+     - POSTGRES_USER=postgres
+     - POSTGRES_PASSWORD=postgres
+  opendp_server:
+    build: ""
+    command: python server/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db

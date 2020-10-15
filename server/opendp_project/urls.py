@@ -13,6 +13,8 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls import url
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
@@ -20,6 +22,8 @@ from rest_framework import routers, serializers
 
 from opendp_apps.user.models import DataverseUser
 from opendp_apps.user.views import UserViewSet, SessionViewSet
+from opendp_project import settings
+from opendp_project.views import home_view
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -33,10 +37,11 @@ router.register(r'users', UserViewSet)
 router.register(r'sessions', SessionViewSet)
 
 urlpatterns = [
+    url(r'^$', home_view),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),    
     path('api/', include(router.urls)),
 
     # Putting all vue-related views under "ui/" for now to separate from the api.
     path('ui/', TemplateView.as_view(template_name='index.html'), name='index'),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT, kwargs={'show_indexes': True})
