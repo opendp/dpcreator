@@ -7,16 +7,16 @@ from pyDataverse.api import Api
 
 class DataverseClient(object):
 
-    def __init__(self, host):
+    def __init__(self, host, api_token=None):
         self._host = host
-        self.api = Api(host)
+        self.api = Api(host, api_token=api_token)
 
     def get_ddi(self, doi, format='ddi'):
         """
         Get DDI metadata file
         """
         response = self.api.get_dataset_export(doi, format)
-        return response.content
+        return DDI(response.content)
 
 
 class DDI(object):
@@ -29,6 +29,9 @@ class DDI(object):
 
     def __call__(self, *args, **kwargs):
         return self.xml_tree
+
+    def __str__(self):
+        return etree.tostring(self.xml_tree, pretty_print=True, encoding="unicode")
 
     def get_title(self):
         return self.xml_tree.find('.//{ddi:codebook:2_5}titl').text
@@ -53,16 +56,15 @@ class DDI(object):
 
 
 if __name__ == '__main__':
-    import json
-    host = 'https://dataverse.harvard.edu'
-    client = DataverseClient(host)
-    doi = 'doi:10.7910/DVN/GEWLZD'
-    ddi_string = client.get_ddi('doi:10.7910/DVN/GEWLZD')
-    ddi_obj = DDI(ddi_string)
 
-    xml_string = etree.tostring(ddi_obj(), pretty_print=True, encoding="unicode")
+    host = 'https://dataverse.harvard.edu'
+    doi = 'doi:10.7910/DVN/GEWLZD'
+
+    client = DataverseClient(host)
+    ddi_obj = client.get_ddi(doi)
+
     with open('example.ddi', 'w') as outfile:
-        outfile.write(xml_string)
+        outfile.write(ddi_obj.__str__())
 
     heading = "Title: " + ddi_obj.get_title()
     print()
