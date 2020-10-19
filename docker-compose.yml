@@ -11,7 +11,7 @@ services:
      - POSTGRES_PASSWORD=postgres
   # TODO: Load data every time
   opendp_server:
-    build: ""
+    build: "./server"
     command: python server/manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
