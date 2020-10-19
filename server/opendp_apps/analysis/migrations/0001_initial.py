@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('user', '0003_group_groupmembership'),
-        ('dataverse', '0001_initial'),
+        ('dataset', '0001_initial'),
     ]
 
     operations = [

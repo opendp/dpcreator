@@ -2,7 +2,7 @@ import uuid as uuid
 from django.contrib.auth.models import User
 from django.db import models
 
-from ..dataverse.models import DataverseFile
+from ..dataset.models import BaseDataSetInfo
 
 
 class DataverseUser(User):
@@ -68,8 +68,8 @@ class Session(models.Model):
     user = models.ForeignKey(DataverseUser,
                              on_delete=models.CASCADE)
 
-    # This will keep track of overall privacy budget usage.
-    dataverse_file = models.ForeignKey(DataverseFile, null=True, blank=True, on_delete=models.CASCADE)
+    # This will keep track of overall privacy budget usage via the DepositorInfo FK relationship
+    dataset_info = models.ForeignKey(BaseDataSetInfo, null=True, blank=True, on_delete=models.CASCADE)
 
     class SessionTypes(models.TextChoices):
         DEPOSITOR = 'DE', 'Depositor'
