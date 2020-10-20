@@ -51,3 +51,25 @@ class DatasetSource(models.Model):
 
     source = models.CharField(max_length=128, choices=SourceChoices.choices)
     dataset_info = models.ForeignKey(BaseDataSetInfo, on_delete=CASCADE)
+
+class DeopositorSetupInfo(models.Model):
+    """
+    Metadata and aggregate data about potential release of Dataset
+    """
+    is_complete = models.BooleanField()
+    user_step = models.CharField(max_length=128)
+    epsilon = models.DecimalField(decimal_places=2, max_digits=50)
+    dataset_questions = models.JSONField()
+    variable_ranges = models.JSONField()
+    variable_categories = models.JSONField()
+
+class AnalysisPlan(models.Model):
+    """
+    Details of request for a differnetially private release
+    """
+    is_complete = models.BooleanField()
+    user_step = models.CharField(max_length=128)
+    variable_ranges = models.JSONField()
+    variable_categories = models.JSONField()
+    custom_variables = models.JSONField()
+    dp_statistics = models.JSONField()
