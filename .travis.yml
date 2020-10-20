@@ -1,0 +1,24 @@
+# ----------------------------------
+# Initial .travis.yml file
+# ----------------------------------
+.branches:
+  # all branches
+
+language: python
+
+python:
+#  - "3.6"      # current default Python on Travis CI
+  - "3.7"
+#  - "3.8"
+#  - "3.8-dev"  # 3.8 development branch
+# command to install dependencies
+
+install:
+  - cd server
+  - pip install -r requirements/dev.txt
+  - cd ../
+
+# command to run tests
+script:
+  - cd server
+  - python manage.py test

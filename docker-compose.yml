@@ -10,15 +10,6 @@ services:
      - POSTGRES_USER=postgres
      - POSTGRES_PASSWORD=postgres
   # TODO: Load data every time
-  opendp_server:
-    build: ""
-    command: python server/manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/code
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db
   client:
     build: "./client"
     command: npm run serve
@@ -27,4 +18,13 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - opendp_server
+      - db
+  opendp_server:
+    build: "./server"
+    command: python server/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - client
