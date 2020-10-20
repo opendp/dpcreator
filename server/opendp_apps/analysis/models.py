@@ -1,6 +1,6 @@
 from django.db import models
 
-from opendp_apps.dataverse.models import DataverseFile
+from opendp_apps.dataset.models import BaseDataSetInfo
 from opendp_apps.user.models import Session, Group, DataverseUser
 
 
@@ -53,4 +53,4 @@ class DPRelease(models.Model):
     group = models.ManyToManyField(Group)
 
     # Stores epsilon, etc.
-    dataverse_file = models.ForeignKey(DataverseFile, on_delete=models.CASCADE)
+    dataset_file = models.ForeignKey(BaseDataSetInfo, on_delete=models.CASCADE)

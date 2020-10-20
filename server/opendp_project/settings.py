@@ -38,10 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'polymorphic',
     'opendp_project',
     'opendp_apps.user',
     'opendp_apps.analysis',
-    'opendp_apps.dataverse'
+    'opendp_apps.dataset'
 ]
 
 MIDDLEWARE = [
