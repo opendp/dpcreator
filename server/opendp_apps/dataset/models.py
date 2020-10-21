@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models import CASCADE
 from polymorphic.models import PolymorphicModel
 
+
 class DepositorSetupInfo(models.Model):
     """
     Metadata and aggregate data about potential release of Dataset
@@ -13,6 +14,7 @@ class DepositorSetupInfo(models.Model):
     variable_ranges = models.JSONField()
     variable_categories = models.JSONField()
 
+
 class BaseDataSetInfo(PolymorphicModel):
     """
     Base type for table that either holds DV data
@@ -23,6 +25,7 @@ class BaseDataSetInfo(PolymorphicModel):
     # during analysis setup
     data_profile_key = models.CharField(max_length=128)
     depositor_setup_info = models.ForeignKey(DepositorSetupInfo, on_delete=CASCADE)
+
 
 class DataverseFileInfo(BaseDataSetInfo):
     """
@@ -47,7 +50,6 @@ class DatasetSource(models.Model):
     Keeps track of where the data came from
     """
     class SourceChoices(models.TextChoices):
-        # TODO: This should allow for all installation names?
         ONE = 'upload', 'Upload'
         TWO = 'dataverse', 'Dataverse'
 
@@ -66,6 +68,8 @@ class AnalysisPlan(models.Model):
     custom_variables = models.JSONField()
     dp_statistics = models.JSONField()
 
+
+# TODO: We already have parts of this in analysis/models.py, need to merge them
 class ReleaseInfo(models.Model):
     """
     Release of differentially private result from Dataset
@@ -73,15 +77,17 @@ class ReleaseInfo(models.Model):
     epsilon_used = models.FloatField(null=False, blank=False)
     dp_release = models.JSONField()
 
+
 class TermsOfAccess(models.Model):
     name = models.CharField(max_length=128)
     description = models.CharField(max_length=256)
     version = models.FloatField(null=False, blank=False)
 
+
 class TermsOfAccessLog(models.Model):
     user = models.CharField(max_length=128)
     terms_of_access = models.ForeignKey(TermsOfAccess, on_delete=models.RESTRICT)
     dataset_info = models.ForeignKey(BaseDataSetInfo, on_delete=models.RESTRICT)
-    timestamp = models.DateField()
+    created = models.DateTimeField(auto_now_add=True)
 
 
