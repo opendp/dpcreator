@@ -44,8 +44,8 @@ INSTALLED_APPS = [
     'opendp_apps.model_helpers',
     'opendp_apps.opendp_auth',
     'opendp_apps.content_pages',
-    'opendp_apps.dataset',
-    #'opendp_apps.analysis',
+    'opendp_apps.datasets',
+    'opendp_apps.analyses',
 ]
 
 MIDDLEWARE = [
