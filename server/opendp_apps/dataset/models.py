@@ -23,7 +23,9 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     class SourceChoices(models.TextChoices):
         UserUpload = 'upload', 'Upload'
         Dataverse = 'dataverse', 'Dataverse'
-    source = models.CharField(max_length=128, choices=SourceChoices.choices)
+
+    source = models.CharField(max_length=128,
+                              choices=SourceChoices.choices)
 
     # Redis key to store potentially sensitive information
     # during analysis setup
@@ -76,17 +78,17 @@ class UploadFileInfo(DataSetInfo):
                     storage=UPLOADED_FILE_STORAGE,
                     upload_to='user-files/%Y/%m/%d/')
 
+    def save(self, *args, **kwargs):
+        # Future: is_complete can be auto-filled based on either field values or the STEP
+        #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
+        #       depending on the data
+        #
+        self.source = DataSetInfo.SourceChoices.UserUpload
+        super(UploadFileInfo, self).save(*args, **kwargs)
 
-class DatasetSource(TimestampedModelWithUUID):
-    """
-    Keeps track of where the data came from
-    """
-    class SourceChoices(models.TextChoices):
-        ONE = 'upload', 'Upload'
-        TWO = 'dataverse', 'Dataverse'
+    def __str__(self):
+        return f'{self.name} ({self.source})'
 
-    source = models.CharField(max_length=128, choices=SourceChoices.choices)
-    dataset_info = models.ForeignKey(DataSetInfo, on_delete=CASCADE)
 
 class DepositorSetupInfo(TimestampedModelWithUUID):
     """
@@ -104,10 +106,15 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     is_complete = models.BooleanField(default=False)
     user_step = models.CharField(max_length=128,
                                  choices=DepositorSteps.choices)
-    epsilon = models.FloatField(null=False, blank=False)
-    dataset_questions = models.JSONField()
-    variable_ranges = models.JSONField()
-    variable_categories = models.JSONField()
+    epsilon = models.FloatField(null=True, blank=True)
+    dataset_questions = models.JSONField(null=True)
+    variable_ranges = models.JSONField(null=True)
+    variable_categories = models.JSONField(null=True)
+
+    class Meta:
+        verbose_name = 'Depositor Setup Data'
+        verbose_name_plural = 'Depositor Setup Data'
+        ordering = ('dataset', '-created')
 
     def __str__(self):
         return f'{self.dataset} - {self.user_step}'
@@ -139,10 +146,10 @@ class AnalysisPlan(TimestampedModelWithUUID):
     is_complete = models.BooleanField(default=False)
     user_step = models.CharField(max_length=128,
                                  choices=AnalystSteps.choices)
-    variable_ranges = models.JSONField()
-    variable_categories = models.JSONField()
-    custom_variables = models.JSONField()
-    dp_statistics = models.JSONField()
+    variable_ranges = models.JSONField(null=True)
+    variable_categories = models.JSONField(null=True)
+    custom_variables = models.JSONField(null=True)
+    dp_statistics = models.JSONField(null=True)
 
     def __str__(self):
         return f'{self.dataset} - {self.user_step}'
@@ -160,13 +167,18 @@ class ReleaseInfo(TimestampedModelWithUUID):
     """
     Release of differentially private result from an AnalysisPlan
     """
-    analysis_plan = models.ForeignKey(AnalysisPlan,
-                                      on_delete=models.PROTECT)
-    # redundant
     dataset = models.ForeignKey(DataSetInfo,
                                 on_delete=models.PROTECT)
+
+    # redundant
+    analysis_plan = models.ForeignKey(AnalysisPlan,
+                                      on_delete=models.PROTECT)
 
     epsilon_used = models.FloatField(null=False, blank=False)
     dp_release = models.JSONField()
 
+    class Meta:
+        verbose_name = 'Release Information'
+        verbose_name_plural = 'Release Information'
+        ordering = ('dataset', '-created')
 
