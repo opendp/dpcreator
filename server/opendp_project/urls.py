@@ -20,6 +20,7 @@ from django.urls import path, include
 from django.views.generic import TemplateView
 from rest_framework import routers, serializers
 
+from opendp_apps.dataset.views import DepositorSetup
 from opendp_apps.user.models import DataverseUser
 from opendp_apps.user.views import UserViewSet, SessionViewSet
 from opendp_project import settings
@@ -41,6 +42,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),    
     path('api/', include(router.urls)),
+    path('api/deposit/', DepositorSetup.as_view()),
 
     # Putting all vue-related views under "ui/" for now to separate from the api.
     path('ui/', TemplateView.as_view(template_name='index.html'), name='index'),
