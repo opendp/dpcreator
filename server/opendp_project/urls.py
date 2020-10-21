@@ -48,4 +48,6 @@ urlpatterns = [
 
     # Putting all vue-related views under "ui/" for now to separate from the api.
     path('ui/', TemplateView.as_view(template_name='index.html'), name='index'),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT, kwargs={'show_indexes': True})
+] + static(settings.STATIC_URL,
+           document_root=settings.STATIC_ROOT,
+           kwargs={'show_indexes': True})

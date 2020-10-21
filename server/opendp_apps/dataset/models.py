@@ -21,18 +21,18 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
                                 on_delete=models.PROTECT)
 
     class SourceChoices(models.TextChoices):
-        ONE = 'upload', 'Upload'
-        TWO = 'dataverse', 'Dataverse'
+        UserUpload = 'upload', 'Upload'
+        Dataverse = 'dataverse', 'Dataverse'
     source = models.CharField(max_length=128, choices=SourceChoices.choices)
 
     # Redis key to store potentially sensitive information
     # during analysis setup
-    data_profile_key = models.CharField(max_length=128)
+    data_profile_key = models.CharField(max_length=128, blank=True)
 
-    # manually added, not sure how it works with polymorphic...
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
-
+    class Meta:
+        verbose_name = 'Dataset Information'
+        verbose_name_plural = 'Dataset Information'
+        ordering = ('name', '-created')
 
     def __str__(self):
         return self.name
@@ -47,8 +47,22 @@ class DataverseFileInfo(DataSetInfo):
     doi = models.CharField(max_length=128)
     installation_name = models.CharField(max_length=128)
 
+    class Meta:
+        verbose_name = 'Dataverse File Information'
+        verbose_name_plural = 'Dataverse File Information'
+        ordering = ('name', '-created')
+
     def __str__(self):
         return f'{self.name} ({self.installation_name})'
+
+    def save(self, *args, **kwargs):
+        # Future: is_complete can be auto-filled based on either field values or the STEP
+        #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
+        #       depending on the data
+        #
+        self.source = DataSetInfo.SourceChoices.Dataverse
+        super(DataverseFileInfo, self).save(*args, **kwargs)
+
 
 
 class UploadFileInfo(DataSetInfo):
