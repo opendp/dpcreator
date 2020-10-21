@@ -3,6 +3,7 @@ bleach==3.2.1
 certifi==2020.6.20
 chardet==3.0.4
 Django==3.1.2
+django-extensions==3.0.9
 django-polymorphic==3.0.0
 django-rest-framework==0.1.0
 djangorestframework==3.12.1
