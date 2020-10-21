@@ -2,13 +2,16 @@ from django.db import models
 from django.db.models import CASCADE
 from polymorphic.models import PolymorphicModel
 
-
 class DepositorSetupInfo(models.Model):
     """
-    Stores data setup during analysis configuration
+    Metadata and aggregate data about potential release of Dataset
     """
+    is_complete = models.BooleanField()
+    user_step = models.CharField(max_length=128)
     epsilon = models.FloatField(null=False, blank=False)
-
+    dataset_questions = models.JSONField()
+    variable_ranges = models.JSONField()
+    variable_categories = models.JSONField()
 
 class BaseDataSetInfo(PolymorphicModel):
     """
@@ -20,7 +23,6 @@ class BaseDataSetInfo(PolymorphicModel):
     # during analysis setup
     data_profile_key = models.CharField(max_length=128)
     depositor_setup_info = models.ForeignKey(DepositorSetupInfo, on_delete=CASCADE)
-
 
 class DataverseFileInfo(BaseDataSetInfo):
     """
@@ -52,16 +54,6 @@ class DatasetSource(models.Model):
     source = models.CharField(max_length=128, choices=SourceChoices.choices)
     dataset_info = models.ForeignKey(BaseDataSetInfo, on_delete=CASCADE)
 
-class DeopositorSetupInfo(models.Model):
-    """
-    Metadata and aggregate data about potential release of Dataset
-    """
-    is_complete = models.BooleanField()
-    user_step = models.CharField(max_length=128)
-    epsilon = models.DecimalField(decimal_places=2, max_digits=50)
-    dataset_questions = models.JSONField()
-    variable_ranges = models.JSONField()
-    variable_categories = models.JSONField()
 
 class AnalysisPlan(models.Model):
     """
@@ -73,3 +65,23 @@ class AnalysisPlan(models.Model):
     variable_categories = models.JSONField()
     custom_variables = models.JSONField()
     dp_statistics = models.JSONField()
+
+class ReleaseInfo(models.Model):
+    """
+    Release of differentially private result from Dataset
+    """
+    epsilon_used = models.FloatField(null=False, blank=False)
+    dp_release = models.JSONField()
+
+class TermsOfAccess(models.Model):
+    name = models.CharField(max_length=128)
+    description = models.CharField(max_length=256)
+    version = models.FloatField(null=False, blank=False)
+
+class TermsOfAccessLog(models.Model):
+    user = models.CharField(max_length=128)
+    terms_of_access = models.ForeignKey(TermsOfAccess, on_delete=models.RESTRICT)
+    dataset_info = models.ForeignKey(BaseDataSetInfo, on_delete=models.RESTRICT)
+    timestamp = models.DateField()
+
+
