@@ -3,6 +3,9 @@ version: "3.8"
 services:
   redis:
     image: redis
+    command: redis-server --requirepass password
+    expose:
+      - 6379
   db:
    image: postgres
    environment:
@@ -21,6 +24,12 @@ services:
       - db
   opendp_server:
     build: "./server"
+    # For production we will need to set
+    # these variables to point to a standalone instance
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=password
     command: python server/manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
