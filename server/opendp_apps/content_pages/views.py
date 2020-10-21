@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 
 
-def home_view(request, *args, **kwargs):
+def view_opendp_welcome(request, *args, **kwargs):
     """
     Useful for testing that server is up
     :param request:

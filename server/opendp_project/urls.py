@@ -19,28 +19,32 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 from rest_framework import routers, serializers
-
-from opendp_apps.user.models import DataverseUser
-from opendp_apps.user.views import UserViewSet, SessionViewSet
+#from opendp_apps.user.models import DataverseUser
+#from opendp_apps.user.views import UserViewSet, SessionViewSet
 from opendp_project import settings
-from opendp_project.views import home_view
+from opendp_apps.content_pages.views import view_opendp_welcome
 
 
+admin.site.site_header = 'OpenDP App Admin Panel'
+admin.site.site_title = 'OpenDP App Admin Panel'
+
+"""
+# temp commenting this out
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = DataverseUser
+        model = settings.AUTH_USER_MODEL
         fields = ['url', 'username', 'email', 'is_staff']
-
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'sessions', SessionViewSet)
+"""
 
 urlpatterns = [
-    url(r'^$', home_view),
+    url(r'^$', view_opendp_welcome, name='welcome_page'),
     path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls')),    
-    path('api/', include(router.urls)),
+    # path('api-auth/', include('rest_framework.urls')),
+    # path('api/', include(router.urls)),
 
     # Putting all vue-related views under "ui/" for now to separate from the api.
     path('ui/', TemplateView.as_view(template_name='index.html'), name='index'),

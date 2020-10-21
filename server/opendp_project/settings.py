@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+AUTH_USER_MODEL = "opendp_auth.User"
 
 # Application definition
 
@@ -39,10 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'polymorphic',
-    'opendp_project',
-    'opendp_apps.user',
-    'opendp_apps.analysis',
-    'opendp_apps.dataset'
+    #'opendp_project',
+    'opendp_apps.model_helpers',
+    'opendp_apps.opendp_auth',
+    'opendp_apps.content_pages',
+    'opendp_apps.dataset',
+    #'opendp_apps.analysis',
 ]
 
 MIDDLEWARE = [
@@ -54,6 +57,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 ROOT_URLCONF = 'opendp_project.urls'
 
@@ -149,3 +153,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination', 'PAGE_SIZE': 10
 }
+
+# reason to split up settings files >
+UPLOADED_FILE_STORAGE_ROOT = os.path.join(BASE_DIR, 'test_setup', 'user_uploaded_data')
+if not os.path.isdir(UPLOADED_FILE_STORAGE_ROOT):
+    os.makedirs(UPLOADED_FILE_STORAGE_ROOT)
