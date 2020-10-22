@@ -1,18 +1,18 @@
 from django.contrib.auth.models import Group
 from rest_framework import serializers
 
-from .models import DataverseUser, Session
+from .models import OpenDPUser #, Session
 
-
+"""
 class SessionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Session
         fields = '__all__'
-
+"""
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = DataverseUser
+        model = OpenDPUser
         fields = ['url', 'username', 'email', 'groups']
 
 

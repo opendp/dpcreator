@@ -40,10 +40,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'polymorphic',
-    'opendp_project',
+    #'opendp_project',
+    'opendp_apps.model_helpers',
+    'opendp_apps.content_pages',
     'opendp_apps.user',
+    'opendp_apps.dataset',
     'opendp_apps.analysis',
-    'opendp_apps.dataset'
+    'opendp_apps.terms_of_access'
 ]
 
 MIDDLEWARE = [
@@ -80,13 +83,20 @@ WSGI_APPLICATION = 'opendp_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+"""
+docker run --rm --name raven-postgres \
+ -e POSTGRES_DB=postgres \
+ -e POSTGRES_USER=postgres \
+ -e POSTGRES_PASSWORD=postgres \
+ -p 5432:5432 postgres
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
-        'HOST': 'db',
+        'HOST': 'db', # 'localhost',
         'PORT': 5432,
     }
 }
@@ -143,3 +153,9 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination', 'PAGE_SIZE': 10
 }
+
+
+# possible reason to split up settings files >
+UPLOADED_FILE_STORAGE_ROOT = os.path.join(BASE_DIR, 'test_setup', 'user_uploaded_data')
+if not os.path.isdir(UPLOADED_FILE_STORAGE_ROOT):
+    os.makedirs(UPLOADED_FILE_STORAGE_ROOT)

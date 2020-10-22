@@ -1,13 +1,15 @@
 import uuid as uuid
 from django.contrib.auth.models import User, AbstractUser
 from django.db import models
+from django.conf import settings
+
 from polymorphic.models import PolymorphicModel
 
 
-class OpenDPUser(AbstractUser, PolymorphicModel):
+class OpenDPUser(AbstractUser): #, PolymorphicModel):
     pass
 
-
+'''
 class DataverseUser(OpenDPUser):
     """
     Extend the base Django user with
@@ -32,7 +34,7 @@ class DataverseUser(OpenDPUser):
         if not self.email or not self.installation:
             raise Exception('Email and installation must be defined')
         super(DataverseUser, self).save(*args, **kwargs)
-
+'''
 
 class Group(models.Model):
     """
@@ -47,7 +49,7 @@ class GroupMembership(models.Model):
     """
     Specify the nature of the User's membership in the group
     """
-    user = models.ForeignKey(DataverseUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
 
     class MembershipTypes(models.TextChoices):
@@ -56,6 +58,7 @@ class GroupMembership(models.Model):
     membership_type = models.CharField(max_length=128, choices=MembershipTypes.choices)
 
 
+'''
 class Session(models.Model):
     """
     Track user interactions with the system coming from Dataverse.
@@ -68,7 +71,7 @@ class Session(models.Model):
 
     # Dataverse user making the request. This will be an extension of the basic
     # Django user object.
-    user = models.ForeignKey(DataverseUser,
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE)
 
     # This will keep track of overall privacy budget usage via the DepositorInfo FK relationship
@@ -102,3 +105,4 @@ class Session(models.Model):
     # before ejecting. Redis keys can be basically arbitrarily large, so
     # leaving this as a TextField for now.
     token_parameters_key = models.TextField()
+'''
