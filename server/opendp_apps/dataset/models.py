@@ -2,6 +2,8 @@ from django.db import models
 from django.db.models import CASCADE
 from polymorphic.models import PolymorphicModel
 
+from opendp_apps.user.models import OpenDPUser
+
 
 class DepositorSetupInfo(models.Model):
     """
@@ -16,6 +18,7 @@ class BaseDataSetInfo(PolymorphicModel):
     or a file upload
     """
     name = models.CharField(max_length=128)
+    creator = models.ForeignKey(OpenDPUser, on_delete=CASCADE)
     # Redis key to store potentially sensitive information
     # during analysis setup
     data_profile_key = models.CharField(max_length=128)

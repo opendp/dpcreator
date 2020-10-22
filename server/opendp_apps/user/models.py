@@ -1,11 +1,14 @@
 import uuid as uuid
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractUser
 from django.db import models
+from polymorphic.models import PolymorphicModel
 
-from ..dataset.models import BaseDataSetInfo
+
+class OpenDPUser(AbstractUser, PolymorphicModel):
+    pass
 
 
-class DataverseUser(User):
+class DataverseUser(OpenDPUser):
     """
     Extend the base Django user with
     Dataverse-specific attributes
@@ -69,7 +72,8 @@ class Session(models.Model):
                              on_delete=models.CASCADE)
 
     # This will keep track of overall privacy budget usage via the DepositorInfo FK relationship
-    dataset_info = models.ForeignKey(BaseDataSetInfo, null=True, blank=True, on_delete=models.CASCADE)
+    # TODO: Commenting this out due to circular import problem
+    # dataset_info = models.ForeignKey(BaseDataSetInfo, null=True, blank=True, on_delete=models.CASCADE)
 
     class SessionTypes(models.TextChoices):
         DEPOSITOR = 'DE', 'Depositor'
