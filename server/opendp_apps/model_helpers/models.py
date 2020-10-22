@@ -14,8 +14,8 @@ class TimestampedModelWithUUID(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4,
+    object_id = models.UUIDField(
+        default=uuid.uuid4,
         editable=False
     )
     class Meta:
