@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'polymorphic',
+    'django_extensions',
     #'opendp_project',
     'opendp_apps.model_helpers',
     'opendp_apps.content_pages',
