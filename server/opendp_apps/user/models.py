@@ -2,12 +2,17 @@ import uuid as uuid
 from django.contrib.auth.models import User, AbstractUser
 from django.db import models
 from django.conf import settings
+from polymorphic.managers import PolymorphicManager
 
 from polymorphic.models import PolymorphicModel
 
 
-class OpenDPUser(AbstractUser): #, PolymorphicModel):
-    pass
+class OpenDPUser(PolymorphicModel, AbstractUser):
+    manager = PolymorphicManager()
+
+    class Meta:
+        base_manager_name = 'manager'
+
 
 '''
 class DataverseUser(OpenDPUser):

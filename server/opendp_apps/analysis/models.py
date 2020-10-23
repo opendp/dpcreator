@@ -5,7 +5,6 @@ from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
 
 
-
 class DepositorSetupInfo(TimestampedModelWithUUID):
     """
     Metadata and aggregate data about potential release of Dataset
@@ -43,8 +42,6 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         super(DepositorSetupInfo, self).save(*args, **kwargs)
 
 
-
-
 class AnalysisPlan(TimestampedModelWithUUID):
     """
     Details of request for a differentially private release
@@ -75,7 +72,7 @@ class AnalysisPlan(TimestampedModelWithUUID):
     def __str__(self):
         return f'{self.dataset} - {self.user_step}'
 
-    def save(self):
+    def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the user_step
         #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
         #       depending on the data
