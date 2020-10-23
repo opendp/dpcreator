@@ -21,26 +21,30 @@ from django.views.generic import TemplateView
 from rest_framework import routers, serializers
 
 from opendp_apps.dataset.views import DepositorSetup
-from opendp_apps.user.models import DataverseUser
-from opendp_apps.user.views import UserViewSet, SessionViewSet
+from opendp_apps.user.models import OpenDPUser
+from opendp_apps.user.views import UserViewSet  #, SessionViewSet
 from opendp_project import settings
-from opendp_project.views import home_view
+from opendp_apps.content_pages.views import view_opendp_welcome
+
+admin.site.site_header = 'OpenDP App Admin Panel'
+admin.site.site_title = 'OpenDP App Admin Panel'
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = DataverseUser
+        model = OpenDPUser
         fields = ['url', 'username', 'email', 'is_staff']
 
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
-router.register(r'sessions', SessionViewSet)
+#router.register(r'sessions', SessionViewSet)
+
 
 urlpatterns = [
-    url(r'^$', home_view),
+    url(r'^$', view_opendp_welcome, name='welcome_page'),
     path('admin/', admin.site.urls),
-    path('api-auth/', include('rest_framework.urls')),    
+    path('api-auth/', include('rest_framework.urls')),
     path('api/', include(router.urls)),
     path('api/deposit/', DepositorSetup.as_view()),
 
