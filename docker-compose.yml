@@ -22,7 +22,7 @@ services:
       - "8080:8080"
     depends_on:
       - db
-  opendp_server:
+  server:
     build: "./server"
     # For production we will need to set
     # these variables to point to a standalone instance

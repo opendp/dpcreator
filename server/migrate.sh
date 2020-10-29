@@ -1,5 +1,12 @@
 #!/bin/sh
-echo "RUNNING MIGRATIONS"
-python manage.py makemigrations
-python manage.py migrate
+echo "-----------------------"
+echo "| Creating Migrations |"
+echo "-----------------------"
+python /code/server/manage.py makemigrations
+echo
+
+echo "-----------------------"
+echo "| Running Migrations  |"
+echo "-----------------------"
+python /code/server/manage.py migrate
 exec "$@"
