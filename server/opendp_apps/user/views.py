@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework import viewsets, permissions
 
 from opendp_apps.user.models import OpenDPUser #Session
@@ -10,6 +9,7 @@ class SessionViewSet(viewsets.ModelViewSet):
     queryset = Session.objects.all()
     serializer_class = SessionSerializer
 """
+
 
 class UserViewSet(viewsets.ModelViewSet):
     """

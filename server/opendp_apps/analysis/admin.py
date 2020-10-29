@@ -14,8 +14,6 @@ class DepositorSetupInfoAdmin(admin.ModelAdmin):
                     'created',)
     readonly_fields = ('id', 'is_complete', 'created', 'updated',)
 
-admin.site.register(DepositorSetupInfo, DepositorSetupInfoAdmin)
-
 
 class AnalysisPlanAdmin(admin.ModelAdmin):
     save_on_top = True
@@ -30,9 +28,6 @@ class AnalysisPlanAdmin(admin.ModelAdmin):
                     'updated',
                     'created',)
     readonly_fields = ('id', 'is_complete', 'created', 'updated',)
-
-admin.site.register(AnalysisPlan, AnalysisPlanAdmin)
-
 
 
 class ReleaseInfoAdmin(admin.ModelAdmin):
@@ -49,5 +44,8 @@ class ReleaseInfoAdmin(admin.ModelAdmin):
                        'dp_release', 'epsilon_used',
                        'created', 'updated',)
 
+
+admin.site.register(DepositorSetupInfo, DepositorSetupInfoAdmin)
+admin.site.register(AnalysisPlan, AnalysisPlanAdmin)
 admin.site.register(ReleaseInfo, ReleaseInfoAdmin)
 
