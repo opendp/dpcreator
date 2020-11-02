@@ -1,5 +1,5 @@
 import uuid as uuid
-from django.contrib.auth.models import User, AbstractUser
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
 from polymorphic.managers import PolymorphicManager
@@ -14,16 +14,11 @@ class OpenDPUser(PolymorphicModel, AbstractUser):
         base_manager_name = 'manager'
 
 
-'''
 class DataverseUser(OpenDPUser):
     """
     Extend the base Django user with
     Dataverse-specific attributes
     """
-
-    # Which dataverse installation user is on
-    installation = models.CharField(max_length=128, null=False, blank=False)
-
     def save(self, *args, **kwargs):
         """
         Custom save method to ensure that Dataverse users
@@ -33,13 +28,8 @@ class DataverseUser(OpenDPUser):
         :return:
         """
         self.set_unusable_password()
-        # Some combination of Dataverse user id + installation name
-        # since we can't guarantee uniqueness across installations
-        self.username = '-'.join([self.email, self.installation])
-        if not self.email or not self.installation:
-            raise Exception('Email and installation must be defined')
         super(DataverseUser, self).save(*args, **kwargs)
-'''
+
 
 class Group(models.Model):
     """
@@ -63,7 +53,6 @@ class GroupMembership(models.Model):
     membership_type = models.CharField(max_length=128, choices=MembershipTypes.choices)
 
 
-'''
 class Session(models.Model):
     """
     Track user interactions with the system coming from Dataverse.
@@ -110,4 +99,3 @@ class Session(models.Model):
     # before ejecting. Redis keys can be basically arbitrarily large, so
     # leaving this as a TextField for now.
     token_parameters_key = models.TextField()
-'''

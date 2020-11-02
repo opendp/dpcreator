@@ -6,7 +6,9 @@ from opendp_apps.model_helpers.models import \
 
 
 class TermsOfAccess(TimestampedModel):
-    """Terms of Access Content"""
+    """
+    Terms of Access Content
+    """
     name = models.CharField(max_length=256)
     active = models.BooleanField(default=True)
     description = models.TextField()
@@ -23,7 +25,9 @@ class TermsOfAccess(TimestampedModel):
 
 
 class TermsOfAccessLog(TimestampedModelWithUUID):
-    """Log of Terms of Access"""
+    """
+    Log of Terms of Access
+    """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     dataset_info = models.ForeignKey(DataSetInfo, on_delete=models.PROTECT)
     terms_of_access = models.ForeignKey(TermsOfAccess, on_delete=models.PROTECT)

@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import TermsOfAccess, TermsOfAccessLog
 
+
 class TermsOfAccessAdmin(admin.ModelAdmin):
     save_on_top = True
     search_fields = ('name', 'description')
@@ -12,8 +13,6 @@ class TermsOfAccessAdmin(admin.ModelAdmin):
                     'updated',
                     'created',)
     readonly_fields = ('created', 'updated',)
-
-admin.site.register(TermsOfAccess, TermsOfAccessAdmin)
 
 
 class TermsOfAccessLogAdmin(admin.ModelAdmin):
@@ -28,5 +27,6 @@ class TermsOfAccessLogAdmin(admin.ModelAdmin):
                     'created',)
     readonly_fields = ('created', 'updated',)
 
-admin.site.register(TermsOfAccessLog, TermsOfAccessLogAdmin)
 
+admin.site.register(TermsOfAccess, TermsOfAccessAdmin)
+admin.site.register(TermsOfAccessLog, TermsOfAccessLogAdmin)
