@@ -15,6 +15,7 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+AUTH_USER_MODEL = 'user.OpenDPUser'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -39,10 +40,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'rest_framework',
-    'opendp_project',
+    'polymorphic',
+    'django_extensions',
+    #'opendp_project',
+    'opendp_apps.model_helpers',
+    'opendp_apps.content_pages',
     'opendp_apps.user',
+    'opendp_apps.dataset',
     'opendp_apps.analysis',
-    'opendp_apps.dataverse'
+    'opendp_apps.terms_of_access'
 ]
 
 MIDDLEWARE = [
@@ -78,25 +84,25 @@ WSGI_APPLICATION = 'opendp_project.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-local = True
-if local:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
+
+"""
+docker run --rm --name raven-postgres \
+ -e POSTGRES_DB=postgres \
+ -e POSTGRES_USER=postgres \
+ -e POSTGRES_PASSWORD=postgres \
+ -p 5432:5432 postgres
+"""
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'db', # 'localhost',
+        #'HOST': 'localhost',
+        'PORT': 5432,
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'postgres',
-            'USER': 'postgres',
-            'PASSWORD': 'postgres',
-            'HOST': 'db',
-            'PORT': 5432,
-        }
-    }
+}
 
 
 # Password validation
@@ -145,7 +151,14 @@ STATICFILES_DIRS = [
 # global settings for the REST framework
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        # 'rest_framework.permissions.IsAdminUser',
+        # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination', 'PAGE_SIZE': 10
 }
+
+
+# possible reason to split up settings files >
+UPLOADED_FILE_STORAGE_ROOT = os.path.join(BASE_DIR, 'test_setup', 'user_uploaded_data')
+if not os.path.isdir(UPLOADED_FILE_STORAGE_ROOT):
+    os.makedirs(UPLOADED_FILE_STORAGE_ROOT)

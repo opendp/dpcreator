@@ -1,19 +1,24 @@
 import uuid as uuid
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.conf import settings
+from polymorphic.managers import PolymorphicManager
 
-from ..dataverse.models import DataverseFile
+from polymorphic.models import PolymorphicModel
 
 
-class DataverseUser(User):
+class OpenDPUser(PolymorphicModel, AbstractUser):
+    manager = PolymorphicManager()
+
+    class Meta:
+        base_manager_name = 'manager'
+
+
+class DataverseUser(OpenDPUser):
     """
     Extend the base Django user with
     Dataverse-specific attributes
     """
-
-    # Which dataverse installation user is on
-    installation = models.CharField(max_length=128, null=False, blank=False)
-
     def save(self, *args, **kwargs):
         """
         Custom save method to ensure that Dataverse users
@@ -23,11 +28,6 @@ class DataverseUser(User):
         :return:
         """
         self.set_unusable_password()
-        # Some combination of Dataverse user id + installation name
-        # since we can't guarantee uniqueness across installations
-        self.username = '-'.join([self.email, self.installation])
-        if not self.email or not self.installation:
-            raise Exception('Email and installation must be defined')
         super(DataverseUser, self).save(*args, **kwargs)
 
 
@@ -44,7 +44,7 @@ class GroupMembership(models.Model):
     """
     Specify the nature of the User's membership in the group
     """
-    user = models.ForeignKey(DataverseUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
 
     class MembershipTypes(models.TextChoices):
@@ -65,11 +65,12 @@ class Session(models.Model):
 
     # Dataverse user making the request. This will be an extension of the basic
     # Django user object.
-    user = models.ForeignKey(DataverseUser,
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE)
 
-    # This will keep track of overall privacy budget usage.
-    dataverse_file = models.ForeignKey(DataverseFile, null=True, blank=True, on_delete=models.CASCADE)
+    # This will keep track of overall privacy budget usage via the DepositorInfo FK relationship
+    # TODO: Commenting this out due to circular import problem
+    # dataset_info = models.ForeignKey(BaseDataSetInfo, null=True, blank=True, on_delete=models.CASCADE)
 
     class SessionTypes(models.TextChoices):
         DEPOSITOR = 'DE', 'Depositor'

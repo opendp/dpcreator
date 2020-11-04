@@ -70,3 +70,24 @@ INSTALLED_APPS = (
 6. Use a browser or viewer to view the created png file, found in the `server/` subdirectory
 
 (This is based on an [existing project](https://github.com/EugeneDae/django-vue-cli-webpack-demo) by EugeneDae. See his project for original documentation.)
+
+## Generating code diagrams
+
+1. Create a Python virtualenv to set up your environment `python3 -m venv venv`
+2. Install PyDotPlus
+`pip install pydotplus`
+3. Install Django Extensions
+`pip install django-extensions`
+4. Configure your Django project to use Django Extensions in settings.py under `server/opendp-projects/`
+```
+INSTALLED_APPS = (
+	...
+	'django_extensions',
+	...
+)
+```
+5. Invoke Django manager with graph models option, from the server/ subdirectory
+`python manage.py graph_models -a -o opendpapp_models.png`
+6. Use a browser or viewer to view the created png file, found in the `server/` subdirectory
+
+(This is based on an [existing project](https://github.com/EugeneDae/django-vue-cli-webpack-demo) by EugeneDae. See his project for original documentation.)

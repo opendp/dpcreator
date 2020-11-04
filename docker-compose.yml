@@ -3,6 +3,9 @@ version: "3.8"
 services:
   redis:
     image: redis
+    command: redis-server --requirepass password
+    expose:
+      - 6379
   db:
    image: postgres
    environment:
@@ -10,15 +13,6 @@ services:
      - POSTGRES_USER=postgres
      - POSTGRES_PASSWORD=postgres
   # TODO: Load data every time
-  opendp_server:
-    build: "./server"
-    command: python server/manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/code
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db
   client:
     build: "./client"
     command: npm run serve
@@ -27,4 +21,19 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - opendp_server
+      - db
+  opendp_server:
+    build: "./server"
+    # For production we will need to set
+    # these variables to point to a standalone instance
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=password
+    command: python server/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - client

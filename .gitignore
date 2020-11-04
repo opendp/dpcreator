@@ -1,4 +1,5 @@
 node_modules
+client/node_modules
 server/db.sqlite3
 server/templates/base-vue.html
 server/static/dist/
@@ -147,3 +148,5 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 .vscode
+.DS_Store
+server/.idea/
