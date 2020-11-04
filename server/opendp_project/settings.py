@@ -41,14 +41,14 @@ INSTALLED_APPS = [
     'django_extensions',
     'rest_framework',
     'polymorphic',
-    'django_extensions',
     #'opendp_project',
     'opendp_apps.model_helpers',
     'opendp_apps.content_pages',
     'opendp_apps.user',
     'opendp_apps.dataset',
     'opendp_apps.analysis',
-    'opendp_apps.terms_of_access'
+    'opendp_apps.terms_of_access',
+    'opendp_apps.dv'
 ]
 
 MIDDLEWARE = [

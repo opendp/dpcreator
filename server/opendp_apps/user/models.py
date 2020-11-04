@@ -7,13 +7,14 @@ from polymorphic.managers import PolymorphicManager
 from polymorphic.models import PolymorphicModel
 
 
-class OpenDPUser(PolymorphicModel, AbstractUser):
-    manager = PolymorphicManager()
-
-    class Meta:
-        base_manager_name = 'manager'
+class OpenDPUser(AbstractUser):
+    pass
+    #manager = PolymorphicManager()
 
 
+
+
+'''
 class DataverseUser(OpenDPUser):
     """
     Extend the base Django user with
@@ -29,7 +30,7 @@ class DataverseUser(OpenDPUser):
         """
         self.set_unusable_password()
         super(DataverseUser, self).save(*args, **kwargs)
-
+'''
 
 class Group(models.Model):
     """

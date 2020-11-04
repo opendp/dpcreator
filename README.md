@@ -14,12 +14,12 @@
 3. The first time you run (or anytime schema changes have been made) 
 you need to run migrate manually:
 
-    `docker-compose run opendp_server python manage.py migrate`
+    `docker-compose run opendp_server python server/manage.py migrate`
 
     (In general, any command can be run by adding "docker-compose run opendp_server" to the beginning, 
 such as:
 
-    `docker-compose run opendp_server python manage.py shell`
+    `docker-compose run opendp_server python server/manage.py shell`
     
 which will drop you into the Django shell on the Docker container.)
 
