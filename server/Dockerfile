@@ -4,10 +4,7 @@ ENV PYTHONUNBUFFERED=1
 RUN mkdir /code
 WORKDIR /code
 
-# Run requirements
-COPY requirements/ /code/requirements
+COPY . /code/server
+WORKDIR /code/server
+
 RUN pip install -r requirements/dev.txt
-
-COPY . /code/
-
-

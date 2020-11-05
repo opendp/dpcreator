@@ -1,25 +1,36 @@
 import uuid as uuid
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
-from polymorphic.managers import PolymorphicManager
 
-from polymorphic.models import PolymorphicModel
-
+from opendp_apps.model_helpers.models import TimestampedModelWithUUID
 
 class OpenDPUser(AbstractUser):
-    pass
-    #manager = PolymorphicManager()
+    """
+    Core App User. May be extended in the future
+    """
+    object_id = models.UUIDField(default=uuid.uuid4, editable=False)
 
 
-
-
-'''
-class DataverseUser(OpenDPUser):
+class DataverseUser(TimestampedModelWithUUID):
     """
     Extend the base Django user with
     Dataverse-specific attributes
     """
+    user = models.ForeignKey(OpenDPUser,
+                             on_delete=models.PROTECT)
+
+    dv_installation = models.CharField(max_length=255)
+    persistent_id = models.CharField(max_length=255) # Persistent DV user id within an installation
+
+    dataverse_email = models.EmailField(max_length=255, blank=True)
+    dataverse_first_name = models.CharField(max_length=255, blank=True)
+    dataverse_last_name = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return f'{self.user} ({self.dv_installation})'
+
     def save(self, *args, **kwargs):
         """
         Custom save method to ensure that Dataverse users
@@ -28,13 +39,12 @@ class DataverseUser(OpenDPUser):
         :param kwargs:
         :return:
         """
-        self.set_unusable_password()
         super(DataverseUser, self).save(*args, **kwargs)
-'''
+
 
 class Group(models.Model):
     """
-    Organize DataverseUsers into (potentially multiple)
+    Organize OpenDP Users into (potentially multiple)
     permission groups, to manage access of releases.
     """
     name = models.CharField(max_length=128)
@@ -54,15 +64,12 @@ class GroupMembership(models.Model):
     membership_type = models.CharField(max_length=128, choices=MembershipTypes.choices)
 
 
-class Session(models.Model):
+'''
+# Move this to a separate app
+class DataverseSession(TimestampedModelWithUUID):
     """
     Track user interactions with the system coming from Dataverse.
     """
-
-    # Unique id used for external representations (URLs, display, etc.) so as not
-    # to expose internal ids
-    uuid = models.UUIDField(primary_key=True,
-                            default=uuid.uuid4, editable=False)
 
     # Dataverse user making the request. This will be an extension of the basic
     # Django user object.
@@ -100,3 +107,4 @@ class Session(models.Model):
     # before ejecting. Redis keys can be basically arbitrarily large, so
     # leaving this as a TextField for now.
     token_parameters_key = models.TextField()
+'''

@@ -5,25 +5,31 @@
 
     `git clone https://github.com/opendifferentialprivacy/opendp-ux.git && cd opendp-ux`
 
-1. `cd server`
-
 2. Tell Docker to turn on the webserver and database: 
 
     `docker-compose up`
+   
+   If major configuration changes have been made (new dependencies, etc.) then the containers will need to be rebuilt:
+   
+   `docker-compose up --rebuild`
+
+1. All subsequent commands should be run from the `server` directory
+   
+   `cd server`
 
 3. The first time you run (or anytime schema changes have been made) 
 you need to run migrate manually:
 
-    `docker-compose run opendp_server python server/manage.py migrate`
+    `docker-compose run server ./migrate.sh`
 
-    (In general, any command can be run by adding "docker-compose run opendp_server" to the beginning, 
+    (In general, any command can be run by adding "docker-compose run server" to the beginning, 
 such as:
 
-    `docker-compose run opendp_server python server/manage.py shell`
+    `docker-compose run server python manage.py shell`
     
 which will drop you into the Django shell on the Docker container.)
 
-## Running without Containers
+## Running without Containers (not recommended)
 
 1. Clone the repo and `cd` into the directory. `git clone https://github.com/opendifferentialprivacy/opendp-ux.git && cd opendp-ux`
 1. Create virtual environment: `python3 -m venv venv`
