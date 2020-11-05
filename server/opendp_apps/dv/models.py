@@ -8,7 +8,7 @@ class RegisteredDataverse(TimestampedModelWithUUID):
     - This is not a substitute for a whitelist but contains a list of Dataverses
       which have external tools pointing to application instance
     """
-    name = models.CharField(unique=True, max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     dataverse_url = models.URLField(unique=True,
                                     help_text='No trailing slash.')
     active = models.BooleanField(default=True)
@@ -36,7 +36,7 @@ class ManifestTestParams(TimestampedModelWithUUID):
     """
     # example: https://dataverse.harvard.edu/file.xhtml?fileId=4164587&datasetVersionId=215032
     # example: https://dataverse.harvard.edu/file.xhtml?persistentId=doi:10.7910/DVN/OLD7MB/ZI4N3J&version=4.2
-    name = models.CharField(blank=True)
+    name = models.CharField(max_length=255, blank=True)
     fileId = models.IntegerField()
     apiSensitiveDataReadToken = models.CharField(max_length=255, blank=True)
     apiGeneralToken = models.CharField(max_length=255, blank=True)
