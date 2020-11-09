@@ -1,6 +1,15 @@
+from urllib.parse import urlencode
+
+from django.core.files.storage import FileSystemStorage
 from django.db import models
+from django.conf import settings
+from django.urls import reverse
+
 from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
+
+UPLOADED_FILE_STORAGE = FileSystemStorage(location=settings.UPLOADED_FILE_STORAGE_ROOT)
+
 
 class RegisteredDataverse(TimestampedModelWithUUID):
     """
@@ -47,7 +56,11 @@ class ManifestTestParams(TimestampedModelWithUUID):
     filePid = models.CharField(max_length=255, blank=True)
     datasetPid = models.CharField(max_length=255, blank=True)
 
-    ddi_file = models.FileField(blank=True, null=True)
+    ddi_content = models.TextField(help_text='Use XML', blank=True)
+
+    raw_file = models.FileField(storage=UPLOADED_FILE_STORAGE,
+                                upload_to='mock-files/%Y/%m/%d/',
+                                blank=True, null=True)
 
 
     def __str__(self):
@@ -65,6 +78,18 @@ class ManifestTestParams(TimestampedModelWithUUID):
     class Meta:
         verbose_name = ('Manifest Test Parameter')
         verbose_name_plural = ('Manifest Test Parameters')
+
+    def get_dataverse_ddi_url(self):
+        """Mock url for retrieving the DDI"""
+        if not self.datasetPid:
+            # Requires the dataset Pid
+            return None
+
+        params = dict(exporter='ddi',
+                      persistentId=self.datasetPid)
+        qstr = urlencode(params)
+
+        return reverse('view_get_dataset_export') + '?' + qstr
 
 
 """

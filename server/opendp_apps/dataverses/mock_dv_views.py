@@ -1,7 +1,7 @@
 """
 Views meant to mimic calls by PyDataverse
 """
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from opendp_apps.dataverses.models import ManifestTestParams
 
 def view_get_info_version(request):
@@ -59,9 +59,42 @@ def view_get_dataset_export(request, format='ddi'):
         return JsonResponse({'status': 'ERROR',
                              'message': user_msg})
 
-    if not mock_params.ddi_file:
-        user_msg = (f'DDI file not available for ManifestTestParams id: {mock_params.id}')
+    if not mock_params.ddi_content:
+        user_msg = (f'DDI info not available for ManifestTestParams id: {mock_params.id}')
         return JsonResponse({'status': 'ERROR',
                              'message': user_msg})
 
+    ddi_download_name = f'ddi_{str(mock_params.id).zfill(5)}.xml'
 
+    response = HttpResponse(mock_params.ddi_content, content_type='application/xml')
+    response['Content-Disposition'] = f'inline;filename={ddi_download_name}'
+
+    return response
+
+
+def view_get_user_info(request, user_token):
+    """
+    Return mock user information
+    """
+    mock_params = ManifestTestParams.objects.filter(apiGeneralToken=user_token).first()
+    if not mock_params:
+        user_msg = (f'ManifestTestParams not found for user_token: {user_token}')
+        return JsonResponse({'status': 'ERROR',
+                             'message': user_msg})
+
+    info_dict = {
+            "authenticationProviderId": "builtin",
+            "persistentUserId": "mockUser",
+            "position": "Depositor",
+            "id": 114,
+            "identifier": "@mockUser",
+            "displayName": "Mock User",
+            "firstName": "Mock",
+            "lastName": "User",
+            "email": "mockUser@some.edu",
+            "superuser": False,
+            "affiliation": "Dataverse.org"
+        }
+
+    return JsonResponse({'status': 'OK',
+                         'data': info_dict})

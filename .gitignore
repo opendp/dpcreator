@@ -150,3 +150,4 @@ cython_debug/
 .vscode
 .DS_Store
 server/.idea/
+server/test_setup/user_uploaded_data/mock-files/2020/11/09/eye-typing.xml
