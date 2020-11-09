@@ -34,7 +34,8 @@ def init_db(context):
     """Initialize the django database (if needed)"""
 
     cmds = (f'python manage.py check;'
-            'python manage.py migrate;')
+            'python manage.py migrate;'
+            'python manage.py loaddata opendp_apps/dataverses/fixtures/test_dataverses_01.json;')
 
     print("Run init_db")
     fab_local(cmds)
@@ -43,7 +44,7 @@ def init_db(context):
 def run_dev(context):
     """Run the Django development server"""
     init_db(context)
-
+    create_django_superuser(context)
     fab_local('python manage.py runserver')
 
 @task

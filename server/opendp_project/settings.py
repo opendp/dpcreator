@@ -10,10 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
-import os
+import os, sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BASE_DIR)
+#sys.path.append(os.path.join(BASE_DIR, 'opendp_apps'))
 
 AUTH_USER_MODEL = 'user.OpenDPUser'
 
@@ -47,7 +49,7 @@ INSTALLED_APPS = [
     'opendp_apps.dataset',
     'opendp_apps.analysis',
     'opendp_apps.terms_of_access',
-    'opendp_apps.dv'
+    'opendp_apps.dataverses',
 ]
 
 MIDDLEWARE = [

@@ -80,3 +80,14 @@ if __name__ == '__main__':
     pprint(descriptions[key])
 
     # print(ddi_obj.get_title())
+
+
+"""
+from pyDataverse.api import Api
+host = 'https://dataverse.harvard.edu'
+api = Api(host)
+#self.api = Api(host, api_token=api_token)
+
+api.get_info_version()
+
+"""

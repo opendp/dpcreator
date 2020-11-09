@@ -36,13 +36,19 @@ class ManifestTestParams(TimestampedModelWithUUID):
     """
     # example: https://dataverse.harvard.edu/file.xhtml?fileId=4164587&datasetVersionId=215032
     # example: https://dataverse.harvard.edu/file.xhtml?persistentId=doi:10.7910/DVN/OLD7MB/ZI4N3J&version=4.2
+    #
+    # fileid=4164587&siteUrl=https://dataverse.harvard.edu&datasetid=4164585&datasetversion=1.0&locale=en
+    #
     name = models.CharField(max_length=255, blank=True)
     fileId = models.IntegerField()
+    siteUrl = models.URLField(max_length=255, blank=True)
     apiSensitiveDataReadToken = models.CharField(max_length=255, blank=True)
     apiGeneralToken = models.CharField(max_length=255, blank=True)
-    siteUrl = models.URLField(max_length=255, blank=True)
     filePid = models.CharField(max_length=255, blank=True)
     datasetPid = models.CharField(max_length=255, blank=True)
+
+    ddi_file = models.FileField(blank=True, null=True)
+
 
     def __str__(self):
         return self.name
@@ -56,7 +62,10 @@ class ManifestTestParams(TimestampedModelWithUUID):
 
         super(ManifestTestParams, self).save(*args, **kwargs)
 
-    #def
+    class Meta:
+        verbose_name = ('Manifest Test Parameter')
+        verbose_name_plural = ('Manifest Test Parameters')
+
 
 """
  {
