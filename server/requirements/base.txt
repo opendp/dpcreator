@@ -16,6 +16,7 @@ pyparsing==2.4.7
 pytz==2020.1
 redis==3.5.3
 requests==2.24.0
+sendgrid==6.4.7
 six==1.15.0
 sqlparse==0.3.1
 urllib3==1.25.10
