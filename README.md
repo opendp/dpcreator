@@ -11,7 +11,7 @@
    
    If major configuration changes have been made (new dependencies, etc.) then the containers will need to be rebuilt:
    
-   `docker-compose up --rebuild`
+   `docker-compose up --build`
 
 1. All subsequent commands should be run from the `server` directory
    

@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'opendp_apps.user',
     'opendp_apps.dataset',
     'opendp_apps.analysis',
-    'opendp_apps.terms_of_access'
+    'opendp_apps.terms_of_access',
+    'opendp_apps.communication'
 ]
 
 MIDDLEWARE = [

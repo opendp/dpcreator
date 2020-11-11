@@ -6,7 +6,7 @@ class EmailMessage(models.Model):
     class ContentTypeChoices(models.TextChoices):
         PLAIN_TEXT = 'text/plain'
         HTML = 'application/html'
-    content_type = models.CharField(choices=ContentTypeChoices.choices)
+    content_type = models.CharField(max_length=128, choices=ContentTypeChoices.choices)
     message_template = models.TextField()
 
 
