@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'polymorphic',
     'django_extensions',
-    #'opendp_project',
     'opendp_apps.model_helpers',
     'opendp_apps.content_pages',
     'opendp_apps.user',
@@ -98,6 +97,7 @@ DATABASES = {
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': 'db',
+       # 'HOST': 'localhost',
         'PORT': 5432,
     }
 }
