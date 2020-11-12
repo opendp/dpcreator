@@ -11,7 +11,12 @@ MOCK_API_PREFIX = 'api'
 MOCK_API_VERSION = 'v1'
 
 urlpatterns = [
-   path(f'{MOCK_API_PREFIX}/{MOCK_API_VERSION}/info/version',
+
+    path(f'dataverse/incoming',
+         mock_dv_views.view_dataverse_incoming,
+         name='view_dataverse_incoming'),
+
+    path(f'{MOCK_API_PREFIX}/{MOCK_API_VERSION}/info/version',
         mock_dv_views.view_get_info_version,
         name='view_get_info_version'),
 

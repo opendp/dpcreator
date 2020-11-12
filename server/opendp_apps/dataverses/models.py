@@ -4,6 +4,7 @@ from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
@@ -51,12 +52,17 @@ class ManifestTestParams(TimestampedModelWithUUID):
     name = models.CharField(max_length=255, blank=True)
     fileId = models.IntegerField()
     siteUrl = models.URLField(max_length=255, blank=True)
+    use_mock_dv_api = models.BooleanField('Use Mock Dataverse API', default=False)
+
+
     apiSensitiveDataReadToken = models.CharField(max_length=255, blank=True)
     apiGeneralToken = models.CharField(max_length=255, blank=True)
     filePid = models.CharField(max_length=255, blank=True)
     datasetPid = models.CharField(max_length=255, blank=True)
 
     ddi_content = models.TextField(help_text='Use XML', blank=True)
+
+    user_info = models.JSONField(null=True, blank=True)
 
     raw_file = models.FileField(storage=UPLOADED_FILE_STORAGE,
                                 upload_to='mock-files/%Y/%m/%d/',
@@ -79,6 +85,19 @@ class ManifestTestParams(TimestampedModelWithUUID):
         verbose_name = ('Manifest Test Parameter')
         verbose_name_plural = ('Manifest Test Parameters')
 
+    @mark_safe
+    def user_info_link(self):
+        """
+        Link to the user info API
+        """
+        if not (self.use_mock_dv_api and self.apiGeneralToken):
+            return 'n/a'
+
+        user_lnk = reverse('view_get_user_info', kwargs=dict(user_token=self.apiGeneralToken))
+        return f'<a href="{user_lnk}">API: user info</a>'
+    user_info_link.allow_tags = True
+
+
     def get_dataverse_ddi_url(self):
         """Mock url for retrieving the DDI"""
         if not self.datasetPid:
@@ -91,6 +110,34 @@ class ManifestTestParams(TimestampedModelWithUUID):
 
         return reverse('view_get_dataset_export') + '?' + qstr
 
+    def get_manifest_url_params(self):
+        """
+        Build a url string with the params
+        """
+        params = dict(fileId=self.fileId,
+                      siteUrl=self.siteUrl,
+                      apiSensitiveDataReadToken=self.apiSensitiveDataReadToken,
+                      apiGeneralToken=self.apiGeneralToken,
+                      datasetPid=self.datasetPid,)
+                      #datasetVersion=self.datasetVersion)
+        qstr = urlencode(params)
+
+        return qstr
+
+    @mark_safe
+    def dataverse_incoming_link(self):
+        """
+        link to mimic incoming DV
+        """
+        if not (self.use_mock_dv_api and self.apiGeneralToken):
+            return 'n/a'
+
+        user_lnk = reverse('view_dataverse_incoming')
+        url_params = self.get_manifest_url_params()
+
+        return f'<a href="{user_lnk}?{url_params}" target="_blank">Mock: Dataverse incoming link</a>'
+
+    dataverse_incoming_link.allow_tags = True
 
 """
  {

@@ -4,6 +4,23 @@ Views meant to mimic calls by PyDataverse
 from django.http import HttpResponse, JsonResponse
 from opendp_apps.dataverses.models import ManifestTestParams
 
+def view_dataverse_incoming(request):
+    """Do something with incoming DV info ..."""
+    outlines = []
+    if request.GET:
+        for k, v in request.GET.items():
+            if v:
+                outlines.append(f'<br /><br /><b>{k}</b>: {v}')
+            else:
+                outlines.append(f'<br /><br /><b>{k}</b>: (not set)')
+
+    if not outlines:
+        return HttpResponse('No GET params found')
+
+    return HttpResponse('\n'.join(outlines))
+
+
+
 def view_get_info_version(request):
     """
     Mock API: Get the Dataverse version and build number.
@@ -82,6 +99,11 @@ def view_get_user_info(request, user_token):
         return JsonResponse({'status': 'ERROR',
                              'message': user_msg})
 
+    if not mock_params.user_info:
+        user_msg = (f'User info not available for ManifestTestParams id: {mock_params.id}')
+        return JsonResponse({'status': 'ERROR',
+                             'message': user_msg})
+    """
     info_dict = {
             "authenticationProviderId": "builtin",
             "persistentUserId": "mockUser",
@@ -92,9 +114,9 @@ def view_get_user_info(request, user_token):
             "firstName": "Mock",
             "lastName": "User",
             "email": "mockUser@some.edu",
-            "superuser": False,
+            "superuser": false,
             "affiliation": "Dataverse.org"
         }
-
+    """
     return JsonResponse({'status': 'OK',
-                         'data': info_dict})
+                         'data': mock_params.user_info})
