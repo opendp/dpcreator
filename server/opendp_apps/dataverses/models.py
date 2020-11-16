@@ -5,6 +5,7 @@ from django.db import models
 from django.conf import settings
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from opendp_apps.dataverses import static_vals as dv_static
 
 from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
@@ -62,6 +63,8 @@ class ManifestTestParams(TimestampedModelWithUUID):
 
     ddi_content = models.TextField(help_text='Use XML', blank=True)
 
+    schema_org_content = models.JSONField(null=True, blank=True)
+
     user_info = models.JSONField(null=True, blank=True)
 
     raw_file = models.FileField(storage=UPLOADED_FILE_STORAGE,
@@ -93,9 +96,38 @@ class ManifestTestParams(TimestampedModelWithUUID):
         if not (self.use_mock_dv_api and self.apiGeneralToken):
             return 'n/a'
 
-        user_lnk = reverse('view_get_user_info', kwargs=dict(user_token=self.apiGeneralToken))
+        user_lnk = reverse('view_get_user_info')
         return f'<a href="{user_lnk}">API: user info</a>'
     user_info_link.allow_tags = True
+
+
+    @mark_safe
+    def ddi_info_link(self):
+        """
+        Retrieve the DDI information
+        """
+        if not (self.use_mock_dv_api and self.ddi_content and self.datasetPid):
+            return 'n/a'
+
+        dataset_lnk = reverse('view_get_dataset_export')
+        return (f'<a href="{dataset_lnk}?persistentId={self.datasetPid}'
+                f'&exporter={dv_static.EXPORTER_FORMAT_DDI}">ddi info</a>')
+    ddi_info_link.allow_tags = True
+
+
+    @mark_safe
+    def schema_org_info_link(self):
+        """
+        Retrieve the schema.org information
+        """
+        if not (self.use_mock_dv_api and self.schema_org_content and self.datasetPid):
+            return 'n/a'
+
+        dataset_lnk = reverse('view_get_dataset_export')
+        return (f'<a href="{dataset_lnk}?persistentId={self.datasetPid}'
+                f'&exporter={dv_static.EXPORTER_FORMAT_SCHEMA_ORG}">schema.org info</a>')
+    schema_org_info_link.allow_tags = True
+
 
 
     def get_dataverse_ddi_url(self):
@@ -129,13 +161,17 @@ class ManifestTestParams(TimestampedModelWithUUID):
         """
         link to mimic incoming DV
         """
-        if not (self.use_mock_dv_api and self.apiGeneralToken):
-            return 'n/a'
+        #if not (self.use_mock_dv_api and self.apiGeneralToken):
+        #    return 'n/a'
 
         user_lnk = reverse('view_dataverse_incoming')
         url_params = self.get_manifest_url_params()
 
-        return f'<a href="{user_lnk}?{url_params}" target="_blank">Mock: Dataverse incoming link</a>'
+        if self.use_mock_dv_api:
+            return f'<a href="{user_lnk}?{url_params}" target="_blank">Mock: Dataverse incoming link</a>'
+        else:
+            return f'<a href="{user_lnk}?{url_params}" target="_blank">Dataverse incoming link (public dataset)</a>'
+
 
     dataverse_incoming_link.allow_tags = True
 

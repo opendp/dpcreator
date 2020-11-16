@@ -1,8 +1,11 @@
 """
 Views meant to mimic calls by PyDataverse
 """
+import json
 from django.http import HttpResponse, JsonResponse
 from opendp_apps.dataverses.models import ManifestTestParams
+from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
+from opendp_apps.dataverses import static_vals as dv_static
 
 def view_dataverse_incoming(request):
     """Do something with incoming DV info ..."""
@@ -21,6 +24,13 @@ def view_dataverse_incoming(request):
     if not outlines:
         return HttpResponse('No GET params found')
 
+    mparams = DataverseManifestParams(request.GET)
+    if mparams.has_error():
+        return HttpResponse(mparams.get_error_message())
+        #print(mparams.get_error_message())
+
+    schema_info = mparams.get_schema_org()
+    return HttpResponse(schema_info)
     return HttpResponse('\n'.join(outlines))
 
 
@@ -64,9 +74,9 @@ def view_get_dataset_export(request, format='ddi'):
     reference: https://github.com/AUSSDA/pyDataverse/blob/master/src/pyDataverse/api.py#L574
     """
     exportFormat = request.GET['exporter'] if 'exporter' in request.GET else None
-    if exportFormat is None or not exportFormat == 'ddi':
+    if exportFormat is None or not exportFormat in dv_static.EXPORTER_FORMATS:
         return JsonResponse({'status': 'ERROR',
-                             'message': 'exporter must be "ddi"'})
+                             'message': f'exporter must be one of {dv_static.EXPORTER_FORMATS}'})
 
     persistentId = request.GET['persistentId'] if 'persistentId' in request.GET else None
     if persistentId is None:
@@ -80,23 +90,44 @@ def view_get_dataset_export(request, format='ddi'):
         return JsonResponse({'status': 'ERROR',
                              'message': user_msg})
 
-    if not mock_params.ddi_content:
-        user_msg = (f'DDI info not available for ManifestTestParams id: {mock_params.id}')
-        return JsonResponse({'status': 'ERROR',
-                             'message': user_msg})
+    # Replicate the DDI API call
+    #
+    if exportFormat == dv_static.EXPORTER_FORMAT_DDI:
+        if not mock_params.ddi_content:
+            user_msg = (f'DDI info not available for ManifestTestParams id: {mock_params.id}')
+            return JsonResponse({'status': 'ERROR',
+                                 'message': user_msg})
 
-    ddi_download_name = f'ddi_{str(mock_params.id).zfill(5)}.xml'
+        ddi_download_name = f'ddi_{str(mock_params.id).zfill(5)}.xml'
 
-    response = HttpResponse(mock_params.ddi_content, content_type='application/xml')
-    response['Content-Disposition'] = f'inline;filename={ddi_download_name}'
+        response = HttpResponse(mock_params.ddi_content, content_type='application/xml')
+        response['Content-Disposition'] = f'inline;filename={ddi_download_name}'
+
+    # Replicate the schema.org API call
+    #
+    elif exportFormat == dv_static.EXPORTER_FORMAT_SCHEMA_ORG:
+        if not mock_params.schema_org_content:
+            user_msg = (f'schema.org content not available for ManifestTestParams id: {mock_params.id}')
+            return JsonResponse({'status': 'ERROR',
+                                 'message': user_msg})
+
+        return JsonResponse({'status': 'OK',
+                             'message': json.dumps(mock_params.schema_org_content)})
 
     return response
 
 
-def view_get_user_info(request, user_token):
+def view_get_user_info(request):
     """
     Return mock user information
     """
+    if dv_static.HEADER_KEY_DATAVERSE not in request.headers:
+        user_msg = (f'"{dv_static.HEADER_KEY_DATAVERSE}" key not found in the request headers')
+        return JsonResponse({'status': 'ERROR',
+                             'message': user_msg})
+
+    user_token = request.headers[dv_static.HEADER_KEY_DATAVERSE]
+
     mock_params = ManifestTestParams.objects.filter(apiGeneralToken=user_token).first()
     if not mock_params:
         user_msg = (f'ManifestTestParams not found for user_token: {user_token}')
@@ -109,17 +140,18 @@ def view_get_user_info(request, user_token):
                              'message': user_msg})
     """
     info_dict = {
-            "authenticationProviderId": "builtin",
-            "persistentUserId": "mockUser",
-            "position": "Depositor",
-            "id": 114,
-            "identifier": "@mockUser",
-            "displayName": "Mock User",
-            "firstName": "Mock",
-            "lastName": "User",
-            "email": "mockUser@some.edu",
-            "superuser": false,
-            "affiliation": "Dataverse.org"
+            "id": 9474,
+            "identifier": "@mock_user",
+            "displayName":"Mock User",
+            "firstName":"Mock",
+            "lastName":"User",
+            "email":"mock_user@some.edu",
+            "superuser":false,
+            "affiliation":"Some University",
+            "persistentUserId":"https://fed.some-it.some.edu/idp/shibboleth|92459eabc12ec34@some.edu",
+            "createdTime":"2000-01-01T05:00:00Z",
+            "lastApiUseTime":"2020-11-16T19:34:51Z",
+            "authenticationProviderId":"shib"
         }
     """
     return JsonResponse({'status': 'OK',

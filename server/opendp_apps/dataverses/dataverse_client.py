@@ -4,6 +4,7 @@ import lxml.etree as etree
 
 from pyDataverse.api import Api
 
+from opendp_apps.dataverses import static_vals as dv_static
 
 class DataverseClient(object):
 
@@ -11,12 +12,19 @@ class DataverseClient(object):
         self._host = host
         self.api = Api(host, api_token=api_token)
 
-    def get_ddi(self, doi, format='ddi'):
+    def get_ddi(self, doi, format=dv_static.EXPORTER_FORMAT_DDI):
         """
         Get DDI metadata file
         """
         response = self.api.get_dataset_export(doi, format)
         return DDI(response.content)
+
+    def get_schema_org(self, doi):
+        """
+        Get DDI metadata file
+        """
+        response = self.api.get_dataset_export(doi, dv_static.EXPORTER_FORMAT_SCHEMA_ORG)
+        return response.content
 
 
 class DDI(object):
