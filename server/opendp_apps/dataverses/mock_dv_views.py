@@ -6,6 +6,10 @@ from opendp_apps.dataverses.models import ManifestTestParams
 
 def view_dataverse_incoming(request):
     """Do something with incoming DV info ..."""
+
+    # user id
+    # call dV api
+
     outlines = []
     if request.GET:
         for k, v in request.GET.items():
