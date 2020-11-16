@@ -1,7 +1,6 @@
 """
 Views meant to mimic calls by PyDataverse
 """
-import json
 from django.http import HttpResponse, JsonResponse
 from opendp_apps.dataverses.models import ManifestTestParams
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
@@ -112,7 +111,7 @@ def view_get_dataset_export(request, format='ddi'):
                                  'message': user_msg})
 
         return JsonResponse({'status': 'OK',
-                             'message': json.dumps(mock_params.schema_org_content)})
+                             'message': mock_params.schema_org_content})
 
     return response
 
