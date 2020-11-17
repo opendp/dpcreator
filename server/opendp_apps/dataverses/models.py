@@ -164,7 +164,7 @@ class ManifestTestParams(TimestampedModelWithUUID):
         #if not (self.use_mock_dv_api and self.apiGeneralToken):
         #    return 'n/a'
 
-        user_lnk = reverse('view_dataverse_incoming')
+        user_lnk = reverse('view_dataverse_incoming_1')
         url_params = self.get_manifest_url_params()
 
         if self.use_mock_dv_api:
@@ -172,29 +172,5 @@ class ManifestTestParams(TimestampedModelWithUUID):
         else:
             return f'<a href="{user_lnk}?{url_params}" target="_blank">Dataverse incoming link (public dataset)</a>'
 
-
     dataverse_incoming_link.allow_tags = True
 
-"""
- {
-        "fileId":"{fileId}"
-      },
-      {
-        "apiSensitiveDataReadToken":"{apiToken}"
-      },
-      {
-        "apiGeneralToken":"{apiToken}"
-      },
-      {
-        "siteUrl":"{siteUrl}"
-      },
-      {
-        "filePid":"{filePid}"
-      },
-      {
-        "datasetPid":"{datasetPid}"
-      },
-      {
-        "datasetVersion":"{datasetVersion}"
-      }
-"""

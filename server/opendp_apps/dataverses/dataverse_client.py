@@ -2,6 +2,7 @@ from urllib.parse import urljoin
 from pprint import pprint
 
 import requests
+from requests.exceptions import ConnectionError
 import lxml.etree as etree
 
 from pyDataverse.api import Api
@@ -26,22 +27,59 @@ class DataverseClient(object):
         """
         Placeholder until pyDataverse API is updated
         """
-        dv_url = urljoin(self._host, '/api/v1/users/:me')
-        print('dv_url', dv_url)
-        headers = {'X-Dataverse-key': api_token}
-        r = requests.get(dv_url, headers=headers)
-        if r.status_code == 200:
-            return ok_resp(r.json())
+        # remove any trailing "/"
+        ye_host = self._host
+        while ye_host.endswith('/'):
+            ye_host = ye_host[:-1]
 
-        return err_resp(f'Status code: {r.status_code}', r.text)
+        # format url
+        dv_url = f'{ye_host}/api/v1/users/:me'
+
+        # make the request
+        headers = {'X-Dataverse-key': api_token}
+        response = requests.get(dv_url, headers=headers)
+        if response.status_code == 200:
+            return ok_resp(response.json())
+
+        try:
+            json_resp = response.json()
+            if 'message' in json_resp:
+                return err_resp(json_resp['message'])
+        except ValueError:
+            pass
+
+        return err_resp(f'Status code: {response.status_code} {response.text}')
 
 
     def get_schema_org(self, doi):
         """
-        Get DDI metadata file
+        Get schema.org data
         """
-        response = self.api.get_dataset_export(doi, dv_static.EXPORTER_FORMAT_SCHEMA_ORG)
-        return response.content
+        return self.get_dataset_export_json(doi, dv_static.EXPORTER_FORMAT_SCHEMA_ORG)
+
+
+    def get_dataset_export_json(self, doi, format_type):
+        """
+        Get dataset export
+        """
+        try:
+            response = self.api.get_dataset_export(doi, format_type)
+        except ConnectionError as err_obj:
+            return err_resp(f'Failed to connect. {err_obj}')
+
+        if response.status_code == 200:
+            return ok_resp(response.json())
+
+        try:
+            json_resp = response.json()
+            if 'message' in json_resp:
+                return err_resp(json_resp['message'])
+        except ValueError:
+            pass
+
+        print('response.status_code', response.status_code)
+        return err_resp(f'Dataset export failed for format {format_type}',
+                        response.content)
 
 
 class DDI(object):

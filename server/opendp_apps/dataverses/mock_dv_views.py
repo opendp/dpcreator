@@ -1,42 +1,35 @@
 """
 Views meant to mimic calls by PyDataverse
 """
+from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from opendp_apps.dataverses.models import ManifestTestParams
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
 from opendp_apps.dataverses import static_vals as dv_static
 
-def view_dataverse_incoming(request):
+def view_dataverse_incoming_1(request):
     """Do something with incoming DV info ..."""
 
-    # user id
-    # call dV api
-
-    outlines = []
-    if request.GET:
-        for k, v in request.GET.items():
-            if v:
-                outlines.append(f'<br /><br /><b>{k}</b>: {v}')
-            else:
-                outlines.append(f'<br /><br /><b>{k}</b>: (not set)')
-
-    if not outlines:
-        return HttpResponse('No GET params found')
+    resp_info = dict(title='Process Incoming Params',
+                     subtitle='Example 1: get user info, schema',
+                     incoming_params = [(k, v) for k, v in request.GET.items()])
 
     mparams = DataverseManifestParams(request.GET)
+
     if mparams.has_error():
-        return HttpResponse(mparams.get_error_message())
-        #print(mparams.get_error_message())
+        resp_info['manifest_param_error'] = mparams.get_error_message()
+    else:
+        # Retrieve user info
+        user_info = mparams.get_user_info()
+        resp_info['user_info'] = user_info
 
-    user_info = mparams.get_user_info()
-    return JsonResponse(user_info.as_dict())
+        # Retrieve dataset citation (JSON-LD)
+        schema_info = mparams.get_schema_org()
+        resp_info['schema_info'] = schema_info
 
-    schema_info = mparams.get_schema_org()
-    return HttpResponse(schema_info)
-
-
-    return HttpResponse('\n'.join(outlines))
-
+    return render(request,
+                  'dataverses/view_mock_incoming_1.html',
+                  resp_info)
 
 
 def view_get_info_version(request):

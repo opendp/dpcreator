@@ -13,8 +13,8 @@ MOCK_API_VERSION = 'v1'
 urlpatterns = [
 
     path(f'dataverse/incoming',
-         mock_dv_views.view_dataverse_incoming,
-         name='view_dataverse_incoming'),
+         mock_dv_views.view_dataverse_incoming_1,
+         name='view_dataverse_incoming_1'),
 
     # Dataverse version and build numbers
     #
