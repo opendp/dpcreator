@@ -1,0 +1,99 @@
+{%  extends "dataverses/test_base.html" %}
+
+{% block main_content %}
+
+ <div class="card shadow-sm">
+      <div class="card-header">
+        <h4 class="my-0 font-weight-normal">(1) Incoming Params from GET request</h4>
+      </div>
+      <div class="card-body">
+
+        {% if DV_HANDLER_ERROR %}
+            <div class="alert alert-danger" role="alert">
+                {{ DV_HANDLER_ERROR }}
+            </div>
+        {% endif %}
+        {% if manifest_param_error %}
+            <div class="alert alert-danger" role="alert">
+                {{ manifest_param_error }}
+            </div>
+        {% else %}
+            <span class="badge badge-success">Success</span>
+        {% endif %}
+        {% if incoming_params %}
+          <table class="table table-bordered table-condensed table-sm">
+          {% for kv_pair in incoming_params %}
+              <tr>
+                  <th>{{ kv_pair.0 }}</th>
+                  <td>{{ kv_pair.1 }}</td>
+              </tr>
+          {% endfor %}
+          </table>
+        {% endif %}
+      </div>
+  </div>
+
+    <br /><br />
+    <div class="card shadow-sm">
+          <div class="card-header">
+            <h4 class="my-0 font-weight-normal">(2) User Info from Dataverse API</h4>
+          </div>
+          <div class="card-body">
+            {% if user_info %}
+                <span class="badge badge-success">Success</span>
+                <br />
+                  <textarea cols="80" rows="8">{{ user_info }}</textarea>
+            {% else %}
+                <span class="badge badge-danger">nope</span>
+            {% endif %}
+          </div>
+      </div>
+
+    <br /><br />
+    <div class="card shadow-sm">
+          <div class="card-header">
+            <h4 class="my-0 font-weight-normal">(3) Dataset Schema Info</h4>
+          </div>
+          <div class="card-body">
+            {% if schema_info %}
+            <span class="badge badge-success">Success</span>
+            <br />
+              <textarea cols="80" rows="8">{{ schema_info }}</textarea>
+            {% else %}
+                <span class="badge badge-danger">nope</span>
+            {% endif %}
+          </div>
+      </div>
+
+      <br /><br />
+      <div class="card shadow-sm">
+          <div class="card-header">
+            <h4 class="my-0 font-weight-normal">(4) File Specific Dataset Schema Info</h4>
+          </div>
+          <div class="card-body">
+            {% if schema_info_for_file %}
+            <span class="badge badge-success">Success</span>
+            <br />
+              <textarea cols="80" rows="8">{{ schema_info_for_file }}</textarea>
+            {% else %}
+                <span class="badge badge-danger">nope</span>
+            {% endif %}
+          </div>
+      </div>
+
+          <br /><br />
+      <div class="card shadow-sm">
+          <div class="card-header">
+            <h4 class="my-0 font-weight-normal">(5) Create/Update Dataverse User</h4>
+          </div>
+          <div class="card-body">
+            {% if dataverse_user %}
+            <span class="badge badge-success">Success</span>
+            <br />
+              <textarea cols="80" rows="8">{{ dataverse_user.as_dict }}</textarea>
+            {% else %}
+                <span class="badge badge-danger">nope</span>
+            {% endif %}
+          </div>
+      </div>
+{% endblock %}

@@ -41,6 +41,17 @@ class DataverseUser(TimestampedModelWithUUID):
         """
         super(DataverseUser, self).save(*args, **kwargs)
 
+    def as_dict(self):
+        """
+        Return several attributes in dict format
+        """
+        return dict(user=str(self.user),
+                    dv_installation=self.dv_installation,
+                    persistent_id=self.persistent_id,
+                    dataverse_email=self.dataverse_email,
+                    dataverse_first_name=self.dataverse_first_name,
+                    dataverse_last_name=self.dataverse_last_name)
+
 
 class Group(models.Model):
     """

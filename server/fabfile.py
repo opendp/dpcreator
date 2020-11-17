@@ -36,7 +36,7 @@ def init_db(context):
     cmds = (f'python manage.py check;'
             'python manage.py migrate;'
             'python manage.py loaddata opendp_apps/dataverses/fixtures/test_dataverses_01.json'
-            ' opendp_apps/dataverses/fixtures/test_manifest_params_03.json;')
+            ' opendp_apps/dataverses/fixtures/test_manifest_params_04.json;')
 
     print("Run init_db")
     fab_local(cmds)

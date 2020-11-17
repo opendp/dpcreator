@@ -1,12 +1,16 @@
 """
 Views meant to mimic calls by PyDataverse
 """
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+
 from django.http import HttpResponse, JsonResponse
 from opendp_apps.dataverses.models import ManifestTestParams
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
+from opendp_apps.dataverses.dataverse_request_handler import DataverseRequestHandler
 from opendp_apps.dataverses import static_vals as dv_static
 
+@login_required
 def view_dataverse_incoming_1(request):
     """Do something with incoming DV info ..."""
 
@@ -31,6 +35,27 @@ def view_dataverse_incoming_1(request):
                   'dataverses/view_mock_incoming_1.html',
                   resp_info)
 
+@login_required
+def view_dataverse_incoming_2(request):
+    """Test the DataverseRequestHandler"""
+    dv_handler = DataverseRequestHandler(request.GET, request.user)
+
+    resp_info = dict(title='Process Incoming Params',
+                     subtitle='Example 2: Test DataverseRequestHandler',
+                     incoming_params = [(k, v) for k, v in request.GET.items()])
+
+    if dv_handler.has_error():
+        resp_info['DV_HANDLER_ERROR'] = dv_handler.get_error_message()
+
+    # Retrieve user info
+    resp_info['user_info'] = dv_handler.user_info
+    resp_info['schema_info'] = dv_handler.schema_info
+    resp_info['schema_info_for_file'] = dv_handler.schema_info_for_file
+    resp_info['dataverse_user'] = dv_handler.dataverse_user
+
+    return render(request,
+                  'dataverses/view_mock_incoming_2.html',
+                  resp_info)
 
 def view_get_info_version(request):
     """
@@ -108,8 +133,7 @@ def view_get_dataset_export(request, format='ddi'):
             return JsonResponse({'status': 'ERROR',
                                  'message': user_msg})
 
-        return JsonResponse({'status': 'OK',
-                             'message': mock_params.schema_org_content})
+        return JsonResponse(mock_params.schema_org_content)
 
     return response
 

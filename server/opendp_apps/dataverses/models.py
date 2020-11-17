@@ -174,3 +174,20 @@ class ManifestTestParams(TimestampedModelWithUUID):
 
     dataverse_incoming_link.allow_tags = True
 
+    @mark_safe
+    def dataverse_incoming_link_2(self):
+        """
+        link to mimic incoming DV
+        """
+        #if not (self.use_mock_dv_api and self.apiGeneralToken):
+        #    return 'n/a'
+
+        user_lnk = reverse('view_dataverse_incoming_2')
+        url_params = self.get_manifest_url_params()
+
+        if self.use_mock_dv_api:
+            return f'<a href="{user_lnk}?{url_params}" target="_blank">Test 2: Mock Dataverse incoming link</a>'
+        else:
+            return f'<a href="{user_lnk}?{url_params}" target="_blank">Test 2: Dataverse incoming link (public dataset)</a>'
+
+    dataverse_incoming_link_2.allow_tags = True
