@@ -4,6 +4,7 @@ Convenience class for assisting with handling Dataverse parameters sent by the e
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.dataverses.dataverse_client import DataverseClient
 
+
 class DataverseManifestParams(BasicErrCheck):
 
     CORE_PARAMS = ['fileId', 'siteUrl', 'datasetPid',]
@@ -53,3 +54,15 @@ class DataverseManifestParams(BasicErrCheck):
         schema_org_content = client.get_schema_org(self.datasetPid)
 
         return schema_org_content
+
+
+    def get_user_info(self):
+        """
+        Return the user information
+        """
+        client = DataverseClient(self.siteUrl, self.apiGeneralToken)
+
+        user_info = client.get_user_info(self.apiGeneralToken)
+        print('user_info', user_info)
+
+        return user_info

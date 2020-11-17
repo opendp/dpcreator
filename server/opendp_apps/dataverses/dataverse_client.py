@@ -1,10 +1,13 @@
+from urllib.parse import urljoin
 from pprint import pprint
 
+import requests
 import lxml.etree as etree
 
 from pyDataverse.api import Api
 
 from opendp_apps.dataverses import static_vals as dv_static
+from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 
 class DataverseClient(object):
 
@@ -18,6 +21,20 @@ class DataverseClient(object):
         """
         response = self.api.get_dataset_export(doi, format)
         return DDI(response.content)
+
+    def get_user_info(self, api_token):
+        """
+        Placeholder until pyDataverse API is updated
+        """
+        dv_url = urljoin(self._host, '/api/v1/users/:me')
+        print('dv_url', dv_url)
+        headers = {'X-Dataverse-key': api_token}
+        r = requests.get(dv_url, headers=headers)
+        if r.status_code == 200:
+            return ok_resp(r.json())
+
+        return err_resp(f'Status code: {r.status_code}', r.text)
+
 
     def get_schema_org(self, doi):
         """

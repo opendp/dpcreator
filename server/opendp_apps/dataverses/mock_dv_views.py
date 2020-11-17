@@ -28,8 +28,13 @@ def view_dataverse_incoming(request):
         return HttpResponse(mparams.get_error_message())
         #print(mparams.get_error_message())
 
+    user_info = mparams.get_user_info()
+    return JsonResponse(user_info.as_dict())
+
     schema_info = mparams.get_schema_org()
     return HttpResponse(schema_info)
+
+
     return HttpResponse('\n'.join(outlines))
 
 
