@@ -21,4 +21,7 @@ install:
 # command to run tests
 script:
   - cd server
-  - python manage.py test
+  # Note: For now excluding tests that use the Django web client, e.g. uses the requests lib
+  - python manage.py test opendp_apps.dataverses.testing.test_dataverse_incoming.DataverseIncomingTest.test_010_dv_params \
+     opendp_apps.dataverses.testing.test_dataverse_incoming.DataverseIncomingTest.test_020_check_dv_handler_directly
+  - cd ..

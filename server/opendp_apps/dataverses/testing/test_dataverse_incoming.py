@@ -95,11 +95,14 @@ class DataverseIncomingTest(TestCase):
         self.assertEqual(dv_user.first_name, 'Mock')  # from test_manifest_params_04.json
         self.assertEqual(dv_user.last_name, 'User')  # from test_manifest_params_04.json
 
+        print('4. Has a DataverseUser file info object been created?')
+        file_info = DataverseFileInfo.objects.filter(creator=self.user_obj, dataverse_file_id=self.mock_params.fileId).first()
+        self.assertTrue(file_info is not None)
+        print('----' + f'{DataverseFileInfo.objects.count()}' + '----------')
 
     def test_030_check_dv_handler_via_url(self):
         """(30) Test DataverseRequestHandler via url"""
         msgt(self.test_030_check_dv_handler_via_url.__doc__)
-
         print('1. Go to page with valid params')
 
         url = reverse('view_dataverse_incoming_2') + '?' + self.mock_params.get_manifest_url_params()
