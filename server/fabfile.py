@@ -118,7 +118,7 @@ def create_django_superuser(context):
     if not settings.DEBUG:
         sys.exit('Only do this when testing')
 
-    create_user(username='admin',
+    create_user(username='dev_admin',
                 first_name='Dev',
                 last_name='Administrator',
                 email='opendp_admin@some.edu',

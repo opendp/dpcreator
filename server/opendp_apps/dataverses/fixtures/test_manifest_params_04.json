@@ -134,7 +134,7 @@
         "siteUrl": "https://dataverse.harvard.edu",
         "use_mock_dv_api": false,
         "apiSensitiveDataReadToken": "some-token",
-        "apiGeneralToken": "d45f0a20-4a2c-4cb7-863a-3a0b6927270a",
+        "apiGeneralToken": "some-other-token",
         "filePid": "",
         "datasetPid": "doi:10.7910/DVN/OLD7MB",
         "ddi_content": "",

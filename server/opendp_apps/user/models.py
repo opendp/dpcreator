@@ -24,9 +24,9 @@ class DataverseUser(TimestampedModelWithUUID):
     dv_installation = models.CharField(max_length=255)
     persistent_id = models.CharField(max_length=255) # Persistent DV user id within an installation
 
-    dataverse_email = models.EmailField(max_length=255, blank=True)
-    dataverse_first_name = models.CharField(max_length=255, blank=True)
-    dataverse_last_name = models.CharField(max_length=255, blank=True)
+    email = models.EmailField(max_length=255, blank=True)
+    first_name = models.CharField(max_length=255, blank=True)
+    last_name = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return f'{self.user} ({self.dv_installation})'
@@ -45,12 +45,17 @@ class DataverseUser(TimestampedModelWithUUID):
         """
         Return several attributes in dict format
         """
-        return dict(user=str(self.user),
+        return dict(id=self.id,
+                    user=str(self.user),
                     dv_installation=self.dv_installation,
                     persistent_id=self.persistent_id,
-                    dataverse_email=self.dataverse_email,
-                    dataverse_first_name=self.dataverse_first_name,
-                    dataverse_last_name=self.dataverse_last_name)
+                    email=self.email,
+                    first_name=self.first_name,
+                    last_name=self.last_name,
+                    updated=str(self.updated),
+                    created=str(self.created),
+                    object_id=self.object_id.hex)
+
 
 
 class Group(models.Model):

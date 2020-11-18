@@ -93,14 +93,14 @@ docker run --rm --name raven-postgres \
  -e POSTGRES_PASSWORD=postgres \
  -p 5432:5432 postgres
 """
-DATABASES_DEFAULT = {
+DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
-        'HOST': 'db',
-        #'HOST': 'localhost',
+        #'HOST': 'db',
+        'HOST': 'localhost',
         'PORT': 5432,
     }
 }

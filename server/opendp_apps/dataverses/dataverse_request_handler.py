@@ -28,6 +28,7 @@ from opendp_apps.dataverses import static_vals as dv_static
 # from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.user.models import DataverseUser, OpenDPUser
+from opendp_apps.dataset.models import DataverseFileInfo
 
 
 class DataverseRequestHandler(BasicErrCheck):
@@ -47,12 +48,15 @@ class DataverseRequestHandler(BasicErrCheck):
 
         self.user = user
 
+        # In memory data
         self.user_info = None
         self.schema_info = None
         self.schema_info_for_file = None
         self.ddi_info = None
 
+        # References to Django model instances
         self.dataverse_user = None
+        self.dataverse_file_info = None
 
         self.process_dv_request()
 
@@ -64,17 +68,23 @@ class DataverseRequestHandler(BasicErrCheck):
         if self.has_error():
             return
 
+        # Retrieve minimal data to do work
+        #
         if not self.retrieve_user_info():
             return
 
         if not self.retrieve_schema_org_info():
             return
 
-        # (do more here)
+        # DDI...
 
+        # Yes, we have all the necessary data, start updating models/tables
+        #
         if not self.update_dataverse_user_info():
             return
 
+        if not self.update_dataverse_file_info():
+            return
 
 
     def retrieve_user_info(self):
@@ -135,10 +145,6 @@ class DataverseRequestHandler(BasicErrCheck):
         if self.has_error():
             return False
 
-        print('---   hahahah -----')
-        print(type(self.user_info))
-        print(self.user_info)
-
         dv_persistent_id = self.user_info.get(dv_static.DV_PERSISTENT_USER_ID)
         if not dv_persistent_id:
             user_msg = (f'Could not find "{dv_static.DV_PERSISTENT_USER_ID}"'
@@ -153,11 +159,32 @@ class DataverseRequestHandler(BasicErrCheck):
 
         # update params, if needed
         self.dataverse_user.email = self.user_info.get(dv_static.DV_EMAIL)
-        self.dataverse_user.dataverse_first_name = self.user_info.get(dv_static.DV_FIRST_NAME)
-        self.dataverse_user.dataverse_last_name = self.user_info.get(dv_static.DV_LAST_NAME)
+        self.dataverse_user.first_name = self.user_info.get(dv_static.DV_FIRST_NAME)
+        self.dataverse_user.last_name = self.user_info.get(dv_static.DV_LAST_NAME)
 
         self.dataverse_user.save()
         return True
+
+    def update_dataverse_file_info(self):
+        """
+        Retrieve or create a DataverseFileInfo object
+        """
+        query_params = dict(source=DataverseFileInfo.SourceChoices.Dataverse,
+                            installation_name=self.mparams.siteUrl,
+                            dataverse_file_id=self.mparams.fileId
+                            )
+        defaults = dict(creator=self.user,
+                        name=self.schema_info_for_file.get(dv_static.SCHEMA_KEY_NAME, f'DV file {self.mparams.filePid}'),
+                        dataset_doi=self.mparams.datasetPid,
+                        file_doi=self.mparams.filePid if self.mparams.filePid else '')
+
+        dv_file_info, _created = DataverseFileInfo.objects.get_or_create(**query_params, defaults=defaults)
+
+        self.dataverse_file_info = dv_file_info
+
+        return True
+
+        # Need to check depositor status, is file in use, is there a release, etc...
 
 
 """ 

@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from django.core.files.storage import FileSystemStorage
 
 from django.db import models
@@ -42,21 +43,37 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     def __str__(self):
         return self.name
 
+    def as_dict(self):
+        """
+        Return as dict
+        """
+        info = dict(id=self.id,
+                    creator=str(self.creator),
+                    source=str(self.source),
+                    updated=str(self.updated),
+                    created=str(self.created),
+                    object_id=self.object_id.hex)
 
+        return info
 
 class DataverseFileInfo(DataSetInfo):
     """
     Refers to a DV file from within a DV dataset
     """
     # TODO: This should have all fields from DV API response
+    installation_name = models.CharField(max_length=255)
     dataverse_file_id = models.IntegerField()
-    doi = models.CharField(max_length=128)
-    installation_name = models.CharField(max_length=128)
+    dataset_doi = models.CharField(max_length=255)
+    file_doi = models.CharField(max_length=255, blank=True)
 
     class Meta:
         verbose_name = 'Dataverse File Information'
         verbose_name_plural = 'Dataverse File Information'
         ordering = ('name', '-created')
+        constraints = [
+            models.UniqueConstraint(fields=['installation_name', 'dataverse_file_id'],
+                                    name='unique Dataverse file')
+        ]
 
     def __str__(self):
         return f'{self.name} ({self.installation_name})'
@@ -69,7 +86,23 @@ class DataverseFileInfo(DataSetInfo):
         self.source = DataSetInfo.SourceChoices.Dataverse
         super(DataverseFileInfo, self).save(*args, **kwargs)
 
+    def as_dict(self):
+        """
+        Return as dict
+        """
+        info = dict(id=self.id,
+                    name=self.name,
+                    creator=str(self.creator),
+                    source=str(self.source),
+                    installation_name=self.installation_name,
+                    dataverse_file_id=self.dataverse_file_id,
+                    dataset_doi=self.dataset_doi,
+                    file_doi=self.file_doi,
+                    updated=str(self.updated),
+                    created=str(self.created),
+                    object_id=self.object_id.hex)
 
+        return info
 
 class UploadFileInfo(DataSetInfo):
     """
@@ -97,3 +130,18 @@ class UploadFileInfo(DataSetInfo):
 
     def __str__(self):
         return f'{self.name} ({self.source})'
+
+    def as_dict(self):
+        """
+        Return as dict
+        """
+        info = dict(self.id,
+                    name=self.name,
+                    creator=str(self.creator),
+                    source=str(self.source),
+                    data_file=self.data_file,
+                    updated=str(self.updated),
+                    created=str(self.created),
+                    object_id=self.object_id.hex)
+
+        return info

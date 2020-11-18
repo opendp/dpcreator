@@ -75,7 +75,6 @@ class DataverseManifestParams(BasicErrCheck):
         client = DataverseClient(self.siteUrl, self.apiGeneralToken)
 
         user_info = client.get_user_info(self.apiGeneralToken)
-        print('user_info', user_info)
 
         return user_info
 

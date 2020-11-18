@@ -52,6 +52,7 @@ def view_dataverse_incoming_2(request):
     resp_info['schema_info'] = dv_handler.schema_info
     resp_info['schema_info_for_file'] = dv_handler.schema_info_for_file
     resp_info['dataverse_user'] = dv_handler.dataverse_user
+    resp_info['dataverse_file_info'] = dv_handler.dataverse_file_info
 
     return render(request,
                   'dataverses/view_mock_incoming_2.html',

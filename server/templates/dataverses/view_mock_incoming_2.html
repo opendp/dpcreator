@@ -36,7 +36,7 @@
     <br /><br />
     <div class="card shadow-sm">
           <div class="card-header">
-            <h4 class="my-0 font-weight-normal">(2) User Info from Dataverse API</h4>
+            <h4 class="my-0 font-weight-normal">(2) User Info retrieved via Dataverse API</h4>
           </div>
           <div class="card-body">
             {% if user_info %}
@@ -52,13 +52,32 @@
     <br /><br />
     <div class="card shadow-sm">
           <div class="card-header">
-            <h4 class="my-0 font-weight-normal">(3) Dataset Schema Info</h4>
+            <h4 class="my-0 font-weight-normal">(3) Dataset Schema Info retrieved via Dataverse API</h4>
           </div>
           <div class="card-body">
+            <p>Retrieved via API from Dataverse. This supplies a description, citation info, file name, filesize,  etc.</p>
             {% if schema_info %}
             <span class="badge badge-success">Success</span>
             <br />
               <textarea cols="80" rows="8">{{ schema_info }}</textarea>
+
+                <hr />
+               <p>Pulled from ^:</p>
+              <table class="table table-bordered table-condensed table-sm">
+                <tr>
+                    <th>Identifier</th>
+                    <td>{{ schema_info.identifier }}</td>
+                </tr>
+                <tr>
+                    <th>Name</th>
+                    <td>{{ schema_info.name }}</td>
+                </tr>
+                  <tr>
+                    <th>Citation</th>
+                    <td>{{ schema_info.citation.0.text|safe }}</td>
+                </tr>
+              </table>
+
             {% else %}
                 <span class="badge badge-danger">nope</span>
             {% endif %}
@@ -68,9 +87,12 @@
       <br /><br />
       <div class="card shadow-sm">
           <div class="card-header">
-            <h4 class="my-0 font-weight-normal">(4) File Specific Dataset Schema Info</h4>
+            <h4 class="my-0 font-weight-normal">(4) Pull File Specific Schema Info (no API call)</h4>
           </div>
           <div class="card-body">
+              <p>Check the datasets's schema.org JSON info for file specific information
+                  by using the <b>fileId</b> from the "incoming params".</p>
+
             {% if schema_info_for_file %}
             <span class="badge badge-success">Success</span>
             <br />
@@ -87,10 +109,29 @@
             <h4 class="my-0 font-weight-normal">(5) Create/Update Dataverse User</h4>
           </div>
           <div class="card-body">
+              <p>Create or update a DataverseUser object. This object is an FK to the OpenDP user.</p>
+              <p>Displayed below are the parameters saved in the DataverseUser object</p>
             {% if dataverse_user %}
             <span class="badge badge-success">Success</span>
             <br />
               <textarea cols="80" rows="8">{{ dataverse_user.as_dict }}</textarea>
+            {% else %}
+                <span class="badge badge-danger">nope</span>
+            {% endif %}
+          </div>
+      </div>
+
+      <div class="card shadow-sm">
+          <div class="card-header">
+            <h4 class="my-0 font-weight-normal">(6) Create/Update DataverseFileInfo</h4>
+          </div>
+          <div class="card-body">
+              <p>Create or update a DataverseUser object. This object is an FK to the OpenDP user.</p>
+              <p>Displayed below are the parameters saved in the DataverseUser object</p>
+            {% if dataverse_file_info %}
+            <span class="badge badge-success">Success</span>
+            <br />
+              <textarea cols="80" rows="8">{{ dataverse_file_info.as_dict }}</textarea>
             {% else %}
                 <span class="badge badge-danger">nope</span>
             {% endif %}
