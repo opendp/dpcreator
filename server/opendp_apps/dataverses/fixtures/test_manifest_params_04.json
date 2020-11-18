@@ -127,7 +127,7 @@
     "pk": 2,
     "fields": {
         "created": "2020-11-16T20:49:06.899Z",
-        "updated": "2020-11-17T21:46:50.261Z",
+        "updated": "2020-11-18T18:00:19.100Z",
         "object_id": "66b8429b-1272-4557-92d0-dc1d3a4aba70",
         "name": "crisis.tab",
         "fileId": 101649,
@@ -137,6 +137,27 @@
         "apiGeneralToken": "some-other-token",
         "filePid": "",
         "datasetPid": "doi:10.7910/DVN/OLD7MB",
+        "ddi_content": "",
+        "schema_org_content": null,
+        "user_info": null,
+        "raw_file": ""
+    }
+},
+{
+    "model": "dataverses.manifesttestparams",
+    "pk": 4,
+    "fields": {
+        "created": "2020-11-18T17:52:14.045Z",
+        "updated": "2020-11-18T20:55:36.723Z",
+        "object_id": "923965bb-d0a4-4a12-8821-85d67dfd2490",
+        "name": "Permits.Ecometrics.CBG.2010.tab",
+        "fileId": 4034504,
+        "siteUrl": "https://dataverse.harvard.edu/",
+        "use_mock_dv_api": false,
+        "apiSensitiveDataReadToken": "some-token",
+        "apiGeneralToken": "some-other-token",
+        "filePid": "doi:10.7910/DVN/B7DHBK/BSNYLQ",
+        "datasetPid": "doi:10.7910/DVN/B7DHBK",
         "ddi_content": "",
         "schema_org_content": null,
         "user_info": null,
