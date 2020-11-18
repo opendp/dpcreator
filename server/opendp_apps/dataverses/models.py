@@ -142,16 +142,23 @@ class ManifestTestParams(TimestampedModelWithUUID):
 
         return reverse('view_get_dataset_export') + '?' + qstr
 
-    def get_manifest_url_params(self):
+    def as_dict(self):
         """
-        Build a url string with the params
+        Return the params as a Python dict
         """
         params = dict(fileId=self.fileId,
                       siteUrl=self.siteUrl,
                       apiSensitiveDataReadToken=self.apiSensitiveDataReadToken,
                       apiGeneralToken=self.apiGeneralToken,
-                      datasetPid=self.datasetPid,)
-                      #datasetVersion=self.datasetVersion)
+                      datasetPid=self.datasetPid, )
+        return params
+
+    def get_manifest_url_params(self):
+        """
+        Build a url string with the params
+        """
+        params = self.as_dict()
+
         qstr = urlencode(params)
 
         return qstr

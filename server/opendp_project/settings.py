@@ -93,17 +93,18 @@ docker run --rm --name raven-postgres \
  -e POSTGRES_PASSWORD=postgres \
  -p 5432:5432 postgres
 """
-DATABASES = {
+DATABASES_DEFAULT = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
-        #'HOST': 'db',
-        'HOST': 'localhost',
+        'HOST': 'db',
+        #'HOST': 'localhost',
         'PORT': 5432,
     }
 }
+
 
 
 # Password validation
@@ -160,6 +161,7 @@ REST_FRAMEWORK = {
 
 
 # possible reason to split up settings files >
+
 UPLOADED_FILE_STORAGE_ROOT = os.path.join(BASE_DIR, 'test_setup', 'user_uploaded_data')
 if not os.path.isdir(UPLOADED_FILE_STORAGE_ROOT):
     os.makedirs(UPLOADED_FILE_STORAGE_ROOT)
