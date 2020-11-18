@@ -22,5 +22,5 @@ install:
 script:
   - cd server
   # Note: For now excluding tests that use the Django web client, e.g. uses the requests lib
-  - python manage.py test opendp_apps.dataverses.testing.test_dataverse_incoming.DataverseIncomingTest.test_010_dv_params opendp_apps.dataverses.testing.test_dataverse_incoming.DataverseIncomingTest.test_020_check_dv_handler_directly
+  - python manage.py test --exclude-tag=web-client
   - cd ../

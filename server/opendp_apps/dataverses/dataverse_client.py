@@ -67,17 +67,24 @@ class DataverseClient(object):
         except ConnectionError as err_obj:
             return err_resp(f'Failed to connect. {err_obj}')
 
+        #print('response.status_code', response.status_code)
+        #print('get_dataset_export_json', response.text)
+
         if response.status_code == 200:
-            return ok_resp(response.json())
+            try:
+                json_resp = response.json()
 
-        try:
-            json_resp = response.json()
-            if 'message' in json_resp:
-                return err_resp(json_resp['message'])
-        except ValueError:
-            pass
+                # Is there an error message in the response?
+                if dv_static.DV_KEY_STATUS in json_resp:
+                    if json_resp[dv_static.DV_KEY_STATUS] == dv_static.STATUS_VAL_ERROR:
+                        # why, yes there is
+                        return err_resp(json_resp[dv_static.DV_KEY_MESSAGE])
+                else:
+                    return ok_resp(json_resp)
+            except ValueError:
+                pass
 
-        print('response.status_code', response.status_code)
+        #print('response.status_code', response.status_code)
         return err_resp(f'Dataset export failed for format {format_type}',
                         response.content)
 

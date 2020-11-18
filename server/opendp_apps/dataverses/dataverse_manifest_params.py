@@ -22,7 +22,7 @@ class DataverseManifestParams(BasicErrCheck):
                                     ' Django QueryDict object (e.g. request.GET)'))
             return
 
-        self.fileId = self.format_param(incoming_params.get(dv_static.DV_PARAM_FILEID))
+        self.fileId = self.format_param(incoming_params.get(dv_static.DV_PARAM_FILE_ID))
         self.siteUrl = self.format_param(incoming_params.get(dv_static.DV_PARAM_SITE_URL))
         self.datasetPid = self.format_param(incoming_params.get(dv_static.DV_PARAM_DATASET_PID))
         self.filePid = self.format_param(incoming_params.get(dv_static.DV_PARAM_FILE_PID))

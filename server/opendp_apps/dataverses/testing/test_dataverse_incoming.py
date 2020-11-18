@@ -2,14 +2,15 @@ import json
 from unittest import skip
 import tempfile
 
-from django.test import Client
-from django.test import TestCase
+from django.test import Client, tag, TestCase
 from django.urls import reverse
+
 from django.conf import settings
 from django.template.loader import render_to_string
 
 from django.contrib.auth import get_user_model
 
+from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.models import ManifestTestParams
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
 from opendp_apps.dataverses.dataverse_request_handler import DataverseRequestHandler
@@ -17,6 +18,7 @@ from opendp_apps.user.models import DataverseUser
 from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.model_helpers.msg_util import msgt
 
+TAG_WEB_CLIENT = 'web-client' # skip these tests on travis
 
 class DataverseIncomingTest(TestCase):
 
@@ -100,9 +102,36 @@ class DataverseIncomingTest(TestCase):
         self.assertTrue(file_info is not None)
         #print('----' + f'{DataverseFileInfo.objects.count()}' + '----------')
 
-    def test_030_check_dv_handler_via_url(self):
-        """(30) Test DataverseRequestHandler via url"""
-        msgt(self.test_030_check_dv_handler_via_url.__doc__)
+
+    def test_030_dv_handler_bad_param(self):
+        """(30) Test DataverseRequestHandler with bad params"""
+        msgt(self.test_030_dv_handler_bad_param.__doc__)
+
+        print('1. Test with bad file id param')
+        params = self.mock_params.as_dict()
+        params[dv_static.DV_PARAM_FILE_ID] = 777777  # bad file Id
+        dv_handler = DataverseRequestHandler(params, self.user_obj)
+
+        self.assertTrue(dv_handler.has_error())
+        print(dv_handler.get_err_msg())
+        self.assertTrue(dv_handler.get_err_msg().find(dv_static.DV_PARAM_FILE_ID) > -1)
+
+
+        print('2. Test with bad datasetPid param')
+        params = self.mock_params.as_dict()
+        params[dv_static.DV_PARAM_DATASET_PID] = 'cool-breeze'  # datasetPid
+        dv_handler = DataverseRequestHandler(params, self.user_obj)
+        print('schema_info', dv_handler.schema_info)
+        self.assertTrue(dv_handler.has_error())
+        print(dv_handler.get_err_msg())
+        self.assertTrue(dv_handler.get_err_msg().find('cool-breeze' ) > -1)
+        self.assertTrue(dv_handler.schema_info is None)
+
+
+    @tag(TAG_WEB_CLIENT)
+    def test_100_check_dv_handler_via_url(self):
+        """(100) Test DataverseRequestHandler via url"""
+        msgt(self.test_100_check_dv_handler_via_url.__doc__)
         print('1. Go to page with valid params')
 
         url = reverse('view_dataverse_incoming_2') + '?' + self.mock_params.get_manifest_url_params()
@@ -131,9 +160,10 @@ class DataverseIncomingTest(TestCase):
         file_info = DataverseFileInfo.objects.filter(creator=self.user_obj).first()
         self.assertTrue(file_info is not None)
 
-    def test_040_check_dv_handler_via_url_no_params(self):
-        """(40) Test DataverseRequestHandler via url with no parameters"""
-        msgt(self.test_040_check_dv_handler_via_url_no_params.__doc__)
+    @tag(TAG_WEB_CLIENT)
+    def test_110_check_dv_handler_via_url_no_params(self):
+        """(110) Test DataverseRequestHandler via url with no parameters"""
+        msgt(self.test_110_check_dv_handler_via_url_no_params.__doc__)
 
         print('1. Go to page with NO params')
         #
