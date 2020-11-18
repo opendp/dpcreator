@@ -98,7 +98,7 @@ class DataverseIncomingTest(TestCase):
         print('4. Has a DataverseUser file info object been created?')
         file_info = DataverseFileInfo.objects.filter(creator=self.user_obj, dataverse_file_id=self.mock_params.fileId).first()
         self.assertTrue(file_info is not None)
-        print('----' + f'{DataverseFileInfo.objects.count()}' + '----------')
+        #print('----' + f'{DataverseFileInfo.objects.count()}' + '----------')
 
     def test_030_check_dv_handler_via_url(self):
         """(30) Test DataverseRequestHandler via url"""
