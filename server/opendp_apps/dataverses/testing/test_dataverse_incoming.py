@@ -18,7 +18,7 @@ from opendp_apps.user.models import DataverseUser
 from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.model_helpers.msg_util import msgt
 
-TAG_WEB_CLIENT = 'web-client' # skip these tests on travis
+TAG_WEB_CLIENT = 'web-client' # skip these tests on travis; need to fix as many use requests to access the localhost
 
 class DataverseIncomingTest(TestCase):
 
@@ -75,7 +75,7 @@ class DataverseIncomingTest(TestCase):
         self.assertTrue(err_msg.find('apiGeneralToken') > -1)
         print(dv_manifest.get_error_message())
 
-
+    @tag(TAG_WEB_CLIENT)
     def test_020_check_dv_handler_directly(self):
         """(20) Test DataverseRequestHandler directly"""
         msgt(self.test_020_check_dv_handler_directly.__doc__)
@@ -102,7 +102,7 @@ class DataverseIncomingTest(TestCase):
         self.assertTrue(file_info is not None)
         #print('----' + f'{DataverseFileInfo.objects.count()}' + '----------')
 
-
+    @tag(TAG_WEB_CLIENT)
     def test_030_dv_handler_bad_param(self):
         """(30) Test DataverseRequestHandler with bad params"""
         msgt(self.test_030_dv_handler_bad_param.__doc__)
