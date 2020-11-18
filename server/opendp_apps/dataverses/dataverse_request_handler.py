@@ -38,15 +38,6 @@ class DataverseRequestHandler(BasicErrCheck):
         manifest_params - Django request.GET or python dict
         """
         self.mparams = DataverseManifestParams(manifest_params)
-        if self.mparams.has_error():
-            self.add_err_msg(self.mparams.get_error_message())
-            return
-
-        if not isinstance(user, OpenDPUser):
-            self.add_err_msg('User must be an OpenDPUser object')
-            return
-
-        self.user = user
 
         # In memory data
         self.user_info = None
@@ -57,6 +48,16 @@ class DataverseRequestHandler(BasicErrCheck):
         # References to Django model instances
         self.dataverse_user = None
         self.dataverse_file_info = None
+
+        if self.mparams.has_error():
+            self.add_err_msg(self.mparams.get_error_message())
+            return
+
+        if not isinstance(user, OpenDPUser):
+            self.add_err_msg('User must be an OpenDPUser object')
+            return
+
+        self.user = user
 
         self.process_dv_request()
 
@@ -145,6 +146,16 @@ class DataverseRequestHandler(BasicErrCheck):
         if self.has_error():
             return False
 
+        {'id': 11086,
+         'identifier': '@raman_prasad',
+         'displayName': 'Raman Prasad',
+         'firstName': 'Raman',
+         'lastName': 'Prasad', 'email': 'raman_prasad@harvard.edu', 'superuser': False,
+         'affiliation': 'Harvard University',
+         'persistentUserId': 'https://fed.huit.harvard.edu/idp/shibboleth|0e459e6d562ec7e5@harvard.edu',
+         'createdTime': '2000-01-01T05:00:00Z', 'lastApiUseTime': '2020-11-16T21:52:14Z',
+         'authenticationProviderId': 'shib'}
+
         dv_persistent_id = self.user_info.get(dv_static.DV_PERSISTENT_USER_ID)
         if not dv_persistent_id:
             user_msg = (f'Could not find "{dv_static.DV_PERSISTENT_USER_ID}"'
@@ -153,9 +164,9 @@ class DataverseRequestHandler(BasicErrCheck):
             return False
 
         self.dataverse_user, _created = DataverseUser.objects.get_or_create(
-                                            user=self.user,
-                                            dv_installation=self.mparams.siteUrl,
-                                            persistent_id=dv_persistent_id)
+                                            user=self.user,     # logged in user
+                                            dv_installation=self.mparams.siteUrl, # from GET request
+                                            persistent_id=dv_persistent_id)     # from User Info
 
         # update params, if needed
         self.dataverse_user.email = self.user_info.get(dv_static.DV_EMAIL)
@@ -173,7 +184,7 @@ class DataverseRequestHandler(BasicErrCheck):
                             installation_name=self.mparams.siteUrl,
                             dataverse_file_id=self.mparams.fileId
                             )
-        defaults = dict(creator=self.user,
+        defaults = dict(creator=self.user,  # logged in user, OpenDP user
                         name=self.schema_info_for_file.get(dv_static.SCHEMA_KEY_NAME, f'DV file {self.mparams.filePid}'),
                         dataset_doi=self.mparams.datasetPid,
                         file_doi=self.mparams.filePid if self.mparams.filePid else '')

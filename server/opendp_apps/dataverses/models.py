@@ -150,7 +150,8 @@ class ManifestTestParams(TimestampedModelWithUUID):
                       siteUrl=self.siteUrl,
                       apiSensitiveDataReadToken=self.apiSensitiveDataReadToken,
                       apiGeneralToken=self.apiGeneralToken,
-                      datasetPid=self.datasetPid, )
+                      datasetPid=self.datasetPid,
+                      filePid=self.filePid)
         return params
 
     def get_manifest_url_params(self):

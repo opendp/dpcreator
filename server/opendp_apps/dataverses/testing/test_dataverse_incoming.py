@@ -14,7 +14,7 @@ from opendp_apps.dataverses.models import ManifestTestParams
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
 from opendp_apps.dataverses.dataverse_request_handler import DataverseRequestHandler
 from opendp_apps.user.models import DataverseUser
-
+from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.model_helpers.msg_util import msgt
 
 
@@ -47,6 +47,7 @@ class DataverseIncomingTest(TestCase):
         #
         params_dict = self.mock_params.as_dict()
         dv_manifest = DataverseManifestParams(params_dict)
+        #print(dv_manifest.get_error_message())
         self.assertTrue(dv_manifest.has_error() is False)
 
         print('3. Test with missing param. fileId')
@@ -96,17 +97,48 @@ class DataverseIncomingTest(TestCase):
 
 
     def test_030_check_dv_handler_via_url(self):
-        """(30) Test DataverseRequestHandler directly"""
+        """(30) Test DataverseRequestHandler via url"""
         msgt(self.test_030_check_dv_handler_via_url.__doc__)
 
+        print('1. Go to page with valid params')
 
         url = reverse('view_dataverse_incoming_2') + '?' + self.mock_params.get_manifest_url_params()
-
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
         # Look for content on the web page
-        print('type', type(response.content))
-        self.assertTrue(response.content.decode().find('Replication Data for: Eye-typing experiment') > -1)
-        #self.assertTrue(response.content.find('mock_user@some.edu') > -1)
+        page_content = response.content.decode()
 
+        print('2. Find title text on web page')
+        #
+        self.assertTrue(page_content.find('Replication Data for: Eye-typing experiment') > -1)
+
+        print('3. Find Dataverse user email on web page')
+        #
+        self.assertTrue(page_content.find('mock_user@some.edu') > -1)
+
+        print('4. Has a DataverseUser been created?')
+        dv_user = DataverseUser.objects.filter(user=self.user_obj).first()
+        self.assertTrue(dv_user is not None)
+        self.assertEqual(dv_user.email, 'mock_user@some.edu')  # from test_manifest_params_04.json
+        self.assertEqual(dv_user.first_name, 'Mock')  # from test_manifest_params_04.json
+        self.assertEqual(dv_user.last_name, 'User')  # from test_manifest_params_04.json
+
+        print('5. Has a DataverseUser file info object been created?')
+        file_info = DataverseFileInfo.objects.filter(creator=self.user_obj).first()
+        self.assertTrue(file_info is not None)
+
+    def test_040_check_dv_handler_via_url_no_params(self):
+        """(40) Test DataverseRequestHandler via url with no parameters"""
+        msgt(self.test_040_check_dv_handler_via_url_no_params.__doc__)
+
+        print('1. Go to page with NO params')
+        #
+        url = reverse('view_dataverse_incoming_2')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        page_content = response.content.decode()
+        print('2. Find error message on web page')
+        #
+        self.assertTrue(page_content.find('These required parameters are missing') > -1)

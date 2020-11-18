@@ -38,12 +38,12 @@ def view_dataverse_incoming_1(request):
 @login_required
 def view_dataverse_incoming_2(request):
     """Test the DataverseRequestHandler"""
-    dv_handler = DataverseRequestHandler(request.GET, request.user)
-
     resp_info = dict(title='Process Incoming Params',
                      subtitle='Example 2: Test DataverseRequestHandler',
                      incoming_params = [(k, v) for k, v in request.GET.items()])
 
+
+    dv_handler = DataverseRequestHandler(request.GET, request.user)
     if dv_handler.has_error():
         resp_info['DV_HANDLER_ERROR'] = dv_handler.get_error_message()
 

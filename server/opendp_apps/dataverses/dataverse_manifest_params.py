@@ -10,19 +10,11 @@ from opendp_apps.dataverses.dataverse_client import DataverseClient
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 
-
 class DataverseManifestParams(BasicErrCheck):
-
-    CORE_PARAMS = ['fileId', 'siteUrl', 'datasetPid',]
-    OPTIONAL_PARAMS = ['filePid',]
-    TOKENS = ['apiGeneralToken', 'apiSensitiveDataReadToken', ]
-
-    REQUIRED_PARAMS = CORE_PARAMS + TOKENS
-    ALL_PARAMS = CORE_PARAMS + TOKENS + OPTIONAL_PARAMS
 
     def __init__(self, incoming_params, **kwargs):
         """
-        Dynamically set fields based on the static variables
+        Set initial params
         """
         if not (isinstance(incoming_params, dict) or \
                 isinstance(incoming_params, QueryDict)):
@@ -30,36 +22,48 @@ class DataverseManifestParams(BasicErrCheck):
                                     ' Django QueryDict object (e.g. request.GET)'))
             return
 
-        self.missing_params = []
+        self.fileId = self.format_param(incoming_params.get(dv_static.DV_PARAM_FILEID))
+        self.siteUrl = self.format_param(incoming_params.get(dv_static.DV_PARAM_SITE_URL))
+        self.datasetPid = self.format_param(incoming_params.get(dv_static.DV_PARAM_DATASET_PID))
+        self.filePid = self.format_param(incoming_params.get(dv_static.DV_PARAM_FILE_PID))
+        self.apiGeneralToken = self.format_param(incoming_params.get(dv_static.DV_API_GENERAL_TOKEN))
+        self.apiSensitiveDataReadToken = self.format_param(incoming_params.get(dv_static.DV_API_SENSITIVE_DATA_READ_TOKEN))
 
-        for param in self.ALL_PARAMS:
-            val = incoming_params.get(param)
-            if isinstance(val, str) and val.strip() == '':
+        self.check_required_params()
+
+    def format_param(self, val):
+        """
+        Convert empty strings to None
+        """
+        if isinstance(val, str):
+            val = val.strip()
+            if not val:
                 val = None
+        return val
 
-            if val is None and param in self.REQUIRED_PARAMS:
-                self.missing_params.append(param)
-
-            self.__dict__[param] = val
-
-        self.check_params()
-
-
-    def check_params(self):
+    def check_required_params(self):
         """
-        Check required params
+        Check that required params are set
         """
-        if self.missing_params:
-            if len(self.missing_params) == 1:
-                user_msg = 'This required parameter is missing: %s' % (', '.join(self.missing_params))
+        missing_params = []
+        for param in dv_static.DV_ALL_PARAMS:
+            if param in dv_static.DV_OPTIONAL_PARAMS:
+                continue
+            elif not self.__dict__.get(param):
+                missing_params.append(param)
+
+        if missing_params:
+            if len(missing_params) == 1:
+                user_msg = 'This required parameter is missing: %s' % (', '.join(missing_params))
             else:
-                user_msg = 'These required parameters are missing: %s' % (', '.join(self.missing_params))
+                user_msg = 'These required parameters are missing: %s' % (', '.join(missing_params))
+
             self.add_err_msg(user_msg)
-            return
+
 
     def get_schema_org(self):
         """
-        Get the schema org content of the dataset
+        Via the Dataverse API, get the schema org content of the dataset
         """
         client = DataverseClient(self.siteUrl, self.apiGeneralToken)
 
@@ -70,7 +74,7 @@ class DataverseManifestParams(BasicErrCheck):
 
     def get_user_info(self):
         """
-        Return the user information
+        Via the Dataverse API, return the user information
         """
         client = DataverseClient(self.siteUrl, self.apiGeneralToken)
 
@@ -101,10 +105,26 @@ class DataverseManifestParams(BasicErrCheck):
         if not dv_static.SCHEMA_KEY_DISTRIBUTION in full_schema_info:
             return err_resp(f'"{dv_static.SCHEMA_KEY_DISTRIBUTION}" not found in the schema')
 
+        url_ending_1 = f'/{self.fileId}'
+        file_doi = self.filePid.split(':')[-1] if self.filePid else None
+
         for file_info in full_schema_info[dv_static.SCHEMA_KEY_DISTRIBUTION]:
+
+            # Try to match the the /{fileId} id to the end of the contentURL
+            #   example "contentUrl": https://dataverse.harvard.edu/api/access/datafile/101646"
+            #
             if dv_static.SCHEMA_KEY_CONTENTURL in file_info:
-                url_ending = f'/{self.fileId}'
-                if file_info[dv_static.SCHEMA_KEY_CONTENTURL].endswith(url_ending):
+                content_url = file_info[dv_static.SCHEMA_KEY_CONTENTURL]
+                if content_url and content_url.endswith(url_ending_1):
+                    return ok_resp(file_info)
+
+            # If there's there's a file DOI, try to match it with the identifier
+            #
+            #   example "identifier": "https://doi.org/10.7910/DVN/B7DHBK/BSNYLQ"
+            #
+            if file_doi and dv_static.SCHEMA_KEY_IDENTIFIER in file_info:
+                identifier = file_info[dv_static.SCHEMA_KEY_IDENTIFIER]
+                if identifier and identifier.endswith(file_doi):
                     return ok_resp(file_info)
 
         return err_resp(f'Info for fileId "{self.fileId}" not found in the schema')
