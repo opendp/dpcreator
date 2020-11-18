@@ -9,7 +9,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 
 from django.contrib.auth import get_user_model
-
+import requests_mock
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.models import ManifestTestParams
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
@@ -75,15 +75,47 @@ class DataverseIncomingTest(TestCase):
         self.assertTrue(err_msg.find('apiGeneralToken') > -1)
         print(dv_manifest.get_error_message())
 
-    @tag(TAG_WEB_CLIENT)
-    def test_020_check_dv_handler_directly(self):
+
+    def set_requests_mocker(self, req_mocker):
+        """
+        Set up test urls that are used by the requests library
+        """
+        # Server Info
+        server_info = {dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_OK,
+                       'data': {'message': 'dataverse.MOCK-SERVER.edu'}}
+        req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/info/server', json=server_info)
+
+        # User Info
+        user_info = {dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_OK, 'data': self.mock_params.user_info}
+        req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/users/:me', json=user_info)
+
+        # Schema.org dataset info
+        schema_url = ('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export?exporter='
+                      'schema.org&persistentId=doi:10.7910/DVN/PUXVDH')
+        req_mocker.get(schema_url, json=self.mock_params.schema_org_content)
+
+        # Schema.org dataset info - nonexistent dataset
+        schema_url = ('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export?exporter='
+                      'schema.org&persistentId=cool-breeze')
+        fail_info = {dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_ERROR,
+                     dv_static.DV_KEY_MESSAGE: 'not found for cool-breeze'}
+        req_mocker.get(schema_url, json=fail_info)
+
+
+
+    @requests_mock.Mocker()
+    def test_020_check_dv_handler_directly(self, req_mocker):
         """(20) Test DataverseRequestHandler directly"""
         msgt(self.test_020_check_dv_handler_directly.__doc__)
 
         print('1. Shouldn\'t be any existing DataverseUser objects')
         self.assertTrue(DataverseUser.objects.count() == 0)
 
+        print('1a. Set up requests mocker')
+        self.set_requests_mocker(req_mocker)
+
         print('2. Process incoming request')
+
         dv_handler = DataverseRequestHandler(self.mock_params.as_dict(), self.user_obj)
         if dv_handler.has_error():
             print(dv_handler.get_err_msg())
@@ -102,10 +134,14 @@ class DataverseIncomingTest(TestCase):
         self.assertTrue(file_info is not None)
         #print('----' + f'{DataverseFileInfo.objects.count()}' + '----------')
 
-    @tag(TAG_WEB_CLIENT)
-    def test_030_dv_handler_bad_param(self):
+    #@tag(TAG_WEB_CLIENT)
+    @requests_mock.Mocker()
+    def test_030_dv_handler_bad_param(self, req_mocker):
         """(30) Test DataverseRequestHandler with bad params"""
         msgt(self.test_030_dv_handler_bad_param.__doc__)
+
+        print('1a. Set up requests mocker')
+        self.set_requests_mocker(req_mocker)
 
         print('1. Test with bad file id param')
         params = self.mock_params.as_dict()
@@ -128,10 +164,14 @@ class DataverseIncomingTest(TestCase):
         self.assertTrue(dv_handler.schema_info is None)
 
 
-    @tag(TAG_WEB_CLIENT)
-    def test_100_check_dv_handler_via_url(self):
+    #@tag(TAG_WEB_CLIENT)
+    @requests_mock.Mocker()
+    def test_100_check_dv_handler_via_url(self, req_mocker):
         """(100) Test DataverseRequestHandler via url"""
         msgt(self.test_100_check_dv_handler_via_url.__doc__)
+        print('Set up requests mocker')
+        self.set_requests_mocker(req_mocker)
+
         print('1. Go to page with valid params')
 
         url = reverse('view_dataverse_incoming_2') + '?' + self.mock_params.get_manifest_url_params()
@@ -160,11 +200,14 @@ class DataverseIncomingTest(TestCase):
         file_info = DataverseFileInfo.objects.filter(creator=self.user_obj).first()
         self.assertTrue(file_info is not None)
 
-    @tag(TAG_WEB_CLIENT)
-    def test_110_check_dv_handler_via_url_no_params(self):
+    # @tag(TAG_WEB_CLIENT)
+    @requests_mock.Mocker()
+    def test_110_check_dv_handler_via_url_no_params(self, req_mocker):
         """(110) Test DataverseRequestHandler via url with no parameters"""
         msgt(self.test_110_check_dv_handler_via_url_no_params.__doc__)
-
+        print('Set up requests mocker')
+        self.set_requests_mocker(req_mocker)
+        
         print('1. Go to page with NO params')
         #
         url = reverse('view_dataverse_incoming_2')
