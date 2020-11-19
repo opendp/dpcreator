@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% load socialaccount %}
+  <!-- Main jumbotron for a primary marketing message or call to action -->
+  <div class="jumbotron">
+    <h1>django-rest-auth demo</h1>
+    <p>Welcome in django-rest-auth demo project!</p>
+     <h3>Google Demo</h3>
+  <a href="{% provider_login_url 'google' %}">Login with Google</a>
+
+  </div>
+{% endblock %}
