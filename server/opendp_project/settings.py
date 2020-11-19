@@ -41,7 +41,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'django.contrib.sites',
     'rest_framework',
+    'rest_framework.authtoken',
+    'rest_auth',
+    'rest_auth.registration',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     'polymorphic',
     'opendp_apps.model_helpers',
     'opendp_apps.content_pages',
@@ -99,8 +107,8 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
-        #'HOST': 'db',
-        'HOST': 'localhost',
+        'HOST': 'db',
+        #'HOST': 'localhost',
         'PORT': 5432,
     }
 }
@@ -165,3 +173,24 @@ REST_FRAMEWORK = {
 UPLOADED_FILE_STORAGE_ROOT = os.path.join(BASE_DIR, 'test_setup', 'user_uploaded_data')
 if not os.path.isdir(UPLOADED_FILE_STORAGE_ROOT):
     os.makedirs(UPLOADED_FILE_STORAGE_ROOT)
+
+AUTHENTICATION_BACKENDS = (
+ 'django.contrib.auth.backends.ModelBackend',
+ 'allauth.account.auth_backends.AuthenticationBackend',
+ )
+
+SITE_ID = 3
+
+LOGIN_REDIRECT_URL = '/ui'
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
