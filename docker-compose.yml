@@ -26,10 +26,8 @@ services:
     build: "./server"
     # For production we will need to set
     # these variables to point to a standalone instance
-    environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_PASSWORD=password
+    env_file:
+      - env
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
