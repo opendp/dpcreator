@@ -27,7 +27,7 @@ services:
     # For production we will need to set
     # these variables to point to a standalone instance
     env_file:
-      - env
+      - .env
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
