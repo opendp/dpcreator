@@ -6,6 +6,8 @@ Django==3.1.2
 django-extensions==3.0.9
 django-polymorphic
 django-rest-framework==0.1.0
+django-rest-auth==0.9.3
+django-allauth
 djangorestframework==3.12.1
 idna==2.10
 lxml==4.5.2
@@ -22,3 +24,6 @@ sqlparse==0.3.1
 urllib3==1.25.10
 uuid==1.30
 webencodings==0.5.1
+
+# for testing, mocks requests
+requests-mock==1.8.0

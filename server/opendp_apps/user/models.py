@@ -6,7 +6,6 @@ from django.conf import settings
 
 from opendp_apps.model_helpers.models import TimestampedModelWithUUID
 
-
 class OpenDPUser(AbstractUser):
     """
     Core App User. May be extended in the future
@@ -25,9 +24,9 @@ class DataverseUser(TimestampedModelWithUUID):
     dv_installation = models.CharField(max_length=255)
     persistent_id = models.CharField(max_length=255) # Persistent DV user id within an installation
 
-    dataverse_email = models.EmailField(max_length=255, blank=True)
-    dataverse_first_name = models.CharField(max_length=255, blank=True)
-    dataverse_last_name = models.CharField(max_length=255, blank=True)
+    email = models.EmailField(max_length=255, blank=True)
+    first_name = models.CharField(max_length=255, blank=True)
+    last_name = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return f'{self.user} ({self.dv_installation})'
@@ -41,6 +40,22 @@ class DataverseUser(TimestampedModelWithUUID):
         :return:
         """
         super(DataverseUser, self).save(*args, **kwargs)
+
+    def as_dict(self):
+        """
+        Return several attributes in dict format
+        """
+        return dict(id=self.id,
+                    user=str(self.user),
+                    dv_installation=self.dv_installation,
+                    persistent_id=self.persistent_id,
+                    email=self.email,
+                    first_name=self.first_name,
+                    last_name=self.last_name,
+                    updated=str(self.updated),
+                    created=str(self.created),
+                    object_id=self.object_id.hex)
+
 
 
 class Group(models.Model):

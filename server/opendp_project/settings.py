@@ -38,9 +38,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'polymorphic',
     'django_extensions',
+    'django.contrib.sites',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'rest_auth',
+    'rest_auth.registration',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'polymorphic',
     'opendp_apps.model_helpers',
     'opendp_apps.content_pages',
     'opendp_apps.user',
@@ -48,6 +56,7 @@ INSTALLED_APPS = [
     'opendp_apps.analysis',
     'opendp_apps.terms_of_access',
     'opendp_apps.communication'
+    'opendp_apps.dataverses',
 ]
 
 MIDDLEWARE = [
@@ -158,6 +167,28 @@ REST_FRAMEWORK = {
 
 
 # possible reason to split up settings files >
+
 UPLOADED_FILE_STORAGE_ROOT = os.path.join(BASE_DIR, 'test_setup', 'user_uploaded_data')
 if not os.path.isdir(UPLOADED_FILE_STORAGE_ROOT):
     os.makedirs(UPLOADED_FILE_STORAGE_ROOT)
+
+AUTHENTICATION_BACKENDS = (
+ 'django.contrib.auth.backends.ModelBackend',
+ 'allauth.account.auth_backends.AuthenticationBackend',
+ )
+
+SITE_ID = 3
+
+LOGIN_REDIRECT_URL = '/ui'
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}

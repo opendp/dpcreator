@@ -3,6 +3,7 @@
 {% block html_tag_attributes %}lang="en"{% endblock %}
 
 {% block content %}
+    {% load socialaccount %}
     <noscript>
         <strong>Please enable JavaScript to continue.</strong>
     </noscript>
@@ -10,4 +11,28 @@
     <div id="app"></div>
 
     <h3 style="margin-top: 4em; text-align: center; font-family: Arial, Helvetica, sans-serif;">Powered by Django!</h3>
+    <h1>OpenDP Login</h1>
+  {% if user.is_authenticated %}
+  <p>Welcome, {{ user.username }} !</p>
+
+  <form class="form-horizontal ajax-post" role="form" action="{% url 'rest_logout' %}">{% csrf_token %}
+    <div class="form-group">
+      <label for="token" class="col-sm-2 control-label">User Token</label>
+      <div class="col-sm-4">
+        <input name="token" type="text" class="form-control" id="token" placeholder="Token">
+        <p class="help-block">Token received after login</p>
+      </div>
+    </div>
+
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-default">Logout</button>
+    </div>
+  </div>
+
+  <div class="form-group api-response"></div>
+  </form>
+  {% else %}
+  <a href="{% provider_login_url 'google' %}">Login with Google</a>
+   {%  endif %}
 {% endblock %}
