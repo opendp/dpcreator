@@ -15,7 +15,7 @@ class DataverseUserAdmin(admin.ModelAdmin):
     list_display = ('user',
                     'dv_installation',
                     'persistent_id',
-                    'dataverse_email',
+                    'email',
                     'updated',
                     'created',)
     readonly_fields = ('created', 'updated',)

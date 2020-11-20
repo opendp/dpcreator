@@ -22,7 +22,7 @@ class DataverseFileInfoAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_filter = ('source', 'creator')
     list_display = ('name',
-                    'doi',
+                    'dataset_doi',
                     'dataverse_file_id',
                     'creator',
                     'installation_name',

@@ -23,3 +23,6 @@ sqlparse==0.3.1
 urllib3==1.25.10
 uuid==1.30
 webencodings==0.5.1
+
+# for testing, mocks requests
+requests-mock==1.8.0

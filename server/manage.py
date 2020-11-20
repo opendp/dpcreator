@@ -5,7 +5,14 @@ import sys
 
 
 def main():
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opendp_project.settings')
+
+    # use seperate settings.py for tests
+    if 'test' in sys.argv:
+        print('using settings_test.py')
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opendp_project.settings_test')
+    else:
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opendp_project.settings')
+
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

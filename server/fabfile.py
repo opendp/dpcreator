@@ -34,7 +34,9 @@ def init_db(context):
     """Initialize the django database (if needed)"""
 
     cmds = (f'python manage.py check;'
-            'python manage.py migrate;')
+            'python manage.py migrate;'
+            'python manage.py loaddata opendp_apps/dataverses/fixtures/test_dataverses_01.json'
+            ' opendp_apps/dataverses/fixtures/test_manifest_params_04.json;')
 
     print("Run init_db")
     fab_local(cmds)
@@ -43,8 +45,32 @@ def init_db(context):
 def run_dev(context):
     """Run the Django development server"""
     init_db(context)
-
+    create_django_superuser(context)
     fab_local('python manage.py runserver')
+
+@task
+def dc_init_db(context):
+    """Docker compose: Initialize the django database (if needed)"""
+
+    cmds = (f'docker-compose run opendp_server python server/manage.py check;'
+            'docker-compose run opendp_server python server/manage.py migrate;')
+
+    print("Docker Compose: Run init_db")
+    fab_local(cmds)
+
+def dc_create_superuser(context):
+    """Dockder compose: create a test superuser"""
+    cmd = 'docker-compose run opendp_server fab -r ./server/ create-django-superuser'
+
+    print("Docker Compose: create superuser")
+    fab_local(cmd)
+
+#@task
+#def dc_run_dev(context):
+#    """Docker compose: Run the Django development server"""
+#    init_db(context)
+#
+ #   fab_local('docker-compose run python manage.py runserver')
 
 
 def create_user(username, last_name, first_name, **kwargs):

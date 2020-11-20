@@ -10,10 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
-import os
+import os, sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BASE_DIR)
+#sys.path.append(os.path.join(BASE_DIR, 'opendp_apps'))
 
 AUTH_USER_MODEL = 'user.OpenDPUser'
 
@@ -38,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
     'django.contrib.sites',
     'rest_framework',
     'rest_framework.authtoken',
@@ -48,13 +51,13 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'polymorphic',
-    'django_extensions',
     'opendp_apps.model_helpers',
     'opendp_apps.content_pages',
     'opendp_apps.user',
     'opendp_apps.dataset',
     'opendp_apps.analysis',
-    'opendp_apps.terms_of_access'
+    'opendp_apps.terms_of_access',
+    'opendp_apps.dataverses',
 ]
 
 MIDDLEWARE = [
@@ -105,10 +108,11 @@ DATABASES = {
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': 'db',
-       # 'HOST': 'localhost',
+        #'HOST': 'localhost',
         'PORT': 5432,
     }
 }
+
 
 
 # Password validation
@@ -165,6 +169,7 @@ REST_FRAMEWORK = {
 
 
 # possible reason to split up settings files >
+
 UPLOADED_FILE_STORAGE_ROOT = os.path.join(BASE_DIR, 'test_setup', 'user_uploaded_data')
 if not os.path.isdir(UPLOADED_FILE_STORAGE_ROOT):
     os.makedirs(UPLOADED_FILE_STORAGE_ROOT)

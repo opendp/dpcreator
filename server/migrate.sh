@@ -27,3 +27,11 @@ echo "-----------------------"
 python /code/server/manage.py create_social_app
 exec "$@"
 echo
+
+echo "-----------------------"
+echo "| Load fixtures       |"
+echo "| (for dev)           |"
+echo "-----------------------"
+python /code/server/manage.py loaddata opendp_apps/dataverses/fixtures/test_dataverses_01.json opendp_apps/dataverses/fixtures/test_manifest_params_04.json
+exec "$@"
+echo
