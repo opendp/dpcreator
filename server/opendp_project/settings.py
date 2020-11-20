@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     'opendp_apps.dataset',
     'opendp_apps.analysis',
     'opendp_apps.terms_of_access',
-    'opendp_apps.communication'
+    'opendp_apps.communication',
     'opendp_apps.dataverses',
 ]
 
