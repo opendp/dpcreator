@@ -7,6 +7,7 @@ server/static/dist/
 /venv/
 Pipfile
 Pipfile.lock
+*.ddi
 
 
 # Byte-compiled / optimized / DLL files
