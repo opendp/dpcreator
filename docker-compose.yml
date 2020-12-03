@@ -17,7 +17,7 @@ services:
     build: "./client"
     command: npm run serve
     volumes:
-      - .:/code/client
+      - .:/code
     ports:
       - "8080:8080"
     depends_on:
