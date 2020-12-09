@@ -20,7 +20,9 @@ from django.urls import path, include
 from django.views.generic import TemplateView, RedirectView
 from rest_framework import routers, serializers
 
-from opendp_apps.dataset.views import DepositorSetup
+from opendp_apps.dataset.views import DepositorSetup, DataSetInfoViewSet
+from opendp_apps.terms_of_access.views import TermsOfAccessAgreement, TermsOfAccessViewSet, \
+    TermsOfAccessAgreementViewSet
 from opendp_apps.user.models import OpenDPUser
 from opendp_apps.user.views import UserViewSet  #, SessionViewSet
 from opendp_apps.user.views import GoogleLogin
@@ -39,6 +41,9 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
+router.register(r'terms-of-access', TermsOfAccessViewSet)
+router.register(r'dataset-info', DataSetInfoViewSet)
+router.register(r'terms-of-access-agreement', TermsOfAccessAgreementViewSet)
 #router.register(r'sessions', SessionViewSet)
 
 
@@ -48,6 +53,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('api/', include(router.urls)),
     path('api/deposit/', DepositorSetup.as_view()),
+    path('api/terms-of-access/<int:terms_of_access_id>/dataset/<int:dataset_info_id>/', TermsOfAccessAgreement.as_view()),
 
     # For testing
     path('dv-mock-api/', include('opendp_apps.dataverses.mock_urls')),
@@ -80,7 +86,6 @@ urlpatterns = [
     url(r'^account/', include('allauth.urls')),
     url(r'^accounts/profile/$', RedirectView.as_view(url='/', permanent=True), name='profile-redirect'),
     url(r'^rest-auth/google/$', GoogleLogin.as_view(), name='google-login'),
-
     # Putting all vue-related views under "ui/" for now to separate from the api.
     path('ui/', TemplateView.as_view(template_name='index.html'), name='index'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT, kwargs={'show_indexes': True})

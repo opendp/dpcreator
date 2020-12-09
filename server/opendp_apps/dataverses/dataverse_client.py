@@ -10,6 +10,7 @@ from pyDataverse.api import Api
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 
+
 class DataverseClient(object):
 
     def __init__(self, host, api_token=None):
@@ -130,7 +131,7 @@ if __name__ == '__main__':
     host = 'https://dataverse.harvard.edu'
     doi = 'doi:10.7910/DVN/GEWLZD'
 
-    client = DataverseClient(host)
+    client = DataverseClient(host, api_token='c1c38ee8-1529-490f-9b9a-940ff4b55d07')
     ddi_obj = client.get_ddi(doi)
 
     with open('example.ddi', 'w') as outfile:
@@ -150,7 +151,9 @@ if __name__ == '__main__':
     pprint(descriptions[key])
 
     # print(ddi_obj.get_title())
-
+    print()
+    resp = client.api.get_user().json()
+    print(resp)
 
 """
 from pyDataverse.api import Api

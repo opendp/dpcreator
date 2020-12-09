@@ -1,12 +1,19 @@
 import json
 
 from django.http import JsonResponse
-from rest_framework import authentication, permissions
+from rest_framework import authentication, permissions, viewsets
 from rest_framework.views import APIView
 
-from opendp_apps.dataset.models import DataverseFileInfo
+from opendp_apps.dataset.models import DataverseFileInfo, DataSetInfo
 from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.dataset.redis import RedisClient
+from opendp_apps.dataset.serializers import DataSetInfoSerializer
+
+
+class DataSetInfoViewSet(viewsets.ModelViewSet):
+    queryset = DataSetInfo.objects.all().order_by('-created')
+    serializer_class = DataSetInfoSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class DepositorSetup(APIView):
