@@ -1,4 +1,4 @@
-from urllib.parse import urljoin
+import json
 from pprint import pprint
 
 import requests
@@ -51,13 +51,11 @@ class DataverseClient(object):
 
         return err_resp(f'Status code: {response.status_code} {response.text}')
 
-
     def get_schema_org(self, doi):
         """
         Get schema.org data
         """
         return self.get_dataset_export_json(doi, dv_static.EXPORTER_FORMAT_SCHEMA_ORG)
-
 
     def get_dataset_export_json(self, doi, format_type):
         """
@@ -131,7 +129,11 @@ if __name__ == '__main__':
     host = 'https://dataverse.harvard.edu'
     doi = 'doi:10.7910/DVN/GEWLZD'
 
-    client = DataverseClient(host, api_token='c1c38ee8-1529-490f-9b9a-940ff4b55d07')
+    # This file must be completed with a valid Dataverse API token
+    with open('dataverse_token.json', 'r') as infile:
+        api_token = json.load(infile).get('token')
+
+    client = DataverseClient(host, api_token=api_token)
     ddi_obj = client.get_ddi(doi)
 
     with open('example.ddi', 'w') as outfile:
