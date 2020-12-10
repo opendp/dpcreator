@@ -9,9 +9,6 @@ from opendp_apps.terms_of_access.serializers import TermsOfAccessSerializer, Ter
 
 
 class TermsOfAccessViewSet(viewsets.ModelViewSet):
-    """
-    view/edit users
-    """
     queryset = TermsOfAccess.objects.all().order_by('-created')
     serializer_class = TermsOfAccessSerializer
     permission_classes = [permissions.IsAuthenticated]
