@@ -21,8 +21,7 @@ from django.views.generic import TemplateView, RedirectView
 from rest_framework import routers, serializers
 
 from opendp_apps.dataset.views import DepositorSetup, DataSetInfoViewSet
-from opendp_apps.terms_of_access.views import TermsOfAccessAgreement, TermsOfAccessViewSet, \
-    TermsOfAccessAgreementViewSet
+from opendp_apps.terms_of_access.views import TermsOfAccessViewSet, TermsOfAccessAgreementViewSet
 from opendp_apps.user.models import OpenDPUser
 from opendp_apps.user.views import UserViewSet  #, SessionViewSet
 from opendp_apps.user.views import GoogleLogin
@@ -44,7 +43,7 @@ router.register(r'users', UserViewSet)
 router.register(r'terms-of-access', TermsOfAccessViewSet)
 router.register(r'dataset-info', DataSetInfoViewSet)
 router.register(r'terms-of-access-agreement', TermsOfAccessAgreementViewSet)
-#router.register(r'sessions', SessionViewSet)
+# router.register(r'sessions', SessionViewSet)
 
 
 urlpatterns = [
@@ -53,7 +52,6 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('api/', include(router.urls)),
     path('api/deposit/', DepositorSetup.as_view()),
-    path('api/terms-of-access/<int:terms_of_access_id>/dataset/<int:dataset_info_id>/', TermsOfAccessAgreement.as_view()),
 
     # For testing
     path('dv-mock-api/', include('opendp_apps.dataverses.mock_urls')),
