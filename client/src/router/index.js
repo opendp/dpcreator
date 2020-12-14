@@ -2,6 +2,13 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
+import store from '../store'
+
+const redirectLogout = (to, from, next) => {
+  store.dispatch('auth/logout')
+    .then(() => next('/login'));
+};
+
 Vue.use(VueRouter)
 
   const routes = [
@@ -24,6 +31,9 @@ Vue.use(VueRouter)
       path: '/login',
       name: 'Login',
       component: Login
+    },{
+      path: '/logout',
+      beforeEnter: redirectLogout,
     }
 
 ]

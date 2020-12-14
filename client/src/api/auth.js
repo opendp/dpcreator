@@ -2,10 +2,10 @@ import session from './session';
 
 export default {
   login(username, password) {
-    return session.post('//localhost:8000/auth/login/', { username, password });
+    return session.post('/rest-auth/login/', { username, password });
   },
   logout() {
-    return session.post('/auth/logout/', {});
+    return session.post('/rest-auth/logout/', {});
   },
   createAccount(username, password1, password2, email) {
     return session.post('//localhost:8000/registration/', { username, password1, password2, email });
