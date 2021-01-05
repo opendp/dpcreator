@@ -20,7 +20,7 @@ export default {
     return session.post('/auth/password/reset/confirm/', { uid, token, new_password1, new_password2 });
   },
   getAccountDetails() {
-    return session.get('/auth/user/');
+    return session.get('/rest-auth/user/');
   },
   updateAccountDetails(data) {
     return session.patch('/auth/user/', data);
