@@ -8,9 +8,7 @@
     <button @click="login(inputs)" id="login-button">
       login
     </button>
-    <button @click="googleLogin({})" id="google-login-button">
-      login with Google
-    </button>
+
       <g-signin-button
             v-if="isEmpty(user)"
             :params="googleSignInParams"
@@ -22,7 +20,6 @@
             </button>
           </g-signin-button>
     <div>
-       <a href="/account/google/login">Login with Google direct link</a> |
 
        <router-link to="/register">create account</router-link> |
       <router-link to="/password_reset">reset password</router-link>
@@ -31,7 +28,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import auth from '../api/auth'
 export default {
   data() {
     return {
@@ -50,24 +47,16 @@ export default {
       this.$store.dispatch('auth/login', { username, password })
         .then(() => this.$router.push('/'));
     },
-    googleLogin({}) {
-      this.$store.dispatch('auth/googleLogin',{})
-          .then(() => this.$router.push('/'));
-    },
-     onGoogleSignInSuccess (resp) {
+    onGoogleSignInSuccess(resp) {
       console.log('success!')
       console.log(resp)
-      const token = resp.xc.access_token
-      axios.post('http://localhost:8000/rest-auth/google/', {
-        access_token: token
-      })
-        .then(resp => {
-          console.log(resp)
-          this.user = resp.data.key
-        })
-        .catch(err => {
-          console.log(err.response)
-        })
+      console.log(resp.xc)
+      const access_token = resp.xc.access_token
+      console.log(access_token)
+      console.log('variable type: ' + typeof (access_token))
+      this.$store.dispatch('auth/googleLogin', access_token).then(() => this.$router.push('/'))
+      .then(() => auth.getAccountDetails().then(({data}) => console.log(data) ))
+        //  then((resp) => this.user = resp.data.user)
     },
     onGoogleSignInError (error) {
       console.log('OH NOES', error)

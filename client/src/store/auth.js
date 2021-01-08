@@ -7,6 +7,7 @@ import {
   LOGOUT,
   REMOVE_TOKEN,
   SET_TOKEN,
+  SET_USER,
 } from './types';
 
 const TOKEN_STORAGE_KEY = 'TOKEN_STORAGE_KEY';
@@ -16,24 +17,54 @@ const initialState = {
   authenticating: false,
   error: false,
   token: null,
+  user: null,
 };
 
 const getters = {
   isAuthenticated: state => !!state.token,
+  getUser: state => {
+      return state.user
+    },
 };
+
 
 const actions = {
   login({ commit }, { username, password }) {
     commit(LOGIN_BEGIN);
     return auth.login(username, password)
-      .then(({ data }) => commit(SET_TOKEN, data.key))
+      .then(({ data }) => {
+        console.log(data)
+        commit(SET_TOKEN, data.key)
+        commit(SET_USER, username)
+      })
       .then(() => commit(LOGIN_SUCCESS))
+      .catch(() => commit(LOGIN_FAILURE));
+  },
+  googleLogin({commit}, token) {
+    commit(LOGIN_BEGIN);
+    console.log('received token from page: ' + token)
+    return auth.googleLogin(token)
+        .then(({ data}) => { console.log('returned from googleLogin: ' + JSON.stringify(data))
+          commit(SET_TOKEN, data.key)})
+      .then(() =>
+          commit(LOGIN_SUCCESS))
       .catch(() => commit(LOGIN_FAILURE));
   },
   logout({ commit }) {
     return auth.logout()
       .then(() => commit(LOGOUT))
       .finally(() => commit(REMOVE_TOKEN));
+  },
+
+  fetchUser({ commit }) {
+    auth.getAccountDetails()
+      .then(response => {
+        console.log(response.data.username)
+        commit('SET_USER', response.data.username)
+      })
+      .catch(error => {
+        console.log('There was an error:', error.response)
+      })
   },
   initialize({ commit }) {
     const token = localStorage.getItem(TOKEN_STORAGE_KEY);
@@ -74,6 +105,10 @@ const mutations = {
     localStorage.removeItem(TOKEN_STORAGE_KEY);
     delete session.defaults.headers.Authorization;
     state.token = null;
+  },
+  [SET_USER](state, username) {
+    console.log('setting user: '+username)
+    state.user = username;
   },
 };
 

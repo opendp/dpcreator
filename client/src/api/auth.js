@@ -4,6 +4,10 @@ export default {
   login(username, password) {
     return session.post('/rest-auth/login/', { username, password });
   },
+  googleLogin(access_token) {
+    console.log('access passing token: '+ access_token)
+    return session.post('/rest-auth/google/',{'access_token':access_token});
+  },
   logout() {
     return session.post('/rest-auth/logout/', {});
   },
