@@ -21,12 +21,12 @@ class TermsOfAccess(TimestampedModel):
         ordering = ('active', 'name',)
 
     def __str__(self):
-        return self.name
+        return f'{self.name} - v{self.version}'
 
 
 class TermsOfAccessLog(TimestampedModelWithUUID):
     """
-    Log of Terms of Access
+    Records a Terms of Access agreement
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     dataset_info = models.ForeignKey(DataSetInfo, on_delete=models.PROTECT)
@@ -37,4 +37,4 @@ class TermsOfAccessLog(TimestampedModelWithUUID):
     ordering = ('-created', 'user')
 
     def __str__(self):
-        return f'{self.user} - {self.dataset_info}'
+        return f'{self.user} - {self.dataset_info} - {self.terms_of_access}'

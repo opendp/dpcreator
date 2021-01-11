@@ -56,6 +56,7 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
         return info
 
+
 class DataverseFileInfo(DataSetInfo):
     """
     Refers to a DV file from within a DV dataset
@@ -103,6 +104,7 @@ class DataverseFileInfo(DataSetInfo):
                     object_id=self.object_id.hex)
 
         return info
+
 
 class UploadFileInfo(DataSetInfo):
     """
