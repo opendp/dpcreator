@@ -12,7 +12,7 @@ export default {
     return session.post('/rest-auth/logout/', {});
   },
   createAccount(username, password1, password2, email) {
-    return session.post('//localhost:8000/registration/', { username, password1, password2, email });
+    return session.post('/dj_rest_auth/registration/', { username, password1, password2, email });
   },
   changeAccountPassword(password1, password2) {
     return session.post('/auth/password/change/', { password1, password2 });

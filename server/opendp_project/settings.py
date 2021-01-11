@@ -43,8 +43,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
-    'rest_auth',
-    'rest_auth.registration',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -208,3 +208,5 @@ CORS_ORIGIN_WHITELIST = (
     'http://localhost:8000',
 
 )
+# for dev purposes only, need to remove
+ACCOUNT_EMAIL_VERIFICATION = 'none'

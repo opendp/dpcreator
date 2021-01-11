@@ -2,6 +2,11 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
+import Lost from '../views/Lost.vue'
+import PasswordReset from "../views/PasswordReset"
+import PasswordResetConfirm from "../views/PasswordResetConfirm"
+import Register from "../views/Register"
+import VerifyEmail from "../views/VerifyEmail"
 import store from '../store'
 
 const redirectLogout = (to, from, next) => {
@@ -31,10 +36,27 @@ Vue.use(VueRouter)
       path: '/login',
       name: 'Login',
       component: Login
-    },{
+    },
+    {
       path: '/logout',
       beforeEnter: redirectLogout,
-    }
+    },
+    {
+      path: '/password_reset',
+      component: PasswordReset,
+    },
+    {
+      path: '/password_reset/:uid/:token',
+      component: PasswordResetConfirm,
+    },
+    {
+      path: '/register',
+      component: Register,
+    },
+    {
+      path: '/register/:key',
+      component: VerifyEmail,
+    },
 
 ]
 

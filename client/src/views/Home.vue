@@ -26,12 +26,8 @@ export default {
    methods: {
     onGoogleSignInSuccess(resp) {
       console.log('success!')
-      console.log(resp)
-      console.log(resp.xc)
       const access_token = resp.xc.access_token
-      console.log(access_token)
-      console.log('variable type: ' + typeof (access_token))
-      this.$store.dispatch('auth/googleLogin', access_token).then(() => this.$router.push('/'))
+       this.$store.dispatch('auth/googleLogin', access_token).then(() => this.$router.push('/'))
       .then(() => auth.getAccountDetails().then(({data}) => console.log(data) ))
         //  then((resp) => this.user = resp.data.user)
     },

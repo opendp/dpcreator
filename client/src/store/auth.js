@@ -33,7 +33,6 @@ const actions = {
     commit(LOGIN_BEGIN);
     return auth.login(username, password)
       .then(({ data }) => {
-        console.log(data)
         commit(SET_TOKEN, data.key)
         commit(SET_USER, username)
       })
@@ -42,7 +41,6 @@ const actions = {
   },
   googleLogin({commit}, token) {
     commit(LOGIN_BEGIN);
-    console.log('received token from page: ' + token)
     return auth.googleLogin(token)
         .then(({ data}) => { console.log('returned from googleLogin: ' + JSON.stringify(data))
           commit(SET_TOKEN, data.key)})
@@ -59,7 +57,6 @@ const actions = {
   fetchUser({ commit }) {
     auth.getAccountDetails()
       .then(response => {
-        console.log(response.data.username)
         commit('SET_USER', response.data.username)
       })
       .catch(error => {
@@ -107,8 +104,7 @@ const mutations = {
     state.token = null;
   },
   [SET_USER](state, username) {
-    console.log('setting user: '+username)
-    state.user = username;
+     state.user = username;
   },
 };
 

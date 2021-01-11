@@ -10,12 +10,12 @@
     </button>
 
       <g-signin-button
-            v-if="isEmpty(user)"
             :params="googleSignInParams"
             @success="onGoogleSignInSuccess"
             @error="onGoogleSignInError"
           >
-            <button class="btn btn-block btn-success">
+            <button style="width:auto" class="btn btn-block btn-success">
+
               Vue Component Google Signin
             </button>
           </g-signin-button>
@@ -32,7 +32,6 @@ import auth from '../api/auth'
 export default {
   data() {
     return {
-      user: {},
       googleSignInParams: {
         client_id: '725082195083-1srivl3ra9mpc1q5ogi7aur17vkjuabg.apps.googleusercontent.com',
       },
@@ -48,15 +47,10 @@ export default {
         .then(() => this.$router.push('/'));
     },
     onGoogleSignInSuccess(resp) {
-      console.log('success!')
-      console.log(resp)
-      console.log(resp.xc)
-      const access_token = resp.xc.access_token
-      console.log(access_token)
-      console.log('variable type: ' + typeof (access_token))
+      const access_token = resp.Bc.access_token
       this.$store.dispatch('auth/googleLogin', access_token).then(() => this.$router.push('/'))
       .then(() => auth.getAccountDetails().then(({data}) => console.log(data) ))
-        //  then((resp) => this.user = resp.data.user)
+
     },
     onGoogleSignInError (error) {
       console.log('OH NOES', error)
