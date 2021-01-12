@@ -209,4 +209,5 @@ CORS_ORIGIN_WHITELIST = (
 
 )
 # for dev purposes only, need to remove
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+#ACCOUNT_EMAIL_VERIFICATION = 'none'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

@@ -8,7 +8,7 @@
       <form @submit.prevent="submit">
         <input v-model="inputs.email" type="text" id="email" placeholder="email">
       </form>
-      <button @click="sendResetEmail(inputs)">
+      <button @click="sendPasswordResetEmail(inputs)">
         send email
       </button>
       <span class="error" v-show="emailError">
@@ -40,7 +40,7 @@ export default {
     'emailLoading',
   ]),
   methods: mapActions('password', [
-    'sendResetEmail',
+    'sendPasswordResetEmail',
     'clearEmailStatus',
   ]),
   beforeRouteLeave(to, from, next) {
