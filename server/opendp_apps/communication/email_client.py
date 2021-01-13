@@ -13,13 +13,13 @@ class EmailClient(object):
     # To verify a new account:
     #   1. Go to https://app.sendgrid.com/settings/sender_auth/senders
     #   2. Click "verify new sender" and proceed
-    default_from_email = 'ecowan@g.harvard.edu'
+    default_from_email = 'kraffmilleropendptest@gmail.com'
 
     def __init__(self, from_email=None, api_key=None):
         self.from_email = from_email if from_email else self.default_from_email
         if not api_key:
             try:
-                self.api_key = os.environ.get('SENDGRID_API_KEY')
+                self.api_key = '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'
             except KeyError:
                 raise SendGridAPIError("SENDGRID_API_KEY must be passed as an argument or"
                                        " set as an environment variable")
@@ -36,15 +36,15 @@ class EmailClient(object):
 
 
 if __name__ == '__main__':
-    apikey_message = "Current API Key: " + os.environ.get('SENDGRID_API_KEY')
-    print("-"*(len(apikey_message)+1))
+   # apikey_message = "Current API Key: " + os.environ.get('SENDGRID_API_KEY')
+   # print("-"*(len(apikey_message)+1))
 
-    print("Current API Key: ", os.environ.get('SENDGRID_API_KEY'))
+  #  print("Current API Key: ", os.environ.get('SENDGRID_API_KEY'))
     c = EmailClient()
     print("From Email: ", c.from_email)
-    print("-"*(len(apikey_message)+1))
-    result = c.send(to_email='ecowan@g.harvard.edu', subject='test test',
+ #   print("-"*(len(apikey_message)+1))
+    result = c.send(to_email='ellen.kraffmiller@gmail.com', subject='test test',
                     content='hi', content_type='text/plain')
     print("Message Sent")
     print("Status Code: ", result.status_code)
-    print("-"*(len(apikey_message)+1))
+  #  print("-"*(len(apikey_message)+1))

@@ -51,7 +51,8 @@ urlpatterns = [
 
     # For testing
     path('dv-mock-api/', include('opendp_apps.dataverses.mock_urls')),
-
+    path('password-reset/confirm/<uidb64>/<token>/', TemplateView.as_view(),
+        name='password_reset_confirm'),
     url('r^home/$', TemplateView.as_view(template_name="home.html"), name='home'),
     url(r'^signup/$', TemplateView.as_view(template_name="signup.html"),
       name='signup'),
@@ -65,9 +66,10 @@ urlpatterns = [
     url(r'^password-reset/$',
       TemplateView.as_view(template_name="password_reset.html"),
       name='password-reset'),
-    url(r'^password-reset/confirm/$',
-      TemplateView.as_view(template_name="password_reset_confirm.html"),
-      name='password-reset-confirm'),
+   #  url(
+  #    r'^password-reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+  #    TemplateView.as_view(template_name="password_reset_confirm.html"),
+  #    name='password_reset_confirm'),
 
     url(r'^user-details/$',
       TemplateView.as_view(template_name="user_details.html"),
