@@ -1,30 +1,39 @@
 <template>
-  <div id="login-view">
-    <h1>Login</h1>
-    <form @submit.prevent="submit">
-      <input v-model="inputs.username" type="text" id="username" placeholder="username">
-      <input v-model="inputs.password" type="password" id="password" placeholder="password">
-    </form>
-    <button @click="login(inputs)" id="login-button">
-      login
-    </button>
+  <v-card width="400" class="mx-auto mt-5">
+    <v-card-title>
+      <h1 class="display-1">Login</h1>
+    </v-card-title>
+    <v-card-text>
+      <v-form @submit.prevent="submit">
+        <v-text-field label="Username" v-model="inputs.username" prepend-icon="mdi-account-circle"/>
+        <v-text-field
+            :type="showPassword ? 'text' : 'password'"
+            label="Password"
+            v-model="inputs.password"
+            prepend-icon="mdi-lock"
+            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+            @click:append="showPassword = !showPassword"
+        />
 
-      <g-signin-button
+      </v-form>
+      <v-divider></v-divider>
+      <v-card-actions>
+        <v-btn @click="$router.push('register')" color="success">Register</v-btn>
+        <v-spacer></v-spacer>
+        <v-btn color="info" @click="login(inputs)">Login</v-btn>
+        <v-spacer></v-spacer>
+        <g-signin-button
             :params="googleSignInParams"
             @success="onGoogleSignInSuccess"
             @error="onGoogleSignInError"
-          >
-            <button style="width:auto" class="btn btn-block btn-success">
-
-              Vue Component Google Signin
-            </button>
-          </g-signin-button>
-    <div>
-
-       <router-link to="/register">create account</router-link> |
-      <router-link to="/password_reset">reset password</router-link>
-    </div>
-  </div>
+        >
+          <v-btn color="info">
+            Google Signin
+          </v-btn>
+        </g-signin-button>
+      </v-card-actions>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>
@@ -32,6 +41,7 @@ import auth from '../api/auth'
 export default {
   data() {
     return {
+      showPassword: false,
       googleSignInParams: {
         client_id: '725082195083-1srivl3ra9mpc1q5ogi7aur17vkjuabg.apps.googleusercontent.com',
       },
