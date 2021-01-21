@@ -1,5 +1,6 @@
 """Convenience commands"""
 import os, sys
+from os.path import abspath, join, isdir
 import random
 import string
 from fabric import task
@@ -32,21 +33,72 @@ except Exception as e:
 @task
 def init_db(context):
     """Initialize the django database (if needed)"""
+    export_cmd = get_export_db_val_cmds()
 
-    cmds = (f'python manage.py check;'
-            'python manage.py migrate;'
-            'python manage.py loaddata opendp_apps/dataverses/fixtures/test_dataverses_01.json'
-            ' opendp_apps/dataverses/fixtures/test_manifest_params_04.json;')
+    cmds = (f'{export_cmd};'
+            f'python manage.py check;'
+            f'python manage.py migrate;'
+            f'python manage.py loaddata opendp_apps/dataverses/fixtures/test_dataverses_01.json'
+            f' opendp_apps/dataverses/fixtures/test_manifest_params_04.json;')
 
     print("Run init_db")
+    print(f'Commands: {cmds}')
     fab_local(cmds)
+
+
+def get_test_db_vals():
+    """Return test database values"""
+    db_vals = dict(DB_HOST='localhost',
+                   DB_NAME='opendp_app',
+                   DB_USER='opendp_user',
+                   DB_PASSWORD='opendp_test_data')
+    return db_vals
+
+def get_export_db_val_cmds():
+    """Return command similar to:"""
+    db_vals = get_test_db_vals()
+    export_vars = ' '.join([f'{key}={val}'
+                            for key, val in db_vals.items()])
+    export_vars = f'export {export_vars}'
+    return export_vars
+
+@task
+def run_postgres(context):
+    """Run Postgres via Docker on a local machine"""
+    path_to_db_files = join(FAB_BASE_DIR, 'test_setup', 'postgres_data')
+    if not isdir(path_to_db_files):
+        os.makedirs(path_to_db_files, exist_ok=True)
+    path_to_db_files = abspath(path_to_db_files)
+
+    db_vals = get_test_db_vals()
+
+    cmd = ('docker run --rm --name postgres-opendp-ux'
+           f' -e POSTGRES_DB={db_vals["DB_NAME"]}'
+           f' -e POSTGRES_USER={db_vals["DB_USER"]}'
+           f' -e POSTGRES_PASSWORD={db_vals["DB_PASSWORD"]}'
+           f' -v {path_to_db_files}:/var/lib/postgresql/data'
+           ' -p 5432:5432 postgres')
+
+    print(f'run-postgres: {cmd}')
+    fab_local(cmd)
+
 
 @task
 def run_dev(context):
     """Run the Django development server"""
     init_db(context)
     create_django_superuser(context)
-    fab_local('python manage.py runserver')
+
+    export_cmd = get_export_db_val_cmds()
+
+    fab_local(f'{export_cmd}; python manage.py runserver')
+
+@task
+def run_npm(context):
+    """Run the Django development server"""
+
+    fab_local(f'cd ../client; npm run serve')
+
 
 @task
 def dc_init_db(context):
@@ -82,6 +134,9 @@ def create_user(username, last_name, first_name, **kwargs):
         - email: default ''
         - group_names: default []"""
     print(f'\nCreating user: {username}')
+    for key, val in get_test_db_vals().items():
+        os.environ[key] = val
+
     from django.conf import settings
     if not settings.DEBUG:
         sys.exit('Only do this when testing')

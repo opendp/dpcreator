@@ -26,9 +26,6 @@ SECRET_KEY = 'tm4wb=azvng$!c^0%f6=nb=hkslh)p$v(z(zs+siva7y@7e9^1'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -95,22 +92,14 @@ WSGI_APPLICATION = 'opendp_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-"""
-docker run --rm --name raven-postgres \
- -e POSTGRES_DB=postgres \
- -e POSTGRES_USER=postgres \
- -e POSTGRES_PASSWORD=postgres \
- -p 5432:5432 postgres
-"""
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
-       # 'HOST': 'localhost',
-        'PORT': 5432,
+        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql_psycopg2'),
+        'HOST': os.getenv('DB_HOST', 'db'),
+        'NAME': os.getenv('DB_NAME', 'postgres'),
+        'USER': os.getenv('DB_USER', 'postgres'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'postgres'),
+        'PORT': os.getenv('DB_PORT', 5432),
     }
 }
 
@@ -197,17 +186,20 @@ SOCIALACCOUNT_PROVIDERS = {
 
 
 #ALLOWED_HOSTS=['*']
-#CORS_ORIGIN_ALLOW_ALL = True
 
-ALLOWED_HOSTS = ['http://localhost:8000', 'localhost']
-
+DEFAULT_ALLOWED_HOSTS = '0.0.0.0,127.0.0.1,localhost'
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', DEFAULT_ALLOWED_HOSTS).split(',')
 
 CORS_ORIGIN_ALLOW_ALL = False
 
-CORS_ORIGIN_WHITELIST = (
-    'http://localhost:8000',
-
+CORS_ALLOWED_ORIGINS = (
+    #'http://localhost:8000',
+    #'http://127.0.0.1:8000',
+    #'http://0.0.0.0:8000',
+    # 8080
+    'http://127.0.0.1:8080',
 )
+
 # for dev purposes only, need to remove
 #ACCOUNT_EMAIL_VERIFICATION = 'none'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
