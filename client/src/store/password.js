@@ -24,6 +24,10 @@ export default {
   actions: {
     resetPassword({ commit }, { uid, token, password1, password2 }) {
       commit(PASSWORD_RESET_BEGIN);
+      console.log(uid)
+      console.log(token)
+      console.log(password1)
+      console.log(password2)
       return auth.resetAccountPassword(uid, token, password1, password2)
         .then(() => commit(PASSWORD_RESET_SUCCESS))
         .catch(() => commit(PASSWORD_RESET_FAILURE));
