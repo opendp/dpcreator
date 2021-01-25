@@ -57,7 +57,8 @@ export default {
         .then(() => this.$router.push('/'));
     },
     onGoogleSignInSuccess(resp) {
-      const access_token = resp.Bc.access_token
+      console.log(resp)
+      const access_token = resp.uc.access_token
       this.$store.dispatch('auth/googleLogin', access_token).then(() => this.$router.push('/'))
       .then(() => auth.getAccountDetails().then(({data}) => console.log(data) ))
 
