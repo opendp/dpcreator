@@ -1,27 +1,47 @@
 <template>
-  <div id="password-reset-confirm-view">
-    <h1>Reset Password Confirm</h1>
-    <template v-if="resetLoading">
-      loading...
-    </template>
-    <template v-else-if="!resetCompleted">
-      <form @submit.prevent="submit">
-        <input v-model="inputs.password1" type="password" id="password1" placeholder="password">
-        <input v-model="inputs.password2" type="password" id="password2"
-          placeholder="confirm password">
-      </form>
-      <button @click="resetPassword(inputs)">
-        reset password
-      </button>
-      <span class="error" v-show="resetError">
-        A error occured while processing your request.
-      </span>
-    </template>
-    <template v-else>
-      Your password has been reset.
-      <router-link to="/login">return to login page</router-link>
-    </template>
-  </div>
+  <v-card width="400" class="mx-auto mt-5">
+    <v-card-title>
+      <h1 class="display-1">Reset Password Confirm</h1>
+    </v-card-title>
+    <v-card-text>
+      <template v-if="resetLoading">
+        loading...
+      </template>
+      <template v-else-if="!resetCompleted">
+        <v-form @submit.prevent="submit">
+          <v-text-field
+              :type="showPassword ? 'text' : 'password'"
+              label="Password"
+              v-model="inputs.password1"
+              prepend-icon="mdi-lock"
+              :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append="showPassword = !showPassword"
+          />
+          <v-text-field
+              :type="showPassword ? 'text' : 'password'"
+              label="Confirm Password"
+              v-model="inputs.password2"
+              prepend-icon="mdi-lock"
+              :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append="showPassword = !showPassword"
+          />
+        </v-form>
+      </template>
+      <template v-else>
+        Your password has been reset.
+      </template>
+    </v-card-text>
+    <v-card-actions>
+      <template v-if="!resetCompleted">
+        <v-btn color="info" @click="resetPassword(inputs)">
+          Reset Password
+        </v-btn>
+      </template>
+      <template v-else>
+        <router-link to="/login">return to login page</router-link>
+      </template>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script>
@@ -30,6 +50,7 @@ import { mapActions, mapState } from 'vuex';
 export default {
   data() {
     return {
+      showPassword: false,
       inputs: {
         password1: '',
         password2: '',
