@@ -18,7 +18,7 @@
       <v-divider></v-divider>
       <v-card-actions>
         <template v-if="!emailCompleted">
-          <v-btn @click="sendPasswordResetEmail(inputs)">
+          <v-btn color="info" @click="sendPasswordResetEmail(inputs)">
             send email
           </v-btn>
         </template>
