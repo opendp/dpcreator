@@ -28,15 +28,25 @@
             @click:append="showPassword = !showPassword"
         />
         <v-text-field v-model="inputs.email" type="email" id="email" label="Email"/>
+         <v-alert
+      dense
+      outlined
+      type="error"
+      v-show="registrationError"
+    >
+        An error occured while processing your request.
+           <ul>
+             <li v-for="err in registrationErrors">{{err}}</li>
+           </ul>
+    </v-alert>
       </v-form>
        <v-divider></v-divider>
       <v-card-actions>
        <v-btn color="info" @click="createAccount(inputs)">
         Create Account
        </v-btn>
-        <span class="error" v-show="registrationError">
-        An error occured while processing your request.
-      </span>
+
+
 
 </v-card-actions>
 
@@ -62,7 +72,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapState,mapGetters } from 'vuex';
 
 export default {
   data() {
@@ -76,11 +86,26 @@ export default {
       },
     };
   },
-  computed: mapState('signup', [
-    'registrationCompleted',
-    'registrationError',
-    'registrationLoading',
-  ]),
+  computed: {
+    ...mapState('signup', ['registrationCompleted',
+      'registrationError',
+      'registrationLoading',
+      'errorMessage']),
+    registrationErrors() {
+
+      if (this.errorMessage != null) {
+        if (this.errorMessage['password1'] != null) {
+          return this.errorMessage['password1']
+        } else if (this.errorMessage['email'] != null) {
+          return this.errorMessage['email'];
+        } else if (this.errorMessage['non_field_errors'] != null) {
+          return this.errorMessage['non_field_errors'];
+        }
+      }
+      return this.errorMessage;
+    }
+  },
+
   methods: mapActions('signup', [
     'createAccount',
     'clearRegistrationStatus',

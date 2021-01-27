@@ -54,14 +54,18 @@ const actions = {
       .finally(() => commit(REMOVE_TOKEN));
   },
 
-  fetchUser({ commit }) {
-    auth.getAccountDetails()
-      .then(response => {
-        commit('SET_USER', response.data.username)
-      })
-      .catch(error => {
-        console.log('There was an error:', error.response)
-      })
+  fetchUser({ commit,state }) {
+    if (state.token!=null) {
+      auth.getAccountDetails()
+          .then(response => {
+            commit('SET_USER', response.data.username)
+          })
+          .catch(error => {
+            console.log('There was an error:', error.response)
+          })
+    } else {
+       commit('SET_USER', null)
+    }
   },
   initialize({ commit }) {
     const token = localStorage.getItem(TOKEN_STORAGE_KEY);

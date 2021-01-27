@@ -12,7 +12,21 @@ export default {
     return session.post('/rest-auth/logout/', {});
   },
   createAccount(username, password1, password2, email) {
-    return session.post('/rest-auth/registration/', { username, password1, password2, email });
+    return session.post('/rest-auth/registration/', { username, password1, password2, email })
+        .catch(function (data) {
+    if (data.response) {
+      if (data.response.status == 400) {
+        return Promise.reject(data.response.data);
+      }
+    } else if (data.request) {
+      // The request was made but no response was received
+      console.log(data.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', data.message);
+    }
+
+  });
   },
   changeAccountPassword(password1, password2) {
     return session.post('/rest-auth/password/change/', { password1, password2 });
