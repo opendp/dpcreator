@@ -25,6 +25,14 @@
               :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
               @click:append="showPassword = !showPassword"
           />
+            <v-alert dense outlined type="error" v-show="resetError">
+            An error occurred while processing your request.
+
+            <ul>
+              <li v-for="err in passwordErrors">{{ err }}</li>
+            </ul>
+
+          </v-alert>
         </v-form>
       </template>
       <template v-else>
@@ -45,7 +53,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex';
+import {mapActions, mapState} from 'vuex';
 
 export default {
   data() {
@@ -59,20 +67,29 @@ export default {
       },
     };
   },
-  computed: mapState('password', [
-    'resetCompleted',
-    'resetError',
-    'resetLoading',
-  ]),
+  computed: {
+    ...mapState('password', [
+      'resetCompleted',
+      'resetError',
+      'resetLoading',
+      'passwordMessage',
+    ]),
+    passwordErrors() {
+      let errs = [];
+      if (this.passwordMessage != null) {
+        if (this.passwordMessage['new_password2'] != null)
+          errs = errs.concat(this.passwordMessage['new_password2'])
+        if (this.passwordMessage['new_password1'] != null)
+          errs = errs.concat(this.passwordMessage['new_password1']);
+        if (this.passwordMessage['non_field_errors'] != null)
+          errs = errs.concat(this.passwordMessage['non_field_errors']);
+      }
+      return errs;
+    },
+  },
   methods: mapActions('password', [
     'resetPassword',
     'clearResetStatus',
   ]),
 };
 </script>
-
-<style>
-form input {
-  display: block
-}
-</style>

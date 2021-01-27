@@ -9,6 +9,8 @@ import {
   PASSWORD_EMAIL_CLEAR,
   PASSWORD_EMAIL_FAILURE,
   PASSWORD_EMAIL_SUCCESS,
+  SET_PASSWORD_MESSAGE,
+
 } from './types';
 
 export default {
@@ -20,17 +22,14 @@ export default {
     resetCompleted: false,
     resetError: false,
     resetLoading: false,
+    passwordMessage: null,
   },
   actions: {
     resetPassword({ commit }, { uid, token, password1, password2 }) {
       commit(PASSWORD_RESET_BEGIN);
-      console.log(uid)
-      console.log(token)
-      console.log(password1)
-      console.log(password2)
       return auth.resetAccountPassword(uid, token, password1, password2)
         .then(() => commit(PASSWORD_RESET_SUCCESS))
-        .catch(() => commit(PASSWORD_RESET_FAILURE));
+        .catch((data) => { commit(SET_PASSWORD_MESSAGE, data); commit(PASSWORD_RESET_FAILURE)});
     },
     sendPasswordResetEmail({ commit }, { email }) {
       commit(PASSWORD_EMAIL_BEGIN);
@@ -46,6 +45,9 @@ export default {
     },
   },
   mutations: {
+    [SET_PASSWORD_MESSAGE](state,errorMessage) {
+      state.passwordMessage = errorMessage;
+    },
     [PASSWORD_RESET_BEGIN](state) {
       state.resetLoading = true;
     },

@@ -28,7 +28,7 @@
           />
           <v-text-field v-model="inputs.email" type="email" id="email" label="Email"/>
           <v-alert dense outlined type="error" v-show="registrationError">
-            An error occured while processing your request.
+            An error occurred while processing your request.
             <ul>
               <li v-for="err in registrationErrors">{{ err }}</li>
             </ul>
@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import { mapActions, mapState,mapGetters } from 'vuex';
+import {mapActions, mapState, mapGetters} from 'vuex';
 
 export default {
   data() {
@@ -78,19 +78,18 @@ export default {
     ...mapState('signup', ['registrationCompleted',
       'registrationError',
       'registrationLoading',
-      'errorMessage']),
+      'registrationMessage']),
     registrationErrors() {
-
-      if (this.errorMessage != null) {
-        if (this.errorMessage['password1'] != null) {
-          return this.errorMessage['password1']
-        } else if (this.errorMessage['email'] != null) {
-          return this.errorMessage['email'];
-        } else if (this.errorMessage['non_field_errors'] != null) {
-          return this.errorMessage['non_field_errors'];
-        }
+      let errs = [];
+      if (this.registrationMessage != null) {
+        if (this.registrationMessage['password1'] != null)
+          errs = errs.concat(this.registrationMessage['password1'])
+        if (this.registrationMessage['email'] != null)
+          errs = errs.concat(this.registrationMessage['email']);
+        if (this.registrationMessage['non_field_errors'] != null)
+          errs = errs.concat(this.registrationMessage['non_field_errors']);
       }
-      return this.errorMessage;
+      return errs;
     }
   },
 
@@ -104,14 +103,3 @@ export default {
   },
 };
 </script>
-
-<style>
-form input {
-  display: block
-}
-
-.error {
-  color: crimson;
-  font-size: 12px;
-}
-</style>

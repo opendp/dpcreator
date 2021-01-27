@@ -5,7 +5,6 @@ export default {
     return session.post('/rest-auth/login/', { username, password });
   },
   googleLogin(access_token) {
-    console.log('access passing token: '+ access_token)
     return session.post('/rest-auth/google/',{'access_token':access_token});
   },
   logout() {
@@ -35,7 +34,21 @@ export default {
     return session.post('/rest-auth/password/reset/', { email });
   },
   resetAccountPassword(uid, token, new_password1, new_password2) { // eslint-disable-line camelcase
-    return session.post('/rest-auth/password/reset/confirm/', { uid, token, new_password1, new_password2 });
+    return session.post('/rest-auth/password/reset/confirm/', { uid, token, new_password1, new_password2 })
+     .catch(function (data) {
+    if (data.response) {
+      if (data.response.status == 400) {
+         return Promise.reject(data.response.data);
+      }
+    } else if (data.request) {
+      // The request was made but no response was received
+      console.log(data.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.log('Error', data.message);
+    }
+
+  });
   },
   getAccountDetails() {
     return session.get('/rest-auth/user/');
