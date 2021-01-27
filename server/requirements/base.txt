@@ -10,7 +10,7 @@ django-rest-auth==0.9.3
 django-allauth
 djangorestframework==3.12.1
 idna==2.10
-lxml==4.5.2
+lxml==4.6.2
 packaging==20.4
 psycopg2-binary==2.8.6
 pyDataverse==0.2.1
