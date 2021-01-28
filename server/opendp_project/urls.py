@@ -20,7 +20,8 @@ from django.urls import path, include
 from django.views.generic import TemplateView, RedirectView
 from rest_framework import routers, serializers
 
-from opendp_apps.dataset.views import DepositorSetup
+from opendp_apps.dataset.views import DepositorSetup, DataSetInfoViewSet
+from opendp_apps.terms_of_access.views import TermsOfAccessViewSet, TermsOfAccessAgreementViewSet
 from opendp_apps.user.models import OpenDPUser
 from opendp_apps.user.views import UserViewSet  #, SessionViewSet
 from opendp_apps.user.views import GoogleLogin
@@ -39,7 +40,10 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
-#router.register(r'sessions', SessionViewSet)
+router.register(r'terms-of-access', TermsOfAccessViewSet)
+router.register(r'dataset-info', DataSetInfoViewSet)
+router.register(r'terms-of-access-agreement', TermsOfAccessAgreementViewSet)
+# router.register(r'sessions', SessionViewSet)
 
 
 urlpatterns = [
@@ -59,7 +63,6 @@ urlpatterns = [
     url(r'^account/', include('allauth.urls')),
     url(r'^accounts/profile/$', RedirectView.as_view(url='/', permanent=True), name='profile-redirect'),
     url(r'^rest-auth/google/$', GoogleLogin.as_view(), name='google-login'),
-
     # Putting all vue-related views under "ui/" for now to separate from the api.
     url(r'^.*$', TemplateView.as_view(template_name="index.html")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT, kwargs={'show_indexes': True})

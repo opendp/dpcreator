@@ -1,4 +1,4 @@
-from urllib.parse import urljoin
+import json
 from pprint import pprint
 
 import requests
@@ -9,6 +9,7 @@ from pyDataverse.api import Api
 
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
+
 
 class DataverseClient(object):
 
@@ -50,13 +51,11 @@ class DataverseClient(object):
 
         return err_resp(f'Status code: {response.status_code} {response.text}')
 
-
     def get_schema_org(self, doi):
         """
         Get schema.org data
         """
         return self.get_dataset_export_json(doi, dv_static.EXPORTER_FORMAT_SCHEMA_ORG)
-
 
     def get_dataset_export_json(self, doi, format_type):
         """
@@ -130,7 +129,11 @@ if __name__ == '__main__':
     host = 'https://dataverse.harvard.edu'
     doi = 'doi:10.7910/DVN/GEWLZD'
 
-    client = DataverseClient(host)
+    # This file must be completed with a valid Dataverse API token
+    with open('dataverse_token.json', 'r') as infile:
+        api_token = json.load(infile).get('token')
+
+    client = DataverseClient(host, api_token=api_token)
     ddi_obj = client.get_ddi(doi)
 
     with open('example.ddi', 'w') as outfile:
@@ -150,7 +153,9 @@ if __name__ == '__main__':
     pprint(descriptions[key])
 
     # print(ddi_obj.get_title())
-
+    print()
+    resp = client.api.get_user().json()
+    print(resp)
 
 """
 from pyDataverse.api import Api
