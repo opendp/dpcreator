@@ -207,7 +207,8 @@ CORS_ALLOWED_ORIGINS = (
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_HOST_USER = 'apikey' # this is exactly the value 'apikey'
-EMAIL_HOST_PASSWORD = os.environ['SENDGRID_API_KEY']
+EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY') \
+    if os.environ.get('SENDGRID_API_KEY') else 'sendgrid-key-not-set'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
