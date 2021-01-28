@@ -212,5 +212,11 @@ EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY') \
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-DEFAULT_FROM_EMAIL = os.environ['DEFAULT_FROM_EMAIL']
+
+# TODO: Make this a product-wide address.
+# To verify a new account:
+#   1. Go to https://app.sendgrid.com/settings/sender_auth/senders
+#   2. Click "verify new sender" and proceed
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL') \
+    if os.environ.get('DEFAULT_FROM_EMAIL') else 'kraffmilleropendptest@gmail.com'
 ACCOUNT_EMAIL_VERIFICATION = 'optional'

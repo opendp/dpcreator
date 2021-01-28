@@ -2,6 +2,8 @@ import os
 
 from sendgrid import sendgrid, Email, Content, Mail, To
 
+from django.conf import settings
+
 
 class SendGridAPIError(Exception):
     pass
@@ -9,14 +11,8 @@ class SendGridAPIError(Exception):
 
 class EmailClient(object):
 
-    # TODO: Make this a product-wide address.
-    # To verify a new account:
-    #   1. Go to https://app.sendgrid.com/settings/sender_auth/senders
-    #   2. Click "verify new sender" and proceed
-    default_from_email = 'kraffmilleropendptest@gmail.com'
-
     def __init__(self, from_email=None, api_key=None):
-        self.from_email = from_email if from_email else self.default_from_email
+        self.from_email = from_email if from_email else settings.DEFAULT_FROM_EMAIL
         if not api_key:
             try:
                 # Can't just use .get() here because the key may be an empty string, which would be returned
