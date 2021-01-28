@@ -37,7 +37,7 @@ const actions = {
         commit(SET_USER, username)
       })
       .then(() => commit(LOGIN_SUCCESS))
-      .catch(() => commit(LOGIN_FAILURE));
+      .catch((data) => {  commit(LOGIN_FAILURE); return Promise.reject(data)} );
   },
   googleLogin({commit}, token) {
     commit(LOGIN_BEGIN);

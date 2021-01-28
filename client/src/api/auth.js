@@ -2,7 +2,21 @@ import session from './session';
 
 export default {
   login(username, password) {
-    return session.post('/rest-auth/login/', { username, password });
+    return session.post('/rest-auth/login/', {username, password})
+        .catch(function (data) {
+          if (data.response) {
+            if (data.response.status == 400) {
+              return Promise.reject(data.response.data);
+            }
+          } else if (data.request) {
+            // The request was made but no response was received
+            console.log(data.request);
+          } else {
+            // Something happened in setting up the request that triggered an Error
+            console.log('Error', data.message);
+          }
+
+        });
   },
   googleLogin(access_token) {
     return session.post('/rest-auth/google/',{'access_token':access_token});

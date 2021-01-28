@@ -14,7 +14,12 @@
             :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
             @click:append="showPassword = !showPassword"
         />
-
+        <v-alert dense outlined type="error" v-show="error">
+          An error occurred while processing your request.
+          <ul>
+            <li v-for="err in loginErrors">{{ err }}</li>
+          </ul>
+        </v-alert>
       </v-form>
       <v-divider></v-divider>
       <v-card-actions>
@@ -38,10 +43,13 @@
 
 <script>
 import auth from '../api/auth'
+import {  mapState } from 'vuex';
+
 export default {
   data() {
     return {
       showPassword: false,
+      errorMessage: null,
       googleSignInParams: {
         client_id: '725082195083-1srivl3ra9mpc1q5ogi7aur17vkjuabg.apps.googleusercontent.com',
       },
@@ -51,10 +59,24 @@ export default {
       },
     };
   },
+  computed: {
+   loginErrors() {
+      let errs = [];
+      if (this.errorMessage != null) {
+
+        if (this.errorMessage['non_field_errors'] != null)
+          errs = errs.concat(this.errorMessage['non_field_errors']);
+      }
+      return errs;
+    },
+    error() { return this.errorMessage!=null;}
+  },
   methods: {
-    login({ username, password }) {
-      this.$store.dispatch('auth/login', { username, password })
-        .then(() => this.$router.push('/'));
+    login({username, password}) {
+      this.$store.dispatch('auth/login', {username, password})
+          .catch((data)=> {this.errorMessage = data;} )
+          .then(() => this.$router.push('/'));
+
     },
     onGoogleSignInSuccess(resp) {
       const access_token = resp.getAuthResponse(true).access_token
