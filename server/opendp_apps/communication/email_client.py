@@ -19,7 +19,10 @@ class EmailClient(object):
         self.from_email = from_email if from_email else self.default_from_email
         if not api_key:
             try:
-                self.api_key = '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'
+                # Can't just use .get() here because the key may be an empty string, which would be returned
+                self.api_key = os.environ['SENDGRID_API_KEY'] \
+                    if os.environ.get('SENDGRID_API_KEY') \
+                    else 'sendgrid-api-key-not-set'
             except KeyError:
                 raise SendGridAPIError("SENDGRID_API_KEY must be passed as an argument or"
                                        " set as an environment variable")
