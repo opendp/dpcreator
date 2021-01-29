@@ -22,14 +22,16 @@ export default {
     resetCompleted: false,
     resetError: false,
     resetLoading: false,
-    passwordMessage: null,
   },
   actions: {
     resetPassword({ commit }, { uid, token, password1, password2 }) {
       commit(PASSWORD_RESET_BEGIN);
       return auth.resetAccountPassword(uid, token, password1, password2)
-        .then(() => commit(PASSWORD_RESET_SUCCESS))
-        .catch((data) => { commit(SET_PASSWORD_MESSAGE, data); commit(PASSWORD_RESET_FAILURE)});
+          .then(() => commit(PASSWORD_RESET_SUCCESS))
+          .catch((data) => {
+            commit(PASSWORD_RESET_FAILURE);
+            return Promise.reject(data)
+          });
     },
     sendPasswordResetEmail({ commit }, { email }) {
       commit(PASSWORD_EMAIL_BEGIN);
@@ -45,9 +47,6 @@ export default {
     },
   },
   mutations: {
-    [SET_PASSWORD_MESSAGE](state,errorMessage) {
-      state.passwordMessage = errorMessage;
-    },
     [PASSWORD_RESET_BEGIN](state) {
       state.resetLoading = true;
     },

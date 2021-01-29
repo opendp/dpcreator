@@ -60,22 +60,32 @@ export default {
     };
   },
   computed: {
-   loginErrors() {
+    ...mapState('auth', [
+      'error']),
+    loginErrors() {
       let errs = [];
       if (this.errorMessage != null) {
-
         if (this.errorMessage['non_field_errors'] != null)
           errs = errs.concat(this.errorMessage['non_field_errors']);
       }
       return errs;
     },
-    error() { return this.errorMessage!=null;}
+    error() {
+      return this.errorMessage != null;
+    }
   },
   methods: {
     login({username, password}) {
+      this.errorMessage = null;
       this.$store.dispatch('auth/login', {username, password})
-          .catch((data)=> {this.errorMessage = data;} )
-          .then(() => this.$router.push('/'));
+          .catch((data) => {
+            console.log('catch');
+            this.errorMessage = data;
+          })
+          .then(() => {
+            console.log('then');
+            if (!this.error) this.$router.push('/');
+          });
 
     },
     onGoogleSignInSuccess(resp) {

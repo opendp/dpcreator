@@ -27,7 +27,6 @@
           />
             <v-alert dense outlined type="error" v-show="resetError">
             An error occurred while processing your request.
-
             <ul>
               <li v-for="err in passwordErrors">{{ err }}</li>
             </ul>
@@ -41,7 +40,7 @@
     </v-card-text>
     <v-card-actions>
       <template v-if="!resetCompleted">
-        <v-btn color="info" @click="resetPassword(inputs)">
+        <v-btn color="info" @click="submitResetPassword">
           Reset Password
         </v-btn>
       </template>
@@ -59,6 +58,7 @@ export default {
   data() {
     return {
       showPassword: false,
+      errorMessage: null,
       inputs: {
         password1: '',
         password2: '',
@@ -72,24 +72,33 @@ export default {
       'resetCompleted',
       'resetError',
       'resetLoading',
-      'passwordMessage',
+
     ]),
     passwordErrors() {
       let errs = [];
-      if (this.passwordMessage != null) {
-        if (this.passwordMessage['new_password2'] != null)
-          errs = errs.concat(this.passwordMessage['new_password2'])
-        if (this.passwordMessage['new_password1'] != null)
-          errs = errs.concat(this.passwordMessage['new_password1']);
-        if (this.passwordMessage['non_field_errors'] != null)
-          errs = errs.concat(this.passwordMessage['non_field_errors']);
+      if (this.errorMessage != null) {
+        if (this.errorMessage['new_password2'] != null)
+          errs = errs.concat(this.errorMessage['new_password2'])
+        if (this.errorMessage['new_password1'] != null)
+          errs = errs.concat(this.errorMessage['new_password1']);
+        if (this.errorMessage['non_field_errors'] != null)
+          errs = errs.concat(this.errorMessage['non_field_errors']);
       }
       return errs;
     },
   },
-  methods: mapActions('password', [
-    'resetPassword',
-    'clearResetStatus',
-  ]),
+  methods: {
+    ...mapActions('password', [
+      'resetPassword',
+      'clearResetStatus',
+    ]),
+    submitResetPassword() {
+      this.resetPassword(this.inputs)
+          .catch((data) => {
+            this.errorMessage = data;
+          })
+    }
+  }
+
 };
 </script>

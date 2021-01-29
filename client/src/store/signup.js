@@ -9,7 +9,6 @@ import {
   REGISTRATION_CLEAR,
   REGISTRATION_FAILURE,
   REGISTRATION_SUCCESS,
-  SET_REGISTRATION_MESSAGE,
 } from './types';
 
 export default {
@@ -21,7 +20,6 @@ export default {
     registrationCompleted: false,
     registrationError: false,
     registrationLoading: false,
-    registrationMessage: null,
   },
    getters: {
     getRegistrationMessage: state => {
@@ -32,8 +30,11 @@ export default {
     createAccount({ commit,state }, { username, password1, password2, email }) {
       commit(REGISTRATION_BEGIN);
       return auth.createAccount(username, password1, password2, email)
-        .then(() => commit(REGISTRATION_SUCCESS))
-        .catch((data ) =>{commit(SET_REGISTRATION_MESSAGE, data);  commit(REGISTRATION_FAILURE)});
+          .then(() => commit(REGISTRATION_SUCCESS))
+          .catch((data) => {
+            commit(REGISTRATION_FAILURE);
+            return Promise.reject(data)
+          });
     },
     activateAccount({ commit }, { key }) {
       commit(ACTIVATION_BEGIN);
@@ -49,9 +50,6 @@ export default {
     },
   },
   mutations: {
-    [SET_REGISTRATION_MESSAGE](state,errorMessage) {
-      state.registrationMessage = errorMessage;
-    },
     [ACTIVATION_BEGIN](state) {
       state.activationLoading = true;
     },

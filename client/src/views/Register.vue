@@ -36,7 +36,7 @@
         </v-form>
         <v-divider></v-divider>
         <v-card-actions>
-          <v-btn color="info" @click="createAccount(inputs)">
+          <v-btn color="info" @click="submitRegister()">
             Create Account
           </v-btn>
         </v-card-actions>
@@ -66,6 +66,7 @@ export default {
   data() {
     return {
       showPassword: false,
+      errorMessage: null,
       inputs: {
         username: '',
         password1: '',
@@ -77,26 +78,30 @@ export default {
   computed: {
     ...mapState('signup', ['registrationCompleted',
       'registrationError',
-      'registrationLoading',
-      'registrationMessage']),
+      'registrationLoading']),
     registrationErrors() {
       let errs = [];
-      if (this.registrationMessage != null) {
-        if (this.registrationMessage['password1'] != null)
-          errs = errs.concat(this.registrationMessage['password1'])
-        if (this.registrationMessage['email'] != null)
-          errs = errs.concat(this.registrationMessage['email']);
-        if (this.registrationMessage['non_field_errors'] != null)
-          errs = errs.concat(this.registrationMessage['non_field_errors']);
+      if (this.errorMessage != null) {
+        if (this.errorMessage['password1'] != null)
+          errs = errs.concat(this.errorMessage['password1'])
+        if (this.errorMessage['email'] != null)
+          errs = errs.concat(this.errorMessage['email']);
+        if (this.errorMessage['non_field_errors'] != null)
+          errs = errs.concat(this.errorMessage['non_field_errors']);
       }
       return errs;
     }
   },
 
-  methods: mapActions('signup', [
-    'createAccount',
-    'clearRegistrationStatus',
-  ]),
+  methods: {
+    ...mapActions('signup', [
+      'createAccount',
+      'clearRegistrationStatus',
+    ]),
+    submitRegister() {
+      this.createAccount(this.inputs).catch((data) => this.errorMessage = data);
+    }
+  },
   beforeRouteLeave(to, from, next) {
     this.clearRegistrationStatus();
     next();
