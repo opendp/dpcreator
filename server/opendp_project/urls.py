@@ -52,6 +52,9 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api/deposit/', DepositorSetup.as_view()),
 
+    # APIs for retrieving Dataverse Info
+    path('dv-test/', include('opendp_apps.dataverses.urls')),
+
     # For testing
     path('dv-mock-api/', include('opendp_apps.dataverses.mock_urls')),
 

@@ -12,12 +12,14 @@ class RegisteredDataverseAdmin(admin.ModelAdmin):
 
 class ManifestTestParamsAdmin(admin.ModelAdmin):
     search_fields = ('name', 'fileId', 'siteUrl')
-    list_display = ('name', 'fileId', 'siteUrl', 'dataverse_incoming_link_2', 'filePid', 'datasetPid')
+    list_display = ('name', 'fileId', 'siteUrl',
+                    'dataverse_incoming_link_2', 'use_mock_dv_api',
+                    'filePid', 'datasetPid')
     save_on_top = True
     list_filter  = ('siteUrl', )
-    readonly_fields = (#'dataverse_incoming_link',
-                       'dataverse_incoming_link_2',
-                       'user_info_link',
+    readonly_fields = ('dataverse_incoming_link_2',
+                       'get_dataverse_user_info_link',
+                       'mock_user_info_link',
                        'ddi_info_link',
                        'schema_org_info_link')
 

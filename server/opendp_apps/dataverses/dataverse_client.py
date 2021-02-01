@@ -38,7 +38,11 @@ class DataverseClient(object):
 
         # make the request
         headers = {'X-Dataverse-key': api_token}
-        response = requests.get(dv_url, headers=headers)
+        try:
+            response = requests.get(dv_url, headers=headers)
+        except ConnectionError as err_obj:
+            return err_resp(f'Failed to connect. {err_obj}')
+
         if response.status_code == 200:
             return ok_resp(response.json())
 
@@ -48,8 +52,8 @@ class DataverseClient(object):
                 return err_resp(json_resp['message'])
         except ValueError:
             pass
-
         return err_resp(f'Status code: {response.status_code} {response.text}')
+
 
     def get_schema_org(self, doi):
         """

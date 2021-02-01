@@ -88,8 +88,25 @@ class ManifestTestParams(TimestampedModelWithUUID):
         verbose_name = ('Manifest Test Parameter')
         verbose_name_plural = ('Manifest Test Parameters')
 
+
     @mark_safe
-    def user_info_link(self):
+    def get_dataverse_user_info_link(self):
+        """
+        Link to the user info API
+        """
+        if not (self.apiGeneralToken):
+            return 'n/a'
+
+        user_lnk = reverse('view_get_dv_user_info') + \
+                   (f'?apiGeneralToken={self.apiGeneralToken}&'
+                    f'siteUrl={self.siteUrl}')
+
+        return f'<a href="{user_lnk}">API: Get User Info from Dataverse API</a>'
+    get_dataverse_user_info_link.allow_tags = True
+
+
+    @mark_safe
+    def mock_user_info_link(self):
         """
         Link to the user info API
         """
@@ -98,7 +115,7 @@ class ManifestTestParams(TimestampedModelWithUUID):
 
         user_lnk = reverse('view_get_user_info')
         return f'<a href="{user_lnk}">API: user info</a>'
-    user_info_link.allow_tags = True
+    mock_user_info_link.allow_tags = True
 
 
     @mark_safe
