@@ -2,6 +2,8 @@ import os
 
 from sendgrid import sendgrid, Email, Content, Mail, To
 
+from django.conf import settings
+
 
 class SendGridAPIError(Exception):
     pass
@@ -9,17 +11,14 @@ class SendGridAPIError(Exception):
 
 class EmailClient(object):
 
-    # TODO: Make this a product-wide address.
-    # To verify a new account:
-    #   1. Go to https://app.sendgrid.com/settings/sender_auth/senders
-    #   2. Click "verify new sender" and proceed
-    default_from_email = 'ecowan@g.harvard.edu'
-
     def __init__(self, from_email=None, api_key=None):
-        self.from_email = from_email if from_email else self.default_from_email
+        self.from_email = from_email if from_email else settings.DEFAULT_FROM_EMAIL
         if not api_key:
             try:
-                self.api_key = os.environ.get('SENDGRID_API_KEY')
+                # Can't just use .get() here because the key may be an empty string, which would be returned
+                self.api_key = os.environ['SENDGRID_API_KEY'] \
+                    if os.environ.get('SENDGRID_API_KEY') \
+                    else 'sendgrid-api-key-not-set'
             except KeyError:
                 raise SendGridAPIError("SENDGRID_API_KEY must be passed as an argument or"
                                        " set as an environment variable")
@@ -36,15 +35,15 @@ class EmailClient(object):
 
 
 if __name__ == '__main__':
-    apikey_message = "Current API Key: " + os.environ.get('SENDGRID_API_KEY')
-    print("-"*(len(apikey_message)+1))
+   # apikey_message = "Current API Key: " + os.environ.get('SENDGRID_API_KEY')
+   # print("-"*(len(apikey_message)+1))
 
-    print("Current API Key: ", os.environ.get('SENDGRID_API_KEY'))
+  #  print("Current API Key: ", os.environ.get('SENDGRID_API_KEY'))
     c = EmailClient()
     print("From Email: ", c.from_email)
-    print("-"*(len(apikey_message)+1))
-    result = c.send(to_email='ecowan@g.harvard.edu', subject='test test',
+ #   print("-"*(len(apikey_message)+1))
+    result = c.send(to_email='ellen.kraffmiller@gmail.com', subject='test test',
                     content='hi', content_type='text/plain')
     print("Message Sent")
     print("Status Code: ", result.status_code)
-    print("-"*(len(apikey_message)+1))
+  #  print("-"*(len(apikey_message)+1))

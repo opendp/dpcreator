@@ -5,6 +5,8 @@
     <head>
         {% block head %}{{ block.super }}{% endblock %}
         <!-- html-webpack-inject will inject head assets below -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css">
     </head>
     <body {% block body_tag_attributes %}{{ block.super }}{% endblock %}>
         {% block body %}{{ block.super }}{% endblock %}

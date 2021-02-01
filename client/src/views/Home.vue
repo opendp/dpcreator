@@ -1,18 +1,43 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <div id="home-view">
+    <h1>Home</h1>
+      <h3 v-if="isAuthenticated">hello, {{user}}</h3>
+      <h3 v-if="!isAuthenticated">not authenticated</h3>
+    </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import auth from '../api/auth'
+import {
+  mapActions,
+  mapGetters,
+  mapState,
+} from 'vuex';
 
 export default {
-  name: 'Home',
-  components: {
-    HelloWorld
-  }
+  name: 'home',
+  created() {
+      this.$store.dispatch('auth/fetchUser')
+  },
+  computed: {
+    ...mapGetters('auth', ['isAuthenticated']),
+    ...mapState('auth', ['user']),
+  },
+   methods: {
+    onGoogleSignInSuccess(resp) {
+      console.log('success!')
+      const access_token = resp.xc.access_token
+       this.$store.dispatch('auth/googleLogin', access_token).then(() => this.$router.push('/'))
+      .then(() => auth.getAccountDetails().then(({data}) => console.log(data) ))
+        //  then((resp) => this.user = resp.data.user)
+    },
+    onGoogleSignInError (error) {
+      console.log('OH NOES', error)
+    },
+    isEmpty (obj) {
+      return Object.keys(obj).length === 0
+    }
+  },
 }
+
 </script>

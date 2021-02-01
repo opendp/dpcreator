@@ -1,6 +1,7 @@
 import json
 from unittest import skip
 import tempfile
+import requests_mock
 
 from django.test import Client, tag, TestCase
 from django.urls import reverse
@@ -9,7 +10,6 @@ from django.conf import settings
 from django.template.loader import render_to_string
 
 from django.contrib.auth import get_user_model
-import requests_mock
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.models import ManifestTestParams
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
@@ -19,6 +19,7 @@ from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.model_helpers.msg_util import msgt
 
 TAG_WEB_CLIENT = 'web-client' # skip these tests on travis; need to fix as many use requests to access the localhost
+
 
 class DataverseIncomingTest(TestCase):
 
@@ -36,7 +37,6 @@ class DataverseIncomingTest(TestCase):
 
         self.mock_params = ManifestTestParams.objects.filter(use_mock_dv_api=True).first()
 
-
     def test_010_dv_params(self):
         """(10) Basic check of incoming DV params"""
         msgt(self.test_010_dv_params.__doc__)
@@ -45,7 +45,7 @@ class DataverseIncomingTest(TestCase):
         #
         self.assertTrue(self.mock_params is not None)
 
-        print('2. Area all params there? (should be yes)')
+        print('2. Are all params there? (should be yes)')
         #
         params_dict = self.mock_params.as_dict()
         dv_manifest = DataverseManifestParams(params_dict)
@@ -75,7 +75,6 @@ class DataverseIncomingTest(TestCase):
         self.assertTrue(err_msg.find('apiGeneralToken') > -1)
         print(dv_manifest.get_error_message())
 
-
     def set_requests_mocker(self, req_mocker):
         """
         Set up test urls that are used by the requests library
@@ -100,8 +99,6 @@ class DataverseIncomingTest(TestCase):
         fail_info = {dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_ERROR,
                      dv_static.DV_KEY_MESSAGE: 'not found for cool-breeze'}
         req_mocker.get(schema_url, json=fail_info)
-
-
 
     @requests_mock.Mocker()
     def test_020_check_dv_handler_directly(self, req_mocker):
@@ -134,7 +131,7 @@ class DataverseIncomingTest(TestCase):
         self.assertTrue(file_info is not None)
         #print('----' + f'{DataverseFileInfo.objects.count()}' + '----------')
 
-    #@tag(TAG_WEB_CLIENT)
+    # @tag(TAG_WEB_CLIENT)
     @requests_mock.Mocker()
     def test_030_dv_handler_bad_param(self, req_mocker):
         """(30) Test DataverseRequestHandler with bad params"""
@@ -163,8 +160,7 @@ class DataverseIncomingTest(TestCase):
         self.assertTrue(dv_handler.get_err_msg().find('cool-breeze' ) > -1)
         self.assertTrue(dv_handler.schema_info is None)
 
-
-    #@tag(TAG_WEB_CLIENT)
+    # @tag(TAG_WEB_CLIENT)
     @requests_mock.Mocker()
     def test_100_check_dv_handler_via_url(self, req_mocker):
         """(100) Test DataverseRequestHandler via url"""

@@ -26,9 +26,6 @@ SECRET_KEY = 'tm4wb=azvng$!c^0%f6=nb=hkslh)p$v(z(zs+siva7y@7e9^1'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -40,10 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'django.contrib.sites',
+    'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
-    'rest_auth',
-    'rest_auth.registration',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -60,6 +58,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -93,22 +92,14 @@ WSGI_APPLICATION = 'opendp_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-"""
-docker run --rm --name raven-postgres \
- -e POSTGRES_DB=postgres \
- -e POSTGRES_USER=postgres \
- -e POSTGRES_PASSWORD=postgres \
- -p 5432:5432 postgres
-"""
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
-       # 'HOST': 'localhost',
-        'PORT': 5432,
+        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql_psycopg2'),
+        'HOST': os.getenv('DB_HOST', 'db'),
+        'NAME': os.getenv('DB_NAME', 'postgres'),
+        'USER': os.getenv('DB_USER', 'postgres'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'postgres'),
+        'PORT': os.getenv('DB_PORT', 5432),
     }
 }
 
@@ -192,3 +183,40 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+
+
+#ALLOWED_HOSTS=['*']
+
+DEFAULT_ALLOWED_HOSTS = '0.0.0.0,127.0.0.1,localhost'
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', DEFAULT_ALLOWED_HOSTS).split(',')
+
+CORS_ORIGIN_ALLOW_ALL = False
+
+CORS_ALLOWED_ORIGINS = (
+    #'http://localhost:8000',
+    #'http://127.0.0.1:8000',
+    #'http://0.0.0.0:8000',
+    # 8080
+    'http://127.0.0.1:8080',
+)
+
+# for dev purposes only, need to remove
+#ACCOUNT_EMAIL_VERIFICATION = 'none'
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_HOST_USER = 'apikey' # this is exactly the value 'apikey'
+EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY') \
+    if os.environ.get('SENDGRID_API_KEY') else 'sendgrid-key-not-set'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# TODO: Make this a product-wide address.
+# To verify a new account:
+#   1. Go to https://app.sendgrid.com/settings/sender_auth/senders
+#   2. Click "verify new sender" and proceed
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL') \
+    if os.environ.get('DEFAULT_FROM_EMAIL') else 'kraffmilleropendptest@gmail.com'
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
