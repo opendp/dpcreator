@@ -8,6 +8,7 @@
 
 <script>
 import auth from '../api/auth'
+import dataverse from '../api/dataverse'
 import {
   mapActions,
   mapGetters,
@@ -17,7 +18,10 @@ import {
 export default {
   name: 'home',
   created() {
-      this.$store.dispatch('auth/fetchUser')
+    const apiGeneralToken = this.$route.query.apiGeneralToken;
+    console.log(apiGeneralToken)
+    dataverse.getUserInfo(apiGeneralToken, 'https://dataverse.harvard.edu').then((data) => console.log(data))
+
   },
   computed: {
     ...mapGetters('auth', ['isAuthenticated']),
