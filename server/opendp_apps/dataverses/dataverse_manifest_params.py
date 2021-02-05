@@ -137,4 +137,11 @@ class DataverseManifestParams(BasicErrCheck):
                 if identifier and identifier.endswith(file_doi):
                     return ok_resp(file_info)
 
-        return err_resp(f'Info for fileId "{self.fileId}" not found in the schema')
+        if self.fileId:
+            user_msg = f'Did not find fileId "{self.fileId}"'
+        elif file_info:
+            user_msg = f'Did not find file DOI "{file_doi}"'
+        else:
+            user_msg = ''
+
+        return err_resp(f'Info for file not found in the schema. {user_msg}')

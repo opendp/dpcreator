@@ -8,6 +8,7 @@ from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestPa
 from opendp_apps.utils.view_helper import get_json_error, get_json_success
 
 class DataverseUserInfoView(View):
+    """API to retrieve Dataverse User Information"""
 
     # These parameters are needed for the Dataverse API
     required_params = [dv_static.DV_PARAM_SITE_URL, dv_static.DV_API_GENERAL_TOKEN]

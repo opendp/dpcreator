@@ -5,7 +5,7 @@ import requests
 from requests.exceptions import ConnectionError
 import lxml.etree as etree
 
-from pyDataverse.api import Api
+from pyDataverse.api import Api, NativeApi
 
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
@@ -16,6 +16,7 @@ class DataverseClient(object):
     def __init__(self, host, api_token=None):
         self._host = host
         self.api = Api(host, api_token=api_token)
+        self.native_api = NativeApi(host, api_token=api_token)
 
     def get_ddi(self, doi, format=dv_static.EXPORTER_FORMAT_DDI):
         """
@@ -66,7 +67,7 @@ class DataverseClient(object):
         Get dataset export
         """
         try:
-            response = self.api.get_dataset_export(doi, format_type)
+            response = self.native_api.get_dataset_export(doi, format_type)
         except ConnectionError as err_obj:
             return err_resp(f'Failed to connect. {err_obj}')
 
