@@ -18,9 +18,17 @@ import {
 export default {
   name: 'home',
   created() {
-    const apiGeneralToken = this.$route.query.apiGeneralToken;
-    console.log(apiGeneralToken)
-    dataverse.getUserInfo(apiGeneralToken, 'https://dataverse.harvard.edu').then((data) => console.log(data))
+    const apiGeneralToken = this.$route.query.apiGeneralToken
+    const siteUrl = this.$route.query.siteUrl
+    const fileId = this.$route.query.fileId
+    const filePid = this.$route.query.filePid
+    const datasetPid = this.$route.query.datasetPid
+    if (apiGeneralToken && siteUrl) {
+      dataverse.getUserInfo(apiGeneralToken, siteUrl).then((data) => console.log(data))
+      if (datasetPid && (fileId || filePid)) {
+        dataverse.getDatasetInfo(apiGeneralToken, siteUrl, datasetPid, fileId, filePid).then((data) => console.log(data));
+      }
+    }
 
   },
   computed: {
