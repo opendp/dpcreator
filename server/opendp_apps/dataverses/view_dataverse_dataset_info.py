@@ -58,7 +58,7 @@ class DataverseDatasetInfoView(View):
             return JsonResponse(get_json_error(schema_info_resp.message))
 
         schema_info = schema_info_resp.data
-        print('schema_info', schema_info)
+        #print('schema_info', schema_info)
 
         # (2) Retrieve the file specific info from the schema.org information
         #
