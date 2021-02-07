@@ -35,6 +35,8 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     # during analysis setup
     data_profile_key = models.CharField(max_length=128, blank=True)
 
+    
+
     class Meta:
         verbose_name = 'Dataset Information'
         verbose_name_plural = 'Dataset Information'

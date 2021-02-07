@@ -5,12 +5,16 @@ Mimic the Dataverse urls for testing
 - download file
 """
 from django.urls import path, re_path
-from opendp_apps.dataverses import mock_dv_views
+from opendp_apps.dataverses import views, mock_dv_views
 
 MOCK_API_PREFIX = 'api'
 MOCK_API_VERSION = 'v1'
 
 urlpatterns = [
+
+    re_path(f'dv-info/as-dict/(?P<object_id>[0-9a-f-]+)',
+            views.view_as_dict,
+            name='view_as_dict'),
 
     path(f'dataverse/incoming-test-1',
          mock_dv_views.view_dataverse_incoming_1,

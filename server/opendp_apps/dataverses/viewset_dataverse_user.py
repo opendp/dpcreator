@@ -1,33 +1,29 @@
 from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.views import View
+from rest_framework.views import APIView
+from rest_framework import authentication, permissions, viewsets
 
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
 
 from opendp_apps.utils.view_helper import get_json_error, get_json_success
 
-class DataverseUserInfoView(View):
-    """API to retrieve Dataverse User Information"""
+class DataverseUserInfoView(APIView):
+    """API to retrieve Dataverse User Information.
+    Required param"""
 
     # These parameters are needed for the Dataverse API
-    required_params = [dv_static.DV_PARAM_SITE_URL, dv_static.DV_API_GENERAL_TOKEN]
+    required_params = [dv_static.DV_PARAM_SITE_URL,
+                       dv_static.DV_API_GENERAL_TOKEN]
 
-    def get(self, request):
-        """(Not recommended) Pass the params as GET parameters
-        Expected parameters: siteUrl, apiGeneralToken
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def post(self, request, *args, **kwargs):
         """
-        mparams = DataverseManifestParams(request.GET,
-                                          custom_required_params=self.required_params)
-
-        return self.retrieve_user_info(mparams)
-
-
-    def post(self, request):
+        Expected parameters:
+        - dv_static.DV_PARAM_SITE_URL
+        - dv_static.DV_API_GENERAL_TOKEN
         """
-        Expected parameters: siteUrl, apiGeneralToken
-        """
-        mparams = DataverseManifestParams(request.POST,
+        mparams = DataverseManifestParams(request.POST.dict(),
                                           custom_required_params=self.required_params)
 
         return self.retrieve_user_info(mparams)
@@ -60,3 +56,14 @@ class DataverseUserInfoView(View):
             user_msg = 'user_info.data must be a Python dict'
 
         return JsonResponse(get_json_error(user_msg))
+
+"""
+import requests
+
+payload = {"siteUrl": "https://dataverse.harvard.edu/", "apiGeneralToken": "(dataverse-token)"} 
+r = requests.post('http://0.0.0.0:8000/api/dv-user/', data=payload)
+                  
+print(f'status: {r.status_code}')
+print(f'text: {r.text}')
+
+"""

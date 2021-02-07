@@ -118,45 +118,15 @@ class ManifestTestParams(TimestampedModelWithUUID):
 
         return qstr
 
-
     @mark_safe
-    def get_dataverse_dataset_info_link(self):
-        """
-        Link to the user info API
-        """
-        if not (self.apiGeneralToken):
-            return 'n/a'
+    def view_as_dict_link(self):
+        """Link to return the params in JSON"""
+        dataset_lnk = reverse('view_as_dict',
+                              kwargs=dict(object_id=self.object_id))
 
-        selected_params = [dv_static.DV_API_GENERAL_TOKEN,
-                           dv_static.DV_PARAM_SITE_URL,
-                           dv_static.DV_PARAM_DATASET_PID,
-                           dv_static.DV_PARAM_FILE_ID,
-                           dv_static.DV_PARAM_FILE_PID]
+        return f'<a href="{dataset_lnk}">API: Get Params as JSON</a>'
 
-        url_str = self.get_manifest_url_params(selected_params)
-        dataset_lnk = reverse('view_get_dv_dataset_info') + f'?{url_str}'
-
-        return f'<a href="{dataset_lnk}">API: Get Dataset Info from Dataverse API</a>'
-    get_dataverse_dataset_info_link.allow_tags = True
-
-
-    @mark_safe
-    def get_dataverse_user_info_link(self):
-        """
-        Link to the user info API
-        """
-        if not (self.apiGeneralToken):
-            return 'n/a'
-
-        selected_params = [dv_static.DV_API_GENERAL_TOKEN,
-                           dv_static.DV_PARAM_SITE_URL]
-
-        url_str = self.get_manifest_url_params(selected_params)
-
-        user_lnk = reverse('view_get_dv_user_info') + f'?{url_str}'
-
-        return f'<a href="{user_lnk}">API: Get User Info from Dataverse API</a>'
-    get_dataverse_user_info_link.allow_tags = True
+    view_as_dict_link.allow_tags = True
 
 
     @mark_safe

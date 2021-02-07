@@ -18,8 +18,7 @@ class ManifestTestParamsAdmin(admin.ModelAdmin):
     save_on_top = True
     list_filter  = ('siteUrl', )
     readonly_fields = ('dataverse_incoming_link_2',
-                       'get_dataverse_user_info_link',
-                       'get_dataverse_dataset_info_link',
+                       'view_as_dict_link',
                        'mock_user_info_link',
                        'ddi_info_link',
                        'schema_org_info_link')
