@@ -1,11 +1,23 @@
 from django.http import JsonResponse
 from rest_framework.views import APIView
-from rest_framework import authentication, permissions, viewsets
+from rest_framework import permissions  #,authentication,  viewsets
+from rest_framework import serializers
 
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
 
 from opendp_apps.utils.view_helper import get_json_error, get_json_success
+
+
+class DaverseUserInputSerializer(serializers.Serializer):
+    """API Input parameters"""
+    siteUrl = serializers.URLField(label='Dataverse url',
+                                   help_text='Example: https://dataverse.harvard.edu')
+
+    apiGeneralToken = serializers.CharField(max_length=255,
+                                            label='Dataverse API Token',
+                                            help_text=('Reference: https://guides.dataverse.org'
+                                                       '/en/latest/user/account.html#api-token'))
 
 class DataverseUserInfoView(APIView):
     """API to retrieve Dataverse User Information.
@@ -56,6 +68,10 @@ class DataverseUserInfoView(APIView):
             user_msg = 'user_info.data must be a Python dict'
 
         return JsonResponse(get_json_error(user_msg))
+
+    def get_serializer(self):
+        return DaverseUserInputSerializer()
+
 
 """
 import requests

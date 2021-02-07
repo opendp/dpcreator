@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from rest_framework.views import APIView
-from rest_framework import authentication, permissions, viewsets
+from rest_framework import permissions #, authentication, viewsets
 from rest_framework import serializers
 
 from opendp_apps.dataverses import static_vals as dv_static
@@ -10,6 +10,7 @@ from opendp_apps.utils.view_helper import get_json_error, get_json_success
 
 
 class DaverseDatasetInputSerializer(serializers.Serializer):
+    """API Input parameters"""
     siteUrl = serializers.URLField(label='Dataverse url',
                                    help_text='Example: https://dataverse.harvard.edu')
 
@@ -22,7 +23,8 @@ class DaverseDatasetInputSerializer(serializers.Serializer):
                                        label='Dataset DOI',
                                        help_text='Example: "doi:10.7910/DVN/B7DHBK"')
 
-    fileId = serializers.IntegerField(label='Dataverse File Id',
+    fileId = serializers.IntegerField(required=False,
+                                      label='Dataverse File Id',
                                       help_text='Example: 4034504')
 
     filePid = serializers.CharField(max_length=255,
