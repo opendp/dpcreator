@@ -8,6 +8,7 @@
 
 <script>
 import auth from '../api/auth'
+import dataverse from '../api/dataverse'
 import {
   mapActions,
   mapGetters,
@@ -17,7 +18,18 @@ import {
 export default {
   name: 'home',
   created() {
-      this.$store.dispatch('auth/fetchUser')
+    const apiGeneralToken = this.$route.query.apiGeneralToken
+    const siteUrl = this.$route.query.siteUrl
+    const fileId = this.$route.query.fileId
+    const filePid = this.$route.query.filePid
+    const datasetPid = this.$route.query.datasetPid
+    if (apiGeneralToken && siteUrl) {
+      dataverse.getUserInfo(apiGeneralToken, siteUrl).then((data) => console.log(data))
+      if (datasetPid && (fileId || filePid)) {
+        dataverse.getDatasetInfo(apiGeneralToken, siteUrl, datasetPid, fileId, filePid).then((data) => console.log(data));
+      }
+    }
+
   },
   computed: {
     ...mapGetters('auth', ['isAuthenticated']),
