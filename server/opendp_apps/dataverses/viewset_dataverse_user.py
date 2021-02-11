@@ -27,7 +27,8 @@ class DataverseUserInfoView(APIView):
     required_params = [dv_static.DV_PARAM_SITE_URL,
                        dv_static.DV_API_GENERAL_TOKEN]
 
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    # Remove this for now, so Vue app can call it before user logs in
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def post(self, request, *args, **kwargs):
         """
