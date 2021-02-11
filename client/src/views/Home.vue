@@ -27,13 +27,17 @@
       <v-btn :disabled="!tipsCheckbox" to="/Register">Create Account</v-btn>
     </template>
 
-    <template v-if="isAuthenticated && !isTermsAccepted">
-      Here are the OpenDP terms of Service text that you must agree with.
-      <v-btn @click="acceptTerms">Accept</v-btn>
-    </template>
-    <template v-if="isAuthenticated && isTermsAccepted">
-      Click here to begin/continue the process of generating a DP Release for your Data
-      <v-btn to="/VariableInfo">Get Started</v-btn>
+    <template v-if="isAuthenticated">
+      <h3>Welcome, {{ user.username }}</h3>
+      <template v-if="!isTermsAccepted">
+        Here are the OpenDP terms of Service text that you must agree with.
+        <v-btn @click="acceptTerms">Accept</v-btn>
+      </template>
+
+      <template v-if="isTermsAccepted">
+        Click here to begin/continue the process of generating a DP Release for your Data
+        <v-btn to="/VariableInfo">Get Started</v-btn>
+      </template>
     </template>
   </div>
 </template>
