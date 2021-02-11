@@ -2,11 +2,8 @@
   <div id="app">
     <v-app>
         <router-link to="/">Home</router-link>
-        |
-        <template v-if="!isAuthenticated">
-          <router-link to="/login">Login</router-link>
-        </template>
-        <navbar v-if="isAuthenticated"></navbar>
+
+      <navbar v-if="isAuthenticated"></navbar>
         <v-content>
 
         <router-view/>

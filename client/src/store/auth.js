@@ -5,7 +5,7 @@ import {
   LOGIN_FAILURE,
   LOGIN_SUCCESS,
   LOGOUT,
-  REMOVE_TOKEN,
+  REMOVE_TOKEN, SET_TERMS_ACCEPTED,
   SET_TOKEN,
   SET_USER,
 } from './types';
@@ -18,13 +18,15 @@ const initialState = {
   error: false,
   token: null,
   user: null,
+  termsAccepted: false
 };
 
 const getters = {
   isAuthenticated: state => !!state.token,
+  isTermsAccepted: state => state.termsAccepted,
   getUser: state => {
-      return state.user
-    },
+    return state.user
+  },
 };
 
 
@@ -58,16 +60,19 @@ const actions = {
     if (state.token!=null) {
       auth.getAccountDetails()
           .then(response => {
-            commit('SET_USER', response.data.username)
+            commit('SET_USER', response.data)
           })
           .catch(error => {
             console.log('There was an error:', error.response)
           })
     } else {
-       commit('SET_USER', null)
+      commit('SET_USER', null)
     }
   },
-  initialize({ commit }) {
+  setTermsAccepted({commit, state}, termsAccepted) {
+    commit('SET_TERMS_ACCEPTED', state, termsAccepted)
+  },
+  initialize({commit}) {
     const token = localStorage.getItem(TOKEN_STORAGE_KEY);
 
     if (isProduction && token) {
@@ -96,6 +101,7 @@ const mutations = {
   [LOGOUT](state) {
     state.authenticating = false;
     state.error = false;
+    state.user = null;
   },
   [SET_TOKEN](state, token) {
     if (!isProduction) localStorage.setItem(TOKEN_STORAGE_KEY, token);
@@ -108,7 +114,10 @@ const mutations = {
     state.token = null;
   },
   [SET_USER](state, username) {
-     state.user = username;
+    state.user = username;
+  },
+  [SET_TERMS_ACCEPTED](state, termsAccepted) {
+    state.termsAccepted = termsAccepted;
   },
 };
 

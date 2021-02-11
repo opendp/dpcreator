@@ -22,4 +22,5 @@ export const SET_TOKEN = 'SET_TOKEN';
 export const REMOVE_TOKEN = 'REMOVE_TOKEN';
 export const SET_USER = 'SET_USER'
 export const SET_DV_TOKEN = 'SET_DV_TOKEN'
+export const SET_TERMS_ACCEPTED = 'SET_TERMS_ACCEPTED'
 
