@@ -8,8 +8,12 @@
         loading...
       </template>
       <template v-else-if="!registrationCompleted">
-        <v-form @submit.prevent="submit">
-          <v-text-field v-model="inputs.username" label="Username"/>
+        <v-form @submit.prevent="submit" v-model="formValidity">
+          <v-text-field
+              v-model="inputs.username"
+              label="Username"
+              :rules="[v => !!v || 'Username is required']"
+          />
           <v-text-field
               :type="showPassword ? 'text' : 'password'"
               label="Password"
@@ -17,6 +21,7 @@
               prepend-icon="mdi-lock"
               :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
               @click:append="showPassword = !showPassword"
+              :rules="passwordRules"
           />
           <v-text-field
               :type="showPassword ? 'text' : 'password'"
@@ -25,8 +30,9 @@
               prepend-icon="mdi-lock"
               :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
               @click:append="showPassword = !showPassword"
+              :rules="passwordRules"
           />
-          <v-text-field v-model="inputs.email" type="email" id="email" label="Email"/>
+          <v-text-field v-model="inputs.email" :rules="emailRules" type="email" id="email" label="Email"/>
           <v-alert dense outlined type="error" v-show="registrationError">
             An error occurred while processing your request.
             <ul>
@@ -36,7 +42,7 @@
         </v-form>
         <v-divider></v-divider>
         <v-card-actions>
-          <v-btn color="info" @click="submitRegister()">
+          <v-btn color="info" :disabled="!formValidity" @click="submitRegister()">
             Create Account
           </v-btn>
         </v-card-actions>
@@ -73,6 +79,17 @@ export default {
         password2: '',
         email: '',
       },
+      emailRules: [
+        value => value.indexOf('@') !== 0 || 'Email should have a username.',
+        value => value.includes('@') || 'Email should include an @ symbol.',
+        value => value.includes('.') || 'Email should include a period symbol.',
+        value =>
+            value.indexOf('.') <= value.length - 3 ||
+            'Email should contain a valid domain extension.'
+      ],
+      passwordRules: [
+        v => !!v || 'Password is required',
+        v => (v && v.length >= 9) || 'Password must have 9+ characters',]
     };
   },
   computed: {
