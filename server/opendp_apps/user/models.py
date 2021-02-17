@@ -12,6 +12,9 @@ class OpenDPUser(AbstractUser):
     """
     object_id = models.UUIDField(default=uuid.uuid4, editable=False)
 
+    class Meta:
+        verbose_name = 'OpenDP User'
+
 
 class DataverseUser(TimestampedModelWithUUID):
     """
