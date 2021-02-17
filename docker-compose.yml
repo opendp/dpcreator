@@ -7,11 +7,13 @@ services:
     expose:
       - 6379
   db:
-   image: postgres
-   environment:
-     - POSTGRES_DB=postgres
-     - POSTGRES_USER=postgres
-     - POSTGRES_PASSWORD=postgres
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
   # TODO: Load data every time
   client:
     build: "./client"
