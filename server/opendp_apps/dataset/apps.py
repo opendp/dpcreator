@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class DataverseConfig(AppConfig):
+class DatasetConfig(AppConfig):
     name = 'dataset'

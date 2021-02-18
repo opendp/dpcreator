@@ -21,7 +21,11 @@ AUTH_USER_MODEL = 'user.OpenDPUser'
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'tm4wb=azvng$!c^0%f6=nb=hkslh)p$v(z(zs+siva7y@7e9^1'
+SECRET_KEY = os.getenv('SECRET_KEY', 'SECRET_KEY!-ADD-REAL-KEY-HERE!--ADD-REAL-KEY!1234!')
+
+# For field level encryption: https://django-cryptography.readthedocs.io/en/latest/settings.html
+CRYPTOGRAPHY_KEY = os.getenv('CRYPTOGRAPHY_KEY', 'CRYPTOGRAPHY_KEY!-ADD-REAL-KEY!1234!')
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -49,12 +53,12 @@ INSTALLED_APPS = [
     'polymorphic',
     'opendp_apps.model_helpers',
     'opendp_apps.content_pages',
+    'opendp_apps.dataverses',
     'opendp_apps.user',
     'opendp_apps.dataset',
     'opendp_apps.analysis',
     'opendp_apps.terms_of_access',
     'opendp_apps.communication',
-    'opendp_apps.dataverses',
 ]
 
 MIDDLEWARE = [

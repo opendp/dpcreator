@@ -1,9 +1,11 @@
 from collections import OrderedDict
 from django.core.files.storage import FileSystemStorage
-
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import CASCADE
 from django.conf import settings
+from django_cryptography.fields import encrypt
+
 from polymorphic.models import PolymorphicModel
 
 from opendp_apps.model_helpers.models import \
@@ -31,9 +33,15 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     source = models.CharField(max_length=128,
                               choices=SourceChoices.choices)
 
-    # Redis key to store potentially sensitive information
-    # during analysis setup
-    data_profile_key = models.CharField(max_length=128, blank=True)
+    # Switch to encryption!
+    #
+    data_profile = encrypt(models.JSONField(default=None, encoder=DjangoJSONEncoder))
+
+    # Switch to encryption!
+    #
+    source_file = models.FileField(storage=UPLOADED_FILE_STORAGE,
+                                   upload_to='source-file/%Y/%m/%d/',
+                                   blank=True, null=True)
 
     
 
@@ -64,7 +72,7 @@ class DataverseFileInfo(DataSetInfo):
     Refers to a DV file from within a DV dataset
     """
     # TODO: This should have all fields from DV API response
-    installation_name = models.CharField(max_length=255)
+    installation_name = models.CharField(max_length=255) # FK: RegisteredDataverse
     dataverse_file_id = models.IntegerField()
     dataset_doi = models.CharField(max_length=255)
     file_doi = models.CharField(max_length=255, blank=True)
