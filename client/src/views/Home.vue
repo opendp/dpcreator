@@ -46,7 +46,6 @@
 import auth from '../api/auth'
 import dataverse from '../api/dataverse'
 import {
-  mapActions,
   mapGetters,
   mapState,
 } from 'vuex';
@@ -54,22 +53,24 @@ import {
 export default {
   name: 'home',
   created() {
-    const apiGeneralToken = this.$route.query.apiGeneralToken
-    this.siteUrl = this.$route.query.siteUrl
+    const apiToken = this.$route.query.apiGeneralToken
+    const siteUrl = this.$route.query.siteUrl
     const fileId = this.$route.query.fileId
     const filePid = this.$route.query.filePid
     this.datasetPid = this.$route.query.datasetPid
-    if (apiGeneralToken && this.siteUrl) {
-      dataverse.getUserInfo(apiGeneralToken, this.siteUrl).then((data) => {
+    if (apiToken && siteUrl) {
+      // TODO: add the rest of the dv params to store
+      this.$store.dispatch('dataverse/setDvParams', {apiToken, siteUrl})
+      /*
+      dataverse.getUserInfo(apiToken, this.siteUrl).then((data) => {
         this.dvUser = data['data']['data'];
         console.log(data['data']['data']);
         console.log(this.dvUser['displayName'])
-      })
+      }) */
       if (this.datasetPid && (fileId || filePid)) {
-        dataverse.getDatasetInfo(apiGeneralToken, this.siteUrl, this.datasetPid, fileId, filePid)
+        dataverse.getDatasetInfo(apiToken, siteUrl, this.datasetPid, fileId, filePid)
             .then((data) => {
               this.dvDataset = data;
-              console.log(data)
             });
       }
     }
@@ -80,7 +81,6 @@ export default {
       tipsCheckbox: false,
       dvUser: null,
       dvDataset: null,
-      siteUrl: null,
       datasetPid: null
     };
   },
@@ -89,16 +89,6 @@ export default {
     ...mapState('auth', ['user']),
   },
   methods: {
-    onGoogleSignInSuccess(resp) {
-      console.log('success!')
-      const access_token = resp.xc.access_token
-      this.$store.dispatch('auth/googleLogin', access_token).then(() => this.$router.push('/'))
-          .then(() => auth.getAccountDetails().then(({data}) => console.log(data)))
-      //  then((resp) => this.user = resp.data.user)
-    },
-    onGoogleSignInError(error) {
-      console.log('OH NOES', error)
-    },
     acceptTerms() {
       this.acceptedTerms = true
       this.$store.dispatch('auth/setTermsAccepted', true)
