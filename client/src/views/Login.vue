@@ -4,8 +4,8 @@
       <h1 class="display-1">Login</h1>
     </v-card-title>
     <v-card-text>
-      <v-form @submit.prevent="submit">
-        <v-text-field label="Username" v-model="inputs.username" prepend-icon="mdi-account-circle"/>
+      <v-form @submit.prevent="submit" v-model="formValidity">
+        <v-text-field required label="Username" v-model="inputs.username" prepend-icon="mdi-account-circle"/>
         <v-text-field
             :type="showPassword ? 'text' : 'password'"
             label="Password"
@@ -48,6 +48,7 @@ import {  mapState } from 'vuex';
 export default {
   data() {
     return {
+      formValidity: false,
       showPassword: false,
       errorMessage: null,
       googleSignInParams: {
@@ -60,8 +61,8 @@ export default {
     };
   },
   computed: {
-    ...mapState('auth', [
-      'error']),
+    ...mapState('auth', ['error', 'user']),
+    ...mapState('dataverse', ['dvParams']),
     loginErrors() {
       let errs = [];
       if (this.errorMessage != null) {
@@ -79,26 +80,39 @@ export default {
       this.errorMessage = null;
       this.$store.dispatch('auth/login', {username, password})
           .catch((data) => {
-            console.log('catch');
             this.errorMessage = data;
           })
           .then(() => {
-            console.log('then');
-            if (!this.error) this.$router.push('/');
+            if (!this.error) {
+              this.getDataverseUser();
+              this.$router.push('/');
+            }
+          })
+          .catch((data) => {
+            console.log(data);
+            this.errorMessage = data
           });
-
     },
     onGoogleSignInSuccess(resp) {
       const access_token = resp.getAuthResponse(true).access_token
-      this.$store.dispatch('auth/googleLogin', access_token).then(() => this.$router.push('/'))
-      .then(() => auth.getAccountDetails().then(({data}) => console.log(data) ))
-
+      this.$store.dispatch('auth/googleLogin', access_token)
+          .then(() => {
+            this.getDataverseUser();
+            this.$router.push('/')
+          })
     },
-    onGoogleSignInError (error) {
+    onGoogleSignInError(error) {
       console.log('OH NOES', error)
     },
-    isEmpty (obj) {
+    isEmpty(obj) {
       return Object.keys(obj).length === 0
+    },
+    getDataverseUser() {
+      if (this.dvParams) {
+        // TODO: replace pk with uuid, when it is available
+        this.$store.dispatch('dataverse/createDataverseUser', this.user['pk'])
+
+      }
     }
   },
 };
