@@ -66,13 +66,13 @@ export default {
         this.dvUser = data['data']['data'];
         console.log(data['data']['data']);
         console.log(this.dvUser['displayName'])
-      }) */
+      })
       if (this.datasetPid && (fileId || filePid)) {
         dataverse.getDatasetInfo(apiToken, siteUrl, this.datasetPid, fileId, filePid)
             .then((data) => {
               this.dvDataset = data;
             });
-      }
+      } */
     }
 
   },
