@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-AUTH_USER_MODEL = 'user.OpenDPUser'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -188,8 +187,11 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-
-#ALLOWED_HOSTS=['*']
+AUTH_USER_MODEL = 'user.OpenDPUser'
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'opendp_apps.user.serializers.CustomRegisterSerializer',
+}
+# ALLOWED_HOSTS=['*']
 
 DEFAULT_ALLOWED_HOSTS = '0.0.0.0,127.0.0.1,localhost'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', DEFAULT_ALLOWED_HOSTS).split(',')
@@ -197,8 +199,8 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', DEFAULT_ALLOWED_HOSTS).split(',')
 CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ALLOWED_ORIGINS = (
-    #'http://localhost:8000',
-    #'http://127.0.0.1:8000',
+    # 'http://localhost:8000',
+    # 'http://127.0.0.1:8000',
     #'http://0.0.0.0:8000',
     # 8080
     'http://127.0.0.1:8080',
@@ -223,4 +225,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 #   2. Click "verify new sender" and proceed
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL') \
     if os.environ.get('DEFAULT_FROM_EMAIL') else 'kraffmilleropendptest@gmail.com'
-ACCOUNT_EMAIL_VERIFICATION = 'optional'
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_REQUIRED = 'true'
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/login/'
