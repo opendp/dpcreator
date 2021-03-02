@@ -84,7 +84,7 @@ export default {
           })
           .then(() => {
             if (!this.error) {
-              this.getDataverseUser();
+              this.checkDataverseUser();
               this.$router.push('/');
             }
           })
@@ -97,7 +97,7 @@ export default {
       const access_token = resp.getAuthResponse(true).access_token
       this.$store.dispatch('auth/googleLogin', access_token)
           .then(() => {
-            this.getDataverseUser();
+            this.checkDataverseUser();
             this.$router.push('/')
           })
     },
@@ -107,11 +107,14 @@ export default {
     isEmpty(obj) {
       return Object.keys(obj).length === 0
     },
-    getDataverseUser() {
-      if (this.dvParams) {
+    checkDataverseUser() {
+      if (this.dvParams.apiToken) {
         // TODO: replace pk with uuid, when it is available
-        this.$store.dispatch('dataverse/createDataverseUser', this.user['pk'])
-
+        this.$store.dispatch('auth/fetchUser')
+            .then(() => {
+              this.$store.dispatch('update/updateDataverseUser', this.user['pk'])
+                  .catch(({data}) => console.log("error: " + data))
+            })
       }
     }
   },

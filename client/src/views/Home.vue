@@ -28,7 +28,7 @@
     </template>
 
     <template v-if="isAuthenticated">
-      <h3>Welcome, {{ user.username }}</h3>
+      <h3>Welcome, {{ username }}</h3>
       <template v-if="!isTermsAccepted">
         Here are the OpenDP terms of Service text that you must agree with.
         <v-btn @click="acceptTerms">Accept</v-btn>
@@ -87,6 +87,9 @@ export default {
   computed: {
     ...mapGetters('auth', ['isAuthenticated', 'isTermsAccepted']),
     ...mapState('auth', ['user']),
+    username() {
+      return (this.user) ? this.user.username : null
+    }
   },
   methods: {
     acceptTerms() {

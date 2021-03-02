@@ -21,16 +21,22 @@ const getters = {
 };
 const actions = {
   setDvParams({commit, state}, {apiToken, siteUrl}) {
-    console.log("apiToken: " + apiToken + " siteUrl: " + siteUrl)
-
     commit('SET_DV_PARAMS', {apiToken, siteUrl})
   },
   removeDvParams({commit}) {
     commit('REMOVE_DV_PARAMS')
   },
-  createDataverseUser({commit, state}, OpenDPUserId) {
-    // TODO: replace this with new createDataverseUser API
-    return dataverse.getUserInfo(state.dvParams.apiToken, state.dvParams.siteUrl)
+  /**
+   * Get the latest DV User info for this OpenDPUser
+   * from Dataverse, and put in Vuex store
+   * @param commit
+   * @param state
+   * @param OpenDPUserId
+   * @returns {Promise<void>}
+   */
+  updateDataverseUser({commit, state}, OpenDPUserId) {
+    // TODO: replace this with new updateDataverseUser API, which takes OpenDPUserId
+    dataverse.updateDataverseUser(OpenDPUserId, state.dvParams.siteUrl, state.dvParams.apiToken)
         .then((resp) => {
           commit('SET_DATAVERSE_USER', resp.data.data)
         })
@@ -46,7 +52,8 @@ const mutations = {
     state.dvParams.apiToken = payload.apiToken
   },
   [REMOVE_DV_PARAMS]() {
-    state.dvParams = null
+    state.dvParams.apiToken = null
+    state.dvParms.siteUrl = null
   },
 
 };

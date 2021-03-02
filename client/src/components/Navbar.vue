@@ -19,7 +19,9 @@
     </v-app-bar>
     -->
 <ul class="navbar" id="navbar">
-    <li><router-link to="/logout">logout</router-link></li>
+    <li>
+      <router-link to="/logout">logout {{ username }}</router-link>
+    </li>
     <li><router-link to="/about">about</router-link></li>
     <li><router-link to="/password_reset">reset password</router-link></li>
   </ul>
@@ -42,6 +44,9 @@ export default {
   computed: {
     ...mapGetters('auth', ['isAuthenticated']),
     ...mapState('auth', ['user']),
+    username() {
+      return (this.user) ? this.user.username : null
+    }
   },
 }
 </script>

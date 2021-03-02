@@ -27,10 +27,14 @@ export default {
       },
   },
   actions: {
+
     createAccount({ commit,state }, { username, password1, password2, email }) {
       commit(REGISTRATION_BEGIN);
       return auth.createAccount(username, password1, password2, email)
-          .then(() => commit(REGISTRATION_SUCCESS))
+          .then((data) => {
+            commit(REGISTRATION_SUCCESS)
+            return Promise.resolve(data)
+          })
           .catch((data) => {
             commit(REGISTRATION_FAILURE);
             return Promise.reject(data)

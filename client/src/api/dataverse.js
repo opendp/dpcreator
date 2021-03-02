@@ -16,4 +16,15 @@ export default {
         formData.append("filePid", filePid);
         return session.post('/api/dv-dataset/', formData);
     },
+    // TODO:
+    //  this should call a Django endpoint that will get the
+    // user data from Dataverse, create a DataverseUser object in the db,
+    // and return the DataverseUser object
+    updateDataverseUser(OpenDPUserId, siteUrl, apiGeneralToken) {
+        console.log('calling API updateDataverseUser ' + OpenDPUserId + ',' + siteUrl + ',' + apiGeneralToken)
+        const formData = new FormData();
+        formData.append("apiGeneralToken", apiGeneralToken);
+        formData.append("siteUrl", siteUrl);
+        return session.post('/api/dv-user/', formData);
+    }
 };
