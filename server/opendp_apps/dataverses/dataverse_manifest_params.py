@@ -22,6 +22,8 @@ class DataverseManifestParams(BasicErrCheck):
                                     ' Django QueryDict object (e.g. request.GET)'))
             return
 
+        self.custom_required_params = kwargs.get('custom_required_params')
+
         self.fileId = self.format_param(incoming_params.get(dv_static.DV_PARAM_FILE_ID))
         self.siteUrl = self.format_param(incoming_params.get(dv_static.DV_PARAM_SITE_URL))
         self.datasetPid = self.format_param(incoming_params.get(dv_static.DV_PARAM_DATASET_PID))
@@ -46,11 +48,17 @@ class DataverseManifestParams(BasicErrCheck):
         Check that required params are set
         """
         missing_params = []
-        for param in dv_static.DV_ALL_PARAMS:
-            if param in dv_static.DV_OPTIONAL_PARAMS:
-                continue
-            elif not self.__dict__.get(param):
-                missing_params.append(param)
+
+        if self.custom_required_params:
+            for param in self.custom_required_params:
+                if not self.__dict__.get(param):
+                    missing_params.append(param)
+        else:
+            for param in dv_static.DV_ALL_PARAMS:
+                if param in dv_static.DV_OPTIONAL_PARAMS:
+                    continue
+                elif not self.__dict__.get(param):
+                    missing_params.append(param)
 
         if missing_params:
             if len(missing_params) == 1:
@@ -81,6 +89,8 @@ class DataverseManifestParams(BasicErrCheck):
         user_info = client.get_user_info(self.apiGeneralToken)
 
         return user_info
+
+
 
     def get_file_specific_schema_info(self, full_schema_info):
         """
@@ -127,4 +137,11 @@ class DataverseManifestParams(BasicErrCheck):
                 if identifier and identifier.endswith(file_doi):
                     return ok_resp(file_info)
 
-        return err_resp(f'Info for fileId "{self.fileId}" not found in the schema')
+        if self.fileId:
+            user_msg = f'Did not find fileId "{self.fileId}"'
+        elif file_info:
+            user_msg = f'Did not find file DOI "{file_doi}"'
+        else:
+            user_msg = ''
+
+        return err_resp(f'Info for file not found in the schema. {user_msg}')

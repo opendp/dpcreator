@@ -8,8 +8,12 @@
         loading...
       </template>
       <template v-else-if="!registrationCompleted">
-        <v-form @submit.prevent="submit">
-          <v-text-field v-model="inputs.username" label="Username"/>
+        <v-form @submit.prevent="submit" v-model="formValidity">
+          <v-text-field
+              v-model="inputs.username"
+              label="Username"
+              :rules="[v => !!v || 'Username is required']"
+          />
           <v-text-field
               :type="showPassword ? 'text' : 'password'"
               label="Password"
@@ -17,6 +21,7 @@
               prepend-icon="mdi-lock"
               :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
               @click:append="showPassword = !showPassword"
+              :rules="passwordRules"
           />
           <v-text-field
               :type="showPassword ? 'text' : 'password'"
@@ -25,8 +30,9 @@
               prepend-icon="mdi-lock"
               :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
               @click:append="showPassword = !showPassword"
+              :rules="passwordRules"
           />
-          <v-text-field v-model="inputs.email" type="email" id="email" label="Email"/>
+          <v-text-field v-model="inputs.email" :rules="emailRules" type="email" id="email" label="Email"/>
           <v-alert dense outlined type="error" v-show="registrationError">
             An error occurred while processing your request.
             <ul>
@@ -36,9 +42,20 @@
         </v-form>
         <v-divider></v-divider>
         <v-card-actions>
-          <v-btn color="info" @click="submitRegister()">
+          <v-btn color="info" :disabled="!formValidity" @click="submitRegister()">
             Create Account
           </v-btn>
+          <v-spacer></v-spacer>
+          <g-signin-button
+              :params="googleSignInParams"
+              @success="onGoogleSignInSuccess"
+              @error="onGoogleSignInError"
+          >
+            <v-spacer></v-spacer>
+            <v-btn color="info">
+              Sign In with Google
+            </v-btn>
+          </g-signin-button>
         </v-card-actions>
         Already have an account?
         <router-link to="/login">login</router-link>
@@ -67,18 +84,37 @@ export default {
     return {
       showPassword: false,
       errorMessage: null,
+      formValidity: false,
+      googleSignInParams: {
+        // TODO:get from a shared location, instead of hard-coded
+        client_id: '725082195083-1srivl3ra9mpc1q5ogi7aur17vkjuabg.apps.googleusercontent.com',
+      },
       inputs: {
         username: '',
         password1: '',
         password2: '',
         email: '',
       },
+      emailRules: [
+        value => value.indexOf('@') !== 0 || 'Email should have a username.',
+        value => value.includes('@') || 'Email should include an @ symbol.',
+        value => value.includes('.') || 'Email should include a period symbol.',
+        value =>
+            value.indexOf('.') <= value.length - 3 ||
+            'Email should contain a valid domain extension.'
+      ],
+      passwordRules: [
+        v => !!v || 'Password is required',
+        v => (v && v.length >= 9) || 'Password must have 9+ characters',]
     };
   },
   computed: {
     ...mapState('signup', ['registrationCompleted',
       'registrationError',
       'registrationLoading']),
+    ...mapState('dataverse', ['dvParams', 'dataverseUser']),
+    ...mapState('auth', ['user']),
+
     registrationErrors() {
       let errs = [];
       if (this.errorMessage != null) {
@@ -97,14 +133,47 @@ export default {
     ...mapActions('signup', [
       'createAccount',
       'clearRegistrationStatus',
-    ]),
+    ], 'auth', ['fetchUser']),
     submitRegister() {
-      this.createAccount(this.inputs).catch((data) => this.errorMessage = data);
-    }
-  },
-  beforeRouteLeave(to, from, next) {
-    this.clearRegistrationStatus();
-    next();
-  },
-};
+      this.$store.dispatch('signup/createAccount', this.inputs)
+          .then((resp) => {
+            console.log('returned from create account')
+            console.log(resp)
+            this.checkDvUser(resp.data[0], this.dvParams.siteUrl, this.dvParams.apiToken)
+          })
+    },
+    onGoogleSignInError(error) {
+      console.log('Google sign in error: ', error)
+    },
+    onGoogleSignInSuccess(resp) {
+      const access_token = resp.getAuthResponse(true).access_token
+      this.$store.dispatch('auth/googleLogin', access_token)
+          .then(() => {
+            this.$store.dispatch('auth/fetchUser')
+                .then(() => {
+                  // TODO: update fetchUser so it returns object_id (uuid)
+                  this.checkDvUser(this.user['pk'])
+                })
+
+          })
+          .then(() => this.$router.push('/'))
+
+    },
+
+    /*
+    If the user came from a Dataverse, get the user info
+    from dataverse and use it to create a dataverse user
+     */
+    checkDvUser(object_id) {
+      if (this.dvParams.apiToken) {
+        this.$store.dispatch('dataverse/updateDataverseUser',
+            object_id)
+      }
+    },
+    beforeRouteLeave(to, from, next) {
+      this.clearRegistrationStatus();
+      next();
+    },
+  }
+}
 </script>

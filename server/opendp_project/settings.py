@@ -15,13 +15,16 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-AUTH_USER_MODEL = 'user.OpenDPUser'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'tm4wb=azvng$!c^0%f6=nb=hkslh)p$v(z(zs+siva7y@7e9^1'
+SECRET_KEY = os.getenv('SECRET_KEY', 'SECRET_KEY!-ADD-REAL-KEY-HERE!--ADD-REAL-KEY!1234!')
+
+# For field level encryption: https://django-cryptography.readthedocs.io/en/latest/settings.html
+CRYPTOGRAPHY_KEY = os.getenv('CRYPTOGRAPHY_KEY', 'CRYPTOGRAPHY_KEY!-ADD-REAL-KEY!1234!')
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -49,12 +52,12 @@ INSTALLED_APPS = [
     'polymorphic',
     'opendp_apps.model_helpers',
     'opendp_apps.content_pages',
+    'opendp_apps.dataverses',
     'opendp_apps.user',
     'opendp_apps.dataset',
     'opendp_apps.analysis',
     'opendp_apps.terms_of_access',
     'opendp_apps.communication',
-    'opendp_apps.dataverses',
 ]
 
 MIDDLEWARE = [
@@ -184,8 +187,11 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-
-#ALLOWED_HOSTS=['*']
+AUTH_USER_MODEL = 'user.OpenDPUser'
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'opendp_apps.user.serializers.CustomRegisterSerializer',
+}
+# ALLOWED_HOSTS=['*']
 
 DEFAULT_ALLOWED_HOSTS = '0.0.0.0,127.0.0.1,localhost'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', DEFAULT_ALLOWED_HOSTS).split(',')
@@ -193,8 +199,8 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', DEFAULT_ALLOWED_HOSTS).split(',')
 CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ALLOWED_ORIGINS = (
-    #'http://localhost:8000',
-    #'http://127.0.0.1:8000',
+    # 'http://localhost:8000',
+    # 'http://127.0.0.1:8000',
     #'http://0.0.0.0:8000',
     # 8080
     'http://127.0.0.1:8080',
@@ -219,4 +225,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 #   2. Click "verify new sender" and proceed
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL') \
     if os.environ.get('DEFAULT_FROM_EMAIL') else 'kraffmilleropendptest@gmail.com'
-ACCOUNT_EMAIL_VERIFICATION = 'optional'
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_REQUIRED = 'true'
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/login/'

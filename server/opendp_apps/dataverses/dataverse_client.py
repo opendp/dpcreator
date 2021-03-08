@@ -5,7 +5,7 @@ import requests
 from requests.exceptions import ConnectionError
 import lxml.etree as etree
 
-from pyDataverse.api import Api
+from pyDataverse.api import Api, DataAccessApi, NativeApi
 
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
@@ -16,6 +16,8 @@ class DataverseClient(object):
     def __init__(self, host, api_token=None):
         self._host = host
         self.api = Api(host, api_token=api_token)
+        self.native_api = NativeApi(host, api_token=api_token)
+        self.data_access_api = DataAccessApi(host, api_token=api_token)
 
     def get_ddi(self, doi, format=dv_static.EXPORTER_FORMAT_DDI):
         """
@@ -38,7 +40,11 @@ class DataverseClient(object):
 
         # make the request
         headers = {'X-Dataverse-key': api_token}
-        response = requests.get(dv_url, headers=headers)
+        try:
+            response = requests.get(dv_url, headers=headers)
+        except ConnectionError as err_obj:
+            return err_resp(f'Failed to connect. {err_obj}')
+
         if response.status_code == 200:
             return ok_resp(response.json())
 
@@ -48,8 +54,8 @@ class DataverseClient(object):
                 return err_resp(json_resp['message'])
         except ValueError:
             pass
-
         return err_resp(f'Status code: {response.status_code} {response.text}')
+
 
     def get_schema_org(self, doi):
         """
@@ -62,7 +68,7 @@ class DataverseClient(object):
         Get dataset export
         """
         try:
-            response = self.api.get_dataset_export(doi, format_type)
+            response = self.native_api.get_dataset_export(doi, format_type)
         except ConnectionError as err_obj:
             return err_resp(f'Failed to connect. {err_obj}')
 
@@ -86,7 +92,29 @@ class DataverseClient(object):
         #print('response.status_code', response.status_code)
         return err_resp(f'Dataset export failed for format {format_type}',
                         response.content)
+'''
+    def get_data_file_by_id(self, file_id):
+        """Return the Dataverse using the file id"""
+        return self.get_data_file(file_id, is_pid=False)
 
+    def get_data_file_by_doi(self, file_doi):
+        """Return the Dataverse using the file DOI"""
+        return self.get_data_file(file_doi)
+
+
+    def get_data_file(self, identifier, is_pid=True):
+        """Return the Dataverse using the file id or file DOI
+        ref: https://github.com/gdcc/pyDataverse/blob/master/src/pyDataverse/api.py#L298
+        """
+        try:
+            response = self.native_api.get_datafile(identifier, is_pid=is_pid)
+        except ConnectionError as err_obj:
+            return err_resp(f'Failed to connect. {err_obj}')
+
+        if response.status_code == 200:
+            return
+        self.data_access_api.get_datafile(identifier)
+'''
 
 class DDI(object):
 

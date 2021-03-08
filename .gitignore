@@ -152,3 +152,7 @@ cython_debug/
 .DS_Store
 server/.idea/
 server/test_setup
+dev_notes/test.env
+virtualenv/*
+virtualenvs/*
+dev_notes/rp_scratch.py

@@ -2,10 +2,15 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from opendp_apps.user.models import OpenDPUser, DataverseUser
 
+
 class OpenDPUserAdmin(UserAdmin):
-    pass
-    # customize later
-    #list_filter = ('company__name',)
+    save_on_top = True
+    list_display = ('email', 'username', 'pk', 'first_name', 'last_name', 'object_id')
+
+
+# pass
+# customize later
+# list_filter = ('company__name',)
 
 
 class DataverseUserAdmin(admin.ModelAdmin):

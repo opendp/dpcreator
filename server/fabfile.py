@@ -53,6 +53,10 @@ def get_test_db_vals():
                    DB_USER='opendp_user',
                    DB_PASSWORD='opendp_test_data')
     return db_vals
+    # docker exec -it postgres-opendp-ux /bin/bash
+    # psql -h localhost -d opendp_app -U opendp_user
+    # select * from user_dataverseuser;
+
 
 def get_export_db_val_cmds():
     """Return command similar to:"""
@@ -81,6 +85,7 @@ def run_postgres(context):
 
     print(f'run-postgres: {cmd}')
     fab_local(cmd)
+
 
 
 @task

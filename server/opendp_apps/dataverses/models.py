@@ -88,8 +88,49 @@ class ManifestTestParams(TimestampedModelWithUUID):
         verbose_name = ('Manifest Test Parameter')
         verbose_name_plural = ('Manifest Test Parameters')
 
+    def as_dict(self):
+        """
+        Return the params as a Python dict
+        """
+        params = {dv_static.DV_PARAM_FILE_ID: self.fileId,
+                  dv_static.DV_PARAM_SITE_URL: self.siteUrl,
+                  dv_static.DV_API_SENSITIVE_DATA_READ_TOKEN: self.apiSensitiveDataReadToken,
+                  dv_static.DV_API_GENERAL_TOKEN: self.apiGeneralToken,
+                  dv_static.DV_PARAM_DATASET_PID: self.datasetPid,
+                  dv_static.DV_PARAM_FILE_PID: self.filePid}
+
+        return params
+
+    def get_manifest_url_params(self, selected_params=None):
+        """
+        Build a url string with the params
+        selected_params - optional, only return params in this list
+                e.g. [dv_static.DV_API_GENERAL_TOKEN,
+                      dv_static.DV_PARAM_SITE_URL]
+        """
+        params = self.as_dict()
+        if selected_params:
+            for key in list(params):
+                if not key in selected_params:
+                    del params[key]
+
+        qstr = urlencode(params)
+
+        return qstr
+
     @mark_safe
-    def user_info_link(self):
+    def view_as_dict_link(self):
+        """Link to return the params in JSON"""
+        dataset_lnk = reverse('view_as_dict',
+                              kwargs=dict(object_id=self.object_id))
+
+        return f'<a href="{dataset_lnk}">API: Get Params as JSON</a>'
+
+    view_as_dict_link.allow_tags = True
+
+
+    @mark_safe
+    def mock_user_info_link(self):
         """
         Link to the user info API
         """
@@ -98,7 +139,7 @@ class ManifestTestParams(TimestampedModelWithUUID):
 
         user_lnk = reverse('view_get_user_info')
         return f'<a href="{user_lnk}">API: user info</a>'
-    user_info_link.allow_tags = True
+    mock_user_info_link.allow_tags = True
 
 
     @mark_safe
@@ -141,28 +182,6 @@ class ManifestTestParams(TimestampedModelWithUUID):
         qstr = urlencode(params)
 
         return reverse('view_get_dataset_export') + '?' + qstr
-
-    def as_dict(self):
-        """
-        Return the params as a Python dict
-        """
-        params = dict(fileId=self.fileId,
-                      siteUrl=self.siteUrl,
-                      apiSensitiveDataReadToken=self.apiSensitiveDataReadToken,
-                      apiGeneralToken=self.apiGeneralToken,
-                      datasetPid=self.datasetPid,
-                      filePid=self.filePid)
-        return params
-
-    def get_manifest_url_params(self):
-        """
-        Build a url string with the params
-        """
-        params = self.as_dict()
-
-        qstr = urlencode(params)
-
-        return qstr
 
     @mark_safe
     def dataverse_incoming_link(self):

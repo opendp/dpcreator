@@ -5,7 +5,7 @@ import {
   LOGIN_FAILURE,
   LOGIN_SUCCESS,
   LOGOUT,
-  REMOVE_TOKEN,
+  REMOVE_TOKEN, SET_TERMS_ACCEPTED,
   SET_TOKEN,
   SET_USER,
 } from './types';
@@ -18,13 +18,15 @@ const initialState = {
   error: false,
   token: null,
   user: null,
+  termsAccepted: false
 };
 
 const getters = {
   isAuthenticated: state => !!state.token,
+  isTermsAccepted: state => state.termsAccepted,
   getUser: state => {
-      return state.user
-    },
+    return state.user
+  },
 };
 
 
@@ -42,11 +44,17 @@ const actions = {
   googleLogin({commit}, token) {
     commit(LOGIN_BEGIN);
     return auth.googleLogin(token)
-        .then(({ data}) => { console.log('returned from googleLogin: ' + JSON.stringify(data))
-          commit(SET_TOKEN, data.key)})
-      .then(() =>
-          commit(LOGIN_SUCCESS))
-      .catch(() => commit(LOGIN_FAILURE));
+        .then(({data}) => {
+          console.log('returned from googleLogin: ' + JSON.stringify(data))
+          commit(SET_TOKEN, data.key)
+          commit(LOGIN_SUCCESS);
+          return Promise.resolve(data)
+        })
+        .catch((data) => {
+          console.log(data);
+          commit(LOGIN_FAILURE)
+          return Promise.reject(data)
+        });
   },
   logout({ commit }) {
     return auth.logout()
@@ -56,18 +64,24 @@ const actions = {
 
   fetchUser({ commit,state }) {
     if (state.token!=null) {
-      auth.getAccountDetails()
+      return auth.getAccountDetails()
           .then(response => {
-            commit('SET_USER', response.data.username)
+            commit('SET_USER', response.data)
+            return Promise.resolve()
           })
           .catch(error => {
             console.log('There was an error:', error.response)
+            return Promise.reject(error)
           })
     } else {
-       commit('SET_USER', null)
+      commit('SET_USER', null)
+      return Promise.resolve()
     }
   },
-  initialize({ commit }) {
+  setTermsAccepted({commit, state}, termsAccepted) {
+    commit('SET_TERMS_ACCEPTED', state, termsAccepted)
+  },
+  initialize({commit}) {
     const token = localStorage.getItem(TOKEN_STORAGE_KEY);
 
     if (isProduction && token) {
@@ -96,6 +110,7 @@ const mutations = {
   [LOGOUT](state) {
     state.authenticating = false;
     state.error = false;
+    state.user = null;
   },
   [SET_TOKEN](state, token) {
     if (!isProduction) localStorage.setItem(TOKEN_STORAGE_KEY, token);
@@ -108,7 +123,10 @@ const mutations = {
     state.token = null;
   },
   [SET_USER](state, username) {
-     state.user = username;
+    state.user = username;
+  },
+  [SET_TERMS_ACCEPTED](state, termsAccepted) {
+    state.termsAccepted = termsAccepted;
   },
 };
 

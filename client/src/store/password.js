@@ -9,8 +9,6 @@ import {
   PASSWORD_EMAIL_CLEAR,
   PASSWORD_EMAIL_FAILURE,
   PASSWORD_EMAIL_SUCCESS,
-  SET_PASSWORD_MESSAGE,
-
 } from './types';
 
 export default {

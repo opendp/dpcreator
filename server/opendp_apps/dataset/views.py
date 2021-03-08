@@ -34,14 +34,9 @@ class DepositorSetup(APIView):
         # request_body = json.loads(request.data)
         #depositor_setup_info = DepositorSetupInfo.objects.create(epsilon=request.data['epsilon'])
 
-        # TODO: For now, just use DOI as Redis key
-        data_profile_key = mock_dataverse_request['doi']
-        #redis_client = RedisClient()
-        #redis_client.set(data_profile_key, mock_dataverse_request['dataverse_token'])
-
         ds_info = DataverseFileInfo.objects.create(name=request.data['name'],
                                                    creator=request.user,
-                                                   data_profile_key=data_profile_key,
+                                                   data_profile=None,
                                                    #depositor_setup_info=depositor_setup_info,
                                                    dataverse_file_id=mock_dataverse_request['dataverse_file_id'],
                                                    doi=mock_dataverse_request['doi'],
