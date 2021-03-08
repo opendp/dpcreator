@@ -108,14 +108,12 @@ export default {
       return Object.keys(obj).length === 0
     },
     checkDataverseUser() {
-      if (this.dvParams.apiToken) {
-        // TODO: replace pk with uuid, when it is available
         this.$store.dispatch('auth/fetchUser')
             .then(() => {
+              // TODO: replace pk with UUID
               this.$store.dispatch('update/updateDataverseUser', this.user['pk'])
                   .catch(({data}) => console.log("error: " + data))
             })
-      }
     }
   },
 };

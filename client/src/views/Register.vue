@@ -151,7 +151,7 @@ export default {
           .then(() => {
             this.$store.dispatch('auth/fetchUser')
                 .then(() => {
-                  // TODO: update fetchUser so it returns object_id
+                  // TODO: update fetchUser so it returns object_id (uuid)
                   this.checkDvUser(this.user['pk'])
                 })
 
