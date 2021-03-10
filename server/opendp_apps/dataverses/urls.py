@@ -12,6 +12,11 @@ urlpatterns = [
     path(f'handoff',
          views.view_dataverse_handoff,
          name='view_dataverse_handoff'),
+
+    re_path(f'view-handoff-params/(?P<object_id>[0-9a-f-]+)',
+         views.view_handoff_params_test,
+         name='view_handoff_params_test'),
+
 ]
 
 """
