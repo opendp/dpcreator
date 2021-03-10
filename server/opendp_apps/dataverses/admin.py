@@ -1,6 +1,15 @@
 from django.contrib import admin
-from opendp_apps.dataverses.models import ManifestTestParams, RegisteredDataverse
+from opendp_apps.dataverses.models import \
+    (DataverseHandoff,
+     ManifestTestParams,
+     RegisteredDataverse)
 
+
+class DataverseHandoffAdmin(admin.ModelAdmin):
+    search_fields = ('name',)
+    list_display = ('name', 'object_id', 'siteUrl')
+    save_on_top = True
+    list_filter  = ('siteUrl', )
 
 class RegisteredDataverseAdmin(admin.ModelAdmin):
     search_fields = ('name', 'dataverse_url', 'notes')
@@ -24,6 +33,7 @@ class ManifestTestParamsAdmin(admin.ModelAdmin):
                        'schema_org_info_link')
 
 
-
+DataverseHandoffAdmin
+admin.site.register(DataverseHandoff, DataverseHandoffAdmin)
 admin.site.register(RegisteredDataverse, RegisteredDataverseAdmin)
 admin.site.register(ManifestTestParams, ManifestTestParamsAdmin)
