@@ -21,34 +21,20 @@ export default {
     },
 
     /**
-     *  check if the OpenDPUser is associated with a DataverseUser,
-     *  and if so, get the apiToken and siteUrl from the DataverseUser
-     *  to call dv-user, and update the DataverseUser with the latest
-     *  user info from dataverse.
+     *  check if there is a DataverseUser for thie openDPUserId and siteUrl.
+     *  If there is not create one, else update it with latest info from Dataverse (using handoff object)
+     *
      *  TODO: update with new API call when ready
-     * @param OpenDPUserId
+     * @param openDPUserId
+     * @param handoffId
      * @returns {Promise<AxiosResponse<any>>} DataverseUser object
      */
-    updateDataverseUser(OpenDPUserId) {
-        console.log('calling API updateDataverseUser ' + OpenDPUserId + ',' + siteUrl + ',' + apiGeneralToken)
-        const formData = new FormData();
-        formData.append("apiGeneralToken", apiGeneralToken);
-        formData.append("siteUrl", siteUrl);
-        return session.post('/api/dv-user/', formData);
+    updateDataverseUser(openDPUserId, handoffId) {
+        console.log('calling API updateDataverseUser ' + openDPUserId + ',' + handoffId)
+        const formData = new FormData()
+        formData.append("handoffId", handoffId)
+        // TODO: replace with updateDataverseUser API when ready
+        // return session.post('/api/dv-user/', formData);
     },
-    /**
-     * Use token and siteUrl to get Dataverse user info, create DataverseUser object
-     * for the OpenDPUser
-     * @param OpenDPUserId
-     * @param siteUrl
-     * @param apiGeneralToken
-     * @returns {Promise<AxiosResponse<any>>}  DataverseUser object
-     */
-    createDataverseUser(OpenDPUserId, siteUrl, apiGeneralToken) {
-        console.log('calling API updateDataverseUser ' + OpenDPUserId + ',' + siteUrl + ',' + apiGeneralToken)
-        const formData = new FormData();
-        formData.append("apiGeneralToken", apiGeneralToken);
-        formData.append("siteUrl", siteUrl);
-        return session.post('/api/dv-user/', formData);
-    }
+
 };
