@@ -15,6 +15,7 @@ class DataverseClient(object):
 
     def __init__(self, host, api_token=None):
         self._host = host
+        self.api_token = api_token
         self.api = Api(host, api_token=api_token)
         self.native_api = NativeApi(host, api_token=api_token)
         self.data_access_api = DataAccessApi(host, api_token=api_token)
@@ -23,13 +24,14 @@ class DataverseClient(object):
         """
         Get DDI metadata file
         """
-        response = self.api.get_dataset_export(doi, format)
+        response = self.native_api.get_dataset_export(doi, format)
         return DDI(response.content)
 
-    def get_user_info(self, api_token):
+    def get_user_info(self, user_api_token=None):
         """
         Placeholder until pyDataverse API is updated
         """
+        api_token = user_api_token if user_api_token else self.api_token
         # remove any trailing "/"
         ye_host = self._host
         while ye_host.endswith('/'):
@@ -55,7 +57,6 @@ class DataverseClient(object):
         except ValueError:
             pass
         return err_resp(f'Status code: {response.status_code} {response.text}')
-
 
     def get_schema_org(self, doi):
         """
@@ -182,8 +183,8 @@ if __name__ == '__main__':
 
     # print(ddi_obj.get_title())
     print()
-    resp = client.api.get_user().json()
-    print(resp)
+    resp = client.get_user_info(api_token)
+    print(resp.__dict__)
 
 """
 from pyDataverse.api import Api
