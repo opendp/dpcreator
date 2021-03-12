@@ -107,7 +107,10 @@ class DataverseUserView(APIView):
 
     def post(self, request):
         content = json.loads(request.body)['content']
-        opendp_user_id, site_url, api_general_token = content['user_id'], content['site_url'], content['api_token']
+        opendp_user_id, dataverse_handoff_id = content['user_id'], content['dataverse_id']
+        dataverse_handoff = DataverseHandoff.objects.get(id=dataverse_handoff_id)
+        api_general_token = dataverse_handoff.apiGeneralToken
+        site_url = dataverse_handoff.siteUrl
         dataverse_client = DataverseClient(site_url, api_general_token)
         dataverse_response = dataverse_client.get_user_info(user_api_token=api_general_token)
 
@@ -123,7 +126,12 @@ class DataverseUserView(APIView):
 
         return JsonResponse({'dv_user': dv_user.id}, status=201)
 
-    def put(self, request, opendp_user_id, site_url, api_general_token):
+    def put(self, request):
+        content = json.loads(request.body)['content']
+        opendp_user_id, dataverse_handoff_id = content['user_id'], content['dataverse_id']
+        dataverse_handoff = DataverseHandoff.objects.get(id=dataverse_handoff_id)
+        api_general_token = dataverse_handoff.apiGeneralToken
+        site_url = dataverse_handoff.siteUrl
         dataverse_client = DataverseClient(site_url, api_general_token)
         dataverse_response = dataverse_client.get_user_info(user_api_token=api_general_token)
 

@@ -51,6 +51,8 @@ class DataverseHandoff(TimestampedModelWithUUID):
     reference: https://guides.dataverse.org/en/latest/api/external-tools.html
     """
     name = models.CharField(max_length=255, blank=True)
+
+    # TODO: These should be snakcase rather than camelcase (PEP standard)
     siteUrl = models.CharField(max_length=255)
 
     fileId = models.CharField(max_length=255)
