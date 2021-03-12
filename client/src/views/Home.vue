@@ -53,26 +53,24 @@ import {
 export default {
   name: 'home',
   created() {
-    const apiToken = this.$route.query.apiGeneralToken
-    const siteUrl = this.$route.query.siteUrl
-    const fileId = this.$route.query.fileId
-    const filePid = this.$route.query.filePid
-    this.datasetPid = this.$route.query.datasetPid
-    if (apiToken && siteUrl) {
-      // TODO: add the rest of the dv params to store
-      this.$store.dispatch('dataverse/setDvParams', {apiToken, siteUrl})
-      /*
-      dataverse.getUserInfo(apiToken, this.siteUrl).then((data) => {
-        this.dvUser = data['data']['data'];
-        console.log(data['data']['data']);
-        console.log(this.dvUser['displayName'])
-      })
-      if (this.datasetPid && (fileId || filePid)) {
-        dataverse.getDatasetInfo(apiToken, siteUrl, this.datasetPid, fileId, filePid)
-            .then((data) => {
-              this.dvDataset = data;
-            });
-      } */
+    const handoffId = this.$route.query.id
+
+    if (handoffId) {
+      this.$store.dispatch('dataverse/setHandoffId', handoffId)
+      /*    TODO: for testing, remove later
+            dataverse.getUserInfo(apiToken, this.siteUrl).then((data) => {
+              this.dvUser = data['data']['data'];
+              console.log(data['data']['data']);
+              console.log(this.dvUser['displayName'])
+            })
+
+
+            if (this.datasetPid && (fileId || filePid)) {
+              dataverse.getDatasetInfo(apiToken, siteUrl, this.datasetPid, fileId, filePid)
+                  .then((data) => {
+                    console.log(data)
+                  });
+            } */
     }
 
   },

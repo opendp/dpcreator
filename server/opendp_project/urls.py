@@ -52,6 +52,9 @@ router.register(r'test', TermsOfAccessAgreementViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
+
+    path('api/dataverses/', include('opendp_apps.dataverses.urls')),
+
     path('api/', include(router.urls)),
     path('api/deposit/', DepositorSetup.as_view()),
     path('api/dv-dataset/', DataverseDatasetInfoView.as_view()),
