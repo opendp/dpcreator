@@ -29,6 +29,8 @@ class DataverseUser(TimestampedModelWithUUID):
                              on_delete=models.PROTECT)
 
     dv_installation = models.ForeignKey(RegisteredDataverse, on_delete=models.PROTECT)
+
+    #TODO: Shouldn't this be unique?
     persistent_id = models.CharField(max_length=255) # Persistent DV user id within an installation
 
     email = models.EmailField(max_length=255, blank=True)

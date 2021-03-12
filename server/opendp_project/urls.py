@@ -56,7 +56,7 @@ urlpatterns = [
     path('api/deposit/', DepositorSetup.as_view()),
     path('api/dv-dataset/', DataverseDatasetInfoView.as_view()),
     path('api/dv-user-info/', DataverseUserInfoView.as_view()),
-    path('api/dv-user/', DataverseUserView.as_view()),
+    path('api/dv-user/', DataverseUserView.as_view(), name='dv-user'),
     # For testing
     path('dv-mock-api/', include('opendp_apps.dataverses.mock_urls')),
     url(r'^user-details/$',

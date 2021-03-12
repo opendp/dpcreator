@@ -1,12 +1,12 @@
 from django.test import TestCase
 from django.http.response import Http404
 
-from opendp_apps.dataverses.helpers import create_dataverse_user, DataverseResponseError
+from opendp_apps.dataverses.dv_user_handler import DataverseResponseError, DataverseUserHandler
 from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.user.models import OpenDPUser
 
 
-class CreateDataverseUserTest(TestCase):
+class DataverseUserHandlerTest(TestCase):
 
     def setUp(self):
         self.opendp_user = OpenDPUser.objects.create(
@@ -44,8 +44,9 @@ class CreateDataverseUserTest(TestCase):
         self.api_general_token = ''
 
     def test_create_dataverse_user(self):
-        new_dataverse_user = create_dataverse_user(self.opendp_user.id, self.site_url,
-                                                   self.api_general_token, self.dataverse_response)
+        handler = DataverseUserHandler(self.opendp_user.id, self.site_url,
+                                       self.api_general_token, self.dataverse_response)
+        new_dataverse_user = handler.create_dataverse_user()
         self.assertEqual(new_dataverse_user.dv_installation_id, 1)
         self.assertEqual(new_dataverse_user.first_name, 'Bob')
         self.assertEqual(new_dataverse_user.last_name, 'Smith')
@@ -57,17 +58,20 @@ class CreateDataverseUserTest(TestCase):
         with self.assertRaises(DataverseResponseError):
             dv_response_without_data = self.dataverse_response.copy()
             del dv_response_without_data['data']['data']
-            new_dataverse_user = create_dataverse_user(self.opendp_user.id, self.site_url,
-                                                       self.api_general_token, dv_response_without_data)
+            handler = DataverseUserHandler(self.opendp_user.id, self.site_url,
+                                           self.api_general_token, dv_response_without_data)
+            new_dataverse_user = handler.create_dataverse_user()
 
     def test_opendp_user_not_found(self):
         with self.assertRaises(Http404):
             invalid_opendp_user_id = -1
-            new_dataverse_user = create_dataverse_user(invalid_opendp_user_id, self.site_url,
-                                                       self.api_general_token, self.dataverse_response)
+            handler = DataverseUserHandler(invalid_opendp_user_id, self.site_url,
+                                           self.api_general_token, self.dataverse_response)
+            new_dataverse_user = handler.create_dataverse_user()
 
     def test_registered_dataverse_not_found(self):
         with self.assertRaises(Http404):
             invalid_site_url = 'www.thisbreaks.com'
-            new_dataverse_user = create_dataverse_user(self.opendp_user.id, invalid_site_url,
-                                                       self.api_general_token, self.dataverse_response)
+            handler = DataverseUserHandler(self.opendp_user.id, invalid_site_url,
+                                           self.api_general_token, self.dataverse_response)
+            new_dataverse_user = create_dataverse_user()
