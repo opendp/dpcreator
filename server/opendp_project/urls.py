@@ -51,6 +51,9 @@ router.register(r'test', TermsOfAccessAgreementViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
+
+    path('api/dataverses/', include('opendp_apps.dataverses.urls')),
+
     path('api/', include(router.urls)),
     path('api/deposit/', DepositorSetup.as_view()),
                   path('api/dv-dataset/', DataverseDatasetInfoView.as_view()),
@@ -70,5 +73,6 @@ urlpatterns = [
                   url(r'^rest-auth/google/$', GoogleLogin.as_view(), name='google-login'),
 
                   # Putting all vue-related views under "ui/" for now to separate from the api.
-                  url(r'^.*$', TemplateView.as_view(template_name="index.html")),
+                  url(r'^.*$', TemplateView.as_view(template_name="index.html"), name='vue-home'),
+
               ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT, kwargs={'show_indexes': True})

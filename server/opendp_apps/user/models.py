@@ -9,6 +9,8 @@ from django_cryptography.fields import encrypt
 from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.models import TimestampedModelWithUUID
 
+
+
 class OpenDPUser(AbstractUser):
     """
     Core App User. May be extended in the future

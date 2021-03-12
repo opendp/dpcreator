@@ -27,7 +27,6 @@ export default {
       },
   },
   actions: {
-
     createAccount({ commit,state }, { username, password1, password2, email }) {
       commit(REGISTRATION_BEGIN);
       return auth.createAccount(username, password1, password2, email)
