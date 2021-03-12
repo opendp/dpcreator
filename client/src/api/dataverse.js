@@ -34,7 +34,7 @@ export default {
         const formData = new FormData()
         formData.append("handoffId", handoffId)
         // TODO: replace with updateDataverseUser API when ready
-        // return session.post('/api/dv-user/', formData);
+         return session.post('/api/dataverses/view-handoff-params/' + handoffId);
     },
 
 };

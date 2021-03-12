@@ -34,7 +34,7 @@ const actions = {
   updateDataverseUser({commit, state}, OpenDPUserId) {
     dataverse.updateDataverseUser(OpenDPUserId, state.handoffId)
         .then((resp) => {
-          commit('SET_DATAVERSE_USER', resp.data.data)
+          commit('SET_DATAVERSE_USER', resp.data)
         })
   },
 };
