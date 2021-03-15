@@ -74,4 +74,4 @@ class DataverseUserHandlerTest(TestCase):
             invalid_site_url = 'www.thisbreaks.com'
             handler = DataverseUserHandler(self.opendp_user.id, invalid_site_url,
                                            self.api_general_token, self.dataverse_response)
-            new_dataverse_user = create_dataverse_user()
+            new_dataverse_user = handler.create_dataverse_user()

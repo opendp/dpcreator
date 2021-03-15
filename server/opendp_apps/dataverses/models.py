@@ -52,7 +52,7 @@ class DataverseHandoff(TimestampedModelWithUUID):
     """
     name = models.CharField(max_length=255, blank=True)
 
-    # TODO: These should be snakcase rather than camelcase (PEP standard)
+    # TODO: These should be snakecase rather than camelcase (PEP standard)
     siteUrl = models.CharField(max_length=255)
 
     fileId = models.CharField(max_length=255)

@@ -10,7 +10,7 @@ Examples:
 
 
 """
-#from collections import OrderedDict
+
 
 class BasicResponse:
 
@@ -47,9 +47,11 @@ def ok_resp(data, message=None):
     """Return a SuccessResponse with success=True and data"""
     return BasicResponse(True, message=message, data=data)
 
+
 def err_resp(err_msg, data=None):
     """Return a ErrorResponse with success=False and err_msg"""
     return BasicResponse(False, message=err_msg, data=data)
+
 
 if __name__ == '__main__':
     br = ok_resp(dict(median=34))

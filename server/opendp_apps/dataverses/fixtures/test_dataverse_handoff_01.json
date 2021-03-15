@@ -1,0 +1,13 @@
+[{
+    "model": "dataverses.dataversehandoff",
+    "pk": 1,
+    "fields": {
+      "name": "test",
+      "siteUrl": "https://dataverse.harvard.edu",
+      "fileId": "file_id",
+      "filePid": "pid_etc",
+      "apiGeneralToken": "",
+      "created": "2020-11-09T17:55:43.854Z",
+      "updated": "2020-11-09T17:55:43.854Z"
+    }
+}]

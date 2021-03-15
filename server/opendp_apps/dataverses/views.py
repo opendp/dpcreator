@@ -1,8 +1,11 @@
 import json
-from http import HTTPStatus
 import uuid
 
+from http import HTTPStatus
+from requests.exceptions import InvalidSchema
+
 from django.contrib.auth.decorators import user_passes_test
+from django.shortcuts import get_object_or_404
 
 from rest_framework.views import APIView
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect, Http404
@@ -106,25 +109,30 @@ def view_as_dict(request, object_id):
 class DataverseUserView(APIView):
 
     def post(self, request):
-        content = json.loads(request.body)['content']
-        opendp_user_id, dataverse_handoff_id = content['user_id'], content['dataverse_id']
-        dataverse_handoff = DataverseHandoff.objects.get(id=dataverse_handoff_id)
+        opendp_user_id, dataverse_handoff_id = request.POST['user_id'], request.POST['dataverse_id']
+        dataverse_handoff = get_object_or_404(DataverseHandoff, id=dataverse_handoff_id)
         api_general_token = dataverse_handoff.apiGeneralToken
         site_url = dataverse_handoff.siteUrl
         dataverse_client = DataverseClient(site_url, api_general_token)
-        dataverse_response = dataverse_client.get_user_info(user_api_token=api_general_token)
+        try:
+            dataverse_response = dataverse_client.get_user_info(user_api_token=api_general_token)
+        except InvalidSchema:
+            return JsonResponse({'error': f'Site {site_url} is not valid'}, status=400)
 
-        if dataverse_response.get('success') is not True:
-            return JsonResponse({'error': dataverse_response.get('message')}, status=400)
+        if dataverse_response.success is not True:
+            print(dataverse_response.__dict__)
+            return JsonResponse({'error': dataverse_response.message}, status=400)
 
         try:
-            handler = DataverseUserHandler(opendp_user_id, site_url, api_general_token, dataverse_response)
+            handler = DataverseUserHandler(opendp_user_id, site_url, api_general_token, dataverse_response.__dict__)
             new_dv_user = handler.create_dataverse_user()
-            dv_user = new_dv_user.save()
+            new_dv_user.save()
         except DataverseResponseError as ex:
+            print(ex)
             return JsonResponse({'error': ex}, status=400)
 
-        return JsonResponse({'dv_user': dv_user.id}, status=201)
+        print(dataverse_response.__dict__)
+        return JsonResponse({'dv_user': new_dv_user.id}, status=201)
 
     def put(self, request):
         content = json.loads(request.body)['content']
