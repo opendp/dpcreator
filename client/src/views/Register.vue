@@ -112,7 +112,7 @@ export default {
     ...mapState('signup', ['registrationCompleted',
       'registrationError',
       'registrationLoading']),
-    ...mapState('dataverse', ['dvParams', 'dataverseUser']),
+    ...mapState('dataverse', ['handoffId', 'dataverseUser']),
     ...mapState('auth', ['user']),
 
     registrationErrors() {
@@ -137,10 +137,13 @@ export default {
     submitRegister() {
       this.$store.dispatch('signup/createAccount', this.inputs)
           .then((resp) => {
-            console.log('returned from create account')
-            console.log(resp)
-            this.checkDvUser(resp.data[0], this.dvParams.siteUrl, this.dvParams.apiToken)
-          })
+                if (this.handoffId) {
+                  const openDPUserId = resp.data[0]
+                  this.$store.dispatch('dataverse/updateDataverseUser',
+                      openDPUserId)
+                }
+              }
+          )
     },
     onGoogleSignInError(error) {
       console.log('Google sign in error: ', error)
@@ -151,25 +154,16 @@ export default {
           .then(() => {
             this.$store.dispatch('auth/fetchUser')
                 .then(() => {
-                  // TODO: update fetchUser so it returns object_id (uuid)
-                  this.checkDvUser(this.user['pk'])
+                  if (this.handoffId) {
+                    // TODO: replace pk with uuid
+                    this.$store.dispatch('dataverse/updateDataverseUser',
+                        this.user['pk'])
+                  }
                 })
-
           })
           .then(() => this.$router.push('/'))
-
     },
 
-    /*
-    If the user came from a Dataverse, get the user info
-    from dataverse and use it to create a dataverse user
-     */
-    checkDvUser(object_id) {
-      if (this.dvParams.apiToken) {
-        this.$store.dispatch('dataverse/updateDataverseUser',
-            object_id)
-      }
-    },
     beforeRouteLeave(to, from, next) {
       this.clearRegistrationStatus();
       next();

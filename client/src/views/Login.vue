@@ -62,7 +62,7 @@ export default {
   },
   computed: {
     ...mapState('auth', ['error', 'user']),
-    ...mapState('dataverse', ['dvParams']),
+    ...mapState('dataverse', ['handoffId']),
     loginErrors() {
       let errs = [];
       if (this.errorMessage != null) {
@@ -108,12 +108,14 @@ export default {
       return Object.keys(obj).length === 0
     },
     checkDataverseUser() {
+      if (this.handoffId) {
         this.$store.dispatch('auth/fetchUser')
             .then(() => {
               // TODO: replace pk with UUID
-              this.$store.dispatch('update/updateDataverseUser', this.user['pk'])
+              this.$store.dispatch('dataverse/updateDataverseUser', this.user['pk'], this.handoffId)
                   .catch(({data}) => console.log("error: " + data))
             })
+      }
     }
   },
 };

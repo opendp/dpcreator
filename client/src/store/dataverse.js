@@ -2,29 +2,26 @@ import dataverse from '../api/dataverse'
 import session from '../api/session';
 
 import {
-  SET_DV_PARAMS,
-  REMOVE_DV_PARAMS,
+  SET_DV_HANDOFF,
+  REMOVE_DV_HANDOFF,
   SET_DATAVERSE_USER,
 } from './types';
 
 const initialState = {
-  dvParams: {
-    apiToken: null,
-    siteUrl: null
-  },
+  handoffId: null,
   dataverseUser: null
 };
 const getters = {
-  getDvParams: state => {
-    return state.dvParams
+  getHandoffId: state => {
+    return state.handoffId
   },
 };
 const actions = {
-  setDvParams({commit, state}, {apiToken, siteUrl}) {
-    commit('SET_DV_PARAMS', {apiToken, siteUrl})
+  setHandoffId({commit, state}, handoffId) {
+    commit('SET_DV_HANDOFF', handoffId)
   },
   removeDvParams({commit}) {
-    commit('REMOVE_DV_PARAMS')
+    commit('REMOVE_DV_HANDOFF')
   },
   /**
    * Get the latest DV User info for this OpenDPUser
@@ -35,10 +32,9 @@ const actions = {
    * @returns {Promise<void>}
    */
   updateDataverseUser({commit, state}, OpenDPUserId) {
-    // TODO: replace this with new updateDataverseUser API, which takes OpenDPUserId
-    dataverse.updateDataverseUser(OpenDPUserId, state.dvParams.siteUrl, state.dvParams.apiToken)
+    dataverse.updateDataverseUser(OpenDPUserId, state.handoffId)
         .then((resp) => {
-          commit('SET_DATAVERSE_USER', resp.data.data)
+          commit('SET_DATAVERSE_USER', resp.data)
         })
   },
 };
@@ -47,13 +43,11 @@ const mutations = {
   [SET_DATAVERSE_USER](state, dataverseUser) {
     state.dataverseUser = dataverseUser
   },
-  [SET_DV_PARAMS](state, payload) {
-    state.dvParams.siteUrl = payload.siteUrl
-    state.dvParams.apiToken = payload.apiToken
+  [SET_DV_HANDOFF](state, payload) {
+    state.handoffId = payload
   },
-  [REMOVE_DV_PARAMS]() {
-    state.dvParams.apiToken = null
-    state.dvParms.siteUrl = null
+  [REMOVE_DV_HANDOFF]() {
+    state.handoffId = null
   },
 
 };

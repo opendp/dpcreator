@@ -5,6 +5,10 @@ from django.db import models
 from django.conf import settings
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+
+from django_cryptography.fields import encrypt
+
+
 from opendp_apps.dataverses import static_vals as dv_static
 
 from opendp_apps.model_helpers.models import \
@@ -39,6 +43,47 @@ class RegisteredDataverse(TimestampedModelWithUUID):
 
     class Meta:
         ordering = ('name',)
+
+
+class DataverseHandoff(TimestampedModelWithUUID):
+    """
+    Dataverse-specific attributes
+    reference: https://guides.dataverse.org/en/latest/api/external-tools.html
+    """
+    name = models.CharField(max_length=255, blank=True)
+    siteUrl = models.CharField(max_length=255)
+
+    fileId = models.CharField(max_length=255)
+
+    datasetPid = models.CharField(max_length=255,
+                                  help_text='Dataset DOI')
+
+    filePid = models.CharField(max_length=255,
+                               blank=True,
+                               help_text='File DOI')
+
+    apiGeneralToken = encrypt(models.CharField(max_length=255))
+
+    apiSensitiveDataReadToken = encrypt(models.CharField(max_length=255))
+
+
+    class Meta:
+        verbose_name = 'Dataverse Handoff Parameter'
+        verbose_name_plural = 'Dataverse Handoff Parameters'
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+
+        # Set then name to the File DOI or ID
+        if not self.name:
+            if self.filePid:
+                self.name = f'{self.object_id} File DOI: {self.filePid}'
+            else:
+                self.name = f'{self.object_id} File ID: {self.fileId}'
+
+        super(DataverseHandoff, self).save(*args, **kwargs)
 
 
 class ManifestTestParams(TimestampedModelWithUUID):
