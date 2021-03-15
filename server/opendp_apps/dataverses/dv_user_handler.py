@@ -44,8 +44,9 @@ class DataverseUserHandler(object):
         )
 
     def update_dataverse_user(self):
-        dataverse_user = DataverseUser.objects.filter(user=self.opendp_user, site_url=self.site_url,
-                                                      persistent_id=self.dataverse_persistent_id).first()
+        dataverse_user = get_object_or_404(DataverseUser,
+                                           user=self.opendp_user,
+                                           dv_installation=self.registered_dataverse)
         if not dataverse_user:
             raise DataverseUser.ObjectNotFound
 
@@ -53,6 +54,5 @@ class DataverseUserHandler(object):
         dataverse_user.first_name = self.first_name
         dataverse_user.last_name = self.last_name
         dataverse_user.email = self.email
-        dataverse_user.save()
 
         return dataverse_user

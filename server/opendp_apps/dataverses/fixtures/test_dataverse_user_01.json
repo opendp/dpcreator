@@ -1,0 +1,11 @@
+[{
+    "model": "user.dataverseuser",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "dv_installation": 1,
+      "persistent_id": 1,
+      "created": "2020-11-09T17:55:43.854Z",
+      "updated": "2020-11-09T17:55:43.854Z"
+    }
+}]

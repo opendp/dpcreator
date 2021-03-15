@@ -1,0 +1,7 @@
+[{
+    "model": "user.opendpuser",
+    "pk": 1,
+    "fields": {
+      "username": "test"
+    }
+}]
