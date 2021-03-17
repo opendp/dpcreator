@@ -191,6 +191,9 @@ AUTH_USER_MODEL = 'user.OpenDPUser'
 REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'opendp_apps.user.serializers.CustomRegisterSerializer',
 }
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'opendp_apps.user.serializers.UserSerializer',
+}
 # ALLOWED_HOSTS=['*']
 
 DEFAULT_ALLOWED_HOSTS = '0.0.0.0,127.0.0.1,localhost'
