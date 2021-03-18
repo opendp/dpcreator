@@ -3,7 +3,7 @@
     "pk": 1,
     "fields": {
       "name": "test",
-      "siteUrl": "https://dataverse.harvard.edu",
+      "siteUrl": "http://127.0.0.1:8000/dv-mock-api",
       "fileId": "file_id",
       "filePid": "pid_etc",
       "apiGeneralToken": "",

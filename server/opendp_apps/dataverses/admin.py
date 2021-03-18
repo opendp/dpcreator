@@ -33,8 +33,6 @@ class ManifestTestParamsAdmin(admin.ModelAdmin):
                        'schema_org_info_link')
 
 
-# Commenting out, not sure why this was here....
-# DataverseHandoffAdmin
 admin.site.register(DataverseHandoff, DataverseHandoffAdmin)
 admin.site.register(RegisteredDataverse, RegisteredDataverseAdmin)
 admin.site.register(ManifestTestParams, ManifestTestParamsAdmin)
