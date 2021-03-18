@@ -112,6 +112,10 @@ class DataverseUserView(APIView):
     def post(self, request):
         opendp_user_id, dataverse_handoff_id = request.POST['user_id'], request.POST['dataverse_id']
         dataverse_handoff = get_object_or_404(DataverseHandoff, id=dataverse_handoff_id)
+
+        if not dataverse_handoff.is_site_url_registered():
+            return JsonResponse({'error': f'Site {dataverse_handoff.siteUrl} is not valid'}, status=400)
+
         api_general_token = dataverse_handoff.apiGeneralToken
         site_url = dataverse_handoff.siteUrl
         dataverse_client = DataverseClient(site_url, api_general_token)

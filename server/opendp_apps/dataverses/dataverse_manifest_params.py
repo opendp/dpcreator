@@ -6,6 +6,7 @@ from django.http import QueryDict
 
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.dataverse_client import DataverseClient
+from opendp_apps.dataverses.forms import DataverseParamsSiteUrlForm
 
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
@@ -31,6 +32,8 @@ class DataverseManifestParams(BasicErrCheck):
         self.apiGeneralToken = self.format_param(incoming_params.get(dv_static.DV_API_GENERAL_TOKEN))
         self.apiSensitiveDataReadToken = self.format_param(incoming_params.get(dv_static.DV_API_SENSITIVE_DATA_READ_TOKEN))
 
+        self.registerd_dataverse = None # RegisteredDataverse connected with self.siteUrl
+
         self.check_required_params()
 
     def format_param(self, val):
@@ -48,17 +51,28 @@ class DataverseManifestParams(BasicErrCheck):
         Check that required params are set
         """
         missing_params = []
-
         if self.custom_required_params:
-            for param in self.custom_required_params:
-                if not self.__dict__.get(param):
-                    missing_params.append(param)
+            # custom required parameters
+            required_params = self.custom_required_params
         else:
-            for param in dv_static.DV_ALL_PARAMS:
-                if param in dv_static.DV_OPTIONAL_PARAMS:
-                    continue
-                elif not self.__dict__.get(param):
-                    missing_params.append(param)
+            # default required parameters
+            required_params = (list(set(dv_static.DV_ALL_PARAMS) - set(dv_static.DV_OPTIONAL_PARAMS)))
+
+        # If the siteUrl is required, check that it's connected to a RegisteredDataverse
+        #
+        if dv_static.DV_PARAM_SITE_URL in required_params:
+            f = DataverseParamsSiteUrlForm({'siteUrl': self.siteUrl})
+            if not f.is_valid():
+                user_msg = (f'This "{dv_static.DV_PARAM_SITE_URL}" was not connected'
+                            f' to a registered Dataverse: {self.siteUrl}')
+                self.add_err_msg(user_msg)
+                return
+            else:
+                self.registerd_dataverse = f.cleaned_data[dv_static.DV_PARAM_SITE_URL]
+
+        for param in required_params:
+            if not self.__dict__.get(param):
+                missing_params.append(param)
 
         if missing_params:
             if len(missing_params) == 1:
@@ -67,6 +81,8 @@ class DataverseManifestParams(BasicErrCheck):
                 user_msg = 'These required parameters are missing: %s' % (', '.join(missing_params))
 
             self.add_err_msg(user_msg)
+            return
+
 
 
     def get_schema_org(self):

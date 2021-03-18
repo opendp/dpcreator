@@ -45,14 +45,12 @@ class RegisteredDataverse(TimestampedModelWithUUID):
         ordering = ('name',)
 
 
-class DataverseHandoff(TimestampedModelWithUUID):
+class DataverseParams(TimestampedModelWithUUID):
     """
-    Dataverse-specific attributes
-    reference: https://guides.dataverse.org/en/latest/api/external-tools.html
-    """
-    name = models.CharField(max_length=255, blank=True)
-
+    Abstract class for Dataverse Params
+    Reference: https://guides.dataverse.org/en/latest/api/external-tools.html
     # TODO: These should be snakecase rather than camelcase (PEP standard)
+    """
     siteUrl = models.CharField(max_length=255)
 
     fileId = models.CharField(max_length=255)
@@ -68,6 +66,33 @@ class DataverseHandoff(TimestampedModelWithUUID):
 
     apiSensitiveDataReadToken = encrypt(models.CharField(max_length=255))
 
+    class Meta:
+        abstract = True
+
+    def is_site_url_registered(self):
+        """Does the site_url match a RegisteredDataverse?"""
+        if RegisteredDataverse.objects.filter(dataverse_url=self.siteUrl).count() > 0:
+            return True
+        return False
+
+    def as_dict(self):
+        """
+        Return the params as a Python dict
+        """
+        params = {dv_static.DV_PARAM_FILE_ID: self.fileId,
+                  dv_static.DV_PARAM_SITE_URL: self.siteUrl,
+                  dv_static.DV_API_SENSITIVE_DATA_READ_TOKEN: self.apiSensitiveDataReadToken,
+                  dv_static.DV_API_GENERAL_TOKEN: self.apiGeneralToken,
+                  dv_static.DV_PARAM_DATASET_PID: self.datasetPid,
+                  dv_static.DV_PARAM_FILE_PID: self.filePid}
+
+        return params
+
+class DataverseHandoff(DataverseParams):
+    """
+    Dataverse parameters passed to the OpenDP App
+    """
+    name = models.CharField(max_length=255, blank=True)
 
     class Meta:
         verbose_name = 'Dataverse Handoff Parameter'
@@ -88,7 +113,7 @@ class DataverseHandoff(TimestampedModelWithUUID):
         super(DataverseHandoff, self).save(*args, **kwargs)
 
 
-class ManifestTestParams(TimestampedModelWithUUID):
+class ManifestTestParams(DataverseParams):
     """
     Used to to create test params for a mock "incoming" Dataverse request
     """
@@ -98,15 +123,7 @@ class ManifestTestParams(TimestampedModelWithUUID):
     # fileid=4164587&siteUrl=https://dataverse.harvard.edu&datasetid=4164585&datasetversion=1.0&locale=en
     #
     name = models.CharField(max_length=255, blank=True)
-    fileId = models.IntegerField()
-    siteUrl = models.URLField(max_length=255, blank=True)
     use_mock_dv_api = models.BooleanField('Use Mock Dataverse API', default=False)
-
-
-    apiSensitiveDataReadToken = models.CharField(max_length=255, blank=True)
-    apiGeneralToken = models.CharField(max_length=255, blank=True)
-    filePid = models.CharField(max_length=255, blank=True)
-    datasetPid = models.CharField(max_length=255, blank=True)
 
     ddi_content = models.TextField(help_text='Use XML', blank=True)
 
@@ -117,7 +134,6 @@ class ManifestTestParams(TimestampedModelWithUUID):
     raw_file = models.FileField(storage=UPLOADED_FILE_STORAGE,
                                 upload_to='mock-files/%Y/%m/%d/',
                                 blank=True, null=True)
-
 
     def __str__(self):
         return self.name
@@ -135,18 +151,6 @@ class ManifestTestParams(TimestampedModelWithUUID):
         verbose_name = ('Manifest Test Parameter')
         verbose_name_plural = ('Manifest Test Parameters')
 
-    def as_dict(self):
-        """
-        Return the params as a Python dict
-        """
-        params = {dv_static.DV_PARAM_FILE_ID: self.fileId,
-                  dv_static.DV_PARAM_SITE_URL: self.siteUrl,
-                  dv_static.DV_API_SENSITIVE_DATA_READ_TOKEN: self.apiSensitiveDataReadToken,
-                  dv_static.DV_API_GENERAL_TOKEN: self.apiGeneralToken,
-                  dv_static.DV_PARAM_DATASET_PID: self.datasetPid,
-                  dv_static.DV_PARAM_FILE_PID: self.filePid}
-
-        return params
 
     def get_manifest_url_params(self, selected_params=None):
         """

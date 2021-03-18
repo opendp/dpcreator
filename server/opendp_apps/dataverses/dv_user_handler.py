@@ -16,6 +16,7 @@ class DataverseUserHandler(object):
         self.site_url = site_url
         self.api_general_token = api_general_token
         self.opendp_user = get_object_or_404(OpenDPUser, id=opendp_user_id)
+
         self.registered_dataverse = get_object_or_404(RegisteredDataverse, dataverse_url=site_url)
 
     def _unpack_dataverse_response(self, dataverse_response):

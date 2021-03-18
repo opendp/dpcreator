@@ -184,7 +184,7 @@ if __name__ == '__main__':
     # print(ddi_obj.get_title())
     print()
     resp = client.get_user_info(api_token)
-    print(resp.__dict__)
+    #print(resp.__dict__)
 
 """
 from pyDataverse.api import Api
