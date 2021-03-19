@@ -10,6 +10,7 @@ from django.contrib.auth import get_user_model
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.models import ManifestTestParams, DataverseHandoff, RegisteredDataverse
 from opendp_apps.user.models import DataverseUser, OpenDPUser
+from opendp_apps.model_helpers.msg_util import msgt
 
 TAG_WEB_CLIENT = 'web-client' # skip these tests on travis; need to fix as many use requests to access the localhost
 
@@ -82,7 +83,8 @@ class BaseEndpointTest(TestCase):
 class DataversePostTest(BaseEndpointTest):
 
     def test_successful_creation(self, req_mocker):
-        """Test a successful user creation call"""
+        """test_successful_creation"""
+        msgt(self.test_successful_creation.__doc__)
 
         # set the mock requests
         self.set_mock_requests(req_mocker)
@@ -95,7 +97,8 @@ class DataversePostTest(BaseEndpointTest):
 
 
     def test_user_not_found(self, req_mocker):
-        """Test a non-existent OpenDP User id"""
+        """test_user_not_found"""
+        msgt(self.test_user_not_found.__doc__)
 
         # set the mock requests
         self.set_mock_requests(req_mocker)
@@ -108,7 +111,8 @@ class DataversePostTest(BaseEndpointTest):
 
 
     def test_dataverse_handoff_not_found(self, req_mocker):
-        """Test a non-existent  DataverseHandoff id"""
+        """test_dataverse_handoff_not_found"""
+        msgt(self.test_dataverse_handoff_not_found.__doc__)
 
         # set the mock requests
         self.set_mock_requests(req_mocker)
@@ -122,6 +126,8 @@ class DataversePostTest(BaseEndpointTest):
 
     def test_invalid_site_url(self, req_mocker):
         """Test an invalid site url"""
+        msgt(self.test_invalid_site_url.__doc__)
+
         # set the mock requests
         self.set_mock_requests(req_mocker)
 
@@ -138,6 +144,7 @@ class DataversePostTest(BaseEndpointTest):
 
     def test_invalid_token(self, req_mocker):
         """Test an invalid token"""
+        msgt(self.test_invalid_token.__doc__)
 
         # set the mock requests
         self.set_mock_requests(req_mocker)
@@ -158,6 +165,7 @@ class DataversePutTest(BaseEndpointTest):
 
     def test_successful_update(self, req_mocker):
         """test_successful_update"""
+        msgt(self.test_successful_update.__doc__)
 
         # ---------------------------
         # set the mock request
@@ -196,6 +204,8 @@ class DataversePutTest(BaseEndpointTest):
 
     def test_user_not_found(self, req_mocker):
         """test_user_not_found"""
+        msgt(self.test_user_not_found.__doc__)
+
         self.set_mock_requests(req_mocker)
 
         url = reverse('dv-user')
@@ -207,6 +217,8 @@ class DataversePutTest(BaseEndpointTest):
 
     def test_dataverse_handoff_not_found(self, req_mocker):
         """test_dataverse_handoff_not_found"""
+        msgt(self.test_dataverse_handoff_not_found.__doc__)
+
         self.set_mock_requests(req_mocker)
 
         url = reverse('dv-user')
@@ -219,6 +231,8 @@ class DataversePutTest(BaseEndpointTest):
 
     def test_invalid_site_url(self, req_mocker):
         """test_invalid_site_url"""
+        msgt(self.test_invalid_site_url.__doc__)
+
         self.set_mock_requests(req_mocker)
 
         dataverse_handoff = DataverseHandoff.objects.first()
@@ -235,6 +249,8 @@ class DataversePutTest(BaseEndpointTest):
     #@skip
     def test_invalid_token(self, req_mocker):
         """test_invalid_token"""
+        msgt(self.test_invalid_token.__doc__)
+
         self.set_mock_requests(req_mocker)
 
         dataverse_handoff = DataverseHandoff.objects.first()
