@@ -19,6 +19,7 @@ class DaverseUserInputSerializer(serializers.Serializer):
                                             help_text=('Reference: https://guides.dataverse.org'
                                                        '/en/latest/user/account.html#api-token'))
 
+
 class DataverseUserInfoView(APIView):
     """API to retrieve Dataverse User Information.
     Required param"""
@@ -40,7 +41,6 @@ class DataverseUserInfoView(APIView):
                                           custom_required_params=self.required_params)
 
         return self.retrieve_user_info(mparams)
-
 
     def retrieve_user_info(self, mparams):
         """

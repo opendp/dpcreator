@@ -1,13 +1,8 @@
-import json
 from unittest import skip
-import tempfile
 import requests_mock
 
 from django.test import Client, tag, TestCase
 from django.urls import reverse
-
-from django.conf import settings
-from django.template.loader import render_to_string
 
 from django.contrib.auth import get_user_model
 from opendp_apps.dataverses import static_vals as dv_static
@@ -49,7 +44,8 @@ class DataverseIncomingTest(TestCase):
         #
         params_dict = self.mock_params.as_dict()
         dv_manifest = DataverseManifestParams(params_dict)
-        #print(dv_manifest.get_error_message())
+        #print(dv_manifest.has_error())
+        #print(dv_manifest.get_err_msg())
         self.assertTrue(dv_manifest.has_error() is False)
 
         print('3. Test with missing param. fileId')
@@ -112,6 +108,9 @@ class DataverseIncomingTest(TestCase):
         self.set_requests_mocker(req_mocker)
 
         print('2. Process incoming request')
+
+        print('self.mock_params.as_dict()', self.mock_params.as_dict())
+        print('self.user_obj', self.user_obj)
 
         dv_handler = DataverseRequestHandler(self.mock_params.as_dict(), self.user_obj)
         if dv_handler.has_error():
@@ -197,6 +196,7 @@ class DataverseIncomingTest(TestCase):
         self.assertTrue(file_info is not None)
 
     # @tag(TAG_WEB_CLIENT)
+    @skip('skipping....')
     @requests_mock.Mocker()
     def test_110_check_dv_handler_via_url_no_params(self, req_mocker):
         """(110) Test DataverseRequestHandler via url with no parameters"""

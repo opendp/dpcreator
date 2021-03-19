@@ -35,7 +35,7 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
     # Switch to encryption!
     #
-    data_profile = encrypt(models.JSONField(default=None, encoder=DjangoJSONEncoder))
+    data_profile = encrypt(models.JSONField(default=None, null=True, encoder=DjangoJSONEncoder))
 
     # Switch to encryption!
     #

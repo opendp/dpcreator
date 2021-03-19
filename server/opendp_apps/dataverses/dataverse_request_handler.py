@@ -146,7 +146,8 @@ class DataverseRequestHandler(BasicErrCheck):
         if self.has_error():
             return False
 
-        {'id': 11086,
+        test_data = {\
+         'id': 11086,
          'identifier': '@raman_prasad',
          'displayName': 'Raman Prasad',
          'firstName': 'Raman',
@@ -165,7 +166,7 @@ class DataverseRequestHandler(BasicErrCheck):
 
         self.dataverse_user, _created = DataverseUser.objects.get_or_create(
                                             user=self.user,     # logged in user
-                                            dv_installation=self.mparams.siteUrl, # from GET request
+                                            dv_installation=self.mparams.registerd_dataverse, # from GET request
                                             persistent_id=dv_persistent_id)     # from User Info
 
         # update params, if needed
@@ -181,7 +182,7 @@ class DataverseRequestHandler(BasicErrCheck):
         Retrieve or create a DataverseFileInfo object
         """
         query_params = dict(source=DataverseFileInfo.SourceChoices.Dataverse,
-                            installation_name=self.mparams.siteUrl,
+                            installation_name=self.mparams.registerd_dataverse,
                             dataverse_file_id=self.mparams.fileId
                             )
         defaults = dict(creator=self.user,  # logged in user, OpenDP user
