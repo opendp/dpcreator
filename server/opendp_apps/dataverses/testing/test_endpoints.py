@@ -34,6 +34,21 @@ class BaseEndpointTest(TestCase):
 
         self.mock_params = ManifestTestParams.objects.filter(use_mock_dv_api=True).first()
 
+        self.updated_user_info = {'status': 'OK', 'data': {
+                "id": 9974,
+                "object_id": "2dd1aa0a-7e48-49e1-af0d-efbd2f68d0bf",
+                "email": "mock_email_updated@some.edu",
+                "firstName": "UpdatedFname",
+                "lastName": "UpdatedLname",
+                "superuser": False,
+                "identifier": "@mock_user",
+                "affiliation": "Some University",
+                "createdTime": "2000-01-01T05:00:00Z",
+                "displayName": "Mock User",
+                "lastApiUseTime": "2020-11-16T19:34:51Z",
+                "persistentUserId": "updatedPersistentUserId",
+                "authenticationProviderId": "shib"
+            }}
 
     def set_mock_requests(self, req_mocker):
         """
@@ -75,8 +90,9 @@ class DataversePostTest(BaseEndpointTest):
         # Now test the API call which would be initiated from the Vue.js client
         #
         url = reverse('dv-user')
-        response = self.client.post(url, data={'user_id': 1, 'dataverse_id': 1})
+        response = self.client.post(url, data={'user_id': 1, 'dataverse_handoff_id': 1})
         self.assertEqual(response.status_code, 201)
+
 
     def test_user_not_found(self, req_mocker):
         """Test a non-existent OpenDP User id"""
@@ -87,8 +103,9 @@ class DataversePostTest(BaseEndpointTest):
         # Now test the API call which would be initiated from the Vue.js client
         #
         url = reverse('dv-user')
-        response = self.client.post(url, data={'user_id': 0, 'dataverse_id': 1})
+        response = self.client.post(url, data={'user_id': 0, 'dataverse_handoff_id': 1})
         self.assertEqual(response.status_code, 404)
+
 
     def test_dataverse_handoff_not_found(self, req_mocker):
         """Test a non-existent  DataverseHandoff id"""
@@ -99,8 +116,9 @@ class DataversePostTest(BaseEndpointTest):
         # Now test the API call which would be initiated from the Vue.js client
         #
         url = reverse('dv-user')
-        response = self.client.post(url, data={'user_id': 1, 'dataverse_id': 0})
+        response = self.client.post(url, data={'user_id': 1, 'dataverse_handoff_id': 0})
         self.assertEqual(response.status_code, 404)
+
 
     def test_invalid_site_url(self, req_mocker):
         """Test an invalid site url"""
@@ -113,7 +131,7 @@ class DataversePostTest(BaseEndpointTest):
         dataverse_handoff.siteUrl = 'www.invalidsite.com'
         dataverse_handoff.save()
         url = reverse('dv-user')
-        response = self.client.post(url, data={'user_id': 1, 'dataverse_id': 1})
+        response = self.client.post(url, data={'user_id': 1, 'dataverse_handoff_id': 1})
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content)['error'], 'Site www.invalidsite.com is not valid')
 
@@ -130,7 +148,7 @@ class DataversePostTest(BaseEndpointTest):
         dataverse_handoff.apiGeneralToken = 'invalid_token_1234'
         dataverse_handoff.save()
         url = reverse('dv-user')
-        response = self.client.post(url, data={'user_id': 1, 'dataverse_id': 0})
+        response = self.client.post(url, data={'user_id': 1, 'dataverse_handoff_id': 0})
         self.assertEqual(response.status_code, 404)
         self.assertEqual(json.loads(response.content)['detail'], 'Not found.')
 
@@ -139,48 +157,102 @@ class DataversePostTest(BaseEndpointTest):
 class DataversePutTest(BaseEndpointTest):
 
     def test_successful_update(self, req_mocker):
-        # set the mock requests
-        self.set_mock_requests(req_mocker)
+        """test_successful_update"""
 
-        # Now test the API call which would be initiated from the Vue.js client
-        #
-        existing_dv_user = DataverseUser.objects.get(id=1)
+        # ---------------------------
+        # set the mock request
+        # contains updated name, email, and persistentId
+        # ---------------------------
+        req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/users/:me',
+                       json=self.updated_user_info)
+
+        # ---------------------------
+        # Update the user
+        # ---------------------------
+        orig_user = DataverseUser.objects.get(pk=2)
+        # print('orig_user', orig_user, orig_user.id, orig_user.last_name, orig_user.first_name)
+
+
         url = reverse('dv-user')
-        response = self.client.put(url, data={'user_id': 1, 'dataverse_id': 1}, content_type='application/json')
+        response = self.client.put(url,
+                                   data={'user_id': 1, 'dataverse_handoff_id': 1},
+                                   content_type='application/json')
 
-        self.assertEqual(json.loads(response.content), {'dv_user': 1})
+        # print('response.content', response.content)
+        # print('response.status_code', response.status_code)
+
+        json_resp = response.json()
+        self.assertTrue(json_resp['success'])
+
         self.assertEqual(response.status_code, 201)
 
-        modified_dv_user = DataverseUser.objects.get(id=1)
-        self.assertNotEqual(existing_dv_user.first_name, modified_dv_user.first_name)
+        updated_user = DataverseUser.objects.get(pk=2)
+        # print('updated_user', updated_user, updated_user.id, updated_user.last_name, updated_user.first_name)
+        self.assertNotEqual(orig_user.first_name, updated_user.first_name)
+        self.assertNotEqual(orig_user.last_name, updated_user.last_name)
+        self.assertNotEqual(orig_user.email, updated_user.email)
+        self.assertNotEqual(orig_user.persistent_id, updated_user.persistent_id)
 
-    def test_user_not_found(self):
+
+    def test_user_not_found(self, req_mocker):
+        """test_user_not_found"""
+        self.set_mock_requests(req_mocker)
+
         url = reverse('dv-user')
-        response = self.client.put(url, data={'user_id': 0, 'dataverse_id': 1}, content_type='application/json')
+        response = self.client.put(url,
+                                   data={'user_id': 0, 'dataverse_handoff_id': 1},
+                                   content_type='application/json')
         self.assertEqual(response.status_code, 404)
 
-    def test_dataverse_handoff_not_found(self):
+
+    def test_dataverse_handoff_not_found(self, req_mocker):
+        """test_dataverse_handoff_not_found"""
+        self.set_mock_requests(req_mocker)
+
         url = reverse('dv-user')
-        response = self.client.put(url, data={'user_id': 1, 'dataverse_id': 0}, content_type='application/json')
+        response = self.client.put(url,
+                                   data={'user_id': 1, 'dataverse_handoff_id': 0},
+                                   content_type='application/json')
+
         self.assertEqual(response.status_code, 404)
 
-    def test_invalid_site_url(self):
-        print('--- test_invalid_site_url ---')
+
+    def test_invalid_site_url(self, req_mocker):
+        """test_invalid_site_url"""
+        self.set_mock_requests(req_mocker)
+
         dataverse_handoff = DataverseHandoff.objects.first()
         dataverse_handoff.siteUrl = 'www.invalidsite.com'
         dataverse_handoff.save()
         url = reverse('dv-user')
-        response = self.client.put(url, data={"user_id": 1, "dataverse_id": 1}, content_type='application/json')
+        response = self.client.put(url,
+                                   data={"user_id": 1, "dataverse_handoff_id": 1},
+                                   content_type='application/json')
         self.assertEqual(response.status_code, 400)
         response_json = json.loads(response.content)
         self.assertEqual(response_json['error'], 'Site www.invalidsite.com is not valid')
 
-    def test_invalid_token(self):
+    #@skip
+    def test_invalid_token(self, req_mocker):
+        """test_invalid_token"""
+        self.set_mock_requests(req_mocker)
+
         dataverse_handoff = DataverseHandoff.objects.first()
         dataverse_handoff.apiGeneralToken = 'invalid_token_1234'
         dataverse_handoff.save()
         url = reverse('dv-user')
-        response = self.client.put(url, data={'user_id': 1, 'dataverse_id': 0}, content_type='application/json')
+        response = self.client.put(url,
+                                   data={'user_id': 1, 'dataverse_handoff_id': 0},
+                                   content_type='application/json')
+
         response_json = json.loads(response.content)
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response_json['detail'], 'Not found.')
+
+
+"""
+https://dataverse.harvard.edu/api/v1/users/:me
+export API_TOKEN=7957c20e-5316-47d5-bd23-2afd19f2d00a
+curl -H X-Dataverse-key:$API_TOKEN https://dataverse.harvard.edu/api/v1/users/:me
+
+"""
