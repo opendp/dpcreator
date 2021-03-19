@@ -112,13 +112,13 @@ def view_as_dict(request, object_id):
 class DataverseUserView(APIView):
 
     def post(self, request):
-        """Given object_ids for OpenDPUser and DataverseHandoff objects,
+        """Expects JSON. Given object_ids for OpenDPUser and DataverseHandoff objects,
         retrieve the user's information from Dataverse and create a DataverseUser"""
 
         # ----------------------------------
         # Validate the input
         # ----------------------------------
-        f = DataverseUserHandlerForm(request.POST)
+        f = DataverseUserHandlerForm(request.data)
         if not f.is_valid():
             return JsonResponse(get_json_error(f.format_errors()),
                                 status=f.get_http_error_code())

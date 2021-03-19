@@ -110,9 +110,10 @@ class DataversePostTest(BaseEndpointTest):
 
         params = self.get_basic_inputs(self.dp_user_object_id, self.dv_handoff_object_id)
 
-        response = self.client.post(url, data=params)
+        response = self.client.post(url, data=params, content_type='application/json')
         msg(response.json())
         self.assertEqual(response.status_code, 201)
+
 
     def test_20_user_not_found(self, req_mocker):
         """(20) test_user_not_found"""
@@ -127,7 +128,7 @@ class DataversePostTest(BaseEndpointTest):
         params = self.get_basic_inputs(self.non_existent_uuid,
                                        self.dv_handoff_object_id)
 
-        response = self.client.post(url, data=params)
+        response = self.client.post(url, data=params, content_type='application/json')
         #response = self.client.post(url, data={'user_id': 0, 'dataverse_handoff_id': 1})
         msg(f'server response: {response.json()}')
         self.assertEqual(response.status_code, 404)
@@ -144,7 +145,7 @@ class DataversePostTest(BaseEndpointTest):
         url = reverse('dv-user')
         params = self.get_basic_inputs(self.dp_user_object_id,
                                        self.non_existent_uuid)
-        response = self.client.post(url, data=params)
+        response = self.client.post(url, data=params, content_type='application/json')
         msg(f'server response: {response.json()}')
         self.assertEqual(response.status_code, 404)
 
@@ -163,7 +164,7 @@ class DataversePostTest(BaseEndpointTest):
         url = reverse('dv-user')
         params = self.get_basic_inputs(self.dp_user_object_id,
                                        self.dv_handoff_object_id)
-        response = self.client.post(url, data=params)
+        response = self.client.post(url, data=params, content_type='application/json')
         self.assertEqual(response.status_code, 400)
         msg(response.content)
         resp_json = response.json()
@@ -189,7 +190,7 @@ class DataversePostTest(BaseEndpointTest):
 
         params = self.get_basic_inputs(self.dp_user_object_id,
                                        dataverse_handoff.object_id)
-        response = self.client.post(url, data=params)
+        response = self.client.post(url, data=params, content_type='application/json')
 
         msg(response.content)
 
