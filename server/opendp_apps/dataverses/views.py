@@ -160,11 +160,10 @@ class DataverseUserView(APIView):
                             status=201)
 
     def put(self, request):
-        """Update the Dataverse User"""
+        """Update the Dataverse User. Expects JSON"""
         # ----------------------------------
         # Validate the input
         # ----------------------------------
-        print('request.POST', request.data)
         f = DataverseUserHandlerForm(request.data)
         if not f.is_valid():
             return JsonResponse(get_json_error(f.format_errors()),
