@@ -12,11 +12,13 @@ class DataverseResponseError(Exception):
 class DataverseUserHandler(object):
 
     def __init__(self, opendp_user_id, site_url, api_general_token, dataverse_response):
-
+        # Unpack the Dataverse response
         self.dataverse_persistent_id, self.first_name, self.last_name, self.email = \
             self._unpack_dataverse_response(dataverse_response)
+
         self.site_url = site_url
         self.api_general_token = api_general_token
+
         self.opendp_user = get_object_or_404(OpenDPUser, id=opendp_user_id)
 
         self.registered_dataverse = get_object_or_404(RegisteredDataverse, dataverse_url=site_url)

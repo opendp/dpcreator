@@ -19,7 +19,8 @@ from opendp_apps.dataverses.dataverse_client import DataverseClient
 from opendp_apps.dataverses.dv_user_handler import DataverseUserHandler, DataverseResponseError
 from opendp_apps.utils.view_helper import get_json_error, get_json_success
 from opendp_apps.dataverses.models import DataverseHandoff, ManifestTestParams
-from opendp_apps.dataverses.forms import DataverseHandoffForm
+from opendp_apps.dataverses.forms import DataverseHandoffForm, DataverseUserHandlerForm
+from opendp_apps.dataverses import static_vals as dv_static
 
 
 @login_required
@@ -111,34 +112,56 @@ def view_as_dict(request, object_id):
 class DataverseUserView(APIView):
 
     def post(self, request):
-        opendp_user_id, dataverse_handoff_id = request.POST['user_id'], request.POST['dataverse_handoff_id']
-        dataverse_handoff = get_object_or_404(DataverseHandoff, id=dataverse_handoff_id)
+        """Given object_ids for OpenDPUser and DataverseHandoff objects,
+        retrieve the user's information from Dataverse and create a DataverseUser"""
 
-        if not dataverse_handoff.is_site_url_registered():
-            return JsonResponse({'error': f'Site {dataverse_handoff.siteUrl} is not valid'}, status=400)
+        # ----------------------------------
+        # Validate the input
+        # ----------------------------------
+        f = DataverseUserHandlerForm(request.POST)
+        if not f.is_valid():
+            return JsonResponse(get_json_error(f.format_errors()),
+                                status=f.get_http_error_code())
 
+        dataverse_handoff, opendp_user = f.get_dv_handoff_and_opendp_user()
+
+        # ----------------------------------
+        # Call the Dataverse API
+        # ----------------------------------
         api_general_token = dataverse_handoff.apiGeneralToken
         site_url = dataverse_handoff.siteUrl
         dataverse_client = DataverseClient(site_url, api_general_token)
         try:
             dataverse_response = dataverse_client.get_user_info(user_api_token=api_general_token)
         except InvalidSchema:
-            return JsonResponse({'error': f'Site {site_url} is not valid'}, status=400)
+            return JsonResponse(get_json_error(f'The Site {site_url} is not valid'),
+                                status=400)
+
+        print('>>> dataverse_response 1 ', dataverse_response.success)
+        print('>>> dataverse_response 2', dataverse_response.message)
 
         if dataverse_response.success is not True:
             print(dataverse_response.__dict__)
-            return JsonResponse({'error': dataverse_response.message}, status=400)
+            return JsonResponse(get_json_error(dataverse_response.message),
+                                status=400)
 
+        # ----------------------------------
+        # Create the DataverseUser object
+        # ----------------------------------
         try:
-            handler = DataverseUserHandler(opendp_user_id, site_url, api_general_token, dataverse_response.__dict__)
+            handler = DataverseUserHandler(opendp_user.id, site_url, api_general_token,
+                                           dataverse_response.__dict__)
             new_dv_user = handler.create_dataverse_user()
             new_dv_user.save()
         except DataverseResponseError as ex:
             print(ex)
-            return JsonResponse({'error': ex}, status=400)
+            return JsonResponse(get_json_error(f'Error {ex}'),
+                                status=400)
 
         #print(dataverse_response.__dict__)
-        return JsonResponse({'dv_user': new_dv_user.id}, status=201)
+        return JsonResponse(get_json_success('success',
+                                             data={'dv_user': new_dv_user.object_id}),
+                            status=201)
 
     def put(self, request):
         """Update the Dataverse User"""

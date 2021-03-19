@@ -48,6 +48,13 @@ class DataverseClient(object):
             return err_resp(f'Failed to connect. {err_obj}')
 
         if response.status_code == 200:
+            resp_json = response.json()
+            if not resp_json.get('status'):
+                raise err_resp(f"Dataverse response failed to return a 'status'.")
+
+            if resp_json.get('status') is "ERROR":
+                raise err_resp("Dataverse error: {err_resp.get('message')}")
+
             return ok_resp(response.json())
 
         try:

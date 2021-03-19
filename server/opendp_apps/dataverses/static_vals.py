@@ -46,3 +46,8 @@ DV_EMAIL = 'email'
 DV_FIRST_NAME = 'firstName'
 DV_LAST_NAME = 'lastName'
 
+# ----------------------------------
+# Keys for Vue -> Django Server API calls
+# ----------------------------------
+KEY_DP_USER_ID = 'user_id' # OpenDPUser.object_id
+KEY_DV_HANDOFF_ID = 'dataverse_handoff_id'  # DataverseHandoff.object_id
