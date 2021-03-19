@@ -137,11 +137,7 @@ class DataverseUserView(APIView):
             return JsonResponse(get_json_error(f'The Site {site_url} is not valid'),
                                 status=400)
 
-        print('>>> dataverse_response 1 ', dataverse_response.success)
-        print('>>> dataverse_response 2', dataverse_response.message)
-
         if dataverse_response.success is not True:
-            print(dataverse_response.__dict__)
             return JsonResponse(get_json_error(dataverse_response.message),
                                 status=400)
 
@@ -154,7 +150,7 @@ class DataverseUserView(APIView):
             new_dv_user = handler.create_dataverse_user()
             new_dv_user.save()
         except DataverseResponseError as ex:
-            print(ex)
+            #print(ex)
             return JsonResponse(get_json_error(f'Error {ex}'),
                                 status=400)
 
@@ -165,12 +161,16 @@ class DataverseUserView(APIView):
 
     def put(self, request):
         """Update the Dataverse User"""
-        content = JSONParser().parse(request)
-        opendp_user_id, dataverse_handoff_id = content['user_id'], content['dataverse_handoff_id']
-        dataverse_handoff = get_object_or_404(DataverseHandoff, id=dataverse_handoff_id)
+        # ----------------------------------
+        # Validate the input
+        # ----------------------------------
+        print('request.POST', request.data)
+        f = DataverseUserHandlerForm(request.data)
+        if not f.is_valid():
+            return JsonResponse(get_json_error(f.format_errors()),
+                                status=f.get_http_error_code())
 
-        if not dataverse_handoff.is_site_url_registered():
-            return JsonResponse({'error': f'Site {dataverse_handoff.siteUrl} is not valid'}, status=400)
+        dataverse_handoff, opendp_user = f.get_dv_handoff_and_opendp_user()
 
         api_general_token = dataverse_handoff.apiGeneralToken
         site_url = dataverse_handoff.siteUrl
@@ -186,7 +186,7 @@ class DataverseUserView(APIView):
             return JsonResponse({'error': dataverse_response.message}, status=400)
 
         try:
-            handler = DataverseUserHandler(opendp_user_id, site_url, api_general_token, dataverse_response.__dict__)
+            handler = DataverseUserHandler(opendp_user.id, site_url, api_general_token, dataverse_response.__dict__)
             update_resp = handler.update_dataverse_user()
             if update_resp.success:
                 updated_dv_user = update_resp.data

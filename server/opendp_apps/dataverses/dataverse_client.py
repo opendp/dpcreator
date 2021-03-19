@@ -49,11 +49,14 @@ class DataverseClient(object):
 
         if response.status_code == 200:
             resp_json = response.json()
-            if not resp_json.get('status'):
-                raise err_resp(f"Dataverse response failed to return a 'status'.")
+            dv_status = resp_json.get(dv_static.DV_KEY_STATUS)
+            if not dv_status:
+                return err_resp(f"Dataverse response failed to return a 'status'.")
 
-            if resp_json.get('status') is "ERROR":
-                raise err_resp("Dataverse error: {err_resp.get('message')}")
+            if dv_status == dv_static.STATUS_VAL_ERROR:
+                user_msg = resp_json.get(dv_static.DV_KEY_MESSAGE,
+                                         '(No message from Dataverse)')
+                return err_resp(f"Dataverse error: {user_msg}")
 
             return ok_resp(response.json())
 
@@ -80,8 +83,6 @@ class DataverseClient(object):
         except ConnectionError as err_obj:
             return err_resp(f'Failed to connect. {err_obj}')
 
-        #print('response.status_code', response.status_code)
-        #print('get_dataset_export_json', response.text)
 
         if response.status_code == 200:
             try:
