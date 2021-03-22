@@ -10,7 +10,6 @@ from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.models import TimestampedModelWithUUID
 
 
-
 class OpenDPUser(AbstractUser):
     """
     Core App User. May be extended in the future
@@ -30,6 +29,8 @@ class DataverseUser(TimestampedModelWithUUID):
                              on_delete=models.PROTECT)
 
     dv_installation = models.ForeignKey(RegisteredDataverse, on_delete=models.PROTECT)
+
+    #TODO: Shouldn't this be unique?
     persistent_id = models.CharField(max_length=255) # Persistent DV user id within an installation
 
     email = models.EmailField(max_length=255, blank=True)

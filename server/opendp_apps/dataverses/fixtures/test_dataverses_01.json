@@ -20,7 +20,7 @@
         "updated": "2020-11-09T17:56:12.419Z",
         "object_id": "2281c623-a06f-498a-8efc-23ebb0c25de1",
         "name": "Mock Local Dataverse",
-        "dataverse_url": "http://127.0.0.1:8000/dv",
+        "dataverse_url": "http://127.0.0.1:8000/dv-mock-api",
         "active": true,
         "notes": "For testing"
     }

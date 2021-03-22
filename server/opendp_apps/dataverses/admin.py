@@ -9,14 +9,14 @@ class DataverseHandoffAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_display = ('name', 'object_id', 'siteUrl')
     save_on_top = True
-    list_filter  = ('siteUrl', )
+    list_filter = ('siteUrl', )
+
 
 class RegisteredDataverseAdmin(admin.ModelAdmin):
     search_fields = ('name', 'dataverse_url', 'notes')
     list_display = ('name', 'dataverse_url', 'active', 'notes')
     save_on_top = True
-    list_filter  = ('active', )
-
+    list_filter = ('active', )
 
 
 class ManifestTestParamsAdmin(admin.ModelAdmin):
@@ -25,7 +25,7 @@ class ManifestTestParamsAdmin(admin.ModelAdmin):
                     'dataverse_incoming_link_2', 'use_mock_dv_api',
                     'filePid', 'datasetPid')
     save_on_top = True
-    list_filter  = ('siteUrl', )
+    list_filter = ('siteUrl', )
     readonly_fields = ('dataverse_incoming_link_2',
                        'view_as_dict_link',
                        'mock_user_info_link',
@@ -33,7 +33,6 @@ class ManifestTestParamsAdmin(admin.ModelAdmin):
                        'schema_org_info_link')
 
 
-DataverseHandoffAdmin
 admin.site.register(DataverseHandoff, DataverseHandoffAdmin)
 admin.site.register(RegisteredDataverse, RegisteredDataverseAdmin)
 admin.site.register(ManifestTestParams, ManifestTestParamsAdmin)

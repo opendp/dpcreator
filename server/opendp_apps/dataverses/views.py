@@ -1,15 +1,26 @@
-from http import HTTPStatus
+import json
 import uuid
 
+from http import HTTPStatus
+from requests.exceptions import InvalidSchema
+
 from django.contrib.auth.decorators import user_passes_test
+from django.shortcuts import get_object_or_404
+from rest_framework.parsers import JSONParser
+
+from rest_framework.views import APIView
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.urls import reverse
 
+from opendp_apps.user.models import DataverseUser
+from opendp_apps.dataverses.dataverse_client import DataverseClient
+from opendp_apps.dataverses.dv_user_handler import DataverseUserHandler, DataverseResponseError
 from opendp_apps.utils.view_helper import get_json_error, get_json_success
 from opendp_apps.dataverses.models import DataverseHandoff, ManifestTestParams
-from opendp_apps.dataverses.forms import DataverseHandoffForm
+from opendp_apps.dataverses.forms import DataverseHandoffForm, DataverseUserHandlerForm
+from opendp_apps.dataverses import static_vals as dv_static
 
 
 @login_required
@@ -32,8 +43,8 @@ def view_dataverse_handoff(request):
             print('client_url', client_url)
             return HttpResponseRedirect(client_url)
 
-            return JsonResponse(dict(message='ok',
-                                     uuid=str(new_obj.object_id)))
+            # return JsonResponse(dict(message='ok',
+            #                          uuid=str(new_obj.object_id)))
 
         # if a GET (or any other method) we'll create a blank form
         else:
@@ -96,3 +107,100 @@ def view_as_dict(request, object_id):
         return JsonResponse(get_json_error('Object not found'), status=HTTPStatus.NOT_FOUND)
 
     return JsonResponse(get_json_success('Success', data=mparams.as_dict()))
+
+
+class DataverseUserView(APIView):
+
+    def post(self, request):
+        """Expects JSON. Given object_ids for OpenDPUser and DataverseHandoff objects,
+        retrieve the user's information from Dataverse and create a DataverseUser"""
+
+        # ----------------------------------
+        # Validate the input
+        # ----------------------------------
+        f = DataverseUserHandlerForm(request.data)
+        if not f.is_valid():
+            return JsonResponse(get_json_error(f.format_errors()),
+                                status=f.get_http_error_code())
+
+        dataverse_handoff, opendp_user = f.get_dv_handoff_and_opendp_user()
+
+        # ----------------------------------
+        # Call the Dataverse API
+        # ----------------------------------
+        api_general_token = dataverse_handoff.apiGeneralToken
+        site_url = dataverse_handoff.siteUrl
+        dataverse_client = DataverseClient(site_url, api_general_token)
+        try:
+            dataverse_response = dataverse_client.get_user_info(user_api_token=api_general_token)
+        except InvalidSchema:
+            return JsonResponse(get_json_error(f'The Site {site_url} is not valid'),
+                                status=400)
+
+        if dataverse_response.success is not True:
+            return JsonResponse(get_json_error(dataverse_response.message),
+                                status=400)
+
+        # ----------------------------------
+        # Create the DataverseUser object
+        # ----------------------------------
+        try:
+            handler = DataverseUserHandler(opendp_user.id, site_url, api_general_token,
+                                           dataverse_response.__dict__)
+            new_dv_user = handler.create_dataverse_user()
+            new_dv_user.save()
+        except DataverseResponseError as ex:
+            #print(ex)
+            return JsonResponse(get_json_error(f'Error {ex}'),
+                                status=400)
+
+        #print(dataverse_response.__dict__)
+        return JsonResponse(get_json_success('success',
+                                             data={'dv_user': new_dv_user.object_id}),
+                            status=201)
+
+    def put(self, request):
+        """Update the Dataverse User. Expects JSON"""
+        # ----------------------------------
+        # Validate the input
+        # ----------------------------------
+        f = DataverseUserHandlerForm(request.data)
+        if not f.is_valid():
+            return JsonResponse(get_json_error(f.format_errors()),
+                                status=f.get_http_error_code())
+
+        dataverse_handoff, opendp_user = f.get_dv_handoff_and_opendp_user()
+
+        api_general_token = dataverse_handoff.apiGeneralToken
+        site_url = dataverse_handoff.siteUrl
+
+        dataverse_client = DataverseClient(site_url, api_general_token)
+        try:
+            dataverse_response = dataverse_client.get_user_info(user_api_token=api_general_token)
+        except InvalidSchema:
+            return JsonResponse({'error': f'Site {site_url} is not valid'}, status=400)
+
+
+        if dataverse_response.success is not True:
+            return JsonResponse({'error': dataverse_response.message}, status=400)
+
+        try:
+            handler = DataverseUserHandler(opendp_user.id, site_url, api_general_token, dataverse_response.__dict__)
+            update_resp = handler.update_dataverse_user()
+            if update_resp.success:
+                updated_dv_user = update_resp.data
+                updated_dv_user.save()
+            else:
+                return JsonResponse(get_json_error(update_resp.message))
+        except DataverseResponseError as ex:
+            print('--- DatDataverseResponseError', ex)
+            return JsonResponse(get_json_error(ex), status=400)
+            #return JsonResponse({'error': ex}, status=400)
+
+        return JsonResponse(get_json_success('updated',
+                                             data=dict(dv_user=updated_dv_user.object_id)),
+                            status=201)
+
+    def get(self, request, *args, **kwargs):
+        pass
+

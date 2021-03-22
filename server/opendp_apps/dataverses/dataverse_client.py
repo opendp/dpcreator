@@ -15,6 +15,7 @@ class DataverseClient(object):
 
     def __init__(self, host, api_token=None):
         self._host = host
+        self.api_token = api_token
         self.api = Api(host, api_token=api_token)
         self.native_api = NativeApi(host, api_token=api_token)
         self.data_access_api = DataAccessApi(host, api_token=api_token)
@@ -23,13 +24,14 @@ class DataverseClient(object):
         """
         Get DDI metadata file
         """
-        response = self.api.get_dataset_export(doi, format)
+        response = self.native_api.get_dataset_export(doi, format)
         return DDI(response.content)
 
-    def get_user_info(self, api_token):
+    def get_user_info(self, user_api_token=None):
         """
         Placeholder until pyDataverse API is updated
         """
+        api_token = user_api_token if user_api_token else self.api_token
         # remove any trailing "/"
         ye_host = self._host
         while ye_host.endswith('/'):
@@ -46,6 +48,16 @@ class DataverseClient(object):
             return err_resp(f'Failed to connect. {err_obj}')
 
         if response.status_code == 200:
+            resp_json = response.json()
+            dv_status = resp_json.get(dv_static.DV_KEY_STATUS)
+            if not dv_status:
+                return err_resp(f"Dataverse response failed to return a 'status'.")
+
+            if dv_status == dv_static.STATUS_VAL_ERROR:
+                user_msg = resp_json.get(dv_static.DV_KEY_MESSAGE,
+                                         '(No message from Dataverse)')
+                return err_resp(f"Dataverse error: {user_msg}")
+
             return ok_resp(response.json())
 
         try:
@@ -55,7 +67,6 @@ class DataverseClient(object):
         except ValueError:
             pass
         return err_resp(f'Status code: {response.status_code} {response.text}')
-
 
     def get_schema_org(self, doi):
         """
@@ -72,8 +83,6 @@ class DataverseClient(object):
         except ConnectionError as err_obj:
             return err_resp(f'Failed to connect. {err_obj}')
 
-        #print('response.status_code', response.status_code)
-        #print('get_dataset_export_json', response.text)
 
         if response.status_code == 200:
             try:
@@ -182,8 +191,8 @@ if __name__ == '__main__':
 
     # print(ddi_obj.get_title())
     print()
-    resp = client.api.get_user().json()
-    print(resp)
+    resp = client.get_user_info(api_token)
+    #print(resp.__dict__)
 
 """
 from pyDataverse.api import Api

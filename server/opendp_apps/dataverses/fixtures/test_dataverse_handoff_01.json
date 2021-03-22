@@ -1,0 +1,14 @@
+[
+  {
+    "model": "dataverses.dataversehandoff",
+    "pk": 1,
+    "fields": {
+      "name": "test",
+      "siteUrl": "http://127.0.0.1:8000/dv-mock-api",
+      "fileId": "file_id",
+      "filePid": "pid_etc",
+      "apiGeneralToken": "some-token",
+      "created": "2020-11-09T17:55:43.854Z",
+      "updated": "2020-11-09T17:55:43.854Z"
+    }
+}]
