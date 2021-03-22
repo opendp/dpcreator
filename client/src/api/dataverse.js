@@ -35,7 +35,7 @@ export default {
         formData.append("dataverse_handoff_id", handoffId)
         formData.append("user_id", openDPUserId)
         //   return session.post('/api/dataverses/dv_user/', formData);
-        return session.post('/api/dv_user/',
+        return session.post('/api/dv-user/',
             {dataverse_handoff_id: handoffId, user_id: openDPUserId});
     },
 
