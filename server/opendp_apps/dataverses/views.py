@@ -14,6 +14,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.urls import reverse
 
+from opendp_apps.dataverses.serializers import DataverseUserSerializer
 from opendp_apps.user.models import DataverseUser
 from opendp_apps.dataverses.dataverse_client import DataverseClient
 from opendp_apps.dataverses.dv_user_handler import DataverseUserHandler, DataverseResponseError
@@ -111,6 +112,9 @@ def view_as_dict(request, object_id):
 
 class DataverseUserView(APIView):
 
+    def get_serializer(self, instance=None):
+        return DataverseUserSerializer(context={'request': instance})
+
     def post(self, request):
         """Expects JSON. Given object_ids for OpenDPUser and DataverseHandoff objects,
         retrieve the user's information from Dataverse and create a DataverseUser"""
@@ -200,7 +204,3 @@ class DataverseUserView(APIView):
         return JsonResponse(get_json_success('updated',
                                              data=dict(dv_user=updated_dv_user.object_id)),
                             status=201)
-
-    def get(self, request, *args, **kwargs):
-        pass
-
