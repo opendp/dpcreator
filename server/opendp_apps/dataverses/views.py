@@ -201,6 +201,3 @@ class DataverseUserView(APIView):
                                              data=dict(dv_user=updated_dv_user.object_id)),
                             status=201)
 
-    def get(self, request, *args, **kwargs):
-        pass
-
