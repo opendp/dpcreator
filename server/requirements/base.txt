@@ -27,5 +27,11 @@ urllib3==1.25.10
 uuid==1.30
 webencodings==0.5.1
 
+# for profiling:
+# reference: https://github.com/TwoRavens/raven-metadata-service
+#
+tworavens-preprocess==1.1.5
+
 # for testing, mocks requests
 requests-mock==1.8.0
+

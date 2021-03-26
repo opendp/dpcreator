@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
-
+import json
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'opendp_apps.analysis',
     'opendp_apps.terms_of_access',
     'opendp_apps.communication',
+    'opendp_apps.profiler',
 ]
 
 MIDDLEWARE = [
@@ -228,3 +229,9 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL') \
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = 'true'
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/login/'
+
+# Dataset reading, default parameters
+#
+FIRST_20_VARIABLE_INDICES = ', '.join([str(x) for x in range(0,20)])
+DEFAULT_COLUMN_INDICES = json.loads(os.environ.get('DEFAULT_COLUMN_INDICES',
+                                                   f"[{FIRST_20_VARIABLE_INDICES}]"))
