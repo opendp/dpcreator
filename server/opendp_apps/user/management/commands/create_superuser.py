@@ -9,6 +9,12 @@ class Command(BaseCommand):
     """
     def handle(self, *args, **options):
         OpenDPUser.objects.filter(is_superuser=True).delete()
-        user = OpenDPUser.objects.create(username='admin', is_superuser=True, is_staff=True)
+        params = dict(username='admin',
+                      email='admin@univ.org',
+                      first_name='Molly',
+                      last_name='McNamara',
+                      is_superuser=True,
+                      is_staff=True)
+        user = OpenDPUser.objects.create(**params)
         user.set_password('admin')
         user.save()

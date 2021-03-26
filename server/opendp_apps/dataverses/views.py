@@ -121,14 +121,15 @@ class DataverseUserView(viewsets.ViewSet):
         # ----------------------------------
         # Validate the input
         # ----------------------------------
-        print(f"data: {request.data}")
+        # print(f"data: {request.data}")
 
         dataverse_user_serializer = DataverseUserSerializer(data=request.data, context={'request': request})
         if not dataverse_user_serializer.is_valid():
             print("INVALID SERIALIZER")
             return JsonResponse(get_json_error(dataverse_user_serializer.errors),
                                 status=status.HTTP_400_BAD_REQUEST)
-        print(f"DataverseUserSerializer.validated_data: {dataverse_user_serializer.validated_data}")
+
+        #print(f"DataverseUserSerializer.validated_data: {dataverse_user_serializer.validated_data}")
         try:
             dataverse_user = dataverse_user_serializer.save()
         except DataverseHandoff.DoesNotExist:
@@ -144,8 +145,6 @@ class DataverseUserView(viewsets.ViewSet):
         api_general_token = dataverse_user.dv_general_token
         dataverse_client = DataverseClient(site_url, api_general_token)
         try:
-            print(f"API token: {api_general_token}")
-            print(f"Dataverse Client: {dataverse_client.__dict__}")
             dataverse_response = dataverse_client.get_user_info(user_api_token=api_general_token)
         except InvalidSchema:
             print("INVALID SCHEMA")
@@ -184,14 +183,14 @@ class DataverseUserView(viewsets.ViewSet):
         # ----------------------------------
         # Validate the input
         # ----------------------------------
-        print(f"data: {request.data}")
+        #print(f"data: {request.data}")
 
         dataverse_user_serializer = DataverseUserSerializer(data=request.data, context={'request': request})
         if not dataverse_user_serializer.is_valid():
             print("INVALID SERIALIZER")
             return JsonResponse(get_json_error(dataverse_user_serializer.errors),
                                 status=status.HTTP_400_BAD_REQUEST)
-        print(f"DataverseUserSerializer.validated_data: {dataverse_user_serializer.validated_data}")
+        #print(f"DataverseUserSerializer.validated_data: {dataverse_user_serializer.validated_data}")
         try:
             dataverse_user = dataverse_user_serializer.save()
         except DataverseHandoff.DoesNotExist:
@@ -206,8 +205,8 @@ class DataverseUserView(viewsets.ViewSet):
         api_general_token = dataverse_user.dv_general_token
         dataverse_client = DataverseClient(site_url, api_general_token)
         try:
-            print(f"API token: {api_general_token}")
-            print(f"Dataverse Client: {dataverse_client.__dict__}")
+            #print(f"API token: {api_general_token}")
+            #print(f"Dataverse Client: {dataverse_client.__dict__}")
             dataverse_response = dataverse_client.get_user_info(user_api_token=api_general_token)
         except InvalidSchema:
             print("INVALID SCHEMA")
