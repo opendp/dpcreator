@@ -45,7 +45,6 @@ class DataverseDatasetInfoView(APIView):
 
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
-
     def post(self, request, *args, **kwargs):
         """
         Expected parameters:
@@ -58,7 +57,6 @@ class DataverseDatasetInfoView(APIView):
                                           custom_required_params=self.required_params)
 
         return self.get_dataset_info(mparams)
-
 
     def get_dataset_info(self, mparams):
         """

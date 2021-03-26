@@ -32,8 +32,8 @@ class BaseEndpointTest(TestCase):
         self.user_obj, _created = get_user_model().objects.get_or_create(username='dv_depositor')
 
         # Object Ids used for most calls
-        self.dp_user_object_id = str(self.user_obj.object_id)
-        self.dv_handoff_object_id = str(DataverseHandoff.objects.get(pk=1).object_id)
+        self.dp_user_object_id = self.user_obj.id
+        self.dv_handoff_object_id = 1  # str(DataverseHandoff.objects.get(pk=1).object_id)
 
         self.non_existent_uuid = '29516628-488e-4f63-a9e0-4a660a22f54b' # I hope....
 
@@ -58,8 +58,6 @@ class BaseEndpointTest(TestCase):
             }}
         self.dv_user_invalid_token = {"status":"ERROR",
             "message":"User with token 7957c20e-5316-47d5-bd23-2afd19f2d00a not found."}
-
-
 
     def set_mock_requests(self, req_mocker):
         """
@@ -88,10 +86,15 @@ class BaseEndpointTest(TestCase):
                      dv_static.DV_KEY_MESSAGE: 'not found for cool-breeze'}
         req_mocker.get(schema_url, json=fail_info)
 
+        req_mocker.get('www.invalidsite.com/api/v1/users/:me')
+        req_mocker.get('https://dataverse.harvard.edu/api/v1/users/:me')
+
     def get_basic_inputs(self, user_id, dataverse_handoff_id):
         """Return dict with key/vals for user_id and dataverse_handoff_id"""
-        basic_params = {dv_static.KEY_DP_USER_ID: user_id,
-                        dv_static.KEY_DV_HANDOFF_ID: dataverse_handoff_id}
+        basic_params = {'user': user_id,
+                        'dv_handoff': dataverse_handoff_id,
+                        'dv_installation': 1,
+                        'persistent_id': 1234}
         return basic_params
 
 @requests_mock.Mocker()
@@ -108,9 +111,20 @@ class DataversePostTest(BaseEndpointTest):
         #
         url = reverse('dv-user')
 
-        params = self.get_basic_inputs(self.dp_user_object_id, self.dv_handoff_object_id)
+        data = {
+            'dv_installation': 1,
+            'user': self.user_obj.id,
+            'dv_handoff': 1,
+            'persistent_id': 1,
+            'email': 'test@test.com',
+            'first_name': 'test',
+            'last_name': 'test',
+            'dv_general_token': 1234,
+            'dv_sensitive_token': 1234,
+            'dv_token_update': None
+        }
 
-        response = self.client.post(url, data=params, content_type='application/json')
+        response = self.client.post(url, data=data, content_type='application/json')
         msg(response.json())
         self.assertEqual(response.status_code, 201)
 

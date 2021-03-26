@@ -7,6 +7,7 @@ from requests.exceptions import InvalidSchema
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import get_object_or_404
 from rest_framework.parsers import JSONParser
+from rest_framework import status
 
 from rest_framework.views import APIView
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect, Http404
@@ -15,7 +16,7 @@ from django.conf import settings
 from django.urls import reverse
 
 from opendp_apps.dataverses.serializers import DataverseUserSerializer
-from opendp_apps.user.models import DataverseUser
+from opendp_apps.user.models import DataverseUser, OpenDPUser
 from opendp_apps.dataverses.dataverse_client import DataverseClient
 from opendp_apps.dataverses.dv_user_handler import DataverseUserHandler, DataverseResponseError
 from opendp_apps.utils.view_helper import get_json_error, get_json_success
@@ -122,26 +123,38 @@ class DataverseUserView(APIView):
         # ----------------------------------
         # Validate the input
         # ----------------------------------
-        f = DataverseUserHandlerForm(request.data)
-        if not f.is_valid():
-            return JsonResponse(get_json_error(f.format_errors()),
-                                status=f.get_http_error_code())
+        print(f"data: {request.data}")
 
-        dataverse_handoff, opendp_user = f.get_dv_handoff_and_opendp_user()
+        dataverse_user_serializer = DataverseUserSerializer(data=request.data, context={'request': request})
+        if not dataverse_user_serializer.is_valid():
+            print("INVALID SERIALIZER")
+            return JsonResponse(get_json_error(dataverse_user_serializer.errors),
+                                status=status.HTTP_400_BAD_REQUEST)
+        print(f"DataverseUserSerializer.validated_data: {dataverse_user_serializer.validated_data}")
+        try:
+            dataverse_user = dataverse_user_serializer.save()
+        except DataverseHandoff.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'No such DataVerse exists'})
+        opendp_user = dataverse_user_serializer.validated_data.get('user')
+
 
         # ----------------------------------
         # Call the Dataverse API
         # ----------------------------------
-        api_general_token = dataverse_handoff.apiGeneralToken
-        site_url = dataverse_handoff.siteUrl
+
+        site_url = dataverse_user.dv_installation.dataverse_url
+        api_general_token = dataverse_user.dv_general_token
         dataverse_client = DataverseClient(site_url, api_general_token)
         try:
+            print(f"API token: {api_general_token}")
             dataverse_response = dataverse_client.get_user_info(user_api_token=api_general_token)
         except InvalidSchema:
+            print("INVALID SCHEMA")
             return JsonResponse(get_json_error(f'The Site {site_url} is not valid'),
                                 status=400)
 
         if dataverse_response.success is not True:
+            print("DATAVERSE RESPONSE FAILURE")
             return JsonResponse(get_json_error(dataverse_response.message),
                                 status=400)
 
@@ -149,12 +162,13 @@ class DataverseUserView(APIView):
         # Create the DataverseUser object
         # ----------------------------------
         try:
-            handler = DataverseUserHandler(opendp_user.id, site_url, api_general_token,
+            handler = DataverseUserHandler(opendp_user.id, site_url,
+                                           api_general_token,
                                            dataverse_response.__dict__)
             new_dv_user = handler.create_dataverse_user()
             new_dv_user.save()
         except DataverseResponseError as ex:
-            #print(ex)
+            print("DV RESPONSE ERROR")
             return JsonResponse(get_json_error(f'Error {ex}'),
                                 status=400)
 
@@ -168,12 +182,17 @@ class DataverseUserView(APIView):
         # ----------------------------------
         # Validate the input
         # ----------------------------------
-        f = DataverseUserHandlerForm(request.data)
-        if not f.is_valid():
-            return JsonResponse(get_json_error(f.format_errors()),
-                                status=f.get_http_error_code())
+        print(f"Query params: {request.query_params}")
+        handoff_id = request.query_params.get('handoff_id')
+        print(f"handoff_id: {handoff_id}")
 
-        dataverse_handoff, opendp_user = f.get_dv_handoff_and_opendp_user()
+        dataverse_handoff = get_object_or_404(DataverseHandoff, uuid=handoff_id)
+        dataverse_user_serializer = DataverseUserSerializer(data=request.data, context={'request': request})
+        if not dataverse_user_serializer.is_valid():
+            return JsonResponse(get_json_error(dataverse_user_serializer.errors),
+                                status=status.HTTP_400_BAD_REQUEST)
+
+        opendp_user = dataverse_user_serializer[dv_static.KEY_DP_USER_ID]
 
         api_general_token = dataverse_handoff.apiGeneralToken
         site_url = dataverse_handoff.siteUrl
@@ -183,7 +202,6 @@ class DataverseUserView(APIView):
             dataverse_response = dataverse_client.get_user_info(user_api_token=api_general_token)
         except InvalidSchema:
             return JsonResponse({'error': f'Site {site_url} is not valid'}, status=400)
-
 
         if dataverse_response.success is not True:
             return JsonResponse({'error': dataverse_response.message}, status=400)
