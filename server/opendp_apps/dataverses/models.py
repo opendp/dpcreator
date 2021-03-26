@@ -88,6 +88,7 @@ class DataverseParams(TimestampedModelWithUUID):
 
         return params
 
+
 class DataverseHandoff(DataverseParams):
     """
     Dataverse parameters passed to the OpenDP App
