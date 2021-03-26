@@ -1,15 +1,13 @@
 import json
-from unittest import skip
 import requests_mock
 
-from django.test import Client, tag, TestCase
-from django.urls import reverse
-
+from django.test import Client, TestCase
 from django.contrib.auth import get_user_model
+from rest_framework.reverse import reverse
 
 from opendp_apps.dataverses import static_vals as dv_static
-from opendp_apps.dataverses.models import ManifestTestParams, DataverseHandoff, RegisteredDataverse
-from opendp_apps.user.models import DataverseUser, OpenDPUser
+from opendp_apps.dataverses.models import ManifestTestParams, DataverseHandoff
+from opendp_apps.user.models import DataverseUser
 from opendp_apps.model_helpers.msg_util import msg, msgt
 
 TAG_WEB_CLIENT = 'web-client' # skip these tests on travis; need to fix as many use requests to access the localhost
@@ -123,7 +121,7 @@ class DataversePostTest(BaseEndpointTest):
 
         # Now test the API call which would be initiated from the Vue.js client
         #
-        url = reverse('dv-user')
+        url = reverse('dv-user-list')
 
         response = self.client.post(url, data=self.data, content_type='application/json')
         msg(response.json())
@@ -138,7 +136,7 @@ class DataversePostTest(BaseEndpointTest):
 
         # Now test the API call which would be initiated from the Vue.js client
         #
-        url = reverse('dv-user')
+        url = reverse('dv-user-list')
         data = self.data
         data['user'] = 0
         response = self.client.post(url, data=data, content_type='application/json')
@@ -154,7 +152,7 @@ class DataversePostTest(BaseEndpointTest):
 
         # Now test the API call which would be initiated from the Vue.js client
         #
-        url = reverse('dv-user')
+        url = reverse('dv-user-list')
 
         dataverse_handoff = DataverseHandoff.objects.first()
         dataverse_handoff.siteUrl = 'www.invalidsite.com'
@@ -179,7 +177,7 @@ class DataversePostTest(BaseEndpointTest):
         dataverse_handoff.siteUrl = 'www.invalidsite.com'
         dataverse_handoff.save()
         print(f"All handoffs: {[x.__dict__ for x in DataverseHandoff.objects.all()]}")
-        url = reverse('dv-user')
+        url = reverse('dv-user-list')
 
         response = self.client.post(url, data=self.data, content_type='application/json')
         msg(response.content)
@@ -202,7 +200,7 @@ class DataversePostTest(BaseEndpointTest):
         dataverse_handoff = DataverseHandoff.objects.first()
         dataverse_handoff.apiGeneralToken = 'invalid_token_1234'
         dataverse_handoff.save()
-        url = reverse('dv-user')
+        url = reverse('dv-user-list')
 
         response = self.client.post(url, data=self.data, content_type='application/json')
 
@@ -235,8 +233,7 @@ class DataversePutTest(BaseEndpointTest):
         orig_user = DataverseUser.objects.get(pk=2)
         #print('orig_user', orig_user, orig_user.id, orig_user.last_name, orig_user.first_name)
 
-
-        url = reverse('dv-user')
+        url = reverse('dv-user-detail', kwargs={'pk': 2})
 
         response = self.client.put(url, data=self.data, content_type='application/json')
 
@@ -260,7 +257,7 @@ class DataversePutTest(BaseEndpointTest):
 
         self.set_mock_requests(req_mocker)
 
-        url = reverse('dv-user')
+        url = reverse('dv-user-detail', kwargs={'pk': 2})
         data = self.data
         data['user'] = 0
 
@@ -275,7 +272,7 @@ class DataversePutTest(BaseEndpointTest):
 
         self.set_mock_requests(req_mocker)
 
-        url = reverse('dv-user')
+        url = reverse('dv-user-detail', kwargs={'pk': 2})
 
         dataverse_handoff = DataverseHandoff.objects.first()
         dataverse_handoff.siteUrl = 'www.invalidsite.com'
@@ -297,7 +294,7 @@ class DataversePutTest(BaseEndpointTest):
         dataverse_handoff = DataverseHandoff.objects.first()
         dataverse_handoff.siteUrl = 'www.invalidsite.com'
         dataverse_handoff.save()
-        url = reverse('dv-user')
+        url = reverse('dv-user-detail', kwargs={'pk': 2})
 
         response = self.client.put(url, data=self.data, content_type='application/json')
         msg(response.content)
@@ -321,7 +318,7 @@ class DataversePutTest(BaseEndpointTest):
         dataverse_handoff = DataverseHandoff.objects.first()
         dataverse_handoff.apiGeneralToken = 'invalid_token_1234'
         dataverse_handoff.save()
-        url = reverse('dv-user')
+        url = reverse('dv-user-detail', kwargs={'pk': 2})
 
         response = self.client.put(url, data=self.data, content_type='application/json')
         msg(response.content)

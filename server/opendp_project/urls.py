@@ -27,10 +27,9 @@ from opendp_apps.dataverses.viewset_dataverse_user import DataverseUserInfoView
 
 from opendp_apps.terms_of_access.views import TermsOfAccessViewSet, TermsOfAccessAgreementViewSet
 from opendp_apps.user.models import OpenDPUser
-from opendp_apps.user.views import UserViewSet  # , SessionViewSet
+from opendp_apps.user.views import UserViewSet
 from opendp_apps.user.views import GoogleLogin, OpenDPRegister
 from django.conf import settings
-from opendp_apps.content_pages.views import view_opendp_welcome
 
 admin.site.site_header = 'OpenDP App Admin Panel'
 admin.site.site_title = 'OpenDP App Admin Panel'
@@ -47,6 +46,7 @@ router.register(r'users', UserViewSet)
 router.register(r'terms-of-access', TermsOfAccessViewSet)
 router.register(r'dataset-info', DataSetInfoViewSet)
 router.register(r'test', TermsOfAccessAgreementViewSet)
+router.register(r'dv-user', DataverseUserView, basename='dv-user')
 
 
 urlpatterns = [
@@ -59,7 +59,6 @@ urlpatterns = [
     path('api/deposit/', DepositorSetup.as_view()),
     path('api/dv-dataset/', DataverseDatasetInfoView.as_view()),
     path('api/dv-user-info/', DataverseUserInfoView.as_view()),
-    path('api/dv-user/', DataverseUserView.as_view(), name='dv-user'),
     # For testing
     path('dv-mock-api/', include('opendp_apps.dataverses.mock_urls')),
     url(r'^user-details/$',

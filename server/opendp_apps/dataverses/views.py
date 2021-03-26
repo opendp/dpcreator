@@ -1,30 +1,26 @@
-import json
-from json import JSONDecodeError
-
 import uuid
 
+from json import JSONDecodeError
 from http import HTTPStatus
+
 from requests.exceptions import InvalidSchema
 
 from django.contrib.auth.decorators import user_passes_test
-from django.shortcuts import get_object_or_404
-from rest_framework.parsers import JSONParser
-from rest_framework import status
 
-from rest_framework.views import APIView
-from django.http import JsonResponse, HttpResponse, HttpResponseRedirect, Http404
+from rest_framework import status
+from rest_framework import viewsets
+
+from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.urls import reverse
 
 from opendp_apps.dataverses.serializers import DataverseUserSerializer
-from opendp_apps.user.models import DataverseUser, OpenDPUser
 from opendp_apps.dataverses.dataverse_client import DataverseClient
 from opendp_apps.dataverses.dv_user_handler import DataverseUserHandler, DataverseResponseError
 from opendp_apps.utils.view_helper import get_json_error, get_json_success
 from opendp_apps.dataverses.models import DataverseHandoff, ManifestTestParams
-from opendp_apps.dataverses.forms import DataverseHandoffForm, DataverseUserHandlerForm
-from opendp_apps.dataverses import static_vals as dv_static
+from opendp_apps.dataverses.forms import DataverseHandoffForm
 
 
 @login_required
@@ -113,12 +109,12 @@ def view_as_dict(request, object_id):
     return JsonResponse(get_json_success('Success', data=mparams.as_dict()))
 
 
-class DataverseUserView(APIView):
+class DataverseUserView(viewsets.ViewSet):
 
     def get_serializer(self, instance=None):
         return DataverseUserSerializer(context={'request': instance})
 
-    def post(self, request):
+    def create(self, request):
         """Expects JSON. Given object_ids for OpenDPUser and DataverseHandoff objects,
         retrieve the user's information from Dataverse and create a DataverseUser"""
 
@@ -183,7 +179,7 @@ class DataverseUserView(APIView):
                                              data={'dv_user': new_dv_user.object_id}),
                             status=201)
 
-    def put(self, request):
+    def update(self, request, pk=None):
         """Update the Dataverse User. Expects JSON"""
         # ----------------------------------
         # Validate the input
