@@ -7,17 +7,18 @@ Mimic the Dataverse urls for testing
 from django.urls import path, re_path
 from opendp_apps.dataverses import views
 
-urlpatterns = [
+from rest_framework import routers, serializers
 
-    path(f'handoff',
-         views.view_dataverse_handoff,
-         name='view_dataverse_handoff'),
+from opendp_apps.dataverses.views import ViewDataverseHandoff, ViewHandoffParams
 
-    re_path(f'view-handoff-params/(?P<object_id>[0-9a-f-]+)',
-         views.view_handoff_params_test,
-         name='view_handoff_params_test'),
+router = routers.DefaultRouter()
+router.register(r'dataverses/handoff',
+                ViewDataverseHandoff,
+                basename='view_dataverse_handoff')
+router.register(r'dataverses/view-handoff-params',
+                ViewHandoffParams,
+                basename='view_handoff_params_test')
 
-]
 
 """
 https://dataverse.harvard.edu/api/v1/datasets/export?persistentId=doi:10.7910/DVN/OLD7MB&exporter=schema.org

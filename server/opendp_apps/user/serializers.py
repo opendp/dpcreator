@@ -12,7 +12,7 @@ class SessionSerializer(serializers.HyperlinkedModelSerializer):
 """
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class OpenDPUserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = OpenDPUser
         fields = ['url', 'username', 'email', 'groups']

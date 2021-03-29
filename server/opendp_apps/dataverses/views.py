@@ -7,6 +7,7 @@ from requests.exceptions import InvalidSchema
 
 from django.contrib.auth.decorators import user_passes_test
 
+from rest_framework import serializers
 from rest_framework import status
 from rest_framework import viewsets
 
@@ -20,75 +21,87 @@ from opendp_apps.dataverses.dataverse_client import DataverseClient
 from opendp_apps.dataverses.dv_user_handler import DataverseUserHandler, DataverseResponseError
 from opendp_apps.utils.view_helper import get_json_error, get_json_success
 from opendp_apps.dataverses.models import DataverseHandoff, ManifestTestParams
-from opendp_apps.dataverses.forms import DataverseHandoffForm
 
 
-@login_required
-def view_dataverse_handoff(request):
-    """Temporarily save the Dataverse paramemeters +
-    redirect to the Vue page"""
-    if request.method == 'GET':
+class DataverseHandoffSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = DataverseHandoff
+        exclude = ['name', 'object_id', 'created']
+
+
+class ViewDataverseHandoff(viewsets.ViewSet):
+
+    def get_serializer(self, instance=None):
+        return DataverseHandoffSerializer()
+
+    def create(self, request):
+        """Temporarily save the Dataverse paramemeters +
+        redirect to the Vue page"""
         # create a form instance and populate it with data from the request:
-        form = DataverseHandoffForm(request.GET)
+        dataverse_handoff = DataverseHandoffSerializer(data=request.data)
 
         # check whether it's valid:
-        if form.is_valid():
+        if dataverse_handoff.is_valid():
             # process the data in form.cleaned_data as required
             # ...
             # redirect to a new URL:
-            new_obj = form.save()
+            new_obj = dataverse_handoff.save()
             # would redirect to Vue page here!!!
 
-            client_url = reverse('vue-home') + f'?id={str(new_obj.object_id)}'
-            print('client_url', client_url)
-            return HttpResponseRedirect(client_url)
+            # TODO: 'vue-home' isn't defined so this endpoint breaks
+            # client_url = reverse('vue-home') + f'?id={str(new_obj.object_id)}'
+            # print('client_url', client_url)
+            return JsonResponse({'id': new_obj.object_id}, status=status.HTTP_201_CREATED)
+            # return HttpResponseRedirect(client_url)
 
             # return JsonResponse(dict(message='ok',
             #                          uuid=str(new_obj.object_id)))
 
         # if a GET (or any other method) we'll create a blank form
         else:
-            return JsonResponse(dict(message='Form errors!',
-                                data=form.errors))#.as_json()))
-
-    return JsonResponse(dict(message='No GET data!!!!'))
+            return JsonResponse(get_json_error(dataverse_handoff.errors),
+                                status=status.HTTP_400_BAD_REQUEST)
 
 
+# TODO: This isn't being used anywhere - should it be removed?
 # make superuser only
-@login_required
-def view_handoff_params_test(request, object_id=None):
-    """
-    Create a Dataverse user via a POST request
-    - OpenDPUser id
-    - DataverseHandoff object id
-    """
-    if not settings.DEBUG:
-        raise Http404('Only for testing')
+class ViewHandoffParams(viewsets.ViewSet):
 
-    # ---------------------------------------
-    # Change the object_id to a proper UUID
-    # ---------------------------------------
-    object_as_uuid = None
-    try:
-        object_as_uuid = uuid.UUID(object_id)
-    except ValueError as err_obj:
-        message = 'Bad UUID!'
-        return JsonResponse(dict(message=message),
-                            status=HTTPStatus.BAD_REQUEST)
+    @login_required
+    def create(self, request, object_id=None):
+        """
+        Create a Dataverse user via a POST request
+        - OpenDPUser id
+        - DataverseHandoff object id
+        """
 
-    # ---------------------------------------
-    # Retrieve the DataverseHandoff object
-    # ---------------------------------------
-    try:
-        handoff_params = DataverseHandoff.objects.get(object_id=object_as_uuid)
-        message = f'Found params!! {handoff_params}'
-    except DataverseHandoff.DoesNotExist:
-        message = 'No handoff params found!!'
+        if not settings.DEBUG:
+            raise Http404('Only for testing')
 
-    info = dict(message=message,
-                object_id=object_id)
+        # ---------------------------------------
+        # Change the object_id to a proper UUID
+        # ---------------------------------------
+        object_as_uuid = None
+        try:
+            object_as_uuid = uuid.UUID(object_id)
+        except ValueError as err_obj:
+            message = 'Bad UUID!'
+            return JsonResponse(dict(message=message),
+                                status=HTTPStatus.BAD_REQUEST)
 
-    return JsonResponse(info)
+        # ---------------------------------------
+        # Retrieve the DataverseHandoff object
+        # ---------------------------------------
+        try:
+            handoff_params = DataverseHandoff.objects.get(object_id=object_as_uuid)
+            message = f'Found params!! {handoff_params}'
+        except DataverseHandoff.DoesNotExist:
+            message = 'No handoff params found!!'
+
+        info = dict(message=message,
+                    object_id=object_id)
+
+        return JsonResponse(info)
 
 
 """
@@ -126,6 +139,7 @@ class DataverseUserView(viewsets.ViewSet):
         dataverse_user_serializer = DataverseUserSerializer(data=request.data, context={'request': request})
         if not dataverse_user_serializer.is_valid():
             print("INVALID SERIALIZER")
+            print(request.data)
             return JsonResponse(get_json_error(dataverse_user_serializer.errors),
                                 status=status.HTTP_400_BAD_REQUEST)
         print(f"DataverseUserSerializer.validated_data: {dataverse_user_serializer.validated_data}")
