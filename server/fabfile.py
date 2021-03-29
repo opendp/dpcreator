@@ -184,3 +184,7 @@ def create_django_superuser(context):
                 email='opendp_admin@some.edu',
                 **dict(new_password='admin',
                        is_superuser=True))
+
+"""
+export DB_HOST=localhost DB_NAME=opendp_app DB_USER=opendp_user DB_PASSWORD=opendp_test_data
+"""

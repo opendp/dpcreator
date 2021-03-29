@@ -1,4 +1,6 @@
 from collections import OrderedDict
+import json
+
 from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
@@ -20,15 +22,15 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     Base type for table that either holds DV data
     or a file upload
     """
+    class SourceChoices(models.TextChoices):
+        UserUpload = 'upload', 'Upload'
+        Dataverse = 'dataverse', 'Dataverse'
+
     name = models.CharField(max_length=128)
 
     # user who initially added/uploaded data
     creator = models.ForeignKey(settings.AUTH_USER_MODEL,
                                 on_delete=models.PROTECT)
-
-    class SourceChoices(models.TextChoices):
-        UserUpload = 'upload', 'Upload'
-        Dataverse = 'dataverse', 'Dataverse'
 
     source = models.CharField(max_length=128,
                               choices=SourceChoices.choices)
@@ -65,6 +67,35 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
                     object_id=self.object_id.hex)
 
         return info
+
+    def data_profile_as_dict(self):
+        """Return the dataprofile as a dict or None. Messy in that this is an encrypted JSONField"""
+        if not self.data_profile:
+            return None
+
+        try:
+            if isinstance(self.data_profile, str):  # messy; decode escaped string to JSON string
+                load1 = json.loads(self.data_profile, object_pairs_hook=OrderedDict)
+            else:
+                load1 = self.data_profile
+
+            if isinstance(load1, dict):
+                return load1
+
+            return json.loads(load1, object_pairs_hook=OrderedDict) # JSON string to OrderedDict
+
+        except json.JSONDecodeError:
+            return None
+
+    def data_profile_as_json_str(self):
+        """Return the dataprofile as a dict or None. Messy in that this is an encrypted JSONField"""
+        if not self.data_profile:
+            return None
+
+        try:
+            return json.loads(self.data_profile)
+        except json.JSONDecodeError:
+            return None
 
 
 class DataverseFileInfo(DataSetInfo):

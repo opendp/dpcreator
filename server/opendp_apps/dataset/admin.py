@@ -9,10 +9,11 @@ class DataSetInfoAdmin(admin.ModelAdmin):
     list_filter = ('source', 'creator')
     list_display = ('name',
                     'creator',
+                    'object_id',
                     'source',
                     'updated',
                     'created',)
-    readonly_fields = ('id', 'source', 'created', 'updated',)
+    readonly_fields = ('id', 'object_id', 'source', 'created', 'updated',)
 
 admin.site.register(DataSetInfo, DataSetInfoAdmin)
 

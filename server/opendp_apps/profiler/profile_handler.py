@@ -25,10 +25,10 @@ class ProfileHandler(BasicErrCheck):
         self.dataset_pointer = dataset_pointer
 
         # Set to 'True' for a file available via a filepath
-        self.dataset_is_filepath = kwargs.get('dataset_is_filepath', False)
+        self.dataset_is_filepath = kwargs.get(pstatic.KEY_DATASET_IS_FILEPATH, False)
 
         # Set to 'True' for a Django FileField object
-        self.dataset_is_django_filefield = kwargs.get('dataset_is_django_filefield', False)
+        self.dataset_is_django_filefield = kwargs.get(pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD, False)
 
         self.data_profile = None    # Data profile information
 
@@ -39,7 +39,7 @@ class ProfileHandler(BasicErrCheck):
         self.chosen_column_indices = kwargs.get('chosen_column_indices', settings.DEFAULT_COLUMN_INDICES)
 
         # If a DataSetInfo object is specified, the profile will be saved to the object
-        self.dataset_info_object_id = kwargs.get('dataset_object_id')
+        self.dataset_info_object_id = kwargs.get(pstatic.KEY_DATASET_OBJECT_ID)
         self.dataset_info_object = None
 
 
@@ -48,6 +48,26 @@ class ProfileHandler(BasicErrCheck):
 
         if self.check_parameters():
             self.run_profiler()
+            self.save_to_dataset_info_object()
+
+    def get_dataset_info_object(self):
+        """Return the data profile as a Python dict"""
+        assert self.has_error() is False, "Call .has_error() before using this method"
+        return self.dataset_info_object
+
+
+    def save_to_dataset_info_object(self):
+        if self.has_error():
+            return
+        # If there's a connected DataSetInfo object,
+        #  save the profile to it
+        #
+        if self.dataset_info_object:
+            # print('type data_profile', type(self.data_profile))
+            self.dataset_info_object.data_profile = self.data_profile
+            self.dataset_info_object.save()
+
+
 
     def get_data_profile(self):
         """Return the data profile as a Python dict"""
@@ -59,16 +79,18 @@ class ProfileHandler(BasicErrCheck):
         assert self.has_error() is False, "Call .has_error() before using this method"
         return self.data_profile
 
-    
+
 
     def check_parameters(self):
         """Check parameters which includes distinguishing between a Django FileField using storages and filepath
         Reference to storage: backends, https://github.com/jschneier/django-storages/tree/master/storages/backends
         """
+        if self.has_error():  # probably always False
+            return
 
         # Is there a DataSetInfo object involved. If so, retrieve it
         #
-        if self.dataset_info_object_id is True:
+        if self.dataset_info_object_id is not None:
             try:
                 self.dataset_info_object = DataSetInfo.objects.get(object_id=self.dataset_info_object_id)
             except DataSetInfo.DoesNotExist:
@@ -116,6 +138,9 @@ class ProfileHandler(BasicErrCheck):
         """Load the dataset into a Pandas dataframe
         TODO: this is set only for tabular files right now
         """
+        if self.has_error():
+            return err_resp('Error already there!')
+
         try:
             df = pd.read_csv(self.dataset_pointer,
                              #sep='\t',
@@ -131,6 +156,8 @@ class ProfileHandler(BasicErrCheck):
 
     def run_profiler(self):
         """Run the profiler"""
+        if self.has_error():
+            return
 
         df_resp = self.get_dataset_as_dataframe()
         if not df_resp.success:
@@ -146,17 +173,14 @@ class ProfileHandler(BasicErrCheck):
 
         self.data_profile = prunner.get_final_dict()
 
-        # If there's a connected DataSetInfo object,
-        #  save the profile to it
-        #
-        if self.dataset_info_object:
-            self.dataset_info_object.data_profile = self.data_profile
-            self.dataset_info_object.save()
 
     @staticmethod
-    def run_profile_by_filepath(filepath):
+    def run_profile_by_filepath(filepath, dataset_object_id=None):
         """Run the profiler using a valid filepath"""
-        params = dict(dataset_is_filepath=True)
+        params = {pstatic.KEY_DATASET_IS_FILEPATH: True}
+
+        params[pstatic.KEY_DATASET_OBJECT_ID] = dataset_object_id
+
         ph = ProfileHandler(dataset_pointer=filepath, **params)
         return ph
 
@@ -169,7 +193,10 @@ class ProfileHandler(BasicErrCheck):
     @staticmethod
     def run_profile_by_filefield(filefield, **kwargs):
         """Run the profiler using a valid filepath"""
-        params = dict(dataset_is_django_filefield=True)
+        params = {pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD: True}
+        if pstatic.KEY_DATASET_OBJECT_ID in kwargs:
+            params[pstatic.KEY_DATASET_OBJECT_ID] = kwargs[pstatic.KEY_DATASET_OBJECT_ID]
+
         ph = ProfileHandler(dataset_pointer=filefield, **params)
         return ph
 

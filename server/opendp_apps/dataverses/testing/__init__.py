@@ -5,6 +5,7 @@ python manage.py test opendp_apps.dataverses.testing.dv_user_handler_test
 python manage.py test opendp_apps.dataverses.testing.test_endpoints.DataversePostTest
 python manage.py test opendp_apps.dataverses.testing.test_endpoints.DataversePutTest
 
+python manage.py test opendp_apps.dataverses.testing.test_endpoints.DataversePutTest.test_40_invalid_site_url
 
 python manage.py test opendp_apps.dataverses.testing.test_dataverse_incoming
 python manage.py test opendp_apps.dataverses.testing.test_dataverse_incoming.DataverseIncomingTest.test_010_dv_params
