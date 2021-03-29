@@ -235,3 +235,19 @@ ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/login/'
 FIRST_20_VARIABLE_INDICES = ', '.join([str(x) for x in range(0,20)])
 DEFAULT_COLUMN_INDICES = json.loads(os.environ.get('DEFAULT_COLUMN_INDICES',
                                                    f"[{FIRST_20_VARIABLE_INDICES}]"))
+
+# ---------------------------
+# Celery Configuration Options
+# ---------------------------
+#CELERY_TIMEZONE = os.environ.get('America/New_York', 'CELERY_TIMEZONE')
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+REDIS_PORT = os.environ.get('REDIS_PORT', 6379)
+
+CELERY_BROKER_URL = 'redis://%s:%d' % (REDIS_HOST, REDIS_PORT)
+CELERY_RESULT_BACKEND = 'redis://%s:%d' % (REDIS_HOST, REDIS_PORT)
+
+# discard a process after executing task, because automl solvers are incredibly leaky
+#CELERY_WORKER_MAX_TASKS_PER_CHILD = 1

@@ -31,6 +31,8 @@ webencodings==0.5.1
 # reference: https://github.com/TwoRavens/raven-metadata-service
 #
 tworavens-preprocess==1.1.5
+# async tasks
+celery==5.0.5
 
 # for testing, mocks requests
 requests-mock==1.8.0

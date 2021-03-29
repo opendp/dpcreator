@@ -185,6 +185,66 @@ def create_django_superuser(context):
                 **dict(new_password='admin',
                        is_superuser=True))
 
+# -----------------------------------
+#   Redis and celery tasks
+# -----------------------------------
+@task
+def redis_run(context):
+    """Run the redis server via Docker"""
+    from django.conf import settings
+    #redis_cmd = 'redis-server /usr/local/etc/redis.conf'
+    redis_cmd = 'docker run --rm --name dpcreator-redis -p 6379:6379 -d redis:6'
+    fab_local(redis_cmd)
+    #with settings(warn_only=True):
+    #    result = fab_local(redis_cmd, capture=True)
+
+    #    if result.failed:
+    #        print('Redis may already be running...')
+
+
+@task
+def redis_clear(context):
+    """Clear data from the *running* local redis server"""
+    redis_cmd = 'redis-cli flushall'    #  /usr/local/etc/redis.conf'
+    fab_local(redis_cmd)
+
+
+@task
+def redis_stop(context):
+    """Clear data from the *running* local redis server"""
+    redis_cmd = 'docker stop dpcreator-redis'
+    fab_local(redis_cmd)
+    return
+    #redis_cmd = 'pkill -f redis'
+    redis_cmd = 'docker stop dpcreator-redis'
+    with settings(warn_only=True):
+        result = fab_local(redis_cmd, capture=True)
+
+        if result.failed:
+            print('Nothing to stop')
+
+@task
+def redis_restart(context):
+    """Stop redis (if it's running) and start it again"""
+    redis_stop(context)
+    redis_run(context)
+
+
+@task
+def celery_run(context):
+    """Clear redis and Start celery"""
+    import random, string
+    rand_str = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
+
+    redis_clear(context)
+
+    export_cmd = get_export_db_val_cmds()
+    celery_cmd = (f'{export_cmd}; '
+                  f'celery -A opendp_project worker'
+                  f' -l info -n worker_{rand_str}@%%h')
+
+    fab_local(celery_cmd)
+
 """
 export DB_HOST=localhost DB_NAME=opendp_app DB_USER=opendp_user DB_PASSWORD=opendp_test_data
 """

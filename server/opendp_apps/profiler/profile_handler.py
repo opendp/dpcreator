@@ -5,7 +5,9 @@ import os
 import pandas as pd
 
 from django.conf import settings
+
 from raven_preprocess.preprocess_runner import PreprocessRunner
+
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 from opendp_apps.dataset.models import DataSetInfo
@@ -174,20 +176,6 @@ class ProfileHandler(BasicErrCheck):
         self.data_profile = prunner.get_final_dict()
 
 
-    @staticmethod
-    def run_profile_by_filepath(filepath, dataset_object_id=None):
-        """Run the profiler using a valid filepath"""
-        params = {pstatic.KEY_DATASET_IS_FILEPATH: True}
-
-        params[pstatic.KEY_DATASET_OBJECT_ID] = dataset_object_id
-
-        ph = ProfileHandler(dataset_pointer=filepath, **params)
-        return ph
-
-        #if ph.has_error():
-        #    print(f'error: {ph.get_err_msg()}')
-        #else:
-        #   print('profiled!')
 
 
     @staticmethod
