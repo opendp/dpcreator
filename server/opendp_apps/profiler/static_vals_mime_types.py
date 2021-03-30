@@ -1,4 +1,5 @@
 """Constants used to identify file extensions and get mime types"""
+import os
 
 CSV_FILE_EXT = '.csv'
 TAB_FILE_EXT = '.tab'
@@ -27,3 +28,12 @@ def get_mime_type(file_ext):
                 file_ext.lower(),
                 "Unknown mime type for extension: %s" % file_ext)
 
+def get_data_file_separator(fname):
+    """Based on the extension, get the correct separator, default to ',' """
+    filename, file_extension = os.path.splitext(fname)
+    file_extension = file_extension.lower()
+    if file_extension == '.tab':
+        return '\t'
+    elif file_extension == '.csv':
+        return ','
+    return ','

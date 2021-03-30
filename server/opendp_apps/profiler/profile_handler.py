@@ -12,6 +12,8 @@ from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.profiler import static_vals as pstatic
+from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
+
 
 class ProfileHandler(BasicErrCheck):
 
@@ -33,6 +35,7 @@ class ProfileHandler(BasicErrCheck):
         self.dataset_is_django_filefield = kwargs.get(pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD, False)
 
         self.data_profile = None    # Data profile information
+        self.num_original_features = None
 
         # -------------------------------------
         # Optional
@@ -59,6 +62,8 @@ class ProfileHandler(BasicErrCheck):
 
 
     def save_to_dataset_info_object(self):
+        """If there's a connected DataSetInfo object, save the profile to it"""
+
         if self.has_error():
             return
         # If there's a connected DataSetInfo object,
@@ -68,7 +73,6 @@ class ProfileHandler(BasicErrCheck):
             # print('type data_profile', type(self.data_profile))
             self.dataset_info_object.data_profile = self.data_profile
             self.dataset_info_object.save()
-
 
 
     def get_data_profile(self):
@@ -88,7 +92,12 @@ class ProfileHandler(BasicErrCheck):
         Reference to storage: backends, https://github.com/jschneier/django-storages/tree/master/storages/backends
         """
         if self.has_error():  # probably always False
-            return
+            return False
+
+        if not self.dataset_pointer:
+            user_msg = 'In order to profile the data, the "dataset_pointer" must be set.'
+            self.add_err_msg(user_msg)
+            return False
 
         # Is there a DataSetInfo object involved. If so, retrieve it
         #
@@ -96,6 +105,7 @@ class ProfileHandler(BasicErrCheck):
             try:
                 self.dataset_info_object = DataSetInfo.objects.get(object_id=self.dataset_info_object_id)
             except DataSetInfo.DoesNotExist:
+                self.dataset_info_object = None
                 user_msg = f'DataSetInfo object not found for id {self.dataset_info_object_id}'
                 self.add_err_msg(user_msg)
                 return False
@@ -125,36 +135,67 @@ class ProfileHandler(BasicErrCheck):
         #  Expecting a reference to a file stored on Azure, S3, etc.
         #
         if self.dataset_is_django_filefield:
-            try:
-                if self.dataset_pointer.exists() is False:
-                    user_msg = f'The dataset does not exist for the Django FileField storage at {self.dataset}'
-                    self.add_err_msg(user_msg)
-                    return False
-            except NotImplementedError:
-                self.add_err_msg(f'.exists() method is not implemented for the Django FileField storage')
+            print('>>>', dir(self.dataset_pointer))
+            #try:
+            if not self.dataset_pointer:
+                user_msg = f'The dataset does not exist for the Django FileField storage at {self.dataset}'
+                self.add_err_msg(user_msg)
                 return False
+            #except NotImplementedError:
+            #    self.add_err_msg(f'.exists() method is not implemented for the Django FileField storage')
+            #    return False
 
         return True
 
+
+    def get_row_separator(self):
+        """Needs some work; Get the 'sep' attribute for opening the dataset into a pandas dataframe"""
+        if self.has_error():
+            return err_resp('Previous error encountered')
+
+        if isinstance(self.dataset_pointer, str):
+            sep = get_data_file_separator(self.dataset_pointer)
+        elif hasattr(self.dataset_pointer, 'name') and self.dataset_pointer.name:
+            sep = get_data_file_separator(self.dataset_pointer.name)
+        else:
+            sep = get_data_file_separator(None)
+
+        return ok_resp(sep)
+
     def get_dataset_as_dataframe(self):
         """Load the dataset into a Pandas dataframe
-        TODO: this is set only for tabular files right now
-        """
+        TODO: this is set only for tabular files right now"""
         if self.has_error():
             return err_resp('Error already there!')
 
-        try:
-            df = pd.read_csv(self.dataset_pointer,
-                             #sep='\t',
-                             # lineterminator='\r',
-                             usecols=self.chosen_column_indices,
-                             #skiprows=range(1, start_row),
-                             # skip rows range starts from 1 as 0 row is the header
-                             #nrows=num_rows
-                            )
+        sep_resp = self.get_row_separator()
+        if not sep_resp.success:
+            return
+        sep_char = sep_resp.data
+
+        df_read_params = dict(sep=sep_char)
+
+        if 1:
+            # Read the 1st 3 rows only; to determine the number of features/columns
+            #
+            df_for_size = pd.read_csv(self.dataset_pointer, nrows=1, **df_read_params)
+            num_rows, self.num_original_features = df_for_size.shape
+            print(f'size: {df_for_size.shape}')
+
+            # If there are more than 20 columns, for the full read, only use the 1st 20
+            #
+            if self.num_original_features > len(self.chosen_column_indices):
+                df_read_params['usecols'] = self.chosen_column_indices
+
+            df = pd.read_csv(self.dataset_pointer, **df_read_params)
             return ok_resp(df)
-        except:
-            return err_resp('Failed to read file')
+        try:
+            pass
+        except pd.errors.EmptyDataError as err_obj:
+            user_msg = f'Profiler. Failed to read dataset. ({err_obj})'
+            return err_resp(user_msg)
+
+        #    return err_resp('Profiler. Failed to read file into a dataframe')
 
     def run_profiler(self):
         """Run the profiler"""
@@ -176,17 +217,6 @@ class ProfileHandler(BasicErrCheck):
         self.data_profile = prunner.get_final_dict()
 
 
-
-
-    @staticmethod
-    def run_profile_by_filefield(filefield, **kwargs):
-        """Run the profiler using a valid filepath"""
-        params = {pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD: True}
-        if pstatic.KEY_DATASET_OBJECT_ID in kwargs:
-            params[pstatic.KEY_DATASET_OBJECT_ID] = kwargs[pstatic.KEY_DATASET_OBJECT_ID]
-
-        ph = ProfileHandler(dataset_pointer=filefield, **params)
-        return ph
 
         #if ph.has_error():
         #    print(f'error: {ph.get_err_msg()}')

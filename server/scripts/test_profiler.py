@@ -35,6 +35,36 @@ def test_profiler_with_file():
            json.dumps(profiler.data_profile, cls=DjangoJSONEncoder))
     print('Looks good!!!')
 
+
+def test_profiler_with_dv_file(object_id):
+
+    if not object_id:
+        object_id = 'b7634453-4ae1-48aa-81fb-1dd9ee3f4b64'
+
+    ds_info = DataSetInfo.objects.filter(object_id=object_id).first()
+    print(f'(1) {ds_info.object_id}')
+    if not ds_info:
+        print(f'DataSetInfo not found for {object_id}')
+        return
+
+    profiler = profiler_tasks.run_profile_by_filefield(ds_info.object_id)
+    # profiler = profiler_tasks.run_profile_by_filefield.delay(ds_info.object_id)
+
+    #print('Pause 3 seconds...')
+    #time.sleep(3)
+
+    if profiler.has_error():
+        print(profiler.get_err_msg())
+
+    print('it worked!')
+    return
+    # let it blow up....
+    ds_info = DataSetInfo.objects.get(object_id=object_id)
+    print(f'(2) {ds_info.object_id}')
+    info = ds_info.data_profile_as_dict()
+    print(info)
+
+
 def test_profiler_with_file_celery():
     """Test profiler with file"""
     filepath = join(TEST_DATA_DIR, 'fearonLaitin.csv')
@@ -72,7 +102,11 @@ def basic_celery():
 
 if __name__=='__main__':
     #test_profiler_with_file()
-    test_profiler_with_file_celery()
+    #test_profiler_with_file_celery()
+    test_profiler_with_dv_file('9255c067-e435-43bd-8af1-33a6987ffc9b')
     # lookat()
     #basic_celery()
 
+"""
+docker-compose run server python scripts/test_profiler.py
+"""

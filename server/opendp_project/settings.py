@@ -230,8 +230,10 @@ ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = 'true'
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/login/'
 
-# Dataset reading, default parameters
-#
+# ---------------------------
+# Profiler - Dataset reading
+#   - default parameters
+# ---------------------------
 FIRST_20_VARIABLE_INDICES = ', '.join([str(x) for x in range(0,20)])
 DEFAULT_COLUMN_INDICES = json.loads(os.environ.get('DEFAULT_COLUMN_INDICES',
                                                    f"[{FIRST_20_VARIABLE_INDICES}]"))
@@ -245,9 +247,16 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 
 REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
 REDIS_PORT = os.environ.get('REDIS_PORT', 6379)
+REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD', '')
 
-CELERY_BROKER_URL = 'redis://%s:%d' % (REDIS_HOST, REDIS_PORT)
-CELERY_RESULT_BACKEND = 'redis://%s:%d' % (REDIS_HOST, REDIS_PORT)
+# reference: https://docs.celeryproject.org/en/stable/getting-started/brokers/redis.html
+if REDIS_PASSWORD:
+    REDIS_URL = f'redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}'
+else:
+    REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}'
+
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
 
 # discard a process after executing task, because automl solvers are incredibly leaky
 #CELERY_WORKER_MAX_TASKS_PER_CHILD = 1

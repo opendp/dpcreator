@@ -23,13 +23,14 @@ class DataverseFileInfoAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_filter = ('source', 'creator')
     list_display = ('name',
+                    'object_id',
                     'dataset_doi',
                     'dataverse_file_id',
                     'creator',
                     'installation_name',
                     'updated',
                     'created',)
-    readonly_fields = ('id', 'source', 'created', 'updated',)
+    readonly_fields = ('id', 'object_id', 'source', 'created', 'updated',)
 admin.site.register(DataverseFileInfo, DataverseFileInfoAdmin)
 
 class UploadFileInfoAdmin(admin.ModelAdmin):
