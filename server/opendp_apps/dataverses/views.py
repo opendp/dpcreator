@@ -7,17 +7,20 @@ from requests.exceptions import InvalidSchema
 
 from django.contrib.auth.decorators import user_passes_test
 
-from rest_framework import status
-from rest_framework import viewsets
+from rest_framework import status, viewsets
+from rest_framework.response import Response
 
 from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.urls import reverse
 
+from opendp_apps.dataset.models import DataverseFileInfo
+from opendp_apps.dataset.serializers import DataverseFileInfoSerializer
 from opendp_apps.dataverses.serializers import DataverseUserSerializer
 from opendp_apps.dataverses.dataverse_client import DataverseClient
 from opendp_apps.dataverses.dv_user_handler import DataverseUserHandler, DataverseResponseError
+from opendp_apps.user.models import OpenDPUser
 from opendp_apps.utils.view_helper import get_json_error, get_json_success
 from opendp_apps.dataverses.models import DataverseHandoff, ManifestTestParams
 from opendp_apps.dataverses.forms import DataverseHandoffForm
@@ -242,3 +245,18 @@ class DataverseUserView(viewsets.ViewSet):
         return JsonResponse(get_json_success('updated',
                                              data=dict(dv_user=updated_dv_user.object_id)),
                             status=201)
+
+
+class DataverseFileView(viewsets.ViewSet):
+
+    def list(self, request):
+        handoff_id = request.query_params.get('handoff_id')
+        user_id = request.query_params.get('user_id')
+        handoff = DataverseHandoff.objects.get(id=handoff_id)
+
+        existing_file_info = DataverseFileInfo.objects.filter(fil)
+
+        user = OpenDPUser.objects.get(id=user_id)
+        queryset = DataverseFileInfo.objects.all()
+        serializer = DataverseFileInfoSerializer(queryset)
+        return Response(serializer.data)

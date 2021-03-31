@@ -8,6 +8,7 @@ from django_cryptography.fields import encrypt
 
 from polymorphic.models import PolymorphicModel
 
+from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
 
@@ -72,17 +73,19 @@ class DataverseFileInfo(DataSetInfo):
     Refers to a DV file from within a DV dataset
     """
     # TODO: This should have all fields from DV API response
-    installation_name = models.CharField(max_length=255) # FK: RegisteredDataverse
+    dv_installation = models.ForeignKey(RegisteredDataverse, on_delete=models.PROTECT)
     dataverse_file_id = models.IntegerField()
     dataset_doi = models.CharField(max_length=255)
     file_doi = models.CharField(max_length=255, blank=True)
+    dataset_schema_info = models.JSONField(blank=True)
+    file_schema_info = models.JSONField(blank=True)
 
     class Meta:
         verbose_name = 'Dataverse File Information'
         verbose_name_plural = 'Dataverse File Information'
         ordering = ('name', '-created')
         constraints = [
-            models.UniqueConstraint(fields=['installation_name', 'dataverse_file_id'],
+            models.UniqueConstraint(fields=['dv_installation', 'dataverse_file_id'],
                                     name='unique Dataverse file')
         ]
 
