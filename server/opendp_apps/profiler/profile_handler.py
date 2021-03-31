@@ -17,6 +17,9 @@ from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
 
 class ProfileHandler(BasicErrCheck):
 
+    ERR_FAILED_TO_READ_DATASET = 'Failed to read the dataset.'
+    ERR_DATASET_POINTER_NOT_SET = 'In order to profile the data, the "dataset_pointer" must be set.'
+
     def __init__(self, dataset_pointer, **kwargs):
         """
         Note: Use the staticmethods to call the initializers.
@@ -41,7 +44,7 @@ class ProfileHandler(BasicErrCheck):
         # Optional
         # -------------------------------------
         # Indices of columns to profile. Default is the 1st 20 indices
-        self.chosen_column_indices = kwargs.get('chosen_column_indices', settings.DEFAULT_COLUMN_INDICES)
+        self.chosen_column_indices = kwargs.get('chosen_column_indices', settings.PROFILER_DEFAULT_COLUMN_INDICES)
 
         # If a DataSetInfo object is specified, the profile will be saved to the object
         self.dataset_info_object_id = kwargs.get(pstatic.KEY_DATASET_OBJECT_ID)
@@ -95,8 +98,8 @@ class ProfileHandler(BasicErrCheck):
             return False
 
         if not self.dataset_pointer:
-            user_msg = 'In order to profile the data, the "dataset_pointer" must be set.'
-            self.add_err_msg(user_msg)
+            #user_msg = 'In order to profile the data, the "dataset_pointer" must be set.'
+            self.add_err_msg(self.ERR_DATASET_POINTER_NOT_SET)
             return False
 
         # Is there a DataSetInfo object involved. If so, retrieve it
@@ -135,7 +138,7 @@ class ProfileHandler(BasicErrCheck):
         #  Expecting a reference to a file stored on Azure, S3, etc.
         #
         if self.dataset_is_django_filefield:
-            print('>>>', dir(self.dataset_pointer))
+            # print('>>>', dir(self.dataset_pointer))
             #try:
             if not self.dataset_pointer:
                 user_msg = f'The dataset does not exist for the Django FileField storage at {self.dataset}'
@@ -175,27 +178,28 @@ class ProfileHandler(BasicErrCheck):
 
         df_read_params = dict(sep=sep_char)
 
-        if 1:
-            # Read the 1st 3 rows only; to determine the number of features/columns
+        try:
+            # Read the 1st row only; to determine the number of features/columns
             #
             df_for_size = pd.read_csv(self.dataset_pointer, nrows=1, **df_read_params)
             num_rows, self.num_original_features = df_for_size.shape
-            print(f'size: {df_for_size.shape}')
+            # print(f'size: {df_for_size.shape}')
 
-            # If there are more than 20 columns, for the full read, only use the 1st 20
+            # If there are more than the expected number of columns, for the full read, only use the 1st 20
             #
             if self.num_original_features > len(self.chosen_column_indices):
                 df_read_params['usecols'] = self.chosen_column_indices
 
+            # read the full file into the dataframe
             df = pd.read_csv(self.dataset_pointer, **df_read_params)
             return ok_resp(df)
-        try:
-            pass
-        except pd.errors.EmptyDataError as err_obj:
-            user_msg = f'Profiler. Failed to read dataset. ({err_obj})'
-            return err_resp(user_msg)
 
-        #    return err_resp('Profiler. Failed to read file into a dataframe')
+        except pd.errors.EmptyDataError as err_obj:
+            user_msg = f'{self.ERR_FAILED_TO_READ_DATASET} (EmptyDataError: {err_obj})'
+            return err_resp(user_msg)
+        except pd.errors.ParserError as err_obj:
+            user_msg = f'{self.ERR_FAILED_TO_READ_DATASET} (ParserError: {err_obj})'
+            return err_resp(user_msg)
 
     def run_profiler(self):
         """Run the profiler"""
@@ -216,6 +220,16 @@ class ProfileHandler(BasicErrCheck):
 
         self.data_profile = prunner.get_final_dict()
 
+        self.prune_profile()
+
+    def prune_profile(self):
+        """Remove un-needed info from the profile
+        TODO: Add these options directly into the TwoRavens preprocess code"""
+        if self.has_error():
+            return
+
+        if 'variableDisplay' in self.data_profile:
+            del self.data_profile['variableDisplay']
 
 
         #if ph.has_error():

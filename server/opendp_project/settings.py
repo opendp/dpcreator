@@ -234,9 +234,9 @@ ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/login/'
 # Profiler - Dataset reading
 #   - default parameters
 # ---------------------------
-FIRST_20_VARIABLE_INDICES = ', '.join([str(x) for x in range(0,20)])
-DEFAULT_COLUMN_INDICES = json.loads(os.environ.get('DEFAULT_COLUMN_INDICES',
-                                                   f"[{FIRST_20_VARIABLE_INDICES}]"))
+PROFILER_FIRST_20_VARIABLE_INDICES = ', '.join([str(x) for x in range(0,20)])
+PROFILER_DEFAULT_COLUMN_INDICES = json.loads(os.environ.get('PROFILER_DEFAULT_COLUMN_INDICES',
+                                                   f"[{PROFILER_FIRST_20_VARIABLE_INDICES}]"))
 
 # ---------------------------
 # Celery Configuration Options
