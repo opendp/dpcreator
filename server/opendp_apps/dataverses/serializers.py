@@ -34,7 +34,7 @@ class DataverseUserSerializer(serializers.HyperlinkedModelSerializer):
         return super().save()
 
 
-class DataverseHandoffSerializer(serializers.HyperlinkedModelSerializer):
+class DataverseHandoffSerializer(serializers.ModelSerializer):
     class Meta:
         model = DataverseHandoff
         exclude = ['apiGeneralToken', 'apiSensitiveDataReadToken']
