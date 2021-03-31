@@ -26,7 +26,7 @@ class DataverseUserSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
 
     def save(self, **kwargs):
-        print(f"(serializer) validated data: {self.validated_data}")
+        #print(f"(serializer) validated data: {self.validated_data}")
         dataverse_handoff = self.validated_data.pop('dv_handoff')
         self.validated_data['dv_general_token'] = dataverse_handoff.apiGeneralToken
         self.validated_data['dv_sensitive_token'] = dataverse_handoff.apiSensitiveDataReadToken
