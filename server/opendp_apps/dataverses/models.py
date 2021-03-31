@@ -94,13 +94,14 @@ class DataverseHandoff(DataverseParams):
     Dataverse parameters passed to the OpenDP App
     """
     name = models.CharField(max_length=255, blank=True)
+    dv_installation = models.ForeignKey(RegisteredDataverse, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Dataverse Handoff Parameter'
         verbose_name_plural = 'Dataverse Handoff Parameters'
 
     def __str__(self):
-        return self.name
+        return str(self.object_id)
 
     def save(self, *args, **kwargs):
 
