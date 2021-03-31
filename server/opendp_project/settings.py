@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'django.contrib.sites',
+    #
+    # Djnago channels..
+    'channels',
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
@@ -59,6 +62,7 @@ INSTALLED_APPS = [
     'opendp_apps.terms_of_access',
     'opendp_apps.communication',
     'opendp_apps.profiler',
+
 ]
 
 MIDDLEWARE = [
@@ -90,7 +94,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'opendp_project.wsgi.application'
+#WSGI_APPLICATION = 'opendp_project.wsgi.application'
+
+ASGI_APPLICATION = "opendp_project.asgi.application"
 
 
 # Database
