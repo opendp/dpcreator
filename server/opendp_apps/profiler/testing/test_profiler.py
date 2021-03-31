@@ -118,7 +118,6 @@ class ProfilerTest(TestCase):
 
         print('-- Profiler output is the same as the output saved to the DataSetInfo object')
         profile_json_str2 = json.dumps(info, cls=DjangoJSONEncoder, indent=4)
-
         self.assertTrue(profile_json_str1, profile_json_str2)
 
 
