@@ -26,7 +26,7 @@ class DataverseUser(TimestampedModelWithUUID):
     Dataverse-specific attributes
     """
     user = models.ForeignKey(OpenDPUser,
-                             on_delete=models.PROTECT)
+                             on_delete=models.CASCADE)
 
     dv_installation = models.ForeignKey(RegisteredDataverse, on_delete=models.PROTECT)
 

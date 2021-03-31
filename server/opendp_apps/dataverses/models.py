@@ -53,7 +53,7 @@ class DataverseParams(TimestampedModelWithUUID):
     """
     siteUrl = models.CharField(max_length=255)
 
-    fileId = models.CharField(max_length=255)
+    fileId = models.IntegerField()
 
     datasetPid = models.CharField(max_length=255,
                                   help_text='Dataset DOI')
