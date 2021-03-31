@@ -267,6 +267,8 @@ class DataverseFileView(viewsets.ViewSet):
         if not (file_info.dataset_schema_info or file_info.file_schema_info):
             params = file_info.as_dict()
             params['siteUrl'] = handoff.siteUrl
+            # TODO: do client = DataverseClient(self.siteUrl, self.apiGeneralToken) instead and make calls
+            # TODO: maybe use DataverseManifestParams directly?
             request_handler = DataverseRequestHandler(params, opendp_user)
             schema_info = request_handler.mparams.get_schema_org()
             file_schema_info = request_handler.mparams.get_file_specific_schema_info(request_handler.schema_info)

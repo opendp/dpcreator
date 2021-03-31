@@ -11,6 +11,7 @@ from opendp_apps.dataverses.forms import DataverseParamsSiteUrlForm
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 
+
 class DataverseManifestParams(BasicErrCheck):
 
     def __init__(self, incoming_params, **kwargs):
@@ -83,8 +84,6 @@ class DataverseManifestParams(BasicErrCheck):
             self.add_err_msg(user_msg)
             return
 
-
-
     def get_schema_org(self):
         """
         Via the Dataverse API, get the schema org content of the dataset
@@ -94,7 +93,6 @@ class DataverseManifestParams(BasicErrCheck):
         schema_org_content = client.get_schema_org(self.datasetPid)
 
         return schema_org_content
-
 
     def get_user_info(self):
         """
