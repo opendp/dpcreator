@@ -7,26 +7,19 @@ from requests.exceptions import InvalidSchema
 
 from django.contrib.auth.decorators import user_passes_test
 
-from rest_framework import serializers
 from rest_framework import status
 from rest_framework import viewsets
 
-from django.http import JsonResponse, HttpResponseRedirect, Http404
+from django.http import JsonResponse, Http404
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.urls import reverse
 
 from opendp_apps.dataverses.serializers import DataverseUserSerializer
 from opendp_apps.dataverses.dataverse_client import DataverseClient
 from opendp_apps.dataverses.dv_user_handler import DataverseUserHandler, DataverseResponseError
 from opendp_apps.utils.view_helper import get_json_error, get_json_success
 from opendp_apps.dataverses.models import DataverseHandoff, ManifestTestParams
-
-
-class DataverseHandoffSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = DataverseHandoff
-        exclude = ['name', 'object_id', 'created']
+from opendp_apps.dataverses.serializers import DataverseHandoffSerializer
 
 
 class ViewDataverseHandoff(viewsets.ViewSet):

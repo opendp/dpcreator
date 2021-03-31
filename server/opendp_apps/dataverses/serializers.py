@@ -31,3 +31,9 @@ class DataverseUserSerializer(serializers.HyperlinkedModelSerializer):
         self.validated_data['dv_general_token'] = dataverse_handoff.apiGeneralToken
         self.validated_data['dv_sensitive_token'] = dataverse_handoff.apiSensitiveDataReadToken
         return super().save()
+
+
+class DataverseHandoffSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = DataverseHandoff
+        exclude = ['name', 'object_id', 'created']
