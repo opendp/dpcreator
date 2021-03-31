@@ -71,9 +71,27 @@ class DataverseParams(TimestampedModelWithUUID):
 
     def is_site_url_registered(self):
         """Does the site_url match a RegisteredDataverse?"""
+        # trim any trailing "/"s
+        while self.siteUrl and self.siteUrl.endswith('/'):
+            self.siteUrl = self.siteUrl[:-1]
+
+        if not self.siteUrl:
+            return False
+
         if RegisteredDataverse.objects.filter(dataverse_url=self.siteUrl).count() > 0:
             return True
         return False
+
+    def get_registered_dataverse(self):
+        """Based on the siteUrl, return the RegisteredDataverse or None"""
+        while self.siteUrl and self.siteUrl.endswith('/'):
+            self.siteUrl = self.siteUrl[:-1]
+
+        if not self.siteUrl:
+            return False
+
+        return RegisteredDataverse.objects.filter(dataverse_url=self.siteUrl).first()
+
 
     def as_dict(self):
         """
