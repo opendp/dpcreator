@@ -23,6 +23,7 @@ class TestDataverseUserView(BaseEndpointTest):
         self.set_mock_requests(req_mocker)
         url = reverse('dv-user-detail', kwargs={'pk': '4472310a-f591-403a-b8d6-dfb562f8b32f'})
         response = self.client.put(url,
-                                   data=self.data,
+                                   data={'user': '4472310a-f591-403a-b8d6-dfb562f8b32f',
+                                         'dv_handoff': '9e7e5506-dd1a-4979-a2c1-ec6e59e4769c'},
                                    format='json')
         self.assertNotEquals(response.status_code, None)
