@@ -152,7 +152,6 @@ class ManifestTestParams(DataverseParams):
         verbose_name = ('Manifest Test Parameter')
         verbose_name_plural = ('Manifest Test Parameters')
 
-
     def get_manifest_url_params(self, selected_params=None):
         """
         Build a url string with the params

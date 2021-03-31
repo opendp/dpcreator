@@ -23,8 +23,6 @@ from rest_framework import routers, serializers
 
 from opendp_apps.dataset.views import DepositorSetup, DataSetInfoViewSet
 from opendp_apps.dataverses.views import DataverseUserView
-from opendp_apps.dataverses.viewset_dataverse_dataset import DataverseDatasetInfoView
-from opendp_apps.dataverses.viewset_dataverse_user import DataverseUserInfoView
 
 from opendp_apps.terms_of_access.views import TermsOfAccessViewSet, TermsOfAccessAgreementViewSet
 from opendp_apps.user.models import OpenDPUser
@@ -48,16 +46,13 @@ router.register(r'terms-of-access', TermsOfAccessViewSet)
 router.register(r'dataset-info', DataSetInfoViewSet)
 router.register(r'test', TermsOfAccessAgreementViewSet)
 router.register(r'dv-user', DataverseUserView, basename='dv-user')
-router.register(r'deposit', DepositorSetup, basename='depositor_setup')
+router.register(r'deposit', DepositorSetup, basename='deposit')
 router.registry.extend(dataverse_router.registry)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-
     path('api/', include(router.urls)),
-    path('api/dv-dataset/', DataverseDatasetInfoView.as_view()),
-    path('api/dv-user-info/', DataverseUserInfoView.as_view()),
     # For testing
     path('dv-mock-api/', include('opendp_apps.dataverses.mock_urls')),
     url(r'^user-details/$',
