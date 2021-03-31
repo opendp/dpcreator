@@ -185,7 +185,8 @@ class DataversePostTest(BaseEndpointTest):
         print(resp_json)
         self.assertEqual(response.status_code, 400)
         self.assertTrue(resp_json['success'] is False)
-        self.assertTrue(resp_json['message'].find('www.invalidsite.com') > -1)
+        #self.assertTrue(resp_json['message'].find('www.invalidsite.com') > -1)
+        self.assertTrue(resp_json['message'].find('failed to return a response') > -1)
 
     def test_50_invalid_token(self, req_mocker):
         """(50) Test an invalid token"""
@@ -303,7 +304,8 @@ class DataversePutTest(BaseEndpointTest):
 
         response_json = json.loads(response.content)
         self.assertTrue(response_json['success'] is False)
-        self.assertTrue(response_json['message'].find('www.invalidsite.com') > -1)
+        self.assertTrue(response_json['message'].find('failed to return a response') > -1)
+        #self.assertTrue(response_json['message'].find('www.invalidsite.com') > -1)
 
     def test_50_invalid_token(self, req_mocker):
         """test_invalid_token"""
