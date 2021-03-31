@@ -21,9 +21,10 @@ class DataverseUserSerializer(serializers.HyperlinkedModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=OpenDPUser.objects.all())
     dv_handoff = serializers.PrimaryKeyRelatedField(queryset=DataverseHandoff.objects.all())
 
+    # This will mean that the form at http://localhost:8000/api/dv-user/ will only have those three fields,
     class Meta:
         model = DataverseUser
-        fields = '__all__'
+        fields = ['dv_installation', 'user', 'dv_handoff']
 
     def save(self, **kwargs):
         #print(f"(serializer) validated data: {self.validated_data}")

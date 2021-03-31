@@ -32,6 +32,9 @@ echo "-----------------------"
 echo "| Load fixtures       |"
 echo "| (for dev)           |"
 echo "-----------------------"
-python /code/server/manage.py loaddata opendp_apps/dataverses/fixtures/test_dataverses_01.json opendp_apps/dataverses/fixtures/test_manifest_params_04.json
+python /code/server/manage.py loaddata opendp_apps/dataverses/fixtures/test_dataverses_01.json \
+  opendp_apps/dataverses/fixtures/test_manifest_params_04.json \
+  opendp_apps/dataverses/fixtures/test_dataverse_handoff_01.json \
+  opendp_apps/dataverses/fixtures/test_opendp_users_01.json
 exec "$@"
 echo
