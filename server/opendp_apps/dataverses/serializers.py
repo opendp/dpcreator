@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses.models import RegisteredDataverse, DataverseHandoff
 from opendp_apps.user.models import DataverseUser, OpenDPUser
 
@@ -31,3 +32,13 @@ class DataverseUserSerializer(serializers.HyperlinkedModelSerializer):
         self.validated_data['dv_general_token'] = dataverse_handoff.apiGeneralToken
         self.validated_data['dv_sensitive_token'] = dataverse_handoff.apiSensitiveDataReadToken
         return super().save()
+
+
+class DataverseFileInfoSerializer(serializers.ModelSerializer):
+
+    dv_installation = serializers.PrimaryKeyRelatedField(queryset=RegisteredDataverse.objects.all())
+    creator = serializers.PrimaryKeyRelatedField(queryset=OpenDPUser.objects.all())
+
+    class Meta:
+        model = DataverseFileInfo
+        exclude = ['data_profile', 'source_file', 'polymorphic_ctype']

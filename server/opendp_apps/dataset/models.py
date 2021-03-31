@@ -44,8 +44,6 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
                                    upload_to='source-file/%Y/%m/%d/',
                                    blank=True, null=True)
 
-    
-
     class Meta:
         verbose_name = 'Dataset Information'
         verbose_name_plural = 'Dataset Information'
@@ -77,8 +75,8 @@ class DataverseFileInfo(DataSetInfo):
     dataverse_file_id = models.IntegerField()
     dataset_doi = models.CharField(max_length=255)
     file_doi = models.CharField(max_length=255, blank=True)
-    dataset_schema_info = models.JSONField(blank=True)
-    file_schema_info = models.JSONField(blank=True)
+    dataset_schema_info = models.JSONField(null=True, blank=True)
+    file_schema_info = models.JSONField(null=True, blank=True)
 
     class Meta:
         verbose_name = 'Dataverse File Information'
@@ -90,7 +88,7 @@ class DataverseFileInfo(DataSetInfo):
         ]
 
     def __str__(self):
-        return f'{self.name} ({self.installation_name})'
+        return f'{self.name} ({self.dv_installation})'
 
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the STEP
@@ -108,7 +106,7 @@ class DataverseFileInfo(DataSetInfo):
                     name=self.name,
                     creator=str(self.creator),
                     source=str(self.source),
-                    installation_name=self.installation_name,
+                    dv_installation=self.dv_installation,
                     dataverse_file_id=self.dataverse_file_id,
                     dataset_doi=self.dataset_doi,
                     file_doi=self.file_doi,

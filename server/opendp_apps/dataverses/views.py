@@ -1,29 +1,24 @@
 import uuid
 
-from json import JSONDecodeError
 from http import HTTPStatus
+from json import JSONDecodeError
 
-from requests.exceptions import InvalidSchema
-
-from django.contrib.auth.decorators import user_passes_test
-
-from rest_framework import status, viewsets
-from rest_framework.response import Response
-
-from django.http import JsonResponse, HttpResponseRedirect, Http404
-from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.contrib.auth.decorators import user_passes_test, login_required
+from django.http import JsonResponse, HttpResponseRedirect, Http404
 from django.urls import reverse
+from requests.exceptions import InvalidSchema
+from rest_framework import status, viewsets
 
 from opendp_apps.dataset.models import DataverseFileInfo
-from opendp_apps.dataset.serializers import DataverseFileInfoSerializer
-from opendp_apps.dataverses.serializers import DataverseUserSerializer
 from opendp_apps.dataverses.dataverse_client import DataverseClient
+from opendp_apps.dataverses.dataverse_request_handler import DataverseRequestHandler
 from opendp_apps.dataverses.dv_user_handler import DataverseUserHandler, DataverseResponseError
-from opendp_apps.user.models import OpenDPUser
-from opendp_apps.utils.view_helper import get_json_error, get_json_success
-from opendp_apps.dataverses.models import DataverseHandoff, ManifestTestParams
 from opendp_apps.dataverses.forms import DataverseHandoffForm
+from opendp_apps.dataverses.models import DataverseHandoff, ManifestTestParams
+from opendp_apps.dataverses.serializers import DataverseUserSerializer, DataverseFileInfoSerializer
+from opendp_apps.user.models import DataverseUser
+from opendp_apps.utils.view_helper import get_json_error, get_json_success
 
 
 @login_required
@@ -52,7 +47,7 @@ def view_dataverse_handoff(request):
         # if a GET (or any other method) we'll create a blank form
         else:
             return JsonResponse(dict(message='Form errors!',
-                                data=form.errors))#.as_json()))
+                                     data=form.errors))  # .as_json()))
 
     return JsonResponse(dict(message='No GET data!!!!'))
 
@@ -132,13 +127,12 @@ class DataverseUserView(viewsets.ViewSet):
             return JsonResponse(get_json_error(dataverse_user_serializer.errors),
                                 status=status.HTTP_400_BAD_REQUEST)
 
-        #print(f"DataverseUserSerializer.validated_data: {dataverse_user_serializer.validated_data}")
+        # print(f"DataverseUserSerializer.validated_data: {dataverse_user_serializer.validated_data}")
         try:
             dataverse_user = dataverse_user_serializer.save()
         except DataverseHandoff.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'No such DataVerse exists'})
         opendp_user = dataverse_user_serializer.validated_data.get('user')
-
 
         # ----------------------------------
         # Call the Dataverse API
@@ -176,7 +170,7 @@ class DataverseUserView(viewsets.ViewSet):
             return JsonResponse(get_json_error(f'Error {ex}'),
                                 status=400)
 
-        #print(dataverse_response.__dict__)
+        # print(dataverse_response.__dict__)
         return JsonResponse(get_json_success('success',
                                              data={'dv_user': new_dv_user.object_id}),
                             status=201)
@@ -186,14 +180,14 @@ class DataverseUserView(viewsets.ViewSet):
         # ----------------------------------
         # Validate the input
         # ----------------------------------
-        #print(f"data: {request.data}")
+        # print(f"data: {request.data}")
 
         dataverse_user_serializer = DataverseUserSerializer(data=request.data, context={'request': request})
         if not dataverse_user_serializer.is_valid():
             print("INVALID SERIALIZER")
             return JsonResponse(get_json_error(dataverse_user_serializer.errors),
                                 status=status.HTTP_400_BAD_REQUEST)
-        #print(f"DataverseUserSerializer.validated_data: {dataverse_user_serializer.validated_data}")
+        # print(f"DataverseUserSerializer.validated_data: {dataverse_user_serializer.validated_data}")
         try:
             dataverse_user = dataverse_user_serializer.save()
         except DataverseHandoff.DoesNotExist:
@@ -208,8 +202,8 @@ class DataverseUserView(viewsets.ViewSet):
         api_general_token = dataverse_user.dv_general_token
         dataverse_client = DataverseClient(site_url, api_general_token)
         try:
-            #print(f"API token: {api_general_token}")
-            #print(f"Dataverse Client: {dataverse_client.__dict__}")
+            # print(f"API token: {api_general_token}")
+            # print(f"Dataverse Client: {dataverse_client.__dict__}")
             dataverse_response = dataverse_client.get_user_info(user_api_token=api_general_token)
         except InvalidSchema:
             print("INVALID SCHEMA")
@@ -252,11 +246,34 @@ class DataverseFileView(viewsets.ViewSet):
     def list(self, request):
         handoff_id = request.query_params.get('handoff_id')
         user_id = request.query_params.get('user_id')
+        dataverse_user = DataverseUser.objects.get(id=user_id)
+        opendp_user = dataverse_user.user
+        registered_dataverse = dataverse_user.dv_installation
+        # print(handoff_id, user_id)
         handoff = DataverseHandoff.objects.get(id=handoff_id)
+        try:
+            file_info = DataverseFileInfo.objects.get(dataverse_file_id=handoff.fileId,
+                                                      dv_installation=registered_dataverse)
+        except DataverseFileInfo.DoesNotExist:
+            file_info = DataverseFileInfo(dv_installation=registered_dataverse,
+                                          # TODO: Should this be a UUID as well?
+                                          dataverse_file_id=1,
+                                          dataset_doi=handoff.datasetPid,
+                                          file_doi=handoff.filePid,
+                                          dataset_schema_info=None,
+                                          file_schema_info=None,
+                                          creator=opendp_user)
 
-        existing_file_info = DataverseFileInfo.objects.filter(fil)
-
-        user = OpenDPUser.objects.get(id=user_id)
-        queryset = DataverseFileInfo.objects.all()
-        serializer = DataverseFileInfoSerializer(queryset)
-        return Response(serializer.data)
+        if not (file_info.dataset_schema_info or file_info.file_schema_info):
+            params = file_info.as_dict()
+            params['siteUrl'] = handoff.siteUrl
+            request_handler = DataverseRequestHandler(params, opendp_user)
+            schema_info = request_handler.mparams.get_schema_org()
+            file_schema_info = request_handler.mparams.get_file_specific_schema_info(request_handler.schema_info)
+            # print(schema_info.as_dict(), file_schema_info.as_dict())
+            file_info.dataset_schema_info = schema_info.as_dict()
+            file_info.file_schema_info = file_schema_info.as_dict()
+        file_info.save()
+        # print(file_info)
+        serializer = DataverseFileInfoSerializer(file_info, context={'request': request})
+        return JsonResponse(data=serializer.data, status=200)

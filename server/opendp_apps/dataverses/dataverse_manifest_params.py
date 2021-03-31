@@ -24,7 +24,7 @@ class DataverseManifestParams(BasicErrCheck):
             return
 
         self.custom_required_params = kwargs.get('custom_required_params')
-
+        # print(incoming_params)
         self.fileId = self.format_param(incoming_params.get(dv_static.DV_PARAM_FILE_ID))
         self.siteUrl = self.format_param(incoming_params.get(dv_static.DV_PARAM_SITE_URL))
         self.datasetPid = self.format_param(incoming_params.get(dv_static.DV_PARAM_DATASET_PID))
@@ -105,8 +105,6 @@ class DataverseManifestParams(BasicErrCheck):
         user_info = client.get_user_info(self.apiGeneralToken)
 
         return user_info
-
-
 
     def get_file_specific_schema_info(self, full_schema_info):
         """
