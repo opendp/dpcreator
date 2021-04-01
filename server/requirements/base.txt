@@ -27,5 +27,19 @@ urllib3==1.25.10
 uuid==1.30
 webencodings==0.5.1
 
+# For profiling:
+# reference: https://github.com/TwoRavens/raven-metadata-service
+#
+tworavens-preprocess==1.1.5
+# async tasks
+celery==5.0.5
+
+
+# Django channels for websockets
+#
+channels==3.0.3
+
+
 # for testing, mocks requests
 requests-mock==1.8.0
+

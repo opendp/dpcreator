@@ -84,7 +84,6 @@ class BaseEndpointTest(TestCase):
         user_info = {dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_OK, 'data': self.mock_params.user_info}
         req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/users/:me', json=user_info)
 
-        #req_mocker.get('http://www.invalidsite.com/api/v1/users/:me')
 
         # Schema.org dataset info
         schema_url = ('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export?exporter='
@@ -99,6 +98,8 @@ class BaseEndpointTest(TestCase):
         req_mocker.get(schema_url, json=fail_info)
 
         req_mocker.get('www.invalidsite.com/api/v1/users/:me')
+        req_mocker.get('http://www.invalidsite.com/api/v1/users/:me')
+
         req_mocker.get('https://dataverse.harvard.edu/api/v1/users/:me')
 
     def get_basic_inputs(self, user_id, dataverse_handoff_id):
@@ -185,9 +186,9 @@ class DataversePostTest(BaseEndpointTest):
         resp_json = response.json()
         print(resp_json)
         self.assertEqual(response.status_code, 400)
-        # self.assertTrue(resp_json['success'] is False)
+        self.assertTrue(resp_json['success'] is False)
         #self.assertTrue(resp_json['message'].find('www.invalidsite.com') > -1)
-        # self.assertTrue(resp_json['message'].find('failed to return a response') > -1)
+        self.assertTrue(resp_json['message'].find('failed to return a response') > -1)
 
     def test_50_invalid_token(self, req_mocker):
         """(50) Test an invalid token"""
@@ -308,7 +309,6 @@ class DataversePutTest(BaseEndpointTest):
         response_json = json.loads(response.content)
         self.assertTrue(response_json['success'] is False)
         self.assertTrue(response_json['message'].find('failed to return a response') > -1)
-        #self.assertTrue(response_json['message'].find('www.invalidsite.com') > -1)
 
     def test_50_invalid_token(self, req_mocker):
         """test_invalid_token"""
