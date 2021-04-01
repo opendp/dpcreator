@@ -39,18 +39,18 @@ services:
     depends_on:
       - client
       - db
-  task-queue:
-    build: "./server"
+#  task-queue:
+#    build: "./server"
     # For production we will need to set
     # these variables to point to a standalone instance
-    env_file:
-      - .env
-    #command: celery -A opendp_project worker -l info -n worker_dpcreator
-    command: celery -A opendp_project worker -l INFO
-    volumes:
-      - .:/code
-    ports:
-      - "8070:8070"
-    depends_on:
-      - db
-      - redis
+#    env_file:
+#      - .env
+#    #command: celery -A opendp_project worker -l info -n worker_dpcreator
+#    command: celery -A opendp_project worker -l INFO
+#    volumes:
+#      - .:/code
+#    ports:
+#      - "8070:8070"
+#    depends_on:
+#      - db
+#      - redis
