@@ -122,11 +122,11 @@ class DataverseRequestHandler(BasicErrCheck):
         # (1) Retrieve the JSON LD info
         #
         schema_info = self.mparams.get_schema_org()
-        if not schema_info.success:
+        if schema_info.status_code >= 400:
             print(schema_info.message)
             self.add_err_msg(schema_info.message)
             return False
-        self.schema_info = schema_info.data
+        self.schema_info = schema_info.json()
 
         # (2) Retrieve the file specific info from the JSON-LD
         #

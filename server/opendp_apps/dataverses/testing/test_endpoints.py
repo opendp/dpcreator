@@ -1,14 +1,14 @@
 import json
-import requests_mock
 
-from django.test import Client, TestCase
+import requests_mock
 from django.contrib.auth import get_user_model
+from django.test import Client, TestCase
 from rest_framework.reverse import reverse
 
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.models import ManifestTestParams, DataverseHandoff
-from opendp_apps.user.models import DataverseUser
 from opendp_apps.model_helpers.msg_util import msg, msgt
+from opendp_apps.user.models import DataverseUser
 
 TAG_WEB_CLIENT = 'web-client' # skip these tests on travis; need to fix as many use requests to access the localhost
 
@@ -99,6 +99,36 @@ class BaseEndpointTest(TestCase):
 
         req_mocker.get('www.invalidsite.com/api/v1/users/:me')
         req_mocker.get('https://dataverse.harvard.edu/api/v1/users/:me')
+
+        # req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export?exporter='
+        #                'schema.org&persistentId=None&User-Agent=pydataverse')
+        dataset_info = {
+            "@context": "http://schema.org",
+            "@type": "Dataset",
+            "@id": "https://doi.org/10.70122/FK2/AE07JZ",
+            "identifier": "https://doi.org/10.70122/FK2/AE07JZ",
+            "name": "GBS of CIMMYT bread wheat breeding lines from the year 2013-2020",
+            "creator": [
+                {
+                    "name": "Alemie, Tilashwork", "affiliation": "Adet Agricultural Research Center, ARARI"}],
+            "author": [{"name": "Alemie, Tilashwork", "affiliation": "Adet Agricultural Research Center, ARARI"}],
+            "datePublished": "2021-03-31", "dateModified": "2021-03-31", "version": "1",
+            "description": ["Bread wheat production improvement through crossing"],
+            "keywords": ["Agricultural Sciences", "Bread wheat"],
+            "citation": [{"@type": "CreativeWork", "text": "Tilashwork Alemie, 2021"}],
+            "license": {"@type": "Dataset", "text": "CC0", "url": "https://creativecommons.org/publicdomain/zero/1.0/"},
+            "includedInDataCatalog": {"@type": "DataCatalog", "name": "Demo Dataverse",
+                                      "url": "https://demo.dataverse.org"},
+            "publisher": {"@type": "Organization", "name": "Demo Dataverse"},
+            "provider": {"@type": "Organization", "name": "Demo Dataverse"}
+        }
+        req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export?exporter='
+                       'schema.org&persistentId=dataset_pid_etc&User-Agent=pydataverse&key=some-token',
+                       json=dataset_info)
+
+        req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export?exporter='
+                       'schema.org&persistentId=None&User-Agent=pydataverse',
+                       json={'distribution': 'just some mock data'})
 
     def get_basic_inputs(self, user_id, dataverse_handoff_id):
         """Return dict with key/vals for user_id and dataverse_handoff_id"""
