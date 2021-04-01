@@ -1,0 +1,2 @@
+
+MESSAGE_TYPE = 'message'

@@ -16,6 +16,10 @@ urlpatterns = [
             views.view_as_dict,
             name='view_as_dict'),
 
+    path(f'dataverse/profile-test',
+         mock_dv_views.view_profile_test,
+         name='view_profile_test'),
+
     path(f'dataverse/incoming-test-1',
          mock_dv_views.view_dataverse_incoming_1,
          name='view_dataverse_incoming_1'),

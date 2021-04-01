@@ -1,0 +1,53 @@
+{%  extends "dataverses/test_base.html" %}
+
+{% block additional_head_content %}
+<script>
+//-------------------------------------------------
+// Initialize a websocket for this page
+//-------------------------------------------------
+let wsLink = `{{ WEBSOCKET_PREFIX }}//${window.location.host}/ws/connect/{{username}}/`;
+
+
+function connectWebsocket() {
+    let ws = null;
+
+    function start() {
+
+        try {
+            ws = new WebSocket(wsLink);
+        } catch (err) {
+            console.log('Cannot connect to streamSocket:', wsLink)
+        }
+        ws.onopen = function () {
+            console.log('Connected to streamSocket:', wsLink);
+        };
+        ws.onmessage = websocketMessage;
+        ws.onclose = function () {
+            console.log('Attempting reconnect to streamSocket:', wsLink);
+            check();
+        };
+    }
+
+    function check() {
+        if (!ws || ws.readyState === 3) start();
+    }
+
+    start();
+
+    setInterval(check, 10000);
+}
+document.addEventListener("DOMContentLoaded", connectWebsocket);
+</script>
+{% endblock %}
+
+{% block main_content %}
+
+ <div class="card shadow-sm">
+      <div class="card-header">
+        <h4 class="my-0 font-weight-normal">(1) Incoming Params from GET request</h4>
+      </div>
+      <div class="card-body">
+        {{ greeting }}
+      </div>
+  </div>
+{% endblock %}

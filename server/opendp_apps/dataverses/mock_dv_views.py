@@ -2,6 +2,7 @@
 Views meant to mimic calls by PyDataverse
 """
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.shortcuts import render
 
 from django.http import HttpResponse, JsonResponse
@@ -9,6 +10,24 @@ from opendp_apps.dataverses.models import ManifestTestParams
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
 from opendp_apps.dataverses.dataverse_request_handler import DataverseRequestHandler
 from opendp_apps.dataverses import static_vals as dv_static
+
+"""
+dv-mock-api
+"""
+
+@login_required
+def view_profile_test(request):
+
+    resp_info = {'title': 'profile?',
+                 'subtitle': 'one step',
+                 'greeting': 'hello',
+                 'WEBSOCKET_PREFIX': settings.WEBSOCKET_PREFIX,
+                 'username': request.user.username,
+                }
+
+    return render(request,
+                  'dataverses/view_profile_test.html',
+                  resp_info)
 
 
 @login_required

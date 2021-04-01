@@ -57,7 +57,9 @@ urlpatterns = [
     path('api/', include(router.urls)),
     # For testing
     path('dv-mock-api/', include('opendp_apps.dataverses.mock_urls')),
-    url(r'^user-details/$',
+    path('async_messages/', include('opendp_apps.async_messages.urls')),
+
+   url(r'^user-details/$',
         TemplateView.as_view(template_name="user_details.html"),
         name='user-details'),
     url(r'^rest-auth/', include('dj_rest_auth.urls')),

@@ -32,6 +32,10 @@ DEBUG = True
 # Application definition
 
 INSTALLED_APPS = [
+    # Django channels..
+    'channels',
+    'opendp_apps.async_messages',
+    #
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,9 +44,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'django.contrib.sites',
-    #
-    # Djnago channels..
-    'channels',
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
@@ -62,7 +63,6 @@ INSTALLED_APPS = [
     'opendp_apps.terms_of_access',
     'opendp_apps.communication',
     'opendp_apps.profiler',
-
 ]
 
 MIDDLEWARE = [
@@ -94,9 +94,40 @@ TEMPLATES = [
     },
 ]
 
+# -----------------------------------------------
+# REDIS settings
+# -----------------------------------------------
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+REDIS_PORT = os.environ.get('REDIS_PORT', 6379)
+REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD', '')
+
+# reference: https://docs.celeryproject.org/en/stable/getting-started/brokers/redis.html
+if REDIS_PASSWORD:
+    REDIS_URL = f'redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}'
+else:
+    REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}'
+
+# -----------------------------------------------
+# ASGI/Channels settings
+# -----------------------------------------------
 #WSGI_APPLICATION = 'opendp_project.wsgi.application'
 
 ASGI_APPLICATION = "opendp_project.asgi.application"
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [REDIS_URL],
+        },
+    },
+}
+
+# WEBSOCKET PREFIX
+# specify whether over a regular (ws://)
+# or secure connection (ws://)
+WEBSOCKET_PREFIX = os.environ.get('WEBSOCKET_PREFIX', 'ws://')
+assert WEBSOCKET_PREFIX in ('ws://', 'wss://'), \
+    "Django settings error: 'WEBSOCKET_PREFIX' must be set to 'ws://' or 'wss://'"
 
 
 # Database
@@ -251,18 +282,17 @@ PROFILER_DEFAULT_COLUMN_INDICES = json.loads(os.environ.get('PROFILER_DEFAULT_CO
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 
-REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
-REDIS_PORT = os.environ.get('REDIS_PORT', 6379)
-REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD', '')
-
-# reference: https://docs.celeryproject.org/en/stable/getting-started/brokers/redis.html
-if REDIS_PASSWORD:
-    REDIS_URL = f'redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}'
-else:
-    REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}'
-
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
 
 # discard a process after executing task, because automl solvers are incredibly leaky
 #CELERY_WORKER_MAX_TASKS_PER_CHILD = 1
+
+# ---------------------------
+# Cookie Names
+# ---------------------------
+SESSION_COOKIE_NAME = os.environ.get('SESSION_COOKIE_NAME',
+                                     'dpcreator_local')
+
+CSRF_COOKIE_NAME = os.environ.get('CSRF_COOKIE_NAME',
+                                  'dpcreator_local_csrf')
