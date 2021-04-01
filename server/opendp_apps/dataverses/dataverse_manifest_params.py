@@ -11,6 +11,7 @@ from opendp_apps.dataverses.forms import DataverseParamsSiteUrlForm
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 
+
 class DataverseManifestParams(BasicErrCheck):
 
     def __init__(self, incoming_params, **kwargs):
@@ -30,9 +31,11 @@ class DataverseManifestParams(BasicErrCheck):
         self.datasetPid = self.format_param(incoming_params.get(dv_static.DV_PARAM_DATASET_PID))
         self.filePid = self.format_param(incoming_params.get(dv_static.DV_PARAM_FILE_PID))
         self.apiGeneralToken = self.format_param(incoming_params.get(dv_static.DV_API_GENERAL_TOKEN))
-        self.apiSensitiveDataReadToken = self.format_param(incoming_params.get(dv_static.DV_API_SENSITIVE_DATA_READ_TOKEN))
+        self.apiSensitiveDataReadToken = self.format_param(
+            incoming_params.get(dv_static.DV_API_SENSITIVE_DATA_READ_TOKEN))
 
-        self.registerd_dataverse = None # RegisteredDataverse connected with self.siteUrl
+        # RegisteredDataverse connected with self.siteUrl
+        self.registerd_dataverse = None
 
         self.check_required_params()
 
@@ -83,8 +86,6 @@ class DataverseManifestParams(BasicErrCheck):
             self.add_err_msg(user_msg)
             return
 
-
-
     def get_schema_org(self):
         """
         Via the Dataverse API, get the schema org content of the dataset
@@ -95,7 +96,6 @@ class DataverseManifestParams(BasicErrCheck):
 
         return schema_org_content
 
-
     def get_user_info(self):
         """
         Via the Dataverse API, return the user information
@@ -105,8 +105,6 @@ class DataverseManifestParams(BasicErrCheck):
         user_info = client.get_user_info(self.apiGeneralToken)
 
         return user_info
-
-
 
     def get_file_specific_schema_info(self, full_schema_info):
         """
