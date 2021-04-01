@@ -19,9 +19,10 @@ class TestDataverseUserSerializer(TestCase):
 
     def test_create(self):
         serializer = DataverseUserSerializer(data={
-            'dv_installation': 1,
-            'user': self.user_obj.id,
-            'dv_handoff': 1,
+            'object_id': '8d24e213-0da3-46cf-ba5c-9f1df5cec53d',
+            'dv_installation': '58fd79dc-8541-4aa1-a7c2-85a5b443efa1',
+            'user': self.user_obj.object_id,
+            'dv_handoff': "9e7e5506-dd1a-4979-a2c1-ec6e59e4769c",
             'persistent_id': 1,
             'email': 'test@test.com',
             'first_name': 'test',

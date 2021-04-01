@@ -4,7 +4,8 @@ from django.contrib.auth import get_user_model
 from django import forms
 
 from opendp_apps.dataverses import static_vals as dv_static
-from opendp_apps.dataverses.models import DataverseHandoff, DataverseParams, RegisteredDataverse
+from opendp_apps.dataverses.models import DataverseHandoff, RegisteredDataverse, DataverseParams
+
 
 class DataverseUserHandlerForm(forms.Form):
     """Validate inputs of OpenDPUser.object_id and DataverseHandoff.object_id"""
@@ -84,25 +85,6 @@ class DataverseUserHandlerForm(forms.Form):
         return ' '.join(outlines)
 
 
-class DataverseParamsForm(forms.ModelForm):
-
-    class Meta:
-        model = DataverseParams
-        exclude = ['object_id', 'created', 'modified']
-
-    def clean_siteUrl(self):
-
-        dataverse_url = self.cleaned_data.get('siteUrl')
-
-        try:
-            registerd_dataverse = RegisteredDataverse.objects.get(dataverse_url=dataverse_url)
-        except RegisteredDataverse.DoesNotExist:
-            user_msg = (f'The Dataverse siteUrl was not recognized: {dataverse_url}')
-            raise forms.ValidationError(user_msg)
-
-        return registerd_dataverse
-
-
 class DataverseParamsSiteUrlForm(forms.ModelForm):
 
     class Meta:
@@ -120,9 +102,3 @@ class DataverseParamsSiteUrlForm(forms.ModelForm):
             raise forms.ValidationError(user_msg)
 
         return registerd_dataverse
-
-
-class DataverseHandoffForm(forms.ModelForm):
-    class Meta:
-        model = DataverseHandoff
-        exclude = ['name', 'object_id', 'created', 'modified']
