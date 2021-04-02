@@ -26,6 +26,9 @@ def push_test(request):
     info = dict(websocket_id=websocket_id)
 
     from opendp_apps.async_messages.websocket_message import WebsocketMessage
+    from opendp_apps.async_messages.tasks import send_test_msg
+
+    send_test_msg.delay(websocket_id)
 
     ws_msg = WebsocketMessage.get_success_message( \
         'TYPE_OF_MESSAGE',

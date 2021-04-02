@@ -21,7 +21,8 @@ def run_profile_by_filepath(filepath, dataset_object_id=None):
 def run_profile_by_filefield(dataset_info_object_id, **kwargs):
     """Run the profiler using a valid filepath"""
     params = {pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD: True,
-              pstatic.KEY_DATASET_OBJECT_ID: dataset_info_object_id}
+              pstatic.KEY_DATASET_OBJECT_ID: dataset_info_object_id,
+              'websocket_id': kwargs.get('websocket_id', None)}
 
     try:
         ds_info = DataSetInfo.objects.get(object_id=dataset_info_object_id)

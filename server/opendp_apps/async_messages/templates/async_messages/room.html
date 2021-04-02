@@ -30,7 +30,9 @@
             console.log('--------------------');
              */
             document.querySelector('#chat-log').value += (data.message.user_message + '\n');
-            // document.querySelector('#chat-log').value += (JSON.stringify(data.message.data) + '\n');
+            //if (data.message.data) {
+            //    document.querySelector('#chat-log').value += (JSON.stringify(data.message.data) + '\n');
+            //}
         };
 
         chatSocket.onclose = function(e) {
