@@ -7,6 +7,7 @@ from collections import OrderedDict
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from opendp_apps.async_messages import static_vals as mstatic
+from opendp_apps.async_messages.consumers import ChatConsumer
 
 class WebsocketMessage(object):
     """Basic message sent back via a websocket"""
@@ -29,8 +30,10 @@ class WebsocketMessage(object):
         """Send the message over a websocket"""
         channel_layer = get_channel_layer()
 
+        group_name = ChatConsumer.get_group_name(websocket_id)
+
         async_to_sync(channel_layer.group_send)(\
-                websocket_id,
+                group_name,
                 dict(type=mstatic.MESSAGE_TYPE,
                      message=self.as_dict()))
 

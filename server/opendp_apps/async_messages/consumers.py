@@ -1,25 +1,29 @@
 # chat/consumers.py
+from datetime import datetime
 import json
-
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
-
 from opendp_apps.async_messages import static_vals as mstatic
-from opendp_apps.utils.random_gen import random_alphanum
+
 
 class ChatConsumer(WebsocketConsumer):
+
+    @staticmethod
+    def get_group_name(room_name):
+        """Method for """
+        return f"{room_name}-{datetime.now().strftime('%Y-%m-%d')}"
+
     def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
-        print('self.room_name', self.room_name)
-        self.room_group_name = 'chat_%s' % self.room_name
-
+        self.room_group_name = ChatConsumer.get_group_name(self.room_name)
+        print('connect', self.room_group_name)
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,
             self.channel_name
         )
-
         self.accept()
+
 
     def disconnect(self, close_code):
         # Leave room group
@@ -33,13 +37,12 @@ class ChatConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
 
-        print('text_data', text_data)
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
-                'type': 'message',# mstatic.MESSAGE_TYPE,
-                'message': message
+                'type': mstatic.MESSAGE_TYPE,
+                'message': dict(user_message=message)
             }
         )
 
@@ -51,11 +54,3 @@ class ChatConsumer(WebsocketConsumer):
         self.send(text_data=json.dumps({
             'message': message
         }))
-
-"""
-from opendp_apps.async_messages.websocket_message import WebsocketMessage
-
-ws_msg = WebsocketMessage.get_success_message('some type', 'The dataset has been materialized',data={'number': 1})
-ws_msg.send_message('higher-ground')
-                     
-"""

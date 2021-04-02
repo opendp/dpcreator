@@ -1,2 +1,2 @@
 
-MESSAGE_TYPE = 'message'
+MESSAGE_TYPE = 'chat_message'

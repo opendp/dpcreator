@@ -6,7 +6,7 @@
     <title>Chat Room</title>
 </head>
 <body>
-    <textarea id="chat-log" cols="100" rows="20"></textarea><br>
+    <textarea id="chat-log" cols="100" rows="10"></textarea><br>
     <input id="chat-message-input" type="text" size="100"><br>
     <input id="chat-message-submit" type="button" value="Send">
     {{ room_name|json_script:"room-name" }}
@@ -16,15 +16,21 @@
         const chatSocket = new WebSocket(
             'ws://'
             + window.location.host
-            + '/async_messages/ws/chat/'
-            + roomName
+            + '/async_messages/ws/chat/{{ ws_name }}'
+            //+ roomName
             + '/'
         );
         chatSocket.onmessage = function(e) {
             console.log(e);
             console.log(e.data);
             const data = JSON.parse(e.data);
-            document.querySelector('#chat-log').value += (data.message + '\n');
+            /*
+            console.log('--------------------');
+            console.log(JSON.stringify(data));
+            console.log('--------------------');
+             */
+            document.querySelector('#chat-log').value += (data.message.user_message + '\n');
+            // document.querySelector('#chat-log').value += (JSON.stringify(data.message.data) + '\n');
         };
 
         chatSocket.onclose = function(e) {
