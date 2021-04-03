@@ -16,22 +16,45 @@ class OpenDPUserSerializer(serializers.ReadOnlyField):
         return {'pk': value.object_id, 'object_id': value.object_id}
 
 
-class DataverseUserSerializer(serializers.HyperlinkedModelSerializer):
+class DataverseUserSerializer(serializers.ModelSerializer):
 
-    dv_installation = serializers.PrimaryKeyRelatedField(queryset=RegisteredDataverse.objects.all())
-    user = serializers.PrimaryKeyRelatedField(queryset=OpenDPUser.objects.all())
-    dv_handoff = serializers.PrimaryKeyRelatedField(queryset=DataverseHandoff.objects.all())
+    user = serializers.SlugRelatedField(queryset=OpenDPUser.objects.all(),
+                                        slug_field='object_id',
+                                        read_only=False)
+    dv_handoff = serializers.SlugRelatedField(queryset=DataverseHandoff.objects.all(),
+                                              slug_field='object_id',
+                                              read_only=False)
 
+    # This will mean that the form at http://localhost:8000/api/dv-user/ will only have those three fields,
     class Meta:
         model = DataverseUser
-        fields = '__all__'
+        fields = ['object_id', 'user', 'dv_handoff']
 
     def save(self, **kwargs):
-        #print(f"(serializer) validated data: {self.validated_data}")
+        # print(f"(serializer) validated data: {self.validated_data}")
         dataverse_handoff = self.validated_data.pop('dv_handoff')
+        self.validated_data['dv_installation'] = dataverse_handoff.dv_installation
         self.validated_data['dv_general_token'] = dataverse_handoff.apiGeneralToken
         self.validated_data['dv_sensitive_token'] = dataverse_handoff.apiSensitiveDataReadToken
         return super().save()
+
+    def update(self, instance, validated_data):
+        # print(f"instance: {instance}, validated_data: {validated_data}")
+        opendp_user = OpenDPUser.objects.get(object_id=validated_data.get('user'))
+        instance.email = opendp_user.email
+        instance.first_name = opendp_user.first_name
+        instance.last_name = opendp_user.last_name
+        # instance.dv_general_token = validated_data.get('dv_general_token')
+        # instance.dv_sensitive_token = validated_data.get('dv_sensitive_token')
+        # instance.dv_token_update = validated_data.get('dv_token_update')
+        instance.save()
+        return instance
+
+
+class DataverseHandoffSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DataverseHandoff
+        exclude = ['apiGeneralToken', 'apiSensitiveDataReadToken']
 
 
 class DataverseFileInfoSerializer(serializers.ModelSerializer):

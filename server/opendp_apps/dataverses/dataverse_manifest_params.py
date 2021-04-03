@@ -31,9 +31,11 @@ class DataverseManifestParams(BasicErrCheck):
         self.datasetPid = self.format_param(incoming_params.get(dv_static.DV_PARAM_DATASET_PID))
         self.filePid = self.format_param(incoming_params.get(dv_static.DV_PARAM_FILE_PID))
         self.apiGeneralToken = self.format_param(incoming_params.get(dv_static.DV_API_GENERAL_TOKEN))
-        self.apiSensitiveDataReadToken = self.format_param(incoming_params.get(dv_static.DV_API_SENSITIVE_DATA_READ_TOKEN))
+        self.apiSensitiveDataReadToken = self.format_param(
+            incoming_params.get(dv_static.DV_API_SENSITIVE_DATA_READ_TOKEN))
 
-        self.registerd_dataverse = None # RegisteredDataverse connected with self.siteUrl
+        # RegisteredDataverse connected with self.siteUrl
+        self.registerd_dataverse = None
 
         self.check_required_params()
 

@@ -71,9 +71,27 @@ class DataverseParams(TimestampedModelWithUUID):
 
     def is_site_url_registered(self):
         """Does the site_url match a RegisteredDataverse?"""
+        # trim any trailing "/"s
+        while self.siteUrl and self.siteUrl.endswith('/'):
+            self.siteUrl = self.siteUrl[:-1]
+
+        if not self.siteUrl:
+            return False
+
         if RegisteredDataverse.objects.filter(dataverse_url=self.siteUrl).count() > 0:
             return True
         return False
+
+    def get_registered_dataverse(self):
+        """Based on the siteUrl, return the RegisteredDataverse or None"""
+        while self.siteUrl and self.siteUrl.endswith('/'):
+            self.siteUrl = self.siteUrl[:-1]
+
+        if not self.siteUrl:
+            return False
+
+        return RegisteredDataverse.objects.filter(dataverse_url=self.siteUrl).first()
+
 
     def as_dict(self):
         """
@@ -94,13 +112,14 @@ class DataverseHandoff(DataverseParams):
     Dataverse parameters passed to the OpenDP App
     """
     name = models.CharField(max_length=255, blank=True)
+    dv_installation = models.ForeignKey(RegisteredDataverse, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Dataverse Handoff Parameter'
         verbose_name_plural = 'Dataverse Handoff Parameters'
 
     def __str__(self):
-        return self.name
+        return str(self.object_id)
 
     def save(self, *args, **kwargs):
 
@@ -151,7 +170,6 @@ class ManifestTestParams(DataverseParams):
     class Meta:
         verbose_name = ('Manifest Test Parameter')
         verbose_name_plural = ('Manifest Test Parameters')
-
 
     def get_manifest_url_params(self, selected_params=None):
         """

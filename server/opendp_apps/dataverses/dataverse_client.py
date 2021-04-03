@@ -48,6 +48,11 @@ class DataverseClient(object):
             return err_resp(f'Failed to connect. {err_obj}')
 
         if response.status_code == 200:
+            if not response.content:
+                # In this instance the response content is an empty string or None -- shouldn't happen...
+                #
+                return err_resp(f"Dataverse returned an HTTP 200 status code but failed to return a response.")
+
             resp_json = response.json()
             dv_status = resp_json.get(dv_static.DV_KEY_STATUS)
             if not dv_status:

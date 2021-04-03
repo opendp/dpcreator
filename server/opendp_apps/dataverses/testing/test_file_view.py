@@ -1,12 +1,7 @@
 import requests_mock
 
-from django.test import Client, TestCase
-from django.contrib.auth import get_user_model
-from rest_framework.reverse import reverse
-
 from opendp_apps.dataverses.testing.test_endpoints import BaseEndpointTest
-from opendp_apps.dataverses.views import DataverseFileView
-from opendp_apps.model_helpers.msg_util import msgt, msg
+from opendp_apps.model_helpers.msg_util import msgt
 
 
 @requests_mock.Mocker()
@@ -19,8 +14,8 @@ class FileViewGetTest(BaseEndpointTest):
         self.set_mock_requests(req_mocker)
 
         response = self.client.get('/api/dv-file/',
-                                   data={'handoff_id': 'f7f5fab9-f51a-4aff-810b-374173132cd9',
-                                         'user_id': '7121b28b-8a0f-4dc0-b46d-e23e43018010'},
+                                   data={'handoff_id': '9e7e5506-dd1a-4979-a2c1-ec6e59e4769c',
+                                         'user_id': '6c4986b1-e90d-48a2-98d5-3a37da1fd331'},
                                    content_type='application/json')
         # print(response.json())
         self.assertEqual(response.status_code, 200)
