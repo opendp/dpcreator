@@ -1,4 +1,3 @@
-import json
 from json import JSONDecodeError
 
 from django.http import JsonResponse
@@ -51,7 +50,7 @@ class DataverseUserView(viewsets.ViewSet):
 
         dataverse_user_serializer = DataverseUserSerializer(data=request.data, context={'request': request})
         if not dataverse_user_serializer.is_valid():
-            print("INVALID SERIALIZER")
+            # print("INVALID SERIALIZER")
             return Response(dataverse_user_serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -63,7 +62,6 @@ class DataverseUserView(viewsets.ViewSet):
             return Response(dataverse_user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         opendp_user = dataverse_user_serializer.validated_data.get('user')
-
 
         # ----------------------------------
         # Call the Dataverse API
@@ -77,27 +75,27 @@ class DataverseUserView(viewsets.ViewSet):
         try:
             dataverse_response = dataverse_client.get_user_info(user_api_token=api_general_token)
         except InvalidSchema:
-            print("INVALID SCHEMA")
+            # print("INVALID SCHEMA")
             return Response(get_json_error(f'The Site {site_url} is not valid'), status=status.HTTP_400_BAD_REQUEST)
         except JSONDecodeError:
             return Response(get_json_error(f'Error reading data from {site_url}'), status=status.HTTP_400_BAD_REQUEST)
 
         if dataverse_response.success is not True:
-            print("DATAVERSE RESPONSE FAILURE")
+            # print("DATAVERSE RESPONSE FAILURE")
             return Response(get_json_error(dataverse_response.message), status=status.HTTP_400_BAD_REQUEST)
 
         # ----------------------------------
         # Create the DataverseUser object
         # ----------------------------------
         try:
-            print(f"OpenDP User id: {opendp_user.id}")
+            # print(f"OpenDP User id: {opendp_user.id}")
             handler = DataverseUserHandler(opendp_user.id, site_url,
                                            api_general_token,
                                            dataverse_response.__dict__)
             new_dv_user = handler.create_dataverse_user()
             new_dv_user.save()
         except DataverseResponseError as ex:
-            print("DV RESPONSE ERROR")
+            # print("DV RESPONSE ERROR")
             return Response(get_json_error(f'Error {ex}'), status=status.HTTP_400_BAD_REQUEST)
 
         return Response(get_json_success('success', data={'dv_user': new_dv_user.object_id}),
@@ -140,7 +138,7 @@ class DataverseUserView(viewsets.ViewSet):
         try:
             dataverse_response = dataverse_client.get_user_info(user_api_token=api_general_token)
         except InvalidSchema:
-            print("INVALID SCHEMA")
+            # print("INVALID SCHEMA")
             return JsonResponse(get_json_error(f'The Site {site_url} is not valid'),
                                 status=400)
         except JSONDecodeError:
@@ -148,7 +146,7 @@ class DataverseUserView(viewsets.ViewSet):
                                 status=status.HTTP_400_BAD_REQUEST)
 
         if dataverse_response.success is not True:
-            print("DATAVERSE RESPONSE FAILURE")
+            # print("DATAVERSE RESPONSE FAILURE")
             return JsonResponse(get_json_error(dataverse_response.message),
                                 status=400)
 
@@ -167,7 +165,7 @@ class DataverseUserView(viewsets.ViewSet):
             else:
                 return JsonResponse(get_json_error(update_resp.message), status=status.HTTP_400_BAD_REQUEST)
         except DataverseResponseError as ex:
-            print("DV RESPONSE ERROR")
+            # print("DV RESPONSE ERROR")
             return JsonResponse(get_json_error(f'Error {ex}'),
                                 status=status.HTTP_400_BAD_REQUEST)
 

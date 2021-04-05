@@ -123,7 +123,6 @@ class DataverseRequestHandler(BasicErrCheck):
         #
         schema_info = self.mparams.get_schema_org()
         if schema_info.status_code >= 400:
-            print(schema_info.message)
             self.add_err_msg(schema_info.message)
             return False
         self.schema_info = schema_info.json()
