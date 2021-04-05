@@ -11,6 +11,7 @@ from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestPa
 from opendp_apps.dataverses.dataverse_request_handler import DataverseRequestHandler
 from opendp_apps.dataverses import static_vals as dv_static
 
+
 @login_required
 def view_dataverse_incoming_1(request):
     """Do something with incoming DV info ..."""

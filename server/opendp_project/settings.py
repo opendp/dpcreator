@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
-
+import json
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'django.contrib.sites',
+    #
+    # Djnago channels..
+    'channels',
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
@@ -58,6 +61,8 @@ INSTALLED_APPS = [
     'opendp_apps.analysis',
     'opendp_apps.terms_of_access',
     'opendp_apps.communication',
+    'opendp_apps.profiler',
+
 ]
 
 MIDDLEWARE = [
@@ -89,7 +94,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'opendp_project.wsgi.application'
+#WSGI_APPLICATION = 'opendp_project.wsgi.application'
+
+ASGI_APPLICATION = "opendp_project.asgi.application"
 
 
 # Database
@@ -231,3 +238,34 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL') \
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = 'true'
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/login/'
+
+# ---------------------------
+# Profiler - Dataset reading
+#   - default parameters
+# ---------------------------
+PROFILER_FIRST_20_VARIABLE_INDICES = ', '.join([str(x) for x in range(0,20)])
+PROFILER_DEFAULT_COLUMN_INDICES = json.loads(os.environ.get('PROFILER_DEFAULT_COLUMN_INDICES',
+                                                   f"[{PROFILER_FIRST_20_VARIABLE_INDICES}]"))
+
+# ---------------------------
+# Celery Configuration Options
+# ---------------------------
+#CELERY_TIMEZONE = os.environ.get('America/New_York', 'CELERY_TIMEZONE')
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+REDIS_PORT = os.environ.get('REDIS_PORT', 6379)
+REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD', '')
+
+# reference: https://docs.celeryproject.org/en/stable/getting-started/brokers/redis.html
+if REDIS_PASSWORD:
+    REDIS_URL = f'redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}'
+else:
+    REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}'
+
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
+
+# discard a process after executing task, because automl solvers are incredibly leaky
+#CELERY_WORKER_MAX_TASKS_PER_CHILD = 1

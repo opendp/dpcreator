@@ -2,6 +2,7 @@
     "model": "user.opendpuser",
     "pk": 1,
     "fields": {
-      "username": "test"
+      "username": "test",
+      "object_id": "42bb5733-97a3-411e-a60b-d35fadfb9689"
     }
 }]

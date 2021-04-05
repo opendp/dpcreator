@@ -61,7 +61,10 @@ class DataverseUserHandler(object):
     def update_dataverse_user(self):
         """Update the DataverseUser parameters"""
         try:
-            dataverse_user = DataverseUser.objects.get(\
+            # print([x.__dict__ for x in DataverseUser.objects.all()])
+            # print(f"dv_user_handler: opendp_user {self.opendp_user.id}")
+            # print(f"dv_user_handler: registered dataverse {self.registered_dataverse.id}")
+            dataverse_user = DataverseUser.objects.get(
                                            user=self.opendp_user,
                                            dv_installation=self.registered_dataverse)
         except DataverseUser.DoesNotExist as ex:
