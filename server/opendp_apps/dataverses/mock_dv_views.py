@@ -3,6 +3,7 @@ Views meant to mimic calls by PyDataverse
 """
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+from django.conf import settings
 
 from django.http import HttpResponse, JsonResponse
 from opendp_apps.dataverses.models import ManifestTestParams
@@ -144,6 +145,9 @@ def view_get_user_info(request):
     """
     Return mock user information
     """
+    if not settings.DEBUG:
+        return JsonResponse('TESTing only!')
+
     if dv_static.HEADER_KEY_DATAVERSE not in request.headers:
         user_msg = f'"{dv_static.HEADER_KEY_DATAVERSE}" key not found in the request headers'
         return JsonResponse({dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_ERROR,
@@ -151,7 +155,12 @@ def view_get_user_info(request):
 
     user_token = request.headers[dv_static.HEADER_KEY_DATAVERSE]
 
-    mock_params = ManifestTestParams.objects.filter(apiGeneralToken=user_token).first()
+    mock_params = None
+    for mp in ManifestTestParams.objects.all():
+        if user_token == mp.apiGeneralToken:
+            mock_params = mp
+            break
+
     if not mock_params:
         user_msg = f'ManifestTestParams not found for user_token: {user_token}'
         return JsonResponse({dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_ERROR,
