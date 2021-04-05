@@ -155,9 +155,8 @@ export default {
             this.$store.dispatch('auth/fetchUser')
                 .then(() => {
                   if (this.handoffId) {
-                    // TODO: replace pk with uuid
                     this.$store.dispatch('dataverse/updateDataverseUser',
-                        this.user['pk'])
+                        this.user['object_id'])
                   }
                 })
           })

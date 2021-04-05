@@ -32,9 +32,11 @@ export default {
     updateDataverseUser(openDPUserId, handoffId) {
         console.log('calling API updateDataverseUser ' + openDPUserId + ',' + handoffId)
         const formData = new FormData()
-        formData.append("handoffId", handoffId)
-        // TODO: replace with updateDataverseUser API when ready
-         return session.post('/api/dataverses/view-handoff-params/' + handoffId);
+        formData.append("dataverse_handoff_id", handoffId)
+        formData.append("user_id", openDPUserId)
+        //   return session.post('/api/dataverses/dv_user/', formData);
+        return session.post('/api/dv-user/',
+            {dataverse_handoff_id: handoffId, user_id: openDPUserId});
     },
 
 };
