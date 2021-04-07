@@ -10,6 +10,9 @@
     <input id="chat-message-input" type="text" size="100"><br>
     <input id="chat-message-submit" type="button" value="Send">
     {{ room_name|json_script:"room-name" }}
+
+    <div id="json-splat1" style="border:1px solid #006699;margin:30px;"></div>
+    <div id="json-splat2" style="border:1px solid #006699;margin:30px;"></div>
     <script>
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
 
@@ -24,15 +27,31 @@
             console.log(e);
             console.log(e.data);
             const data = JSON.parse(e.data);
-            /*
+
             console.log('--------------------');
             console.log(JSON.stringify(data));
             console.log('--------------------');
-             */
+
             document.querySelector('#chat-log').value += (data.message.user_message + '\n');
-            //if (data.message.data) {
-            //    document.querySelector('#chat-log').value += (JSON.stringify(data.message.data) + '\n');
-            //}
+            if (data.message.data) {
+                msg_data = data.message.data
+                let data_str = JSON.stringify(msg_data);
+                //console.log(data_str)
+
+                if (msg_data.profile_str){
+                    let info = JSON.parse(msg_data.profile_str);
+                    let var_names = Object.keys(info.variables);
+                    console.log(var_names);
+                    //var keys = Object.keys(foo);
+                    document.querySelector('#json-splat1').innerHTML += var_names.join(' | ');
+
+                    document.querySelector('#json-splat2').innerHTML += msg_data.profile_str + '\n';
+
+                }else {
+                    document.querySelector('#json-splat2').innerHTML += (JSON.stringify(msg_data) + '\n');
+                    //document.querySelector('#chat-log').value += (JSON.stringify(data.message.data) + '\n');
+                }
+            }
         };
 
         chatSocket.onclose = function(e) {

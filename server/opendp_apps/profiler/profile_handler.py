@@ -231,8 +231,24 @@ class ProfileHandler(BasicErrCheck):
         if 'variableDisplay' in self.data_profile:
             del self.data_profile['variableDisplay']
 
+        # Prune variables, keeping only these:
+        #
+        var_keys_to_keep = ['description', 'numchar', 'nature', 'binary', 'interval',
+                            'geogrphic', 'temporal',
+                            'invalidCount', 'validCount', 'uniqueCount']
 
-        #if ph.has_error():
-        #    print(f'error: {ph.get_err_msg()}')
-        #else:
-        #   print('profiled!')
+        # Gather all the variable names
+        var_names = self.data_profile['variables'].keys()
+
+        # Iterate through the profile and remove unnecessary keys
+        #
+        for vname in var_names:
+            var_all_keys = self.data_profile['variables'][vname].keys()
+
+            # list of un-needed keys
+            keys_to_remove = [x for x in var_all_keys
+                              if not x in var_keys_to_keep]
+
+            # delete un-needed keys
+            for del_key in keys_to_remove:
+                del self.data_profile['variables'][vname][del_key]

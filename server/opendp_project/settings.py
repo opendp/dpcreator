@@ -278,7 +278,6 @@ PROFILER_DEFAULT_COLUMN_INDICES = json.loads(os.environ.get('PROFILER_DEFAULT_CO
 # ---------------------------
 # Celery Configuration Options
 # ---------------------------
-#CELERY_TIMEZONE = os.environ.get('America/New_York', 'CELERY_TIMEZONE')
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 
