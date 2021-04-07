@@ -12,7 +12,7 @@
     {{ room_name|json_script:"room-name" }}
 
     <div id="json-splat1" style="border:1px solid #006699;margin:30px;"></div>
-    <div id="json-splat2" style="border:1px solid #006699;margin:30px;"></div>
+    <pre id="json-splat2" style="border:1px solid #006699;margin:30px;"></pre>
     <script>
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
 
@@ -45,10 +45,11 @@
                     //var keys = Object.keys(foo);
                     document.querySelector('#json-splat1').innerHTML += var_names.join(' | ');
 
-                    document.querySelector('#json-splat2').innerHTML += msg_data.profile_str + '\n';
+                    //document.querySelector('#json-splat2').innerHTML += msg_data.profile_str + '\n';
+                    document.querySelector('#json-splat2').innerHTML += (JSON.stringify(info, null, '\t') + '\n');
 
                 }else {
-                    document.querySelector('#json-splat2').innerHTML += (JSON.stringify(msg_data) + '\n');
+                    //document.querySelector('#json-splat2').innerHTML += (JSON.stringify(msg_data) + '\n');
                     //document.querySelector('#chat-log').value += (JSON.stringify(data.message.data) + '\n');
                 }
             }
