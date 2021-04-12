@@ -12,8 +12,9 @@ def index(request):
     return render(request, 'async_messages/index.html')
 
 @login_required
-def room(request, room_name):
+def view_room(request):
 
+    room_name = 'download-profile'
     info = dict(room_name=f'{room_name}',
                 ws_name=f'{request.user.object_id}')
     return render(request, 'async_messages/room.html', info)
