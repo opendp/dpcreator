@@ -9,10 +9,7 @@ class TestDataverseUserSerializer(TestCase):
 
     fixtures = ['test_dataverses_01.json',
                 'test_manifest_params_04.json',
-                # This file needs a real token in order to run tests
-                'test_dataverse_handoff_01.json',
-                'test_opendp_users_01.json',
-                'test_dataverse_user_01.json']
+                'test_opendp_users_01.json']
 
     def setUp(self):
         self.user_obj, _created = get_user_model().objects.get_or_create(username='dv_depositor')

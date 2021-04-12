@@ -1,0 +1,12 @@
+[
+  {
+    "model": "account.emailaddress",
+    "pk": 1,
+    "fields": {
+      "email": "admin@univ.org",
+      "verified": true,
+      "primary": true,
+      "user_id": 1
+    }
+  }
+]

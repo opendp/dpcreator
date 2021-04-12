@@ -52,22 +52,21 @@ router.register(r'dv-handoff', DataverseHandoffView, basename='dv-handoff')
 router.registry.extend(dataverse_router.registry)
 
 urlpatterns = [
+    path('async_messages/', include('opendp_apps.async_messages.urls')),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('api/', include(router.urls)),
     # For testing
     path('dv-mock-api/', include('opendp_apps.dataverses.mock_urls')),
-    path('async_messages/', include('opendp_apps.async_messages.urls')),
-
-   url(r'^user-details/$',
-        TemplateView.as_view(template_name="user_details.html"),
-        name='user-details'),
-    url(r'^rest-auth/', include('dj_rest_auth.urls')),
-    url(r'^rest-auth/registration/', OpenDPRegister.as_view(), name='opendp-register'),
-    url(r'^rest-auth/registration/', include('dj_rest_auth.registration.urls')),
-    url(r'^account/', include('allauth.urls')),
-    url(r'^accounts/profile/$', RedirectView.as_view(url='/', permanent=True), name='profile-redirect'),
-    url(r'^rest-auth/google/$', GoogleLogin.as_view(), name='google-login'),
-    # Putting all vue-related views under "ui/" for now to separate from the api.
-    url(r'^.*$', TemplateView.as_view(template_name="index.html")),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT, kwargs={'show_indexes': True})
+                  url(r'^user-details/$',
+                      TemplateView.as_view(template_name="user_details.html"),
+                      name='user-details'),
+                  url(r'^rest-auth/', include('dj_rest_auth.urls')),
+                  url(r'^rest-auth/registration/', OpenDPRegister.as_view(), name='opendp-register'),
+                  url(r'^rest-auth/registration/', include('dj_rest_auth.registration.urls')),
+                  url(r'^account/', include('allauth.urls')),
+                  url(r'^accounts/profile/$', RedirectView.as_view(url='/', permanent=True), name='profile-redirect'),
+                  url(r'^rest-auth/google/$', GoogleLogin.as_view(), name='google-login'),
+                  # Putting all vue-related views under "ui/" for now to separate from the api.
+                  url(r'^.*$', TemplateView.as_view(template_name="index.html"), name='vue-home'),
+              ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT, kwargs={'show_indexes': True})
