@@ -27,49 +27,46 @@ class DataverseUserView(viewsets.ViewSet):
         # ----------------------------------
         # print(f"data: {request.data}")
         user_id = request.data.get('user')
-        try:
-            dataverse_user = DataverseUser.objects.get(object_id=request.data.get('user'))
-        except DataverseUser.DoesNotExist:
-            return Response({'success': False,
-                             'message': f'DataverseUser not found with object_id {user_id}'},
-                            status=status.HTTP_400_BAD_REQUEST)
-
+        handoff_id = request.data.get('dv_handoff')
         try:
             handoff = DataverseHandoff.objects.get(object_id=request.data.get('dv_handoff'))
         except DataverseHandoff.DoesNotExist:
             return Response({'success': False, 'message': 'No Handoff found'}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            request.data['user'] = OpenDPUser.objects.get(object_id=dataverse_user.user.object_id)
+            request.data['user'] = OpenDPUser.objects.get(object_id=user_id)
         except OpenDPUser.DoesNotExist:
             return Response({'success': False,
-                             'message': f'OpenDPUser not found with object_id {dataverse_user.user.object_id}'},
+                             'message': f'OpenDPUser not found with object_id {user_id}'},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        request.data['handoff'] = handoff.object_id
-        request.data['user'] = dataverse_user.user.object_id
-
-        dataverse_user_serializer = DataverseUserSerializer(data=request.data, context={'request': request})
-        if not dataverse_user_serializer.is_valid():
-            # print("INVALID SERIALIZER")
-            return Response(dataverse_user_serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
-
+        request.data['handoff'] = handoff_id
+        request.data['user'] = user_id
         try:
-            dataverse_user = dataverse_user_serializer.save()
-        except DataverseHandoff.DoesNotExist:
-            return Response(dataverse_user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            dataverse_user = DataverseUser.objects.get(user__object_id=user_id, dv_installation=handoff.dv_installation)
+            opendp_user = dataverse_user.user
         except DataverseUser.DoesNotExist:
-            return Response(dataverse_user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            # ----------------------------------
+            # Create the DataverseUser object
+            # ----------------------------------
+            dataverse_user_serializer = DataverseUserSerializer(data=request.data, context={'request': request})
+            if not dataverse_user_serializer.is_valid():
+                # print("INVALID SERIALIZER")
+                return Response(dataverse_user_serializer.errors,
+                                status=status.HTTP_400_BAD_REQUEST)
 
-        opendp_user = dataverse_user_serializer.validated_data.get('user')
+            try:
+                dataverse_user = dataverse_user_serializer.save()
+            except DataverseHandoff.DoesNotExist:
+                return Response(dataverse_user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            except DataverseUser.DoesNotExist:
+                return Response(dataverse_user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            opendp_user = dataverse_user_serializer.validated_data.get('user')
 
         # ----------------------------------
         # Call the Dataverse API
         # ----------------------------------
-        try:
-            site_url = DataverseHandoff.objects.get(object_id=request.data['dv_handoff']).siteUrl
-        except DataverseHandoff.DoesNotExist:
-            return Response({'success': False, 'message': 'No Handoff found'}, status=status.HTTP_400_BAD_REQUEST)
+        site_url = handoff.siteUrl
         api_general_token = dataverse_user.dv_general_token
         dataverse_client = DataverseClient(site_url, api_general_token)
         try:
@@ -84,21 +81,18 @@ class DataverseUserView(viewsets.ViewSet):
             # print("DATAVERSE RESPONSE FAILURE")
             return Response(get_json_error(dataverse_response.message), status=status.HTTP_400_BAD_REQUEST)
 
-        # ----------------------------------
-        # Create the DataverseUser object
-        # ----------------------------------
         try:
             # print(f"OpenDP User id: {opendp_user.id}")
             handler = DataverseUserHandler(opendp_user.id, site_url,
                                            api_general_token,
                                            dataverse_response.__dict__)
-            new_dv_user = handler.create_dataverse_user()
-            new_dv_user.save()
+            update_response = handler.update_dataverse_user()
+            # print(update_response)
         except DataverseResponseError as ex:
             # print("DV RESPONSE ERROR")
             return Response(get_json_error(f'Error {ex}'), status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(get_json_success('success', data={'dv_user': new_dv_user.object_id}),
+        return Response(get_json_success('success', data={'dv_user': dataverse_user.object_id}),
                         status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):

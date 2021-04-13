@@ -246,6 +246,31 @@ class DataversePostTest(BaseEndpointTest):
         # self.assertTrue(resp_json['success'] is False)
         # self.assertTrue(resp_json['message'].find('Dataverse error') > -1)
 
+    def test_60_duplicate_dataverse_user(self, req_mocker):
+        msgt(self.test_60_duplicate_dataverse_user.__doc__)
+
+        # set the mock requests
+        self.set_mock_requests(req_mocker)
+
+        url = reverse('dv-user-list')
+
+        # Ensure there are no DataverseUsers
+        DataverseUser.objects.all().delete()
+        initial_dv_user_count = DataverseUser.objects.count()
+
+        # Call once to create DataverseUser
+        response = self.client.post(url, data=self.data, format='json')
+        msg(response.json())
+        self.assertEqual(response.status_code, 201)
+        dataverse_users_count = DataverseUser.objects.count()
+        self.assertEqual(initial_dv_user_count+1, dataverse_users_count)
+
+        # Now make the same request, and demonstrate that it queried for DataverseUser
+        # rather than creating another one
+        response = self.client.post(url, data=self.data, format='json')
+        msg(response.json())
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(dataverse_users_count, DataverseUser.objects.count())
 
 @requests_mock.Mocker()
 class DataversePutTest(BaseEndpointTest):
