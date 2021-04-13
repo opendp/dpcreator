@@ -160,7 +160,7 @@ export default {
                   }
                 })
           })
-          .then(() => this.$router.push('/'))
+          .then(() => this.$router.push('/old'))
     },
 
     beforeRouteLeave(to, from, next) {

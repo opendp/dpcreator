@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/old/Home.vue'
+import Home from '../views/old/OldHome.vue'
 import Login from '../views/old/Login.vue'
 import Lost from '../views/old/Lost.vue'
 import PasswordReset from "../views/old/PasswordReset"
@@ -8,6 +8,7 @@ import PasswordResetConfirm from "../views/old/PasswordResetConfirm"
 import Register from "../views/old/Register"
 import VerifyEmail from "../views/old/VerifyEmail"
 import store from '../store'
+import OldHome from "@/views/old/OldHome";
 
 const redirectLogout = (to, from, next) => {
   store.dispatch('auth/logout')
@@ -18,9 +19,9 @@ Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
+    path: '/old',
     name: 'Home',
-    component: Home
+    component: OldHome
   },
   {
     path: '/about',

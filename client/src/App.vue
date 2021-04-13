@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <v-app>
-        <router-link to="/">Home</router-link>
+        <router-link to="/old">Home</router-link>
 
       <navbar v-if="isAuthenticated"></navbar>
         <v-content>

@@ -51,7 +51,7 @@ import {
 } from 'vuex';
 
 export default {
-  name: 'home',
+  name: 'oldhome',
   created() {
     const handoffId = this.$route.query.id
 
