@@ -7,7 +7,7 @@
     <v-container>
       <v-row>
         <v-col>
-          <h1 class="title-size-1">Welcome, Danny</h1>
+          <h1 class="title-size-1">Welcome, {{ username }}</h1>
           <CreateDPStatistics/>
           <h2 class="title-size-2 font-weight-bold mt-16">My Data</h2>
           <MyDataTable :datasets="variables" :paginationVisible="false"/>
@@ -31,6 +31,7 @@ import EventSuccessAlert from "../components/Home/EventSuccessAlert.vue";
 import MyDataTable from "../components/MyData/MyDataTable.vue";
 import SupportBanner from "../components/SupportBanner.vue";
 import CreateDPStatistics from "../components/Welcome/CreateDPStatistics.vue";
+import {mapGetters, mapState} from "vuex";
 
 export default {
   name: "Welcome",
@@ -53,6 +54,16 @@ export default {
         datasetId: "abcd1234"
       }
     ]
-  })
+  }),
+  created() {
+    this.$store.dispatch('auth/fetchUser')
+  },
+  computed: {
+    ...mapGetters('auth', ['isAuthenticated']),
+    ...mapState('auth', ['user']),
+    username() {
+      return (this.user) ? this.user.username : null
+    }
+  },
 };
 </script>
