@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import auth from '../api/auth'
+import auth from '../../api/auth'
 import {mapState} from 'vuex';
 
 export default {

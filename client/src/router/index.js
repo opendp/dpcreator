@@ -1,22 +1,22 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
-import Login from '../views/Login.vue'
-import Lost from '../views/Lost.vue'
-import PasswordReset from "../views/PasswordReset"
-import PasswordResetConfirm from "../views/PasswordResetConfirm"
-import Register from "../views/Register"
-import VerifyEmail from "../views/VerifyEmail"
+import Home from '../views/old/Home.vue'
+import Login from '../views/old/Login.vue'
+import Lost from '../views/old/Lost.vue'
+import PasswordReset from "../views/old/PasswordReset"
+import PasswordResetConfirm from "../views/old/PasswordResetConfirm"
+import Register from "../views/old/Register"
+import VerifyEmail from "../views/old/VerifyEmail"
 import store from '../store'
 
 const redirectLogout = (to, from, next) => {
   store.dispatch('auth/logout')
-    .then(() => next('/login'));
+      .then(() => next('/login'));
 };
 
 Vue.use(VueRouter)
 
-  const routes = [
+const routes = [
   {
     path: '/',
     name: 'Home',
@@ -29,7 +29,7 @@ Vue.use(VueRouter)
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: function () {
-      return import(/* webpackChunkName: "about" */ '../views/About.vue')
+      return import(/* webpackChunkName: "about" */ '../views/old/About.vue')
     }
   },
     {

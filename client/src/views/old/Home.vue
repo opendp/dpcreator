@@ -43,8 +43,8 @@
 </template>
 
 <script>
-import auth from '../api/auth'
-import dataverse from '../api/dataverse'
+import auth from '../../api/auth'
+import dataverse from '../../api/dataverse'
 import {
   mapGetters,
   mapState,
