@@ -1,5 +1,5 @@
-from django.http import JsonResponse
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.response import Response
 
 from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses.dataverse_client import DataverseClient
@@ -14,11 +14,18 @@ class DataverseFileView(viewsets.ViewSet):
     def list(self, request):
         handoff_id = request.query_params.get('handoff_id')
         user_id = request.query_params.get('user_id')
-        dataverse_user = DataverseUser.objects.get(object_id=user_id)
+        try:
+            dataverse_user = DataverseUser.objects.get(object_id=user_id)
+        except DataverseUser.DoesNotExist:
+            return Response({'success': False, 'message': 'DataverseUser not found'},
+                            status=status.HTTP_400_BAD_REQUEST)
         opendp_user = dataverse_user.user
         registered_dataverse = dataverse_user.dv_installation
-        # print(handoff_id, user_id)
-        handoff = DataverseHandoff.objects.get(object_id=handoff_id)
+        try:
+            handoff = DataverseHandoff.objects.get(object_id=handoff_id)
+        except DataverseHandoff.DoesNotExist:
+            return Response({'success': False, 'message': 'DataverseHandoff not found'},
+                            status=status.HTTP_400_BAD_REQUEST)
         try:
             file_info = DataverseFileInfo.objects.get(dataverse_file_id=handoff.fileId,
                                                       dv_installation=registered_dataverse)
@@ -39,9 +46,9 @@ class DataverseFileView(viewsets.ViewSet):
             schema_org_content = client.get_schema_org(handoff.datasetPid)
             request_handler = DataverseRequestHandler(params, opendp_user)
             schema_info = request_handler.mparams.get_schema_org()
-            print(schema_info.json())
+            # print(schema_info.json())
             if schema_info.status_code >= 400:
-                print(schema_info.message)
+                # print(schema_info.message)
                 request_handler.add_err_msg(schema_info.message)
             file_schema_info = request_handler.mparams.get_file_specific_schema_info(schema_info.json())
             # print(schema_info.as_dict(), file_schema_info.as_dict())
@@ -50,4 +57,4 @@ class DataverseFileView(viewsets.ViewSet):
         file_info.save()
         # print(file_info)
         serializer = DataverseFileInfoSerializer(file_info, context={'request': request})
-        return JsonResponse(data=serializer.data, status=200)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)

@@ -30,17 +30,12 @@ class DataverseUserView(viewsets.ViewSet):
         handoff_id = request.data.get('dv_handoff')
         try:
             handoff = DataverseHandoff.objects.get(object_id=request.data.get('dv_handoff'))
+            request.data['handoff'] = handoff_id
         except DataverseHandoff.DoesNotExist:
             return Response({'success': False, 'message': 'No Handoff found'}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            request.data['user'] = OpenDPUser.objects.get(object_id=user_id)
-        except OpenDPUser.DoesNotExist:
-            return Response({'success': False,
-                             'message': f'OpenDPUser not found with object_id {user_id}'},
-                            status=status.HTTP_400_BAD_REQUEST)
 
-        request.data['handoff'] = handoff_id
         request.data['user'] = user_id
+
         try:
             dataverse_user = DataverseUser.objects.get(user__object_id=user_id, dv_installation=handoff.dv_installation)
             opendp_user = dataverse_user.user
