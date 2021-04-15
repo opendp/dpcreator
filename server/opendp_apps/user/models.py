@@ -19,8 +19,9 @@ class OpenDPUser(AbstractUser):
     class Meta:
         verbose_name = 'OpenDP User'
 
-    def __str__(self):
-        return str(self.object_id)
+    #def __str__(self):
+    #    return self.username
+    #    #str(self.object_id)
 
 
 class DataverseUser(TimestampedModelWithUUID):

@@ -21,7 +21,7 @@ def view_room(request):
 
 
 @login_required
-def push_test(request):
+def view_push_test(request):
     """Try to send a message"""
     websocket_id = request.user.object_id
     info = dict(websocket_id=websocket_id)

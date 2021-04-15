@@ -15,7 +15,10 @@ from opendp_apps.profiler.tasks import ProfileHandler
 from opendp_apps.profiler import tasks as profiler_tasks
 
 
-@celery_app.task()#bind=True)
+@celery_app.task
+def profile_dataset_info(websocket_id=None)
+
+@celery_app.task
 def send_test_msg(websocket_id):
 
 

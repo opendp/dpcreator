@@ -24,6 +24,7 @@ from rest_framework import routers, serializers
 from opendp_apps.dataset.views import DepositorSetup, DataSetInfoViewSet
 from opendp_apps.dataverses.views.dataverse_user_view import DataverseUserView
 from opendp_apps.dataverses.views.dataverse_handoff_view import DataverseHandoffView
+from opendp_apps.profiler.views.dataset_profile_view import DatasetProfileView
 
 from opendp_apps.terms_of_access.views import TermsOfAccessViewSet, TermsOfAccessAgreementViewSet
 from opendp_apps.user.models import OpenDPUser
@@ -49,6 +50,7 @@ router.register(r'test', TermsOfAccessAgreementViewSet)
 router.register(r'dv-user', DataverseUserView, basename='dv-user')
 router.register(r'deposit', DepositorSetup, basename='deposit')
 router.register(r'dv-handoff', DataverseHandoffView, basename='dv-handoff')
+router.register(r'profiler', DatasetProfileView, basename='profiler')
 router.registry.extend(dataverse_router.registry)
 
 urlpatterns = [
