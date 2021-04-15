@@ -120,8 +120,7 @@ export default {
             console.log(data);
             this.errorMessage = data
           });
-      localStorage.setItem("loggedUser", true);
-      this.$router.push("/welcome");
+
     },
     loginGoogle: function () {
       alert("login with Google!");

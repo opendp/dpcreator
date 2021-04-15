@@ -86,49 +86,7 @@ const routes = [
   //
   // Old Routes
   //
-  {
-    path: '/old',
-    name: 'Home',
-    component: OldHome
-  },
-  {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: function () {
-      return import(/* webpackChunkName: "about" */ '../views/old/About.vue')
-    }
-  },
-    {
-      path: '/login',
-      name: 'Login',
-      component: Login
-    },
-    {
-      path: '/logout',
-      beforeEnter: redirectLogout,
-    },
-    {
-      path: '/password_reset',
-      component: PasswordReset,
-    },
-    {
-      path: '/password_reset/:uid/:token',
-      component: PasswordResetConfirm,
-    },
-  {
-    path: '/register',
-    component: Register,
-  },
-  {
-    path: '/register/:key',
-    component: VerifyEmail,
-  },
-  //
-  // end old routes
-  //
+
 ]
 
 const router = new VueRouter({
