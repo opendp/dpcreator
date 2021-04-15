@@ -272,6 +272,7 @@ class DataversePostTest(BaseEndpointTest):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(dataverse_users_count, DataverseUser.objects.count())
 
+
 @requests_mock.Mocker()
 class DataversePutTest(BaseEndpointTest):
 

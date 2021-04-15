@@ -159,6 +159,7 @@ STATICFILES_DIRS = [
 
 # global settings for the REST framework
 REST_FRAMEWORK = {
+    # 'EXCEPTION_HANDLER': 'opendp_apps.utils.view_helper.opendp_exception_handler',
     'DEFAULT_PERMISSION_CLASSES': [
         # 'rest_framework.permissions.IsAdminUser',
         # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'

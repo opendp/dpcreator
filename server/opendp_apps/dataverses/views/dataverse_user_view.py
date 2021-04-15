@@ -1,6 +1,7 @@
 from json import JSONDecodeError
 
 from django.http import JsonResponse
+
 from requests.exceptions import InvalidSchema
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -9,8 +10,8 @@ from opendp_apps.dataverses.dataverse_client import DataverseClient
 from opendp_apps.dataverses.dv_user_handler import DataverseUserHandler, DataverseResponseError
 from opendp_apps.dataverses.models import DataverseHandoff
 from opendp_apps.dataverses.serializers import DataverseUserSerializer
-from opendp_apps.user.models import DataverseUser, OpenDPUser
-from opendp_apps.utils.view_helper import get_json_error, get_json_success
+from opendp_apps.user.models import DataverseUser
+from opendp_apps.utils.view_helper import get_json_error, get_json_success, get_object_or_error_response
 
 
 class DataverseUserView(viewsets.ViewSet):
@@ -28,13 +29,10 @@ class DataverseUserView(viewsets.ViewSet):
         # print(f"data: {request.data}")
         user_id = request.data.get('user')
         handoff_id = request.data.get('dv_handoff')
-        try:
-            handoff = DataverseHandoff.objects.get(object_id=request.data.get('dv_handoff'))
-            request.data['handoff'] = handoff_id
-        except DataverseHandoff.DoesNotExist:
-            return Response({'success': False, 'message': 'No Handoff found'}, status=status.HTTP_400_BAD_REQUEST)
-
+        request.data['handoff'] = handoff_id
         request.data['user'] = user_id
+
+        handoff = get_object_or_error_response(DataverseHandoff, object_id=handoff_id)
 
         try:
             dataverse_user = DataverseUser.objects.get(user__object_id=user_id, dv_installation=handoff.dv_installation)
@@ -96,13 +94,10 @@ class DataverseUserView(viewsets.ViewSet):
         # Validate the input
         # ----------------------------------
         # print(f"dataverse_user_view: {request.data}")
-        try:
-            dataverse_user = DataverseUser.objects.get(object_id=pk)
-        except DataverseUser.DoesNotExist:
-            return Response({'success': False, 'message': 'No Dataverse user found'},
-                            status=status.HTTP_400_BAD_REQUEST)
+        dataverse_user = get_object_or_error_response(DataverseUser, object_id=pk)
         opendp_user = dataverse_user.user
         request.data['user'] = opendp_user.object_id
+
         dataverse_user_serializer = DataverseUserSerializer(data=request.data, context={'request': request})
         if dataverse_user_serializer.is_valid():
             try:

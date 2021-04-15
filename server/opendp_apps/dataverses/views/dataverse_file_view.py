@@ -7,6 +7,7 @@ from opendp_apps.dataverses.dataverse_request_handler import DataverseRequestHan
 from opendp_apps.dataverses.models import DataverseHandoff
 from opendp_apps.dataverses.serializers import DataverseFileInfoSerializer
 from opendp_apps.user.models import DataverseUser
+from opendp_apps.utils.view_helper import get_object_or_error_response
 
 
 class DataverseFileView(viewsets.ViewSet):
@@ -14,18 +15,11 @@ class DataverseFileView(viewsets.ViewSet):
     def list(self, request):
         handoff_id = request.query_params.get('handoff_id')
         user_id = request.query_params.get('user_id')
-        try:
-            dataverse_user = DataverseUser.objects.get(object_id=user_id)
-        except DataverseUser.DoesNotExist:
-            return Response({'success': False, 'message': 'DataverseUser not found'},
-                            status=status.HTTP_400_BAD_REQUEST)
+        dataverse_user = get_object_or_error_response(DataverseUser, object_id=user_id)
         opendp_user = dataverse_user.user
         registered_dataverse = dataverse_user.dv_installation
-        try:
-            handoff = DataverseHandoff.objects.get(object_id=handoff_id)
-        except DataverseHandoff.DoesNotExist:
-            return Response({'success': False, 'message': 'DataverseHandoff not found'},
-                            status=status.HTTP_400_BAD_REQUEST)
+        handoff = get_object_or_error_response(DataverseHandoff, object_id=handoff_id)
+
         try:
             file_info = DataverseFileInfo.objects.get(dataverse_file_id=handoff.fileId,
                                                       dv_installation=registered_dataverse)
