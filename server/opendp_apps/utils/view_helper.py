@@ -65,7 +65,7 @@ def get_object_or_error_response(model, **kwargs):
 
         # This could lead to other errors with split() and replace()
         # if string isn't formatted as expected:
-        model_type = repr(model.objects.first()).split(':')[0].replace('<', '')
+        model_type = repr(model).split('.')[-1].replace('>', '').replace('\'', '')
 
         # Alternatively, format model type this way,
         # model_type = repr(model)
