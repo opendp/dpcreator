@@ -29,7 +29,7 @@
 
 <script>
 
-import auth from '../api/auth'
+import auth from '../../api/auth'
 import {
   mapActions,
   mapGetters,
