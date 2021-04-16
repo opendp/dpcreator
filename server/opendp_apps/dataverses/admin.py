@@ -10,6 +10,7 @@ class DataverseHandoffAdmin(admin.ModelAdmin):
     list_display = ('name', 'object_id', 'siteUrl')
     save_on_top = True
     list_filter = ('siteUrl', )
+    readonly_fields = ('object_id',)
 
 
 class RegisteredDataverseAdmin(admin.ModelAdmin):

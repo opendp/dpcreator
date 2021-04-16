@@ -59,6 +59,9 @@ def opendp_exception_handler(exc, context):
 
 
 def get_object_or_error_response(model, **kwargs):
+    """
+    Utility to find the object for the given model
+    """
     try:
         return model.objects.get(**kwargs)
     except model.DoesNotExist:
