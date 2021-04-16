@@ -1,29 +1,31 @@
+import json
 import requests_mock
-
+from unittest import skip
+from django.contrib.auth import get_user_model
+from django.test import TestCase
 from rest_framework.reverse import reverse
+from rest_framework.test import APIClient
 
 from opendp_apps.dataverses.testing.test_endpoints import BaseEndpointTest
+from opendp_apps.model_helpers.msg_util import msgt
 
 
 @requests_mock.Mocker()
-class TestDataverseUserView(BaseEndpointTest):
-    """
-    Placeholder for view-level tests
-    """
+class TestDataverseFileView(BaseEndpointTest):
 
-    def test_successful_create(self, req_mocker):
-        self.set_mock_requests(req_mocker)
-        url = reverse('dv-user-list')
-        response = self.client.post(url, data={'user': '42bb5733-97a3-411e-a60b-d35fadfb9689',
-                                               'dv_handoff': '9e7e5506-dd1a-4979-a2c1-ec6e59e4769c'},
-                                    format='json')
-        self.assertNotEquals(response.status_code, None)
+    client = APIClient()
+    fixtures = ['test_dataverses_01.json',
+                'test_manifest_params_04.json',
+                'test_opendp_users_01.json']
 
-    def test_successful_update(self, req_mocker):
+    @skip('replacing with test_file_view.py')
+    def test_10_list_successful(self, req_mocker):
+        msgt(self.test_10_list_successful.__doc__)
         self.set_mock_requests(req_mocker)
-        url = reverse('dv-user-detail', kwargs={'pk': '4472310a-f591-403a-b8d6-dfb562f8b32f'})
-        response = self.client.put(url,
-                                   data={'user': '4472310a-f591-403a-b8d6-dfb562f8b32f',
-                                         'dv_handoff': '9e7e5506-dd1a-4979-a2c1-ec6e59e4769c'},
-                                   format='json')
-        self.assertNotEquals(response.status_code, None)
+
+        response = self.client.get('/api/dv-file/',
+                                   data={'handoff_id': '9e7e5506-dd1a-4979-a2c1-ec6e59e4769c',
+                                         'user_id': '6c4986b1-e90d-48a2-98d5-3a37da1fd331'})
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.json().get('dv_installation'), 1)
+

@@ -22,14 +22,14 @@ from django.views.generic import TemplateView, RedirectView
 from rest_framework import routers, serializers
 
 from opendp_apps.dataset.views import DepositorSetup, DataSetInfoViewSet
-from opendp_apps.dataverses.views.dataverse_user_view import DataverseUserView
+from opendp_apps.dataverses.urls import router as dataverse_router
+from opendp_apps.dataverses.views.dataverse_file_view import DataverseFileView
 from opendp_apps.dataverses.views.dataverse_handoff_view import DataverseHandoffView
-
+from opendp_apps.dataverses.views.dataverse_user_view import DataverseUserView
 from opendp_apps.terms_of_access.views import TermsOfAccessViewSet, TermsOfAccessAgreementViewSet
 from opendp_apps.user.models import OpenDPUser
-from opendp_apps.user.views import UserViewSet
 from opendp_apps.user.views import GoogleLogin, OpenDPRegister
-from opendp_apps.dataverses.urls import router as dataverse_router
+from opendp_apps.user.views import UserViewSet
 
 admin.site.site_header = 'OpenDP App Admin Panel'
 admin.site.site_title = 'OpenDP App Admin Panel'
@@ -49,6 +49,7 @@ router.register(r'test', TermsOfAccessAgreementViewSet)
 router.register(r'dv-user', DataverseUserView, basename='dv-user')
 router.register(r'deposit', DepositorSetup, basename='deposit')
 router.register(r'dv-handoff', DataverseHandoffView, basename='dv-handoff')
+router.register(r'dv-file', DataverseFileView, basename='dv-file')
 router.registry.extend(dataverse_router.registry)
 
 urlpatterns = [

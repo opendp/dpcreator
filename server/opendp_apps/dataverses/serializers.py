@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses.models import RegisteredDataverse, DataverseHandoff
 from opendp_apps.user.models import DataverseUser, OpenDPUser
 
@@ -8,11 +9,6 @@ class RegisteredDataverseSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = RegisteredDataverse
         fields = '__all__'
-
-
-class OpenDPUserSerializer(serializers.ReadOnlyField):
-    def to_representation(self, value):
-        return {'pk': value.object_id, 'object_id': value.object_id}
 
 
 class DataverseUserSerializer(serializers.ModelSerializer):
@@ -54,3 +50,13 @@ class DataverseHandoffSerializer(serializers.ModelSerializer):
     class Meta:
         model = DataverseHandoff
         exclude = ['apiGeneralToken', 'apiSensitiveDataReadToken']
+
+
+class DataverseFileInfoSerializer(serializers.ModelSerializer):
+
+    dv_installation = serializers.PrimaryKeyRelatedField(queryset=RegisteredDataverse.objects.all())
+    creator = serializers.PrimaryKeyRelatedField(queryset=OpenDPUser.objects.all())
+
+    class Meta:
+        model = DataverseFileInfo
+        exclude = ['data_profile', 'source_file', 'polymorphic_ctype']

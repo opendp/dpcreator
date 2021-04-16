@@ -29,12 +29,12 @@ class DataverseUser(TimestampedModelWithUUID):
     Dataverse-specific attributes
     """
     user = models.ForeignKey(OpenDPUser,
-                             on_delete=models.PROTECT)
+                             on_delete=models.CASCADE)
 
     dv_installation = models.ForeignKey(RegisteredDataverse, on_delete=models.PROTECT)
 
     #TODO: Shouldn't this be unique?
-    persistent_id = models.CharField(max_length=255) # Persistent DV user id within an installation
+    persistent_id = models.CharField(max_length=255)  # Persistent DV user id within an installation
 
     email = models.EmailField(max_length=255, blank=True)
     first_name = models.CharField(max_length=255, blank=True)
@@ -46,6 +46,7 @@ class DataverseUser(TimestampedModelWithUUID):
 
     class Meta:
         verbose_name = 'Dataverse User'
+        unique_together = ['user', 'dv_installation']
 
     def __str__(self):
         return f'{self.user} ({self.dv_installation})'

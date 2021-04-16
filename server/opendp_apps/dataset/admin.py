@@ -27,7 +27,7 @@ class DataverseFileInfoAdmin(admin.ModelAdmin):
                     'dataset_doi',
                     'dataverse_file_id',
                     'creator',
-                    'installation_name',
+                    'dv_installation',
                     'updated',
                     'created',)
     readonly_fields = ('id', 'object_id', 'source', 'created', 'updated',)

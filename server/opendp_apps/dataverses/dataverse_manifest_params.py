@@ -25,7 +25,6 @@ class DataverseManifestParams(BasicErrCheck):
             return
 
         self.custom_required_params = kwargs.get('custom_required_params')
-
         self.fileId = self.format_param(incoming_params.get(dv_static.DV_PARAM_FILE_ID))
         self.siteUrl = self.format_param(incoming_params.get(dv_static.DV_PARAM_SITE_URL))
         self.datasetPid = self.format_param(incoming_params.get(dv_static.DV_PARAM_DATASET_PID))
@@ -106,7 +105,14 @@ class DataverseManifestParams(BasicErrCheck):
 
         return user_info
 
-    def get_file_specific_schema_info(self, full_schema_info):
+
+    def retrieve_file_specific_info(self, schema_info):
+        """Retrieve file specific info from the Dataverse dataset JSON-LD schema """
+        return DataverseManifestParams.get_file_specific_schema_info(schema_info, self.fileId, self.filePid)
+
+
+    @staticmethod
+    def get_file_specific_schema_info(full_schema_info, file_id=None, file_persistent_id=None):
         """
         Navigate the JSON-LD schema.org info to retrieve file specific info
        "distribution":[
@@ -123,15 +129,16 @@ class DataverseManifestParams(BasicErrCheck):
           (etc)
         ]
         """
+        print('get_file_specific_schema_info', file_id, file_persistent_id)
         if not isinstance(full_schema_info, dict):
             return err_resp('"full_schema_info" must be a Python dict')
 
         if not dv_static.SCHEMA_KEY_DISTRIBUTION in full_schema_info:
             return err_resp(f'"{dv_static.SCHEMA_KEY_DISTRIBUTION}" not found in the schema')
 
-        url_ending_1 = f'/{self.fileId}'
-        file_doi = self.filePid.split(':')[-1] if self.filePid else None
-
+        url_ending_1 = f'/{file_id}'
+        file_doi = file_persistent_id.split(':')[-1] if file_persistent_id else None
+        print('file_doi', file_doi)
         for file_info in full_schema_info[dv_static.SCHEMA_KEY_DISTRIBUTION]:
 
             # Try to match the the /{fileId} id to the end of the contentURL
@@ -151,8 +158,8 @@ class DataverseManifestParams(BasicErrCheck):
                 if identifier and identifier.endswith(file_doi):
                     return ok_resp(file_info)
 
-        if self.fileId:
-            user_msg = f'Did not find fileId "{self.fileId}"'
+        if file_id:
+            user_msg = f'Did not find fileId "{file_id}"'
         elif file_info:
             user_msg = f'Did not find file DOI "{file_doi}"'
         else:

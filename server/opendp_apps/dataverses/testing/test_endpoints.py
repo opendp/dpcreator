@@ -18,7 +18,7 @@ class BaseEndpointTest(TestCase):
 
     fixtures = ['test_dataverses_01.json',
                 'test_manifest_params_04.json',
-                'test_opendp_users_01.json',]
+                'test_opendp_users_01.json']
 
     def setUp(self):
 
@@ -81,6 +81,7 @@ class BaseEndpointTest(TestCase):
         user_info = {dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_OK, 'data': self.mock_params.user_info}
         req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/users/:me', json=user_info)
 
+        #req_mocker.get('http://www.invalidsite.com/api/v1/users/:me')
 
         # Schema.org dataset info
         schema_url = ('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export?exporter='
@@ -98,6 +99,47 @@ class BaseEndpointTest(TestCase):
         req_mocker.get('http://www.invalidsite.com/api/v1/users/:me')
 
         req_mocker.get('https://dataverse.harvard.edu/api/v1/users/:me')
+
+        dataset_info = {
+            "@context": "http://schema.org",
+            "@type": "Dataset",
+            "@id": "https://doi.org/10.70122/FK2/AE07JZ",
+            "identifier": "https://doi.org/10.70122/FK2/AE07JZ",
+            "name": "GBS of CIMMYT bread wheat breeding lines from the year 2013-2020",
+            "creator": [
+                {
+                    "name": "Alemie, Tilashwork", "affiliation": "Adet Agricultural Research Center, ARARI"}],
+            "author": [{"name": "Alemie, Tilashwork", "affiliation": "Adet Agricultural Research Center, ARARI"}],
+            "datePublished": "2021-03-31", "dateModified": "2021-03-31", "version": "1",
+            "description": ["Bread wheat production improvement through crossing"],
+            "keywords": ["Agricultural Sciences", "Bread wheat"],
+            "citation": [{"@type": "CreativeWork", "text": "Tilashwork Alemie, 2021"}],
+            "license": {"@type": "Dataset", "text": "CC0", "url": "https://creativecommons.org/publicdomain/zero/1.0/"},
+            "includedInDataCatalog": {"@type": "DataCatalog", "name": "Demo Dataverse",
+                                      "url": "https://demo.dataverse.org"},
+            "publisher": {"@type": "Organization", "name": "Demo Dataverse"},
+            "provider": {"@type": "Organization", "name": "Demo Dataverse"}
+        }
+
+        req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export?exporter=schema.org&'
+                       'persistentId=&User-Agent=pydataverse&key=some-token',
+                       json=dataset_info)
+
+        req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export?exporter=schema.org&'
+                       'persistentId=None&User-Agent=pydataverse',
+                       json=dataset_info)
+
+        req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export?exporter='
+                       'schema.org&persistentId=dataset_pid_etc&User-Agent=pydataverse&key=some-token',
+                       json=dataset_info)
+
+        req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export?exporter=schema.org&'
+                       'persistentId=&User-Agent=pydataverse&key=some-token',
+                       json=dataset_info)
+
+        req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export?exporter=schema.org&'
+                       'persistentId=None&User-Agent=pydataverse',
+                       json={'distribution': 'just some mock data'})
 
     def get_basic_inputs(self, user_id, dataverse_handoff_id):
         """Return dict with key/vals for user_id and dataverse_handoff_id"""
@@ -211,6 +253,32 @@ class DataversePostTest(BaseEndpointTest):
         resp_json = response.json()
         # self.assertTrue(resp_json['success'] is False)
         # self.assertTrue(resp_json['message'].find('Dataverse error') > -1)
+
+    def test_60_duplicate_dataverse_user(self, req_mocker):
+        msgt(self.test_60_duplicate_dataverse_user.__doc__)
+
+        # set the mock requests
+        self.set_mock_requests(req_mocker)
+
+        url = reverse('dv-user-list')
+
+        # Ensure there are no DataverseUsers
+        DataverseUser.objects.all().delete()
+        initial_dv_user_count = DataverseUser.objects.count()
+
+        # Call once to create DataverseUser
+        response = self.client.post(url, data=self.data, format='json')
+        msg(response.json())
+        self.assertEqual(response.status_code, 201)
+        dataverse_users_count = DataverseUser.objects.count()
+        self.assertEqual(initial_dv_user_count+1, dataverse_users_count)
+
+        # Now make the same request, and demonstrate that it queried for DataverseUser
+        # rather than creating another one
+        response = self.client.post(url, data=self.data, format='json')
+        msg(response.json())
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(dataverse_users_count, DataverseUser.objects.count())
 
 
 @requests_mock.Mocker()

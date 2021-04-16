@@ -3,7 +3,7 @@ from django.http.response import Http404
 
 from opendp_apps.dataverses.dv_user_handler import DataverseResponseError, DataverseUserHandler
 from opendp_apps.dataverses.models import RegisteredDataverse
-from opendp_apps.user.models import OpenDPUser
+from opendp_apps.user.models import OpenDPUser, DataverseUser
 from opendp_apps.model_helpers.msg_util import msgt
 
 
@@ -47,17 +47,17 @@ class DataverseUserHandlerTest(TestCase):
     def test_create_dataverse_user(self):
         """test_create_dataverse_user"""
         msgt(self.test_create_dataverse_user.__doc__)
+        count_before = DataverseUser.objects.count()
         handler = DataverseUserHandler(self.opendp_user.id, self.site_url,
                                        self.api_general_token, self.dataverse_response)
         new_dataverse_user = handler.create_dataverse_user()
-     #   self.assertEqual(new_dataverse_user.dv_installation_id, 1)
         self.assertEqual(new_dataverse_user.first_name, 'Bob')
         self.assertEqual(new_dataverse_user.last_name, 'Smith')
         self.assertEqual(new_dataverse_user.persistent_id, '823743986739586739586')
         new_dataverse_user.save()
+        self.assertEqual(DataverseUser.objects.count(), count_before + 1)
 
-    #    self.assertEqual(new_dataverse_user.id, 1)
-
+    # TODO: The following 3 tests aren't testing anything
     def test_invalid_dataverse_data_response(self):
         """test_invalid_dataverse_data_response"""
         msgt(self.test_invalid_dataverse_data_response.__doc__)
