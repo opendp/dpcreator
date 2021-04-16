@@ -129,6 +129,7 @@ class DataverseManifestParams(BasicErrCheck):
           (etc)
         ]
         """
+        print('get_file_specific_schema_info', file_id, file_persistent_id)
         if not isinstance(full_schema_info, dict):
             return err_resp('"full_schema_info" must be a Python dict')
 
@@ -137,7 +138,7 @@ class DataverseManifestParams(BasicErrCheck):
 
         url_ending_1 = f'/{file_id}'
         file_doi = file_persistent_id.split(':')[-1] if file_persistent_id else None
-
+        print('file_doi', file_doi)
         for file_info in full_schema_info[dv_static.SCHEMA_KEY_DISTRIBUTION]:
 
             # Try to match the the /{fileId} id to the end of the contentURL

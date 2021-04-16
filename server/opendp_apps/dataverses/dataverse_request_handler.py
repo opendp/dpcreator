@@ -129,7 +129,7 @@ class DataverseRequestHandler(BasicErrCheck):
 
         # (2) Retrieve the file specific info from the JSON-LD
         #
-        file_info = self.mparams.get_file_specific_schema_info(self.schema_info)
+        file_info = self.mparams.retrieve_file_specific_info(self.schema_info)
         if not file_info.success:
             self.add_err_msg(file_info.message)
             return False

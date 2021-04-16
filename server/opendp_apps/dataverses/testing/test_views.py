@@ -1,6 +1,6 @@
 import json
 import requests_mock
-
+from unittest import skip
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework.reverse import reverse
@@ -18,6 +18,7 @@ class TestDataverseFileView(BaseEndpointTest):
                 'test_manifest_params_04.json',
                 'test_opendp_users_01.json']
 
+    @skip('replacing with test_file_view.py')
     def test_10_list_successful(self, req_mocker):
         msgt(self.test_10_list_successful.__doc__)
         self.set_mock_requests(req_mocker)
