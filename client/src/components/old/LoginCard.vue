@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import auth from '../api/auth'
+import auth from '../../api/auth'
 import {mapState} from 'vuex';
 
 export default {
@@ -86,7 +86,7 @@ export default {
           .then(() => {
             if (!this.error) {
               this.checkDataverseUser();
-              this.$router.push('/');
+              this.$router.push('/old');
             }
           })
           .catch((data) => {
@@ -99,7 +99,7 @@ export default {
       this.$store.dispatch('auth/googleLogin', access_token)
           .then(() => {
             this.checkDataverseUser();
-            this.$router.push('/')
+            this.$router.push('/old')
           })
     },
     onGoogleSignInError(error) {

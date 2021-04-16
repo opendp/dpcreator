@@ -16,10 +16,7 @@ class TestDataverseFileView(BaseEndpointTest):
     client = APIClient()
     fixtures = ['test_dataverses_01.json',
                 'test_manifest_params_04.json',
-                # This file needs a real token in order to run tests
-                'test_dataverse_handoff_01.json',
-                'test_opendp_users_01.json',
-                'test_dataverse_user_01.json']
+                'test_opendp_users_01.json']
 
     def test_10_list_successful(self, req_mocker):
         msgt(self.test_10_list_successful.__doc__)

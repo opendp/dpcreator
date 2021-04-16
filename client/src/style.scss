@@ -1,0 +1,110 @@
+.v-application {
+  .router-link {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+.logo {
+  font-size: 1.625rem;
+  font-weight: bold;
+  padding: 0;
+}
+
+.v-toolbar__content,
+.v-toolbar__extension {
+  padding: 0 !important;
+}
+
+.title-size-1 {
+  font-size: 2.5rem;
+  line-height: 3.125rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  @media (max-width: 600px) {
+    font-size: 1.6rem;
+    line-height: 2.2rem;
+  }
+}
+
+.title-size-2 {
+  font-size: 1.625rem;
+  line-height: 1.6875rem;
+  font-weight: 400;
+  @media (max-width: 600px) {
+    font-size: 1.4rem;
+  }
+
+  &.title-size-2--small {
+    font-size: 1.25rem;
+  }
+
+  strong {
+    font-weight: 600;
+  }
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.disabled {
+  opacity: 0.6;
+}
+
+$body-font-family: var(--font-name);
+
+.v-application {
+  font-family: $body-font-family, sans-serif !important;
+  font-size: 1rem;
+}
+
+.top-borders-radius {
+  border-top-left-radius: 5px !important;
+  border-top-right-radius: 5px !important;
+}
+
+.width50 {
+  width: 50%;
+}
+
+.width80 {
+  width: 80%;
+}
+
+.width100 {
+  width: 100%;
+}
+
+@media screen and (min-width: 960px) {
+  .container {
+    max-width: 90%;
+  }
+}
+
+.v-application .noise-params.lighten-4 {
+  border-bottom: 1px solid gray !important;
+}
+
+.v-application {
+  .v-card__title {
+    word-break: normal;
+  }
+
+  .v-card__subtitle,
+  .v-card__text {
+    font-size: 1rem;
+  }
+}
+
+.v-card__actions {
+  padding-left: 24px !important;
+}
+
+.router-link-active {
+  font-weight: bold;
+}
+
+.social-login {
+  max-width: 360px;
+}

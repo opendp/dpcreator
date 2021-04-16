@@ -18,10 +18,7 @@ class BaseEndpointTest(TestCase):
 
     fixtures = ['test_dataverses_01.json',
                 'test_manifest_params_04.json',
-                # This file needs a real token in order to run tests
-                'test_dataverse_handoff_01.json',
-                'test_opendp_users_01.json',
-                'test_dataverse_user_01.json']
+                'test_opendp_users_01.json']
 
     def setUp(self):
 
@@ -103,8 +100,6 @@ class BaseEndpointTest(TestCase):
 
         req_mocker.get('https://dataverse.harvard.edu/api/v1/users/:me')
 
-        # req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export?exporter='
-        #                'schema.org&persistentId=None&User-Agent=pydataverse')
         dataset_info = {
             "@context": "http://schema.org",
             "@type": "Dataset",
@@ -125,12 +120,25 @@ class BaseEndpointTest(TestCase):
             "publisher": {"@type": "Organization", "name": "Demo Dataverse"},
             "provider": {"@type": "Organization", "name": "Demo Dataverse"}
         }
+
+        req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export?exporter=schema.org&'
+                       'persistentId=&User-Agent=pydataverse&key=some-token',
+                       json=dataset_info)
+
+        req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export?exporter=schema.org&'
+                       'persistentId=None&User-Agent=pydataverse',
+                       json=dataset_info)
+
         req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export?exporter='
                        'schema.org&persistentId=dataset_pid_etc&User-Agent=pydataverse&key=some-token',
                        json=dataset_info)
 
-        req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export?exporter='
-                       'schema.org&persistentId=None&User-Agent=pydataverse',
+        req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export?exporter=schema.org&'
+                       'persistentId=&User-Agent=pydataverse&key=some-token',
+                       json=dataset_info)
+
+        req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export?exporter=schema.org&'
+                       'persistentId=None&User-Agent=pydataverse',
                        json={'distribution': 'just some mock data'})
 
     def get_basic_inputs(self, user_id, dataverse_handoff_id):

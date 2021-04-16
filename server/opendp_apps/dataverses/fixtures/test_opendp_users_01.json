@@ -1,8 +1,40 @@
-[{
+[
+    {
     "model": "user.opendpuser",
-    "pk": 1,
+    "pk": 2,
     "fields": {
       "username": "test",
       "object_id": "4472310a-f591-403a-b8d6-dfb562f8b32f"
     }
-}]
+} ,
+   {
+      "model": "user.dataverseuser",
+      "pk": 1,
+      "fields": {
+         "object_id": "6c4986b1-e90d-48a2-98d5-3a37da1fd331",
+         "user": 2,
+         "dv_installation": 1,
+         "persistent_id": "persistent_id1",
+         "first_name": "Fname",
+         "last_name": "Lname",
+         "email": "dv_user@mock.edu",
+         "created": "2020-11-09T17:55:43.854Z",
+         "updated": "2020-11-09T17:55:43.854Z"
+      }
+   },
+   {
+      "model": "user.dataverseuser",
+      "pk": 2,
+      "fields": {
+         "object_id": "4472310a-f591-403a-b8d6-dfb562f8b32f",
+         "user": 2,
+         "dv_installation": 2,
+         "persistent_id": "persistent_id2",
+         "first_name": "Fname2",
+         "last_name": "Lname2",
+         "email": "dv_user2@mock.edu",
+         "created": "2020-11-09T17:55:43.854Z",
+         "updated": "2020-11-09T17:55:43.854Z"
+      }
+   }
+]
