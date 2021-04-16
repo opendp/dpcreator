@@ -8,7 +8,7 @@
       <v-row>
         <v-col offset-sm="1" offset-md="0" sm="10" md="12">
           <!-- TODO: Change this label with the name of the current logged user -->
-          <h1 class="title-size-1">Welcome, Danny</h1>
+          <h1 class="title-size-1">Welcome, {{ username }}</h1>
           <ColoredBorderAlert type="warning" v-if="$vuetify.breakpoint.xsOnly">
             <template v-slot:content>
               If you want to start or continue the process you have to
@@ -58,6 +58,7 @@ import MyDataTable from "../components/MyData/MyDataTable.vue";
 import SupportBanner from "../components/SupportBanner.vue";
 import CreateDPStatistics from "../components/Welcome/CreateDPStatistics.vue";
 import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
+import {mapGetters, mapState} from 'vuex';
 
 export default {
   name: "Welcome",
@@ -70,6 +71,17 @@ export default {
     ColoredBorderAlert
   },
   //   TODO: These data should be loaded from the backend
+
+  created() {
+    this.$store.dispatch('auth/fetchUser')
+  },
+  computed: {
+    ...mapGetters('auth', ['isAuthenticated']),
+    ...mapState('auth', ['user']),
+    username() {
+      return (this.user) ? this.user.username : null
+    }
+  },
   data: () => ({
     variables: [
       {
