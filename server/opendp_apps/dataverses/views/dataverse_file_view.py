@@ -72,4 +72,5 @@ class DataverseFileView(viewsets.ViewSet):
             file_info.save()
 
         serializer = DataverseFileInfoSerializer(file_info, context={'request': request})
-        return Response(data=serializer.data, status=status.HTTP_200_OK)
+        return Response({'success': True, 'data': serializer.data},
+                        status=status.HTTP_200_OK)

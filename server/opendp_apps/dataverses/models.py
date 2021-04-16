@@ -10,6 +10,7 @@ from django_cryptography.fields import encrypt
 
 
 from opendp_apps.dataverses import static_vals as dv_static
+from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 
 from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
@@ -88,7 +89,7 @@ class DataverseParams(TimestampedModelWithUUID):
             self.siteUrl = self.siteUrl[:-1]
 
         if not self.siteUrl:
-            return False
+            return None
 
         return RegisteredDataverse.objects.filter(dataverse_url=self.siteUrl).first()
 
@@ -170,6 +171,21 @@ class ManifestTestParams(DataverseParams):
     class Meta:
         verbose_name = ('Manifest Test Parameter')
         verbose_name_plural = ('Manifest Test Parameters')
+
+
+    def make_test_handoff_object(self):
+        """For unit tests, make a DataverseHandoff object with the same params"""
+
+        dv_handoff = DataverseHandoff(**self.as_dict())
+
+        reg_dv = dv_handoff.get_registered_dataverse()
+        if not reg_dv:
+            return err_resp('No RegisteredDataverse for siteUrl {self.siteUrl}')
+
+        dv_handoff.dv_installation = reg_dv
+        dv_handoff.save()
+
+        return ok_resp(data=dv_handoff)
 
     def get_manifest_url_params(self, selected_params=None):
         """

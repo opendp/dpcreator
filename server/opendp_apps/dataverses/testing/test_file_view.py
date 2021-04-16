@@ -4,12 +4,12 @@ import requests_mock
 from django.test import TestCase
 
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
-from opendp_apps.dataverses.testing.test_endpoints import BaseEndpointTest
+from opendp_apps.dataverses.models import ManifestTestParams
 from opendp_apps.dataverses.testing import schema_test_data
 from opendp_apps.model_helpers.msg_util import msgt
 
 
-#@requests_mock.Mocker()
+
 class FileViewGetTest(TestCase):
 
     fixtures = ['test_dataverses_01.json',
@@ -17,21 +17,66 @@ class FileViewGetTest(TestCase):
                 'test_opendp_users_01.json']
 
 
-    @skip('skipping')
+    @requests_mock.Mocker()
     def test_10_successful_get(self, req_mocker):
         """(10) test_successful_creation"""
         msgt(self.test_10_successful_get.__doc__)
 
-        self.set_mock_requests(req_mocker)
+        # From fixture file: "test_manifest_params_04.json"
+        tparams = ManifestTestParams.objects.get(object_id='4bcad631-ce7c-475e-a569-29e71ee0b2ee')
+        handoff_req = tparams.make_test_handoff_object()
+        self.assertTrue(handoff_req.success is True)
+        handoff_obj = handoff_req.data
+
+        # The Mock url is for when the applications calls "Dataverse" to retrieve JSON-LD metadata
+        #
+        mock_url = ('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export'
+                    '?exporter=schema.org&persistentId=doi:10.7910/DVN/PUXVDH'
+                    '&User-Agent=pydataverse&key=shoefly-dont-bother-m3')
+        req_mocker.get(mock_url, json=tparams.schema_org_content)
 
         response = self.client.get('/api/dv-file/',
-                                   data={'handoff_id': '9e7e5506-dd1a-4979-a2c1-ec6e59e4769c',
+                                   data={'handoff_id': handoff_obj.object_id,
                                          'user_id': '6c4986b1-e90d-48a2-98d5-3a37da1fd331'},
                                    content_type='application/json')
+        #print(response.json())
         self.assertEqual(response.status_code, 200)
-        print(response.json())
-        self.assertIsNotNone(response.json().get('dataset_schema_info'))
-        self.assertIsNotNone(response.json().get('file_schema_info'))
+        self.assertEqual(response.json().get('success'), True)
+        self.assertTrue('dataset_schema_info' in response.json().get('data', {}))
+        self.assertTrue('file_schema_info' in response.json().get('data', {}))
+
+    @requests_mock.Mocker()
+    def test_15_unsuccessful_get(self, req_mocker):
+        """(15) Schema.org retrieved but file specific info is not found!"""
+        msgt(self.test_15_unsuccessful_get.__doc__)
+
+        # From fixture file: "test_manifest_params_04.json"
+        tparams = ManifestTestParams.objects.get(object_id='4bcad631-ce7c-475e-a569-29e71ee0b2ee')
+        handoff_req = tparams.make_test_handoff_object()
+        self.assertTrue(handoff_req.success is True)
+        handoff_obj = handoff_req.data
+
+        # The Mock url is for when the applications calls "Dataverse" to retrieve JSON-LD metadata
+        #
+        mock_url = ('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export'
+                    '?exporter=schema.org&persistentId=doi:10.7910/DVN/PUXVDH'
+                    '&User-Agent=pydataverse&key=shoefly-dont-bother-m3')
+
+        # Changing the schema org reponse so that it doesn't contain any file info
+        schema_content = tparams.schema_org_content
+        schema_content['distribution'] = [] # no file info
+
+        req_mocker.get(mock_url, json=schema_content)
+
+        response = self.client.get('/api/dv-file/',
+                                   data={'handoff_id': handoff_obj.object_id,
+                                         'user_id': '6c4986b1-e90d-48a2-98d5-3a37da1fd331'},
+                                   content_type='application/json')
+        #print(response.json())
+        print('response.status_code', response.status_code)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json().get('success'), False)
+        self.assertTrue('message' in response.json())
 
 
     def test_20_schema_info_parsing(self):
