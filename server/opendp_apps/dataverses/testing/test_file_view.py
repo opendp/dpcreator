@@ -35,20 +35,23 @@ class FileViewGetTest(TestCase):
 
 
     def test_20_schema_info_parsing(self):
-        """Retrieve the correct dataset from schema info"""
+        """Retrieve the correct dataset from schema info, using File Ids"""
+        msgt(self.test_20_schema_info_parsing.__doc__)
 
-        msgt('(20)(a) Schema contains file info, when file Id is an integer')
-        file_resp = DataverseManifestParams.get_file_specific_schema_info(\
-                                            schema_test_data.schema_info_01,
-                                            file_id=schema_test_data.schema_info_01_file_id,
-                                            file_persistent_id=schema_test_data.schema_info_01_file_pid)
+        # Schema contains file info, when file Id is an int
+        #
+        file_resp = DataverseManifestParams.get_file_specific_schema_info( \
+            schema_test_data.schema_info_01,
+            file_id=schema_test_data.schema_info_01_file_id,
+            file_persistent_id=schema_test_data.schema_info_01_file_pid)
 
         self.assertTrue(file_resp.success is True)
         self.assertTrue('contentUrl' in file_resp.data)
+
         self.assertTrue(file_resp.data['contentUrl'].endswith(str(schema_test_data.schema_info_01_file_id)))
 
-
-        msgt('(20)(b) Schema contains file info, when file Id is a string')
+        # Schema contains file info, when file Id is a string
+        #
         file_resp = DataverseManifestParams.get_file_specific_schema_info(\
                                             schema_test_data.schema_info_01,
                                             file_id=str(schema_test_data.schema_info_01_file_id),
@@ -58,7 +61,11 @@ class FileViewGetTest(TestCase):
         self.assertTrue('contentUrl' in file_resp.data)
         self.assertTrue(file_resp.data['contentUrl'].endswith(str(schema_test_data.schema_info_01_file_id)))
 
-        msgt('(20)(c) Schema does NOT contain file info, bad id as string')
+    def test_30_schema_info_parsing_bad_id(self):
+        """Bad File Id used to retrieve data from schema info"""
+        msgt(self.test_30_schema_info_parsing_bad_id.__doc__)
+
+        # Bad File Id, as a string, used to retrieve data from schema info
         bad_file_id = '63'
         file_resp = DataverseManifestParams.get_file_specific_schema_info(\
                                             schema_test_data.schema_info_01,
@@ -66,9 +73,10 @@ class FileViewGetTest(TestCase):
                                             file_persistent_id=schema_test_data.schema_info_01_file_pid)
         self.assertTrue(file_resp.success is False)
         self.assertTrue(file_resp.message.find(bad_file_id) > -1)
-        print(file_resp.message)
 
-        msgt('(20)(d) Schema does NOT contain file info, bad id as int')
+
+        # Schema does NOT contain file info, bad id as int
+        #
         bad_file_id = 99999
         file_resp = DataverseManifestParams.get_file_specific_schema_info(\
                                             schema_test_data.schema_info_01,
@@ -76,4 +84,20 @@ class FileViewGetTest(TestCase):
                                             file_persistent_id=schema_test_data.schema_info_01_file_pid)
         self.assertTrue(file_resp.success is False)
         self.assertTrue(file_resp.message.find(str(bad_file_id)) > -1)
-        print(file_resp.message)
+
+
+    def test_40_schema_info_parsing(self):
+        """Retrieve the correct dataset from schema info, uses DOIs"""
+        msgt(self.test_40_schema_info_parsing.__doc__)
+
+        # Schema contains file info, when file Id is an int
+        #
+        file_resp = DataverseManifestParams.get_file_specific_schema_info( \
+            schema_test_data.schema_info_02,
+            file_id=schema_test_data.schema_info_02_file_id,
+            file_persistent_id=schema_test_data.schema_info_02_file_pid)
+
+        self.assertTrue(file_resp.success is True)
+        print(file_resp.data)
+        self.assertTrue('contentUrl' in file_resp.data)
+        self.assertTrue(file_resp.data['identifier'].endswith(schema_test_data.schema_info_02_file_pid))
