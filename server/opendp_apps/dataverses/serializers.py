@@ -11,11 +11,6 @@ class RegisteredDataverseSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
 
 
-class OpenDPUserSerializer(serializers.ReadOnlyField):
-    def to_representation(self, value):
-        return {'pk': value.object_id, 'object_id': value.object_id}
-
-
 class DataverseUserSerializer(serializers.ModelSerializer):
 
     user = serializers.SlugRelatedField(queryset=OpenDPUser.objects.all(),
