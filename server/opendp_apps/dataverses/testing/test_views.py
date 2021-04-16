@@ -28,10 +28,6 @@ class TestDataverseFileView(BaseEndpointTest):
         response = self.client.get('/api/dv-file/',
                                    data={'handoff_id': '9e7e5506-dd1a-4979-a2c1-ec6e59e4769c',
                                          'user_id': '6c4986b1-e90d-48a2-98d5-3a37da1fd331'})
-        print(response.json())
-        # print(response.content)
         self.assertEquals(response.status_code, 200)
-        # Testing against ids can be tricky
-        # self.assertEquals(response.json().get('id'), 4)
         self.assertEquals(response.json().get('dv_installation'), 1)
 

@@ -65,24 +65,19 @@ class DataverseUserView(viewsets.ViewSet):
         try:
             dataverse_response = dataverse_client.get_user_info(user_api_token=api_general_token)
         except InvalidSchema:
-            # print("INVALID SCHEMA")
             return Response(get_json_error(f'The Site {site_url} is not valid'), status=status.HTTP_400_BAD_REQUEST)
         except JSONDecodeError:
             return Response(get_json_error(f'Error reading data from {site_url}'), status=status.HTTP_400_BAD_REQUEST)
 
         if dataverse_response.success is not True:
-            # print("DATAVERSE RESPONSE FAILURE")
             return Response(get_json_error(dataverse_response.message), status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # print(f"OpenDP User id: {opendp_user.id}")
             handler = DataverseUserHandler(opendp_user.id, site_url,
                                            api_general_token,
                                            dataverse_response.__dict__)
             update_response = handler.update_dataverse_user()
-            # print(update_response)
         except DataverseResponseError as ex:
-            # print("DV RESPONSE ERROR")
             return Response(get_json_error(f'Error {ex}'), status=status.HTTP_400_BAD_REQUEST)
 
         return Response(get_json_success('success', data={'dv_user': dataverse_user.object_id}),
@@ -93,7 +88,7 @@ class DataverseUserView(viewsets.ViewSet):
         # ----------------------------------
         # Validate the input
         # ----------------------------------
-        # print(f"dataverse_user_view: {request.data}")
+        # print(f"data: {request.data}")
         dataverse_user = get_object_or_error_response(DataverseUser, object_id=pk)
         opendp_user = dataverse_user.user
         request.data['user'] = opendp_user.object_id
@@ -122,7 +117,6 @@ class DataverseUserView(viewsets.ViewSet):
         try:
             dataverse_response = dataverse_client.get_user_info(user_api_token=api_general_token)
         except InvalidSchema:
-            # print("INVALID SCHEMA")
             return JsonResponse(get_json_error(f'The Site {site_url} is not valid'),
                                 status=400)
         except JSONDecodeError:
@@ -130,7 +124,6 @@ class DataverseUserView(viewsets.ViewSet):
                                 status=status.HTTP_400_BAD_REQUEST)
 
         if dataverse_response.success is not True:
-            # print("DATAVERSE RESPONSE FAILURE")
             return JsonResponse(get_json_error(dataverse_response.message),
                                 status=400)
 
@@ -138,7 +131,6 @@ class DataverseUserView(viewsets.ViewSet):
         # Update the DataverseUser object
         # ----------------------------------
         try:
-            # print(f"OpenDP user id: {opendp_user.id}")
             handler = DataverseUserHandler(opendp_user.id, site_url,
                                            api_general_token,
                                            dataverse_response.__dict__)
@@ -149,7 +141,6 @@ class DataverseUserView(viewsets.ViewSet):
             else:
                 return JsonResponse(get_json_error(update_resp.message), status=status.HTTP_400_BAD_REQUEST)
         except DataverseResponseError as ex:
-            # print("DV RESPONSE ERROR")
             return JsonResponse(get_json_error(f'Error {ex}'),
                                 status=status.HTTP_400_BAD_REQUEST)
 

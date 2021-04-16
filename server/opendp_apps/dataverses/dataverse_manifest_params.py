@@ -25,7 +25,6 @@ class DataverseManifestParams(BasicErrCheck):
             return
 
         self.custom_required_params = kwargs.get('custom_required_params')
-        # print(incoming_params)
         self.fileId = self.format_param(incoming_params.get(dv_static.DV_PARAM_FILE_ID))
         self.siteUrl = self.format_param(incoming_params.get(dv_static.DV_PARAM_SITE_URL))
         self.datasetPid = self.format_param(incoming_params.get(dv_static.DV_PARAM_DATASET_PID))
