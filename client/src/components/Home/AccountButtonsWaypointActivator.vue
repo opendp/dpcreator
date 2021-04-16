@@ -13,11 +13,17 @@
 export default {
   name: "AccountButtonsWaypointActivator",
   methods: {
-    onSeparatorAppear({going}) {
-      if (going === this.$waypointMap.GOING_IN) {
+    onSeparatorAppear({going, direction}) {
+      if (
+          going === this.$waypointMap.GOING_IN &&
+          direction === this.$waypointMap.DIRECTION_TOP
+      ) {
         this.$root.$emit("buttonsShouldNotStick");
       }
-      if (going === this.$waypointMap.GOING_OUT) {
+      if (
+          going === this.$waypointMap.GOING_OUT &&
+          direction === this.$waypointMap.DIRECTION_BOTTOM
+      ) {
         this.$root.$emit("buttonsShouldStick");
       }
     }

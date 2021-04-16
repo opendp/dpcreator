@@ -11,6 +11,12 @@
 </template>
 
 <style lang="scss" scoped>
+.v-tooltip__content {
+  background: rgba(68, 68, 68, 0.95);
+}
+</style>
+
+<style lang="scss" scoped>
 span {
   white-space: pre-wrap;
 }

@@ -1,12 +1,10 @@
 <template>
-  <v-container class="alert-wrapper">
+  <v-container class="alert-wrapper event-success-alert">
     <v-alert
         v-model="showAlert"
-        type="info"
         icon="mdi-check"
-        text
         transition="scale-transition"
-        class="alert"
+        class="alert soft_primary px-10"
     >
       {{ text }}
     </v-alert>
@@ -14,19 +12,26 @@
 </template>
 
 <style lang="scss">
-.alert-wrapper {
-  position: relative;
-}
+.event-success-alert {
+  &.alert-wrapper {
+    position: relative;
+  }
 
-.alert {
-  position: absolute !important;
-  top: 0;
-  right: 0;
-  z-index: 1;
+  .alert {
+    position: absolute !important;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    @media (max-width: 600px) {
+      text-align: center;
+      width: 90%;
+      margin: 0 auto;
+      right: 5%;
+    }
+  }
 
-  .v-alert__content,
-  .v-icon {
-    color: #000000 !important;
+  .theme--light.v-sheet {
+    color: black;
   }
 }
 </style>

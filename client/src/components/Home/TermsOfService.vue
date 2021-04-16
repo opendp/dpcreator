@@ -1,12 +1,15 @@
 <template>
   <v-container>
     <v-row>
-      <v-col>
+      <v-col offset-sm="1" sm="10" md="12" offset-md="0">
         <h2 class="title-size-1 text-center mb-10">Terms of Service</h2>
         <LinearBox
             v-for="(term, index) in termsOfService"
             :key="index"
-            class="mb-12"
+            :class="{
+            'mb-6': $vuetify.breakpoint.xsOnly,
+            'mb-12': $vuetify.breakpoint.smAndUp
+          }"
         >
           <template v-slot:content>
             <h2 class="title-size-1">{{ term.title }}</h2>
@@ -17,12 +20,11 @@
     </v-row>
     <v-row>
       <v-col class="d-flex justify-center">
-        <v-checkbox
-            v-model="termsOfServiceCheckbox"
-            label="I have read and agree to the Terms of Service."
-            @change="termsOfServiceChange"
-        >
-        </v-checkbox>
+        <Checkbox
+            :class="{ 'width80 mx-auto': $vuetify.breakpoint.xsOnly }"
+            :value.sync="termsOfServiceCheckbox"
+            text="I have read and agree to the Terms of Service."
+        />
       </v-col>
     </v-row>
     <span></span>
@@ -37,16 +39,13 @@
 
 <script>
 import LinearBox from "../DesignSystem/Boxes/LinearBox.vue";
-
+import Checkbox from "../DesignSystem/Checkbox.vue";
 export default {
-  components: {LinearBox},
+  components: {LinearBox, Checkbox},
   name: "TermsOfService",
-  methods: {
-    termsOfServiceChange: function () {
-      this.$root.$emit(
-          "termsOfServiceCheckboxChanged",
-          this.termsOfServiceCheckbox
-      );
+  watch: {
+    termsOfServiceCheckbox: function (newCheckboxValue) {
+      this.$root.$emit("termsOfServiceCheckboxChanged", newCheckboxValue);
     }
   },
   data: () => ({

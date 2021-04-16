@@ -7,7 +7,7 @@
     >
       <AccountButtonsBar/>
     </div>
-    <div id="account-buttons--dummy" class="account-buttons white">
+    <div id="account-buttons--placeholder" class="account-buttons white">
       <AccountButtonsBar/>
     </div>
   </section>
@@ -17,14 +17,13 @@
 .account-buttons--fixed {
   position: fixed;
   bottom: 0;
-  width: 100%;
+  width: 100vw;
   z-index: 1;
 }
 </style>
 
 <script>
 import AccountButtonsBar from "./AccountButtonsBar.vue";
-
 export default {
   name: "AccountButtons",
   components: {AccountButtonsBar},

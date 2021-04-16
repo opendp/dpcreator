@@ -1,5 +1,11 @@
 <template>
-  <div class="mt-5 social-login-button pointer white--text" @click="handler">
+  <div
+      class="mt-5 social-login-button pointer white--text"
+      @click="handler"
+      :class="{
+      'width80 mx-auto': $vuetify.breakpoint.xsOnly
+    }"
+  >
     <div
         class="py-3 d-flex justify-center social-login-button__icon"
         :style="`backgroundColor: ${iconBgColor}`"

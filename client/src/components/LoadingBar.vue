@@ -5,7 +5,6 @@
         aria-valuemin="0"
         aria-valuemax="100"
         class="v-progress-linear theme--light"
-        style="height: 20px;"
     >
       <div
           class="v-progress-linear__background grey lighten-1"
@@ -28,17 +27,16 @@
 .v-card__progress {
   padding: 15px 0;
 }
-
 .v-card__progress:first-child {
   padding-top: 30px;
 }
-
 .v-card__progress:last-child {
   padding-bottom: 30px;
 }
 
 .v-progress-linear {
   border-radius: 50px;
+  height: 20px;
 }
 </style>
 

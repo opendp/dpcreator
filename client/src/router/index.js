@@ -1,102 +1,100 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import Home from '../views/old/OldHome.vue'
-import Login from '../views/old/Login.vue'
-import Lost from '../views/old/Lost.vue'
-import PasswordReset from "../views/old/PasswordReset"
-import PasswordResetConfirm from "../views/old/PasswordResetConfirm"
-import Register from "../views/old/Register"
-import VerifyEmail from "../views/old/VerifyEmail"
-import store from '../store'
-import OldHome from "@/views/old/OldHome";
+import Vue from "vue";
+import VueRouter from "vue-router";
+import Home from "../views/Home.vue";
 
-const redirectLogout = (to, from, next) => {
-  store.dispatch('auth/logout')
-      .then(() => next('/login'));
-};
+import NETWORK_CONSTANTS from "./NETWORK_CONSTANTS";
 
-Vue.use(VueRouter)
+const {
+  HOME,
+  WELCOME,
+  MY_DATA,
+  WIZARD,
+  SIGN_UP,
+  LOGIN,
+  CONTACT_US,
+  MY_PROFILE,
+  TERMS_AND_CONDITIONS,
+  FORGOT_YOUR_PASSWORD
+} = NETWORK_CONSTANTS;
+
+Vue.use(VueRouter);
 
 const routes = [
   {
-    path: "/",
-    name: "Home",
-    component: () => import("../views/Home.vue")
+    path: HOME.PATH,
+    name: HOME.NAME,
+    component: Home
   },
   {
-    path: "/wizard",
-    name: "Wizard",
+    path: WIZARD.PATH,
+    name: WIZARD.NAME,
     component: () => import("../views/Wizard.vue")
   },
   {
-    path: "/my-data",
-    name: "MyData",
+    path: MY_DATA.PATH,
+    name: MY_DATA.NAME,
     component: () => import("../views/MyData.vue")
   },
   {
-    path: "/my-data/:id",
+    path: `${MY_DATA.PATH}/:id`,
     name: "MyDataDetails",
     component: () => import("../views/MyDataDetails.vue")
   },
   {
-    path: "/sign-up",
-    name: "SignUp",
+    path: SIGN_UP.PATH,
+    name: SIGN_UP.NAME,
     component: () => import("../views/SignUp.vue")
   },
   {
-    path: "/sign-up/confirmation",
+    path: `${SIGN_UP.PATH}/confirmation`,
     name: "SignUpConfirmation",
     component: () => import("../views/SignUpConfirmation.vue")
   },
   {
-    path: "/log-in",
-    name: "LogIn",
+    path: LOGIN.PATH,
+    name: LOGIN.NAME,
     component: () => import("../views/LogIn.vue")
   },
   {
-    path: "/forgot-your-password",
-    name: "ForgotYourPassword",
+    path: FORGOT_YOUR_PASSWORD.PATH,
+    name: FORGOT_YOUR_PASSWORD.NAME,
     component: () => import("../views/ForgotYourPassword.vue")
   },
   {
-    path: "/welcome",
-    name: "Welcome",
+    path: WELCOME.PATH,
+    name: WELCOME.NAME,
     component: () => import("../views/Welcome.vue")
   },
   {
-    path: "/terms-and-conditions",
-    name: "TermsAndConditions",
+    path: TERMS_AND_CONDITIONS.PATH,
+    name: TERMS_AND_CONDITIONS.NAME,
     component: () => import("../views/TermsAndConditions.vue")
   },
   {
-    path: "/contact-us",
-    name: "ContactUs",
+    path: CONTACT_US.PATH,
+    name: CONTACT_US.NAME,
     component: () => import("../views/ContactUs.vue")
   },
   {
-    path: "/my-profile",
-    name: "MyProfile",
+    path: MY_PROFILE.PATH,
+    name: MY_PROFILE.NAME,
     component: () => import("../views/MyProfile.vue")
   },
   {
     path: "*",
-    name: "404",
-    component: () => import("../views/404.vue")
-  },
-  //
-  // Old Routes
-  //
-
-]
+    name: "NotFoundPage",
+    component: () => import("../views/NotFoundPage.vue")
+  }
+];
 
 const router = new VueRouter({
-  mode: 'history',
-  //base: process.env.BASE_URL,
+  mode: "history",
+  // base: process.env.BASE_URL,
   routes
-})
+});
 
 router.afterEach(() => {
   window.scrollTo(0, 0);
 });
 
-export default router
+export default router;

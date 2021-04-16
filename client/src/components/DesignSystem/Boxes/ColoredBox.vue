@@ -1,5 +1,5 @@
 <template>
-  <div class="colored-box rounded-lg ">
+  <div class="soft_primary rounded-lg ">
     <v-container>
       <v-row>
         <v-col cols="11" md="10" class="mx-auto my-8">
@@ -9,12 +9,6 @@
     </v-container>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.colored-box {
-  background-color: var(--light-blue-color);
-}
-</style>
 
 <script>
 export default {

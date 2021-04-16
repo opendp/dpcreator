@@ -23,21 +23,28 @@
           :rules="messageRules"
           filled
       ></v-textarea>
-      <v-btn type="submit" color="primary" :disabled="!validContactForm"
-      >Send
-      </v-btn
-      >
+      <Button
+          type="submit"
+          color="primary"
+          :disabled="!validContactForm"
+          label="Send"
+          :class="{
+          'width80 mx-auto d-block mb-5': $vuetify.breakpoint.xsOnly
+        }"
+      />
     </v-form>
   </div>
 </template>
 
 <script>
+import Button from "../DesignSystem/Button.vue";
 export default {
+  components: {Button},
   name: "ContactUsForm",
   methods: {
     handleFormSubmit: function () {
       if (this.$refs.contactForm.validate()) {
-        // CONTACT FORM LOGIC HERE //
+        //TODO: Implement Contact Form logic
         this.$emit("update:submitted", true);
       }
     }

@@ -1,6 +1,14 @@
 <template>
-  <v-dialog width="66%" v-model="dialog" @click:outside="close">
+  <v-dialog
+      :width="$vuetify.breakpoint.smAndDown ? '90%' : '50%'"
+      v-model="dialog"
+      @click:outside="close"
+  >
     <v-card elevation="2" class="px-10 py-12 add-statistic-dialog">
+      <v-icon style="position: absolute; right: 40px" @click="close"
+      >mdi-close
+      </v-icon
+      >
       <v-card-title>
         <h2 class="title-size-2 mb-5">{{ formTitle }}</h2>
       </v-card-title>
@@ -17,8 +25,8 @@
           >
             <v-radio
                 class="rounded-pill mr-2"
-                v-for="statistic in singleVariableStatistics"
-                :key="statistic"
+                v-for="(statistic, index) in singleVariableStatistics"
+                :key="statistic + '-' + index"
                 :label="statistic"
                 :value="statistic"
                 on-icon="mdi-check"
@@ -36,8 +44,8 @@
           >
             <v-radio
                 class="rounded-pill mr-2"
-                v-for="variable in variables"
-                :key="variable"
+                v-for="(variable, index) in variables"
+                :key="variable + index"
                 :label="variable"
                 :value="variable"
                 on-icon="mdi-check"
@@ -57,15 +65,12 @@
           >
             <v-radio
                 class="rounded-pill mr-2"
-                v-for="handlingOption in missingValuesHandling"
-                :key="handlingOption"
+                v-for="(handlingOption, index) in missingValuesHandling"
+                :key="handlingOption + '-' + index"
                 :label="handlingOption"
                 :value="handlingOption"
                 on-icon="mdi-check"
-                @click="
-                editedItemDialog.handleAsFixed =
-                  handlingOption === 'Insert fixed value'
-              "
+                @click="() => updateFixedInputVisibility(handlingOption)"
             ></v-radio>
           </v-radio-group>
         </div>
@@ -76,7 +81,7 @@
             <v-text-field
                 v-model="editedItemDialog.fixedValue"
                 placeholder="E.g. Lorem ipsum"
-                background-color="blue lighten-4"
+                background-color="soft_primary"
                 class="top-borders-radius width50"
             ></v-text-field>
           </div>
@@ -84,17 +89,21 @@
       </v-card-text>
 
       <v-card-actions>
-        <v-btn
+        <Button
             color="primary"
-            class="mr-2 px-5"
-            @click="save"
+            classes="mr-2 px-5"
+            :click="save"
             :disabled="isButtonDisabled"
-        >
-          Save
-        </v-btn>
-        <v-btn color="primary" outlined class="px-5" @click="close">
-          Cancel
-        </v-btn>
+            label="Create statistic"
+        />
+
+        <Button
+            color="primary"
+            outlined
+            classes="px-5"
+            :click="close"
+            label="Close"
+        />
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -102,8 +111,6 @@
 
 <style lang="scss">
 .add-statistic-dialog {
-  @import "~vuetify/src/styles/main.sass";
-
   .radio-group-statistics-modal {
     .v-input--selection-controls__input {
       height: 0;
@@ -114,21 +121,19 @@
         display: inherit;
         color: white !important;
       }
-
       input,
       div,
       i {
         display: none;
       }
     }
-
     .v-radio {
-      border: 1px solid map-get($map: $blue, $key: darken-2);
+      border: 1px solid var(--v-primary-base);
       padding: 5px 20px;
 
       &:hover,
       &.v-item--active {
-        background: map-get($map: $blue, $key: darken-2);
+        background: var(--v-primary-base);
 
         .v-label {
           color: white;
@@ -142,18 +147,25 @@
       }
 
       .v-label {
-        color: map-get($map: $blue, $key: darken-2);
+        color: var(--v-primary-base);
         font-weight: 700;
         justify-content: center;
       }
     }
   }
+
+  .v-text-field__slot {
+    padding-left: 10px;
+  }
 }
 </style>
 
 <script>
+import Button from "../../../DesignSystem/Button.vue";
+
 export default {
   name: "AddStatisticDialog",
+  components: {Button},
   props: ["formTitle", "dialog", "editedIndex", "editedItem"],
   computed: {
     isButtonDisabled: function () {
@@ -162,6 +174,9 @@ export default {
           !this.editedItemDialog.variable ||
           !this.editedItemDialog.missingValuesHandling
       );
+    },
+    isMultiple: function () {
+      return this.editedIndex === -1;
     }
   },
   watch: {
@@ -169,7 +184,9 @@ export default {
       this.editedItemDialog = Object.assign({}, newEditedItem);
     }
   },
+  //TODO: Define the default epsilon and error values for new statistics
   data: () => ({
+    //TODO: These should be connected with the variables loaded on the previous step
     singleVariableStatistics: ["Mean", "Histogram", "Quantile"],
     variables: ["Age", "Sex", "Educ", "Race", "Income", "Married"],
     editedItemDialog: {
@@ -179,7 +196,8 @@ export default {
       error: "",
       missingValuesHandling: "",
       handleAsFixed: false,
-      fixedValue: "0"
+      fixedValue: "0",
+      locked: "false"
     },
     missingValuesHandling: [
       "Drop them",
@@ -193,6 +211,10 @@ export default {
     },
     close() {
       this.$emit("close");
+    },
+    updateFixedInputVisibility(handlingOption) {
+      this.editedItemDialog.handleAsFixed =
+          handlingOption === "Insert fixed value";
     }
   }
 };

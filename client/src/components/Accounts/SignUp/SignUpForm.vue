@@ -1,9 +1,18 @@
 <template>
   <div>
-    <h2 class="title-size-2 mb-4"><strong>2/2. </strong>Sign up</h2>
-    <v-container>
+    <h2
+        class="title-size-2 mb-4"
+        :class="{ 'ml-5': $vuetify.breakpoint.xsOnly }"
+    >
+      <strong>2/2. </strong>Sign up
+    </h2>
+    <v-container class="ml-0">
       <v-row>
-        <v-col md="6" class="pl-0">
+        <v-col
+            md="8"
+            class="pl-0"
+            :class="{ 'ml-5': $vuetify.breakpoint.xsOnly }"
+        >
           <v-form
               v-model="validSignUpForm"
               ref="signUpForm"
@@ -32,7 +41,10 @@
                 counter
                 @click:append="showPassword = !showPassword"
             ></v-text-field>
-            <span class="pl-6 d-block grey--text text--darken-2"
+            <span
+                id="password-hint"
+                class="d-block grey--text text--darken-2 mb-5"
+                :class="{ 'pl-6': $vuetify.breakpoint.smAndUp }"
             >Your <strong>password</strong> must be at least 6 characters long
               and must contain letters, numbers and special characters. Cannot
               contain whitespace.</span
@@ -47,43 +59,42 @@
                 counter
                 @click:append="showConfirmPassword = !showConfirmPassword"
             ></v-text-field>
-            <v-btn
-                class="mr-3 mt-10"
+            <Button
+                classes="mt-5"
                 color="primary"
+                :class="{
+                'width80 mx-auto d-block': $vuetify.breakpoint.xsOnly,
+                'mr-2': $vuetify.breakpoint.smAndUp
+              }"
                 type="submit"
                 :disabled="!validSignUpForm"
-            >Create account
-            </v-btn
-            >
-            <v-btn
+                label="Create account"
+            />
+            <Button
                 color="primary"
-                class="mt-10"
+                classes="mt-5"
+                :class="{ 'width80 mx-auto d-block': $vuetify.breakpoint.xsOnly }"
                 outlined
-                @click="$router.push('/')"
-            >Cancel
-            </v-btn
-            >
+                :click="() => $router.push(NETWORK_CONSTANTS.HOME.PATH)"
+                label="Cancel"
+            />
           </v-form>
-          <div class="mt-10">
+          <div class="mt-10 social-login">
             <SocialLoginSeparator/>
-            <v-row>
-              <v-col>
-                <SocialLoginButton
-                    mdiIcon="mdi-google"
-                    iconBgColor="#C53126"
-                    label="Log in with Google"
-                    labelBgColor="#F44336"
-                    :handler="loginGoogle"
-                />
-                <SocialLoginButton
-                    mdiIcon="mdi-github"
-                    iconBgColor="#2E2E2E"
-                    label="Log in with GitHub"
-                    labelBgColor="#050505"
-                    :handler="loginGithub"
-                />
-              </v-col>
-            </v-row>
+            <SocialLoginButton
+                mdiIcon="mdi-google"
+                iconBgColor="#C53126"
+                label="Log in with Google"
+                labelBgColor="#F44336"
+                :handler="loginGoogle"
+            />
+            <SocialLoginButton
+                mdiIcon="mdi-github"
+                iconBgColor="#2E2E2E"
+                label="Log in with GitHub"
+                labelBgColor="#050505"
+                :handler="loginGithub"
+            />
           </div>
         </v-col>
       </v-row>
@@ -91,12 +102,22 @@
   </div>
 </template>
 
+<style lang="scss" scoped>
+#password-hint {
+  @media screen and (max-width: 600px) {
+    font-size: 0.875rem;
+  }
+}
+</style>
+
 <script>
+import Button from "../../DesignSystem/Button.vue";
 import SocialLoginButton from "../SocialLoginButton.vue";
 import SocialLoginSeparator from "../SocialLoginSeparator.vue";
+import NETWORK_CONSTANTS from "../../../router/NETWORK_CONSTANTS";
 
 export default {
-  components: {SocialLoginButton, SocialLoginSeparator},
+  components: {SocialLoginButton, SocialLoginSeparator, Button},
   name: "SignUpForm",
   methods: {
     confirmPasswordVerification() {
@@ -109,14 +130,16 @@ export default {
     },
     handleFormSubmit: function () {
       if (this.$refs.signUpForm.validate()) {
-        // SIGN UP FORM LOGIC HERE //
-        this.$router.push("/sign-up/confirmation");
+        //TODO: Implement Sign Up logic here
+        this.$router.push(`${NETWORK_CONSTANTS.SIGN_UP.PATH}/confirmation`);
       }
     },
     loginGoogle: function () {
+      //TODO: Implement Login with Google logic here
       alert("login with Google!");
     },
     loginGithub: function () {
+      //TODO: Implement Login with Github logic here
       alert("login with Github!");
     }
   },
@@ -161,7 +184,8 @@ export default {
         );
       }
     ],
-    confirmPasswordRules: [v => !!v || "Please confirm your password"]
+    confirmPasswordRules: [v => !!v || "Please confirm your password"],
+    NETWORK_CONSTANTS
   })
 };
 </script>

@@ -5,10 +5,15 @@
       We received your email and will get back to you with a response as soon as
       possible.
     </p>
-    <v-btn class="mb-5" color="primary" @click="$router.push('/')"
-    >Go to home
-    </v-btn
-    >
+    <Button
+        classes="mb-5"
+        color="primary"
+        :click="() => $router.push(NETWORK_CONSTANTS.HOME.PATH)"
+        :class="{
+        'width80 mx-auto d-block mb-5': $vuetify.breakpoint.xsOnly
+      }"
+        label="Go to Home"
+    />
   </div>
 </template>
 
@@ -24,7 +29,12 @@ p {
 </style>
 
 <script>
+import Button from "../DesignSystem/Button.vue";
+import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
+
 export default {
-  name: "ContactUsSubmitted"
+  components: {Button},
+  name: "ContactUsSubmitted",
+  data: () => ({NETWORK_CONSTANTS})
 };
 </script>

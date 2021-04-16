@@ -1,91 +1,127 @@
 <template>
-  <div class="my-profile mt-16">
-    <v-container>
-      <v-sheet rounded="lg">
-        <v-container class="py-5">
-          <v-row>
-            <v-col offset-md="2" md="4">
-              <h1 class="title-size-1">My Profile</h1>
-              <h2 class="title-size-2 mt-8">Edit account information</h2>
-              <v-form @submit.prevent="handleEditAccountInformation">
-                <v-text-field
-                    v-model="username"
-                    label="Username"
-                    required
-                ></v-text-field>
-                <v-text-field
-                    v-model="email"
-                    label="Email"
-                    required
-                    :rules="emailRules"
-                    type="email"
-                ></v-text-field>
-                <div class="mt-5 mb-10">
-                  <v-btn type="submit" color="primary" class="mr-5"
-                  >Save changes
-                  </v-btn
-                  >
-                  <v-btn color="primary" outlined @click="$router.push('/')"
-                  >Cancel
-                  </v-btn>
-                </div>
-              </v-form>
-              <h2 class="title-size-2 mt-10">Change password</h2>
-              <v-form @submit.prevent="handleChangePassword">
-                <v-text-field
-                    v-model="password"
-                    :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
-                    :type="show1 ? 'text' : 'password'"
-                    name="input-10-1"
-                    label="Current password"
-                    @click:append="show1 = !show1"
-                ></v-text-field>
-                <v-text-field
-                    v-model="newPassword"
-                    :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
-                    :type="show2 ? 'text' : 'password'"
-                    name="input-10-2"
-                    label="Password"
-                    :rules="passwordRules"
-                    counter
-                    @click:append="show2 = !show2"
-                ></v-text-field>
-                <span class="pl-6 d-block grey--text text--darken-2"
-                >Your <strong>password</strong> must be at least 6 characters
-                  long and must contain letters, numbers and special characters.
-                  Cannot contain whitespace.</span
-                >
-                <v-text-field
-                    v-model="confirmNewPassword"
-                    :append-icon="show3 ? 'mdi-eye' : 'mdi-eye-off'"
-                    :type="show3 ? 'text' : 'password'"
-                    :rules="[confirmNewPasswordRules]"
-                    name="input-10-3"
-                    label="Confirm password"
-                    counter
-                    @click:append="show3 = !show3"
-                ></v-text-field>
-                <div class="mt-5 mb-10">
-                  <v-btn type="submit" color="primary" class="mr-5"
-                  >Save changes
-                  </v-btn
-                  >
-                  <v-btn color="primary" outlined @click="$router.push('/')"
-                  >Cancel
-                  </v-btn>
-                </div>
-              </v-form>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-sheet>
+  <div class="my-profile mt-5">
+    <EventSuccessAlert queryParam="saved" text="Changes saved"/>
+
+    <v-container
+        class="py-5"
+        :class="{
+        'px-10': $vuetify.breakpoint.xsOnly
+      }"
+    >
+      <v-row>
+        <v-col offset-md="2" md="5">
+          <h1 class="title-size-1">My Profile</h1>
+          <h2 class="title-size-2 mt-8">Edit account information</h2>
+          <v-form @submit.prevent="handleEditAccountInformation">
+            <v-text-field
+                v-model="username"
+                label="Username"
+                required
+            ></v-text-field>
+            <v-text-field
+                v-model="email"
+                label="Email"
+                required
+                :rules="emailRules"
+                type="email"
+            ></v-text-field>
+            <div class="mt-5 mb-10">
+              <Button
+                  type="submit"
+                  color="primary"
+                  label="Save changes"
+                  :class="{
+                  'width80 mx-auto d-block mb-2': $vuetify.breakpoint.xsOnly,
+                  'mr-2 mb-2': $vuetify.breakpoint.smAndUp
+                }"
+              />
+              <Button
+                  color="primary"
+                  outlined
+                  :click="() => $router.push(NETWORK_CONSTANTS.HOME.PATH)"
+                  :class="{
+                  'width80 mx-auto d-block': $vuetify.breakpoint.xsOnly,
+                  'mb-2': $vuetify.breakpoint.smAndUp
+                }"
+                  label="Cancel"
+              />
+            </div>
+          </v-form>
+          <h2 class="title-size-2 mt-10">Change password</h2>
+          <v-form @submit.prevent="handleChangePassword">
+            <v-text-field
+                v-model="password"
+                :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                :type="showPassword ? 'text' : 'password'"
+                name="input-10-1"
+                label="Current password"
+                @click:append="showPassword = !showPassword"
+            ></v-text-field>
+            <v-text-field
+                v-model="newPassword"
+                :append-icon="showNewPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                :type="showNewPassword ? 'text' : 'password'"
+                name="input-10-2"
+                label="New password"
+                :rules="passwordRules"
+                counter
+                @click:append="showNewPassword = !showNewPassword"
+            ></v-text-field>
+            <span
+                class="d-block grey--text text--darken-2"
+                :class="{
+                'pl-6': $vuetify.breakpoint.smAndUp
+              }"
+            >Your <strong>password</strong> must be at least 6 characters long
+              and must contain letters, numbers and special characters. Cannot
+              contain whitespace.</span
+            >
+            <v-text-field
+                v-model="confirmNewPassword"
+                :append-icon="showConfirmNewPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                :type="showConfirmNewPassword ? 'text' : 'password'"
+                :rules="[confirmNewPasswordRules]"
+                name="input-10-3"
+                label="Confirm new password"
+                counter
+                @click:append="showConfirmNewPassword = !showConfirmNewPassword"
+            ></v-text-field>
+            <div class="mt-5 mb-10">
+              <Button
+                  type="submit"
+                  color="primary"
+                  label="Save changes"
+                  :class="{
+                  'width80 mx-auto d-block mb-2': $vuetify.breakpoint.xsOnly,
+                  'mr-2 mb-2': $vuetify.breakpoint.smAndUp
+                }"
+              />
+              <Button
+                  color="primary"
+                  outlined
+                  :click="() => $router.push(NETWORK_CONSTANTS.HOME.PATH)"
+                  label="Cancel"
+                  :class="{
+                  'width80 mx-auto d-block mb-2': $vuetify.breakpoint.xsOnly,
+                  'mb-2': $vuetify.breakpoint.smAndUp
+                }"
+              />
+            </div>
+          </v-form>
+        </v-col>
+      </v-row>
     </v-container>
   </div>
 </template>
 
 <script>
+import Button from "../components/DesignSystem/Button.vue";
+import EventSuccessAlert from "../components/Home/EventSuccessAlert.vue";
+import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
+
 export default {
   name: "MyProfile",
+  components: {Button, EventSuccessAlert},
   methods: {
     confirmNewPasswordRules() {
       return (
@@ -93,17 +129,23 @@ export default {
       );
     },
     handleEditAccountInformation() {
+      //TODO: Implement Edit Account Information Handler
       alert("edit account information form submitted!");
+      this.$router.push(`${NETWORK_CONSTANTS.MY_PROFILE.PATH}?saved=true`);
+      this.$router.go();
     },
     handleChangePassword() {
+      //TODO: Implement Change Password Handler
       alert("change password form submitted!");
+      this.$router.push(`${NETWORK_CONSTANTS.MY_PROFILE.PATH}?saved=true`);
+      this.$router.go();
     }
   },
 
   data: () => ({
-    show1: false,
-    show2: false,
-    show3: false,
+    showPassword: false,
+    showNewPassword: false,
+    showConfirmNewPassword: false,
     username: "",
     email: "",
     password: "",
@@ -140,7 +182,8 @@ export default {
             "Your password has to have at least one special character"
         );
       }
-    ]
+    ],
+    NETWORK_CONSTANTS
   })
 };
 </script>

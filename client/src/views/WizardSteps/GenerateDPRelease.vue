@@ -15,35 +15,38 @@
       <p class="mb-2">
         <strong>Confirm the email to send notifications to:</strong>
       </p>
-      <v-text-field
-          class="top-borders-radius width50"
-          :value="email + '*'"
-          readonly
-          type="email"
-          hide-details
-          background-color="blue lighten-4"
-      ></v-text-field>
-      <span class="d-block grey--text text--darken-2 mt-0"
-      >*If you would like to change your email address, you can edit it in
-        your profile area</span
+      <p>{{ email }}*</p>
+
+      <span class="d-block grey--text text--darken-2 mt-0 font-italic"
+      >* If you would like to change your email address, you can edit it in
+        your profile area.</span
       >
 
-      <v-btn color="primary" type="submit" class="mt-5"
-      >Submit statistics
-      </v-btn>
+      <Button
+          color="primary"
+          type="submit"
+          classes="mt-5"
+          label="Submit statistics"
+      />
     </v-form>
-    <v-overlay :value="statisticsSubmitted">
+    <v-overlay :value="areStatisticsSubmitted">
       <div class="d-flex flex-column align-center">
         <v-progress-circular indeterminate size="64"></v-progress-circular>
         <p class="mt-10 title-size-2">Uploading statistics</p>
       </div>
     </v-overlay>
     <v-dialog
-        v-model="statisticsReceived"
-        width="60%"
-        @click:outside="$router.push('/')"
+        v-model="areStatisticsReceived"
+        :width="$vuetify.breakpoint.smAndDown ? '90%' : '45%'"
+        @click:outside="$router.push(NETWORK_CONSTANTS.HOME.PATH)"
     >
       <v-card elevation="2" class="px-10 py-12">
+        <v-icon
+            style="position: absolute; right: 40px"
+            @click="() => $router.push(NETWORK_CONSTANTS.HOME.PATH)"
+        >mdi-close
+        </v-icon
+        >
         <v-card-title>
           <h2 class="title-size-2 mb-5">Statistics are being processed</h2>
         </v-card-title>
@@ -54,12 +57,7 @@
           </p>
           <p>
             Your statistics are now on
-            <v-chip color="grey lighten-3" label>
-              <v-icon left small>
-                mdi-progress-clock
-              </v-icon>
-              In execution
-            </v-chip>
+            <StatusTag :status="IN_EXECUTION"/>
             status, you can check the remaining time to complete in the
             <router-link
                 :to="releaseLink"
@@ -75,21 +73,19 @@
           </p>
         </v-card-text>
         <v-card-actions>
-          <v-btn
+          <Button
               color="primary"
-              class="mr-2 px-5"
-              @click="$router.push(releaseLink)"
-          >
-            View Data Details
-          </v-btn>
-          <v-btn
+              classes="mr-2 px-5"
+              :click="() => $router.push(releaseLink)"
+              label="View Data Details"
+          />
+          <Button
               color="primary"
               outlined
-              class="px-5"
-              @click="$router.push('/')"
-          >
-            Go to Home
-          </v-btn>
+              classes="px-5"
+              :click="() => $router.push(NETWORK_CONSTANTS.HOME.PATH)"
+              label="Go to Home"
+          />
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -97,25 +93,30 @@
 </template>
 
 <script>
+import Button from "../../components/DesignSystem/Button.vue";
 import ColoredBorderAlert from "../../components/DynamicHelpResources/ColoredBorderAlert.vue";
+import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
+import statusInformation from "../../data/statusInformation";
+import StatusTag from "../../components/DesignSystem/StatusTag.vue";
+
+const {IN_EXECUTION} = statusInformation.statuses;
 
 export default {
   name: "GenerateDPRelease",
-  components: {ColoredBorderAlert},
+  components: {ColoredBorderAlert, Button, StatusTag},
   mounted() {
-    const that = this;
-    this.$root.$on("statisticsSubmitted", function () {
-      that.statisticsSubmitted = true;
+    this.$root.$on("areStatisticsSubmitted", () => {
+      this.areStatisticsSubmitted = true;
     });
   },
   watch: {
-    statisticsSubmitted: function (newStatisticsSubmitted) {
-      const that = this;
-      if (newStatisticsSubmitted === true) {
-        setTimeout(function () {
-          that.statisticsSubmitted = false;
-          that.releaseLink = "/my-data/abcd1234";
-          that.statisticsReceived = true;
+    areStatisticsSubmitted: function (newareStatisticsSubmitted) {
+      if (newareStatisticsSubmitted === true) {
+        setTimeout(() => {
+          this.areStatisticsSubmitted = false;
+          //TODO: Implement the Handler of the response of the statistics submit
+          this.releaseLink = `${NETWORK_CONSTANTS.MY_DATA.PATH}/abcd1234`;
+          this.areStatisticsReceived = true;
         }, 3000);
       }
     }
@@ -123,15 +124,19 @@ export default {
   methods: {
     handleFormSubmit: function () {
       if (this.$refs.form.validate()) {
-        this.statisticsSubmitted = true;
+        this.areStatisticsSubmitted = true;
+        //TODO: Implement Submit Statistics handler
       }
     }
   },
   data: () => ({
-    statisticsSubmitted: false,
-    email: "danny-fysdfsdfsfsdfsdfsdfdsf@gmail.com",
-    statisticsReceived: false,
-    releaseLink: ""
+    areStatisticsSubmitted: false,
+    //TODO: Change with the email of the current logged user
+    email: "danny-fy@gmail.com",
+    areStatisticsReceived: false,
+    releaseLink: "",
+    NETWORK_CONSTANTS,
+    IN_EXECUTION
   })
 };
 </script>

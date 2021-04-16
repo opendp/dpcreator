@@ -33,7 +33,9 @@
         :statistics="statistics"
         v-on:newStatisticButtonPressed="dialogAddStatistic = true"
         v-on:editStatistic="editItem"
+        v-on:changeLockStatus="changeLockStatus"
         v-on:deleteStatistic="deleteItem"
+        class="mb-10"
     />
 
     <AddStatisticDialog
@@ -58,6 +60,7 @@
         v-on:noiseParamsUpdated="handleSaveEditNoiseParamsDialog"
         :epsilon="epsilon"
         :delta="delta"
+        :confidenceLevel="confidenceLevel"
     />
   </div>
 </template>
@@ -68,6 +71,13 @@
     span {
       color: #000000;
     }
+
+    color: inherit !important;
+    border-bottom-color: black !important;
+  }
+
+  .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
+    font-size: 0.875rem;
   }
 }
 </style>
@@ -81,7 +91,6 @@ import EditNoiseParamsConfirmationDialog
   from "../../components/Wizard/Steps/CreateStatistics/EditNoiseParamsConfirmation.vue";
 import NoiseParams from "../../components/Wizard/Steps/CreateStatistics/NoiseParams.vue";
 import StatisticsTable from "../../components/Wizard/Steps/CreateStatistics/StatisticsTable.vue";
-
 export default {
   name: "CreateStatistics",
   components: {
@@ -95,9 +104,12 @@ export default {
   },
   computed: {
     formTitle() {
-      return this.editedIndex === -1
-          ? "Create your statistic"
-          : "Edit your statistic";
+      return this.isEditionMode
+          ? "Edit your statistic"
+          : "Create your statistic";
+    },
+    isEditionMode() {
+      return this.editedIndex > -1;
     }
   },
   watch: {
@@ -108,7 +120,7 @@ export default {
   data: () => ({
     epsilon: 0.25,
     delta: 0.000001,
-    confidenceLevel: 0.000001,
+    confidenceLevel: "99%",
     statistics: [],
     dialogAddStatistic: false,
     dialogDelete: false,
@@ -122,7 +134,8 @@ export default {
       error: "",
       missingValuesHandling: "",
       handleAsFixed: false,
-      fixedValue: "0"
+      fixedValue: "0",
+      locked: "false"
     },
     defaultItem: {
       statistic: "",
@@ -131,7 +144,8 @@ export default {
       error: "",
       missingValuesHandling: "",
       handleAsFixed: false,
-      fixedValue: "0"
+      fixedValue: "0",
+      locked: "false"
     }
   }),
   methods: {
@@ -139,13 +153,14 @@ export default {
       this.dialogEditNoiseParamsConfirmation = false;
       this.dialogEditNoiseParams = true;
     },
-    handleSaveEditNoiseParamsDialog(epsilon, delta) {
+    handleSaveEditNoiseParamsDialog(epsilon, delta, confidenceLevel) {
       this.epsilon = epsilon;
       this.delta = delta;
+      this.confidenceLevel = confidenceLevel;
     },
     save(editedItemFromDialog) {
       this.editedItem = Object.assign({}, editedItemFromDialog);
-      if (this.editedIndex > -1) {
+      if (this.isEditionMode) {
         Object.assign(this.statistics[this.editedIndex], this.editedItem);
       } else {
         for (let variable of this.editedItem.variable) {
@@ -160,6 +175,9 @@ export default {
       this.editedIndex = this.statistics.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialogAddStatistic = true;
+    },
+    changeLockStatus(item) {
+      item.locked = !item.locked;
     },
     deleteItem(item) {
       this.editedIndex = this.statistics.indexOf(item);

@@ -8,8 +8,7 @@
       dismissible
       close-icon="mdi-close"
   >
-    <strong>{{ title }}</strong>
-    <p class="my-1">{{ text }}</p>
+    <slot name="content"></slot>
   </v-alert>
 </template>
 
@@ -20,11 +19,9 @@
     align-self: start;
     top: 15px;
   }
-
   .v-alert__content p {
     width: 98%;
   }
-
   .mdi-close {
     color: rgba(0, 0, 0, 0.4) !important;
   }
@@ -33,7 +30,6 @@
 
 <script>
 export default {
-  name: "BorderTopAlertDismissible",
-  props: ["title", "text"]
+  name: "BorderTopAlertDismissible"
 };
 </script>

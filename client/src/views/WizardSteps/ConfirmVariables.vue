@@ -27,6 +27,7 @@
     <v-data-table
         :headers="headers"
         :items="variables"
+        class="my-10"
         :items-per-page="20"
         :loading="loadingVariables"
         :hide-default-footer="true"
@@ -49,7 +50,7 @@ Categorical: cat1, cat2, cat3,…"
         />
       </template>
       <template v-slot:[`item.index`]="{ index }">
-        <span class="index-td">{{ index + 1 }}</span>
+        <span class="index-td grey--text">{{ index + 1 }}</span>
       </template>
       <template v-slot:[`item.name`]="{ item }">
         <div v-if="item.editDisabled">
@@ -74,37 +75,34 @@ Categorical: cat1, cat2, cat3,…"
               chips
               label="Add categories"
               multiple
-              background-color="blue lighten-4"
+              class="my-0 py-0"
+              background-color="soft_primary my-0"
           >
             <template v-slot:selection="{ attrs, item, select, selected }">
-              <v-chip
-                  v-bind="attrs"
-                  :input-value="selected"
-                  close
-                  color="blue darken-2"
-                  text-color="white"
-                  @click="select"
-                  @click:close="removeCategoryFromVariable(item, variable)"
-              >
-                <strong>{{ item }}</strong>
-              </v-chip>
+              <ChipSelectItem
+                  :v_bind="attrs"
+                  :input_value="selected"
+                  :click="select"
+                  :click_close="() => removeCategoryFromVariable(item, variable)"
+                  :item="item"
+              />
             </template>
           </v-combobox>
         </div>
         <div v-if="variable.type === 'Numerical'" class="range-input-wrapper">
           <v-text-field
-              background-color="blue lighten-4"
+              background-color="soft_primary mb-0"
               type="number"
               label="Add min"
               v-model="variable.additional_information['min']"
-              class="text-center"
+              class="text-center py-0"
           ></v-text-field>
           <v-text-field
-              background-color="blue lighten-4"
+              background-color="soft_primary mb-0"
               type="number"
               label="Add max"
               v-model="variable.additional_information['max']"
-              class="text-center"
+              class="text-center py-0"
           ></v-text-field>
         </div>
       </template>
@@ -123,8 +121,20 @@ Categorical: cat1, cat2, cat3,…"
     border-bottom-color: black !important;
   }
 
+  .v-data-table > .v-data-table__wrapper > table > thead > tr > th {
+    font-size: 0.875rem;
+  }
+
+  .v-data-table > .v-data-table__wrapper > table > tbody > tr > td {
+    height: 60px;
+  }
+
   input {
     font-size: 0.875rem;
+  }
+
+  .v-text-field__details {
+    display: none;
   }
 
   .index-td {
@@ -141,32 +151,26 @@ Categorical: cat1, cat2, cat3,…"
     display: grid;
     grid-template-columns: 47.5% 47.5%;
     grid-gap: 5%;
-
     input {
       text-align: center;
     }
-
     .v-label:not(.v-label--active) {
       width: 100%;
       padding-left: 20px;
     }
   }
-
   .v-select__slot {
     padding-left: 20px;
   }
-
   div[role="combobox"] {
     .v-input__append-inner {
       display: none;
     }
-
     .v-label:not(.v-label--active) {
       left: unset !important;
       top: unset !important;
     }
   }
-
   .v-input__control {
     border-top-left-radius: 5px !important;
     border-top-right-radius: 5px !important;
@@ -178,10 +182,15 @@ Categorical: cat1, cat2, cat3,…"
 import QuestionIconTooltip from "../../components/DynamicHelpResources/QuestionIconTooltip.vue";
 import ColoredBorderAlert from "../../components/DynamicHelpResources/ColoredBorderAlert.vue";
 import LoadingBar from "../../components/LoadingBar.vue";
-
+import ChipSelectItem from "../../components/DesignSystem/ChipSelectItem.vue";
 export default {
   name: "ConfirmVariables",
-  components: {LoadingBar, QuestionIconTooltip, ColoredBorderAlert},
+  components: {
+    LoadingBar,
+    QuestionIconTooltip,
+    ColoredBorderAlert,
+    ChipSelectItem
+  },
   mounted: function () {
     setTimeout(() => {
       this.loadingVariables = false;
@@ -203,7 +212,7 @@ export default {
         {
           name: "Age 4",
           label: "Variable label 4",
-          type: "Numerical",
+          type: "Boolean",
           additional_information: {},
           editDisabled: true
         },

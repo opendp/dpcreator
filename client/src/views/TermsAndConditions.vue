@@ -1,8 +1,13 @@
 <template>
-  <div class="terms-and-conditions mt-16">
+  <div
+      class="terms-and-conditions mt-5 mb-10"
+      :class="{
+      'px-5': $vuetify.breakpoint.xsOnly
+    }"
+  >
     <v-container>
       <v-row>
-        <v-col offset-md="2" cols="10" md="6">
+        <v-col offset-sm="1" sm="10" offset-md="2" cols="12" md="6">
           <h1 class="title-size-1">Terms of use</h1>
           <p>
             The following Terms govern all use of the Harvard Web Publishing

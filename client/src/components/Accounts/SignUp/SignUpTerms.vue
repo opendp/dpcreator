@@ -1,14 +1,16 @@
 <template>
   <div>
-    <h2 class="title-size-2 mb-10">
-      <strong>1/2. </strong>Check and accept Terms of Use
+    <h2
+        class="title-size-2 mb-10"
+        :class="{ 'ml-5': $vuetify.breakpoint.xsOnly }"
+    >
+      <strong>1/2. </strong>Check and accept Terms of Use:
     </h2>
-    <v-card class="mb-5 rounded-lg terms-card" elevation="2">
-      <v-card-title
-      >Terms for depositing a DP release back to Dataverse
-      </v-card-title
-      >
-      <v-card-text>
+    <ShadowBoxWithScroll>
+      <template v-slot:title>
+        Terms for depositing a DP release back to Dataverse
+      </template>
+      <template v-slot:scrollable-area>
         <p>
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora
           reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi
@@ -45,28 +47,20 @@
           dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt
           eligendi voluptatem deleniti iste! Veritatis, voluptate!
         </p>
-      </v-card-text>
-      <v-card-actions>
-        <v-checkbox v-model="confirmTerms1"
-        >
-          <template v-slot:label
-          >
-            <div class="primary--text">
-              I have read and agree to the Terms of Service.
-            </div>
-          </template
-          >
-        </v-checkbox
-        >
-      </v-card-actions>
-    </v-card>
+      </template>
+      <template v-slot:actions>
+        <Checkbox
+            :value.sync="confirmTerms1"
+            text="I have read and agree to the Terms of Service."
+        />
+      </template>
+    </ShadowBoxWithScroll>
 
-    <v-card class="mb-5 rounded-lg terms-card" elevation="2">
-      <v-card-title
-      >Terms for depositing a DP release back to Dataverse
-      </v-card-title
-      >
-      <v-card-text>
+    <ShadowBoxWithScroll>
+      <template v-slot:title>
+        Terms for depositing a DP release back to Dataverse
+      </template>
+      <template v-slot:scrollable-area>
         <p>
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora
           reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi
@@ -103,54 +97,64 @@
           dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt
           eligendi voluptatem deleniti iste! Veritatis, voluptate!
         </p>
-      </v-card-text>
-      <v-card-actions>
-        <v-checkbox v-model="confirmTerms2"
-        >
-          <template v-slot:label
-          >
-            <div class="primary--text">
-              I have read and agree to the Terms of Service.
-            </div>
-          </template
-          >
-        </v-checkbox
-        >
-      </v-card-actions>
-    </v-card>
-    <v-btn
+      </template>
+      <template v-slot:actions>
+        <Checkbox
+            :value.sync="confirmTerms2"
+            text="I have read and agree to the Terms of Service."
+        />
+      </template>
+    </ShadowBoxWithScroll>
+    <Button
         :disabled="!confirmTerms1 || !confirmTerms2"
-        class="mr-4 mt-6"
+        classes="mt-6"
+        :class="{
+        'width80 mx-auto d-block': $vuetify.breakpoint.xsOnly,
+        'mr-2': $vuetify.breakpoint.smAndUp
+      }"
         color="primary"
-        @click="$emit('update:signUpStep', signUpStep + 1)"
-    >Continue
-    </v-btn
-    >
-    <v-btn color="primary" class="mt-6" outlined @click="$router.push('/')"
-    >Cancel
-    </v-btn
-    >
+        :click="handleContinue"
+        label="Continue"
+    />
+    <Button
+        color="primary"
+        classes="mt-6"
+        :class="{ 'width80 mx-auto d-block': $vuetify.breakpoint.xsOnly }"
+        outlined
+        :click="() => $router.push(NETWORK_CONSTANTS.HOME.PATH)"
+        label="Cancel"
+    />
   </div>
 </template>
 
-<style lang="scss" scoped>
-.terms-card {
-  border: 1px solid #c2c2c2;
-  box-shadow: 2px 2px 6px 0 rgba(0, 0, 0, 0.2);
-}
-
-.v-card__actions {
-  padding-left: 16px;
+<style lang="scss">
+.v-stepper__content {
+  @media (max-width: 600px) {
+    padding: 0 !important;
+  }
 }
 </style>
 
 <script>
+import ShadowBoxWithScroll from "../../DesignSystem/Boxes/ShadowBoxWithScroll.vue";
+import Button from "../../DesignSystem/Button.vue";
+import Checkbox from "../../DesignSystem/Checkbox.vue";
+import NETWORK_CONSTANTS from "../../../router/NETWORK_CONSTANTS";
+
 export default {
+  components: {ShadowBoxWithScroll, Checkbox, Button},
   name: "SignUpTerms",
   props: ["signUpStep"],
   data: () => ({
     confirmTerms1: false,
-    confirmTerms2: false
-  })
+    confirmTerms2: false,
+    NETWORK_CONSTANTS
+  }),
+  methods: {
+    handleContinue: function () {
+      window.scrollTo(0, 0);
+      this.$emit("update:signUpStep", this.signUpStep + 1);
+    }
+  }
 };
 </script>

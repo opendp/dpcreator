@@ -1,5 +1,5 @@
 <template>
-  <div class="wizard-page mt-16">
+  <div class="wizard-page">
     <v-container>
       <v-row>
         <v-col>
@@ -8,7 +8,8 @@
             <v-stepper-items>
               <span class="d-block mt-5"
               >Used dataset:
-                <a href="http://" class="text-decoration-none font-weight-bold"
+                <!-- TODO: This name should be the original from the loaded dataset -->
+                <a href="http://" class="text-decoration-none"
                 >California Demographic Dataset
                   <v-icon small color="primary">mdi-open-in-new</v-icon></a
                 ></span
@@ -30,8 +31,13 @@
               </v-stepper-content>
             </v-stepper-items>
           </v-stepper>
+          <WizardNavigationButtons
+              :steps="steps"
+              :stepperPosition.sync="stepperPosition"
+              class="hidden-md-and-up"
+          />
         </v-col>
-        <v-col cols="3" class="hidden-sm-and-down">
+        <v-col cols="3" lg="2" class="hidden-sm-and-down">
           <WizardNavigationButtons
               :steps="steps"
               :stepperPosition.sync="stepperPosition"
@@ -45,12 +51,6 @@
 <style scoped lang="scss">
 .v-stepper {
   box-shadow: none;
-}
-
-.sticky-wizard {
-  position: sticky;
-  top: 144px;
-  z-index: 1;
 }
 
 .v-stepper__content {
@@ -72,7 +72,6 @@ import GenerateDPRelease from "./WizardSteps/GenerateDPRelease.vue";
 import StepperHeader from "../components/Wizard/StepperHeader.vue";
 import WizardNavigationButtons from "../components/Wizard/WizardNavigationButtons.vue";
 import ValidateDataset from "./WizardSteps/ValidateDataset.vue";
-
 export default {
   name: "Wizard",
   components: {
@@ -94,19 +93,19 @@ export default {
     stepperPosition: 0,
     steps: [
       {
-        title: "Start",
+        title: "Validate Dataset",
         completed: false
       },
       {
-        title: "Confirm variables",
+        title: "Confirm Variables",
         completed: false
       },
       {
-        title: "Set epsilon value",
+        title: "Set Epsilon Value",
         completed: false
       },
       {
-        title: "Create statistics",
+        title: "Create Statistics",
         completed: false
       },
       {

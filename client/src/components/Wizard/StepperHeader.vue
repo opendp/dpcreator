@@ -1,19 +1,16 @@
 <template>
-  <v-stepper-header class="grey lighten-4">
+  <v-stepper-header class="wizard_navigator rounded">
     <template v-for="(step, i) in steps">
       <v-stepper-step
           :editable="isEditable(i)"
-          :key="i"
-          :complete="stepperPosition > i"
+          :key="i + '-v1'"
+          :complete="isStepCompleted(i)"
           :step="i"
           edit-icon="mdi-check"
       >
         {{ step.title }}
       </v-stepper-step>
-      <v-divider
-          :key="'step-divider-' + i"
-          v-if="i !== steps.length - 1"
-      ></v-divider>
+      <v-divider :key="i + '-v2'" v-if="i !== steps.length - 1"></v-divider>
     </template>
   </v-stepper-header>
 </template>
@@ -36,6 +33,14 @@
 }
 </style>
 
+<style lang="scss">
+.v-application .v-stepper__label {
+  @media screen and (max-width: 1080px) {
+    font-size: 0.75rem;
+  }
+}
+</style>
+
 <script>
 export default {
   name: "StepperHeader",
@@ -49,6 +54,9 @@ export default {
         }
       }
       return editable;
+    },
+    isStepCompleted(i) {
+      return this.stepperPosition > i;
     }
   }
 };

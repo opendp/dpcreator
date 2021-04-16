@@ -1,6 +1,10 @@
 <template>
-  <section style="backgroundColor: #F7F8F9" class="pa-12 mt-16">
-    <v-container>
+  <section class="py-11 mt-16 soft_secondary">
+    <v-container
+        :class="{
+        'px-0': $vuetify.breakpoint.xsOnly
+      }"
+    >
       <v-row>
         <v-col>
           <h2 class="title-size-2 font-weight-bold mb-5">

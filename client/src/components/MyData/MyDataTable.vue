@@ -4,11 +4,12 @@
         :headers="headers"
         :items="datasets"
         :items-per-page="computedItemsPerPage"
-        :search="searchTerm ? searchTerm : search"
+        :search="searchTerm || search"
         :hide-default-footer="true"
         class="my-data-table"
         :page.sync="page"
         @page-count="pageCount = $event"
+        :disable-sort="$vuetify.breakpoint.xsOnly"
     >
       <template v-slot:top v-if="inlineSearchEnabled">
         <v-text-field
@@ -23,31 +24,48 @@
         >
       </template>
       <template v-slot:[`item.num`]="{ index }">
-        <span class="index-td">{{ index + 1 }}</span>
+        <span class="index-td hidden-xs-only grey--text">{{ index + 1 }}</span>
       </template>
       <template v-slot:[`item.status`]="{ item }">
-        <v-chip :color="statusInformation[item.status].color" label>
-          <v-icon left small>
-            {{ statusInformation[item.status].icon }}
-          </v-icon>
-          {{ statusInformation[item.status].label }}
-        </v-chip>
+        <StatusTag :status="item.status"/>
+      </template>
+      <template v-slot:[`item.remainingTime`]="{ item }">
+        <span
+            :class="{
+            'error_status__color--text': item.remainingTime === 'Expired'
+          }"
+        >{{ item.remainingTime }}</span
+        >
       </template>
       <template v-slot:[`item.options`]="{ item }">
-        <v-btn
-            v-for="action in statusInformation[item.status].availableActions"
-            :key="action"
+        <Button
+            v-for="(action, index) in statusInformation[item.status]
+            .availableActions"
+            :key="action + '-' + index"
+            small
+            :outlined="action !== CONTINUE_WORKFLOW"
+            :disabled="
+            (action === CONTINUE_WORKFLOW &&
+              item.remainingTime === 'Expired') ||
+              (action === CONTINUE_WORKFLOW && $vuetify.breakpoint.xsOnly)
+          "
             color="primary"
-            :class="`mr-3 ${action}`"
-            @click="handleButtonClick(action, item)"
-        >
-          {{ actionsInformation[action] }}
-        </v-btn>
+            :class="{
+            'width100 d-block': $vuetify.breakpoint.xsOnly,
+            'mr-2': $vuetify.breakpoint.smAndUp
+          }"
+            :classes="`my-2 ${action}`"
+            :click="() => handleButtonClick(action, item)"
+            :label="actionsInformation[action]"
+        />
       </template>
       <template v-slot:footer="{ props }">
         <div
             v-if="paginationVisible"
             class="d-flex justify-space-between mt-10 itemsPerPage"
+            :class="{
+            'flex-column align-center': $vuetify.breakpoint.xsOnly
+          }"
         >
           <div class="d-inline">
             Showing
@@ -81,20 +99,20 @@
     span {
       color: #000000;
     }
-  }
 
+    color: inherit !important;
+    border-bottom-color: black !important;
+  }
   .index-td {
     color: rgba(0, 0, 0, 0.6);
     font-weight: 600;
     font-size: 0.75rem;
   }
-
   .select {
     max-width: 90px;
     text-align: center;
     margin: 0 10px !important;
   }
-
   .v-select__selections input {
     display: none;
   }
@@ -113,6 +131,10 @@
     text-align: start !important;
   }
 
+  &.v-data-table > .v-data-table__wrapper > table > thead > tr > th {
+    font-size: 0.875rem;
+  }
+
   .itemsPerPage {
     font-size: 0.875rem;
 
@@ -129,16 +151,39 @@
   .viewDetails {
     min-width: unset !important;
   }
+
+  .v-data-table-header-mobile {
+    display: none;
+  }
+
+  .v-data-table__mobile-table-row {
+    .v-data-table__mobile-row:first-child {
+      display: none;
+    }
+
+    .v-data-table__mobile-row {
+      align-items: unset;
+    }
+  }
 }
 </style>
 
 <script>
 import statusInformation from "../../data/statusInformation";
 import actionsInformation from "../../data/actionsInformation";
+import StatusTag from "../DesignSystem/StatusTag.vue";
+import Button from "../DesignSystem/Button.vue";
+import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
+
+const {
+  VIEW_DETAILS,
+  CONTINUE_WORKFLOW,
+  CANCEL_EXECUTION
+} = actionsInformation.actions;
 
 export default {
   name: "MyDataTable",
-
+  components: {StatusTag, Button},
   props: {
     datasets: {
       type: Array
@@ -152,7 +197,7 @@ export default {
     },
     itemsPerPage: {
       type: Number,
-      default: 3
+      default: 4
     },
     paginationVisible: {
       type: Boolean,
@@ -169,10 +214,14 @@ export default {
         {value: "num"},
         {text: "Dataset", value: "dataset"},
         {text: "Status", value: "status"},
+        {text: "Remaining time to complete release", value: "remainingTime"},
         {text: "Options", value: "options", align: "end"}
       ],
       statusInformation,
-      actionsInformation
+      actionsInformation,
+      VIEW_DETAILS,
+      CONTINUE_WORKFLOW,
+      CANCEL_EXECUTION
     };
   },
   methods: {
@@ -180,12 +229,14 @@ export default {
       this[action](item);
     },
     viewDetails(item) {
-      this.$router.push(`/my-data/${item.datasetId}`);
+      this.$router.push(`${NETWORK_CONSTANTS.MY_DATA.PATH}/${item.datasetId}`);
     },
     continueWorkflow(item) {
+      //TODO: Implement Continue Workflow handler
       alert("continue workflow " + item.dataset);
     },
     cancelExecution(item) {
+      //TODO: Implement Cancel Execution handler
       alert("cancel execution " + item.dataset);
     }
   }

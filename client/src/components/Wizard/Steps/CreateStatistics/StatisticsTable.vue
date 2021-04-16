@@ -21,16 +21,18 @@
         <div class="d-flex justify-space-between">
           <v-tooltip bottom max-width="220px">
             <template v-slot:activator="{ on, attrs }">
+              <!-- TODO: Implement the logic of locking a statistic -->
               <v-icon
                   v-bind="attrs"
                   v-on="on"
                   class="mr-2"
-                  @click="$emit('editStatistic', item)"
+                  @click="$emit('changeLockStatus', item)"
               >
-                mdi-lock
+                {{ item.locked ? "mdi-lock" : "mdi-lock-open" }}
               </v-icon>
             </template>
-            <span>Lock</span>
+            <!-- TODO: Define the default status of the lock and adjust the label of the tooltip -->
+            <span>Lock/Unlock</span>
           </v-tooltip>
           <v-tooltip bottom max-width="220px">
             <template v-slot:activator="{ on, attrs }">
@@ -60,23 +62,30 @@
         </div>
       </template>
     </v-data-table>
-    <v-btn
-        color="blue lighten-4 primary--text"
+    <Button
+        color="soft_primary primary--text"
         width="100%"
         depressed
-        @click="$emit('newStatisticButtonPressed')"
+        :click="() => $emit('newStatisticButtonPressed')"
     >
       <v-icon left>mdi-plus-box</v-icon>
       Create new statistic
-    </v-btn>
+    </Button>
   </div>
 </template>
 
+<style lang="scss">
+.v-data-table__empty-wrapper {
+  font-style: italic;
+}
+</style>
+
 <script>
+import Button from "../../../DesignSystem/Button.vue";
 import QuestionIconTooltip from "../../../DynamicHelpResources/QuestionIconTooltip.vue";
 
 export default {
-  components: {QuestionIconTooltip},
+  components: {QuestionIconTooltip, Button},
   name: "StatisticsTable",
   props: ["statistics"],
   data: () => ({

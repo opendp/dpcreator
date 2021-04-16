@@ -22,5 +22,11 @@ export default {
         color: "light-green lighten-3",
         icon: "",
         availableActions: ["viewDetails"]
+    },
+    statuses: {
+        IN_PROGRESS: "in_progress",
+        IN_EXECUTION: "in_execution",
+        ERROR: "error",
+        COMPLETED: "completed"
     }
 };

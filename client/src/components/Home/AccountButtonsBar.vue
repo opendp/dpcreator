@@ -1,22 +1,31 @@
 <template>
-  <div class="d-flex justify-center">
-    <v-btn
-        class="ma-5 account-buttons__item"
+  <div
+      class="d-flex justify-center"
+      :class="{ 'flex-column align-center py-5': $vuetify.breakpoint.xsOnly }"
+  >
+    <Button
+        classes="account-buttons__item"
+        :class="{
+        'mx-5 my-2 width80': $vuetify.breakpoint.xsOnly,
+        'ma-2': $vuetify.breakpoint.smAndUp
+      }"
         color="primary"
-        @click="$router.push('/log-in')"
+        :click="() => $router.push(NETWORK_CONSTANTS.LOGIN.PATH)"
         :disabled="buttonsDisabled"
-    >Log in
-    </v-btn
-    >
-    <v-btn
-        class="ma-5 account-buttons__item"
+        label="Log in"
+    />
+    <Button
+        classes="account-buttons__item"
+        :class="{
+        'mx-5 my-2 width80': $vuetify.breakpoint.xsOnly,
+        'ma-2': $vuetify.breakpoint.smAndUp
+      }"
         color="primary"
         outlined
-        @click="$router.push('/sign-up')"
+        :click="() => $router.push(NETWORK_CONSTANTS.SIGN_UP.PATH)"
         :disabled="buttonsDisabled"
-    >Create account
-    </v-btn
-    >
+        label="Create account"
+    />
   </div>
 </template>
 
@@ -27,10 +36,15 @@
 </style>
 
 <script>
+import Button from "../DesignSystem/Button.vue";
+import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
+
 export default {
+  components: {Button},
   name: "AccountButtonsBar",
   data: () => ({
-    buttonsDisabled: true
+    buttonsDisabled: true,
+    NETWORK_CONSTANTS
   }),
   mounted() {
     const that = this;

@@ -17,7 +17,9 @@ export default {
   props: ["type", "icon"],
   data: () => ({
     icons: {
-      warning: "mdi-alert"
+      info: "mdi-information",
+      warning: "mdi-alert",
+      error: "mdi-cancel"
     }
   })
 };

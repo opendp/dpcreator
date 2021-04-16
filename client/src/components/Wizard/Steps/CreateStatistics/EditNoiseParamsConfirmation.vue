@@ -1,6 +1,15 @@
 <template>
-  <v-dialog v-model="dialog" width="50%">
+  <v-dialog
+      v-model="dialog"
+      :width="$vuetify.breakpoint.smAndDown ? '90%' : '50%'"
+  >
     <v-card elevation="2" class="px-10 py-12">
+      <v-icon
+          style="position: absolute; right: 40px"
+          @click="() => $emit('update:dialog', false)"
+      >mdi-close
+      </v-icon
+      >
       <v-card-title>
         <h2 class="title-size-2 mb-5">Are you sure you want to proceed?</h2>
       </v-card-title>
@@ -12,24 +21,29 @@
       </v-card-text>
 
       <v-card-actions>
-        <v-btn color="primary" class="mr-2 px-5" @click="$emit('confirm')">
-          Yes
-        </v-btn>
-        <v-btn
+        <Button
+            color="primary"
+            classes="mr-2 px-5"
+            :click="() => $emit('confirm')"
+            label="Yes"
+        />
+
+        <Button
             color="primary"
             outlined
-            class="px-5"
-            @click="$emit('update:dialog', false)"
-        >
-          Cancel
-        </v-btn>
+            classes="px-5"
+            :click="() => $emit('update:dialog', false)"
+            label="Cancel"
+        />
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
+import Button from "../../../DesignSystem/Button.vue";
 export default {
+  components: {Button},
   name: "EditNoiseParamsConfirmationDialog",
   props: ["dialog"]
 };

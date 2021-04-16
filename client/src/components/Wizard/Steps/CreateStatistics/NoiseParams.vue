@@ -3,7 +3,7 @@
     <v-row class="mb-10">
       <v-col>
         <div
-            class="blue lighten-4 grey--text text--darken-2
+            class="borderBottom soft_primary grey--text text--darken-2
 		  pa-3 top-borders-radius noise-params d-flex 
 		  justify-space-between"
         >
@@ -19,7 +19,7 @@
       </v-col>
       <v-col>
         <div
-            class="blue lighten-4 grey--text text--darken-2
+            class="borderBottom soft_primary grey--text text--darken-2
 		  pa-3 top-borders-radius noise-params d-flex 
 		  justify-space-between"
         >
@@ -35,7 +35,7 @@
       </v-col>
       <v-col>
         <div
-            class="blue lighten-4 grey--text text--darken-2 pa-3 top-borders-radius noise-params d-flex justify-space-between"
+            class="borderBottom soft_primary grey--text text--darken-2 pa-3 top-borders-radius noise-params d-flex justify-space-between"
         >
           <span>Confidence level</span>
           <span>
@@ -50,6 +50,12 @@
     </v-row>
   </div>
 </template>
+
+<style lang="scss">
+.v-application .borderBottom {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.42) !important;
+}
+</style>
 
 <script>
 export default {
