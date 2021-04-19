@@ -120,16 +120,13 @@ export default {
 
     },
     checkDataverseUser() {
-      console.log('checking for handoff')
-      if (this.handoffId) {
-        console.log('found handoff')
-        this.$store.dispatch('auth/fetchUser')
-            .then(() => {
-              console.log('dispatching  update')
-              this.$store.dispatch('dataverse/updateDataverseUser', this.user['object_id'], this.handoffId)
-                  .catch((data) => console.log("error: " + data)).then((data) => console.log(data))
-            })
-      }
+       if (this.handoffId) {
+         this.$store.dispatch('auth/fetchUser')
+             .then(() => {
+               this.$store.dispatch('dataverse/updateDataverseUser', this.user['object_id'], this.handoffId)
+                   .catch((data) => console.log("error: " + data)).then((data) => console.log(data))
+             })
+       }
     },
   },
   data: () => ({

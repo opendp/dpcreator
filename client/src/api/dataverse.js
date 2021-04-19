@@ -21,29 +21,18 @@ export default {
     },
 
     /**
-     *  check if there is a DataverseUser for thie openDPUserId and siteUrl.
+     *  check if there is a DataverseUser for this openDPUserId and siteUrl.
      *  If there is not create one, else update it with latest info from Dataverse (using handoff object)
      *
-     *  TODO: update with new API call when ready
      * @param openDPUserId
      * @param handoffId
      * @returns {Promise<AxiosResponse<any>>} DataverseUser object
      */
-    createDataverseUser(openDPUserId, handoffId) {
-        console.log('calling API createDataverseUser ' + openDPUserId + ',' + handoffId)
-        const formData = new FormData()
-        formData.append("dataverse_handoff_id", handoffId)
-        formData.append("user_id", openDPUserId)
-        //   return session.post('/api/dataverses/dv_user/', formData);
-        return session.post('/api/dv-user/',
-            {dv_handoff: handoffId, user: openDPUserId});
-    },
     updateDataverseUser(openDPUserId, handoffId) {
         console.log('calling API updateDataverseUser ' + openDPUserId + ',' + handoffId)
         const formData = new FormData()
         formData.append("dataverse_handoff_id", handoffId)
         formData.append("user_id", openDPUserId)
-        //   return session.post('/api/dataverses/dv_user/', formData);
         return session.post('/api/dv-user/',
             {dv_handoff: handoffId, user: openDPUserId});
     },
