@@ -29,6 +29,15 @@ export default {
      * @param handoffId
      * @returns {Promise<AxiosResponse<any>>} DataverseUser object
      */
+    createDataverseUser(openDPUserId, handoffId) {
+        console.log('calling API createDataverseUser ' + openDPUserId + ',' + handoffId)
+        const formData = new FormData()
+        formData.append("dataverse_handoff_id", handoffId)
+        formData.append("user_id", openDPUserId)
+        //   return session.post('/api/dataverses/dv_user/', formData);
+        return session.post('/api/dv-user/',
+            {dv_handoff: handoffId, user: openDPUserId});
+    },
     updateDataverseUser(openDPUserId, handoffId) {
         console.log('calling API updateDataverseUser ' + openDPUserId + ',' + handoffId)
         const formData = new FormData()
@@ -36,7 +45,7 @@ export default {
         formData.append("user_id", openDPUserId)
         //   return session.post('/api/dataverses/dv_user/', formData);
         return session.post('/api/dv-user/',
-            {dataverse_handoff_id: handoffId, user_id: openDPUserId});
+            {dv_handoff: handoffId, user: openDPUserId});
     },
 
 };

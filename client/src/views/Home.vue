@@ -26,6 +26,14 @@ export default {
     TermsOfService,
     StepsGrid,
     AccountButtonsWaypointActivator
+  },
+  created() {
+    const handoffId = this.$route.query.id
+
+    if (handoffId) {
+      this.$store.dispatch('dataverse/setHandoffId', handoffId)
+
+    }
   }
 };
 </script>

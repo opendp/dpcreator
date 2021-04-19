@@ -88,13 +88,6 @@
                 labelBgColor="#F44336"
                 :handler="loginGoogle"
             />
-            <SocialLoginButton
-                mdiIcon="mdi-github"
-                iconBgColor="#2E2E2E"
-                label="Log in with GitHub"
-                labelBgColor="#050505"
-                :handler="loginGithub"
-            />
           </div>
         </v-col>
       </v-row>
