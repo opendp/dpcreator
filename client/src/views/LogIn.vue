@@ -78,13 +78,7 @@
                 labelBgColor="#F44336"
                 :handler="loginGoogle"
             />
-            <SocialLoginButton
-                mdiIcon="mdi-github"
-                iconBgColor="#2E2E2E"
-                label="Log in with GitHub"
-                labelBgColor="#050505"
-                :handler="loginGithub"
-            />
+
           </div>
         </v-col>
       </v-row>
@@ -97,10 +91,15 @@ import SocialLoginButton from "../components/Accounts/SocialLoginButton.vue";
 import SocialLoginSeparator from "../components/Accounts/SocialLoginSeparator.vue";
 import Button from "../components/DesignSystem/Button.vue";
 import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
+import {mapState} from 'vuex';
 
 export default {
   name: "MyData",
   components: {SocialLoginButton, SocialLoginSeparator, Button},
+  computed: {
+    ...mapState('auth', ['error', 'user']),
+    ...mapState('dataverse', ['handoffId']),
+  },
   methods: {
     handleLogin: function () {
       this.errorMessage = null;
@@ -121,22 +120,14 @@ export default {
 
     },
     checkDataverseUser() {
-      if (this.handoffId) {
-        this.$store.dispatch('auth/fetchUser')
-            .then(() => {
-              this.$store.dispatch('dataverse/updateDataverseUser', this.user['object_id'], this.handoffId)
-                  .catch(({data}) => console.log("error: " + data)).then(({data}) => console.log(data))
-            })
-      }
+       if (this.handoffId) {
+         this.$store.dispatch('auth/fetchUser')
+             .then(() => {
+               this.$store.dispatch('dataverse/updateDataverseUser', this.user['object_id'], this.handoffId)
+                   .catch((data) => console.log("error: " + data)).then((data) => console.log(data))
+             })
+       }
     },
-    loginGoogle: function () {
-      //TODO: Implement Login with Google
-      alert("login with Google!");
-    },
-    loginGithub: function () {
-      //TODO: Implement Login with Github
-      alert("login with Github!");
-    }
   },
   data: () => ({
     validLoginForm: false,
