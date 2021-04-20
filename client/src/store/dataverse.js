@@ -32,9 +32,10 @@ const actions = {
    * @returns {Promise<void>}
    */
   updateDataverseUser({commit, state}, OpenDPUserId) {
-    dataverse.updateDataverseUser(OpenDPUserId, state.handoffId)
+    return dataverse.updateDataverseUser(OpenDPUserId, state.handoffId)
         .then((resp) => {
           commit('SET_DATAVERSE_USER', resp.data)
+          return resp.data
         })
   },
 };
