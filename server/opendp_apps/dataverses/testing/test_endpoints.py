@@ -65,7 +65,10 @@ class BaseEndpointTest(TestCase):
             'last_name': 'test',
             'dv_general_token': 1234,
             'dv_sensitive_token': 1234,
-            'dv_token_update': None
+            'dv_token_update': None,
+            'siteUrl': 'https://dataverse.harvard.edu',
+            'fileId': 1,
+            'datasetPid': 'doi:10.7910/DVN/B7DHBK'
         }
 
     def set_mock_requests(self, req_mocker):

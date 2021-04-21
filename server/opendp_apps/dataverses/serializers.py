@@ -47,6 +47,10 @@ class DataverseUserSerializer(serializers.ModelSerializer):
 
 
 class DataverseHandoffSerializer(serializers.ModelSerializer):
+    dv_installation = serializers.SlugRelatedField(queryset=RegisteredDataverse.objects.all(),
+                                                   slug_field='dataverse_url',
+                                                   read_only=False)
+
     class Meta:
         model = DataverseHandoff
         exclude = ['apiGeneralToken', 'apiSensitiveDataReadToken']
