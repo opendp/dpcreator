@@ -19,13 +19,13 @@ jobs:
           cd server
           pip install -r requirements/dev.txt
           cd ../
-      # Install NPM dependencies, cache them correctly
-      # and run all Cypress tests
+      - name: Django server run
+        run: python manage.py runserver 0.0.0.0:8000
+          # Install NPM dependencies, cache them correctly
+        # and run all Cypress tests
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
           working-directory: ./client
           build: npm run build
           start: npm start
-      - name: Django server run
-        run: python manage.py runserver 0.0.0.0:8000
