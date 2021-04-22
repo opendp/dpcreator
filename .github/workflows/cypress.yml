@@ -31,4 +31,4 @@ jobs:
           working-directory: ./client
           build: npm run build
           start: npm start
-          wait-on: 'http://0.0.0.0:8080'
+          wait-on: 'http://0.0.0.0:8000'
