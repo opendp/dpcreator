@@ -1,14 +1,11 @@
-name: Cypress Tests
+name: docker-compose-actions-workflow
 
 on: [ push ]
 
 jobs:
-  cypress-run:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: Cypress run
-        uses: cypress-io/github-action@v2
-        with:
-          working-directory: ./client
-          run: docker-compose up --build
-          wait-on: 'http://0.0.0.0:8000'
+      - uses: actions/checkout@v2
+      - name: Build the stack
+        run: docker-compose up -d
