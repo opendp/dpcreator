@@ -52,11 +52,13 @@ class BaseEndpointTest(TestCase):
                 "persistentUserId": "updatedPersistentUserId",
                 "authenticationProviderId": "shib"
             }}
-        self.dv_user_invalid_token = {"status":"ERROR",
-            "message":"User with token 7957c20e-5316-47d5-bd23-2afd19f2d00a not found."}
+        self.dv_user_invalid_token = {
+            "status": "ERROR",
+            "message": "User with token 7957c20e-5316-47d5-bd23-2afd19f2d00a not found."
+        }
 
         self.data = {
-            'dv_installation': '2281c623-a06f-498a-8efc-23ebb0c25de1',
+            # 'dv_installation': 'https://dataverse.harvard.edu',
             'user': '4472310a-f591-403a-b8d6-dfb562f8b32f',
             'dv_handoff': '9e7e5506-dd1a-4979-a2c1-ec6e59e4769c',
             'persistent_id': 1,
@@ -66,6 +68,8 @@ class BaseEndpointTest(TestCase):
             'dv_general_token': 1234,
             'dv_sensitive_token': 1234,
             'dv_token_update': None,
+            # TODO: Repeated field, camelcase is for parent model field, snakecase is for serializer
+            'site_url': 'https://dataverse.harvard.edu',
             'siteUrl': 'https://dataverse.harvard.edu',
             'fileId': 1,
             'datasetPid': 'doi:10.7910/DVN/B7DHBK'

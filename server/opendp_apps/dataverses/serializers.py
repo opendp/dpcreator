@@ -47,13 +47,14 @@ class DataverseUserSerializer(serializers.ModelSerializer):
 
 
 class DataverseHandoffSerializer(serializers.ModelSerializer):
-    dv_installation = serializers.SlugRelatedField(queryset=RegisteredDataverse.objects.all(),
-                                                   slug_field='dataverse_url',
-                                                   read_only=False)
+    site_url = serializers.SlugRelatedField(queryset=RegisteredDataverse.objects.all(),
+                                            slug_field='dataverse_url',
+                                            read_only=False,
+                                            source='dv_installation')
 
     class Meta:
         model = DataverseHandoff
-        exclude = ['apiGeneralToken', 'apiSensitiveDataReadToken']
+        exclude = ['apiGeneralToken', 'apiSensitiveDataReadToken', 'dv_installation', 'siteUrl']
 
 
 class DataverseFileInfoSerializer(serializers.ModelSerializer):
