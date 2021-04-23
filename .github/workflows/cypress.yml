@@ -14,4 +14,4 @@ jobs:
         with:
           time: '30s'
       - name: Cypress run
-          uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v2
