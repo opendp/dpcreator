@@ -10,8 +10,8 @@ jobs:
       - name: Build the stack
         run: docker-compose up -d
       - name: Sleep for 30 seconds
-          uses: jakejarvis/wait-action@master
-          with:
-            time: '30s'
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '30s'
       - name: Cypress run
           uses: cypress-io/github-action@v2
