@@ -1,0 +1,70 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis
+    command: redis-server --requirepass password
+    expose:
+      - 6379
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+  # TODO: Load data every time
+  client:
+    build: "./client"
+    command: npm run serve
+    volumes:
+      - .:/code
+      - /code/client/node_modules
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+  server:
+    build: "./server"
+    # For production we will need to set
+    # these variables to point to a standalone instance
+    env_file:
+      - .env
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - client
+      - db
+  cypress:
+    image: "cypress/included:4.4.0"
+    depends_on:
+      - client
+      - server
+      - db
+    environment:
+      - CYPRESS_baseUrl=http://server:8000
+    working_dir: /e2e
+    volumes:
+      - ./client:/e2e
+    # command: ["./wait-for-it.sh", "server:8000", "-t", "60", "--", "npx", "cypress", "run"]
+    # command: ./wait-for-it.sh server:8000 -- echo "server is up"
+    # command: npx cypress run
+    #  task-queue:
+    #    build: "./server"
+    # For production we will need to set
+    # these variables to point to a standalone instance
+#    env_file:
+#      - .env
+#    #command: celery -A opendp_project worker -l info -n worker_dpcreator
+#    command: celery -A opendp_project worker -l INFO
+#    volumes:
+#      - .:/code
+#    ports:
+#      - "8070:8070"
+#    depends_on:
+#      - db
+#      - redis
