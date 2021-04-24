@@ -12,7 +12,6 @@ jobs:
       - name: Install dependencies
         run: |
           cd client
-          mkdir node_modules
           npm install
       - name: run Cypress tests
         run: |
