@@ -10,8 +10,6 @@ jobs:
       - name: Build the stack
         run: docker-compose up -d
       - name: Cypress run
-        uses: cypress-io/github-action@v2
-        with:
-          working-directory: ./client
-          build: npm run build
-          start: npm start
+        run: |
+          cd client
+          node_modules/.bin/cypress run
