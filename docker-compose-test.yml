@@ -15,16 +15,16 @@ services:
     ports:
       - "5432:5432"
   # TODO: Load data every time
-  client:
-    build: "./client"
-    command: npm run build
-    volumes:
-      - .:/code
-      - /code/client/node_modules
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
+  # client:
+  #   build: "./client"
+  #   command: npm run build
+  #   volumes:
+  #     - .:/code
+  #     - /code/client/node_modules
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - db
   server:
     container_name: webapp-frontend
     build: "./server"
@@ -39,12 +39,12 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - client
+      #     - client
       - db
   cypress:
     image: "cypress/included:4.4.0"
     depends_on:
-      - client
+      #   - client
       - server
       - db
     environment:
