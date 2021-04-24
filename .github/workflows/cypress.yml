@@ -9,7 +9,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build the stack
         run: docker-compose up -d
-      - name: Cypress run
+      - name: Install dependencies
+          run: |
+            cd client
+            npm install
+      - name: run Cypress tests
         run: |
           cd client
           node_modules/.bin/cypress run
