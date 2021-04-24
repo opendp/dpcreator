@@ -17,7 +17,7 @@ services:
   # TODO: Load data every time
   client:
     build: "./client"
-    command: npm run serve
+    command: npm run build
     volumes:
       - .:/code
       - /code/client/node_modules
@@ -26,6 +26,7 @@ services:
     depends_on:
       - db
   server:
+    container_name: webapp-frontend
     build: "./server"
     # For production we will need to set
     # these variables to point to a standalone instance
@@ -34,6 +35,7 @@ services:
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/code
+      - ./server/static:/server/static
     ports:
       - "8000:8000"
     depends_on:
