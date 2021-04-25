@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+
+
+  client:
+    build: "./client"
+    command: npm run build
+    volumes:
+      - .:/code
+      - /code/client/node_modules
+    ports:
+      - "8080:8080"

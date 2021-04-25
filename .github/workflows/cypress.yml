@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build the stack
-        run: docker-compose up -d
-      - name: curl test
-        run: curl localhost:8000
+      - name: Build the client static files
+        run: docker-compose-ci-step1.yml
+      - name: Build server and test
+        run: docker-compose-ci-step2.yml
