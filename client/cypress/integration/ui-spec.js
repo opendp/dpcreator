@@ -18,7 +18,7 @@
       describe('The Home Page Title', () => {
           it('successfully loads', () => {
               cy.visit('/') // change URL to match your dev URL
-              cy.get('thisdoesnotexist') // 9.
+              cy.get('h2') // 9.
                   .should('contain', 'Open')
           })
       })
