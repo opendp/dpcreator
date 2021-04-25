@@ -8,6 +8,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build the client static files
-        run: docker-compose-ci-step1.yml
+        run: docker-compose -f docker-compose-ci-step1.yml up
       - name: Build server and test
-        run: docker-compose-ci-step2.yml
+        run: docker-compose -f  docker-compose-ci-step2.yml up --exit-code-from cypress
