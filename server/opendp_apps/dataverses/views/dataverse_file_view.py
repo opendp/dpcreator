@@ -3,7 +3,6 @@ from rest_framework.response import Response
 
 from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses.dataverse_client import DataverseClient
-from opendp_apps.dataverses.dataverse_request_handler import DataverseRequestHandler
 from opendp_apps.dataverses.models import DataverseHandoff
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
 from opendp_apps.dataverses.serializers import DataverseFileInfoSerializer

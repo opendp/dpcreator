@@ -1,5 +1,6 @@
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from requests.utils import quote
 from rest_framework import viewsets
 from rest_framework.response import Response
 
@@ -31,4 +32,11 @@ class DataverseHandoffView(viewsets.ViewSet):
             # return Response({'id': new_obj.object_id}, status=status.HTTP_201_CREATED)
             return HttpResponseRedirect(client_url)
         else:
-            return HttpResponseRedirect(reverse('vue-home'))
+            error_code = ''
+            for k, v in dataverse_handoff.errors.items():
+                for error_detail in v:
+                    if error_detail.code in ['does_not_exist', 'required'] and k is not None:
+                        error_code += ','.join([k, ''])
+            # Remove trailing comma
+            error_code = quote(error_code[:-1])
+            return HttpResponseRedirect(reverse('vue-home') + f'?error_code={error_code}')
