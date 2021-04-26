@@ -36,5 +36,28 @@ export default {
         return session.post('/api/dv-user/',
             {dv_handoff: handoffId, user: openDPUserId});
     },
+    testHandoff() {
+        console.log('posting to dv-handoff')
+        session.post('/api/dv-handoff/', {
+            site_url: 'http://127.0.0.1:8000/dv-mock-api',
+            token: 'shoefly-dont-bother-m3',
+            fileId: '2342342',
+            datasetPid: 'doi:10.7910/DVN/TEST'
+
+        }).catch((error) => {
+            console.log(error)
+        })
+    },
+    getDataverseHandoff(handoffId) {
+        return session.get('/api/dv-handoff/', {
+            params: {
+                object_id: 'xyz'
+            }
+        })
+            .then(function (response) {
+                console.log(response);
+            })
+
+    }
 
 };

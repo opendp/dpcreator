@@ -108,6 +108,7 @@ import Button from "../../DesignSystem/Button.vue";
 import SocialLoginButton from "../SocialLoginButton.vue";
 import SocialLoginSeparator from "../SocialLoginSeparator.vue";
 import NETWORK_CONSTANTS from "../../../router/NETWORK_CONSTANTS";
+import {mapState} from "vuex";
 
 export default {
   components: {SocialLoginButton, SocialLoginSeparator, Button},
@@ -123,7 +124,21 @@ export default {
     },
     handleFormSubmit: function () {
       if (this.$refs.signUpForm.validate()) {
-        //TODO: Implement Sign Up logic here
+        let inputs = {
+          username: this.username,
+          password1: this.password,
+          password2: this.confirmPassword,
+          email: this.email,
+        }
+        this.$store.dispatch('signup/createAccount', inputs)
+            .then((resp) => {
+                  if (this.handoffId) {
+                    const openDPUserId = resp.data[0]
+                    this.$store.dispatch('dataverse/updateDataverseUser',
+                        openDPUserId)
+                  }
+                }
+            )
         this.$router.push(`${NETWORK_CONSTANTS.SIGN_UP.PATH}/confirmation`);
       }
     },
@@ -136,10 +151,36 @@ export default {
       alert("login with Github!");
     }
   },
+  computed: {
+    ...mapState('signup', ['registrationCompleted',
+      'registrationError',
+      'registrationLoading']),
+    ...mapState('dataverse', ['handoffId', 'dataverseUser']),
+    ...mapState('auth', ['user']),
+
+    registrationErrors() {
+      let errs = [];
+      if (this.errorMessage != null) {
+        if (this.errorMessage['password1'] != null)
+          errs = errs.concat(this.errorMessage['password1'])
+        if (this.errorMessage['email'] != null)
+          errs = errs.concat(this.errorMessage['email']);
+        if (this.errorMessage['non_field_errors'] != null)
+          errs = errs.concat(this.errorMessage['non_field_errors']);
+      }
+      return errs;
+    }
+  },
   data: () => ({
     validSignUpForm: false,
     showPassword: false,
     showConfirmPassword: false,
+    errorMessage: null,
+    googleSignInParams: {
+      // TODO:get from a shared location, instead of hard-coded
+      client_id: '725082195083-1srivl3ra9mpc1q5ogi7aur17vkjuabg.apps.googleusercontent.com',
+    },
+
     username: "",
     email: "",
     password: "",

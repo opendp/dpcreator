@@ -46,16 +46,25 @@
 </style>
 
 <script>
+import {mapState} from 'vuex';
+
 export default {
   name: "SignUpConfirmation",
+  created() {
+    this.$store.dispatch('auth/fetchUser')
+  },
   methods: {
     handleResendEmail: function () {
       //TODO: Implement the logic that resends the confirmation email
       alert("resend email!");
     }
   },
-  data: () => ({
-    email: "danny-fi@gmail.com"
-  })
+  data: () => ({}),
+  computed: {
+    ...mapState('auth', ['user']),
+    email() {
+      return (this.user) ? this.user.email : null
+    }
+  },
 };
 </script>
