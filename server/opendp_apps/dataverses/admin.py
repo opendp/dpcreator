@@ -7,9 +7,9 @@ from opendp_apps.dataverses.models import \
 
 class DataverseHandoffAdmin(admin.ModelAdmin):
     search_fields = ('name',)
-    list_display = ('name', 'object_id', 'siteUrl')
+    list_display = ('name', 'object_id', 'dv_installation')
     save_on_top = True
-    list_filter = ('siteUrl', )
+    list_filter = ('dv_installation', )
     readonly_fields = ('object_id',)
 
 
