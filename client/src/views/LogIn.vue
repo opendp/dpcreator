@@ -76,7 +76,7 @@
                 iconBgColor="#C53126"
                 label="Log in with Google"
                 labelBgColor="#F44336"
-                :handler="loginGoogle"
+                :handler="handleGoogle"
             />
 
           </div>
@@ -104,29 +104,34 @@ export default {
     handleLogin: function () {
       this.errorMessage = null;
       this.$store.dispatch('auth/login', this.inputs)
-          .catch((data) => {
-            this.errorMessage = data;
-          })
           .then(() => {
-            if (!this.error) {
-              this.checkDataverseUser();
-              this.$router.push('/welcome');
-            }
+            this.processLogin();
           })
-          .catch((data) => {
-            console.log(data);
-            this.errorMessage = data
-          });
-
     },
-    checkDataverseUser() {
-       if (this.handoffId) {
-         this.$store.dispatch('auth/fetchUser')
-             .then(() => {
-               this.$store.dispatch('dataverse/updateDataverseUser', this.user['object_id'], this.handoffId)
-                   .catch((data) => console.log("error: " + data)).then((data) => console.log(data))
-             })
-       }
+    handleGoogle(access_token) {
+      this.$store.dispatch('auth/googleLogin', access_token)
+          .then(() => {
+            this.processLogin();
+          })
+    },
+
+    processLogin() {
+      if (this.handoffId) {
+        this.$store.dispatch('auth/fetchUser')
+            .then((data) => {
+              this.$store.dispatch('dataverse/updateDataverseUser', this.user['object_id'], this.handoffId)
+                  .then((data) => {
+                    console.log('returned from updateUser:' + data)
+                    this.$router.push('/welcome');
+                  })
+                  .catch((data) => console.log(data))
+              this.errorMessage = data
+            })
+            .catch((data) => {
+              console.log(data)
+              this.errorMessage = data
+            });
+      }
     },
   },
   data: () => ({

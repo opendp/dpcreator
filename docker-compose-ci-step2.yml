@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis
+    command: redis-server --requirepass password
+    expose:
+      - 6379
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+  # TODO: Load data every time
+  server:
+    container_name: webapp-frontend
+    build: "./server"
+    # For production we will need to set
+    # these variables to point to a standalone instance
+    env_file:
+      - .env
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+      - ./server/static:/server/static
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+  cypress:
+    image: "cypress/included:4.4.0"
+    depends_on:
+      - server
+      - db
+    environment:
+      - CYPRESS_baseUrl=http://server:8000
+    working_dir: /e2e
+    volumes:
+      - ./client:/e2e
