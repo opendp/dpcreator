@@ -51,27 +51,16 @@ export default {
   methods: {
     onGoogleSignInSuccess(resp) {
       const access_token = resp.getAuthResponse(true).access_token
-      this.$store.dispatch('auth/googleLogin', access_token)
-          .then(() => {
-            this.checkDataverseUser();
-            this.$router.push('/welcome')
-          })
+      this.handler(access_token)
+
     },
     onGoogleSignInError(error) {
-      console.log('OH NOES', error)
+      console.log('google signin error:', error)
     },
     isEmpty(obj) {
       return Object.keys(obj).length === 0
     },
-    checkDataverseUser() {
-      if (this.handoffId) {
-        this.$store.dispatch('auth/fetchUser')
-            .then(() => {
-              this.$store.dispatch('dataverse/updateDataverseUser', this.user['object_id'], this.handoffId)
-                  .catch(({data}) => console.log("error: " + data)).then(({data}) => console.log(data))
-            })
-      }
-    }
+
   },
   data: () => ({
     googleSignInParams: {

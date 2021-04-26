@@ -1,6 +1,10 @@
 <template>
   <div class="home">
     <EventSuccessAlert text="Done! You are out." queryParam="logout"/>
+    <BadRequestAlert
+        :show-alert=showAlert
+        :alert-text=alertText
+    />
     <StepsGrid/>
     <TermsOfService/>
     <AccountButtons/>
@@ -16,10 +20,12 @@ import AccountButtonsWaypointActivator from "../components/Home/AccountButtonsWa
 import EventSuccessAlert from "../components/Home/EventSuccessAlert.vue";
 import StepsGrid from "../components/Home/StepsGrid.vue";
 import TermsOfService from "../components/Home/TermsOfService.vue";
+import BadRequestAlert from "@/components/Home/BadRequestAlert";
 
 export default {
   name: "Home",
   components: {
+    BadRequestAlert,
     AccountButtons,
     AboutOpenDPBanner,
     EventSuccessAlert,
@@ -32,8 +38,14 @@ export default {
 
     if (handoffId) {
       this.$store.dispatch('dataverse/setHandoffId', handoffId)
-
+    } else {
+      this.showAlert = true
+      this.alertText = 'handoff id is missing.'
     }
-  }
+  },
+  data: () => ({
+    showAlert: false,
+    alertText: 'here is some text',
+  })
 };
 </script>
