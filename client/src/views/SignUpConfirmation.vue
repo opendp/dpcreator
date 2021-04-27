@@ -5,9 +5,10 @@
         <v-col offset-md="2" offset-sm="1" sm="8" md="8">
           <h1 class="title-size-1">Check your inbox and confirm the account</h1>
           <p class="mb-0">
-            We have sent a confirmation link to the following email address:
+            <!-- We have sent a confirmation link to the following email address: -->
+            We have sent a confirmation link to your email address.
           </p>
-          <span class="font-weight-bold primary--text">{{ email }} </span>
+          <!--<span class="font-weight-bold primary--text">{{ email }} </span>-->
         </v-col>
       </v-row>
       <v-row>
@@ -46,16 +47,25 @@
 </style>
 
 <script>
+import {mapState} from 'vuex';
+
 export default {
   name: "SignUpConfirmation",
+  created() {
+    this.$store.dispatch('auth/fetchUser')
+  },
   methods: {
     handleResendEmail: function () {
       //TODO: Implement the logic that resends the confirmation email
       alert("resend email!");
     }
   },
-  data: () => ({
-    email: "danny-fi@gmail.com"
-  })
+  data: () => ({}),
+  computed: {
+    ...mapState('auth', ['user']),
+    email() {
+      return (this.user) ? this.user.email : null
+    }
+  },
 };
 </script>

@@ -19,6 +19,7 @@ import settings from "./settings";
 import Footer from "./components/Structure/Footer.vue";
 import Header from "./components/Structure/Header.vue";
 export default {
+  title: 'DP Creator',
   components: {Footer, Header},
   data: () => ({
     fontUrl: settings.google_fonts_url

@@ -27,25 +27,37 @@ class DataverseUserView(viewsets.ViewSet):
         # Validate the input
         # ----------------------------------
         # print(f"data: {request.data}")
+        request_data = request.data.copy()
+        print('create 1 request_data', request_data)
+
         user_id = request.data.get('user')
         handoff_id = request.data.get('dv_handoff')
-        request.data['handoff'] = handoff_id
-        request.data['user'] = user_id
 
-        handoff = get_object_or_error_response(DataverseHandoff, object_id=handoff_id)
+        request_data['handoff'] = handoff_id
+        request_data['user'] = user_id
+        print('create 2 request_data 2', request_data)
+
+        handoff_obj = get_object_or_error_response(DataverseHandoff, object_id=handoff_id)
+
+        print('create 3 handoff', handoff_obj)
 
         try:
-            dataverse_user = DataverseUser.objects.get(user__object_id=user_id, dv_installation=handoff.dv_installation)
+            dataverse_user = DataverseUser.objects.get(user__object_id=user_id,
+                                                       dv_installation=handoff_obj.dv_installation)
             opendp_user = dataverse_user.user
+            print('create 4c')
+
         except DataverseUser.DoesNotExist:
+            print('5 - does not exist')
             # ----------------------------------
             # Create the DataverseUser object
             # ----------------------------------
-            dataverse_user_serializer = DataverseUserSerializer(data=request.data, context={'request': request})
+            dataverse_user_serializer = DataverseUserSerializer(data=request_data, context={'request': request})
             if not dataverse_user_serializer.is_valid():
                 # print("INVALID SERIALIZER")
                 return Response(dataverse_user_serializer.errors,
                                 status=status.HTTP_400_BAD_REQUEST)
+
 
             try:
                 dataverse_user = dataverse_user_serializer.save()
@@ -56,28 +68,36 @@ class DataverseUserView(viewsets.ViewSet):
 
             opendp_user = dataverse_user_serializer.validated_data.get('user')
 
+
         # ----------------------------------
         # Call the Dataverse API
         # ----------------------------------
-        site_url = handoff.siteUrl
+        site_url = handoff_obj.siteUrl
+
         api_general_token = dataverse_user.dv_general_token
+
         dataverse_client = DataverseClient(site_url, api_general_token)
         try:
             dataverse_response = dataverse_client.get_user_info(user_api_token=api_general_token)
         except InvalidSchema:
+            print('create 10: InvalidSchema')
             return Response(get_json_error(f'The Site {site_url} is not valid'), status=status.HTTP_400_BAD_REQUEST)
         except JSONDecodeError:
+            print('create 11: JSONDecodeError')
             return Response(get_json_error(f'Error reading data from {site_url}'), status=status.HTTP_400_BAD_REQUEST)
 
         if dataverse_response.success is not True:
+            print('create 12: dataverse_response.message')
             return Response(get_json_error(dataverse_response.message), status=status.HTTP_400_BAD_REQUEST)
 
         try:
+            print('create 14')
             handler = DataverseUserHandler(opendp_user.id, site_url,
                                            api_general_token,
                                            dataverse_response.__dict__)
             update_response = handler.update_dataverse_user()
         except DataverseResponseError as ex:
+            print('create 16')
             return Response(get_json_error(f'Error {ex}'), status=status.HTTP_400_BAD_REQUEST)
 
         return Response(get_json_success('success', data={'dv_user': dataverse_user.object_id}),

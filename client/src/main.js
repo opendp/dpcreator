@@ -14,6 +14,10 @@ import VueWaypoint from "vue-waypoint";
 
 Vue.use(VueWaypoint);
 
+import titleMixin from './mixins/titleMixin'
+
+Vue.mixin(titleMixin)
+
 new Vue({
   router,
   store,

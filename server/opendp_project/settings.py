@@ -238,7 +238,7 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL') \
     if os.environ.get('DEFAULT_FROM_EMAIL') else 'kraffmilleropendptest@gmail.com'
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = 'true'
-ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/login/'
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/log-in/'
 
 # ---------------------------
 # Profiler - Dataset reading

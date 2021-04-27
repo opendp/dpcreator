@@ -11,7 +11,7 @@
       <v-container class="my-5 fill-height">
         <v-col class="logo" cols="3">
           <router-link class="router-link" :to="NETWORK_CONSTANTS.HOME.PATH"
-          >Logo
+          >DP Creator
           </router-link
           >
         </v-col>
@@ -95,9 +95,8 @@
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title
-                @click="$router.push('/?logout=true')"
+                @click="$router.push('/logout')"
                 class="red--text text--accent-4"
-                v-on:click="logoutHandler()"
             >Logout
             </v-list-item-title
             >
@@ -118,12 +117,17 @@
 
 <script>
 import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
+import {mapGetters, mapState} from "vuex";
 export default {
   name: "Header",
   computed: {
-    //TODO: this should be changed to adapt the way the login logic was implemented
+    ...mapGetters('auth', ['isAuthenticated', 'isTermsAccepted']),
+    ...mapState('auth', ['user']),
+    username() {
+      return (this.user) ? this.user.username : null
+    },
     isLoggedUser: function () {
-      return localStorage.getItem("isLoggedUser");
+      return this.isAuthenticated;
     },
     mobileMenu: function () {
       return this.isLoggedUser

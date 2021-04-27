@@ -23,12 +23,33 @@ class DataverseHandoffView(viewsets.ViewSet):
         Temporarily save the Dataverse paramemeters +
         redirect to the Vue page
         """
+        ## Fix this!!! #161
+        request_data = request.data.copy()
+        print('handoff-create: request.data', request_data)
 
-        dataverse_handoff = DataverseHandoffSerializer(data=request.data)
+        dataverse_handoff = DataverseHandoffSerializer(data=request_data)
 
         if dataverse_handoff.is_valid():
-            new_obj = dataverse_handoff.save()
-            client_url = reverse('vue-home') + f'?id={str(new_obj.object_id)}'
+
+            new_dv_handoff = dataverse_handoff.save()
+            # serious hack
+            ## Fix this!!! #161
+            new_dv_handoff.siteUrl = new_dv_handoff.dv_installation.dataverse_url
+
+            if 'token' in request_data:
+                new_dv_handoff.apiGeneralToken = request_data['token']
+                new_dv_handoff.apiSensitiveDataReadToken = request_data['token']
+            if 'fileId' in request_data:
+                new_dv_handoff.fileId = request_data['fileId']
+
+            new_dv_handoff.save()
+
+            # Fix this!!! #161
+            if not new_dv_handoff.is_site_url_registered():
+                error_code = 'site_url'
+                return HttpResponseRedirect(reverse('vue-home') + f'?error_code={error_code}')
+
+            client_url = reverse('vue-home') + f'?id={str(new_dv_handoff.object_id)}'
             # return Response({'id': new_obj.object_id}, status=status.HTTP_201_CREATED)
             return HttpResponseRedirect(client_url)
         else:
@@ -39,4 +60,5 @@ class DataverseHandoffView(viewsets.ViewSet):
                         error_code += ','.join([k, ''])
             # Remove trailing comma
             error_code = quote(error_code[:-1])
+            print('error_code', error_code)
             return HttpResponseRedirect(reverse('vue-home') + f'?error_code={error_code}')

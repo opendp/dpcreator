@@ -6,23 +6,24 @@
   }),
       describe('The Home Page', () => {
           it('successfully loads', () => {
-              cy.visit('/') // change URL to match your dev URL
+              cy.visit('/')
           })
       }),
-      //   describe('serve static', () => {
-      //     it('successfully loads', () => {
-      //         cy.visit('/code/server/static/dist/css/chunk-2b9c28d5.efbb04fc.css') // change URL to match your dev URL
 
-      //     })
-      //   })
       describe('The Home Page Title', () => {
           it('successfully loads', () => {
-              cy.visit('/') // change URL to match your dev URL
-              cy.get('h2') // 9.
+              cy.visit('/')
+              cy.get('h2')
                   .should('contain', 'Open')
           })
       })
-
+    describe('The Home Page', () => {
+        it('shows correct error message', () => {
+            cy.visit('/')
+            cy.get('div')
+                .should('contain', 'To create a DP Release, please make a request from an registered Dataverse installation')
+        })
+    })
 
 }
 
