@@ -11,7 +11,7 @@
       <v-container class="my-5 fill-height">
         <v-col class="logo" cols="3">
           <router-link class="router-link" :to="NETWORK_CONSTANTS.HOME.PATH"
-          >Logo
+          >DP Creator
           </router-link
           >
         </v-col>
