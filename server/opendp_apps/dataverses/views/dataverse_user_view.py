@@ -42,12 +42,8 @@ class DataverseUserView(viewsets.ViewSet):
         print('create 3 handoff', handoff_obj)
 
         try:
-            print('create 4a')
-            print(f'user_id: {user_id}')
-            print(f'handoff_id: {handoff_id}')
             dataverse_user = DataverseUser.objects.get(user__object_id=user_id,
                                                        dv_installation=handoff_obj.dv_installation)
-            print('create 4b')
             opendp_user = dataverse_user.user
             print('create 4c')
 
@@ -62,31 +58,24 @@ class DataverseUserView(viewsets.ViewSet):
                 return Response(dataverse_user_serializer.errors,
                                 status=status.HTTP_400_BAD_REQUEST)
 
-            print('create 6')
 
             try:
                 dataverse_user = dataverse_user_serializer.save()
-                print('create 6a')
-
             except DataverseHandoff.DoesNotExist:
                 return Response(dataverse_user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             except DataverseUser.DoesNotExist:
                 return Response(dataverse_user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-            print('create 6')
-
             opendp_user = dataverse_user_serializer.validated_data.get('user')
 
-            print('create 7')
 
         # ----------------------------------
         # Call the Dataverse API
         # ----------------------------------
         site_url = handoff_obj.siteUrl
-        print('create 8 site_url', site_url)
 
         api_general_token = dataverse_user.dv_general_token
-        print('create 9 api_general_token', api_general_token)
+
         dataverse_client = DataverseClient(site_url, api_general_token)
         try:
             dataverse_response = dataverse_client.get_user_info(user_api_token=api_general_token)
@@ -101,13 +90,11 @@ class DataverseUserView(viewsets.ViewSet):
             print('create 12: dataverse_response.message')
             return Response(get_json_error(dataverse_response.message), status=status.HTTP_400_BAD_REQUEST)
 
-        print('create 13')
         try:
             print('create 14')
             handler = DataverseUserHandler(opendp_user.id, site_url,
                                            api_general_token,
                                            dataverse_response.__dict__)
-            print('create 15')
             update_response = handler.update_dataverse_user()
         except DataverseResponseError as ex:
             print('create 16')
