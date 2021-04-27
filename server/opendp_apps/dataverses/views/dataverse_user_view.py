@@ -45,7 +45,8 @@ class DataverseUserView(viewsets.ViewSet):
             print('create 4a')
             print(f'user_id: {user_id}')
             print(f'handoff_id: {handoff_id}')
-            dataverse_user = DataverseUser.objects.get(user__object_id=user_id, dv_installation__object_id=handoff_id)
+            dataverse_user = DataverseUser.objects.get(user__object_id=user_id,
+                                                       dv_installation=handoff_obj.dv_installation)
             print('create 4b')
             opendp_user = dataverse_user.user
             print('create 4c')
