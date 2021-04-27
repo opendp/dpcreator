@@ -1,29 +1,58 @@
 <template>
   <div class="log-in mt-5">
     <v-container>
+      <h2
+          class="title-size-2 mb-4"
+          :class="{ 'ml-5': $vuetify.breakpoint.xsOnly }"
+      >
+        Mock DV Test
+      </h2>
       <v-row>
         <v-col
-            offset-md="2"
-            offset-sm="1"
-            sm="8"
-            md="5"
-            :class="{ 'px-10': $vuetify.breakpoint.xsOnly }"
+            md="8"
+            class="pl-0"
+            :class="{ 'ml-5': $vuetify.breakpoint.xsOnly }"
         >
-          <h1 class="title-size-1">Mock Dataverse Request</h1>
-          <v-form>
-
+          <v-form
+              v-model="validForm"
+              ref="dvForm"
+              @submit.prevent="handleFormSubmit"
+          >
+            <v-text-field
+                v-model="site_url"
+                label="site_url"
+                required
+            ></v-text-field>
+            <v-text-field
+                v-model="token"
+                label="token"
+                required
+            ></v-text-field>
+            <v-text-field
+                v-model="fileId"
+                label="fileId"
+                required
+            ></v-text-field>
+            <v-text-field
+                v-model="datasetPid"
+                label="datasetPid"
+                required
+            ></v-text-field>
 
             <Button
+                classes="mt-5"
                 color="primary"
                 :class="{
-                  'width80 mx-auto d-block': $vuetify.breakpoint.xsOnly
-                }"
-                outlined
-                :click="testHandoff"
-                label="Test Handoff"
+                'width80 mx-auto d-block': $vuetify.breakpoint.xsOnly,
+                'mr-2': $vuetify.breakpoint.smAndUp
+              }"
+                type="submit"
+                :disabled="!validForm"
+                label="Post to OpenDP"
             />
 
           </v-form>
+
           <div
               class="my-5"
               :class="{
@@ -53,21 +82,18 @@ export default {
     ...mapState('dataverse', ['handoffId']),
   },
   methods: {
-    testHandoff: function () {
-      dataverse.testHandoff()
+    handleFormSubmit: function () {
+      dataverse.testHandoff(this.site_url, this.fileId, this.datasetPid, this.token)
     },
 
 
   },
   data: () => ({
-    validLoginForm: false,
-    showPassword: false,
-    inputs: {
-      username: '',
-      password: '',
-    },
-
-    NETWORK_CONSTANTS
+    validForm: false,
+    site_url: 'http://127.0.0.1:8000/dv-mock-api',
+    fileId: '2342324',
+    datasetPid: 'doi:10.7910/DVN/TEST',
+    token: 'shoefly-dont-bother-m3'
   })
 };
 </script>
