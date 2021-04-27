@@ -1,4 +1,4 @@
-name: docker-compose-actions-workflow
+name: dpcreator-integration-tests
 
 on: [ push ]
 
