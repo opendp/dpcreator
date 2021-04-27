@@ -23,11 +23,34 @@ class DataverseHandoffView(viewsets.ViewSet):
         Temporarily save the Dataverse paramemeters +
         redirect to the Vue page
         """
+        ## Fix this!!! #161
+        print('handoff-create: request.data', request.data)
+        request_data = request.data.copy()
+        print('handoff-create: request.data', request_data)
+        if 'site_url' in request_data and (not 'siteUrl' in request_data):
+            request_data['siteUrl'] =  request_data['site_url']
 
-        dataverse_handoff = DataverseHandoffSerializer(data=request.data)
+        dataverse_handoff = DataverseHandoffSerializer(data=request_data)
+
+        #<QueryDict: {'site_url': ['http://127.0.0.1:8000/dv-mock-api'], 'token': ['shoefly-dont-bother-m3'], 'datasetPid': ['doi:10.7910/DVN/TEST'], 'fileId': ['2342324']}>
 
         if dataverse_handoff.is_valid():
+
             new_obj = dataverse_handoff.save()
+            # serious hack
+            ## Fix this!!! #161
+            new_obj.siteUrl = new_obj.dv_installation.dataverse_url
+
+            if 'token' in request_data:
+                new_obj.apiGeneralToken = request_data['token']
+                new_obj.apiSensitiveDataReadToken = request_data['token']
+            if 'fileId' in request_data:
+                new_obj.fileId = request_data['fileId']
+
+            new_obj.save()
+
+
+
             client_url = reverse('vue-home') + f'?id={str(new_obj.object_id)}'
             # return Response({'id': new_obj.object_id}, status=status.HTTP_201_CREATED)
             return HttpResponseRedirect(client_url)
