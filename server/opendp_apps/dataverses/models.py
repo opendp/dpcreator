@@ -45,6 +45,29 @@ class RegisteredDataverse(TimestampedModelWithUUID):
     class Meta:
         ordering = ('name',)
 
+    @staticmethod
+    def get_registered_dataverse(dv_url):
+        """Based on the siteUrl, return the RegisteredDataverse or None"""
+        while dv_url and dv_url.endswith('/'):
+            dv_url = dv_url[:-1]
+
+        if not dv_url:
+            return None
+
+        return RegisteredDataverse.objects.filter(dataverse_url=dv_url).first()
+
+    @staticmethod
+    def is_site_url_registered(dv_url):
+        """Does the site_url match a RegisteredDataverse?"""
+        while dv_url and dv_url.endswith('/'):
+            dv_url = dv_url[:-1]
+
+        if not dv_url:
+            return False
+
+        if RegisteredDataverse.objects.filter(dataverse_url=dv_url).count() > 0:
+            return True
+        return False
 
 class DataverseParams(TimestampedModelWithUUID):
     """
@@ -70,26 +93,12 @@ class DataverseParams(TimestampedModelWithUUID):
 
     def is_site_url_registered(self):
         """Does the site_url match a RegisteredDataverse?"""
-        # trim any trailing "/"s
-        while self.siteUrl and self.siteUrl.endswith('/'):
-            self.siteUrl = self.siteUrl[:-1]
+        return RegisteredDataverse.is_site_url_registered(self.siteUrl)
 
-        if not self.siteUrl:
-            return False
-
-        if RegisteredDataverse.objects.filter(dataverse_url=self.siteUrl).count() > 0:
-            return True
-        return False
 
     def get_registered_dataverse(self):
         """Based on the siteUrl, return the RegisteredDataverse or None"""
-        while self.siteUrl and self.siteUrl.endswith('/'):
-            self.siteUrl = self.siteUrl[:-1]
-
-        if not self.siteUrl:
-            return None
-
-        return RegisteredDataverse.objects.filter(dataverse_url=self.siteUrl).first()
+        return RegisteredDataverse.get_registered_dataverse(self.siteUrl)
 
 
     def as_dict(self):
@@ -122,6 +131,9 @@ class DataverseHandoff(DataverseParams):
         return str(self.object_id)
 
     def save(self, *args, **kwargs):
+
+        #if not self.dv_installation:
+        #    self.dv_installation = DataverseHandoff.get_registered_dataverse(self.siteUrl)
 
         # Set then name to the File DOI or ID
         if not self.name:

@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses.models import RegisteredDataverse, DataverseHandoff
+from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.user.models import DataverseUser, OpenDPUser
 
 
@@ -49,7 +50,21 @@ class DataverseHandoffSerializer2(serializers.ModelSerializer):
 
     class Meta:
         model = DataverseHandoff
-        exclude = ['apiGeneralToken', 'dv_installation', 'siteUrl']
+        exclude = ['object_id']
+
+    def validate_siteUrl(self, value):
+        """
+        Check that siteUrl is valid
+        """
+        if not RegisteredDataverse.is_site_url_registered(value):
+            raise serializers.ValidationError(f"The {dv_static.DV_PARAM_SITE_URL} is not registered")
+        return value
+
+    def save(self, **kwargs):
+        # print(f"(serializer) validated data: {self.validated_data}")
+        dv_url = self.validated_data.pop(dv_static.DV_PARAM_SITE_URL)
+        self.validated_data['dv_installation'] = RegisteredDataverse.get_registered_dataverse(dv_url)
+        return super().save()
 
 
 class DataverseHandoffSerializer(serializers.ModelSerializer):

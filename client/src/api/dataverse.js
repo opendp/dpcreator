@@ -36,10 +36,11 @@ export default {
     testHandoff(site_url, fileId, datasetPid, token) {
         console.log('posting to dv-handoff')
         const formData = new FormData()
-        formData.append("site_url", site_url)
-        formData.append("token", token)
+        formData.append("siteUrl", site_url)
+        formData.append("apiGeneralToken", token)
         formData.append('datasetPid', datasetPid)
         formData.append('fileId', fileId)
+
         session.post('/api/dv-handoff/', formData)
             .then(function (response) {
                 window.location = response.request.responseURL; // full URI to redirect to
