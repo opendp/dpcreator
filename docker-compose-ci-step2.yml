@@ -22,7 +22,7 @@ services:
     # these variables to point to a standalone instance
     env_file:
       - .env
-    command: python manage.py runserver 0.0.0.0:8000
+    command: sh -c "./migrate.sh && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
       - ./server/static:/server/static
@@ -30,17 +30,11 @@ services:
       - "8000:8000"
     depends_on:
       - db
-  migration:
-    build: "./server"
-    command: ./migrate.sh
-    volumes:
-      - .:/code
-    depends_on:
-      - db
+
   cypress:
     image: "cypress/included:4.4.0"
     depends_on:
-      - migration
+      - server
     environment:
       - CYPRESS_baseUrl=http://server:8000
     working_dir: /e2e
