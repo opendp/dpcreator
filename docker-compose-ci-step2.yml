@@ -37,12 +37,12 @@ services:
       - .:/code
     depends_on:
       - db
-    cypress:
-      image: "cypress/included:4.4.0"
-      depends_on:
-        - migration
-      environment:
-        - CYPRESS_baseUrl=http://server:8000
-      working_dir: /e2e
-      volumes:
-        - ./client:/e2e
+  cypress:
+    image: "cypress/included:4.4.0"
+    depends_on:
+      - migration
+    environment:
+      - CYPRESS_baseUrl=http://server:8000
+    working_dir: /e2e
+    volumes:
+      - ./client:/e2e
