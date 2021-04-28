@@ -32,7 +32,7 @@
       "name": "test",
       "dv_installation": 1,
       "object_id": "9e7e5506-dd1a-4979-a2c1-ec6e59e4769c",
-      "siteUrl": "http://127.0.0.1:8000/dv-mock-api",
+      "site_url": "http://127.0.0.1:8000/dv-mock-api",
       "fileId": 1,
       "filePid": "pid_etc",
       "apiGeneralToken": "some-token",

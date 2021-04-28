@@ -15,7 +15,7 @@ class DataverseUserHandlerForm(forms.Form):
     status_code = None
 
     def clean_dataverse_handoff_id(self):
-        """Check that the DataverseHandoff object exists and check the siteUrl for validity.
+        """Check that the DataverseHandoff object exists and check the site_url for validity.
         If everything looks good, return the object.DataverseHandoffForm"""
         dataverse_handoff_id = self.cleaned_data.get(dv_static.KEY_DV_HANDOFF_ID)
 
@@ -27,7 +27,7 @@ class DataverseUserHandlerForm(forms.Form):
             raise forms.ValidationError(user_msg)
 
         if not dv_handoff.is_site_url_registered():
-            user_msg = f'The Dataverse siteUrl ({dv_handoff.siteUrl}) is not registered'
+            user_msg = f'The Dataverse site_url ({dv_handoff.site_url}) is not registered'
             raise forms.ValidationError(user_msg)
 
         return dv_handoff
@@ -89,11 +89,11 @@ class DataverseParamsSiteUrlForm(forms.ModelForm):
 
     class Meta:
         model = DataverseParams
-        fields = ['siteUrl']
+        fields = ['site_url']
 
-    def clean_siteUrl(self):
+    def clean_site_url(self):
 
-        dataverse_url = self.cleaned_data.get('siteUrl')
+        dataverse_url = self.cleaned_data.get('site_url')
 
         try:
             registerd_dataverse = RegisteredDataverse.objects.get(dataverse_url=dataverse_url)

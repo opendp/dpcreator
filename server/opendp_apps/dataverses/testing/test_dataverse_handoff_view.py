@@ -131,7 +131,7 @@ class TestDataverseHandoffView(TestCase):
         # Ensure redirect
         self.assertEqual(response.status_code, 302)
         # Since no params passed, we expect them all to appear under error_code
-        self.assertEqual(response.url, '/?error_code=siteUrl%2CfileId%2CdatasetPid%2CapiGeneralToken')
+        self.assertEqual(response.url, '/?error_code=site_url%2CfileId%2CdatasetPid%2CapiGeneralToken')
 
     def test_30_invalid_site_url_for_creation(self, req_mocker):
         """(30) test_invalid_site_url_for_creation"""
@@ -150,4 +150,4 @@ class TestDataverseHandoffView(TestCase):
         # Ensure redirect
         self.assertEqual(response.status_code, 302)
         # Other params are present and valid, so we should just see dv_installation here
-        self.assertEqual(response.url, '/?error_code=siteUrl')
+        self.assertEqual(response.url, '/?error_code=site_url')

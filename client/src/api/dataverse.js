@@ -36,7 +36,7 @@ export default {
     testHandoff(site_url, fileId, datasetPid, token) {
         console.log('posting to dv-handoff')
         const formData = new FormData()
-        formData.append("siteUrl", site_url)
+        formData.append("site_url", site_url)
         formData.append("apiGeneralToken", token)
         formData.append('datasetPid', datasetPid)
         formData.append('fileId', fileId)

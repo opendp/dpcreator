@@ -69,8 +69,7 @@ class BaseEndpointTest(TestCase):
             'dv_sensitive_token': 1234,
             'dv_token_update': None,
             # TODO: Repeated field, camelcase is for parent model field, snakecase is for serializer
-            'site_url': 'https://dataverse.harvard.edu',
-            'siteUrl': 'https://dataverse.harvard.edu',
+            dv_static.DV_PARAM_SITE_URL: 'https://dataverse.harvard.edu',
             'fileId': 1,
             'datasetPid': 'doi:10.7910/DVN/B7DHBK'
         }
@@ -203,7 +202,7 @@ class DataversePostTest(BaseEndpointTest):
         url = reverse('dv-user-list')
 
         dataverse_handoff = DataverseHandoff.objects.first()
-        dataverse_handoff.siteUrl = 'www.invalidsite.com'
+        dataverse_handoff.site_url = 'www.invalidsite.com'
         dataverse_handoff.save()
         data = self.data
         data['dv_handoff'] = '1234567a-f591-403a-b8d6-dfb562f8b32f'
@@ -222,7 +221,7 @@ class DataversePostTest(BaseEndpointTest):
         # Now test the API call which would be initiated from the Vue.js client
         #
         dataverse_handoff = DataverseHandoff.objects.first()
-        dataverse_handoff.siteUrl = 'www.invalidsite.com'
+        dataverse_handoff.site_url = 'www.invalidsite.com'
         dataverse_handoff.save()
         print(f"All handoffs: {[x.__dict__ for x in DataverseHandoff.objects.all()]}")
         url = reverse('dv-user-list')
@@ -351,7 +350,7 @@ class DataversePutTest(BaseEndpointTest):
         url = reverse('dv-user-detail', kwargs={'pk': '4472310a-f591-403a-b8d6-dfb562f8b32f'})
 
         dataverse_handoff = DataverseHandoff.objects.first()
-        dataverse_handoff.siteUrl = 'www.invalidsite.com'
+        dataverse_handoff.site_url = 'www.invalidsite.com'
         dataverse_handoff.save()
         data = self.data
         # Non-existent handoff object id
@@ -369,7 +368,7 @@ class DataversePutTest(BaseEndpointTest):
         self.set_mock_requests(req_mocker)
 
         dataverse_handoff = DataverseHandoff.objects.first()
-        dataverse_handoff.siteUrl = 'www.invalidsite.com'
+        dataverse_handoff.site_url = 'www.invalidsite.com'
         dataverse_handoff.save()
         url = reverse('dv-user-detail', kwargs={'pk': '4472310a-f591-403a-b8d6-dfb562f8b32f'})
 

@@ -72,7 +72,7 @@ class DataverseUserView(viewsets.ViewSet):
         # ----------------------------------
         # Call the Dataverse API
         # ----------------------------------
-        site_url = handoff_obj.siteUrl
+        site_url = handoff_obj.site_url
 
         api_general_token = dataverse_user.dv_general_token
 
@@ -131,7 +131,7 @@ class DataverseUserView(viewsets.ViewSet):
         # ----------------------------------
         # Call the Dataverse API
         # ----------------------------------
-        site_url = DataverseHandoff.objects.get(object_id=request.data['dv_handoff']).siteUrl
+        site_url = DataverseHandoff.objects.get(object_id=request.data['dv_handoff']).site_url
         api_general_token = dataverse_user.dv_general_token
         dataverse_client = DataverseClient(site_url, api_general_token)
         try:

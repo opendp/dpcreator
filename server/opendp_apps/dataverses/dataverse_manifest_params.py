@@ -26,12 +26,12 @@ class DataverseManifestParams(BasicErrCheck):
 
         self.custom_required_params = kwargs.get('custom_required_params')
         self.fileId = self.format_param(incoming_params.get(dv_static.DV_PARAM_FILE_ID))
-        self.siteUrl = self.format_param(incoming_params.get(dv_static.DV_PARAM_SITE_URL))
+        self.site_url = self.format_param(incoming_params.get(dv_static.DV_PARAM_SITE_URL))
         self.datasetPid = self.format_param(incoming_params.get(dv_static.DV_PARAM_DATASET_PID))
         self.filePid = self.format_param(incoming_params.get(dv_static.DV_PARAM_FILE_PID))
         self.apiGeneralToken = self.format_param(incoming_params.get(dv_static.DV_API_GENERAL_TOKEN))
 
-        # RegisteredDataverse connected with self.siteUrl
+        # RegisteredDataverse connected with self.site_url
         self.registerd_dataverse = None
 
         self.check_required_params()
@@ -61,10 +61,10 @@ class DataverseManifestParams(BasicErrCheck):
         # If the siteUrl is required, check that it's connected to a RegisteredDataverse
         #
         if dv_static.DV_PARAM_SITE_URL in required_params:
-            f = DataverseParamsSiteUrlForm({'siteUrl': self.siteUrl})
+            f = DataverseParamsSiteUrlForm({'site_url': self.site_url})
             if not f.is_valid():
                 user_msg = (f'This "{dv_static.DV_PARAM_SITE_URL}" was not connected'
-                            f' to a registered Dataverse: {self.siteUrl}')
+                            f' to a registered Dataverse: {self.site_url}')
                 self.add_err_msg(user_msg)
                 return
             else:
@@ -87,7 +87,7 @@ class DataverseManifestParams(BasicErrCheck):
         """
         Via the Dataverse API, get the schema org content of the dataset
         """
-        client = DataverseClient(self.siteUrl, self.apiGeneralToken)
+        client = DataverseClient(self.site_url, self.apiGeneralToken)
 
         schema_org_content = client.get_schema_org(self.datasetPid)
 
@@ -97,7 +97,7 @@ class DataverseManifestParams(BasicErrCheck):
         """
         Via the Dataverse API, return the user information
         """
-        client = DataverseClient(self.siteUrl, self.apiGeneralToken)
+        client = DataverseClient(self.site_url, self.apiGeneralToken)
 
         user_info = client.get_user_info(self.apiGeneralToken)
 

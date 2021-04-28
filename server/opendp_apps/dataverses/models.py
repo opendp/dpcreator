@@ -47,7 +47,7 @@ class RegisteredDataverse(TimestampedModelWithUUID):
 
     @staticmethod
     def get_registered_dataverse(dv_url):
-        """Based on the siteUrl, return the RegisteredDataverse or None"""
+        """Based on the Dataverse url, return the RegisteredDataverse or None"""
         while dv_url and dv_url.endswith('/'):
             dv_url = dv_url[:-1]
 
@@ -75,7 +75,7 @@ class DataverseParams(TimestampedModelWithUUID):
     Reference: https://guides.dataverse.org/en/latest/api/external-tools.html
     # TODO: These should be snakecase rather than camelcase (PEP standard)
     """
-    siteUrl = models.CharField(max_length=255)
+    site_url = models.CharField(max_length=255)
 
     fileId = models.IntegerField()
 
@@ -93,12 +93,12 @@ class DataverseParams(TimestampedModelWithUUID):
 
     def is_site_url_registered(self):
         """Does the site_url match a RegisteredDataverse?"""
-        return RegisteredDataverse.is_site_url_registered(self.siteUrl)
+        return RegisteredDataverse.is_site_url_registered(self.site_url)
 
 
     def get_registered_dataverse(self):
-        """Based on the siteUrl, return the RegisteredDataverse or None"""
-        return RegisteredDataverse.get_registered_dataverse(self.siteUrl)
+        """Based on the site_url, return the RegisteredDataverse or None"""
+        return RegisteredDataverse.get_registered_dataverse(self.site_url)
 
 
     def as_dict(self):
@@ -106,7 +106,7 @@ class DataverseParams(TimestampedModelWithUUID):
         Return the params as a Python dict
         """
         params = {dv_static.DV_PARAM_FILE_ID: self.fileId,
-                  dv_static.DV_PARAM_SITE_URL: self.siteUrl,
+                  dv_static.DV_PARAM_SITE_URL: self.site_url,
                   dv_static.DV_API_GENERAL_TOKEN: self.apiGeneralToken,
                   dv_static.DV_PARAM_DATASET_PID: self.datasetPid,
                   dv_static.DV_PARAM_FILE_PID: self.filePid}
@@ -191,7 +191,7 @@ class ManifestTestParams(DataverseParams):
 
         reg_dv = dv_handoff.get_registered_dataverse()
         if not reg_dv:
-            return err_resp('No RegisteredDataverse for siteUrl {self.siteUrl}')
+            return err_resp('No RegisteredDataverse for site_url {self.site_url}')
 
         dv_handoff.dv_installation = reg_dv
         dv_handoff.save()
