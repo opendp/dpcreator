@@ -72,7 +72,7 @@ class DataverseUserView(viewsets.ViewSet):
         # ----------------------------------
         # Call the Dataverse API
         # ----------------------------------
-        site_url = handoff_obj.site_url
+        site_url = handoff_obj.dv_installation.dataverse_url
 
         api_general_token = dataverse_user.dv_general_token
 

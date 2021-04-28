@@ -46,28 +46,8 @@ class DataverseUserSerializer(serializers.ModelSerializer):
         return instance
 
 
-class DataverseHandoffSerializer2(serializers.ModelSerializer):
-
-    class Meta:
-        model = DataverseHandoff
-        exclude = ['object_id']
-
-    def validate_site_url(self, value):
-        """
-        Check that siteUrl is valid
-        """
-        if not RegisteredDataverse.is_site_url_registered(value):
-            raise serializers.ValidationError(f"The {dv_static.DV_PARAM_SITE_URL} is not registered")
-        return value
-
-    def save(self, **kwargs):
-        """Override save to add the dv_installation"""
-        dv_url = self.validated_data.get(dv_static.DV_PARAM_SITE_URL)
-        self.validated_data['dv_installation'] = RegisteredDataverse.get_registered_dataverse(dv_url)
-        return super().save()
-
-
 class DataverseHandoffSerializer(serializers.ModelSerializer):
+
     site_url = serializers.SlugRelatedField(queryset=RegisteredDataverse.objects.all(),
                                             slug_field='dataverse_url',
                                             read_only=False,
@@ -75,7 +55,8 @@ class DataverseHandoffSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DataverseHandoff
-        exclude = ['apiGeneralToken', 'dv_installation', 'site_url']
+        exclude = ['object_id']
+        #exclude = ['apiGeneralToken', 'dv_installation', 'site_url']
 
 
 class DataverseFileInfoSerializer(serializers.ModelSerializer):

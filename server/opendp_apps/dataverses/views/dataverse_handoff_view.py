@@ -5,7 +5,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 
 from opendp_apps.dataverses.models import DataverseHandoff
-from opendp_apps.dataverses.serializers import DataverseHandoffSerializer, DataverseHandoffSerializer2
+from opendp_apps.dataverses.serializers import DataverseHandoffSerializer
 
 
 class DataverseHandoffView(viewsets.ViewSet):
@@ -25,7 +25,7 @@ class DataverseHandoffView(viewsets.ViewSet):
         """
         request_data = request.data.copy()
         print('request_data', request_data)
-        handoff_serializer = DataverseHandoffSerializer2(data=request_data)
+        handoff_serializer = DataverseHandoffSerializer(data=request_data)
 
         if handoff_serializer.is_valid():
 
@@ -36,7 +36,6 @@ class DataverseHandoffView(viewsets.ViewSet):
             # return Response({'id': new_obj.object_id}, status=status.HTTP_201_CREATED)
             return HttpResponseRedirect(client_url)
         else:
-            # print('handoff_serializer.errors', handoff_serializer.errors)
             error_code = ''
             for k, v in handoff_serializer.errors.items():
                 for error_detail in v:

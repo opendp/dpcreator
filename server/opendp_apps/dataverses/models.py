@@ -35,10 +35,7 @@ class RegisteredDataverse(TimestampedModelWithUUID):
 
     def save(self, *args, **kwargs):
         # remove any trailing slashes
-        while self.dataverse_url.endswith('/'):
-            self.dataverse_url = self.dataverse_url[:-1]
-
-        self.dataverse_url = self.dataverse_url.lower()
+        self.dataverse_url = RegisteredDataverse.format_dv_url(self.dataverse_url)
 
         super(RegisteredDataverse, self).save(*args, **kwargs)
 
@@ -48,8 +45,7 @@ class RegisteredDataverse(TimestampedModelWithUUID):
     @staticmethod
     def get_registered_dataverse(dv_url):
         """Based on the Dataverse url, return the RegisteredDataverse or None"""
-        while dv_url and dv_url.endswith('/'):
-            dv_url = dv_url[:-1]
+        dv_url = RegisteredDataverse.format_dv_url(dv_url)
 
         if not dv_url:
             return None
@@ -59,8 +55,7 @@ class RegisteredDataverse(TimestampedModelWithUUID):
     @staticmethod
     def is_site_url_registered(dv_url):
         """Does the site_url match a RegisteredDataverse?"""
-        while dv_url and dv_url.endswith('/'):
-            dv_url = dv_url[:-1]
+        dv_url = RegisteredDataverse.format_dv_url(dv_url)
 
         if not dv_url:
             return False
@@ -68,6 +63,21 @@ class RegisteredDataverse(TimestampedModelWithUUID):
         if RegisteredDataverse.objects.filter(dataverse_url=dv_url).count() > 0:
             return True
         return False
+
+    @staticmethod
+    def format_dv_url(dv_url):
+        """Trim trailing "/" and make lowercase. If it's an empty string or None, return None"""
+        if not isinstance(dv_url, str):
+            return None
+
+        while dv_url and dv_url.endswith('/'):
+            dv_url = dv_url[:-1]
+
+        if not dv_url:
+            return None
+
+        return dv_url.lower()
+
 
 class DataverseParams(TimestampedModelWithUUID):
     """
@@ -118,6 +128,7 @@ class DataverseHandoff(DataverseParams):
     Dataverse parameters passed to the OpenDP App
     """
     name = models.CharField(max_length=255, blank=True)
+    site_url = None
     dv_installation = models.ForeignKey(RegisteredDataverse,
                                         blank=True,
                                         null=True,
