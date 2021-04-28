@@ -30,13 +30,19 @@ services:
       - "8000:8000"
     depends_on:
       - db
-  cypress:
-    image: "cypress/included:4.4.0"
-    depends_on:
-      - server
-      - db
-    environment:
-      - CYPRESS_baseUrl=http://server:8000
-    working_dir: /e2e
+  migration:
+    build: "./server"
+    command: ./migrate.sh
     volumes:
-      - ./client:/e2e
+      - .:/code
+    depends_on:
+      - db
+    cypress:
+      image: "cypress/included:4.4.0"
+      depends_on:
+        - migration
+      environment:
+        - CYPRESS_baseUrl=http://server:8000
+      working_dir: /e2e
+      volumes:
+        - ./client:/e2e

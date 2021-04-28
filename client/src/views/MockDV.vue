@@ -18,10 +18,10 @@
               ref="dvForm"
               @submit.prevent="handleFormSubmit"
           >
-            <v-text-field
-                v-model="site_url"
-                label="site_url"
-                required
+            <v-text-field id="site_url"
+                          v-model="site_url"
+                          label="site_url"
+                          required
             ></v-text-field>
             <v-text-field
                 v-model="token"
@@ -40,6 +40,7 @@
             ></v-text-field>
 
             <Button
+                id="postOpenDP"
                 classes="mt-5"
                 color="primary"
                 :class="{
