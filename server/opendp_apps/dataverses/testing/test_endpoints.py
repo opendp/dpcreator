@@ -1,6 +1,6 @@
 import json
 import requests_mock
-
+from unittest import skip
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from rest_framework.reverse import reverse

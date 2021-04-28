@@ -23,9 +23,7 @@ class DataverseHandoffView(viewsets.ViewSet):
         Temporarily save the Dataverse paramemeters +
         redirect to the Vue page
         """
-        request_data = request.data.copy()
-        print('request_data', request_data)
-        handoff_serializer = DataverseHandoffSerializer(data=request_data)
+        handoff_serializer = DataverseHandoffSerializer(data=request.data)
 
         if handoff_serializer.is_valid():
 

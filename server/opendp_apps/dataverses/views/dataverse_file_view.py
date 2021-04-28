@@ -43,14 +43,15 @@ class DataverseFileView(viewsets.ViewSet):
         # populate the relevant fields
         if not (file_info.dataset_schema_info or file_info.file_schema_info):
             params = file_info.as_dict()
-            params[dv_static.DV_PARAM_SITE_URL] = handoff.site_url
-            if not handoff.site_url:
+            site_url = handoff.dv_installation.dataverse_url
+            params[dv_static.DV_PARAM_SITE_URL] = site_url
+            if not site_url:
                 # shouldn't happen....
                 return Response({'success': False, 'message': 'The Dataverse url has not been set.'},
                                 status=status.HTTP_400_BAD_REQUEST)
 
             # (1) Retrieve the JSON LD info
-            client = DataverseClient(handoff.site_url, handoff.apiGeneralToken)
+            client = DataverseClient(site_url, handoff.apiGeneralToken)
             schema_org_resp = client.get_schema_org(handoff.datasetPid)
             if schema_org_resp.status_code >= 400:
                 return Response({'success': False, 'message': schema_org_resp.message},

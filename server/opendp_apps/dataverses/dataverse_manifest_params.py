@@ -6,7 +6,7 @@ from django.http import QueryDict
 
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.dataverse_client import DataverseClient
-from opendp_apps.dataverses.forms import DataverseParamsSiteUrlForm
+from opendp_apps.dataverses.models import RegisteredDataverse
 
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
@@ -61,14 +61,14 @@ class DataverseManifestParams(BasicErrCheck):
         # If the siteUrl is required, check that it's connected to a RegisteredDataverse
         #
         if dv_static.DV_PARAM_SITE_URL in required_params:
-            f = DataverseParamsSiteUrlForm({'site_url': self.site_url})
-            if not f.is_valid():
+            reg_dv = RegisteredDataverse.get_registered_dataverse(self.site_url)
+            if not reg_dv:
                 user_msg = (f'This "{dv_static.DV_PARAM_SITE_URL}" was not connected'
                             f' to a registered Dataverse: {self.site_url}')
                 self.add_err_msg(user_msg)
                 return
             else:
-                self.registerd_dataverse = f.cleaned_data[dv_static.DV_PARAM_SITE_URL]
+                self.registerd_dataverse = reg_dv
 
         for param in required_params:
             if not self.__dict__.get(param):

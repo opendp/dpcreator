@@ -55,8 +55,7 @@ class DataverseHandoffSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DataverseHandoff
-        exclude = ['object_id']
-        #exclude = ['apiGeneralToken', 'dv_installation', 'site_url']
+        exclude = ['dv_installation']
 
 
 class DataverseFileInfoSerializer(serializers.ModelSerializer):
