@@ -24,6 +24,15 @@
                 .should('contain', 'To create a DP Release, please make a request from an registered Dataverse installation')
         })
     })
+    describe('Mock DV Request', () => {
+        it('correctly redirects to homepage', () => {
+            cy.visit('/mock-dv')
+            cy.get('#postOpenDP > .v-btn__content').click();
+            cy.get('.v-form').submit();
+            cy.url().should('include', '/?id=');
+
+        })
+    })
 
 }
 
