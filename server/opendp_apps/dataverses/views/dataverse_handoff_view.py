@@ -38,7 +38,6 @@ class DataverseHandoffView(viewsets.ViewSet):
 
             if 'token' in request_data:
                 new_dv_handoff.apiGeneralToken = request_data['token']
-                new_dv_handoff.apiSensitiveDataReadToken = request_data['token']
             if 'fileId' in request_data:
                 new_dv_handoff.fileId = request_data['fileId']
 

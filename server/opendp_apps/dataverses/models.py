@@ -65,8 +65,6 @@ class DataverseParams(TimestampedModelWithUUID):
 
     apiGeneralToken = encrypt(models.CharField(max_length=255))
 
-    apiSensitiveDataReadToken = encrypt(models.CharField(max_length=255))
-
     class Meta:
         abstract = True
 
@@ -100,20 +98,21 @@ class DataverseParams(TimestampedModelWithUUID):
         """
         params = {dv_static.DV_PARAM_FILE_ID: self.fileId,
                   dv_static.DV_PARAM_SITE_URL: self.siteUrl,
-                  dv_static.DV_API_SENSITIVE_DATA_READ_TOKEN: self.apiSensitiveDataReadToken,
                   dv_static.DV_API_GENERAL_TOKEN: self.apiGeneralToken,
                   dv_static.DV_PARAM_DATASET_PID: self.datasetPid,
                   dv_static.DV_PARAM_FILE_PID: self.filePid}
 
         return params
 
-
 class DataverseHandoff(DataverseParams):
     """
     Dataverse parameters passed to the OpenDP App
     """
     name = models.CharField(max_length=255, blank=True)
-    dv_installation = models.ForeignKey(RegisteredDataverse, on_delete=models.CASCADE)
+    dv_installation = models.ForeignKey(RegisteredDataverse,
+                                        blank=True,
+                                        null=True,
+                                        on_delete=models.SET_NULL)
 
     class Meta:
         verbose_name = 'Dataverse Handoff Parameter'

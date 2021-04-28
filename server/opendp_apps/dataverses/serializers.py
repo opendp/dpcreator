@@ -30,7 +30,6 @@ class DataverseUserSerializer(serializers.ModelSerializer):
         dataverse_handoff = self.validated_data.pop('dv_handoff')
         self.validated_data['dv_installation'] = dataverse_handoff.dv_installation
         self.validated_data['dv_general_token'] = dataverse_handoff.apiGeneralToken
-        self.validated_data['dv_sensitive_token'] = dataverse_handoff.apiSensitiveDataReadToken
         return super().save()
 
     def update(self, instance, validated_data):
@@ -46,6 +45,13 @@ class DataverseUserSerializer(serializers.ModelSerializer):
         return instance
 
 
+class DataverseHandoffSerializer2(serializers.ModelSerializer):
+
+    class Meta:
+        model = DataverseHandoff
+        exclude = ['apiGeneralToken', 'dv_installation', 'siteUrl']
+
+
 class DataverseHandoffSerializer(serializers.ModelSerializer):
     site_url = serializers.SlugRelatedField(queryset=RegisteredDataverse.objects.all(),
                                             slug_field='dataverse_url',
@@ -54,7 +60,7 @@ class DataverseHandoffSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DataverseHandoff
-        exclude = ['apiGeneralToken', 'apiSensitiveDataReadToken', 'dv_installation', 'siteUrl']
+        exclude = ['apiGeneralToken', 'dv_installation', 'siteUrl']
 
 
 class DataverseFileInfoSerializer(serializers.ModelSerializer):
