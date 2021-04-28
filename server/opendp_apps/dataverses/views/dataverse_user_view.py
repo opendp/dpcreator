@@ -26,7 +26,7 @@ class DataverseUserView(viewsets.ViewSet):
         # ----------------------------------
         # Validate the input
         # ----------------------------------
-        #print(f"data: {request.data}")
+        # print(f"data: {request.data}")
         request_data = request.data.copy()
 
         user_id = request.data.get('user')
@@ -67,7 +67,7 @@ class DataverseUserView(viewsets.ViewSet):
         # Call the Dataverse API
         # ----------------------------------
         site_url = handoff_obj.dv_installation.dataverse_url
-
+        # print('-- site_url', site_url)
         api_general_token = dataverse_user.dv_general_token
 
         dataverse_client = DataverseClient(site_url, api_general_token)

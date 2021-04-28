@@ -29,35 +29,9 @@ class TestDataverseHandoffView(TestCase):
 
         self.user_obj, _created = get_user_model().objects.get_or_create(username='dv_depositor')
 
-        # Object Ids used for most calls
-        self.dp_user_object_id = self.user_obj.id
-        self.dv_handoff_object_id = 1  # str(DataverseHandoff.objects.get(pk=1).object_id)
-
-        self.non_existent_uuid = '29516628-488e-4f63-a9e0-4a660a22f54b'  # I hope....
-
         self.client.force_login(self.user_obj)
 
         self.mock_params = ManifestTestParams.objects.filter(use_mock_dv_api=True).first()
-
-        self.dv_updated_user_info = {'status': 'OK', 'data': {
-            "id": 9974,
-            "object_id": "2dd1aa0a-7e48-49e1-af0d-efbd2f68d0bf",
-            "email": "mock_email_updated@some.edu",
-            "firstName": "UpdatedFname",
-            "lastName": "UpdatedLname",
-            "superuser": False,
-            "identifier": "@mock_user",
-            "affiliation": "Some University",
-            "createdTime": "2000-01-01T05:00:00Z",
-            "displayName": "Mock User",
-            "lastApiUseTime": "2020-11-16T19:34:51Z",
-            "persistentUserId": "updatedPersistentUserId",
-            "authenticationProviderId": "shib"
-        }}
-        self.dv_user_invalid_token = {
-            "status": "ERROR",
-            "message": "User with token 7957c20e-5316-47d5-bd23-2afd19f2d00a not found."
-        }
 
         self.data = {
             # 'dv_installation': 'https://dataverse.harvard.edu',
