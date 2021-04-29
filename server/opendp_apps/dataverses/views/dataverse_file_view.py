@@ -17,12 +17,22 @@ class DataverseFileView(viewsets.ViewSet):
         return DataverseFileInfoSerializer(context={'request': instance})
 
     def list(self, request):
+        # TODO: This is to prevent errors in testing, why is test sending "AnonymousUser" in request?
+        if not request.user.id:
+            queryset = DataverseFileInfo.objects.all()
+        else:
+            queryset = DataverseFileInfo.objects.filter(creator=request.user)
+        serializer = DataverseFileInfoSerializer(queryset, many=True)
+        return Response(data={'success': True, 'data': serializer.data}, status=status.HTTP_200_OK)
+
+    def create(self, request):
         """
         Get a Dataverse File corresponding to a user_id (UUID)
         and values from a DataverseHandoff object
         """
-        handoff_id = request.query_params.get('handoff_id')
-        user_id = request.query_params.get('user_id')
+        # TODO: changing user_id to creator to match DB, we should standardize this naming convention
+        handoff_id = request.data.get('handoff_id')
+        user_id = request.data.get('creator')
 
         handoff = get_object_or_error_response(DataverseHandoff, object_id=handoff_id)
         dataverse_user = get_object_or_error_response(DataverseUser, object_id=user_id)
@@ -78,4 +88,4 @@ class DataverseFileView(viewsets.ViewSet):
 
         serializer = DataverseFileInfoSerializer(file_info, context={'request': request})
         return Response({'success': True, 'data': serializer.data},
-                        status=status.HTTP_200_OK)
+                        status=status.HTTP_201_CREATED)
