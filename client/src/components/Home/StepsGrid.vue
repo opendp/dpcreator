@@ -16,14 +16,14 @@
         <h2 class="title-size-1 home-title mx-auto mb-7">
           {{ $t("home.stepsTitle") }}
         </h2>
-        <p
-            class="grey--text text--darken-2 home-description"
-            :class="{
+        <p v-html="$t('home.stepsDescription')"
+           class="grey--text text--darken-2 home-description"
+           :class="{
             'mb-5': $vuetify.breakpoint.xsOnly,
             'mb-10': $vuetify.breakpoint.smAndUp
           }"
         >
-          {{ $t("home.stepsDescription") }}
+
         </p>
       </v-col>
     </v-row>
