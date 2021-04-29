@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses.models import RegisteredDataverse, DataverseHandoff
+from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.user.models import DataverseUser, OpenDPUser
 
 
@@ -30,7 +31,6 @@ class DataverseUserSerializer(serializers.ModelSerializer):
         dataverse_handoff = self.validated_data.pop('dv_handoff')
         self.validated_data['dv_installation'] = dataverse_handoff.dv_installation
         self.validated_data['dv_general_token'] = dataverse_handoff.apiGeneralToken
-        self.validated_data['dv_sensitive_token'] = dataverse_handoff.apiSensitiveDataReadToken
         return super().save()
 
     def update(self, instance, validated_data):
@@ -47,6 +47,7 @@ class DataverseUserSerializer(serializers.ModelSerializer):
 
 
 class DataverseHandoffSerializer(serializers.ModelSerializer):
+
     site_url = serializers.SlugRelatedField(queryset=RegisteredDataverse.objects.all(),
                                             slug_field='dataverse_url',
                                             read_only=False,
@@ -54,7 +55,7 @@ class DataverseHandoffSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DataverseHandoff
-        exclude = ['apiGeneralToken', 'apiSensitiveDataReadToken', 'dv_installation', 'siteUrl']
+        exclude = ['dv_installation']
 
 
 class DataverseFileInfoSerializer(serializers.ModelSerializer):

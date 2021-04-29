@@ -8,6 +8,7 @@ import lxml.etree as etree
 from pyDataverse.api import Api, DataAccessApi, NativeApi
 
 from opendp_apps.dataverses import static_vals as dv_static
+from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 
 
@@ -33,9 +34,9 @@ class DataverseClient(object):
         """
         api_token = user_api_token if user_api_token else self.api_token
         # remove any trailing "/"
-        ye_host = self._host
-        while ye_host.endswith('/'):
-            ye_host = ye_host[:-1]
+        ye_host = RegisteredDataverse.format_dv_url(self._host)
+        #while ye_host.endswith('/'):
+        #    ye_host = ye_host[:-1]
 
         # format url
         dv_url = f'{ye_host}/api/v1/users/:me'

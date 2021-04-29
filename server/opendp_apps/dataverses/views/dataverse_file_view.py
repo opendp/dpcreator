@@ -3,6 +3,7 @@ from rest_framework.response import Response
 
 from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses.dataverse_client import DataverseClient
+from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.models import DataverseHandoff
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
 from opendp_apps.dataverses.serializers import DataverseFileInfoSerializer
@@ -42,10 +43,15 @@ class DataverseFileView(viewsets.ViewSet):
         # populate the relevant fields
         if not (file_info.dataset_schema_info or file_info.file_schema_info):
             params = file_info.as_dict()
-            params['siteUrl'] = handoff.siteUrl
+            site_url = handoff.dv_installation.dataverse_url
+            params[dv_static.DV_PARAM_SITE_URL] = site_url
+            if not site_url:
+                # shouldn't happen....
+                return Response({'success': False, 'message': 'The Dataverse url has not been set.'},
+                                status=status.HTTP_400_BAD_REQUEST)
 
             # (1) Retrieve the JSON LD info
-            client = DataverseClient(handoff.siteUrl, handoff.apiGeneralToken)
+            client = DataverseClient(site_url, handoff.apiGeneralToken)
             schema_org_resp = client.get_schema_org(handoff.datasetPid)
             if schema_org_resp.status_code >= 400:
                 return Response({'success': False, 'message': schema_org_resp.message},
