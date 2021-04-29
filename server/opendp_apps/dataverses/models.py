@@ -35,15 +35,48 @@ class RegisteredDataverse(TimestampedModelWithUUID):
 
     def save(self, *args, **kwargs):
         # remove any trailing slashes
-        while self.dataverse_url.endswith('/'):
-            self.dataverse_url = self.dataverse_url[:-1]
-
-        self.dataverse_url = self.dataverse_url.lower()
+        self.dataverse_url = RegisteredDataverse.format_dv_url(self.dataverse_url)
 
         super(RegisteredDataverse, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ('name',)
+
+    @staticmethod
+    def get_registered_dataverse(dv_url):
+        """Based on the Dataverse url, return the RegisteredDataverse or None"""
+        dv_url = RegisteredDataverse.format_dv_url(dv_url)
+
+        if not dv_url:
+            return None
+
+        return RegisteredDataverse.objects.filter(dataverse_url=dv_url).first()
+
+    @staticmethod
+    def is_site_url_registered(dv_url):
+        """Does the site_url match a RegisteredDataverse?"""
+        dv_url = RegisteredDataverse.format_dv_url(dv_url)
+
+        if not dv_url:
+            return False
+
+        if RegisteredDataverse.objects.filter(dataverse_url=dv_url).count() > 0:
+            return True
+        return False
+
+    @staticmethod
+    def format_dv_url(dv_url):
+        """Trim trailing "/" and make lowercase. If it's an empty string or None, return None"""
+        if not isinstance(dv_url, str):
+            return None
+
+        while dv_url and dv_url.endswith('/'):
+            dv_url = dv_url[:-1]
+
+        if not dv_url:
+            return None
+
+        return dv_url.lower()
 
 
 class DataverseParams(TimestampedModelWithUUID):
@@ -52,8 +85,6 @@ class DataverseParams(TimestampedModelWithUUID):
     Reference: https://guides.dataverse.org/en/latest/api/external-tools.html
     # TODO: These should be snakecase rather than camelcase (PEP standard)
     """
-    siteUrl = models.CharField(max_length=255)
-
     fileId = models.IntegerField()
 
     datasetPid = models.CharField(max_length=255,
@@ -65,33 +96,8 @@ class DataverseParams(TimestampedModelWithUUID):
 
     apiGeneralToken = encrypt(models.CharField(max_length=255))
 
-    apiSensitiveDataReadToken = encrypt(models.CharField(max_length=255))
-
     class Meta:
         abstract = True
-
-    def is_site_url_registered(self):
-        """Does the site_url match a RegisteredDataverse?"""
-        # trim any trailing "/"s
-        while self.siteUrl and self.siteUrl.endswith('/'):
-            self.siteUrl = self.siteUrl[:-1]
-
-        if not self.siteUrl:
-            return False
-
-        if RegisteredDataverse.objects.filter(dataverse_url=self.siteUrl).count() > 0:
-            return True
-        return False
-
-    def get_registered_dataverse(self):
-        """Based on the siteUrl, return the RegisteredDataverse or None"""
-        while self.siteUrl and self.siteUrl.endswith('/'):
-            self.siteUrl = self.siteUrl[:-1]
-
-        if not self.siteUrl:
-            return None
-
-        return RegisteredDataverse.objects.filter(dataverse_url=self.siteUrl).first()
 
 
     def as_dict(self):
@@ -99,21 +105,20 @@ class DataverseParams(TimestampedModelWithUUID):
         Return the params as a Python dict
         """
         params = {dv_static.DV_PARAM_FILE_ID: self.fileId,
-                  dv_static.DV_PARAM_SITE_URL: self.siteUrl,
-                  dv_static.DV_API_SENSITIVE_DATA_READ_TOKEN: self.apiSensitiveDataReadToken,
+                  #dv_static.DV_PARAM_SITE_URL: self.site_url,
                   dv_static.DV_API_GENERAL_TOKEN: self.apiGeneralToken,
                   dv_static.DV_PARAM_DATASET_PID: self.datasetPid,
                   dv_static.DV_PARAM_FILE_PID: self.filePid}
 
         return params
 
-
 class DataverseHandoff(DataverseParams):
     """
     Dataverse parameters passed to the OpenDP App
     """
     name = models.CharField(max_length=255, blank=True)
-    dv_installation = models.ForeignKey(RegisteredDataverse, on_delete=models.CASCADE)
+    dv_installation = models.ForeignKey(RegisteredDataverse,
+                                        on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Dataverse Handoff Parameter'
@@ -123,6 +128,9 @@ class DataverseHandoff(DataverseParams):
         return str(self.object_id)
 
     def save(self, *args, **kwargs):
+
+        #if not self.dv_installation:
+        #    self.dv_installation = DataverseHandoff.get_registered_dataverse(self.siteUrl)
 
         # Set then name to the File DOI or ID
         if not self.name:
@@ -144,6 +152,8 @@ class ManifestTestParams(DataverseParams):
     # fileid=4164587&siteUrl=https://dataverse.harvard.edu&datasetid=4164585&datasetversion=1.0&locale=en
     #
     name = models.CharField(max_length=255, blank=True)
+
+    site_url = models.CharField(max_length=255)
     use_mock_dv_api = models.BooleanField('Use Mock Dataverse API', default=False)
 
     ddi_content = models.TextField(help_text='Use XML', blank=True)
@@ -176,16 +186,21 @@ class ManifestTestParams(DataverseParams):
     def make_test_handoff_object(self):
         """For unit tests, make a DataverseHandoff object with the same params"""
 
-        dv_handoff = DataverseHandoff(**self.as_dict())
+        params = self.as_dict()
+        if dv_static.DV_PARAM_SITE_URL in params:
+            del params[dv_static.DV_PARAM_SITE_URL]
 
-        reg_dv = dv_handoff.get_registered_dataverse()
+        dv_handoff = DataverseHandoff(**params)
+
+        reg_dv = RegisteredDataverse.get_registered_dataverse(self.site_url)
         if not reg_dv:
-            return err_resp('No RegisteredDataverse for siteUrl {self.siteUrl}')
+            return err_resp('No RegisteredDataverse for site_url {self.site_url}')
 
         dv_handoff.dv_installation = reg_dv
         dv_handoff.save()
 
         return ok_resp(data=dv_handoff)
+
 
     def get_manifest_url_params(self, selected_params=None):
         """
@@ -255,7 +270,17 @@ class ManifestTestParams(DataverseParams):
                 f'&exporter={dv_static.EXPORTER_FORMAT_SCHEMA_ORG}">schema.org info</a>')
     schema_org_info_link.allow_tags = True
 
+    def as_dict(self):
+        """
+        Return the params as a Python dict
+        """
+        params = {dv_static.DV_PARAM_FILE_ID: self.fileId,
+                  dv_static.DV_PARAM_SITE_URL: self.site_url,
+                  dv_static.DV_API_GENERAL_TOKEN: self.apiGeneralToken,
+                  dv_static.DV_PARAM_DATASET_PID: self.datasetPid,
+                  dv_static.DV_PARAM_FILE_PID: self.filePid}
 
+        return params
 
     def get_dataverse_ddi_url(self):
         """Mock url for retrieving the DDI"""
@@ -304,3 +329,15 @@ class ManifestTestParams(DataverseParams):
             return f'<a href="{user_lnk}?{url_params}" target="_blank">Test 2: Dataverse incoming link (public dataset)</a>'
 
     dataverse_incoming_link_2.allow_tags = True
+
+
+'''
+    def is_site_url_registered(self):
+        """Does the site_url match a RegisteredDataverse?"""
+        return RegisteredDataverse.is_site_url_registered(self.site_url)
+
+
+    def get_registered_dataverse(self):
+        """Based on the site_url, return the RegisteredDataverse or None"""
+        return RegisteredDataverse.get_registered_dataverse(self.site_url)
+'''

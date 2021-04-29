@@ -6,7 +6,7 @@ from django.http import QueryDict
 
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.dataverse_client import DataverseClient
-from opendp_apps.dataverses.forms import DataverseParamsSiteUrlForm
+from opendp_apps.dataverses.models import RegisteredDataverse
 
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
@@ -26,14 +26,12 @@ class DataverseManifestParams(BasicErrCheck):
 
         self.custom_required_params = kwargs.get('custom_required_params')
         self.fileId = self.format_param(incoming_params.get(dv_static.DV_PARAM_FILE_ID))
-        self.siteUrl = self.format_param(incoming_params.get(dv_static.DV_PARAM_SITE_URL))
+        self.site_url = self.format_param(incoming_params.get(dv_static.DV_PARAM_SITE_URL))
         self.datasetPid = self.format_param(incoming_params.get(dv_static.DV_PARAM_DATASET_PID))
         self.filePid = self.format_param(incoming_params.get(dv_static.DV_PARAM_FILE_PID))
         self.apiGeneralToken = self.format_param(incoming_params.get(dv_static.DV_API_GENERAL_TOKEN))
-        self.apiSensitiveDataReadToken = self.format_param(
-            incoming_params.get(dv_static.DV_API_SENSITIVE_DATA_READ_TOKEN))
 
-        # RegisteredDataverse connected with self.siteUrl
+        # RegisteredDataverse connected with self.site_url
         self.registerd_dataverse = None
 
         self.check_required_params()
@@ -63,14 +61,14 @@ class DataverseManifestParams(BasicErrCheck):
         # If the siteUrl is required, check that it's connected to a RegisteredDataverse
         #
         if dv_static.DV_PARAM_SITE_URL in required_params:
-            f = DataverseParamsSiteUrlForm({'siteUrl': self.siteUrl})
-            if not f.is_valid():
+            reg_dv = RegisteredDataverse.get_registered_dataverse(self.site_url)
+            if not reg_dv:
                 user_msg = (f'This "{dv_static.DV_PARAM_SITE_URL}" was not connected'
-                            f' to a registered Dataverse: {self.siteUrl}')
+                            f' to a registered Dataverse: {self.site_url}')
                 self.add_err_msg(user_msg)
                 return
             else:
-                self.registerd_dataverse = f.cleaned_data[dv_static.DV_PARAM_SITE_URL]
+                self.registerd_dataverse = reg_dv
 
         for param in required_params:
             if not self.__dict__.get(param):
@@ -89,7 +87,7 @@ class DataverseManifestParams(BasicErrCheck):
         """
         Via the Dataverse API, get the schema org content of the dataset
         """
-        client = DataverseClient(self.siteUrl, self.apiGeneralToken)
+        client = DataverseClient(self.site_url, self.apiGeneralToken)
 
         schema_org_content = client.get_schema_org(self.datasetPid)
 
@@ -99,7 +97,7 @@ class DataverseManifestParams(BasicErrCheck):
         """
         Via the Dataverse API, return the user information
         """
-        client = DataverseClient(self.siteUrl, self.apiGeneralToken)
+        client = DataverseClient(self.site_url, self.apiGeneralToken)
 
         user_info = client.get_user_info(self.apiGeneralToken)
 
