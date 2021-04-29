@@ -13,6 +13,7 @@ const {
   LOGIN,
   CONTACT_US,
   MY_PROFILE,
+  MOCK_DV,
   TERMS_AND_CONDITIONS,
   FORGOT_YOUR_PASSWORD
 } = NETWORK_CONSTANTS;
@@ -79,6 +80,11 @@ const routes = [
     path: MY_PROFILE.PATH,
     name: MY_PROFILE.NAME,
     component: () => import("../views/MyProfile.vue")
+  },
+  {
+    path: MOCK_DV.PATH,
+    name: MOCK_DV.NAME,
+    component: () => import("../views/MockDV.vue")
   },
   {
     path: "*",

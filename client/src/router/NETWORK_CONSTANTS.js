@@ -38,5 +38,9 @@ export default {
     FORGOT_YOUR_PASSWORD: {
         PATH: "/forgot-your-password",
         NAME: "ForgorYourPassword"
+    },
+    MOCK_DV: {
+        PATH: "/mock-dv",
+        NAME: "MockDV"
     }
 };

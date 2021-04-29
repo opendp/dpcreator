@@ -131,6 +131,10 @@ export default {
               console.log(data)
               this.errorMessage = data
             });
+      } else {
+        if (this.errorMessage == null) {
+          this.$router.push('/welcome')
+        }
       }
     },
   },
