@@ -11,42 +11,7 @@
         Terms for depositing a DP release back to Dataverse
       </template>
       <template v-slot:scrollable-area>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora
-          reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi
-          porro nemo inventore, ducimus qui dicta nostrum deleniti maxime,
-          quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur
-          adipisicing elit. Necessitatibus magni at aut sed dignissimos velit
-          dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt
-          eligendi voluptatem deleniti iste! Veritatis, voluptate!
-        </p>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora
-          reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi
-          porro nemo inventore, ducimus qui dicta nostrum deleniti maxime,
-          quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur
-          adipisicing elit. Necessitatibus magni at aut sed dignissimos velit
-          dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt
-          eligendi voluptatem deleniti iste! Veritatis, voluptate!
-        </p>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora
-          reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi
-          porro nemo inventore, ducimus qui dicta nostrum deleniti maxime,
-          quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur
-          adipisicing elit. Necessitatibus magni at aut sed dignissimos velit
-          dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt
-          eligendi voluptatem deleniti iste! Veritatis, voluptate!
-        </p>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora
-          reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi
-          porro nemo inventore, ducimus qui dicta nostrum deleniti maxime,
-          quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur
-          adipisicing elit. Necessitatibus magni at aut sed dignissimos velit
-          dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt
-          eligendi voluptatem deleniti iste! Veritatis, voluptate!
-        </p>
+        {{ $t("signup.terms1") }}
       </template>
       <template v-slot:actions>
         <Checkbox
@@ -61,42 +26,7 @@
         Terms for depositing a DP release back to Dataverse
       </template>
       <template v-slot:scrollable-area>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora
-          reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi
-          porro nemo inventore, ducimus qui dicta nostrum deleniti maxime,
-          quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur
-          adipisicing elit. Necessitatibus magni at aut sed dignissimos velit
-          dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt
-          eligendi voluptatem deleniti iste! Veritatis, voluptate!
-        </p>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora
-          reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi
-          porro nemo inventore, ducimus qui dicta nostrum deleniti maxime,
-          quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur
-          adipisicing elit. Necessitatibus magni at aut sed dignissimos velit
-          dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt
-          eligendi voluptatem deleniti iste! Veritatis, voluptate!
-        </p>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora
-          reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi
-          porro nemo inventore, ducimus qui dicta nostrum deleniti maxime,
-          quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur
-          adipisicing elit. Necessitatibus magni at aut sed dignissimos velit
-          dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt
-          eligendi voluptatem deleniti iste! Veritatis, voluptate!
-        </p>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora
-          reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi
-          porro nemo inventore, ducimus qui dicta nostrum deleniti maxime,
-          quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur
-          adipisicing elit. Necessitatibus magni at aut sed dignissimos velit
-          dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt
-          eligendi voluptatem deleniti iste! Veritatis, voluptate!
-        </p>
+        {{ $t("signup.terms2") }}
       </template>
       <template v-slot:actions>
         <Checkbox

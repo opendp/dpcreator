@@ -14,7 +14,7 @@
           md="7"
       >
         <h2 class="title-size-1 home-title mx-auto mb-7">
-          Introduce noise into your statistics to protect privacy
+          {{ $t("home.stepsTitle") }}
         </h2>
         <p
             class="grey--text text--darken-2 home-description"
@@ -23,10 +23,7 @@
             'mb-10': $vuetify.breakpoint.smAndUp
           }"
         >
-          This tool allows researchers to easily
-          <strong>introduce noise into variables</strong> allowing them to mask
-          specific details and <strong>keep data private</strong>. Find out how
-          to get started with this tool below:
+          {{ $t("home.stepsDescription") }}
         </p>
       </v-col>
     </v-row>
