@@ -3,10 +3,13 @@ module.exports = {
 
   //"publicPath": "http://127.0.0.1:8080",
   "outputDir": "../server/static/dist",
+
   "indexPath": "../../templates/base-vue.html",
+
   "devServer": {
     "progress": false
   },
+
   chainWebpack: config => {
       /*
       The arrow function in writeToDisk(...) tells the dev server to write
@@ -19,13 +22,23 @@ module.exports = {
       https://cli.vuejs.org/config/#indexpath
       https://webpack.js.org/configuration/dev-server/#devserverwritetodisk-
       */
-      config.devServer
-          .public('http://127.0.0.1:8080')
-          .hotOnly(true)
-          .headers({"Access-Control-Allow-Origin": "*"})
-          .writeToDisk(filePath => filePath.endsWith('index.html'));
+    config.devServer
+        .public('http://127.0.0.1:8080')
+        .hotOnly(true)
+        .headers({"Access-Control-Allow-Origin": "*"})
+        .writeToDisk(filePath => filePath.endsWith('index.html'));
   },
+
   "transpileDependencies": [
     "vuetify"
-  ]
+  ],
+
+  pluginOptions: {
+    i18n: {
+      locale: 'en',
+      fallbackLocale: 'en',
+      localeDir: 'locales',
+      enableInSFC: false
+    }
+  }
 }
