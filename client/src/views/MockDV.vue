@@ -92,8 +92,8 @@ export default {
   data: () => ({
     validForm: false,
     site_url: 'http://127.0.0.1:8000/dv-mock-api',
-    fileId: '2342324',
-    datasetPid: 'doi:10.7910/DVN/TEST',
+    fileId: '4164587',
+    datasetPid: 'doi:10.7910/DVN/PUXVDH',
     token: 'shoefly-dont-bother-m3'
   })
 };
