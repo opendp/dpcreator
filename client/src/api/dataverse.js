@@ -19,7 +19,19 @@ export default {
         formData.append("filePid", filePid);
         return session.post('/api/dv-dataset/', formData);
     },
-
+    /**
+     *  check if there is a DataverseFileInfo for this openDPUserId and siteUrl (contained in handoff object).
+     *  If there is not create one, else update it with latest info from Dataverse (using handoff object)
+     *
+     * @param openDPUserId
+     * @param handoffId
+     * @returns {Promise<AxiosResponse<any>>} DataverseUser object
+     */
+    updateFileInfo(openDPUserId, handoffId) {
+        console.log('calling API updateFileInfo ' + openDPUserId + ',' + handoffId)
+        return session.post('/api/dv-file/',
+            {handoff_id: handoffId, creator: openDPUserId})
+    },
     /**
      *  check if there is a DataverseUser for this openDPUserId and siteUrl.
      *  If there is not create one, else update it with latest info from Dataverse (using handoff object)

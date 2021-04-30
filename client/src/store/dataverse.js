@@ -5,11 +5,13 @@ import {
   SET_DV_HANDOFF,
   REMOVE_DV_HANDOFF,
   SET_DATAVERSE_USER,
+  SET_DATAVERSE_FILE_INFO
 } from './types';
 
 const initialState = {
   handoffId: null,
-  dataverseUser: null
+  dataverseUser: null,
+  fileInfo: null
 };
 const getters = {
   getHandoffId: state => {
@@ -34,8 +36,25 @@ const actions = {
   updateDataverseUser({commit, state}, OpenDPUserId) {
     return dataverse.updateDataverseUser(OpenDPUserId, state.handoffId)
         .then((resp) => {
-          commit('SET_DATAVERSE_USER', resp.data)
-          return resp.data
+          console.log(resp.data)
+          commit('SET_DATAVERSE_USER', resp.data.data['dv_user'])
+          return resp.data.data['dv_user']
+        })
+  },
+
+  /**
+   * Get the latest DV FileInfo info for this OpenDPUser
+   * from Dataverse, and put in Vuex store
+   * @param commit
+   * @param state
+   * @param dataverseUserId (object_id field of DataverseUser object)
+   * @returns {Promise<void>}
+   */
+  updateFileInfo({commit, state}, dataverseUserId) {
+    return dataverse.updateFileInfo(dataverseUserId, state.handoffId)
+        .then((resp) => {
+          commit('SET_DATAVERSE_FILE_INFO', resp.data.data)
+          //   return resp.data.data
         })
   },
 };
@@ -44,10 +63,13 @@ const mutations = {
   [SET_DATAVERSE_USER](state, dataverseUser) {
     state.dataverseUser = dataverseUser
   },
+  [SET_DATAVERSE_FILE_INFO](state, fileInfo) {
+    state.fileInfo = fileInfo
+  },
   [SET_DV_HANDOFF](state, payload) {
     state.handoffId = payload
   },
-  [REMOVE_DV_HANDOFF]() {
+  [REMOVE_DV_HANDOFF](state) {
     state.handoffId = null
   },
 
