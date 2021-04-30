@@ -123,9 +123,10 @@ export default {
                   .then((dvUserObjectId) => {
                     console.log('returned from updateUser:' + JSON.stringify(dvUserObjectId))
                     this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
-                        .catch(({data}) => console.log("error: " + data)).then(({data}) => console.log(data))
-
-                    this.$router.push('/welcome');
+                        .catch(({data}) => console.log("error: " + data))
+                        .then(() => {
+                          this.$router.push('/welcome')
+                        })
                   })
                   .catch((data) => console.log(data))
               this.errorMessage = data

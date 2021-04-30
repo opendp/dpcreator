@@ -17,6 +17,9 @@ const getters = {
   getHandoffId: state => {
     return state.handoffId
   },
+  getfileInfo: state => {
+    return state.fileInfo
+  },
 };
 const actions = {
   setHandoffId({commit, state}, handoffId) {

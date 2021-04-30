@@ -15,7 +15,7 @@
               <strong>use the desktop version of the app.</strong>
             </template>
           </ColoredBorderAlert>
-          <CreateDPStatistics/>
+          <CreateDPStatistics v-bind:fileInfo="fileInfo"/>
           <h2
               class="title-size-2 font-weight-bold mt-16"
               :class="{
@@ -70,7 +70,6 @@ export default {
     Button,
     ColoredBorderAlert
   },
-  //   TODO: These data should be loaded from the backend
 
   created() {
     this.$store.dispatch('auth/fetchUser')
@@ -78,6 +77,7 @@ export default {
   computed: {
     ...mapGetters('auth', ['isAuthenticated']),
     ...mapState('auth', ['user']),
+    ...mapState('dataverse', ['fileInfo']),
     username() {
       return (this.user) ? this.user.username : null
     }
