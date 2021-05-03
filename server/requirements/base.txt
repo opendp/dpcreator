@@ -9,6 +9,7 @@ django-polymorphic
 dj-rest-auth
 django-allauth
 djangorestframework
+django-rest-polymorphic==0.1.9
 django-cors-headers==3.6.0
 idna==2.10
 lxml==4.6.3
