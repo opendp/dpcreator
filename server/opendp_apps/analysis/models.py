@@ -1,6 +1,5 @@
 from django.db import models
 from django.conf import settings
-from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
 
@@ -10,13 +9,21 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     Metadata and aggregate data about potential release of Dataset
     """
     class DepositorSteps(models.TextChoices):
-        """10/21 Waiting for UI finalization to define these"""
-        STEP_10_TOA = 'step_10', 'Step 10: Terms of Access'
-        STEP_20_UPLOAD_DEPOSIT = 'step_20', 'Step 20: Upload'   # done automatically for Dataverse use case
-        STEP_30_DATASET_TYPE = 'step_30', 'Step 30: Dataset Type'
+        """
+        Potential enumeration for different statuses
+        """
+        STEP_0100_UPLOADED = 'step_100', 'Step 1: Uploaded'
+        STEP_0200_VALIDATED = 'step_200', 'Step 2: Validated'   # done automatically for Dataverse use case
+        STEP_0300_VARIABLES_CONFIRMED = 'step_300', 'Step 3: Variables Confirmed'
+        STEP_0400_EPSILON_SET = 'step_400', 'Step 4: Epsilon Set'
+        STEP_0500_STATISTICS_CREATED = 'step_500', 'Step 5: Statistics Created'
+        STEP_0600_STATISTICS_SUBMITTED = 'step_600', 'Step 6: Statistics Submitted'
+        STEP_0700_RELEASE_COMPLETE = 'step_700', 'Step 7: Release Complete'
+        STEP_0800_DV_RELEASE_DEPOSITED = 'step_800', 'Step 8: Dataverse Release Deposited'   # Dataverse Only
+        STEP_0900_PROCESS_COMPLETE = 'step_900', 'Step 9: Process Complete'
 
     # each dataset can only have one DepositorSetupInfo object
-    dataset = models.OneToOneField(DataSetInfo,
+    dataset = models.OneToOneField('dataset.DataSetInfo',
                                    on_delete=models.PROTECT)
     is_complete = models.BooleanField(default=False)
     user_step = models.CharField(max_length=128,
@@ -59,7 +66,7 @@ class AnalysisPlan(TimestampedModelWithUUID):
 
     name = models.CharField(max_length=255)
 
-    dataset = models.ForeignKey(DataSetInfo,
+    dataset = models.ForeignKey('dataset.DataSetInfo',
                                 on_delete=models.PROTECT)
     is_complete = models.BooleanField(default=False)
     user_step = models.CharField(max_length=128,
@@ -84,7 +91,7 @@ class ReleaseInfo(TimestampedModelWithUUID):
     """
     Release of differentially private result from an AnalysisPlan
     """
-    dataset = models.ForeignKey(DataSetInfo,
+    dataset = models.ForeignKey('dataset.DataSetInfo',
                                 on_delete=models.PROTECT)
 
     # also gives analyst

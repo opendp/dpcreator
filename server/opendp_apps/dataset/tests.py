@@ -34,12 +34,13 @@ class TestDataSetSerializer(APITestCase):
                                                                   'name': 'test',
                                                                   'creator': self.user_obj.username,
                                                                   'source': 'upload'})
-        self.assertEqual(response.json(), {'creator': 'dv_depositor',
-                                           'data_profile': None,
-                                           'name': 'test',
-                                           'resourcetype': 'DataSetInfo',
-                                           'source': 'upload',
-                                           'source_file': None})
+        self.assertEqual(response.json(), {"creator": "dv_depositor",
+                                           "data_profile": None,
+                                           "name": "test",
+                                           "resourcetype": "DataSetInfo",
+                                           "source": "upload",
+                                           "source_file": None,
+                                           "status": "step_100"})
         self.assertEqual(response.status_code, 201)
 
     def test_unsuccessful_post(self):
