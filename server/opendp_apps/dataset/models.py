@@ -126,6 +126,8 @@ class DataverseFileInfo(DataSetInfo):
         #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
         #       depending on the data
         #
+        if not self.name:
+            self.name = f'{self.dataset_doi} ({self.dv_installation})'
         self.source = DataSetInfo.SourceChoices.Dataverse
         super(DataverseFileInfo, self).save(*args, **kwargs)
 

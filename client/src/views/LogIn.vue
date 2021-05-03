@@ -120,9 +120,13 @@ export default {
         this.$store.dispatch('auth/fetchUser')
             .then((data) => {
               this.$store.dispatch('dataverse/updateDataverseUser', this.user['object_id'], this.handoffId)
-                  .then((data) => {
-                    console.log('returned from updateUser:' + data)
-                    this.$router.push('/welcome');
+                  .then((dvUserObjectId) => {
+                    console.log('returned from updateUser:' + JSON.stringify(dvUserObjectId))
+                    this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
+                        .catch(({data}) => console.log("error: " + data))
+                        .then(() => {
+                          this.$router.push('/welcome')
+                        })
                   })
                   .catch((data) => console.log(data))
               this.errorMessage = data

@@ -12,7 +12,7 @@
       statistics for this dataset:
     </p>
     <a href="" class="text-decoration-none font-weight-bold my-6 d-block">
-      {{ datasetId }} | {{ datasetName }} | {{ datasetInformation }}
+      {{ fileInfo.dataset_doi }} | {{ fileInfo.file_schema_info.name }} | {{ fileInfo.file_schema_info.description }}
     </a>
 
     <Button
@@ -35,11 +35,11 @@ import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
 export default {
   components: {Button},
   name: "CreateDPStatistics",
+  props: ["fileInfo"],
+
   //   TODO: This data should be extracted from the URL or other ways
   data: () => ({
-    datasetId: "Dataset ID",
-    datasetName: "Dataset Name",
-    datasetInformation: "Other relevant information",
+
     NETWORK_CONSTANTS
   })
 };

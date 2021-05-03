@@ -25,7 +25,7 @@
         })
     }),
         describe('The Home Page', () => {
-            it('correctly renders local text', () => {
+            it('correctly renders locale text', () => {
                 cy.visit('/')
                 cy.get('p')
                     .should('contain', 'This tool allows researchers to easily')
