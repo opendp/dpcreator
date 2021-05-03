@@ -21,6 +21,10 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         STEP_0700_RELEASE_COMPLETE = 'step_700', 'Step 7: Release Complete'
         STEP_0800_DV_RELEASE_DEPOSITED = 'step_800', 'Step 8: Dataverse Release Deposited'   # Dataverse Only
         STEP_0900_PROCESS_COMPLETE = 'step_900', 'Step 9: Process Complete'
+        STEP_9100_VALIDATION_FAILED = 'step_9100', 'Error 1: Validation Failed'
+        STEP_9200_DATAVERSE_DOWNLOAD_FAILED = 'step_9200', 'Error 2: Dataverse Download Failed'
+        STEP_9300_PROFILING_FAILED = 'step_9300', 'Error 3: Profiling Failed'
+        STEP_9400_CREATE_RELEASE_FAILED = 'step_9400', 'Error 4: Create Release Failed'
 
     # each dataset can only have one DepositorSetupInfo object
     dataset = models.OneToOneField('dataset.DataSetInfo',
