@@ -4,9 +4,9 @@ from requests.utils import quote
 from rest_framework import viewsets
 from rest_framework.response import Response
 
-from opendp_apps.dataverses.models import DataverseHandoff
+from opendp_apps.dataverses.models import DataverseHandoff, RegisteredDataverse
 from opendp_apps.dataverses.serializers import DataverseHandoffSerializer
-
+from opendp_apps.dataverses import static_vals as dv_static
 
 class DataverseHandoffView(viewsets.ViewSet):
 
@@ -23,7 +23,12 @@ class DataverseHandoffView(viewsets.ViewSet):
         Temporarily save the Dataverse paramemeters +
         redirect to the Vue page
         """
-        handoff_serializer = DataverseHandoffSerializer(data=request.data)
+        request_data = request.data.copy()
+        if dv_static.DV_PARAM_SITE_URL in request_data:
+            init_site_url = request_data[dv_static.DV_PARAM_SITE_URL]
+            request_data[dv_static.DV_PARAM_SITE_URL] = RegisteredDataverse.format_dv_url(init_site_url)
+
+        handoff_serializer = DataverseHandoffSerializer(data=request_data)
 
         if handoff_serializer.is_valid():
 
