@@ -10,6 +10,7 @@ from django_cryptography.fields import encrypt
 
 from polymorphic.models import PolymorphicModel
 
+from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
 
@@ -44,8 +45,6 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     source_file = models.FileField(storage=UPLOADED_FILE_STORAGE,
                                    upload_to='source-file/%Y/%m/%d/',
                                    blank=True, null=True)
-
-    
 
     class Meta:
         verbose_name = 'Dataset Information'
@@ -103,28 +102,32 @@ class DataverseFileInfo(DataSetInfo):
     Refers to a DV file from within a DV dataset
     """
     # TODO: This should have all fields from DV API response
-    installation_name = models.CharField(max_length=255) # FK: RegisteredDataverse
+    dv_installation = models.ForeignKey(RegisteredDataverse, on_delete=models.PROTECT)
     dataverse_file_id = models.IntegerField()
     dataset_doi = models.CharField(max_length=255)
     file_doi = models.CharField(max_length=255, blank=True)
+    dataset_schema_info = models.JSONField(null=True, blank=True)
+    file_schema_info = models.JSONField(null=True, blank=True)
 
     class Meta:
         verbose_name = 'Dataverse File Information'
         verbose_name_plural = 'Dataverse File Information'
         ordering = ('name', '-created')
         constraints = [
-            models.UniqueConstraint(fields=['installation_name', 'dataverse_file_id'],
+            models.UniqueConstraint(fields=['dv_installation', 'dataverse_file_id'],
                                     name='unique Dataverse file')
         ]
 
     def __str__(self):
-        return f'{self.name} ({self.installation_name})'
+        return f'{self.name} ({self.dv_installation})'
 
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the STEP
         #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
         #       depending on the data
         #
+        if not self.name:
+            self.name = f'{self.dataset_doi} ({self.dv_installation})'
         self.source = DataSetInfo.SourceChoices.Dataverse
         super(DataverseFileInfo, self).save(*args, **kwargs)
 
@@ -136,7 +139,7 @@ class DataverseFileInfo(DataSetInfo):
                     name=self.name,
                     creator=str(self.creator),
                     source=str(self.source),
-                    installation_name=self.installation_name,
+                    dv_installation=self.dv_installation,
                     dataverse_file_id=self.dataverse_file_id,
                     dataset_doi=self.dataset_doi,
                     file_doi=self.file_doi,

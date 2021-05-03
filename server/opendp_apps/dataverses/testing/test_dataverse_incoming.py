@@ -148,7 +148,6 @@ class DataverseIncomingTest(TestCase):
         print(dv_handler.get_err_msg())
         self.assertTrue(dv_handler.get_err_msg().find(dv_static.DV_PARAM_FILE_ID) > -1)
 
-
         print('2. Test with bad datasetPid param')
         params = self.mock_params.as_dict()
         params[dv_static.DV_PARAM_DATASET_PID] = 'cool-breeze'  # datasetPid
@@ -156,8 +155,8 @@ class DataverseIncomingTest(TestCase):
         print('schema_info', dv_handler.schema_info)
         self.assertTrue(dv_handler.has_error())
         print(dv_handler.get_err_msg())
-        self.assertTrue(dv_handler.get_err_msg().find('cool-breeze' ) > -1)
-        self.assertTrue(dv_handler.schema_info is None)
+        self.assertTrue('cool-breeze' in dv_handler.schema_info.get('message'))
+        self.assertFalse(dv_handler.schema_info is None)
 
     # @tag(TAG_WEB_CLIENT)
     @requests_mock.Mocker()

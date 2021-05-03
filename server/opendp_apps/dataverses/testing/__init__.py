@@ -1,9 +1,13 @@
 """
 Running individual tests
 
+python manage.py test opendp_apps.dataverses.testing.test_dataverse_handoff_view
+
 python manage.py test opendp_apps.dataverses.testing.test_dv_user_handler
 python manage.py test opendp_apps.dataverses.testing.test_endpoints.DataversePostTest
 python manage.py test opendp_apps.dataverses.testing.test_endpoints.DataversePostTest
+
+python manage.py test opendp_apps.dataverses.testing.test_file_view.FileViewGetTest.test_10_successful_get
 
 python manage.py test opendp_apps.dataverses.testing.test_endpoints.DataversePutTest.test_10_successful_creation
 

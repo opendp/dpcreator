@@ -37,7 +37,7 @@ def view_dataverse_incoming_1(request):
 
     resp_info = dict(title='Process Incoming Params',
                      subtitle='Example 1: get user info, schema',
-                     incoming_params = [(k, v) for k, v in request.GET.items()])
+                     incoming_params=[(k, v) for k, v in request.GET.items()])
 
     mparams = DataverseManifestParams(request.GET)
 
@@ -56,13 +56,13 @@ def view_dataverse_incoming_1(request):
                   'dataverses/view_mock_incoming_1.html',
                   resp_info)
 
+
 @login_required
 def view_dataverse_incoming_2(request):
     """Test the DataverseRequestHandler"""
     resp_info = dict(title='Process Incoming Params',
                      subtitle='Example 2: Test DataverseRequestHandler',
-                     incoming_params = [(k, v) for k, v in request.GET.items()])
-
+                     incoming_params=[(k, v) for k, v in request.GET.items()])
 
     dv_handler = DataverseRequestHandler(request.GET, request.user)
     if dv_handler.has_error():
@@ -79,6 +79,7 @@ def view_dataverse_incoming_2(request):
                   'dataverses/view_mock_incoming_2.html',
                   resp_info)
 
+
 def view_get_info_version(request):
     """
     Mock API: Get the Dataverse version and build number.
@@ -92,6 +93,7 @@ def view_get_info_version(request):
                      'build': 'OpenDP App Mock API!'}
                  }
     return JsonResponse(info_dict)
+
 
 def view_get_info_server(request):
     """
@@ -117,47 +119,45 @@ def view_get_dataset_export(request, format='ddi'):
 
     reference: https://github.com/AUSSDA/pyDataverse/blob/master/src/pyDataverse/api.py#L574
     """
-    exportFormat = request.GET['exporter'] if 'exporter' in request.GET else None
-    if exportFormat is None or not exportFormat in dv_static.EXPORTER_FORMATS:
-        return JsonResponse({dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_ERROR,
-                             dv_static.DV_KEY_MESSAGE: f'exporter must be one of {dv_static.EXPORTER_FORMATS}'})
+    export_format = request.GET['exporter'] if 'exporter' in request.GET else None
+    if export_format is not None and export_format in dv_static.EXPORTER_FORMATS:
+        persistent_id = request.GET['persistentId'] if 'persistentId' in request.GET else None
+        if persistent_id is None:
+            return JsonResponse({dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_ERROR,
+                                 dv_static.DV_KEY_MESSAGE: 'persistentId must be set'})
 
-    persistentId = request.GET['persistentId'] if 'persistentId' in request.GET else None
-    if persistentId is None:
-        return JsonResponse({dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_ERROR,
-                             dv_static.DV_KEY_MESSAGE: 'persistentId must be set'})
-
-
-    mock_params = ManifestTestParams.objects.filter(datasetPid=persistentId).first()
-    if not mock_params:
-        user_msg = (f'ManifestTestParams object not found for persistentId {persistentId}')
-        return JsonResponse({dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_ERROR,
-                             dv_static.DV_KEY_MESSAGE: user_msg})
-
-    # Replicate the DDI API call
-    #
-    if exportFormat == dv_static.EXPORTER_FORMAT_DDI:
-        if not mock_params.ddi_content:
-            user_msg = (f'DDI info not available for ManifestTestParams id: {mock_params.id}')
+        mock_params = ManifestTestParams.objects.filter(datasetPid=persistent_id).first()
+        if not mock_params:
+            user_msg = f'ManifestTestParams object not found for persistentId {persistent_id}'
             return JsonResponse({dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_ERROR,
                                  dv_static.DV_KEY_MESSAGE: user_msg})
 
-        ddi_download_name = f'ddi_{str(mock_params.id).zfill(5)}.xml'
+        # Replicate the DDI API call
+        #
+        if export_format == dv_static.EXPORTER_FORMAT_DDI:
+            if not mock_params.ddi_content:
+                user_msg = f'DDI info not available for ManifestTestParams id: {mock_params.id}'
+                return JsonResponse({dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_ERROR,
+                                     dv_static.DV_KEY_MESSAGE: user_msg})
 
-        response = HttpResponse(mock_params.ddi_content, content_type='application/xml')
-        response['Content-Disposition'] = f'inline;filename={ddi_download_name}'
+            ddi_download_name = f'ddi_{str(mock_params.id).zfill(5)}.xml'
 
-    # Replicate the schema.org API call
-    #
-    elif exportFormat == dv_static.EXPORTER_FORMAT_SCHEMA_ORG:
-        if not mock_params.schema_org_content:
-            user_msg = (f'schema.org content not available for ManifestTestParams id: {mock_params.id}')
-            return JsonResponse({dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_ERROR,
-                                 dv_static.DV_KEY_MESSAGE: user_msg})
+            response = HttpResponse(mock_params.ddi_content, content_type='application/xml')
+            response['Content-Disposition'] = f'inline;filename={ddi_download_name}'
+            return response
 
-        return JsonResponse(mock_params.schema_org_content)
+        # Replicate the schema.org API call
+        #
+        elif export_format == dv_static.EXPORTER_FORMAT_SCHEMA_ORG:
+            if not mock_params.schema_org_content:
+                user_msg = f'schema.org content not available for ManifestTestParams id: {mock_params.id}'
+                return JsonResponse({dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_ERROR,
+                                     dv_static.DV_KEY_MESSAGE: user_msg})
 
-    return response
+            return JsonResponse(mock_params.schema_org_content)
+
+    return JsonResponse({dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_ERROR,
+                         dv_static.DV_KEY_MESSAGE: f'exporter must be one of {dv_static.EXPORTER_FORMATS}'})
 
 
 def view_get_user_info(request):
@@ -168,7 +168,7 @@ def view_get_user_info(request):
         return JsonResponse('TESTing only!')
 
     if dv_static.HEADER_KEY_DATAVERSE not in request.headers:
-        user_msg = (f'"{dv_static.HEADER_KEY_DATAVERSE}" key not found in the request headers')
+        user_msg = f'"{dv_static.HEADER_KEY_DATAVERSE}" key not found in the request headers'
         return JsonResponse({dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_ERROR,
                              dv_static.DV_KEY_MESSAGE: user_msg})
 
@@ -181,12 +181,12 @@ def view_get_user_info(request):
             break
 
     if not mock_params:
-        user_msg = (f'ManifestTestParams not found for user_token: {user_token}')
+        user_msg = f'ManifestTestParams not found for user_token: {user_token}'
         return JsonResponse({dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_ERROR,
                              dv_static.DV_KEY_MESSAGE: user_msg})
 
     if not mock_params.user_info:
-        user_msg = (f'User info not available for ManifestTestParams id: {mock_params.id}')
+        user_msg = f'User info not available for ManifestTestParams id: {mock_params.id}'
         return JsonResponse({dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_ERROR,
                              dv_static.DV_KEY_MESSAGE: user_msg})
     """

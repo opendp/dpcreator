@@ -22,12 +22,12 @@ class DataverseFileInfoAdmin(admin.ModelAdmin):
     save_on_top = True
     search_fields = ('name',)
     list_filter = ('source', 'creator')
-    list_display = ('name',
+    list_display = ('id', 'name',
                     'object_id',
                     'dataset_doi',
                     'dataverse_file_id',
                     'creator',
-                    'installation_name',
+                    'dv_installation',
                     'updated',
                     'created',)
     readonly_fields = ('id', 'object_id', 'source', 'created', 'updated',)

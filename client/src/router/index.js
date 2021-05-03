@@ -1,69 +1,106 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
-import Login from '../views/Login.vue'
-import Lost from '../views/Lost.vue'
-import PasswordReset from "../views/PasswordReset"
-import PasswordResetConfirm from "../views/PasswordResetConfirm"
-import Register from "../views/Register"
-import VerifyEmail from "../views/VerifyEmail"
-import store from '../store'
+import Vue from "vue";
+import VueRouter from "vue-router";
+import Home from "../views/Home.vue";
 
-const redirectLogout = (to, from, next) => {
-  store.dispatch('auth/logout')
-    .then(() => next('/login'));
-};
+import NETWORK_CONSTANTS from "./NETWORK_CONSTANTS";
 
-Vue.use(VueRouter)
+const {
+  HOME,
+  WELCOME,
+  MY_DATA,
+  WIZARD,
+  SIGN_UP,
+  LOGIN,
+  CONTACT_US,
+  MY_PROFILE,
+  MOCK_DV,
+  TERMS_AND_CONDITIONS,
+  FORGOT_YOUR_PASSWORD
+} = NETWORK_CONSTANTS;
 
-  const routes = [
+Vue.use(VueRouter);
+
+const routes = [
   {
-    path: '/',
-    name: 'Home',
+    path: HOME.PATH,
+    name: HOME.NAME,
     component: Home
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: function () {
-      return import(/* webpackChunkName: "about" */ '../views/About.vue')
-    }
+    path: WIZARD.PATH,
+    name: WIZARD.NAME,
+    component: () => import("../views/Wizard.vue")
   },
-    {
-      path: '/login',
-      name: 'Login',
-      component: Login
-    },
-    {
-      path: '/logout',
-      beforeEnter: redirectLogout,
-    },
-    {
-      path: '/password_reset',
-      component: PasswordReset,
-    },
-    {
-      path: '/password_reset/:uid/:token',
-      component: PasswordResetConfirm,
-    },
-    {
-      path: '/register',
-      component: Register,
-    },
-    {
-      path: '/register/:key',
-      component: VerifyEmail,
-    },
-
-]
+  {
+    path: MY_DATA.PATH,
+    name: MY_DATA.NAME,
+    component: () => import("../views/MyData.vue")
+  },
+  {
+    path: `${MY_DATA.PATH}/:id`,
+    name: "MyDataDetails",
+    component: () => import("../views/MyDataDetails.vue")
+  },
+  {
+    path: SIGN_UP.PATH,
+    name: SIGN_UP.NAME,
+    component: () => import("../views/SignUp.vue")
+  },
+  {
+    path: `${SIGN_UP.PATH}/confirmation`,
+    name: "SignUpConfirmation",
+    component: () => import("../views/SignUpConfirmation.vue")
+  },
+  {
+    path: LOGIN.PATH,
+    name: LOGIN.NAME,
+    component: () => import("../views/LogIn.vue")
+  },
+  {
+    path: FORGOT_YOUR_PASSWORD.PATH,
+    name: FORGOT_YOUR_PASSWORD.NAME,
+    component: () => import("../views/ForgotYourPassword.vue")
+  },
+  {
+    path: WELCOME.PATH,
+    name: WELCOME.NAME,
+    component: () => import("../views/Welcome.vue")
+  },
+  {
+    path: TERMS_AND_CONDITIONS.PATH,
+    name: TERMS_AND_CONDITIONS.NAME,
+    component: () => import("../views/TermsAndConditions.vue")
+  },
+  {
+    path: CONTACT_US.PATH,
+    name: CONTACT_US.NAME,
+    component: () => import("../views/ContactUs.vue")
+  },
+  {
+    path: MY_PROFILE.PATH,
+    name: MY_PROFILE.NAME,
+    component: () => import("../views/MyProfile.vue")
+  },
+  {
+    path: MOCK_DV.PATH,
+    name: MOCK_DV.NAME,
+    component: () => import("../views/MockDV.vue")
+  },
+  {
+    path: "*",
+    name: "NotFoundPage",
+    component: () => import("../views/NotFoundPage.vue")
+  }
+];
 
 const router = new VueRouter({
-  mode: 'history',
-  //base: process.env.BASE_URL,
+  mode: "history",
+  // base: process.env.BASE_URL,
   routes
-})
+});
 
-export default router
+router.afterEach(() => {
+  window.scrollTo(0, 0);
+});
+
+export default router;

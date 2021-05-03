@@ -112,7 +112,6 @@ class DataverseRequestHandler(BasicErrCheck):
         self.add_err_msg(user_msg)
         return False
 
-
     def retrieve_schema_org_info(self):
         """
         User the DV API to retrieve schema.org info about the dataset
@@ -123,15 +122,14 @@ class DataverseRequestHandler(BasicErrCheck):
         # (1) Retrieve the JSON LD info
         #
         schema_info = self.mparams.get_schema_org()
-        if not schema_info.success:
-            print(schema_info.message)
+        if schema_info.status_code >= 400:
             self.add_err_msg(schema_info.message)
             return False
-        self.schema_info = schema_info.data
+        self.schema_info = schema_info.json()
 
         # (2) Retrieve the file specific info from the JSON-LD
         #
-        file_info = self.mparams.get_file_specific_schema_info(self.schema_info)
+        file_info = self.mparams.retrieve_file_specific_info(self.schema_info)
         if not file_info.success:
             self.add_err_msg(file_info.message)
             return False
@@ -182,7 +180,7 @@ class DataverseRequestHandler(BasicErrCheck):
         Retrieve or create a DataverseFileInfo object
         """
         query_params = dict(source=DataverseFileInfo.SourceChoices.Dataverse,
-                            installation_name=self.mparams.registerd_dataverse,
+                            dv_installation=self.mparams.registerd_dataverse,
                             dataverse_file_id=self.mparams.fileId
                             )
         defaults = dict(creator=self.user,  # logged in user, OpenDP user

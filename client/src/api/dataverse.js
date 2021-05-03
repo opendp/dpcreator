@@ -19,24 +19,58 @@ export default {
         formData.append("filePid", filePid);
         return session.post('/api/dv-dataset/', formData);
     },
-
     /**
-     *  check if there is a DataverseUser for thie openDPUserId and siteUrl.
+     *  check if there is a DataverseFileInfo for this openDPUserId and siteUrl (contained in handoff object).
      *  If there is not create one, else update it with latest info from Dataverse (using handoff object)
      *
-     *  TODO: update with new API call when ready
+     * @param openDPUserId
+     * @param handoffId
+     * @returns {Promise<AxiosResponse<any>>} DataverseUser object
+     */
+    updateFileInfo(openDPUserId, handoffId) {
+        console.log('calling API updateFileInfo ' + openDPUserId + ',' + handoffId)
+        return session.post('/api/dv-file/',
+            {handoff_id: handoffId, creator: openDPUserId})
+    },
+    /**
+     *  check if there is a DataverseUser for this openDPUserId and siteUrl.
+     *  If there is not create one, else update it with latest info from Dataverse (using handoff object)
+     *
      * @param openDPUserId
      * @param handoffId
      * @returns {Promise<AxiosResponse<any>>} DataverseUser object
      */
     updateDataverseUser(openDPUserId, handoffId) {
         console.log('calling API updateDataverseUser ' + openDPUserId + ',' + handoffId)
-        const formData = new FormData()
-        formData.append("dataverse_handoff_id", handoffId)
-        formData.append("user_id", openDPUserId)
-        //   return session.post('/api/dataverses/dv_user/', formData);
         return session.post('/api/dv-user/',
-            {dataverse_handoff_id: handoffId, user_id: openDPUserId});
+            {dv_handoff: handoffId, user: openDPUserId});
     },
+    testHandoff(site_url, fileId, datasetPid, token) {
+        console.log('posting to dv-handoff')
+        const formData = new FormData()
+        formData.append("site_url", site_url)
+        formData.append("apiGeneralToken", token)
+        formData.append('datasetPid', datasetPid)
+        formData.append('fileId', fileId)
+
+        session.post('/api/dv-handoff/', formData)
+            .then(function (response) {
+                window.location = response.request.responseURL; // full URI to redirect to
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    },
+    getDataverseHandoff(handoffId) {
+        return session.get('/api/dv-handoff/', {
+            params: {
+                object_id: 'xyz'
+            }
+        })
+            .then(function (response) {
+                console.log(response);
+            })
+
+    }
 
 };

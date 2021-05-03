@@ -1,19 +1,28 @@
-import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
+import Vue from "vue";
+import App from "./App.vue";
+import router from "./router";
 import store from './store'
-import  axios from  'axios'
+import axios from 'axios'
 import GSignInButton from 'vue-google-signin-button'
-import vuetify from './plugins/vuetify';
+import vuetify from "./plugins/vuetify";
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 Vue.use(GSignInButton)
 axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 axios.defaults.xsrfCookieName = 'csrftoken';
+import VueWaypoint from "vue-waypoint";
+
+Vue.use(VueWaypoint);
+
+import titleMixin from './mixins/titleMixin'
+import i18n from './i18n'
+
+Vue.mixin(titleMixin)
 
 new Vue({
   router,
   store,
   vuetify,
-  render: function (h) { return h(App) }
-}).$mount('#app')
+  i18n,
+  render: h => h(App)
+}).$mount("#app");

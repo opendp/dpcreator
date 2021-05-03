@@ -100,7 +100,7 @@
     "model": "dataset.dataversefileinfo",
     "pk": 1,
     "fields": {
-        "installation_name": "Mock Local Dataverse (http://127.0.0.1:8000/dv-mock-api)",
+        "dv_installation": 1,
         "dataverse_file_id": 4164587,
         "dataset_doi": "doi:10.7910/DVN/PUXVDH",
         "file_doi": ""

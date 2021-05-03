@@ -6,14 +6,13 @@ HEADER_KEY_DATAVERSE = 'X-Dataverse-key'
 #   - sent over via GET
 # -----------------------------
 DV_PARAM_FILE_ID = 'fileId'
-DV_PARAM_SITE_URL = 'siteUrl'
+DV_PARAM_SITE_URL = 'site_url'
 DV_PARAM_DATASET_PID = 'datasetPid' # dataset DOI
 DV_PARAM_FILE_PID = 'filePid'   # file DOI
 DV_API_GENERAL_TOKEN = 'apiGeneralToken'
-DV_API_SENSITIVE_DATA_READ_TOKEN = 'apiSensitiveDataReadToken'
 
 DV_ALL_PARAMS = [DV_PARAM_FILE_ID, DV_PARAM_SITE_URL, DV_PARAM_DATASET_PID,
-                 DV_PARAM_FILE_PID, DV_API_GENERAL_TOKEN, DV_API_SENSITIVE_DATA_READ_TOKEN]
+                 DV_PARAM_FILE_PID, DV_API_GENERAL_TOKEN]
 DV_OPTIONAL_PARAMS = [DV_PARAM_FILE_PID,]
 
 

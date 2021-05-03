@@ -190,6 +190,7 @@ STATICFILES_DIRS = [
 
 # global settings for the REST framework
 REST_FRAMEWORK = {
+    # 'EXCEPTION_HANDLER': 'opendp_apps.utils.view_helper.opendp_exception_handler',
     'DEFAULT_PERMISSION_CLASSES': [
         # 'rest_framework.permissions.IsAdminUser',
         # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
@@ -234,7 +235,7 @@ REST_AUTH_SERIALIZERS = {
 }
 # ALLOWED_HOSTS=['*']
 
-DEFAULT_ALLOWED_HOSTS = '0.0.0.0,127.0.0.1,localhost'
+DEFAULT_ALLOWED_HOSTS = '0.0.0.0,127.0.0.1,localhost,server'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', DEFAULT_ALLOWED_HOSTS).split(',')
 
 CORS_ORIGIN_ALLOW_ALL = False
@@ -268,7 +269,7 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL') \
     if os.environ.get('DEFAULT_FROM_EMAIL') else 'kraffmilleropendptest@gmail.com'
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = 'true'
-ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/login/'
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/log-in/'
 
 # ---------------------------
 # Profiler - Dataset reading
