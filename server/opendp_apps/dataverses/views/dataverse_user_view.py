@@ -92,7 +92,6 @@ class DataverseUserView(viewsets.ViewSet):
         return Response(get_json_success('success', data={'dv_user': dataverse_user.object_id}),
                         status=status.HTTP_201_CREATED)
 
-
     def update(self, request, pk=None):
         """NOT REALLY USED!!! e.g. create is really create_or_update"""
         """Update the Dataverse User. Expects JSON"""
