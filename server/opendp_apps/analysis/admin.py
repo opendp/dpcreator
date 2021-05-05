@@ -6,8 +6,8 @@ from .models import \
 class DepositorSetupInfoAdmin(admin.ModelAdmin):
     save_on_top = True
     search_fields = ('dataset__name',)
-    list_filter = ('is_complete', 'dataset__source')
-    list_display = ('dataset',
+    list_filter = ('is_complete', )
+    list_display = ('dataversefileinfo',
                     'user_step',
                     'epsilon',
                     'updated',

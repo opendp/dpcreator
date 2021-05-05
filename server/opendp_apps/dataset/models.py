@@ -38,7 +38,7 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
     # Switch to encryption!
     #
-    data_profile = encrypt(models.JSONField(default=None, null=True, encoder=DjangoJSONEncoder))
+    data_profile = encrypt(models.JSONField(default=None, null=True, blank=True, encoder=DjangoJSONEncoder))
 
     # Switch to encryption!
     #
@@ -119,13 +119,13 @@ class DataverseFileInfo(DataSetInfo):
     """
     Refers to a DV file from within a DV dataset
     """
-    # TODO: This should have all fields from DV API response
     dv_installation = models.ForeignKey(RegisteredDataverse, on_delete=models.PROTECT)
     dataverse_file_id = models.IntegerField()
     dataset_doi = models.CharField(max_length=255)
     file_doi = models.CharField(max_length=255, blank=True)
     dataset_schema_info = models.JSONField(null=True, blank=True)
     file_schema_info = models.JSONField(null=True, blank=True)
+    depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo', on_delete=models.PROTECT)
 
     class Meta:
         verbose_name = 'Dataverse File Information'
@@ -137,7 +137,7 @@ class DataverseFileInfo(DataSetInfo):
         ]
 
     def __str__(self):
-        return f'{self.name} ({self.dv_installation})'
+        return f'{self.name} ({self.dv_installation.name})'
 
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the STEP
