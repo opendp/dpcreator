@@ -17,7 +17,10 @@ class DataSetInfoSerializer(serializers.ModelSerializer):
         fields = ['name', 'creator', 'source', 'data_profile', 'source_file', 'status']
 
 
-class DataverseFileInfoSerializer(serializers.ModelSerializer):
+class DataverseFileInfoSerializer(DataSetInfoSerializer):
+    creator = serializers.SlugRelatedField(queryset=OpenDPUser.objects.all(),
+                                           slug_field='username',
+                                           read_only=False)
 
     installation_name = serializers.SlugRelatedField(queryset=RegisteredDataverse.objects.all(),
                                                      slug_field='name',
@@ -26,16 +29,20 @@ class DataverseFileInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DataverseFileInfo
-        fields = ['creator', 'installation_name', 'dataverse_file_id', 'dataset_doi', 'file_doi']
+        fields = ['name', 'creator', 'installation_name', 'dataverse_file_id', 'dataset_doi', 'file_doi', 'status']
         extra_kwargs = {
             'url': {'view_name': 'dataset-info-list'},
         }
 
 
 class UploadFileInfoSerializer(serializers.ModelSerializer):
+    creator = serializers.SlugRelatedField(queryset=OpenDPUser.objects.all(),
+                                           slug_field='username',
+                                           read_only=False)
+
     class Meta:
         model = UploadFileInfo
-        fields = []
+        fields = ['name', 'creator', 'data_file', 'status']
         extra_kwargs = {
             'url': {'view_name': 'dataset-info-list'},
         }

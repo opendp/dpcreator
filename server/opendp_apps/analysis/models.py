@@ -10,17 +10,15 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     """
     class DepositorSteps(models.TextChoices):
         """
-        Potential enumeration for different statuses
+        Enumeration for different statuses during depositor process
         """
         STEP_0100_UPLOADED = 'step_100', 'Step 1: Uploaded'
         STEP_0200_VALIDATED = 'step_200', 'Step 2: Validated'   # done automatically for Dataverse use case
-        STEP_0300_VARIABLES_CONFIRMED = 'step_300', 'Step 3: Variables Confirmed'
-        STEP_0400_EPSILON_SET = 'step_400', 'Step 4: Epsilon Set'
-        STEP_0500_STATISTICS_CREATED = 'step_500', 'Step 5: Statistics Created'
-        STEP_0600_STATISTICS_SUBMITTED = 'step_600', 'Step 6: Statistics Submitted'
-        STEP_0700_RELEASE_COMPLETE = 'step_700', 'Step 7: Release Complete'
-        STEP_0800_DV_RELEASE_DEPOSITED = 'step_800', 'Step 8: Dataverse Release Deposited'   # Dataverse Only
-        STEP_0900_PROCESS_COMPLETE = 'step_900', 'Step 9: Process Complete'
+        STEP_0300_PROFILING_PROCESSING = 'step_300', 'Step 3: Profiling Processing'
+        STEP_0400_PROFILING_COMPLETE = 'step_400', 'Step 4: Profiling Complete'
+        STEP_0500_VARIABLE_DEFAULTS_CONFIRMED = 'step_500', 'Step 5: Variable Defaults Confirmed'
+        STEP_0600_EPSILON_SET = 'step_600', 'Step 6: Epsilon Set'
+        # Error statuses should begin with 9
         STEP_9100_VALIDATION_FAILED = 'error_9100', 'Error 1: Validation Failed'
         STEP_9200_DATAVERSE_DOWNLOAD_FAILED = 'error_9200', 'Error 2: Dataverse Download Failed'
         STEP_9300_PROFILING_FAILED = 'error_9300', 'Error 3: Profiling Failed'
@@ -59,11 +57,18 @@ class AnalysisPlan(TimestampedModelWithUUID):
     ! Do we want another object to monitor the plan once it is sent to the execution engine?
     """
     class AnalystSteps(models.TextChoices):
-        """10/21 Waiting for UI finalization to define these"""
-        STEP_010_TOA = 'step_010', 'Step 10: Terms of Access'
-        STEP_020_CUSTOM_VARIABLES = 'step_020', 'Step 20: Custom Variables'
-        STEP_030_VARIABLE_TYPES = 'step_030', 'Step 30: Confirm Variable Types'
-        STEP_100_ANALYSIS_READY = 'step_100', 'Step 100: Analysis ready!'
+        """
+        Enumeration for statuses during the analysis process
+        """
+        STEP_0500_VARIABLES_CONFIRMED = 'step_500', 'Step 5: Variables Confirmed'
+        STEP_0600_STATISTICS_CREATED = 'step_600', 'Step 6: Statistics Created'
+        STEP_0700_STATISTICS_SUBMITTED = 'step_700', 'Step 7: Statistics Submitted'
+        STEP_0800_RELEASE_COMPLETE = 'step_800', 'Step 8: Release Complete'
+        STEP_0900_DV_RELEASE_DEPOSITED = 'step_900', 'Step 9: Dataverse Release Deposited'   # Dataverse Only
+        STEP_1000_PROCESS_COMPLETE = 'step_1000', 'Step 10: Process Complete'
+        # Error statuses should begin with 9
+        STEP_9500_RELEASE_CREATION_FAILED = 'error_9500', 'Error 5: Release Creation Failed'
+        STEP_9600_RELEASE_DEPOSIT_FAILED = 'error_9600', 'Error 6: Release Deposit Failed'
 
     analyst = models.ForeignKey(settings.AUTH_USER_MODEL,
                                 on_delete=models.PROTECT)
