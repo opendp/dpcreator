@@ -1,0 +1,139 @@
+<!-- chat/templates/chat/room.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Test profile</title>
+
+    <!-- Bootstrap CDN -->
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
+
+
+    <!-- Bootstrap bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+
+
+</head>
+<body style="margin:40px;">
+<h1>Profile Test</h1>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <td>#</td>
+            <td>name<br>(type)</td>
+            <td>object id</td>
+            <td>source</td>
+            <td>profile</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ds in ds_info_objects %}
+        <tr>
+            <td>{{ forloop.counter}}</td>
+            <td>{{ ds.name}}<br />({{ ds.polymorphic_ctype.name }})</td>
+            <td>{{ ds.object_id}}</td>
+            <td>{% if ds.source_file %}}
+                    <i class="bi bi-file"></i>
+                {% else %}
+                <i class="bi bi-exclamation-square"></i>
+                    (not available)
+                    <a href="#" id="{{ ds.object_id}}" class="profile-btn btn btn-sm btn-primary">Download + Profile!</a>
+
+                {% endif %}
+            </td>
+            <td>{% if ds.data_profile %}}
+                    <i class="bi bi-file-spreadsheet"></i>
+                {% else %}
+                <i class="bi bi-exclamation-square"></i>
+                    <a href="#" id="{{ ds.object_id}}" class="profile-btn btn btn-sm btn-primary">Profile!</a>
+
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+
+</table>
+    <h5>response from ajax</h5>
+    <div id="postResult" style="border:1px solid #006699;margin:20px;">&nbsp;</div>
+
+    <h5>response from websocket</h5>
+    <pre id="webSocketResult" style="border:1px solid #006699;margin:30px;">(nuthin' yet)</pre>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    {% csrf_token %}
+
+    <script>
+
+        const chatSocket = new WebSocket(
+            '{{ WEBSOCKET_PREFIX }}' + window.location.host + '/async_messages/ws/chat/{{ websocket_id }}' + '/'
+        );
+        chatSocket.onmessage = function(e) {
+            console.log(e);
+            console.log(e.data);
+            const ws_data = JSON.parse(e.data);
+            const ws_msg = ws_data.message
+            console.log('----------------');
+            console.log(ws_msg.msg_type);
+            console.log(ws_msg.success);
+            console.log('----------------');
+
+            if (ws_msg.msg_type = 'TYPE_OF_MESSAGE') {
+                console.log('TYPE_OF_MESSAGE found!');
+                if (ws_msg.success) {
+                    console.log('-- it worked!')
+                } else {
+                    console.log('-- error occurred!')
+                }
+                console.log('ws_msg.user_message: ' + ws_msg.user_message);
+                document.querySelector('#webSocketResult').innerHTML += '<br /><br />' + ws_msg.user_message;
+
+
+            } else {
+                console.log('unknown msg_type: ' + ws_msg.msg_type);
+            }
+
+
+            chatSocket.onclose = function (e) {
+                console.error('Chat socket closed unexpectedly');
+            };
+        };
+
+
+        $(document).ready(function() {
+            $("a.profile-btn").click(function() {
+                let dataset_id = this.id
+                console.log('profile! ' + dataset_id);//Do stuff when clicked
+                params = {'dataset_object_id': dataset_id};
+
+                const request = new Request(
+                    "{% url 'ajax_profile_by_dataset_object_id' %}",
+                    // {headers: {'X-CSRFToken': csrftoken}}
+                );
+
+                fetch(request, {
+                  method: "POST",
+                  mode: 'same-origin',  // Do not send CSRF token to another domain.
+                  body: JSON.stringify(params)
+                }).then(res => {
+                  console.log("Request complete! response:", res);
+                  console.log("Request complete! response:", res.data);
+                });
+
+                  //$( "#postResult" ).html( data );
+            });
+        });
+
+
+    </script>
+</body>
+</html>

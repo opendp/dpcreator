@@ -95,6 +95,12 @@ TEMPLATES = [
 ]
 
 # -----------------------------------------------
+# Websocket prefix.
+# When using https, set it to 'wss://'
+# -----------------------------------------------
+WEBSOCKET_PREFIX = os.environ.get('ws://', 'WEBSOCKET_PREIX')
+
+# -----------------------------------------------
 # REDIS settings
 # -----------------------------------------------
 REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')

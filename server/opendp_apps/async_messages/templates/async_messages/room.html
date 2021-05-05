@@ -6,10 +6,12 @@
     <title>Test profile</title>
 </head>
 <p>
+    {% comment %}
     <textarea id="chat-log" cols="100" rows="10"></textarea><br>
     <input id="chat-message-input" type="text" size="100"><br>
     <input id="chat-message-submit" type="button" value="Send">
     {{ room_name|json_script:"room-name" }}
+    {% endcomment %}
     <p><a href="{%  url 'view_push_test' %}" target="_blank">run async profile</a></p>
     <div id="json-splat1" style="border:1px solid #006699;margin:30px;"></div>
     <pre id="json-splat2" style="border:1px solid #006699;margin:30px;"></pre>
@@ -75,6 +77,7 @@
             }));
             messageInputDom.value = '';
         };
+
     </script>
 </body>
 </html>
