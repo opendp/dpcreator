@@ -4,12 +4,12 @@ import json
 from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.db.models import CASCADE
 from django.conf import settings
 from django_cryptography.fields import encrypt
 
 from polymorphic.models import PolymorphicModel
 
+from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
@@ -53,6 +53,35 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
     def __str__(self):
         return self.name
+
+    def _get_current_status(self):
+        """
+        This represents the *other* method, where we infer
+        status based on certain fields in the DepositorSetupInfo object
+        """
+        pass
+
+    @property
+    def status(self):
+        """
+        Two approaches possible here: either write logic to generate status (_get_current_status()),
+        or call directly to depositor_setup_info.user_step (below)
+        """
+        try:
+            return DepositorSetupInfo.objects.get(dataset=self).user_step
+        except DepositorSetupInfo.DoesNotExist:
+            return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED
+
+    @property
+    def status_name(self):
+        """
+        Two approaches possible here: either write logic to generate status (_get_current_status()),
+        or call directly to depositor_setup_info.user_step (below)
+        """
+        try:
+            return DepositorSetupInfo.objects.get(dataset=self).user_step.label
+        except DepositorSetupInfo.DoesNotExist:
+            return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED.label
 
     def as_dict(self):
         """
