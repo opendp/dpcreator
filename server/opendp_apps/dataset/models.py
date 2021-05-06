@@ -137,13 +137,20 @@ class DataverseFileInfo(DataSetInfo):
     @property
     def status(self):
         """
-        Two approaches possible here: either write logic to generate status (_get_current_status()),
-        or call directly to depositor_setup_info.user_step (below)
         """
         try:
             return self.depositor_setup_info.user_step
         except DepositorSetupInfo.DoesNotExist:
             return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED
+
+    @property
+    def status_name(self):
+        """
+        """
+        try:
+            return self.depositor_setup_info.user_step.label
+        except DepositorSetupInfo.DoesNotExist:
+            return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED.label
 
     def as_dict(self):
         """

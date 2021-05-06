@@ -40,15 +40,19 @@ class TestDataSetSerializer(APITestCase):
                                                                   'dataverse_file_id': 1,
                                                                   'installation_name': 'Harvard Dataverse',
                                                                   'depositor_setup_info': 1})
-        print(response.json())
-        self.assertEqual(response.json(), {'name': 'test',
-                                           'creator': 'dv_depositor',
-                                           'installation_name': 'Harvard Dataverse',
-                                           'dataverse_file_id': 1,
-                                           'dataset_doi': 'test',
-                                           'file_doi': '',
-                                           'status': 'step_100',
-                                           'resourcetype': 'DataverseFileInfo'}
+        response_json = response.json()
+        # Remove object_id, since it will be different every time the test is run
+        # which makes equality testing difficult
+        object_id = response_json.pop('object_id')
+        self.assertEqual(response_json, {'name': 'test',
+                                         'creator': 'dv_depositor',
+                                         'installation_name': 'Harvard Dataverse',
+                                         'dataverse_file_id': 1,
+                                         'dataset_doi': 'test',
+                                         'file_doi': '',
+                                         'status': 'step_100',
+                                         'status_name': 'Step 1: Uploaded',
+                                         'resourcetype': 'DataverseFileInfo'}
 )
         self.assertEqual(response.status_code, 201)
 
