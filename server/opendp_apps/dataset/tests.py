@@ -41,9 +41,10 @@ class TestDataSetSerializer(APITestCase):
                                                                   'installation_name': 'Harvard Dataverse',
                                                                   'depositor_setup_info': 1})
         response_json = response.json()
-        # Remove object_id, since it will be different every time the test is run
+        # Remove object_id, and created since they will be different every time the test is run
         # which makes equality testing difficult
         object_id = response_json.pop('object_id')
+        created = response_json.pop('created')
         self.assertEqual(response_json, {'name': 'test',
                                          'creator': 'dv_depositor',
                                          'installation_name': 'Harvard Dataverse',
