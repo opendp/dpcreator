@@ -1,6 +1,5 @@
 from django.db import models
 from django.conf import settings
-from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
 
@@ -10,13 +9,23 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     Metadata and aggregate data about potential release of Dataset
     """
     class DepositorSteps(models.TextChoices):
-        """10/21 Waiting for UI finalization to define these"""
-        STEP_10_TOA = 'step_10', 'Step 10: Terms of Access'
-        STEP_20_UPLOAD_DEPOSIT = 'step_20', 'Step 20: Upload'   # done automatically for Dataverse use case
-        STEP_30_DATASET_TYPE = 'step_30', 'Step 30: Dataset Type'
+        """
+        Enumeration for different statuses during depositor process
+        """
+        STEP_0100_UPLOADED = 'step_100', 'Step 1: Uploaded'
+        STEP_0200_VALIDATED = 'step_200', 'Step 2: Validated'   # done automatically for Dataverse use case
+        STEP_0300_PROFILING_PROCESSING = 'step_300', 'Step 3: Profiling Processing'
+        STEP_0400_PROFILING_COMPLETE = 'step_400', 'Step 4: Profiling Complete'
+        STEP_0500_VARIABLE_DEFAULTS_CONFIRMED = 'step_500', 'Step 5: Variable Defaults Confirmed'
+        STEP_0600_EPSILON_SET = 'step_600', 'Step 6: Epsilon Set'
+        # Error statuses should begin with 9
+        STEP_9100_VALIDATION_FAILED = 'error_9100', 'Error 1: Validation Failed'
+        STEP_9200_DATAVERSE_DOWNLOAD_FAILED = 'error_9200', 'Error 2: Dataverse Download Failed'
+        STEP_9300_PROFILING_FAILED = 'error_9300', 'Error 3: Profiling Failed'
+        STEP_9400_CREATE_RELEASE_FAILED = 'error_9400', 'Error 4: Create Release Failed'
 
     # each dataset can only have one DepositorSetupInfo object
-    dataset = models.OneToOneField(DataSetInfo,
+    dataset = models.OneToOneField('dataset.DataSetInfo',
                                    on_delete=models.PROTECT)
     is_complete = models.BooleanField(default=False)
     user_step = models.CharField(max_length=128,
@@ -48,18 +57,25 @@ class AnalysisPlan(TimestampedModelWithUUID):
     ! Do we want another object to monitor the plan once it is sent to the execution engine?
     """
     class AnalystSteps(models.TextChoices):
-        """10/21 Waiting for UI finalization to define these"""
-        STEP_010_TOA = 'step_010', 'Step 10: Terms of Access'
-        STEP_020_CUSTOM_VARIABLES = 'step_020', 'Step 20: Custom Variables'
-        STEP_030_VARIABLE_TYPES = 'step_030', 'Step 30: Confirm Variable Types'
-        STEP_100_ANALYSIS_READY = 'step_100', 'Step 100: Analysis ready!'
+        """
+        Enumeration for statuses during the analysis process
+        """
+        STEP_0500_VARIABLES_CONFIRMED = 'step_500', 'Step 5: Variables Confirmed'
+        STEP_0600_STATISTICS_CREATED = 'step_600', 'Step 6: Statistics Created'
+        STEP_0700_STATISTICS_SUBMITTED = 'step_700', 'Step 7: Statistics Submitted'
+        STEP_0800_RELEASE_COMPLETE = 'step_800', 'Step 8: Release Complete'
+        STEP_0900_DV_RELEASE_DEPOSITED = 'step_900', 'Step 9: Dataverse Release Deposited'   # Dataverse Only
+        STEP_1000_PROCESS_COMPLETE = 'step_1000', 'Step 10: Process Complete'
+        # Error statuses should begin with 9
+        STEP_9500_RELEASE_CREATION_FAILED = 'error_9500', 'Error 5: Release Creation Failed'
+        STEP_9600_RELEASE_DEPOSIT_FAILED = 'error_9600', 'Error 6: Release Deposit Failed'
 
     analyst = models.ForeignKey(settings.AUTH_USER_MODEL,
                                 on_delete=models.PROTECT)
 
     name = models.CharField(max_length=255)
 
-    dataset = models.ForeignKey(DataSetInfo,
+    dataset = models.ForeignKey('dataset.DataSetInfo',
                                 on_delete=models.PROTECT)
     is_complete = models.BooleanField(default=False)
     user_step = models.CharField(max_length=128,
@@ -84,7 +100,7 @@ class ReleaseInfo(TimestampedModelWithUUID):
     """
     Release of differentially private result from an AnalysisPlan
     """
-    dataset = models.ForeignKey(DataSetInfo,
+    dataset = models.ForeignKey('dataset.DataSetInfo',
                                 on_delete=models.PROTECT)
 
     # also gives analyst

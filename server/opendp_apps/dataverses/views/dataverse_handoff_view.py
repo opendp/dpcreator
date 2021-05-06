@@ -8,6 +8,7 @@ from opendp_apps.dataverses.models import DataverseHandoff, RegisteredDataverse
 from opendp_apps.dataverses.serializers import DataverseHandoffSerializer
 from opendp_apps.dataverses import static_vals as dv_static
 
+
 class DataverseHandoffView(viewsets.ViewSet):
 
     def get_serializer(self, instance=None):
