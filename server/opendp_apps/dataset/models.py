@@ -54,13 +54,6 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     def __str__(self):
         return self.name
 
-    def _get_current_status(self):
-        """
-        This represents the *other* method, where we infer
-        status based on certain fields in the DepositorSetupInfo object
-        """
-        pass
-
     def as_dict(self):
         """
         Return as dict

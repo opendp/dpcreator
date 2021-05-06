@@ -14,7 +14,7 @@ class DataSetInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DataSetInfo
-        fields = ['name', 'creator', 'source', 'data_profile', 'source_file']
+        fields = ['object_id', 'name', 'creator', 'source', 'status', 'status_name']
 
 
 class DataverseFileInfoSerializer(DataSetInfoSerializer):
@@ -29,7 +29,10 @@ class DataverseFileInfoSerializer(DataSetInfoSerializer):
 
     class Meta:
         model = DataverseFileInfo
-        fields = ['name', 'creator', 'installation_name', 'dataverse_file_id', 'dataset_doi', 'file_doi', 'status']
+        fields = ['object_id', 'name',
+                  'creator',
+                  'installation_name', 'dataverse_file_id', 'dataset_doi', 'file_doi',
+                  'status', 'status_name']
         extra_kwargs = {
             'url': {'view_name': 'dataset-info-list'},
         }
@@ -42,7 +45,7 @@ class UploadFileInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UploadFileInfo
-        fields = ['name', 'creator', 'data_file', 'status']
+        fields = ['object_id', 'name', 'creator', 'data_file', 'status', 'status_name']
         extra_kwargs = {
             'url': {'view_name': 'dataset-info-list'},
         }
