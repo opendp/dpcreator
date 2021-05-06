@@ -72,6 +72,17 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         except DepositorSetupInfo.DoesNotExist:
             return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED
 
+    @property
+    def  (self):
+        """
+        Two approaches possible here: either write logic to generate status (_get_current_status()),
+        or call directly to depositor_setup_info.user_step (below)
+        """
+        try:
+            return DepositorSetupInfo.objects.get(dataset=self).user_step.label
+        except DepositorSetupInfo.DoesNotExist:
+            return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED.label
+
     def as_dict(self):
         """
         Return as dict
