@@ -4,7 +4,8 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 
 from opendp_apps.model_helpers.msg_util import msgt
-
+from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.dataset.models import DataSetInfo
 
 class TestDataSetSerializer(APITestCase):
 
@@ -34,13 +35,19 @@ class TestDataSetSerializer(APITestCase):
                                                                   'name': 'test',
                                                                   'creator': self.user_obj.username,
                                                                   'source': 'upload'})
-        self.assertEqual(response.json(), {"creator": "dv_depositor",
-                                           "data_profile": None,
-                                           "name": "test",
-                                           "resourcetype": "DataSetInfo",
-                                           "source": "upload",
-                                           "source_file": None,
-                                           "status": "step_100"})
+
+        resp_json = response.json()
+
+        expected_resp = {"creator": "dv_depositor",
+                         "name": "test",
+                         "object_id": resp_json['object_id'],   # object_id value is dynamic
+                         "resourcetype": DataSetInfo.__name__,
+                         "source": "upload",
+                         "status": DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED,
+                         "status_name": DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED.label}
+
+        self.assertEqual(resp_json, expected_resp)
+
         self.assertEqual(response.status_code, 201)
 
     def test_unsuccessful_post(self):
