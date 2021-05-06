@@ -26,7 +26,8 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
 
     is_complete = models.BooleanField(default=False)
     user_step = models.CharField(max_length=128,
-                                 choices=DepositorSteps.choices)
+                                 choices=DepositorSteps.choices,
+                                 default=DepositorSteps.STEP_0100_UPLOADED)
     epsilon = models.FloatField(null=True, blank=True)
     dataset_questions = models.JSONField(null=True, blank=True)
     variable_ranges = models.JSONField(null=True, blank=True)

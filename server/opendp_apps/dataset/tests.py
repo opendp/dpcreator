@@ -8,6 +8,8 @@ from opendp_apps.model_helpers.msg_util import msgt
 
 class TestDataSetSerializer(APITestCase):
 
+    fixtures = ['test_dataset_data_001.json']
+
     def setUp(self) -> None:
         self.user_obj, _created = get_user_model().objects.get_or_create(username='dv_depositor')
         self.client.force_login(self.user_obj)
@@ -30,17 +32,24 @@ class TestDataSetSerializer(APITestCase):
     def test_successful_post(self):
         """(20) Create new inheritor of DataSetInfo"""
         msgt(self.test_successful_post.__doc__)
-        response = self.client.post(reverse("datasetinfo-list"), {'resourcetype': 'DataSetInfo',
+        response = self.client.post(reverse("datasetinfo-list"), {'resourcetype': 'DataverseFileInfo',
                                                                   'name': 'test',
                                                                   'creator': self.user_obj.username,
-                                                                  'source': 'upload'})
-        self.assertEqual(response.json(), {"creator": "dv_depositor",
-                                           "data_profile": None,
-                                           "name": "test",
-                                           "resourcetype": "DataSetInfo",
-                                           "source": "upload",
-                                           "source_file": None,
-                                           "status": "step_100"})
+                                                                  'source': 'upload',
+                                                                  'dataset_doi': 'test',
+                                                                  'dataverse_file_id': 1,
+                                                                  'installation_name': 'Harvard Dataverse',
+                                                                  'depositor_setup_info': 1})
+        print(response.json())
+        self.assertEqual(response.json(), {'name': 'test',
+                                           'creator': 'dv_depositor',
+                                           'installation_name': 'Harvard Dataverse',
+                                           'dataverse_file_id': 1,
+                                           'dataset_doi': 'test',
+                                           'file_doi': '',
+                                           'status': 'step_100',
+                                           'resourcetype': 'DataverseFileInfo'}
+)
         self.assertEqual(response.status_code, 201)
 
     def test_unsuccessful_post(self):

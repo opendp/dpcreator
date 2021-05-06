@@ -61,17 +61,6 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         """
         pass
 
-    @property
-    def status(self):
-        """
-        Two approaches possible here: either write logic to generate status (_get_current_status()),
-        or call directly to depositor_setup_info.user_step (below)
-        """
-        try:
-            return DepositorSetupInfo.objects.get(dataset=self).user_step
-        except DepositorSetupInfo.DoesNotExist:
-            return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED
-
     def as_dict(self):
         """
         Return as dict
@@ -125,7 +114,7 @@ class DataverseFileInfo(DataSetInfo):
     file_doi = models.CharField(max_length=255, blank=True)
     dataset_schema_info = models.JSONField(null=True, blank=True)
     file_schema_info = models.JSONField(null=True, blank=True)
-    depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo', on_delete=models.PROTECT)
+    depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo', on_delete=models.PROTECT, null=True)
 
     class Meta:
         verbose_name = 'Dataverse File Information'
@@ -144,10 +133,24 @@ class DataverseFileInfo(DataSetInfo):
         #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
         #       depending on the data
         #
+        if not self.depositor_setup_info:
+            dsi = DepositorSetupInfo.objects.create()
+            self.depositor_setup_info = dsi
         if not self.name:
             self.name = f'{self.dataset_doi} ({self.dv_installation})'
         self.source = DataSetInfo.SourceChoices.Dataverse
         super(DataverseFileInfo, self).save(*args, **kwargs)
+
+    @property
+    def status(self):
+        """
+        Two approaches possible here: either write logic to generate status (_get_current_status()),
+        or call directly to depositor_setup_info.user_step (below)
+        """
+        try:
+            return self.depositor_setup_info.user_step
+        except DepositorSetupInfo.DoesNotExist:
+            return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED
 
     def as_dict(self):
         """

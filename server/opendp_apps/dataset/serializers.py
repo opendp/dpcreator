@@ -14,7 +14,7 @@ class DataSetInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DataSetInfo
-        fields = ['name', 'creator', 'source', 'data_profile', 'source_file', 'status']
+        fields = ['name', 'creator', 'source', 'data_profile', 'source_file']
 
 
 class DataverseFileInfoSerializer(DataSetInfoSerializer):
