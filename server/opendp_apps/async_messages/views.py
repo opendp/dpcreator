@@ -49,11 +49,11 @@ def ajax_profile_by_dataset_object_id(request):
     if not 'dataset_object_id' in json_data:
         ws_msg = WebsocketMessage.get_fail_message(
             'TYPE_OF_MESSAGE',
-            f'The dataset has been materialized {datetime.now()}')
+            f'({datetime.now()}) The dataset has been materialized {datetime.now()}')
     else:
         ws_msg = WebsocketMessage.get_success_message(
             'TYPE_OF_MESSAGE',
-            f'Looking good, ready for the next step')
+            f'({datetime.now()}) Looking good, ready for the next step')
 
     ws_msg.send_message(websocket_id)
 

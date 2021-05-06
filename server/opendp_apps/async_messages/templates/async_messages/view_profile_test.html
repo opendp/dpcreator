@@ -95,7 +95,8 @@
                     console.log('-- error occurred!')
                 }
                 console.log('ws_msg.user_message: ' + ws_msg.user_message);
-                document.querySelector('#webSocketResult').innerHTML += '<br /><br />' + ws_msg.user_message;
+                updatedHtml = ws_msg.user_message + '<br />' +document.querySelector('#webSocketResult').innerHTML;
+                document.querySelector('#webSocketResult').innerHTML = updatedHtml;
 
 
             } else {
@@ -124,9 +125,13 @@
                   method: "POST",
                   mode: 'same-origin',  // Do not send CSRF token to another domain.
                   body: JSON.stringify(params)
-                }).then(res => {
-                  console.log("Request complete! response:", res);
-                  console.log("Request complete! response:", res.data);
+                })
+                .then(response => response.json())
+                .then(data => {
+                  console.log('Success:', data);
+                })
+                .catch((error) => {
+                  console.error('Error:', error);
                 });
 
                   //$( "#postResult" ).html( data );
