@@ -109,6 +109,9 @@
     "model": "dataset.dataversefileinfo",
     "pk": 1,
     "fields": {
+        "object_id": "64ed8ad9-3c40-4140-af07-de91d5efaa0c",
+        "created": "2021-03-23T17:22:50.889Z",
+        "updated": "2021-03-30T20:39:14.177Z",
         "dv_installation": 1,
         "dataverse_file_id": 4164587,
         "dataset_doi": "doi:10.7910/DVN/PUXVDH",

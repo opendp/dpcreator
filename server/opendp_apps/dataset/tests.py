@@ -38,13 +38,27 @@ class TestDataSetSerializer(APITestCase):
                                                                   'source': 'upload',
                                                                   'dataset_doi': 'test',
                                                                   'dataverse_file_id': 1,
-                                                                  'installation_name': 'Harvard Dataverse',
-                                                                  'depositor_setup_info': 1})
+                                                                  'installation_name': 'Harvard Dataverse'})
         response_json = response.json()
-        # Remove object_id, and created since they will be different every time the test is run
-        # which makes equality testing difficult
-        object_id = response_json.pop('object_id')
-        created = response_json.pop('created')
+
+        # Examine this separately.
+        # Since DepositorSetupInfo is created dynamically when the DataverseFileInfo is created, let's
+        # remove fields that will have different values every time
+        depositor_setup_info = response_json.pop('depositor_setup_info')
+        depositor_setup_info.pop('object_id')
+        depositor_setup_info.pop('created')
+        depositor_setup_info.pop('updated')
+        self.assertEqual(depositor_setup_info, {'dataset_questions': None,
+                                                'epsilon': None,
+                                                'id': 2,
+                                                'is_complete': False,
+                                                'user_step': 'step_100',
+                                                'variable_categories': None,
+                                                'variable_ranges': None})
+
+        # Tests against response with depositor info
+        response_json.pop('object_id')
+        response_json.pop('created')
         self.assertEqual(response_json, {'name': 'test',
                                          'creator': 'dv_depositor',
                                          'installation_name': 'Harvard Dataverse',
@@ -53,8 +67,7 @@ class TestDataSetSerializer(APITestCase):
                                          'file_doi': '',
                                          'status': 'step_100',
                                          'status_name': 'Step 1: Uploaded',
-                                         'resourcetype': 'DataverseFileInfo'}
-)
+                                         'resourcetype': 'DataverseFileInfo'})
         self.assertEqual(response.status_code, 201)
 
     def test_unsuccessful_post(self):

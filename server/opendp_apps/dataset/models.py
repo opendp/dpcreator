@@ -182,6 +182,8 @@ class UploadFileInfo(DataSetInfo):
                     storage=UPLOADED_FILE_STORAGE,
                     upload_to='user-files/%Y/%m/%d/')
 
+    depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo', on_delete=models.PROTECT, null=True)
+
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the STEP
         #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
