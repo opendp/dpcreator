@@ -4,10 +4,11 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 
 from opendp_apps.model_helpers.msg_util import msgt
-from opendp_apps.analysis.models import DepositorSetupInfo
-from opendp_apps.dataset.models import DataSetInfo
+
 
 class TestDataSetSerializer(APITestCase):
+
+    fixtures = ['test_dataset_data_001.json']
 
     def setUp(self) -> None:
         self.user_obj, _created = get_user_model().objects.get_or_create(username='dv_depositor')
@@ -31,23 +32,42 @@ class TestDataSetSerializer(APITestCase):
     def test_successful_post(self):
         """(20) Create new inheritor of DataSetInfo"""
         msgt(self.test_successful_post.__doc__)
-        response = self.client.post(reverse("datasetinfo-list"), {'resourcetype': 'DataSetInfo',
+        response = self.client.post(reverse("datasetinfo-list"), {'resourcetype': 'DataverseFileInfo',
                                                                   'name': 'test',
                                                                   'creator': self.user_obj.username,
-                                                                  'source': 'upload'})
+                                                                  'source': 'upload',
+                                                                  'dataset_doi': 'test',
+                                                                  'dataverse_file_id': 1,
+                                                                  'installation_name': 'Harvard Dataverse'})
+        response_json = response.json()
 
-        resp_json = response.json()
+        # Examine this separately.
+        # Since DepositorSetupInfo is created dynamically when the DataverseFileInfo is created, let's
+        # remove fields that will have different values every time
+        depositor_setup_info = response_json.pop('depositor_setup_info')
+        depositor_setup_info.pop('object_id')
+        depositor_setup_info.pop('created')
+        depositor_setup_info.pop('updated')
+        self.assertEqual(depositor_setup_info, {'dataset_questions': None,
+                                                'epsilon': None,
+                                                'id': 2,
+                                                'is_complete': False,
+                                                'user_step': 'step_100',
+                                                'variable_categories': None,
+                                                'variable_ranges': None})
 
-        expected_resp = {"creator": "dv_depositor",
-                         "name": "test",
-                         "object_id": resp_json['object_id'],   # object_id value is dynamic
-                         "resourcetype": DataSetInfo.__name__,
-                         "source": "upload",
-                         "status": DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED,
-                         "status_name": DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED.label}
-
-        self.assertEqual(resp_json, expected_resp)
-
+        # Tests against response with depositor info
+        response_json.pop('object_id')
+        response_json.pop('created')
+        self.assertEqual(response_json, {'name': 'test',
+                                         'creator': 'dv_depositor',
+                                         'installation_name': 'Harvard Dataverse',
+                                         'dataverse_file_id': 1,
+                                         'dataset_doi': 'test',
+                                         'file_doi': '',
+                                         'status': 'step_100',
+                                         'status_name': 'Step 1: Uploaded',
+                                         'resourcetype': 'DataverseFileInfo'})
         self.assertEqual(response.status_code, 201)
 
     def test_unsuccessful_post(self):

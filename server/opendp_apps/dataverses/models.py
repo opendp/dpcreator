@@ -112,6 +112,7 @@ class DataverseParams(TimestampedModelWithUUID):
 
         return params
 
+
 class DataverseHandoff(DataverseParams):
     """
     Dataverse parameters passed to the OpenDP App
@@ -331,13 +332,3 @@ class ManifestTestParams(DataverseParams):
     dataverse_incoming_link_2.allow_tags = True
 
 
-'''
-    def is_site_url_registered(self):
-        """Does the site_url match a RegisteredDataverse?"""
-        return RegisteredDataverse.is_site_url_registered(self.site_url)
-
-
-    def get_registered_dataverse(self):
-        """Based on the site_url, return the RegisteredDataverse or None"""
-        return RegisteredDataverse.get_registered_dataverse(self.site_url)
-'''

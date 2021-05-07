@@ -65,13 +65,6 @@ def get_object_or_error_response(model, **kwargs):
     try:
         return model.objects.get(**kwargs)
     except model.DoesNotExist:
-
-        # This could lead to other errors with split() and replace()
-        # if string isn't formatted as expected:
-        model_type = repr(model).split('.')[-1].replace('>', '').replace('\'', '')
-
-        # Alternatively, format model type this way,
-        # model_type = repr(model)
-        # but this shows full classpath to frontend
+        model_type = type(model).__name__
         response = ParseError(detail={'success': False, 'message': f'{model_type} not found'})
         raise response

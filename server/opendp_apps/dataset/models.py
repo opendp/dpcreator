@@ -38,7 +38,7 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
     # Switch to encryption!
     #
-    data_profile = encrypt(models.JSONField(default=None, null=True, encoder=DjangoJSONEncoder))
+    data_profile = encrypt(models.JSONField(default=None, null=True, blank=True, encoder=DjangoJSONEncoder))
 
     # Switch to encryption!
     #
@@ -53,35 +53,6 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
     def __str__(self):
         return self.name
-
-    def _get_current_status(self):
-        """
-        This represents the *other* method, where we infer
-        status based on certain fields in the DepositorSetupInfo object
-        """
-        pass
-
-    @property
-    def status(self):
-        """
-        Two approaches possible here: either write logic to generate status (_get_current_status()),
-        or call directly to depositor_setup_info.user_step (below)
-        """
-        try:
-            return DepositorSetupInfo.objects.get(dataset=self).user_step
-        except DepositorSetupInfo.DoesNotExist:
-            return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED
-
-    @property
-    def status_name(self):
-        """
-        Two approaches possible here: either write logic to generate status (_get_current_status()),
-        or call directly to depositor_setup_info.user_step (below)
-        """
-        try:
-            return DepositorSetupInfo.objects.get(dataset=self).user_step.label
-        except DepositorSetupInfo.DoesNotExist:
-            return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED.label
 
     def as_dict(self):
         """
@@ -130,13 +101,13 @@ class DataverseFileInfo(DataSetInfo):
     """
     Refers to a DV file from within a DV dataset
     """
-    # TODO: This should have all fields from DV API response
     dv_installation = models.ForeignKey(RegisteredDataverse, on_delete=models.PROTECT)
     dataverse_file_id = models.IntegerField()
     dataset_doi = models.CharField(max_length=255)
     file_doi = models.CharField(max_length=255, blank=True)
     dataset_schema_info = models.JSONField(null=True, blank=True)
     file_schema_info = models.JSONField(null=True, blank=True)
+    depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo', on_delete=models.PROTECT, null=True)
 
     class Meta:
         verbose_name = 'Dataverse File Information'
@@ -148,17 +119,38 @@ class DataverseFileInfo(DataSetInfo):
         ]
 
     def __str__(self):
-        return f'{self.name} ({self.dv_installation})'
+        return f'{self.name} ({self.dv_installation.name})'
 
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the STEP
         #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
         #       depending on the data
         #
+        if not self.depositor_setup_info:
+            dsi = DepositorSetupInfo.objects.create()
+            self.depositor_setup_info = dsi
         if not self.name:
             self.name = f'{self.dataset_doi} ({self.dv_installation})'
         self.source = DataSetInfo.SourceChoices.Dataverse
         super(DataverseFileInfo, self).save(*args, **kwargs)
+
+    @property
+    def status(self):
+        """
+        """
+        try:
+            return self.depositor_setup_info.user_step
+        except DepositorSetupInfo.DoesNotExist:
+            return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED
+
+    @property
+    def status_name(self):
+        """
+        """
+        try:
+            return self.depositor_setup_info.user_step.label
+        except DepositorSetupInfo.DoesNotExist:
+            return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED.label
 
     def as_dict(self):
         """
@@ -189,6 +181,8 @@ class UploadFileInfo(DataSetInfo):
     data_file = models.FileField('User uploaded files',
                     storage=UPLOADED_FILE_STORAGE,
                     upload_to='user-files/%Y/%m/%d/')
+
+    depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo', on_delete=models.PROTECT, null=True)
 
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the STEP
