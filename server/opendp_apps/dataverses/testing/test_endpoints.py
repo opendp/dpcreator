@@ -62,7 +62,6 @@ class BaseEndpointTest(TestCase):
             'dv_handoff': '9e7e5506-dd1a-4979-a2c1-ec6e59e4769c',
         }
 
-
     def set_mock_requests(self, req_mocker):
         """
         Set up test urls that are used by the requests library

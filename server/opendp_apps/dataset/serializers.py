@@ -36,10 +36,15 @@ class DataverseFileInfoSerializer(DataSetInfoSerializer):
 
     depositor_setup_info = DepositorSetupSerializer(read_only=True)
 
+    dataset_schema_info = serializers.JSONField(read_only=True)
+
+    file_schema_info = serializers.JSONField(read_only=True)
+
     class Meta:
         model = DataverseFileInfo
         fields = ['object_id', 'name', 'created', 'creator', 'installation_name', 'dataverse_file_id', 'dataset_doi',
-                  'file_doi', 'status', 'status_name', 'depositor_setup_info']
+                  'file_doi', 'status', 'status_name', 'depositor_setup_info', 'dataset_schema_info',
+                  'file_schema_info']
         extra_kwargs = {
             'url': {'view_name': 'dataset-info-list'},
         }
