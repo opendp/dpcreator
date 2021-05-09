@@ -82,6 +82,8 @@ class DataverseFileView(viewsets.ViewSet):
             #
             file_info.dataset_schema_info = schema_org_content
             file_info.file_schema_info = file_schema_resp.data
+            # This will fail if the dataset_schema_info is malformed, use DOI as backup just in case:
+            file_info.name = file_info.dataset_schema_info.get('name', file_info.dataset_doi)
 
             # Save the DataverseFileInfo updates
             file_info.save()
