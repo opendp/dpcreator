@@ -212,9 +212,9 @@ export default {
       search: "",
       headers: [
         {value: "num"},
-        {text: "Dataset", value: "dataset"},
+        {text: "Dataset", value: "name"},
         {text: "Status", value: "status"},
-        {text: "Remaining time to complete release", value: "remainingTime"},
+        //  {text: "Remaining time to complete release", value: "remainingTime"},
         {text: "Options", value: "options", align: "end"}
       ],
       statusInformation,
