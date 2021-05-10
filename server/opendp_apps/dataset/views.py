@@ -3,9 +3,10 @@ from rest_framework import permissions, viewsets
 from opendp_apps.dataset.models import DataverseFileInfo, DataSetInfo
 from opendp_apps.dataset.serializers import DataverseFileInfoSerializer, \
     DataSetInfoPolymorphicSerializer
+from opendp_project.views import BaseModelViewSet
 
 
-class DataSetInfoViewSet(viewsets.ModelViewSet):
+class DataSetInfoViewSet(BaseModelViewSet):
     queryset = DataSetInfo.objects.all().order_by('-created')
     serializer_class = DataSetInfoPolymorphicSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -17,7 +18,7 @@ class DataSetInfoViewSet(viewsets.ModelViewSet):
         return self.queryset.filter(creator=self.request.user)
 
 
-class DepositorSetup(viewsets.ModelViewSet):
+class DepositorSetup(BaseModelViewSet):
     queryset = DataverseFileInfo.objects.all()
     serializer_class = DataverseFileInfoSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
