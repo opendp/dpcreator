@@ -5,7 +5,7 @@
             cy.get('#postOpenDP > .v-btn__content').click();
             cy.url().should('contains', '/?id=');
             cy.scrollTo("bottom");
-            cy.get('.v-input--selection-controls__ripple').click();
+            cy.get('.v-input--selection-controls__ripple').click({force: true});
             cy.get('#account-buttons--placeholder .v-btn--is-elevated > .v-btn__content').click();
             cy.url().should('contain', 'log-in')
             cy.get('#input-65').click();
