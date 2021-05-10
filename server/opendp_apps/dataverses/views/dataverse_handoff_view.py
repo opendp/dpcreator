@@ -7,19 +7,20 @@ from rest_framework.response import Response
 from opendp_apps.dataverses.models import DataverseHandoff, RegisteredDataverse
 from opendp_apps.dataverses.serializers import DataverseHandoffSerializer
 from opendp_apps.dataverses import static_vals as dv_static
+from opendp_project.views import BaseModelViewSet
 
 
-class DataverseHandoffView(viewsets.ViewSet):
+class DataverseHandoffView(BaseModelViewSet):
 
     def get_serializer(self, instance=None):
         return DataverseHandoffSerializer()
 
-    def list(self, request):
+    def list(self, request, *args, **kwargs):
         queryset = DataverseHandoff.objects.all()
         serializer = DataverseHandoffSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
 
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         """
         Temporarily save the Dataverse paramemeters +
         redirect to the Vue page

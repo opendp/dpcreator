@@ -9,14 +9,15 @@ from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestPa
 from opendp_apps.dataverses.serializers import DataverseFileInfoSerializer
 from opendp_apps.user.models import DataverseUser
 from opendp_apps.utils.view_helper import get_object_or_error_response
+from opendp_project.views import BaseModelViewSet
 
 
-class DataverseFileView(viewsets.ViewSet):
+class DataverseFileView(BaseModelViewSet):
 
     def get_serializer(self, instance=None):
         return DataverseFileInfoSerializer(context={'request': instance})
 
-    def list(self, request):
+    def list(self, request, *args, **kwargs):
         # TODO: This is to prevent errors in testing, why is test sending "AnonymousUser" in request?
         if not request.user.id:
             queryset = DataverseFileInfo.objects.all()
@@ -25,7 +26,7 @@ class DataverseFileView(viewsets.ViewSet):
         serializer = DataverseFileInfoSerializer(queryset, many=True)
         return Response(data={'success': True, 'data': serializer.data}, status=status.HTTP_200_OK)
 
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         """
         Get a Dataverse File corresponding to a user_id (UUID)
         and values from a DataverseHandoff object

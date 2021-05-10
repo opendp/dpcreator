@@ -12,14 +12,15 @@ from opendp_apps.dataverses.models import DataverseHandoff
 from opendp_apps.dataverses.serializers import DataverseUserSerializer
 from opendp_apps.user.models import DataverseUser
 from opendp_apps.utils.view_helper import get_json_error, get_json_success, get_object_or_error_response
+from opendp_project.views import BaseModelViewSet
 
 
-class DataverseUserView(viewsets.ViewSet):
+class DataverseUserView(BaseModelViewSet):
 
     def get_serializer(self, instance=None):
         return DataverseUserSerializer(context={'request': instance})
 
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         """Expects JSON. Given object_ids for OpenDPUser and DataverseHandoff objects,
         retrieve the user's information from Dataverse and create a DataverseUser"""
 
@@ -51,7 +52,6 @@ class DataverseUserView(viewsets.ViewSet):
                 # print("INVALID SERIALIZER")
                 return Response(dataverse_user_serializer.errors,
                                 status=status.HTTP_400_BAD_REQUEST)
-
 
             try:
                 dataverse_user = dataverse_user_serializer.save()
@@ -92,14 +92,14 @@ class DataverseUserView(viewsets.ViewSet):
         return Response(get_json_success('success', data={'dv_user': dataverse_user.object_id}),
                         status=status.HTTP_201_CREATED)
 
-    def update(self, request, pk=None):
+    def update(self, request, object_id=None, *args, **kwargs):
         """NOT REALLY USED!!! e.g. create is really create_or_update"""
         """Update the Dataverse User. Expects JSON"""
         # ----------------------------------
         # Validate the input
         # ----------------------------------
-        # print(f"data: {request.data}")
-        dataverse_user = get_object_or_error_response(DataverseUser, object_id=pk)
+        print(f"data: {request.data}\tpk: {object_id}")
+        dataverse_user = get_object_or_error_response(DataverseUser, object_id=object_id)
         opendp_user = dataverse_user.user
         request.data['user'] = opendp_user.object_id
 
