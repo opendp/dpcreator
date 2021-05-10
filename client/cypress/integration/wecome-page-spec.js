@@ -12,7 +12,7 @@
             cy.get('#input-65').type('dev_admin');
             cy.get('#input-68').click();
             cy.get('#input-68').type('admin');
-            cy.get('.v-btn--is-elevated > .v-btn__content').click();
+            cy.get('.v-btn--is-elevated > .v-btn__content').click({force: true});
             cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
                 ' doi:10.7910/DVN/PUXVDH | Replication Data for: Eye-typing experiment | Fatigue_data.tab ')
         })
