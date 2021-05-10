@@ -1,9 +1,9 @@
 {
     describe('Dataverse Handoff mock-dv test', () => {
         it('Displays correct file on Welcome Page', () => {
-            cy.visit('http://localhost:8000/mock-dv');
+            cy.visit('/mock-dv');
             cy.get('#postOpenDP > .v-btn__content').click();
-            cy.url().should('contains', 'http://localhost:8000/');
+            cy.url().should('contains', '/');
             cy.get('.v-input--selection-controls__ripple').click();
             cy.get('#account-buttons--placeholder .v-btn--is-elevated > .v-btn__content').click();
             cy.url().should('contain', 'log-in')
