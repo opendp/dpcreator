@@ -7,8 +7,6 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView
 from dj_rest_auth.registration.views import RegisterView
 
-from opendp_project.views import BaseModelViewSet
-
 """
 class SessionViewSet(viewsets.ModelViewSet):
     queryset = Session.objects.all()
@@ -16,7 +14,7 @@ class SessionViewSet(viewsets.ModelViewSet):
 """
 
 
-class UserViewSet(BaseModelViewSet):
+class UserViewSet(viewsets.ModelViewSet):
     """
     view/edit users
     """

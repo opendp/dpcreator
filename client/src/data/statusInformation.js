@@ -1,4 +1,10 @@
 export default {
+    step_100: {
+        label: "Uploaded",
+        color: "blue lighten-3",
+        icon: "",
+        availableActions: ["viewDetails", "continueWorkflow"]
+    },
     in_progress: {
         label: "In progress",
         color: "blue lighten-3",
