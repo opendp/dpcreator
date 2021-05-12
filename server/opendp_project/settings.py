@@ -222,8 +222,8 @@ CORS_ALLOWED_ORIGINS = (
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = 'apikey' # this is exactly the value 'apikey'
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.sendgrid.net')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'apikey')
 EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY') \
     if os.environ.get('SENDGRID_API_KEY') else 'sendgrid-key-not-set'
 EMAIL_PORT = 587
@@ -268,5 +268,10 @@ else:
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
 
+# ---------------------------
+# Cookies
+# ---------------------------
+SESSION_COOKIE_NAME = os.environ.get('SESSION_COOKIE_NAME', 'dpcreator_default')
+CSRF_COOKIE_NAME = os.environ.get('CSRF_COOKIE_NAME', 'dpcreator_default_csrf')
 # discard a process after executing task, because automl solvers are incredibly leaky
 #CELERY_WORKER_MAX_TASKS_PER_CHILD = 1
