@@ -41,6 +41,13 @@ class DataverseFileView(BaseModelViewSet):
         try:
             file_info = DataverseFileInfo.objects.get(dataverse_file_id=handoff.fileId,
                                                       dv_installation=dataverse_user.dv_installation)
+            if file_info.creator != request.user:
+                # and depositor_setup_info is step 600 "epsilon set" and analysis_plan does not exist:
+                # then user can continue to work on file
+                # else:
+                #   raise FileLockedException()
+                return Response({'success': False, 'message': 'File is locked by another user'},
+                                status=status.HTTP_423_LOCKED)
         except DataverseFileInfo.DoesNotExist:
             file_info = DataverseFileInfo(dv_installation=dataverse_user.dv_installation,
                                           dataverse_file_id=handoff.fileId,
