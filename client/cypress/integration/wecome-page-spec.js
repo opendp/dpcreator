@@ -33,9 +33,9 @@
                 ' doi:10.7910/DVN/PUXVDH | Replication Data for: Eye-typing experiment | Fatigue_data.tab ')
         }),
             it('Correctly displays locked file message', () => {
-                cy.visit('http://localhost:8000/mock-dv');
+                cy.visit('/mock-dv');
                 cy.get('#postOpenDP > .v-btn__content').click();
-                cy.url().should('contains', 'http://localhost:8000/');
+                cy.url().should('contains', '/?id=');
                 cy.get('.v-input--selection-controls__ripple').click();
                 cy.get('#account-buttons--placeholder .v-btn--is-elevated > .v-btn__content').click();
                 cy.get('#input-65').click();
