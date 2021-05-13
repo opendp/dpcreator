@@ -1,0 +1,7 @@
+# Files to exclude from docker build
+
+test_data/
+test_setup/
+.idea/
+.env
+__pycache__/
