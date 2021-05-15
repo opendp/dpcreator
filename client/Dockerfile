@@ -2,7 +2,7 @@ FROM node:15
 
 # Create app directory
 WORKDIR /code/client
-COPY package*.json /code/client
+COPY package*.json /code/client/
 COPY build_locale/*.* /code/client/build_locale/
 
 
