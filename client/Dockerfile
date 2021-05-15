@@ -3,7 +3,7 @@ FROM node:15
 # Create app directory
 WORKDIR /code/client
 COPY package*.json /code/client/
-COPY build_locale/*.* /code/client/build_locale/
+#COPY build_locale/*.* /code/client/build_locale/
 
 
 RUN npm install
@@ -13,8 +13,8 @@ RUN npm install
 
 # Convert Locale CSV to JSON and copy it to locale src dir
 # make directory if it doesn't already exist
-RUN mkdir -p /code/client/src/locales
-RUN node /code/client/build_locale/CreateLocaleJson.js
+#RUN mkdir -p /code/client/src/locales
+#RUN node /code/client/build_locale/CreateLocaleJson.js
 
 # Bundle app source
 #COPY . .
