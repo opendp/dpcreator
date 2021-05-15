@@ -2,12 +2,15 @@ FROM node:15
 
 # Create app directory
 WORKDIR /code/client
-COPY package*.json /code/client/
+COPY . /code/client/
 
 
 RUN npm install
 # If you are building your code for production
 # RUN npm ci --only=production
+
+# Convert Locale CSV to JSON and copy it to locale src dir
+RUN node /code/client/build_locale/CreateLocaleJson.js
 
 # Bundle app source
 #COPY . .
