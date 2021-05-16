@@ -17,7 +17,7 @@ fs.readFile('./build_locale/DPCreatorText.csv', 'utf8', function (err, csvString
             console.log("Finished:", JSON.stringify(pageDict, null, 4));
             let json = JSON.stringify(pageDict, null, 4)
             // Write data in 'Output.txt' .
-            fs.writeFile('/code/client/src/locales/en.json', json, (err) => {
+            fs.writeFile('./src/locales/en.json', json, (err) => {
                 // In case of a error throw err.
                 if (err) throw err;
             })
