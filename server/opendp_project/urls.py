@@ -69,4 +69,9 @@ urlpatterns = [
                   url(r'^rest-auth/google/$', GoogleLogin.as_view(), name='google-login'),
                   # Putting all vue-related views under "ui/" for now to separate from the api.
                   url(r'^.*$', TemplateView.as_view(template_name="index.html"), name='vue-home'),
-              ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT, kwargs={'show_indexes': True})
+    ]
+
+if settings.USE_DEV_STATIC_SERVER:
+    urlpatterns += static(settings.STATIC_URL,
+                          document_root=settings.STATIC_ROOT,
+                          kwargs={'show_indexes': True})

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 import json
 import os
+from distutils.util import strtobool
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -150,12 +151,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/dist')
+STATIC_URL = os.environ.get('STATIC_URL', '/static/')
+DEFAULT_STATIC_ROOT = os.path.join(BASE_DIR, 'static_deploy', 'static', 'dist')
+STATIC_ROOT = os.environ.get('STATIC_ROOT', DEFAULT_STATIC_ROOT)
+if not os.path.isdir(STATIC_ROOT):
+    os.makedirs(STATIC_ROOT)
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')
+    os.path.join(BASE_DIR, 'static', 'dist')
 ]
+
+USE_DEV_STATIC_SERVER = strtobool(os.environ.get('USE_DEV_STATIC_SERVER', 'True'))
 
 # global settings for the REST framework
 REST_FRAMEWORK = {
@@ -168,12 +174,31 @@ REST_FRAMEWORK = {
 }
 
 
-# possible reason to split up settings files >
+# -----------------------------------
+# Handling uploaded files
+# -----------------------------------
 
+# (1) If using nginx, should be the same value as NGINX_MAX_UPLOAD_SIZE
+# ref: https://docs.djangoproject.com/en/3.2/ref/settings/#std:setting-DATA_UPLOAD_MAX_MEMORY_SIZE
+# 20971520 bytes = 20 MB
+#
+DATA_UPLOAD_MAX_MEMORY_SIZE = int(os.environ.get('DATA_UPLOAD_MAX_MEMORY_SIZE', '20971520'))
+
+# (2) If file exceed this size, it will be streamed to a "temp" location
+# ref: https://docs.djangoproject.com/en/3.2/ref/settings/#std:setting-FILE_UPLOAD_MAX_MEMORY_SIZE
+#  2621440 byes = 2.5 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = int(os.environ.get('FILE_UPLOAD_MAX_MEMORY_SIZE', '2621440'))
+# (2a) Where the file is streamed too -- needs to be secure!
+FILE_UPLOAD_TEMP_DIR = os.environ.get('FILE_UPLOAD_TEMP_DIR', '/tmp')
+
+# (3) Storage root for uploaded files
+#   - will be objects on cloud service. e.g. S3, Azure, etc.
+#
 UPLOADED_FILE_STORAGE_ROOT = os.path.join(BASE_DIR, 'test_setup', 'user_uploaded_data')
 if not os.path.isdir(UPLOADED_FILE_STORAGE_ROOT):
     os.makedirs(UPLOADED_FILE_STORAGE_ROOT)
 
+# -------------------------------------
 AUTHENTICATION_BACKENDS = (
  'django.contrib.auth.backends.ModelBackend',
  'allauth.account.auth_backends.AuthenticationBackend',

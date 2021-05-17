@@ -5,3 +5,4 @@ test_setup/
 .idea/
 .env
 __pycache__/
+.DS_Store

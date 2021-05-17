@@ -1,5 +1,5 @@
 """
-Usage at top of other scripts
+Usage at top of other scripts_dev
 
 from load_django_settings import load_local_settings
 load_local_settings()

@@ -15,3 +15,7 @@ xCORS_ALLOWED_ORIGINS = (
     'http://52.147.198.81',
     'http://0.0.0.0:8000',
 )
+
+# Let nginx serve static files
+USE_DEV_STATIC_SERVER = False
+

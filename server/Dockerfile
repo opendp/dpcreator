@@ -16,9 +16,13 @@ RUN pip install --no-cache-dir -r requirements/dev.txt
 # -------------------------------------
 # Copy over the rest of the repository
 # -------------------------------------
-#RUN mkdir /code
 WORKDIR /code
 COPY . /code/server
 WORKDIR /code/server
 
-#RUN pip install -r requirements/dev.txt
+# -------------------------------------
+# Copy startup script
+# (Used for deployment)
+# -------------------------------------
+COPY scripts_startup/azure_start_01.sh /usr/bin/azure_start_01.sh
+RUN chmod u+x /usr/bin/azure_start_01.sh
