@@ -21,4 +21,4 @@ RUN npm install
 # COPY . .
 
 EXPOSE 8080
-ENTRYPOINT [ "./run_client.sh" ]
+CMD [ "./run_client.sh" ]

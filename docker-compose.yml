@@ -17,7 +17,9 @@ services:
   # TODO: Load data every time
   client:
     build: "./client"
-    command: npm run serve
+    environment:
+      - DEV_MODE=true
+    command: ./run_client.sh
     volumes:
       - .:/code
       - /code/client/node_modules
