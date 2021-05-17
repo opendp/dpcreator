@@ -7,4 +7,4 @@ printf "\n-- (20) Run CreateLocaleJson.js "
 node ./build_locale/CreateLocaleJson.js 
 
 printf "\n-- (30) 'npm run server --quiet' "
-npm run serve --quiet
+# npm run serve --quiet
