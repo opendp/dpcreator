@@ -110,7 +110,7 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME', 'postgres'),
         'USER': os.getenv('DB_USER', 'postgres'),
         'PASSWORD': os.getenv('DB_PASSWORD', 'postgres'),
-        'PORT': os.getenv('DB_PORT', 5432),
+        'PORT': int(os.getenv('DB_PORT', 5432)),
     }
 }
 
@@ -251,7 +251,7 @@ EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.sendgrid.net')
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'apikey')
 EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY') \
     if os.environ.get('SENDGRID_API_KEY') else 'sendgrid-key-not-set'
-EMAIL_PORT = 587
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
 EMAIL_USE_TLS = True
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
