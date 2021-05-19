@@ -8,10 +8,11 @@ fs.readFile('./build_locale/DPCreatorText.csv', 'utf8', function (err, csvString
             let pageDict = {};
             for (let row in results.data) {
                 if (row > 0) {
-                    let pageName = results.data[row][0]
+                    let pageName = (results.data[row][0]).trim()
+                    let sectionName = (results.data[row][1]).trim()
                     if (!pageDict[pageName])
                         pageDict[pageName] = {}
-                    pageDict[pageName][results.data[row][1]] = results.data[row][2]
+                    pageDict[pageName][sectionName] = results.data[row][2]
                 }
             }
             console.log("Finished:", JSON.stringify(pageDict, null, 4));
