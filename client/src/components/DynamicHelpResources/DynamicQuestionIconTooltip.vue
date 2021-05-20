@@ -6,7 +6,7 @@
       </v-icon
       >
     </template>
-    <span>{{ $t(text) }}</span>
+    <span v-html="$t(localeTag)"></span>
   </v-tooltip>
 </template>
 
@@ -25,6 +25,6 @@ span {
 <script>
 export default {
   name: "DynamicQuestionIconTooltip",
-  props: ["text"]
+  props: ["localeTag"]
 };
 </script>

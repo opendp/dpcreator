@@ -34,13 +34,13 @@
       <template v-slot:[`header.type`]="{ header }">
         {{ header.text }}
         <DynamicQuestionIconTooltip
-            text="confirm variables.help type"
+            locale-tag="confirm variables.help type"
         />
       </template>
       <template v-slot:[`header.additional_information`]="{ header }">
         {{ header.text }}
         <DynamicQuestionIconTooltip
-            text="confirm variables.help variable"
+            locale-tag="confirm variables.help variable"
         />
       </template>
       <template v-slot:[`item.index`]="{ index }">
