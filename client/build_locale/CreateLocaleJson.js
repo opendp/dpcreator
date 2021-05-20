@@ -12,7 +12,9 @@ fs.readFile('./build_locale/DPCreatorText.csv', 'utf8', function (err, csvString
                     let sectionName = (results.data[row][1]).trim()
                     if (!pageDict[pageName])
                         pageDict[pageName] = {}
-                    pageDict[pageName][sectionName] = results.data[row][2]
+                    let text = results.data[row][2]
+                    text = text.replace('\n', ' ');
+                    pageDict[pageName][sectionName] = text
                 }
             }
             console.log("Finished:", JSON.stringify(pageDict, null, 4));
