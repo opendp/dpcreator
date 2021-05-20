@@ -17,7 +17,7 @@ class TestDataSetInfo(BaseEndpointTest):
 
     def setUp(self) -> None:
         super(TestDataSetInfo, self).setUp()
-        self.user_obj, _created = get_user_model().objects.get_or_create(username='dv_depositor')
+        self.user_obj, _created = get_user_model().objects.get_or_create(pk=1)
         self.client.force_login(self.user_obj)
 
     def test_successful_patch(self, req_mocker):
