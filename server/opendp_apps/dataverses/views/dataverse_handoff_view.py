@@ -1,7 +1,6 @@
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from requests.utils import quote
-from rest_framework import viewsets
 from rest_framework.response import Response
 
 from opendp_apps.dataverses.models import DataverseHandoff, RegisteredDataverse
@@ -12,8 +11,8 @@ from opendp_project.views import BaseModelViewSet
 
 class DataverseHandoffView(BaseModelViewSet):
 
-    def get_serializer(self, instance=None):
-        return DataverseHandoffSerializer()
+    queryset = DataverseHandoff.objects.all()
+    serializer_class = DataverseHandoffSerializer
 
     def list(self, request, *args, **kwargs):
         queryset = DataverseHandoff.objects.all()
