@@ -14,6 +14,9 @@ class DataverseHandoffView(BaseModelViewSet):
     queryset = DataverseHandoff.objects.all()
     serializer_class = DataverseHandoffSerializer
 
+    # This needs to be available before login
+    permission_classes = []
+
     def list(self, request, *args, **kwargs):
         queryset = DataverseHandoff.objects.all()
         serializer = DataverseHandoffSerializer(queryset, many=True, context={'request': request})
