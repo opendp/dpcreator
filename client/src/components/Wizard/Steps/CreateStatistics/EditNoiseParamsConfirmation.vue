@@ -15,9 +15,7 @@
       </v-card-title>
 
       <v-card-text class="text--primary">
-        Changing the epsilon or delta values will
-        <strong>directly impact the privacy settings. </strong>We recommend
-        using the default values provided by the system.
+      <div v-html="$t('create statistics.edit epsilon warning')"></div>
       </v-card-text>
 
       <v-card-actions>

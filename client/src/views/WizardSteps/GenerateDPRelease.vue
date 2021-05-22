@@ -2,9 +2,9 @@
   <div>
     <h1 class="title-size-1">Generate DP Release</h1>
     <p>
-      The final step is to submit the statistics and generate the differential
-      privacy release. This will finalize the current selections and spend your
-      allocated privacy budget on them.
+      {{
+        $t('generate DP.generate text')
+      }}
     </p>
     <ColoredBorderAlert type="warning">
       <template v-slot:content>

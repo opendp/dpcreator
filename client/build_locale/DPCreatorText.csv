@@ -180,16 +180,15 @@ create statistics,help error,Calculated error to be added to your statistic.,Cal
 create statistics,edit epsilon warning,"Changing the epsilon, delta, or confidence level will directly impact the privacy settings. We recommend
 using the default values provided by the system","Changing the epsilon, delta, or confidence level will directly impact the privacy settings. We recommend
 using the default values provided by the system"
-create statistics,confirm 1,"The recommended values below are based upon your dataset type selection
-(i.e. “Information that could cause risk of harm to individuals or the university if
-disclosed”)","The recommended values below are based upon your dataset type selection
-(i.e. “Information that could cause risk of harm to individuals or the university if
-disclosed”)"
+create statistics,confirm 1,"
+          <strong>The recommended values below are based upon your dataset type
+            selection <br/></strong>","  <strong>The recommended values below are based upon your dataset type
+            selection <br/></strong>"
 create statistics,confirm 2,"Note: Larger X corresponds to larger privacy loss budget, and hence, less privacy.
 We do not recommend X exceding 1.","Note: Larger X corresponds to larger privacy loss budget, and hence, less privacy.
 We do not recommend X exceding 1."
 create statistics,confirm 3,Note: X is the probability of a blatant privacy violation. X values larger than the reciprocal of the dataset size are not allowed.,Note: X is the probability of a blatant privacy violation. X values larger than the reciprocal of the dataset size are not allowed.
-create statistics,confirm 4,The level of privacy protection for individuals in the dataset is governed by two privacy-loss parameters - x & x. Watch video to learn more.,The level of privacy protection for individuals in the dataset is governed by two privacy-loss parameters - x & x. Watch video to learn more.
+create statistics,confirm 4,The level of privacy protection for individuals in the dataset is governed by two privacy-loss parameters - x & x. ,The level of privacy protection for individuals in the dataset is governed by two privacy-loss parameters - x & x.
 generate DP,generate text,"The final step is to submit the statistics and generate the differential privacy release. This will finalize the current
 selections and spend your allocated privacy budget on them.","The final step is to submit the statistics and generate the differential privacy release. This will finalize the current
 selections and spend your allocated privacy budget on them."
