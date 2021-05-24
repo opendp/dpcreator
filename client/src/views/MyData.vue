@@ -71,49 +71,49 @@ export default {
     // TODO: This data should be loaded from the backend
     variables: [
       {
-        dataset: "California Demographic Dataset",
+        name: "California Demographic Dataset",
         status: "in_progress",
         remainingTime: "Expired",
         datasetId: "exampleInProgress"
       },
       {
-        dataset: "Tokio Demographic Dataset",
+        name: "Tokio Demographic Dataset",
         status: "in_execution",
         remainingTime: "10h 30m",
         datasetId: "exampleInExecution"
       },
       {
-        dataset: "USA Demographic Dataset",
+        name: "USA Demographic Dataset",
         status: "error",
         remainingTime: "5h 42m",
         datasetId: "exampleError"
       },
       {
-        dataset: "Example Demographic Dataset",
+        name: "Example Demographic Dataset",
         status: "completed",
         remainingTime: "-",
         datasetId: "exampleCompleted"
       },
       {
-        dataset: "Tokio Demographic Dataset",
+        name: "Tokio Demographic Dataset",
         status: "in_execution",
         remainingTime: "-",
         datasetId: "exampleInExecution"
       },
       {
-        dataset: "USA Demographic Dataset",
+        name: "USA Demographic Dataset",
         status: "error",
         remainingTime: "-",
         datasetId: "exampleError"
       },
       {
-        dataset: "Tokio Demographic Dataset",
+        name: "Tokio Demographic Dataset",
         status: "in_execution",
         remainingTime: "-",
         datasetId: "exampleInExecution"
       },
       {
-        dataset: "USA Demographic Dataset",
+        name: "USA Demographic Dataset",
         status: "error",
         remainingTime: "-",
         datasetId: "exampleError"
