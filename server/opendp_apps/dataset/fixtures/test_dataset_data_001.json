@@ -85,6 +85,7 @@
     "model": "analysis.depositorsetupinfo",
     "pk": 1,
     "fields": {
+        "creator": 1,
         "created": "2021-03-23T17:22:50.889Z",
         "updated": "2021-03-30T20:39:14.177Z",
         "object_id": "9255c067-e435-43bd-8af1-33a6987ffc9b"

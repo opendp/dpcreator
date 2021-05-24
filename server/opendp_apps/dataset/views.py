@@ -1,10 +1,10 @@
 from rest_framework import permissions, status
 from rest_framework.response import Response
 
-from opendp_apps.dataset.models import DataverseFileInfo, DataSetInfo
+from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.dataset.permissions import IsOwnerOrBlocked
-from opendp_apps.dataset.serializers import DataverseFileInfoSerializer, \
-    DataSetInfoPolymorphicSerializer
+from opendp_apps.dataset.serializers import DataSetInfoPolymorphicSerializer, DepositorSetupInfoSerializer
 from opendp_project.views import BaseModelViewSet
 
 
@@ -21,8 +21,8 @@ class DataSetInfoViewSet(BaseModelViewSet):
 
 
 class DepositorSetupViewSet(BaseModelViewSet):
-    queryset = DataverseFileInfo.objects.all()
-    serializer_class = DataverseFileInfoSerializer
+    queryset = DepositorSetupInfo.objects.all()
+    serializer_class = DepositorSetupInfoSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrBlocked]
 
     def partial_update(self, request, *args, **kwargs):

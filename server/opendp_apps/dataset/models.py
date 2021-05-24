@@ -127,7 +127,7 @@ class DataverseFileInfo(DataSetInfo):
         #       depending on the data
         #
         if not self.depositor_setup_info:
-            dsi = DepositorSetupInfo.objects.create()
+            dsi = DepositorSetupInfo.objects.create(creator=self.creator)
             self.depositor_setup_info = dsi
         if not self.name:
             self.name = f'{self.dataset_doi} ({self.dv_installation})'

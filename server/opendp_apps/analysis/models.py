@@ -24,6 +24,9 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         STEP_9300_PROFILING_FAILED = 'error_9300', 'Error 3: Profiling Failed'
         STEP_9400_CREATE_RELEASE_FAILED = 'error_9400', 'Error 4: Create Release Failed'
 
+    # user who initially added/uploaded data
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                on_delete=models.PROTECT)
     is_complete = models.BooleanField(default=False)
     user_step = models.CharField(max_length=128,
                                  choices=DepositorSteps.choices,
