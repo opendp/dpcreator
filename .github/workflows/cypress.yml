@@ -1,5 +1,4 @@
 name: dpcreator-integration-tests
-
 on: [ push ]
 
 jobs:

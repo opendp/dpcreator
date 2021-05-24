@@ -11,7 +11,7 @@
         Terms for depositing a DP release back to Dataverse
       </template>
       <template v-slot:scrollable-area>
-        <span v-html="$t('signup.terms1')"></span>
+        <span v-html="$t('new account.TOU Creating DP')"></span>
       </template>
       <template v-slot:actions>
         <Checkbox
@@ -26,7 +26,7 @@
         Terms for depositing a DP release back to Dataverse
       </template>
       <template v-slot:scrollable-area>
-        <span v-html="$t('signup.terms2')"></span>
+        <span v-html="$t('new account.TOU Dataverse')"></span>
       </template>
       <template v-slot:actions>
         <Checkbox
