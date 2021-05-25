@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from rest_framework import viewsets
+from rest_framework import permissions, viewsets
 
 
 def home_view(request, *args, **kwargs):
@@ -21,3 +21,4 @@ class BaseModelViewSet(viewsets.ModelViewSet):
     object_id rather than the primary key in the database
     """
     lookup_field = 'object_id'
+    permission_classes = [permissions.IsAuthenticated]
