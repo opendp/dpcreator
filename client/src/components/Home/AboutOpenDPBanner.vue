@@ -20,15 +20,12 @@
           ></v-img>
         </v-col>
         <v-col cols="12" md="6" id="text-wrapper">
-          <h2 class="title-size-1">
-            This is a sentence <br/>
-            about Open DP
+          <h2 v-html="$t('home.footer title')" class="title-size-1">
           </h2>
           <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi in
-            veniam explicabo porro autem voluptas, aperiam perferendis soluta
-            velit laborum voluptates similique repellendus, natus tempora, quia
-            saepe.
+            {{
+              $t('home.footer text')
+            }}
           </p>
           <Button
               color="primary"

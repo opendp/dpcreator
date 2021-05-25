@@ -9,6 +9,8 @@
       <v-row>
         <v-col offset-sm="1" sm="10" offset-md="2" cols="12" md="6">
           <h1 class="title-size-1">Terms of use</h1>
+          <template v-html="$('terms of use.TOU text')">
+          </template>
           <p>
             The following Terms govern all use of the Harvard Web Publishing
             website (the Site), the web publishing platforms (the Tools), and

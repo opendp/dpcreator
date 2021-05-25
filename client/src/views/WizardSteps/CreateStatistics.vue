@@ -2,8 +2,9 @@
   <div id="create-statistics-page">
     <h1 class="title-size-1">Create the statistics</h1>
     <p>
-      Create the statistics you would like to release. Please edit and confirm
-      the degree of noise or interference you'd like to add to the statistics.
+      {{
+        $t('create statistics.statistics intro')
+      }}
     </p>
 
     <NoiseParams
@@ -13,20 +14,9 @@
         v-on:editNoiseParams="dialogEditNoiseParamsConfirmation = true"
     />
 
-    <ColoredBorderAlert type="warning">
-      <template v-slot:content>
-        <strong>
-          Changing the epsilon, delta, or confidence level will directly impact
-          the privacy settings.
-        </strong>
-        We recommend using the default values provided by the system.
-      </template>
+    <ColoredBorderAlert type="warning" locale-tag="create statistics.epsilon warning">
     </ColoredBorderAlert>
-    <ColoredBorderAlert type="info">
-      <template v-slot:content>
-        You can apply different statistics to single or multiple variables.
-        Then, you can edit these statistics, lock them or delete them.
-      </template>
+    <ColoredBorderAlert type="info" locale-tag="create statistics.statistics help">
     </ColoredBorderAlert>
 
     <StatisticsTable
