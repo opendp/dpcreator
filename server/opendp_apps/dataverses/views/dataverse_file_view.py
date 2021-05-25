@@ -88,6 +88,7 @@ class DataverseFileView(BaseModelViewSet):
 
             # Update the DataverseFileInfo object
             #
+            file_info.creator = dataverse_user.user
             file_info.dataset_schema_info = schema_org_content
             file_info.file_schema_info = file_schema_resp.data
             # This will fail if the dataset_schema_info is malformed, use DOI as backup just in case:

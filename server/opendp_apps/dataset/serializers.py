@@ -18,7 +18,7 @@ class DataSetInfoSerializer(serializers.ModelSerializer):
         fields = ['object_id', 'name', 'created', 'creator', 'source', 'status', 'status_name']
 
 
-class DepositorSetupSerializer(serializers.ModelSerializer):
+class DepositorSetupInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = DepositorSetupInfo
         fields = '__all__'
@@ -34,7 +34,7 @@ class DataverseFileInfoSerializer(DataSetInfoSerializer):
                                                      read_only=False,
                                                      source='dv_installation')
 
-    depositor_setup_info = DepositorSetupSerializer(read_only=True)
+    depositor_setup_info = DepositorSetupInfoSerializer(read_only=True)
 
     dataset_schema_info = serializers.JSONField(read_only=True)
 
