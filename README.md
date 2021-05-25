@@ -1,3 +1,8 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![integration tests](https://github.com/opendp/dpcreator/actions/workflows/cypress.yml/badge.svg)
+![python server side tests](https://github.com/opendp/dpcreator/actions/workflows/python-app.yml/badge.svg)
+
+****
 # The OpenDP Web Application
 
 ## Building with Docker Compose

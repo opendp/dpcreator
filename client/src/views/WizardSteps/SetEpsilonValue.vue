@@ -2,8 +2,9 @@
   <div class="set-epsilon-page">
     <h1 class="title-size-1">Set epsilon value</h1>
     <p>
-      To determine the epsilon value, we need to confirm your dataset's
-      characteristics with some questions about the sample.
+      {{
+        $t('set epsilon.epsilon intro')
+      }}
     </p>
     <BorderTopAlertDismissible>
       <template v-slot:content>
@@ -41,15 +42,7 @@
       <RadioItem label="I'm unsure." value="unsure"/>
     </v-radio-group>
 
-    <AdditionalInformationAlert class="mb-10">
-      <template v-slot:content>
-        For example, information about persons, their behavior, beliefs and
-        attributes is generally private information that individuals in the
-        dataset would not want publicly shared in their name and should be
-        marked “yes”. Information that is solely about instituons, corporations,
-        natural phenomena, etc., that are public record and can be publicly
-        distributed, does not depend on private information.
-      </template>
+    <AdditionalInformationAlert class="mb-10" locale-tag="set epsilon.help data secret">
     </AdditionalInformationAlert>
 
     <div
@@ -69,14 +62,7 @@
         <RadioItem label="I'm unsure." value="unsure"/>
       </v-radio-group>
 
-      <AdditionalInformationAlert>
-        <template v-slot:content>
-          For example, the number of observations in a dataset containing a 5%
-          sample of California voters is public, but the number of observations
-          in a dataset containing all cancer patients in a particular hospital
-          may not be public, as it could be combined with auxiliary information
-          to reveal whether or not a patient has cancer.
-        </template>
+      <AdditionalInformationAlert locale-tag="set epsilon.help data public">
       </AdditionalInformationAlert>
     </div>
   </div>

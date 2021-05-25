@@ -5,7 +5,9 @@ services:
 
   client:
     build: "./client"
-    command: npm run build
+    command: ./run_client.sh
+    environment:
+      - DEV_MODE=false
     volumes:
       - .:/code
       - /code/client/node_modules
