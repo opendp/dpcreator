@@ -24,7 +24,7 @@ requests==2.24.0
 sendgrid==6.4.7
 six==1.15.0
 sqlparse==0.3.1
-urllib3==1.25.10
+urllib3==1.26.5
 uuid==1.30
 webencodings==0.5.1
 
