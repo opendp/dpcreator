@@ -1,5 +1,5 @@
 export default {
-    step_100: {
+    uploaded: {
         label: "Uploaded",
         color: "blue lighten-3",
         icon: "",
@@ -30,6 +30,7 @@ export default {
         availableActions: ["viewDetails"]
     },
     statuses: {
+        UPLOADED: "uploaded",
         IN_PROGRESS: "in_progress",
         IN_EXECUTION: "in_execution",
         ERROR: "error",
