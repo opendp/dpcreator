@@ -12,12 +12,14 @@
           <h1 class="title-size-1">Log in</h1>
           <v-form v-model="validLoginForm">
             <v-text-field
+                data-test="username"
                 v-model="inputs.username"
                 label="Username"
                 required
                 type="text"
             ></v-text-field>
             <v-text-field
+                data-test="password"
                 v-model="inputs.password"
                 :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                 :type="showPassword ? 'text' : 'password'"
@@ -34,6 +36,7 @@
             >
             <div class="mt-14 mb-7">
               <Button
+                  data-test="Log in"
                   :class="{
                   'mb-2 width80 mx-auto d-block': $vuetify.breakpoint.xsOnly,
                   'mr-2': $vuetify.breakpoint.smAndUp

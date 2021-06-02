@@ -41,6 +41,7 @@
 
             <Button
                 id="postOpenDP"
+                data-test="submit button"
                 classes="mt-5"
                 color="primary"
                 :class="{
