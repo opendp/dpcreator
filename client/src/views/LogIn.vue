@@ -10,7 +10,7 @@
             :class="{ 'px-10': $vuetify.breakpoint.xsOnly }"
         >
           <h1 class="title-size-1">Log in</h1>
-          <v-form v-model="validLoginForm">
+          <v-form data-test="login form" v-model="validLoginForm">
             <v-text-field
                 data-test="username"
                 v-model="inputs.username"

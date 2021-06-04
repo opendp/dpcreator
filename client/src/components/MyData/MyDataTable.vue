@@ -1,6 +1,7 @@
 <template>
   <div>
     <v-data-table
+        data-test="my-data-table"
         :headers="headers"
         :items="datasets"
         :items-per-page="computedItemsPerPage"
