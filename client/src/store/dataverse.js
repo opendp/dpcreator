@@ -5,13 +5,15 @@ import {
   SET_DV_HANDOFF,
   REMOVE_DV_HANDOFF,
   SET_DATAVERSE_USER,
-  SET_DATAVERSE_FILE_INFO
+  SET_DATAVERSE_FILE_INFO,
+  SET_DATAVERSE_FILE_LOCKED
 } from './types';
 
 const initialState = {
   handoffId: null,
   dataverseUser: null,
-  fileInfo: null
+  fileInfo: null,
+  fileLocked: false
 };
 const getters = {
   getHandoffId: state => {
@@ -19,6 +21,9 @@ const getters = {
   },
   getfileInfo: state => {
     return state.fileInfo
+  },
+  getFileLocked: state => {
+    return state.fileLocked
   },
 };
 const actions = {
@@ -58,6 +63,12 @@ const actions = {
         .then((resp) => {
           commit('SET_DATAVERSE_FILE_INFO', resp.data.data)
           //   return resp.data.data
+        }).catch((error) => {
+          if (error.response.status == 423) {
+            commit('SET_DATAVERSE_FILE_LOCKED', true)
+          }
+          console.log(error.response.data);
+          console.log(error.response.status);
         })
   },
 };
@@ -68,6 +79,9 @@ const mutations = {
   },
   [SET_DATAVERSE_FILE_INFO](state, fileInfo) {
     state.fileInfo = fileInfo
+  },
+  [SET_DATAVERSE_FILE_LOCKED](state, fileLocked) {
+    state.fileLocked = fileLocked
   },
   [SET_DV_HANDOFF](state, payload) {
     state.handoffId = payload

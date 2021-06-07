@@ -21,7 +21,7 @@ from django.urls import path, include
 from django.views.generic import TemplateView, RedirectView
 from rest_framework import routers, serializers
 
-from opendp_apps.dataset.views import DepositorSetup, DataSetInfoViewSet
+from opendp_apps.dataset.views import DepositorSetupViewSet, DataSetInfoViewSet
 from opendp_apps.dataverses.urls import router as dataverse_router
 from opendp_apps.dataverses.views.dataverse_file_view import DataverseFileView
 from opendp_apps.dataverses.views.dataverse_handoff_view import DataverseHandoffView
@@ -47,7 +47,7 @@ router.register(r'terms-of-access', TermsOfAccessViewSet)
 router.register(r'dataset-info', DataSetInfoViewSet)
 router.register(r'test', TermsOfAccessAgreementViewSet)
 router.register(r'dv-user', DataverseUserView, basename='dv-user')
-router.register(r'deposit', DepositorSetup, basename='deposit')
+router.register(r'deposit', DepositorSetupViewSet, basename='deposit')
 router.register(r'dv-handoff', DataverseHandoffView, basename='dv-handoff')
 router.register(r'dv-file', DataverseFileView, basename='dv-file')
 router.registry.extend(dataverse_router.registry)

@@ -18,10 +18,7 @@
       </v-card-title>
       <v-card-text class="text--primary">
         <span>
-          <strong
-          >The recommended values below are based upon your dataset type
-            selection <br
-            /></strong>
+          <div v-html="$t('create statistics.confirm 1')"></div>
         </span>
         <span class="grey--text text--darken-2">
           (i.e.
@@ -45,8 +42,7 @@
           />
         </div>
         <small class="mr-16 grey--text text--darken-2">
-          Note: Larger X corresponds to larger privacy loss budget, and hence,
-          less privacy. We do not recommend X exceding 1.
+          <div v-html="$t('create statistics.confirm 2')"></div>
         </small>
         <div
             class="borderBottom soft_primary grey--text text--darken-2 pa-3 my-5 top-borders-radius noise-params d-flex justify-space-between width50"
@@ -59,8 +55,7 @@
           />
         </div>
         <small class="mr-16 mb-5 d-block grey--text text--darken-2">
-          Note: X is the probability of a blatant privacy violation. X values
-          larger than the reciprocal of the dataset size are not allowed.
+          <div v-html="$t('create statistics.confirm 3')"></div>
         </small>
         <div
             class="soft_primary grey--text text--darken-2 top-borders-radius width50 pl-3 mb-5 borderBottom"
@@ -76,8 +71,8 @@
         <AdditionalInformationAlert>
           <template v-slot:content>
             <span
-            >The level of privacy protection for individuals in the dataset is
-              governed by two privacy-loss parametres - x & x.
+            >
+              <div v-html="$t('create statistics.confirm 4')"></div>
               <a href="http://" class="text-decoration-none primary--text"
               >Watch video to learn more.</a
               >

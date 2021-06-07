@@ -15,7 +15,12 @@
               <strong>use the desktop version of the app.</strong>
             </template>
           </ColoredBorderAlert>
-          <CreateDPStatistics v-if="!loading" v-bind:fileInfo="uploadedFile"/>
+          <ColoredBorderAlert type="warning" v-if="fileLocked">
+            <template v-slot:content>
+              File is locked by another user
+            </template>
+          </ColoredBorderAlert>
+          <CreateDPStatistics v-if="!loading && !fileLocked" v-bind:fileInfo="uploadedFile"/>
           <h2
               class="title-size-2 font-weight-bold mt-16"
               :class="{
@@ -76,13 +81,16 @@ export default {
     Promise.all(
         [this.$store.dispatch('auth/fetchUser'),
           this.$store.dispatch('dataset/setDatasetList')])
-        .then(() => this.loading = false)
+        .then(() => {
+          this.loading = false
+          console.log('file locked: ' + this.fileLocked)
+        })
 
   },
   computed: {
     ...mapGetters('auth', ['isAuthenticated']),
     ...mapState('auth', ['user']),
-    ...mapState('dataverse', ['fileInfo']),
+    ...mapState('dataverse', ['fileLocked']),
     ...mapState('dataset', ['datasetList']),
     uploadedFile() {
       return this.datasetList ? this.datasetList[0] : null

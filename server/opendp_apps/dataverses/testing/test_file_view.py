@@ -1,6 +1,6 @@
-from unittest import skip
 import requests_mock
 
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
@@ -14,6 +14,10 @@ class FileViewGetTest(TestCase):
     fixtures = ['test_dataverses_01.json',
                 'test_manifest_params_04.json',
                 'test_opendp_users_01.json']
+
+    def setUp(self) -> None:
+        self.user_obj, _created = get_user_model().objects.get_or_create(username='dv_depositor')
+        self.client.force_login(self.user_obj)
 
     @requests_mock.Mocker()
     def test_10_successful_get(self, req_mocker):
@@ -65,7 +69,7 @@ class FileViewGetTest(TestCase):
                                     data={'handoff_id': handoff_obj.object_id,
                                           'creator': '6c4986b1-e90d-48a2-98d5-3a37da1fd331'},
                                     content_type='application/json')
-        # print(response.json())
+        print(response.json())
         # print('response.status_code', response.status_code)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json().get('success'), True)
