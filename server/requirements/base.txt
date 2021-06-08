@@ -2,7 +2,7 @@ asgiref==3.2.10
 bleach==3.3.0
 certifi==2020.6.20
 chardet==3.0.4
-Django==3.1.8
+Django==3.1.9
 django-cryptography==1.0
 django-extensions==3.0.9
 django-polymorphic==3.0.0
@@ -20,11 +20,11 @@ python-dotenv==0.15.0
 pyparsing==2.4.7
 pytz==2020.1
 redis==3.5.3
-requests==2.24.0
+requests==2.25.1
 sendgrid==6.4.7
 six==1.15.0
 sqlparse==0.3.1
-urllib3==1.25.10
+urllib3==1.26.5
 uuid==1.30
 webencodings==0.5.1
 

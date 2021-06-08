@@ -1,0 +1,65 @@
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: dpcreator-app-service
+#  labels:
+#    app: dpcreator
+#    tier: app-svc
+#spec:
+#  type: NodePort
+#  ports:
+#    - port: 8000
+#      targetPort: 8000
+#      nodePort: 30685
+#      protocol: TCP
+#  selector:
+#    app: dpcreator
+#    tier: app
+#---
+# ---------------------------
+# DPCreator - Service
+# ---------------------------
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: dpcreator-load-balancer
+#  labels:
+#    app: dpcreator
+#    tier: load-balancer
+#spec:
+#  type: LoadBalancer
+#  # IP mapped to dpcreator.2ravens.org
+#  loadBalancerIP: {{ loadBalancerIP }}
+#  selector:
+#    app: dpcreator
+#    tier: app
+#  ports:
+#  - port: 80
+#    targetPort: 8000
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: dpcreator-app-service
+spec:
+  selector:
+    app: dpcreator
+    tier: app
+  ports:
+    - port: 5678
+      #targetPort: 8000
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: dpcreator-ingress
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+        - path: /
+          backend:
+            serviceName: dpcreator-app-service
+            servicePort: 5678

@@ -1,0 +1,49 @@
+#
+# https://docs.microsoft.com/en-us/azure/aks/ingress-static-ip
+# kubectl --namespace ingress-basic get services -o yaml -w nginx-ingress-ingress-nginx-controller
+#
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    meta.helm.sh/release-name: nginx-ingress
+    meta.helm.sh/release-namespace: ingress-basic
+  creationTimestamp: "2021-05-14T18:53:32Z"
+  finalizers:
+  - service.kubernetes.io/load-balancer-cleanup
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: nginx-ingress
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/version: 0.46.0
+    helm.sh/chart: ingress-nginx-3.30.0
+  name: nginx-ingress-ingress-nginx-controller
+  namespace: ingress-basic
+  resourceVersion: "389401"
+  selfLink: /api/v1/namespaces/ingress-basic/services/nginx-ingress-ingress-nginx-controller
+  uid: c68f52e2-85d8-4f53-9863-fdfa395a652a
+spec:
+  clusterIP: 10.0.9.115
+  externalTrafficPolicy: Cluster
+  ports:
+  - name: http
+    nodePort: 30995
+    port: 80
+    protocol: TCP
+    targetPort: http
+  - name: https
+    nodePort: 32329
+    port: 443
+    protocol: TCP
+    targetPort: https
+  selector:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: nginx-ingress
+    app.kubernetes.io/name: ingress-nginx
+  sessionAffinity: None
+  type: LoadBalancer
+status:
+  loadBalancer:
+    ingress:
+    - ip: 20.75.149.124

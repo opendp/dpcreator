@@ -1,0 +1,97 @@
+---
+# reference: https://github.com/kubernetes-operators-book/chapters/blob/master/ch05/database.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dpcreator-db-data-configmap
+data:
+  #
+  # Database settings for postgres and django
+  #
+  DB_HOST: "postgres-service"
+  DB_PORT: "5432"
+  DB_ENGINE: "django.db.backends.postgresql_psycopg2"
+  #
+  # These two variables should have the same value (kludge):
+  POSTGRES_DB: "db_dpcreator"
+  DB_NAME: "db_dpcreator"
+---
+# ---------------------------
+# Test secret to get this running
+# before deconstructing it
+# ---------------------------
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-auth
+type: Opaque
+stringData:
+  username: test_postgres_user
+  password: test_not_real
+---
+# ---------------------------
+# DPCreator - Postgres Deployment
+# ---------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dpcreator
+      tier: postgres
+  template:
+    metadata:
+      labels:
+        app: dpcreator
+        tier: postgres
+    spec:
+      containers:
+        - name: dpcreator-postgres
+          image: postgres:13
+          imagePullPolicy: Always
+          ports:
+            - name: postgres-port
+              containerPort: 5432
+              protocol: TCP
+          # To do: Make this an azureDisk / Managed
+          #volumeMounts:
+          #- name: postgres-persistent-volume
+          #  mountPath: "/var/lib/postgresql/data"
+          #  subPath: dpcreator
+          # "public" database data
+          envFrom:
+          - configMapRef:
+              name: dpcreator-db-data-configmap
+          # "secret" database auth data
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-auth
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-auth
+                  key: password
+---
+# ---------------------------
+# DPCreator - Postgres Service
+# ---------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  labels:
+    app: dpcreator
+    tier: postgres
+spec:
+  clusterIP: None
+  ports:
+    - port: 5432
+  selector:
+    app: dpcreator
+    tier: postgres
