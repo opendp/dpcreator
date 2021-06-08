@@ -103,3 +103,5 @@ These steps document how to run a Python script which will generate a k8s specif
 1. Check the new/updated k8s file into the [opendp/dpcreator](https://github.com/opendp/dpcreator) repository
 
 ## Azure: Using the K8s file
+
+(Assumes you have an Azure account.)
