@@ -23,8 +23,8 @@ services:
     env_file:
       - .env
     environment:
-      - STATIC_ROOT=/code/server
-    command: sh -c "python manage.py show_debug_params && ./migrate.sh && python manage.py runserver 0.0.0.0:8000"
+      - STATIC_ROOT=/code/server/static/dist
+    command: sh -c "./migrate.sh && python manage.py show_debug_params && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
       - ./server/static:/server/static
