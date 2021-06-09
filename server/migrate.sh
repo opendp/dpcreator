@@ -1,4 +1,5 @@
 #!/bin/sh
+echo "The current working directory: $PWD"
 echo "-----------------------"
 echo "| Creating Migrations |"
 echo "-----------------------"

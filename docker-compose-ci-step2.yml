@@ -22,6 +22,8 @@ services:
     # these variables to point to a standalone instance
     env_file:
       - .env
+    environment:
+      - STATIC_ROOT=/code/server/static
     command: sh -c "./migrate.sh && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
