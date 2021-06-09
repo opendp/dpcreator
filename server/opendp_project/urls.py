@@ -72,6 +72,8 @@ urlpatterns = [
     ]
 
 if settings.USE_DEV_STATIC_SERVER:
+    print('Adding static url!!')
+    print(f'Serving directory "{settings.STATIC_ROOT}" from url "{settings.STATIC_URL}"')
     urlpatterns += static(settings.STATIC_URL,
                           document_root=settings.STATIC_ROOT,
                           kwargs={'show_indexes': True})
