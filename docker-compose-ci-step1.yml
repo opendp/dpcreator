@@ -6,7 +6,7 @@ services:
     command: ./run_client.sh
     environment:
       - DEV_MODE=false
-      - NODE_ENV=production
+      #- NODE_ENV=production
     volumes:
       - .:/code
       - /code/client/node_modules

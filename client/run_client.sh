@@ -7,6 +7,6 @@ if [ "$DEV_MODE" == "true" ]; then
   echo 'dev mode'
   npm run serve
 else
-  echo 'production - not dev mode'
+  echo 'not dev mode'
   npm  run build
 fi
