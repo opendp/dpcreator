@@ -33,10 +33,11 @@ services:
 
   cypress:
     image: "cypress/included:7.2.0"
+    command: "--config-file cypress_github_ci.json"
     depends_on:
       - server
-    environment:
-      - CYPRESS_baseUrl=http://server:8000
+    #environment:
+    #  - CYPRESS_BASE_URL=http://server:8000
     working_dir: /e2e
     volumes:
       - ./client:/e2e
