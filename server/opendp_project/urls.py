@@ -15,8 +15,8 @@ Including another URLconf
 """
 from django.conf import settings
 from django.conf.urls import url
-from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import path, include
 from django.views.generic import TemplateView, RedirectView
 from rest_framework import routers, serializers
@@ -74,6 +74,7 @@ urlpatterns = [
 if settings.USE_DEV_STATIC_SERVER:
     print('Adding static url!!')
     print(f'Serving directory "{settings.STATIC_ROOT}" from url "{settings.STATIC_URL}"')
-    urlpatterns += static(settings.STATIC_URL,
-                          document_root=settings.STATIC_ROOT,
-                          kwargs={'show_indexes': True})
+    urlpatterns += staticfiles_urlpatterns()
+    #urlpatterns += static(settings.STATIC_URL,
+    #                      document_root=settings.STATIC_ROOT,
+    #                      kwargs={'show_indexes': True})

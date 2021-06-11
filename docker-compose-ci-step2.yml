@@ -22,9 +22,9 @@ services:
     # these variables to point to a standalone instance
     env_file:
       - .env
-    #environment:
-    #  - USE_DEV_STATIC_SERVER=False
-    command: sh -c "./migrate.sh && python manage.py collectstatic --no-input && python manage.py show_debug_params && python manage.py runserver 0.0.0.0:8000"
+    environment:
+      - STATIC_ROOT=/code/server/static/dist
+    command: sh -c "./migrate.sh && python manage.py show_debug_params && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
       - ./server/static:/server/static
