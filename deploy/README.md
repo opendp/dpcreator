@@ -108,7 +108,51 @@ These steps document how to run a Python script which will generate a k8s specif
 In this example, the cluster name is **DPCreatorCluster01**
 
 1. Log into 'portal.azure.com'
+1. From the "All Resources" section, find your cluster name and click on it.
+1. Click on the "Connect" icon
+   - Follow instructions 1 and 2 to open the Cloud Shell and connect to the cluster
+1. (One time) Clone the dpcreator repository
+   ```
+   git clone git@github.com:opendp/dpcreator.git
+   ```
+1. Update the dpcreator repository / Start the app + related services
+   ```
+   cd dpcreator/deploy/k8s_maker/rendered/
+   git pull
+   # The k8s file you created in the previous section should be available
+   
+   # Start the application
+   # - file name example: dpcreator_05_2021_0608.yaml
+   #    
+   kc apply -f dpcreator_nn_YYYY_MMDD.yaml  
+   ```
+   - You should see output similar to:
+   ```    
+    configmap/dpcreator-db-data-configmap created
+    deployment.apps/postgres created
+    service/postgres-service created
+    configmap/dpcreator-app-configmap created
+    deployment.apps/dpcreator-app created
+    service/dpcreator-load-balancer created
+   ```
+1. To see the running pods, run: `kc get pods`
+   - Two of the pods are related to the dp
+   - Sample output:
+   ```
+    NAME                             READY   STATUS    RESTARTS   AGE
+    dpcreator-app-856ccfcfcc-skntv   2/2     Running   0          2m24s
+    postgres-695bffdb4-2hcpb         1/1     Running   0          2m24s
+   ```
 
+   # See if the application is starting up. Example output:
+   #  
+   kc get pods
+   
+   ```
+ 1. Start the application and related services
+   ```
+   # from within the directory ~//deploy/k8s_maker/rendered/
+   ```
 ```
 cd dpcreator/deploy/k8s_maker/rendered/
 git pull

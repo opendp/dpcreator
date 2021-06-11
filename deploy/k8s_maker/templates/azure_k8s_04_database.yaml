@@ -22,7 +22,7 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres
+  name: dpcreator-database
 spec:
   replicas: 1
   selector:
