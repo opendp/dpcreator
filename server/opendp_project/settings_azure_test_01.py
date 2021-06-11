@@ -19,3 +19,11 @@ xCORS_ALLOWED_ORIGINS = (
 # Let nginx serve static files
 USE_DEV_STATIC_SERVER = False
 
+STATIC_ROOT = os.getenv('STATIC_ROOT', os.path.join(BASE_DIR, 'static_deploy', 'static', 'dist'))
+if not os.path.isdir(STATIC_ROOT):
+    os.makedirs(STATIC_ROOT)
+
+STATICFILES_DIRS = [
+    #os.path.join(BASE_DIR, 'static')
+    os.path.join(BASE_DIR, 'static', 'dist')
+]
