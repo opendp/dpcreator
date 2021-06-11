@@ -6,7 +6,8 @@ The deployment is on a kubernetes (k8s) cluster and requires the coordination of
 
 - Building of Docker Images
 - Creation of k8s .yaml files with correct environment variable settings
-- Setting up Azure resources
+- Using the k8s files on an Azure cluster
+- Setting up Azure resources (_covered in a separate doc_)
 
 The instructions here are not exhaustive and depend on the specific cluster/etc.
 
@@ -136,24 +137,33 @@ In this example, the cluster name is **DPCreatorCluster01**
    
    ```
    - You should see output similar to:
-   ```    
-    configmap/dpcreator-db-data-configmap created
-    deployment.apps/postgres created
-    service/postgres-service created
-    configmap/dpcreator-app-configmap created
-    deployment.apps/dpcreator-app created
-    service/dpcreator-load-balancer created
-   ```
+       ```    
+        configmap/dpcreator-db-data-configmap created
+        deployment.apps/postgres created
+        service/postgres-service created
+        configmap/dpcreator-app-configmap created
+        deployment.apps/dpcreator-app created
+        service/dpcreator-load-balancer created
+       ```
 1. To see the running pods, run: `kc get pods`
    - Sample output:
-    ```
-    NAME                                 READY   STATUS              RESTARTS   AGE
-    dpcreator-app-856ccfcfcc-cn5dr       0/2     ContainerCreating   0          1s
-    dpcreator-database-695bffdb4-grvld   0/1     ContainerCreating   0          2s
-    ```
+        ```
+        NAME                                 READY   STATUS              RESTARTS   AGE
+        dpcreator-app-856ccfcfcc-cn5dr       0/2     ContainerCreating   0          1s
+        dpcreator-database-695bffdb4-grvld   0/1     ContainerCreating   0          2s
+        ```
     - Note, the DPCreator pod names are prefaced with `dpcreator-`
-1. Below are several k8s commands. 
-    - For those that are pod specific, you'll need the pod name from `kc get pods`
+    - To see more details on a specific pod:
+        ```
+        # syntax:  kc describe pod dpcreator-app-[extension added at runtime)
+        # example (be sure to change the extension!)
+        #
+        kc describe pod dpcreator-app-856ccfcfcc-cn5dr 
+        ```
+    
+1. Below are several more k8s commands. 
+    - For commands that are pod specific, you'll need the pod name from:
+      - `kc get pods`
    ```
    # See if the services are running and the IP address
    #  - `dpcreator-load-balancer` - should have an external IP
@@ -161,23 +171,36 @@ In this example, the cluster name is **DPCreatorCluster01**
    # 
    kc get svc
    
+   # -----------------
+   # --- View Logs ---
+   # -----------------
    # See the logs for the dpcreator app or nginx
-   #  - example uses pod name "dpcreator-app-zzzzzzzz" where "zzzzzzzz" is the random extension added at pod creation
+   #  - example uses pod name "dpcreator-app-zzzzzzzz" where "zzzzzzzz" is 
+   #    the extension added at pod creation
+   
+   # nginx logs, regular and tailed
+   kc logs dpcreator-app-zzzzzzzz dpcreator-nginx
+   kc logs -f dpcreator-app-zzzzzzzz dpcreator-nginx 
+
+   # app logs, regular and tailed
+   kc logs dpcreator-app-zzzzzzzz dpcreator-app
+   kc logs -f dpcreator-app-zzzzzzzz dpcreator-app
+
+   # ------------------------------------
+   # --- Log into a Running Container ---
+   # ------------------------------------
+   # Log into the container dpcreator app or nginx
+   #  - example uses pod name "dpcreator-app-zzzzzzzz" where "zzzzzzzz" is 
+   #    the extension added at pod creation
+   # 
+   # Syntax:
+   # kc exec -it [pod name] -c [container name] -- /bin/bash
+   
+   # nginx 
+   kc exec -it dpcreator-app-zzzzzzzz -c dpcreator-nginx -- /bin/bash
+
+   # app 
+   kc exec -it dpcreator-app-zzzzzzzz -c dpcreator-app -- /bin/bash
+
    ```   
     
-   # See if the application is starting up. Example output:
-   #  
-   kc get pods
-   
-   ```
- 1. Start the application and related services
-   ```
-   # from within the directory ~//deploy/k8s_maker/rendered/
-   ```
-```
-cd dpcreator/deploy/k8s_maker/rendered/
-git pull
-
-# stop the app and related services
-kc delete -f dpcreator_nn_YYYY_MMDD.yaml 
-```
