@@ -8,7 +8,7 @@ data:
   #
   # Database settings for postgres and Django
   #
-  DB_HOST: "postgres-service"
+  DB_HOST: "dpcreator-postgres-service"
   DB_PORT: "5432"
   DB_ENGINE: "django.db.backends.postgresql_psycopg2"
   #
@@ -76,7 +76,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-service
+  name: dpcreator-postgres-service
   labels:
     app: dpcreator
     tier: postgres

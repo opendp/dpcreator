@@ -125,6 +125,15 @@ In this example, the cluster name is **DPCreatorCluster01**
    # - file name example: dpcreator_05_2021_0608.yaml
    #    
    kc apply -f dpcreator_nn_YYYY_MMDD.yaml  
+   
+   # Stop the application
+   #
+   kc delete -f dpcreator_nn_YYYY_MMDD.yaml  
+   
+   # To stop it immediately:
+   kc delete -f dpcreator_nn_YYYY_MMDD.yaml -grace-period=0 --force
+   
+   
    ```
    - You should see output similar to:
    ```    
@@ -136,14 +145,26 @@ In this example, the cluster name is **DPCreatorCluster01**
     service/dpcreator-load-balancer created
    ```
 1. To see the running pods, run: `kc get pods`
-   - Two of the pods are related to the dp
    - Sample output:
+    ```
+    NAME                                 READY   STATUS              RESTARTS   AGE
+    dpcreator-app-856ccfcfcc-cn5dr       0/2     ContainerCreating   0          1s
+    dpcreator-database-695bffdb4-grvld   0/1     ContainerCreating   0          2s
+    ```
+    - Note, the DPCreator pod names are prefaced with `dpcreator-`
+1. Below are several k8s commands. 
+    - For those that are pod specific, you'll need the pod name from `kc get pods`
    ```
-    NAME                             READY   STATUS    RESTARTS   AGE
-    dpcreator-app-856ccfcfcc-skntv   2/2     Running   0          2m24s
-    postgres-695bffdb4-2hcpb         1/1     Running   0          2m24s
-   ```
-
+   # See if the services are running and the IP address
+   #  - `dpcreator-load-balancer` - should have an external IP
+   #  - `dpcreator-postgres-service` - db service
+   # 
+   kc get svc
+   
+   # See the logs for the dpcreator app or nginx
+   #  - example uses pod name "dpcreator-app-zzzzzzzz" where "zzzzzzzz" is the random extension added at pod creation
+   ```   
+    
    # See if the application is starting up. Example output:
    #  
    kc get pods
