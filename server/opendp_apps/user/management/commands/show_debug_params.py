@@ -25,4 +25,4 @@ class Command(BaseCommand):
         print('USE_DEV_STATIC_SERVER', settings.USE_DEV_STATIC_SERVER)
         print('BASE_DIR', settings.BASE_DIR)
         print('STATIC_ROOT', settings.STATIC_ROOT)
-        self.show_dir_contents(settings.STATIC_ROOT)
+        # self.show_dir_contents(settings.STATIC_ROOT)

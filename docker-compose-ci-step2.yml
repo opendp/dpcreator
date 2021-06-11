@@ -22,8 +22,6 @@ services:
     # these variables to point to a standalone instance
     env_file:
       - .env
-    #environment:
-    #  - STATIC_ROOT=/code/server/static/dist
     command: sh -c "./migrate.sh && python manage.py show_debug_params && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
@@ -40,6 +38,7 @@ services:
       - server
     #environment:
     #  - CYPRESS_BASE_URL=http://server:8000
+    #  ^ moved to custom config file: cypress_github_ci.json
     working_dir: /e2e
     volumes:
       - ./client:/e2e

@@ -105,3 +105,14 @@ These steps document how to run a Python script which will generate a k8s specif
 ## Azure: Using the K8s file
 
 (Assumes you have an Azure account.)
+In this example, the cluster name is **DPCreatorCluster01**
+
+1. Log into 'portal.azure.com'
+
+```
+cd dpcreator/deploy/k8s_maker/rendered/
+git pull
+
+# stop the app and related services
+kc delete -f dpcreator_nn_YYYY_MMDD.yaml 
+```

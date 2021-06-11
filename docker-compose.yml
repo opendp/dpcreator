@@ -33,8 +33,6 @@ services:
     # these variables to point to a standalone instance
     env_file:
       - .env
-    #environment:
-    #  - STATIC_ROOT=/code/server
     command: sh -c "python manage.py show_debug_params && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
