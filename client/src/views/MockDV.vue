@@ -29,8 +29,8 @@
                 required
             ></v-text-field>
             <v-text-field
-                v-model="fileId"
-                label="fileId"
+                v-model="filePid"
+                label="filePid"
                 required
             ></v-text-field>
             <v-text-field
@@ -85,7 +85,7 @@ export default {
   },
   methods: {
     handleFormSubmit: function () {
-      dataverse.testHandoff(this.site_url, this.fileId, this.datasetPid, this.token)
+      dataverse.testHandoff(this.site_url, this.fileId, this.datasetPid, this.filePid, this.token)
     },
 
 
@@ -95,8 +95,8 @@ export default {
     site_url: 'http://127.0.0.1:8000/dv-mock-api',
     fileId: '4164587',
     datasetPid: 'doi:10.7910/DVN/PUXVDH',
-    token: 'shoefly-dont-bother-m3'
-
+    token: 'shoefly-dont-bother-m3',
+    filePid: 'doi:10.7910/DVN/PUXVDH'
     // validForm: false,
     // site_url: 'https://dataverse.harvard.edu/',
     // fileId: '4498613',
