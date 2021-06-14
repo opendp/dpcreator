@@ -28,13 +28,14 @@ export default {
         return session.post('/api/dv-user/',
             {dv_handoff: handoffId, user: openDPUserId});
     },
-    testHandoff(site_url, fileId, datasetPid, token) {
+    testHandoff(site_url, fileId, datasetPid, filePid, token) {
         console.log('posting to dv-handoff')
         const formData = new FormData()
         formData.append("site_url", site_url)
         formData.append("apiGeneralToken", token)
         formData.append('datasetPid', datasetPid)
         formData.append('fileId', fileId)
+        formData.append("filePid", filePid)
 
         session.post('/api/dv-handoff/', formData)
             .then(function (response) {
