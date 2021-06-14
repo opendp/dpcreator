@@ -188,7 +188,8 @@ export default {
   data: () => ({
     //TODO: These should be connected with the variables loaded on the previous step
     singleVariableStatistics: ["Mean", "Histogram", "Quantile"],
-    variables: ["Age", "Sex", "Educ", "Race", "Income", "Married"],
+    variables: ["Age", "DOB",
+      "Income", "Visit", "Program", "Provider"],
     editedItemDialog: {
       statistic: "",
       variable: [],
