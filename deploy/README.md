@@ -116,7 +116,13 @@ In this example, the cluster name is **DPCreatorCluster01**
    ```
    git clone git@github.com:opendp/dpcreator.git
    ```
-1. Update the dpcreator repository / Start the app + related services
+1. (Very Infrequent) Upload the k8s secrets YAML file which contains settings such as the SECRET_KEY. (* The secrets file is not in this repository. Example name: `dpcreator-azure-secrets.yaml`)
+   - The Azure cloud shell has a button to upload a file to your home directory.
+   - Make the secrets available to the k8s cluster using the command:
+      ```
+      kc apply -f dpcreator-azure-secrets.yaml
+      ```
+1. Update the dpcreator repository + Start the app and related services
    ```
    cd dpcreator/deploy/k8s_maker/rendered/
    git pull
