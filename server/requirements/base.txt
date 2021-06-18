@@ -20,11 +20,11 @@ python-dotenv==0.15.0
 pyparsing==2.4.7
 pytz==2020.1
 redis==3.5.3
-requests==2.24.0
+requests==2.25.1
 sendgrid==6.4.7
 six==1.15.0
 sqlparse==0.3.1
-urllib3==1.25.10
+urllib3==1.26.5
 uuid==1.30
 webencodings==0.5.1
 
