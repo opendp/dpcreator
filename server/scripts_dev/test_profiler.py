@@ -108,5 +108,5 @@ if __name__=='__main__':
     #basic_celery()
 
 """
-docker-compose run server python scripts/test_profiler.py
+docker-compose run server python scripts_dev/test_profiler.py
 """

@@ -1,0 +1,178 @@
+---
+# ---------------------------
+# DPCreator - Service
+# ---------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: dpcreator-svc
+  labels:
+    app: dpcreator
+spec:
+  selector:
+    app: dpcreator
+    tier: web
+  ports:
+  - port: 80
+    # targetPort on the pod
+    targetPort: 8000
+  type: LoadBalancer
+  #
+  # IP mapped to dpcreator.2ravens.org
+  #
+  loadBalancerIP: {{ loadBalancerIP }}
+---
+# ---------------------------
+# DPCreator - Kubernetes Pod File
+# ---------------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dpcreator-pod
+  labels:
+    app: dpcreator
+    tier: web
+spec:
+  restartPolicy: Always
+  volumes:
+    - name: dpcreator-volume
+      emptyDir: {}
+      # azureDisk:
+      #  kind: Managed
+      #  diskName: storage-dpcreator-files
+      #  diskURI:
+    - name: postgres-persistent-volume
+      emptyDir: {}
+      #azureDisk:
+      #  kind: Managed
+      #  diskName: storage-dpcreator-postgres
+      #  diskURI:
+  containers:
+  # --------------------------------
+  # 1 of 3: Postgres
+  # --------------------------------
+  - name: dpcreator-postgres
+    image: postgres:13
+    envFrom:
+    - configMapRef:
+        name: dpcreator-data-configmap
+    #env:
+    #- name: POSTGRES_USER
+    #  valueFrom:
+    #    secretKeyRef:
+    #      name: azure-dpcreator-secrets
+    #      key: POSTGRES_USER
+    #- name: POSTGRES_PASSWORD
+    #  valueFrom:
+    #    secretKeyRef:
+    #      name: azure-dpcreator-secrets
+    #      key: POSTGRES_PASSWORD
+    ports:
+    - containerPort: 5432
+      name: postgres-port
+    volumeMounts:
+    - name: postgres-persistent-volume
+      mountPath: "/var/lib/postgresql/data"
+      subPath: dpcreator
+  # --------------------------------
+  # 2 of 3: Ravens nginx
+  # - reverse proxy for ta3-main
+  # --------------------------------
+  #- name: dpcreator-nginx
+  #  image: {{ dpcreator_nginx_container }}:{{ dpcreator_container_tag }}
+  #  #tworavens/dpcreator-nginx:yarrow-2021-0120
+  #  imagePullPolicy: Always
+  #  ports:
+  #    - containerPort: 80
+  #      name: http
+  #      protocol: TCP
+  #  volumeMounts:
+  #  - name: "dpcreator-volume"
+  #    mountPath: "/dpcreator_volume"
+  #    readOnly: true
+  # --------------------------------
+  # 3 of 3: TA3 main container
+  # - includes entry point for evaluation
+  # --------------------------------
+  - name: dpcreator-app
+    image: {{ dpcreator_app_container }}:{{ dpcreator_container_tag }}
+    imagePullPolicy: Always
+    #command: [sh -c "./migrate.sh && python manage.py runserver 0.0.0.0:8000"]
+    command: [ "/bin/sh" ]
+    args: [ "-c", "./migrate.sh && python manage.py runserver 0.0.0.0:8000"]
+    ports:
+    # Main web port; nginx makes this available via port 80
+    - containerPort: 8000
+      name: http
+      protocol: TCP
+    envFrom:
+    - configMapRef:
+        name: dpcreator-data-configmap
+    env:
+    #- name: SECRET_KEY
+    #  valueFrom:
+    #    secretKeyRef:
+    #      name: azure-dpcreator-secrets
+    #      key: SECRET_KEY
+    #- name: CRYPTOGRAPHY_KEY
+    #  valueFrom:
+    #    secretKeyRef:
+    #      name: azure-dpcreator-secrets
+    #      key: CRYPTOGRAPHY_KEY
+    # ---------------------------
+    # SQL db credentials
+    # ---------------------------
+    #- name: DB_USER
+    #  valueFrom:
+    #    secretKeyRef:
+    #      name: azure-dpcreator-secrets
+    #      key: POSTGRES_USER
+    #- name: DB_PASSWORD
+    #  valueFrom:
+    #    secretKeyRef:
+    #      name: azure-dpcreator-secrets
+    #      key: POSTGRES_PASSWORD
+    # ---------------------------
+    volumeMounts:
+      - name: "dpcreator-volume"
+        mountPath: "/dpcreator_volume"
+        readOnly: false
+---
+# ---------------------------------------
+# Configmap
+# ---------------------------------------
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dpcreator-data-configmap
+data:
+  #
+  #
+  # Same env variables for django + celery
+  #
+  DJANGO_SETTINGS_MODULE: "opendp_project.settings_azure_test_01"
+  SESSION_COOKIE_NAME: "dpcreator_azure01"
+  CSRF_COOKIE_NAME: "dpcreator_azure01_csrf"
+  #
+  #
+  # Database settings
+  #
+  DB_HOST: "127.0.0.1"
+  DB_PORT: "5432"
+  DB_ENGINE: "django.db.backends.postgresql_psycopg2"
+  # These two variables should have the same value (kludge):
+  POSTGRES_DB: "db_dpcreator"
+  DB_NAME: "db_dpcreator"
+  #
+  # WILL ALL GO INTO SECRETS FILE ....
+  POSTGRES_USER: "test_postgres_user"
+  DB_USER: "test_postgres_user"
+  #
+  POSTGRES_PASSWORD: "test_not_real"
+  DB_PASSWORD: "test_not_real"
+  #
+  SECRET_KEY: "SECRET_KEY!-ADD-REAL-KEY-HERE!--ADD-REAL-KEY!1234!"
+  CRYPTOGRAPHY_KEY: "CRYPTOGRAPHY_KEY!-ADD-REAL-KEY!1234!"
+  #
+  # Make these the same value:
+  ALLOWED_HOSTS: "{{ ALLOWED_HOSTS }}"
