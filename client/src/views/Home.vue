@@ -40,7 +40,7 @@ export default {
       this.$store.dispatch('dataverse/setHandoffId', handoffId)
     } else {
       this.showAlert = true
-      this.alertText = 'To create a DP Release, please make a request from an registered Dataverse installation.'
+      this.alertText = 'To create a DP Release, please make a request from a registered Dataverse installation.'
     }
   },
   data: () => ({

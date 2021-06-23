@@ -21,7 +21,7 @@
         it('shows correct error message', () => {
             cy.visit('/')
             cy.get('div')
-                .should('contain', 'To create a DP Release, please make a request from an registered Dataverse installation')
+                .should('contain', 'To create a DP Release, please make a request from a registered Dataverse installation')
         })
     }),
         describe('The Home Page', () => {
