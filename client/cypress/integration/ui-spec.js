@@ -28,7 +28,7 @@
             it('correctly renders locale text', () => {
                 cy.visit('/')
                 cy.get('p')
-                    .should('contain', 'This tool allows researchers to easily')
+                    .should('contain', 'DP Creator allows researchers to easily')
             })
         }),
         describe('Mock DV Request', () => {
