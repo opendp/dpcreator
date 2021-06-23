@@ -17,7 +17,7 @@ sys.path.append(FAB_BASE_DIR)
 # Set the DJANGO_SETTINGS_MODULE, if it's not already
 # ----------------------------------------------------
 KEY_DJANGO_SETTINGS_MODULE = 'DJANGO_SETTINGS_MODULE'
-KEY_DEV_SETTINGS = 'opendp_project.settings'
+KEY_DEV_SETTINGS = 'opendp_project.settings.development'
 os.environ.setdefault(KEY_DJANGO_SETTINGS_MODULE,
                       KEY_DEV_SETTINGS)
 

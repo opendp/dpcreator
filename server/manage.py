@@ -8,10 +8,10 @@ def main():
 
     # use seperate settings.py for tests
     if 'test' in sys.argv:
-        print('using settings_test.py')
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opendp_project.settings_test')
-    else:
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opendp_project.settings')
+        print('Using settings/development_test.py')
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opendp_project.settings.development_test')
+    elif not 'DJANGO_SETTINGS_MODULE' in os.environ:
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opendp_project.settings.development')
 
     try:
         from django.core.management import execute_from_command_line

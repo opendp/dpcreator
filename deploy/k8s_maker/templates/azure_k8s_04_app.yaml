@@ -101,7 +101,7 @@ spec:
               name: dpcreator-app-configmap
           env:
             - name: DJANGO_SETTINGS_MODULE
-              value: opendp_project.settings_azure_test_01
+              value: opendp_project.settings.azure_test_01
             - name: ALLOWED_HOSTS
               value: "{{ ALLOWED_HOSTS }}"
             - name: DB_USER
