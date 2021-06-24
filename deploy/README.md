@@ -38,6 +38,16 @@ Deployment currently requires the building of two Docker images:
     # Switch to the "client" directory 
     #  (at the top-level of the dpcreator repository)
     cd client
+    
+    #
+    # Build the language file from the .csv
+    #   - For more information, see README-TEXT.md at the top of the project directory
+    #
+    node ./build_locale/CreateLocaleJson.js
+    
+    #
+    # Build the Vue app
+    #
     export NODE_ENV=production DEV_MODE=false
     ./run_client.sh   #npm run build
     ```
