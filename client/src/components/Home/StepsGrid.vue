@@ -75,16 +75,8 @@
         <ColoredBox class="step">
           <template v-slot:content>
             <RoundedNumber :number="3"/>
-            <h3 class="mb-5 grid-item__title">Work on release</h3>
-            <p class="grey--text text--darken-2">
-              You can work with your data in 5 steps: Validate Dataset, Confirm
-              variables, Set epsilon value, Create statistics, Generate DP
-              Release. You'll see more information about the steps during the
-              process, which
-              <strong
-              >you have to finish before 72 hours or the data will be deleted
-                from the tool.</strong
-              >
+            <h3 class="mb-5 grid-item__title">{{ $t('home.step3 title') }}</h3>
+            <p v-html="$t('home.step3 text')" class="grey--text text--darken-2">
             </p>
           </template>
         </ColoredBox>
