@@ -1,5 +1,16 @@
 """
 Settings for running cypress tests
+DANGER: This Cypress settings file introduces an API endpoint that deletes nearly all data.
+ - This settings file makes that endpoint available accessible by doing the following:
+ (1) Adding this Django app: 'opendp_apps.cypress_utils'
+    - The app includes the "clear_test_data" management command
+ (2) Using a different ROOT_URLCONF
+    - This adds the API endpoint and view which uses the "clear_test_data" management command
+ (3) The management command and extra url/endpoint are only run/added when the conditions in this
+    function are met: opendp_app/cypress_utils/check_setup.py -> are_cypress_settings_in_place()
+        -> Part of this check is that:
+            settings.ALLOW_CYPRESS_TEST_ENDPOINT == cypress_utils.statics_vals.ALLOW_CYPRESS_TEST_ENDPOINT_VAL
+
 """
 import os
 
@@ -10,4 +21,7 @@ DEBUG = True
 ROOT_URLCONF = 'opendp_project.urls_cypress'
 
 ALLOW_CYPRESS_TEST_ENDPOINT = 'cypress-in-ci-endpoint'
+
+# Include the clear data management command
+INSTALLED_APPS += ['opendp_apps.cypress_utils']
 
