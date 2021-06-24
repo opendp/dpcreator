@@ -5,7 +5,7 @@ specs_01 = dict(bird='song',
                 # tag used for dpcreator app and nginx
                 dpcreator_app_container="ghcr.io/opendp/dpcreator/app",
                 dpcreator_nginx_container="ghcr.io/opendp/dpcreator/nginx",
-                dpcreator_container_tag="2021-0623", # "t01",
+                dpcreator_container_tag="2021-0624", # "t01",
                 #
                 DEFAULT_FROM_EMAIL='smartnoise@opendp.org',
                 # Make these two the same!!!
