@@ -1,67 +1,58 @@
 """
-Wait for a stable database connection.
-Used as a bit of hack if/when waiting for a Postgres container to start.
-
-ref: https://stackoverflow.com/questions/32098797/how-can-i-check-database-connection-to-mysql-in-django
+Allow deletion of data in between cypress tests
 """
+import os
 import time
 
+from django.apps import apps
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
+# Should be the same value as settings.ALLOW_CYPRESS_ENDPOINT
+#  within the the file opendp_project/settings/cypress_tests.py
+#
+_ALLOW_CYPRESS_ENDPOINT_VAL = 'cypress-in-ci-endpoint'
+
+def are_cypress_settings_in_place():
+    """Two checks to see if cypress settings are running"""
+
+    # (1) Settings module must be named 'opendp_project.settings.cypress_tests'
+    #
+    settings_name = os.environ.get('DJANGO_SETTINGS_MODULE')
+    if settings_name != 'opendp_project.settings.cypress_tests':
+        return False
+
+    # (2a) Settings has variable ALLOW_CYPRESS_ENDPOINT
+    #
+    if hasattr(settings, 'ALLOW_CYPRESS_ENDPOINT'):
+
+        # (2b) settings.ALLOW_CYPRESS_ENDPOINT equals _ALLOW_CYPRESS_ENDPOINT_VAL
+        if settings.ALLOW_CYPRESS_ENDPOINT == _ALLOW_CYPRESS_ENDPOINT_VAL:
+            return True
+
+    return False
 
 class Command(BaseCommand):
     help = "Deletes data for Cypress tests"
 
-    """
-    def add_arguments(self, parser):
-        parser.add_argument(
-            "--seconds",
-            nargs="?",
-            type=int,
-            const=1,
-            help="Number of seconds to wait before retrying",
-            default=5,
-        )
-        parser.add_argument(
-            "--max_retries",
-            nargs="?",
-            type=int,
-            const=1,
-            help="Maximum number of times to to test for a connection",
-            default=30,
-        )
-    """
-
     def handle(self, *args, **options):
         """Delete data in-between Cypress tests"""
+        if not are_cypress_settings_in_place():
+            self.stdout.write(self.style.ERROR('This command is reserved for cypress testing'))
+            return
 
-        wait = options["seconds"]
-        max_retries = options["max_retries"]
-        num_loops = 1
-        connection_made = False
-        while True:
-            self.stdout.write(self.style.SUCCESS(f"({num_loops}/{max_retries}) Checking database connection..."))
-            try:
-                connection.ensure_connection()
-                connection_made = True
-                break
-            except OperationalError:
-                plural_time = ngettext("second", "seconds", wait)
-                self.stdout.write(
-                    self.style.WARNING(
-                        f"Database unavailable, retrying after {wait} {plural_time}!"
-                    )
-                )
-                time.sleep(wait)
-            if num_loops >= max_retries:
-                self.stdout.write(
-                    self.style.WARNING(f"Maximum attempts reached: {max_retries}")
-                )
-                break
-            num_loops += 1
+        models_to_clear = [ ('terms_of_access', ['TermsOfAccessLog', 'TermsOfAccess']),
+                            ('dataset', ['UploadFileInfo', 'DataverseFileInfo', 'DataSetInfo']),
+                            ('analysis', ['ReleaseInfo', 'AnalysisPlan', 'DepositorSetupInfo']),
+                            ('dataverses', ['ManifestTestParams', 'DataverseHandoff']),
+                            ]
+        self.stdout.write(self.style.WARNING('Preparing to delete test data'))
 
-        if connection_made:
-            self.stdout.write(self.style.SUCCESS("Database connections successful"))
-        else:
-            self.stdout.write(self.style.WARNING("Failed to make Database connection"))
+        for app_name, model_names in models_to_clear:
+            for model_name in model_names:
+                ye_model = apps.get_model(app_name, model_name)
+                (del_cnt, _ignore) = ye_model.objects.all().delete()
+                self.stdout.write(self.style.SUCCESS(f"{app_name}.{model_name} {del_cnt} instance(s) deleted."))
+
+        self.stdout.write(self.style.SUCCESS(f">> Data deletion complete."))
+

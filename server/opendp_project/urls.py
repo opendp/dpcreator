@@ -72,7 +72,7 @@ urlpatterns = [
     ]
 
 if settings.USE_DEV_STATIC_SERVER:
-    print('Adding static url!!')
+    #print('Adding static url!!')
     print(f'Serving directory "{settings.STATIC_ROOT}" from url "{settings.STATIC_URL}"')
     urlpatterns += staticfiles_urlpatterns()
     #urlpatterns += static(settings.STATIC_URL,
