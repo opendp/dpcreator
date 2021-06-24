@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col offset-sm="1" sm="10" md="12" offset-md="0">
-        <h2 class="title-size-1 text-center mb-10">Terms of Service</h2>
+        <h2 class="title-size-1 text-center mb-10">{{ $t('home.service section title') }}</h2>
         <LinearBox
             :class="{
             'mb-6': $vuetify.breakpoint.xsOnly,
@@ -54,7 +54,7 @@
         <Checkbox
             :class="{ 'width80 mx-auto': $vuetify.breakpoint.xsOnly }"
             :value.sync="termsOfServiceCheckbox"
-            text="I have read and agree to the Terms of Service."
+            :text=checkboxString
         />
       </v-col>
     </v-row>
@@ -81,6 +81,14 @@ export default {
   },
   data: () => ({
     termsOfServiceCheckbox: false,
-  })
+
+  }),
+  computed: {
+    checkboxString() {
+      return this.$t('home.checkbox')
+    }
+  }
+
+
 };
 </script>

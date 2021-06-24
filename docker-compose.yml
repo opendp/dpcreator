@@ -12,6 +12,7 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - DB_HOST=localhost
     ports:
       - "5432:5432"
   # TODO: Load data every time
@@ -33,7 +34,7 @@ services:
     # these variables to point to a standalone instance
     env_file:
       - .env
-    command: python manage.py runserver 0.0.0.0:8000
+    command: sh -c "python manage.py show_debug_params && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
     ports:
