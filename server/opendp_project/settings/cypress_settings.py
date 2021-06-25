@@ -18,10 +18,13 @@ from opendp_project.settings.base import *
 
 DEBUG = True
 
+# (1) This app includes the "clear_test_data" management command
+INSTALLED_APPS += ['opendp_apps.cypress_utils']
+
+# (2) This ROOT_URLCONF adds the API endpoint and view which uses the "clear_test_data" management command
 ROOT_URLCONF = 'opendp_project.urls_cypress'
 
-ALLOW_CYPRESS_TEST_ENDPOINT = 'cypress-in-ci-endpoint'
+# (3) ALLOW_CYPRESS_ENDPOINT value is set
+ALLOW_CYPRESS_ENDPOINT = 'cypress-in-ci-endpoint'
 
-# Include the clear data management command
-INSTALLED_APPS += ['opendp_apps.cypress_utils']
 

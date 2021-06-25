@@ -8,12 +8,24 @@ def clear_test_data(request):
     """
     Should only be available during cypress tests
     """
+    if not request.user.is_authenticated:
+        return JsonResponse({'success': False,
+                             'message': 'nothing 1'},
+                            status=404)
+
+    if not request.user.is_superuser:
+        return JsonResponse({'success': False,
+                             'message': 'nothing 2'},
+                            status=404)
 
     # Note: this check is made again in the command
     #
     if not are_cypress_settings_in_place():
-        raise Http404('nothing here')
+        return JsonResponse({'success': False,
+                             'message': 'nothing 3'},
+                            status=404)
 
     call_command('clear_test_data')
+
     return JsonResponse({'success': True,
                          'message': 'Data cleared'})

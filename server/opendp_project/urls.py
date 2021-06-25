@@ -58,17 +58,18 @@ urlpatterns = [
     path('api/', include(router.urls)),
     # For testing
     path('dv-mock-api/', include('opendp_apps.dataverses.mock_urls')),
-                  url(r'^user-details/$',
-                      TemplateView.as_view(template_name="user_details.html"),
-                      name='user-details'),
-                  url(r'^rest-auth/', include('dj_rest_auth.urls')),
-                  url(r'^rest-auth/registration/', OpenDPRegister.as_view(), name='opendp-register'),
-                  url(r'^rest-auth/registration/', include('dj_rest_auth.registration.urls')),
-                  url(r'^account/', include('allauth.urls')),
-                  url(r'^accounts/profile/$', RedirectView.as_view(url='/', permanent=True), name='profile-redirect'),
-                  url(r'^rest-auth/google/$', GoogleLogin.as_view(), name='google-login'),
-                  # Putting all vue-related views under "ui/" for now to separate from the api.
-                  url(r'^.*$', TemplateView.as_view(template_name="index.html"), name='vue-home'),
+
+    url(r'^user-details/$',
+      TemplateView.as_view(template_name="user_details.html"),
+      name='user-details'),
+    url(r'^rest-auth/', include('dj_rest_auth.urls')),
+    url(r'^rest-auth/registration/', OpenDPRegister.as_view(), name='opendp-register'),
+    url(r'^rest-auth/registration/', include('dj_rest_auth.registration.urls')),
+    url(r'^account/', include('allauth.urls')),
+    url(r'^accounts/profile/$', RedirectView.as_view(url='/', permanent=True), name='profile-redirect'),
+    url(r'^rest-auth/google/$', GoogleLogin.as_view(), name='google-login'),
+    # Putting all vue-related views under "ui/" for now to separate from the api.
+    url(r'^.*$', TemplateView.as_view(template_name="index.html"), name='vue-home'),
     ]
 
 if settings.USE_DEV_STATIC_SERVER:

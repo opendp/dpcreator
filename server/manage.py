@@ -5,6 +5,7 @@ import sys
 
 
 def main():
+    print('DJANGO_SETTINGS_MODULE', os.environ.get('DJANGO_SETTINGS_MODULE'))
 
     # use seperate settings.py for tests
     if 'test' in sys.argv:
