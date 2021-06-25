@@ -1,6 +1,10 @@
 version: "3.8"
 
 services:
+  # ---------------------------------
+  # Client side (Vue.js)
+  #  - Built static files
+  # ---------------------------------
   client:
     build: "./client"
     command: ./run_client.sh

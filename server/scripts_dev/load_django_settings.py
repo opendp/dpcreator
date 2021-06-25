@@ -20,7 +20,7 @@ def load_local_settings():
 
     if not 'DJANGO_SETTINGS_MODULE' in os.environ:
         os.environ.setdefault('DJANGO_SETTINGS_MODULE',
-                              'opendp_project.settings')
+                              'opendp_project.settings.development')
 
     import django
     try:

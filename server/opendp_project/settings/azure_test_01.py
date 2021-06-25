@@ -1,5 +1,4 @@
-import os
-from .settings import *
+from opendp_project.settings.base import *
 
 # ----------------------------------
 # Azure specific settings

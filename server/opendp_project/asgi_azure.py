@@ -13,7 +13,7 @@ import django
 from channels.http import AsgiHandler
 from channels.routing import ProtocolTypeRouter
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opendp_project.settings_azure_test_01')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opendp_project.settings.azure_test_01')
 
 django.setup()
 
