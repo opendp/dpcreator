@@ -4,6 +4,8 @@ Allow deletion of data in between cypress tests
 from django.apps import apps
 from django.core.management.base import BaseCommand
 from opendp_apps.cypress_utils.check_setup import are_cypress_settings_in_place
+from opendp_apps.cypress_utils import static_vals as cystatic
+
 
 class Command(BaseCommand):
     help = "Deletes data for Cypress tests"
@@ -13,7 +15,7 @@ class Command(BaseCommand):
 
         # Important check!!
         if not are_cypress_settings_in_place(): # Do not remove this check
-            self.stdout.write(self.style.ERROR('This command is reserved for cypress testing'))
+            self.stdout.write(self.style.ERROR(cystatic.MESSAGE_CLEAR_DATA_CMD_ERR))
             return
 
         models_to_clear = [ ('terms_of_access', ['TermsOfAccessLog', 'TermsOfAccess']),
