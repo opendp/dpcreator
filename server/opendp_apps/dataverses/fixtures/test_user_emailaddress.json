@@ -1,0 +1,12 @@
+[
+  {
+    "model": "account.emailaddress",
+    "pk": 2,
+    "fields": {
+      "email": "r@r.com",
+      "verified": true,
+      "primary": true,
+      "user_id": 2
+    }
+  }
+]

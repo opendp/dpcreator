@@ -2,11 +2,7 @@
   <div class="confirmVariablesPage">
     <h1 class="title-size-1">Confirm variables</h1>
     <p>
-      First, you have to review, adjust, and confirm the variables of your
-      dataset. These will be considered in the generation of the differential
-      privacy release. To adjust the necessary parameters to complete the
-      process, you will need to set a valid range depending on the variable's
-      type in the table below.
+      {{ $t('confirm variables.confirm variables intro') }}
     </p>
     <ColoredBorderAlert type="warning">
       <template v-slot:content>
@@ -37,16 +33,14 @@
       </template>
       <template v-slot:[`header.type`]="{ header }">
         {{ header.text }}
-        <QuestionIconTooltip
-            text="Type is inferred. Edit it in the original file."
+        <DynamicQuestionIconTooltip
+            locale-tag="confirm variables.help type"
         />
       </template>
       <template v-slot:[`header.additional_information`]="{ header }">
         {{ header.text }}
-        <QuestionIconTooltip
-            text="E.g.
-Numerical: min: X - max: Y
-Categorical: cat1, cat2, cat3,…"
+        <DynamicQuestionIconTooltip
+            locale-tag="confirm variables.help variable"
         />
       </template>
       <template v-slot:[`item.index`]="{ index }">
@@ -183,11 +177,13 @@ import QuestionIconTooltip from "../../components/DynamicHelpResources/QuestionI
 import ColoredBorderAlert from "../../components/DynamicHelpResources/ColoredBorderAlert.vue";
 import LoadingBar from "../../components/LoadingBar.vue";
 import ChipSelectItem from "../../components/DesignSystem/ChipSelectItem.vue";
+import DynamicQuestionIconTooltip from "@/components/DynamicHelpResources/DynamicQuestionIconTooltip";
 export default {
   name: "ConfirmVariables",
   components: {
     LoadingBar,
     QuestionIconTooltip,
+    DynamicQuestionIconTooltip,
     ColoredBorderAlert,
     ChipSelectItem
   },

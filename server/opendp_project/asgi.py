@@ -15,7 +15,7 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.http import AsgiHandler
 from opendp_apps.async_messages import routing as async_routing
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opendp_project.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opendp_project.settings.development')
 
 django.setup()
 

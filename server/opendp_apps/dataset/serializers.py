@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_polymorphic.serializers import PolymorphicSerializer
 
+from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.dataset.models import DataSetInfo, DataverseFileInfo, UploadFileInfo
 from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.user.models import OpenDPUser
@@ -14,7 +15,13 @@ class DataSetInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DataSetInfo
-        fields = ['object_id', 'name', 'creator', 'source', 'status', 'status_name']
+        fields = ['object_id', 'name', 'created', 'creator', 'source', 'status', 'status_name']
+
+
+class DepositorSetupInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DepositorSetupInfo
+        fields = '__all__'
 
 
 class DataverseFileInfoSerializer(DataSetInfoSerializer):
@@ -27,12 +34,17 @@ class DataverseFileInfoSerializer(DataSetInfoSerializer):
                                                      read_only=False,
                                                      source='dv_installation')
 
+    depositor_setup_info = DepositorSetupInfoSerializer(read_only=True)
+
+    dataset_schema_info = serializers.JSONField(read_only=True)
+
+    file_schema_info = serializers.JSONField(read_only=True)
+
     class Meta:
         model = DataverseFileInfo
-        fields = ['object_id', 'name',
-                  'creator',
-                  'installation_name', 'dataverse_file_id', 'dataset_doi', 'file_doi',
-                  'status', 'status_name']
+        fields = ['object_id', 'name', 'created', 'creator', 'installation_name', 'dataverse_file_id', 'dataset_doi',
+                  'file_doi', 'status', 'status_name', 'depositor_setup_info', 'dataset_schema_info',
+                  'file_schema_info']
         extra_kwargs = {
             'url': {'view_name': 'dataset-info-list'},
         }
@@ -45,7 +57,7 @@ class UploadFileInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UploadFileInfo
-        fields = ['object_id', 'name', 'creator', 'data_file', 'status', 'status_name']
+        fields = ['object_id', 'name', 'created', 'creator', 'data_file', 'status', 'status_name']
         extra_kwargs = {
             'url': {'view_name': 'dataset-info-list'},
         }

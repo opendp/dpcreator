@@ -46,8 +46,9 @@
             </v-col>
           </v-row>
           <MyDataTable
+              v-if="!loading"
               :class="{ 'my-5': $vuetify.breakpoint.smAndUp }"
-              :datasets="variables"
+              :datasets="datasetList"
               :searchTerm="search"
               :itemsPerPage="5"
           />
@@ -62,63 +63,24 @@
 import ColoredBorderAlert from "../components/DynamicHelpResources/ColoredBorderAlert.vue";
 import MyDataTable from "../components/MyData/MyDataTable.vue";
 import SupportBanner from "../components/SupportBanner.vue";
+import {mapGetters, mapState} from "vuex";
 export default {
   name: "MyData",
   components: {MyDataTable, ColoredBorderAlert, SupportBanner},
+  created() {
+    this.$store.dispatch('dataset/setDatasetList')
+        .then(() => {
+          this.loading = false
+        })
 
+  },
+  computed: {
+    ...mapState('dataset', ['datasetList']),
+  },
   data: () => ({
+    loading: true,
     search: "",
-    // TODO: This data should be loaded from the backend
-    variables: [
-      {
-        dataset: "California Demographic Dataset",
-        status: "in_progress",
-        remainingTime: "Expired",
-        datasetId: "exampleInProgress"
-      },
-      {
-        dataset: "Tokio Demographic Dataset",
-        status: "in_execution",
-        remainingTime: "10h 30m",
-        datasetId: "exampleInExecution"
-      },
-      {
-        dataset: "USA Demographic Dataset",
-        status: "error",
-        remainingTime: "5h 42m",
-        datasetId: "exampleError"
-      },
-      {
-        dataset: "Example Demographic Dataset",
-        status: "completed",
-        remainingTime: "-",
-        datasetId: "exampleCompleted"
-      },
-      {
-        dataset: "Tokio Demographic Dataset",
-        status: "in_execution",
-        remainingTime: "-",
-        datasetId: "exampleInExecution"
-      },
-      {
-        dataset: "USA Demographic Dataset",
-        status: "error",
-        remainingTime: "-",
-        datasetId: "exampleError"
-      },
-      {
-        dataset: "Tokio Demographic Dataset",
-        status: "in_execution",
-        remainingTime: "-",
-        datasetId: "exampleInExecution"
-      },
-      {
-        dataset: "USA Demographic Dataset",
-        status: "error",
-        remainingTime: "-",
-        datasetId: "exampleError"
-      }
-    ]
+
   })
 };
 </script>

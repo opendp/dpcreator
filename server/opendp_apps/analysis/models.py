@@ -24,24 +24,25 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         STEP_9300_PROFILING_FAILED = 'error_9300', 'Error 3: Profiling Failed'
         STEP_9400_CREATE_RELEASE_FAILED = 'error_9400', 'Error 4: Create Release Failed'
 
-    # each dataset can only have one DepositorSetupInfo object
-    dataset = models.OneToOneField('dataset.DataSetInfo',
-                                   on_delete=models.PROTECT)
+    # user who initially added/uploaded data
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                on_delete=models.PROTECT)
     is_complete = models.BooleanField(default=False)
     user_step = models.CharField(max_length=128,
-                                 choices=DepositorSteps.choices)
+                                 choices=DepositorSteps.choices,
+                                 default=DepositorSteps.STEP_0100_UPLOADED)
     epsilon = models.FloatField(null=True, blank=True)
-    dataset_questions = models.JSONField(null=True)
-    variable_ranges = models.JSONField(null=True)
-    variable_categories = models.JSONField(null=True)
+    dataset_questions = models.JSONField(null=True, blank=True)
+    variable_ranges = models.JSONField(null=True, blank=True)
+    variable_categories = models.JSONField(null=True, blank=True)
 
     class Meta:
         verbose_name = 'Depositor Setup Data'
         verbose_name_plural = 'Depositor Setup Data'
-        ordering = ('dataset', '-created')
+        ordering = ('dataversefileinfo', '-created', )
 
     def __str__(self):
-        return f'{self.dataset} - {self.user_step}'
+        return f'{self.dataversefileinfo} - {self.user_step}'
 
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the STEP
@@ -114,4 +115,3 @@ class ReleaseInfo(TimestampedModelWithUUID):
         verbose_name = 'Release Information'
         verbose_name_plural = 'Release Information'
         ordering = ('dataset', '-created')
-

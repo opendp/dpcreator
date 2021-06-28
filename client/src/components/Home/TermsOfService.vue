@@ -2,18 +2,49 @@
   <v-container>
     <v-row>
       <v-col offset-sm="1" sm="10" md="12" offset-md="0">
-        <h2 class="title-size-1 text-center mb-10">Terms of Service</h2>
+        <h2 class="title-size-1 text-center mb-10">{{ $t('home.service section title') }}</h2>
         <LinearBox
-            v-for="(term, index) in termsOfService"
-            :key="index"
             :class="{
             'mb-6': $vuetify.breakpoint.xsOnly,
             'mb-12': $vuetify.breakpoint.smAndUp
           }"
         >
           <template v-slot:content>
-            <h2 class="title-size-1">{{ term.title }}</h2>
-            <p class="grey--text text--darken-2">{{ term.content }}</p>
+            <h2 class="title-size-1">{{ $t('home.service1 title') }}</h2>
+            <p class="grey--text text--darken-2">{{ $t('home.service1 text') }}</p>
+          </template>
+        </LinearBox>
+        <LinearBox
+            :class="{
+            'mb-6': $vuetify.breakpoint.xsOnly,
+            'mb-12': $vuetify.breakpoint.smAndUp
+          }"
+        >
+          <template v-slot:content>
+            <h2 class="title-size-1">{{ $t('home.service2 title') }}</h2>
+            <p class="grey--text text--darken-2">{{ $t('home.service2 text') }}</p>
+          </template>
+        </LinearBox>
+        <LinearBox
+            :class="{
+            'mb-6': $vuetify.breakpoint.xsOnly,
+            'mb-12': $vuetify.breakpoint.smAndUp
+          }"
+        >
+          <template v-slot:content>
+            <h2 class="title-size-1">{{ $t('home.service3 title') }}</h2>
+            <p class="grey--text text--darken-2">{{ $t('home.service3 text') }}</p>
+          </template>
+        </LinearBox>
+        <LinearBox
+            :class="{
+            'mb-6': $vuetify.breakpoint.xsOnly,
+            'mb-12': $vuetify.breakpoint.smAndUp
+          }"
+        >
+          <template v-slot:content>
+            <h2 class="title-size-1">{{ $t('home.service4 title') }}</h2>
+            <p class="grey--text text--darken-2">{{ $t('home.service4 text') }}</p>
           </template>
         </LinearBox>
       </v-col>
@@ -23,7 +54,7 @@
         <Checkbox
             :class="{ 'width80 mx-auto': $vuetify.breakpoint.xsOnly }"
             :value.sync="termsOfServiceCheckbox"
-            text="I have read and agree to the Terms of Service."
+            :text=checkboxString
         />
       </v-col>
     </v-row>
@@ -50,28 +81,14 @@ export default {
   },
   data: () => ({
     termsOfServiceCheckbox: false,
-    termsOfService: [
-      {
-        title: "Who should use this tool and why?",
-        content:
-            "Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi iusto in, voluptas quia fugiat soluta labore consectetur harum repellendus accusamus quisquam quasi velit vero totam, optio assumenda atque obcaecati eum!"
-      },
-      {
-        title: "What statistics can be released using this tool?",
-        content:
-            "Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi iusto in, voluptas quia fugiat soluta labore consectetur harum repellendus accusamus quisquam quasi velit vero totam, optio assumenda atque obcaecati eum!"
-      },
-      {
-        title: "What type of files are appropiate?",
-        content:
-            "Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi iusto in, voluptas quia fugiat soluta labore consectetur harum repellendus accusamus quisquam quasi velit vero totam, optio assumenda atque obcaecati eum!"
-      },
-      {
-        title: "What can be done with the DP release?",
-        content:
-            "Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi iusto in, voluptas quia fugiat soluta labore consectetur harum repellendus accusamus quisquam quasi velit vero totam, optio assumenda atque obcaecati eum!"
-      }
-    ]
-  })
+
+  }),
+  computed: {
+    checkboxString() {
+      return this.$t('home.checkbox')
+    }
+  }
+
+
 };
 </script>

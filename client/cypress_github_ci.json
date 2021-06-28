@@ -1,0 +1,5 @@
+{
+  "defaultCommandTimeout": 4000,
+  "pageLoadTimeout": 4000,
+  "baseUrl": "http://server:8000"
+}

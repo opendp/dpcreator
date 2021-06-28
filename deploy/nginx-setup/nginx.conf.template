@@ -1,0 +1,92 @@
+#
+# This .conf files uses two settings from environment variables
+#   (1) NGINX_MAX_UPLOAD_SIZE
+#       This is the maximum upload size allowed via nginx. Note that his number should match
+#       Django's DATA_UPLOAD_MAX_MEMORY_SIZE and FILE_UPLOAD_MAX_MEMORY_SIZE
+#       Example value for a 20M file:
+#       - NGINX_MAX_UPLOAD_SIZE="20M"
+#
+#   (2) NGINX_SERVER_NAME
+#       - Example 1: NGINX_SERVER_NAME=dev.dpcreator.org
+#       - Example 2: NGINX_SERVER_NAME=.dpcreator.org
+#              - Matches dpcreator.org, www.dpcreator.org, applepie.dpcreator.org, etc
+#
+
+events { worker_connections 1024; }
+
+
+http {
+    # Note: this upload size is also dependent on
+    # Django's DATA_UPLOAD_MAX_MEMORY_SIZE and FILE_UPLOAD_MAX_MEMORY_SIZE
+    #
+    client_max_body_size ${NGINX_MAX_UPLOAD_SIZE};
+
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    # "dpcreator-app" is the name of the
+    #
+    upstream dpcreator-app {
+        server localhost:8000;
+    }
+
+    server {
+
+        listen 80;
+        listen [::]:80;
+
+        # nginx doc note: A special wildcard name in the form ".example.org"
+        # can be used to match both the exact name "example.org"
+        # and the wildcard name "*.example.org".
+        #
+        server_name ${NGINX_SERVER_NAME};
+
+        # serve static files
+        #  - Same value as STATIC_URL in Django settings
+        #  - Example:
+        #       static file -> "some.js"
+        #       - url: dev.dpcreator.org/static/dist/js/some.js
+        #       - location: "/static/"
+        #       - root: "/dpcreator_volume" where the actual path is
+        #           - /dpcreator_volume/static/dist/js/some.js
+        #
+        location /static/ {
+            #
+            # This path needs to follow the STATIC_ROOT in Django settings
+            #
+            #  - opendp_project/settings/azure_test_01.py
+            #
+            root /dpcreator_volume;
+            #autoindex on;
+        }
+
+
+        # handle websocket requests
+        #
+        location /ws {
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+
+            proxy_set_header  Host $host;
+            proxy_redirect off;
+
+
+            proxy_pass http://dpcreator-app;
+        }
+
+        # django app with main UI
+        #
+        location / {
+
+            proxy_set_header  Host $host;
+            # proxy_set_header  X-Real-IP $remote_addr;
+            # proxy_set_header  Client-IP $remote_addr;
+            proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header  X-Forwarded-Host $server_name;
+
+            proxy_pass http://dpcreator-app;
+        }
+
+    }
+}

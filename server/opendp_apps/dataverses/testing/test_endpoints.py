@@ -62,7 +62,6 @@ class BaseEndpointTest(TestCase):
             'dv_handoff': '9e7e5506-dd1a-4979-a2c1-ec6e59e4769c',
         }
 
-
     def set_mock_requests(self, req_mocker):
         """
         Set up test urls that are used by the requests library
@@ -260,7 +259,7 @@ class DataversePostTest(BaseEndpointTest):
 @requests_mock.Mocker()
 class DataversePutTest(BaseEndpointTest):
 
-    url = reverse('dv-user-detail', kwargs={'pk': '4472310a-f591-403a-b8d6-dfb562f8b32f'})
+    url = reverse('dv-user-detail', kwargs={'object_id': '4472310a-f591-403a-b8d6-dfb562f8b32f'})
 
     #@skip
     def test_10_successful_update(self, req_mocker):
@@ -278,7 +277,7 @@ class DataversePutTest(BaseEndpointTest):
         # Update the user
         # ---------------------------
         orig_user = DataverseUser.objects.get(pk=2)
-        url = reverse('dv-user-detail', kwargs={'pk': orig_user.object_id})
+        # url = reverse('dv-user-detail', kwargs={'pk': orig_user.object_id})
         #print('orig_user', orig_user, orig_user.id, orig_user.last_name, orig_user.first_name)
 
         response = self.client.put(self.url, data=self.dv_user_api_input_01, format='json')
@@ -307,7 +306,7 @@ class DataversePutTest(BaseEndpointTest):
         data = self.dv_user_api_input_01
         data['user'] = 0
         # Non-existent user object id
-        url = reverse('dv-user-detail', kwargs={'pk': '1234567a-f591-403a-b8d6-dfb562f8b32f'})
+        url = reverse('dv-user-detail', kwargs={'object_id': '1234567a-f591-403a-b8d6-dfb562f8b32f'})
 
         response = self.client.put(url, data=data, format='json')
         msg(response.content)
@@ -321,7 +320,7 @@ class DataversePutTest(BaseEndpointTest):
 
         self.set_mock_requests(req_mocker)
 
-        url = reverse('dv-user-detail', kwargs={'pk': '4472310a-f591-403a-b8d6-dfb562f8b32f'})
+        # url = reverse('dv-user-detail', kwargs={'pk': '4472310a-f591-403a-b8d6-dfb562f8b32f'})
 
         dataverse_handoff = DataverseHandoff.objects.first()
         dataverse_handoff.site_url = 'www.invalidsite.com'
@@ -350,7 +349,7 @@ class DataversePutTest(BaseEndpointTest):
         dataverse_handoff = DataverseHandoff.objects.first()
         dataverse_handoff.apiGeneralToken = 'invalid_token_1234'
         dataverse_handoff.save()
-        url = reverse('dv-user-detail', kwargs={'pk': '4472310a-f591-403a-b8d6-dfb562f8b32f'})
+        # url = reverse('dv-user-detail', kwargs={'pk': '4472310a-f591-403a-b8d6-dfb562f8b32f'})
 
         response = self.client.put(self.url, data=self.dv_user_api_input_01, format='json')
         msg(response.content)

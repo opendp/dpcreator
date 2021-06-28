@@ -1,4 +1,10 @@
 export default {
+    uploaded: {
+        label: "Uploaded",
+        color: "blue lighten-3",
+        icon: "",
+        availableActions: ["viewDetails", "continueWorkflow"]
+    },
     in_progress: {
         label: "In progress",
         color: "blue lighten-3",
@@ -24,6 +30,7 @@ export default {
         availableActions: ["viewDetails"]
     },
     statuses: {
+        UPLOADED: "uploaded",
         IN_PROGRESS: "in_progress",
         IN_EXECUTION: "in_execution",
         ERROR: "error",

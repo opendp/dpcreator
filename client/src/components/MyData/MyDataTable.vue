@@ -27,7 +27,7 @@
         <span class="index-td hidden-xs-only grey--text">{{ index + 1 }}</span>
       </template>
       <template v-slot:[`item.status`]="{ item }">
-        <StatusTag :status="item.status"/>
+        <StatusTag :status="stepInformation[item.status].workflowStatus"/>
       </template>
       <template v-slot:[`item.remainingTime`]="{ item }">
         <span
@@ -39,7 +39,7 @@
       </template>
       <template v-slot:[`item.options`]="{ item }">
         <Button
-            v-for="(action, index) in statusInformation[item.status]
+            v-for="(action, index) in statusInformation[stepInformation[item.status].workflowStatus]
             .availableActions"
             :key="action + '-' + index"
             small
@@ -171,6 +171,7 @@
 <script>
 import statusInformation from "../../data/statusInformation";
 import actionsInformation from "../../data/actionsInformation";
+import stepInformation from "@/data/stepInformation";
 import StatusTag from "../DesignSystem/StatusTag.vue";
 import Button from "../DesignSystem/Button.vue";
 import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
@@ -212,13 +213,14 @@ export default {
       search: "",
       headers: [
         {value: "num"},
-        {text: "Dataset", value: "dataset"},
+        {text: "Dataset", value: "name"},
         {text: "Status", value: "status"},
-        {text: "Remaining time to complete release", value: "remainingTime"},
+        //  {text: "Remaining time to complete release", value: "remainingTime"},
         {text: "Options", value: "options", align: "end"}
       ],
       statusInformation,
       actionsInformation,
+      stepInformation,
       VIEW_DETAILS,
       CONTINUE_WORKFLOW,
       CANCEL_EXECUTION

@@ -15,7 +15,12 @@
               <strong>use the desktop version of the app.</strong>
             </template>
           </ColoredBorderAlert>
-          <CreateDPStatistics v-bind:fileInfo="fileInfo"/>
+          <ColoredBorderAlert type="warning" v-if="fileLocked">
+            <template v-slot:content>
+              File is locked by another user
+            </template>
+          </ColoredBorderAlert>
+          <CreateDPStatistics v-if="!loading && !fileLocked" v-bind:fileInfo="uploadedFile"/>
           <h2
               class="title-size-2 font-weight-bold mt-16"
               :class="{
@@ -25,11 +30,12 @@
             My Data
           </h2>
           <MyDataTable
+              v-if="!loading"
               :class="{
               'my-7': $vuetify.breakpoint.xsOnly,
               'my-5': $vuetify.breakpoint.smAndUp
             }"
-              :datasets="variables"
+              :datasets="datasetList"
               :paginationVisible="false"
               :itemsPerPage="5"
           />
@@ -72,17 +78,29 @@ export default {
   },
 
   created() {
-    this.$store.dispatch('auth/fetchUser')
+    Promise.all(
+        [this.$store.dispatch('auth/fetchUser'),
+          this.$store.dispatch('dataset/setDatasetList')])
+        .then(() => {
+          this.loading = false
+          console.log('file locked: ' + this.fileLocked)
+        })
+
   },
   computed: {
     ...mapGetters('auth', ['isAuthenticated']),
     ...mapState('auth', ['user']),
-    ...mapState('dataverse', ['fileInfo']),
+    ...mapState('dataverse', ['fileLocked']),
+    ...mapState('dataset', ['datasetList']),
+    uploadedFile() {
+      return this.datasetList ? this.datasetList[0] : null
+    },
     username() {
       return (this.user) ? this.user.username : null
     }
   },
   data: () => ({
+    loading: true,
     variables: [
       {
         dataset: "California Demographic Dataset",

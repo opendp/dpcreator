@@ -12,8 +12,10 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import json
 import os
 
+from distutils.util import strtobool
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 # Quick-start development settings - unsuitable for production
@@ -146,7 +148,7 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME', 'postgres'),
         'USER': os.getenv('DB_USER', 'postgres'),
         'PASSWORD': os.getenv('DB_PASSWORD', 'postgres'),
-        'PORT': os.getenv('DB_PORT', 5432),
+        'PORT': int(os.getenv('DB_PORT', 5432)),
     }
 }
 
@@ -187,12 +189,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/dist')
+STATIC_URL = os.environ.get('STATIC_URL', '/static/')
+STATIC_ROOT = os.getenv('STATIC_ROOT', os.path.join(BASE_DIR, 'static', 'dist'))
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
+
+USE_DEV_STATIC_SERVER = strtobool(os.environ.get('USE_DEV_STATIC_SERVER', 'True'))
 
 # global settings for the REST framework
 REST_FRAMEWORK = {
@@ -205,12 +209,31 @@ REST_FRAMEWORK = {
 }
 
 
-# possible reason to split up settings files >
+# -----------------------------------
+# Handling uploaded files
+# -----------------------------------
 
+# (1) If using nginx, should be the same value as NGINX_MAX_UPLOAD_SIZE
+# ref: https://docs.djangoproject.com/en/3.2/ref/settings/#std:setting-DATA_UPLOAD_MAX_MEMORY_SIZE
+# 20971520 bytes = 20 MB
+#
+DATA_UPLOAD_MAX_MEMORY_SIZE = int(os.environ.get('DATA_UPLOAD_MAX_MEMORY_SIZE', '20971520'))
+
+# (2) If file exceed this size, it will be streamed to a "temp" location
+# ref: https://docs.djangoproject.com/en/3.2/ref/settings/#std:setting-FILE_UPLOAD_MAX_MEMORY_SIZE
+#  2621440 byes = 2.5 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = int(os.environ.get('FILE_UPLOAD_MAX_MEMORY_SIZE', '2621440'))
+# (2a) Where the file is streamed too -- needs to be secure!
+FILE_UPLOAD_TEMP_DIR = os.environ.get('FILE_UPLOAD_TEMP_DIR', '/tmp')
+
+# (3) Storage root for uploaded files
+#   - will be objects on cloud service. e.g. S3, Azure, etc.
+#
 UPLOADED_FILE_STORAGE_ROOT = os.path.join(BASE_DIR, 'test_setup', 'user_uploaded_data')
 if not os.path.isdir(UPLOADED_FILE_STORAGE_ROOT):
     os.makedirs(UPLOADED_FILE_STORAGE_ROOT)
 
+# -------------------------------------
 AUTHENTICATION_BACKENDS = (
  'django.contrib.auth.backends.ModelBackend',
  'allauth.account.auth_backends.AuthenticationBackend',
@@ -259,11 +282,11 @@ CORS_ALLOWED_ORIGINS = (
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
-EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = 'apikey' # this is exactly the value 'apikey'
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.sendgrid.net')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'apikey')
 EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY') \
     if os.environ.get('SENDGRID_API_KEY') else 'sendgrid-key-not-set'
-EMAIL_PORT = 587
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
 EMAIL_USE_TLS = True
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
@@ -294,6 +317,11 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
 
+# ---------------------------
+# Cookies
+# ---------------------------
+#SESSION_COOKIE_NAME = os.environ.get('SESSION_COOKIE_NAME', 'dpcreator')
+#CSRF_COOKIE_NAME = os.environ.get('CSRF_COOKIE_NAME', 'dpcreator_csrf')
 # discard a process after executing task, because automl solvers are incredibly leaky
 #CELERY_WORKER_MAX_TASKS_PER_CHILD = 1
 

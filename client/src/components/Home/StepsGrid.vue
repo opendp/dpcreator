@@ -39,13 +39,9 @@
         <ColoredBox class="step">
           <template v-slot:content>
             <RoundedNumber :number="1"/>
-            <h3 class="mb-5 grid-item__title">Sign up</h3>
-            <p class="grey--text text--darken-2">
-              Before starting, you have to
-              <strong
-              >make sure your data is appropriate to be processed</strong
-              >
-              with this tool by checking the following tips and terms of use.
+            <h3 class="mb-5 grid-item__title"> {{ $t("home.step1 title") }}</h3>
+            <p v-html="$t('home.step1 text')" class="grey--text text--darken-2">
+
             </p>
           </template>
         </ColoredBox>
@@ -61,12 +57,9 @@
         <ColoredBox class="step">
           <template v-slot:content>
             <RoundedNumber :number="2"/>
-            <h3 class="mb-5 grid-item__title">Start the process</h3>
-            <p class="grey--text text--darken-2">
-              When you log in you can start working with your Dataverse
-              file.<strong>
-              We’ll use the first 20 variables of your dataset.</strong
-            >
+            <h3 class="mb-5 grid-item__title">{{ $t("home.step2 title") }}</h3>
+            <p v-html="$t('home.step2 text')" class="grey--text text--darken-2">
+
             </p>
           </template>
         </ColoredBox>
@@ -82,16 +75,8 @@
         <ColoredBox class="step">
           <template v-slot:content>
             <RoundedNumber :number="3"/>
-            <h3 class="mb-5 grid-item__title">Work on release</h3>
-            <p class="grey--text text--darken-2">
-              You can work with your data in 5 steps: Validate Dataset, Confirm
-              variables, Set epsilon value, Create statistics, Generate DP
-              Release. You'll see more information about the steps during the
-              process, which
-              <strong
-              >you have to finish before 72 hours or the data will be deleted
-                from the tool.</strong
-              >
+            <h3 class="mb-5 grid-item__title">{{ $t('home.step3 title') }}</h3>
+            <p v-html="$t('home.step3 text')" class="grey--text text--darken-2">
             </p>
           </template>
         </ColoredBox>
@@ -107,12 +92,9 @@
         <ColoredBox class="step">
           <template v-slot:content>
             <RoundedNumber :number="4"/>
-            <h3 class="mb-5 grid-item__title">Check the release</h3>
-            <p class="grey--text text--darken-2">
-              Once you finish the steps,
-              <strong>the file has to be processed</strong> and it can take
-              minutes or hours.
-              <strong>You’ll receive an email when it's done.</strong>
+            <h3 class="mb-5 grid-item__title">{{ $t('home.step4 title') }}</h3>
+            <p v-html="$t('home.step4 text')" class="grey--text text--darken-2">
+
             </p>
           </template>
         </ColoredBox>

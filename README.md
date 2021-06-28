@@ -1,3 +1,8 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![integration tests](https://github.com/opendp/dpcreator/actions/workflows/cypress.yml/badge.svg)
+![python server side tests](https://github.com/opendp/dpcreator/actions/workflows/python-app.yml/badge.svg)
+
+****
 # The OpenDP Web Application
 
 ## Building with Docker Compose
@@ -97,3 +102,9 @@ INSTALLED_APPS = (
 6. Use a browser or viewer to view the created png file, found in the `server/` subdirectory
 
 (This is based on an [existing project](https://github.com/EugeneDae/django-vue-cli-webpack-demo) by EugeneDae. See his project for original documentation.)
+
+## Communication
+
+- You are very welcome to join us on [GitHub Discussions](https://github.com/opendp/opendp/discussions)!
+- Please use [GitHub Issues](https://github.com/opendp/dpcreator/issues) for bug reports and feature requests.
+- For other requests, including security issues, please contact us at [info@opendp.org](mailto:info@opendp.org).

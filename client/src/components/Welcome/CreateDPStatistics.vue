@@ -12,7 +12,7 @@
       statistics for this dataset:
     </p>
     <a href="" class="text-decoration-none font-weight-bold my-6 d-block">
-      {{ fileInfo.dataset_doi }} | {{ fileInfo.file_schema_info.name }} | {{ fileInfo.file_schema_info.description }}
+      {{ fileInfo.dataset_doi }} | {{ fileInfo.dataset_schema_info.name }} | {{ fileInfo.file_schema_info.name }}
     </a>
 
     <Button
@@ -37,9 +37,8 @@ export default {
   name: "CreateDPStatistics",
   props: ["fileInfo"],
 
-  //   TODO: This data should be extracted from the URL or other ways
-  data: () => ({
 
+  data: () => ({
     NETWORK_CONSTANTS
   })
 };
