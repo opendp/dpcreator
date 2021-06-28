@@ -17,7 +17,7 @@ sys.path.append(FAB_BASE_DIR)
 # Set the DJANGO_SETTINGS_MODULE, if it's not already
 # ----------------------------------------------------
 KEY_DJANGO_SETTINGS_MODULE = 'DJANGO_SETTINGS_MODULE'
-KEY_DEV_SETTINGS = 'opendp_project.settings'
+KEY_DEV_SETTINGS = 'opendp_project.settings.development'
 os.environ.setdefault(KEY_DJANGO_SETTINGS_MODULE,
                       KEY_DEV_SETTINGS)
 
@@ -38,8 +38,11 @@ def init_db(context):
     cmds = (f'{export_cmd};'
             f'python manage.py check;'
             f'python manage.py migrate;'
-            f'python manage.py loaddata opendp_apps/dataverses/fixtures/test_dataverses_01.json'
-            f' opendp_apps/dataverses/fixtures/test_manifest_params_04.json;')
+            f'python manage.py loaddata opendp_apps/dataverses/fixtures/*.json'
+            f' opendp_apps/dataset/fixtures/*.json;')
+#            f'python manage.py loaddata opendp_apps/dataverses/fixtures/test_dataverses_01.json'
+#            f' opendp_apps/dataverses/fixtures/test_manifest_params_04.json;')
+
 
     print("Run init_db")
     print(f'Commands: {cmds}')
