@@ -1,9 +1,11 @@
 node_modules
 client/node_modules
+client/src/locales/en.json
+client/cypress/screenshots
 server/db.sqlite3
 server/templates/base-vue.html
 server/static/dist/
-client/src/locales/en.json
+
 /.idea/
 /venv/
 Pipfile
