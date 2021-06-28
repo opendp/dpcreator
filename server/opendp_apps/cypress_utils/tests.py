@@ -8,12 +8,14 @@ from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.core.management.base import CommandError
 from django.core.management import call_command
+from django.conf import settings
 
 from rest_framework.test import APIClient
 
 from opendp_apps.model_helpers.msg_util import msg, msgt
 from opendp_apps.cypress_utils import static_vals as cystatic
 
+CYPRESS_SETTINGS_APP_NAME = 'opendp_apps.cypress_utils'
 
 test_01_settings = override_settings(
     ROOT_URLCONF='opendp_project.urls_cypress',
@@ -21,13 +23,13 @@ test_01_settings = override_settings(
 )
 
 test_02_settings_no_url = override_settings(
-    # ROOT_URLCONF='opendp_project.urls_cypress',
+    ROOT_URLCONF='opendp_project.urls',
     ALLOW_CYPRESS_ENDPOINT='cypress-in-ci-endpoint',
 )
 
 test_03_settings_no_cypress_val = override_settings(
     ROOT_URLCONF='opendp_project.urls_cypress',
-    # ALLOW_CYPRESS_ENDPOINT='cypress-in-ci-endpoint',
+    ALLOW_CYPRESS_ENDPOINT='wrong-val-here',
 )
 
 test_04_settings_bad_cypress_val = override_settings(
@@ -50,14 +52,14 @@ class TestClearData(TestCase):
         self.user_obj_admin, _created = get_user_model().objects.get_or_create(\
                                                     username='dev_admin', is_superuser=True)
 
+
     @test_01_settings
     def test_10_clear_data_success(self):
         """(10) Successfully clear the data"""
         msgt(self.test_10_clear_data_success.__doc__)
 
-
         with self.modify_settings(INSTALLED_APPS={
-            'append': 'opendp_apps.cypress_utils'}):
+            'append': CYPRESS_SETTINGS_APP_NAME}):
 
             # set DJANGO_SETTINGS_MODULE
             os.environ['DJANGO_SETTINGS_MODULE'] = 'opendp_project.settings.cypress_settings'
@@ -173,7 +175,11 @@ class TestClearData(TestCase):
             self.assertEquals('NoReverseMatch', err_obj.__class__.__name__)
 
         # Test management command in the same context
-        self.run_cmd_clear_test_data(expect_success=False, **dict(expect_command_error=True))
+        if CYPRESS_SETTINGS_APP_NAME in settings.INSTALLED_APPS:
+            self.run_cmd_clear_test_data(expect_success=True)
+        else:
+            self.run_cmd_clear_test_data(expect_success=False, **dict(expect_command_error=True))
+
 
     @test_03_settings_no_cypress_val
     def test_50_clear_data_fail_bad_cypress_val(self):
