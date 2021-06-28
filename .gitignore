@@ -3,6 +3,7 @@ client/node_modules
 server/db.sqlite3
 server/templates/base-vue.html
 server/static/dist/
+client/src/locales/en.json
 /.idea/
 /venv/
 Pipfile
