@@ -24,6 +24,8 @@ let options = {
 module.exports = (on, config) => {
     // `on` is used to hook into various events Cypress emits
     // `config` is the resolved Cypress config
-    require('cypress-terminal-report/src/installLogsPrinter')(on, options);
+
+    // the terminal-report plugin is only available in development mode
+    //  require('cypress-terminal-report/src/installLogsPrinter')(on, options);
 }
 
