@@ -16,14 +16,14 @@
         it('shows correct error message', () => {
             cy.visit('/')
             cy.get('div')
-                .should('contain', 'To create a DP Release, please make a request from an registered Dataverse installation')
+                .should('contain', 'To create a DP Release, please make a request from a registered Dataverse installation')
         })
     }),
         describe('The Home Page', () => {
             it('correctly renders locale text', () => {
                 cy.visit('/')
                 cy.get('p')
-                    .should('contain', 'This tool allows researchers to easily')
+                    .should('contain', 'DP Creator allows researchers to easily')
             })
         })
 }

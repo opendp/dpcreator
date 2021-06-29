@@ -51,11 +51,14 @@
     </v-row>
     <v-row>
       <v-col class="d-flex justify-center">
-        <Checkbox
-            :class="{ 'width80 mx-auto': $vuetify.breakpoint.xsOnly }"
-            :value.sync="termsOfServiceCheckbox"
-            :text=checkboxString
-        />
+        <div>
+          <Checkbox
+              data-test="termsOfServiceCheckbox"
+              :class="{ 'width80 mx-auto': $vuetify.breakpoint.xsOnly }"
+              :value.sync="termsOfServiceCheckbox"
+              :text=checkboxString
+          />
+        </div>
       </v-col>
     </v-row>
     <span></span>

@@ -1,6 +1,7 @@
 {
     describe('Dataverse Handoff mock-dv test', () => {
         it('Displays correct file on Welcome Page', () => {
+            cy.clearData()
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
                 console.log('runnable', runnable)
@@ -21,8 +22,13 @@
             cy.get('[data-test="submit button"]').click();
             cy.url().should('contains', '/?id=');
             cy.scrollTo("bottom");
-            cy.get('.v-input--selection-controls__ripple').click({force: true});
-            cy.get('#account-buttons--placeholder .v-btn--is-elevated > .v-btn__content').click();
+            cy.get('[data-test="termsOfServiceCheckbox"]').click({force: true});
+
+            // This get (below) is more readable, but it causes a cypress error saying that the element
+            // is detachached from the DOM.  Need to investigate further, but in the meantime, use the less
+            // readable get string.
+            //    cy.get('[data-test="loginButton"]').click({multiple:true});
+            cy.get('#account-buttons--placeholder .v-btn--is-elevated > .v-btn__content').click()
             cy.url().should('contain', 'log-in')
             cy.get('[data-test="username"]').type('dev_admin');
             cy.get('[data-test="password"]').type('admin');

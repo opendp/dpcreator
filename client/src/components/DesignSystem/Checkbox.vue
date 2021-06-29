@@ -1,5 +1,5 @@
 <template>
-  <v-checkbox v-model="checkboxValue" class="checkbox">
+  <v-checkbox :data-test=dataTest v-model="checkboxValue" class="checkbox">
     <template v-slot:label>
       <div
           class="primary--text"
@@ -33,6 +33,6 @@ export default {
       this.$emit("update:value", newCheckboxValue);
     }
   },
-  props: ["text", "value"]
+  props: ["text", "value", "dataTest"]
 };
 </script>
