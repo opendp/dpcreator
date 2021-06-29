@@ -33,7 +33,7 @@
         }),
         describe('Mock DV Request', () => {
             it('correctly redirects to homepage', () => {
-                cy.login()
+                cy.login('dev_admin', 'admin')
                 cy.request('/cypress-tests/clear-test-data/')
                 cy.visit('/mock-dv')
                 cy.get('#postOpenDP > .v-btn__content').click();
