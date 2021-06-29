@@ -24,10 +24,6 @@
             cy.url().should('contain', 'welcome')
 
             cy.visit('/my-data')
-            //        cy.visit('http://localhost:8000/my-data');
-//cy.url().should('contains', 'http://localhost:8000/my-data');
-//cy.get('tbody .text-start:nth-child(2)').dblclick();
-//cy.get('tbody .text-start:nth-child(2)').click();
 
             cy.get('tr').should('contain',
                 'Replication Data for: Eye-typing experiment')
