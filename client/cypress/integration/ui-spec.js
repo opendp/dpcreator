@@ -33,6 +33,12 @@
         }),
         describe('Mock DV Request', () => {
             it('correctly redirects to homepage', () => {
+                cy.on('uncaught:exception', (e, runnable) => {
+                    console.log('error', e)
+                    console.log('runnable', runnable)
+
+                    return false
+                })
                 cy.login('dev_admin', 'admin')
                 cy.request('/cypress-tests/clear-test-data/')
                 cy.visit('/mock-dv')
