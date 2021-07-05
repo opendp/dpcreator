@@ -1,6 +1,6 @@
 <template>
   <div class="wizard-page">
-    <v-container>
+    <v-container v-if="!loading">
       <v-row>
         <v-col>
           <v-stepper v-model="stepperPosition" id="wizard-content" alt-labels>
@@ -72,6 +72,7 @@ import GenerateDPRelease from "./WizardSteps/GenerateDPRelease.vue";
 import StepperHeader from "../components/Wizard/StepperHeader.vue";
 import WizardNavigationButtons from "../components/Wizard/WizardNavigationButtons.vue";
 import ValidateDataset from "./WizardSteps/ValidateDataset.vue";
+import {mapState} from "vuex";
 export default {
   name: "Wizard",
   components: {
@@ -83,13 +84,24 @@ export default {
     WizardNavigationButtons,
     ValidateDataset
   },
+  created() {
+    const objectId = this.$route.params.id
+    this.$store.dispatch('dataset/setDatasetInfo', objectId)
+        .then(() => {
+          this.loading = false
+        })
+
+  },
   methods: {
     updateStepStatus: function (stepNumber, completedStatus) {
       this.steps[stepNumber].completed = completedStatus;
     }
   },
-
+  computed: {
+    ...mapState('dataset', ['datasetInfo']),
+  },
   data: () => ({
+    loading: true,
     stepperPosition: 0,
     steps: [
       {
