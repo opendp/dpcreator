@@ -16,9 +16,15 @@
         ><v-icon color="primary" left>mdi-play</v-icon> Does your dataset
           depend on private information of subjects?</span
         >
-        <v-radio-group v-model="radioDependOnPrivateInformation" class="pl-2">
-          <RadioItem label="Yes." value="yes"/>
-          <!-- TODO: add the :on attribute to all options that should invalidate the dataset -->
+        <v-radio-group
+            v-model="radioDependOnPrivateInformation"
+            class="pl-2"
+            v-on:change="saveUserInput"
+        >
+          <RadioItem
+              label="Yes."
+              value="yes"
+          />
           <RadioItem
               label="No."
               value="no"
@@ -27,7 +33,10 @@
                 handleInvalidDataset('radioDependOnPrivateInformation')
             }"
           />
-          <RadioItem label="I'm unsure." value="unsure"/>
+          <RadioItem
+              label="I'm unsure."
+              value="unsure"
+          />
         </v-radio-group>
       </div>
 
@@ -42,13 +51,11 @@
             :disabled="radioBestDescribesShouldBeDisabled"
             v-model="radioBestDescribes"
             class="pl-2"
+            v-on:change="saveUserInput"
         >
           <RadioItem
               label="Public information."
               value="public"
-              :on="{
-              change: () => handleInvalidDataset('radioBestDescribes')
-            }"
           />
           <RadioItem value="notHarmButConfidential">
             <template v-slot:label>
@@ -115,6 +122,7 @@
             :disabled="radioOnlyOneIndividualPerRowShouldBeDisabled"
             v-model="radioOnlyOneIndividualPerRow"
             class="pl-2"
+            v-on:change="saveUserInput"
         >
           <RadioItem label="Yes." value="yes"/>
           <RadioItem
@@ -172,6 +180,8 @@ import AdditionalInformationAlert from "../../components/DynamicHelpResources/Ad
 import ColoredBorderAlert from "../../components/DynamicHelpResources/ColoredBorderAlert.vue";
 import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
 
+import {mapState, mapGetters} from "vuex";
+
 export default {
   components: {
     AdditionalInformationAlert,
@@ -187,7 +197,22 @@ export default {
     suitableDatasetDialogIsOpen: false,
     optionToUnset: ""
   }),
+  created() {
+    // Initialize questions with previously input values,
+    // if they exist
+    if (this.getDepositorSetupInfo.datasetQuestions !== null) {
+      this.radioDependOnPrivateInformation =
+          this.getDepositorSetupInfo.datasetQuestions.radioDependOnPrivateInformation
+      this.radioOnlyOneIndividualPerRow =
+          this.getDepositorSetupInfo.datasetQuestions.radioOnlyOneIndividualPerRow
+      this.radioBestDescribes =
+          this.getDepositorSetupInfo.datasetQuestions.radioBestDescribes
+
+    }
+  },
   computed: {
+    ...mapState('dataset', ['datasetInfo']),
+    ...mapGetters('dataset', ['getDepositorSetupInfo']),
     radioBestDescribesShouldBeDisabled: function () {
       return (
           this.radioDependOnPrivateInformation === "" ||
@@ -201,6 +226,19 @@ export default {
     }
   },
   methods: {
+    saveUserInput() {
+      const userInput = {
+        datasetQuestions: {
+          radioDependOnPrivateInformation: this.radioDependOnPrivateInformation,
+          radioBestDescribes: this.radioBestDescribes,
+          radioOnlyOneIndividualPerRow: this.radioOnlyOneIndividualPerRow,
+        }
+      }
+      const payload = {objectId: this.getDepositorSetupInfo.objectId, props: userInput}
+      this.$store.dispatch('dataset/updateDepositorSetupInfo',
+          payload)
+
+    },
     handleInvalidDataset: function (invalidOption) {
       this.optionToUnset = invalidOption;
       this.suitableDatasetDialogIsOpen = true;

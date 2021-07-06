@@ -44,9 +44,7 @@ export default {
   }),
   computed: {
     wizardPath() {
-      console.log(" CREATEDP STATISTICS ")
-      console.log(this.fileInfo)
-      return NETWORK_CONSTANTS.WIZARD.PATH + '/' + this.fileInfo.objectId
+       return NETWORK_CONSTANTS.WIZARD.PATH + '/' + this.fileInfo.objectId
     }
   }
 };
