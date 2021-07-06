@@ -10,10 +10,19 @@ const initialState = {
   datasetInfo: null
 };
 const getters = {
-  getDatasetList: state => {
-    return state.datasetList
-  },
-
+    getDatasetList: state => {
+        return state.datasetList
+    },
+    getDatasetInfo: state => {
+        return state.datasetInfo
+    },
+    getDepositorSetupInfo: state => {
+        if (state.datasetInfo) {
+            return state.datasetInfo.depositorSetupInfo
+        } else {
+            return null
+        }
+    }
 };
 const actions = {
   setDatasetList({commit, state}) {

@@ -12,7 +12,7 @@
       statistics for this dataset:
     </p>
     <a href="" class="text-decoration-none font-weight-bold my-6 d-block">
-      {{ fileInfo.dataset_doi }} | {{ fileInfo.dataset_schema_info.name }} | {{ fileInfo.file_schema_info.name }}
+      {{ fileInfo.datasetDoi }} | {{ fileInfo.datasetSchemaInfo.name }} | {{ fileInfo.fileSchemaInfo.name }}
     </a>
 
     <Button
@@ -22,7 +22,7 @@
         'width100 mx-auto': $vuetify.breakpoint.xsOnly
       }"
         :disabled="$vuetify.breakpoint.xsOnly"
-        :click="() => $router.push(NETWORK_CONSTANTS.WIZARD.PATH)"
+        :click="() => $router.push(wizardPath)"
         label="Start the process"
     />
   </div>
@@ -40,6 +40,14 @@ export default {
 
   data: () => ({
     NETWORK_CONSTANTS
-  })
+
+  }),
+  computed: {
+    wizardPath() {
+      console.log(" CREATEDP STATISTICS ")
+      console.log(this.fileInfo)
+      return NETWORK_CONSTANTS.WIZARD.PATH + '/' + this.fileInfo.objectId
+    }
+  }
 };
 </script>
