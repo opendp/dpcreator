@@ -19,10 +19,14 @@ import i18n from './i18n'
 
 Vue.mixin(titleMixin)
 
-new Vue({
+const app = new Vue({
   router,
   store,
   vuetify,
   i18n,
   render: h => h(App)
 }).$mount("#app");
+
+if (window.Cypress) {
+  window.app = app
+}

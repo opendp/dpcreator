@@ -29,8 +29,8 @@
                 required
             ></v-text-field>
             <v-text-field
-                v-model="fileId"
-                label="fileId"
+                v-model="filePid"
+                label="filePid"
                 required
             ></v-text-field>
             <v-text-field
@@ -41,6 +41,7 @@
 
             <Button
                 id="postOpenDP"
+                data-test="submit button"
                 classes="mt-5"
                 color="primary"
                 :class="{
@@ -84,28 +85,23 @@ export default {
   },
   methods: {
     handleFormSubmit: function () {
-      dataverse.testHandoff(this.site_url, this.fileId, this.datasetPid, this.token)
+      dataverse.testHandoff(this.site_url, this.fileId, this.datasetPid, this.filePid, this.token)
     },
 
 
   },
   data: () => ({
-    
     validForm: false,
     site_url: 'http://127.0.0.1:8000/dv-mock-api',
     fileId: '4164587',
     datasetPid: 'doi:10.7910/DVN/PUXVDH',
-    token: 'shoefly-dont-bother-m3'
-
-    /*
-    // https://dataverse.harvard.edu/file.xhtml?fileId=4498613&version=2.0
-     validForm: false,
-     site_url: 'https://dataverse.harvard.edu/',
-     fileId: '4498613',
-     datasetPid: 'doi:10.7910/DVN/VOB36N',
-     token: '<use harvard dv token>'
-     */
-
+    token: 'shoefly-dont-bother-m3',
+    filePid: 'doi:10.7910/DVN/PUXVDH'
+    // validForm: false,
+    // site_url: 'https://dataverse.harvard.edu/',
+    // fileId: '4498613',
+    // datasetPid: 'doi:10.7910/DVN/VOB36N',
+    // token: '<use harvard dv token>'
   })
 };
 </script>

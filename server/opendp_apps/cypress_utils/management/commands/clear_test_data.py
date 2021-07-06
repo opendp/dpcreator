@@ -18,11 +18,11 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR(cystatic.MESSAGE_CLEAR_DATA_CMD_ERR))
             return
 
-        models_to_clear = [ ('terms_of_access', ['TermsOfAccessLog', 'TermsOfAccess']),
-                            ('dataset', ['UploadFileInfo', 'DataverseFileInfo', 'DataSetInfo']),
-                            ('analysis', ['ReleaseInfo', 'AnalysisPlan', 'DepositorSetupInfo']),
-                            ('dataverses', ['ManifestTestParams', 'DataverseHandoff']),
-                            ]
+        models_to_clear = [('terms_of_access', ['TermsOfAccessLog', 'TermsOfAccess']),
+                           ('dataset', ['UploadFileInfo', 'DataverseFileInfo', 'DataSetInfo']),
+                           ('analysis', ['ReleaseInfo', 'AnalysisPlan', 'DepositorSetupInfo']),
+                           ('dataverses', ['DataverseHandoff']),
+                           ]
 
         self.stdout.write(self.style.WARNING('Preparing to delete test data'))
 

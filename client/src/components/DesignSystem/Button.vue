@@ -1,6 +1,7 @@
 <template>
   <v-btn
       class="button"
+      :data-test=dataTest
       :class="classes"
       :color="color"
       :disabled="disabled"
@@ -62,7 +63,8 @@ export default {
     "large",
     "small",
     "width",
-    "depressed"
+    "depressed",
+    "dataTest"
   ],
   methods: {
     handleClick: function () {

@@ -64,6 +64,7 @@ import MyDataTable from "../components/MyData/MyDataTable.vue";
 import SupportBanner from "../components/SupportBanner.vue";
 import CreateDPStatistics from "../components/Welcome/CreateDPStatistics.vue";
 import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
+import depositorSetup from "@/api/depositorSetup";
 import {mapGetters, mapState} from 'vuex';
 
 export default {
@@ -78,12 +79,12 @@ export default {
   },
 
   created() {
+    //  depositorSetup.patchDepositorSetup('9255c067-e435-43bd-8af1-33a6987ffc9b')
     Promise.all(
         [this.$store.dispatch('auth/fetchUser'),
           this.$store.dispatch('dataset/setDatasetList')])
         .then(() => {
           this.loading = false
-          console.log('file locked: ' + this.fileLocked)
         })
 
   },

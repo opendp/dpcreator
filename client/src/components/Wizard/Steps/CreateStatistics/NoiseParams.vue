@@ -30,7 +30,7 @@
           </span>
         </div>
         <a href="http://" class="primary--text caption">
-          More information about Epsilon
+          More information about Delta
         </a>
       </v-col>
       <v-col>
@@ -44,7 +44,7 @@
           </span>
         </div>
         <a href="http://" class="primary--text caption">
-          More information about Epsilon
+          More information about Confidence Level
         </a>
       </v-col>
     </v-row>

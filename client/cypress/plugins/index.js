@@ -16,7 +16,16 @@
  * @type {Cypress.PluginConfig}
  */
 // eslint-disable-next-line no-unused-vars
+let options = {
+    //  printLogsToConsole: 'onFail',
+    printLogsToConsole: 'always',
+};
+
 module.exports = (on, config) => {
     // `on` is used to hook into various events Cypress emits
     // `config` is the resolved Cypress config
+
+    // the terminal-report plugin is only available in development mode
+    //  require('cypress-terminal-report/src/installLogsPrinter')(on, options);
 }
+

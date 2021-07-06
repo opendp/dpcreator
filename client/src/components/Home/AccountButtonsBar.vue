@@ -4,6 +4,7 @@
       :class="{ 'flex-column align-center py-5': $vuetify.breakpoint.xsOnly }"
   >
     <Button
+        data-test="loginButton"
         classes="account-buttons__item"
         :class="{
         'mx-5 my-2 width80': $vuetify.breakpoint.xsOnly,
