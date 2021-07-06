@@ -72,7 +72,7 @@ import GenerateDPRelease from "./WizardSteps/GenerateDPRelease.vue";
 import StepperHeader from "../components/Wizard/StepperHeader.vue";
 import WizardNavigationButtons from "../components/Wizard/WizardNavigationButtons.vue";
 import ValidateDataset from "./WizardSteps/ValidateDataset.vue";
-import {mapState} from "vuex";
+import {mapState, mapGetters} from "vuex";
 export default {
   name: "Wizard",
   components: {
@@ -88,17 +88,29 @@ export default {
     const objectId = this.$route.params.id
     this.$store.dispatch('dataset/setDatasetInfo', objectId)
         .then(() => {
+          this.initStepperPosition(this.depositorSetupInfo.userStep)
           this.loading = false
+
         })
 
   },
   methods: {
     updateStepStatus: function (stepNumber, completedStatus) {
       this.steps[stepNumber].completed = completedStatus;
+    },
+    // Set the current Wizard stepper position based on the
+    // depositorSetup user step
+    initStepperPosition: function (depositorStep) {
+      if (depositorStep.userStep = 'step100') {
+        this.stepperPosition = 0;
+      } else {
+        console.log('unexpected user step')
+      }
     }
   },
   computed: {
     ...mapState('dataset', ['datasetInfo']),
+    ...mapGetters('dataset' ['depositorSetupInfo'])
   },
   data: () => ({
     loading: true,
