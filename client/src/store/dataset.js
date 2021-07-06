@@ -28,15 +28,13 @@ const actions = {
   setDatasetList({commit, state}) {
     return dataset.getUserDatasets()
         .then((resp) => {
-          console.log(resp.data.results)
           commit('SET_DATASET_LIST', resp.data.results)
         })
   },
   setDatasetInfo({commit}, objectId) {
     return dataset.getDatasetInfo(objectId)
         .then((resp) => {
-          console.log(resp.data.results)
-          commit('SET_DATASET_INFO', resp.data.results)
+           commit('SET_DATASET_INFO', resp.data)
         })
   }
 
