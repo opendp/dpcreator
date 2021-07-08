@@ -10,7 +10,7 @@ export default {
             }
           } else if (data.request) {
             // The request was made but no response was received
-            console.log(data.request);
+            console.log('no response' + data.request);
           } else {
             // Something happened in setting up the request that triggered an Error
             console.log('Error', data.message);

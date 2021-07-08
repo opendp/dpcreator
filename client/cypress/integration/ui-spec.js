@@ -40,7 +40,7 @@
                     return false
                 })
                 cy.login('dev_admin', 'admin')
-                cy.request('/cypress-tests/clear-test-data/')
+                cy.clearData()
                 cy.visit('/mock-dv')
                 cy.get('#postOpenDP > .v-btn__content').click();
                 cy.url().should('include', '/?id=');

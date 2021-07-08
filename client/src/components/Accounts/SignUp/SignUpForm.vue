@@ -136,8 +136,7 @@ export default {
               if (this.handoffId) {
                 this.$store.dispatch('dataverse/updateDataverseUser', openDPUserId, this.handoffId)
                     .then((dvUserObjectId) => {
-                      console.log('returned from updateUser:' + JSON.stringify(dvUserObjectId))
-                      this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
+                       this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
                           .catch(({data}) => console.log("error: " + data))
 
                     })
@@ -165,7 +164,6 @@ export default {
             .then((data) => {
               this.$store.dispatch('dataverse/updateDataverseUser', this.user['object_id'], this.handoffId)
                   .then((dvUserObjectId) => {
-                    console.log('returned from updateUser:' + JSON.stringify(dvUserObjectId))
                     this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
                         .catch(({data}) => console.log("error: " + data))
                         .then(() => {

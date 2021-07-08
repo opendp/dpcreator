@@ -14,8 +14,10 @@ Cypress.Commands.add('clearData', () => {
     cy.request('/cypress-tests/clear-test-data/')
 })
 
-// TODO - replace this with data from a fixture
+
 Cypress.Commands.add('createMockDataset', () => {
+    cy.visit('/mock-dv');
+    cy.get('[data-test="submit button"]').click();
     cy.visit('/mock-dv');
     cy.get('[data-test="submit button"]').click();
     cy.url().should('contains', '/?id=');
@@ -28,9 +30,10 @@ Cypress.Commands.add('createMockDataset', () => {
     //    cy.get('[data-test="loginButton"]').click({multiple:true});
     cy.get('#account-buttons--placeholder .v-btn--is-elevated > .v-btn__content').click()
     cy.url().should('contain', 'log-in')
-    // The login command triggers the creation of a dataverse file from the mockdv form
-    cy.login('dev_admin', 'admin')
-
+    cy.get('[data-test="username"]').type('dev_admin');
+    cy.get('[data-test="password"]').type('admin');
+    cy.get('[data-test="Log in"]').click();
+    cy.url().should('contain', 'welcome')
 })
 
 

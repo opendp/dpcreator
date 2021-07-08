@@ -45,7 +45,6 @@ const actions = {
     commit(LOGIN_BEGIN);
     return auth.googleLogin(token)
         .then(({data}) => {
-          console.log('returned from googleLogin: ' + JSON.stringify(data))
           commit(SET_TOKEN, data.key)
           commit(LOGIN_SUCCESS);
           return Promise.resolve(data)
