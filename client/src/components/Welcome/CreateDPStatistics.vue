@@ -16,6 +16,7 @@
     </a>
 
     <Button
+        data-test="Start Process"
         color="primary"
         classes="d-block"
         :class="{

@@ -17,6 +17,7 @@
           depend on private information of subjects?</span
         >
         <v-radio-group
+            data-test="radioPrivateInformation"
             v-model="radioDependOnPrivateInformation"
             class="pl-2"
             v-on:change="saveUserInput"
@@ -24,6 +25,7 @@
           <RadioItem
               label="Yes."
               value="yes"
+              data-test="radioPrivateInformationYes"
           />
           <RadioItem
               label="No."
@@ -48,6 +50,7 @@
           best describes your dataset?</span
         >
         <v-radio-group
+            data-test="radioBestDescribes"
             :disabled="radioBestDescribesShouldBeDisabled"
             v-model="radioBestDescribes"
             class="pl-2"
@@ -56,8 +59,10 @@
           <RadioItem
               label="Public information."
               value="public"
+              data-test="public"
           />
-          <RadioItem value="notHarmButConfidential">
+          <RadioItem value="notHarmButConfidential"
+                     data-test="notHarmButConfidential">
             <template v-slot:label>
               <div>
                 Information that, if disclosed,
@@ -124,7 +129,8 @@
             class="pl-2"
             v-on:change="saveUserInput"
         >
-          <RadioItem label="Yes." value="yes"/>
+          <RadioItem label="Yes." value="yes"
+                     data-test="radioOnlyOneIndividualPerRowYes"/>
           <RadioItem
               label="No."
               value="no"

@@ -29,7 +29,7 @@ export default {
     // STEP_0600_EPSILON_SET
     step_600: {
         workflowStatus: statusInformation.statuses.IN_PROGRESS,
-        wizardStepper: 2
+        wizardStepper: 3
     },
     // STEP_9100_VALIDATION_FAILED
     step_9100: {

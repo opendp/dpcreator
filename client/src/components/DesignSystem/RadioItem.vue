@@ -1,5 +1,5 @@
 <template>
-  <v-radio :label="label" :value="value" v-on="on" class="radio">
+  <v-radio :data-test="dataTest" :label="label" :value="value" v-on="on" class="radio">
     <template v-slot:label>
       <slot name="label"/>
     </template>
@@ -17,6 +17,6 @@
 <script>
 export default {
   name: "RadioItem",
-  props: ["label", "value", "on"]
+  props: ["label", "value", "on", "dataTest"]
 };
 </script>
