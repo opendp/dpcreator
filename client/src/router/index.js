@@ -27,8 +27,9 @@ const routes = [
     component: Home
   },
   {
-    path: WIZARD.PATH,
+    path: `${WIZARD.PATH}/:id`,
     name: WIZARD.NAME,
+    // dynamic segments start with a colon
     component: () => import("../views/Wizard.vue")
   },
   {

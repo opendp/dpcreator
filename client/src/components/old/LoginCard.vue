@@ -103,7 +103,7 @@ export default {
           })
     },
     onGoogleSignInError(error) {
-      console.log('OH NOES', error)
+      console.log('Google Signin  Error', error)
     },
     isEmpty(obj) {
       return Object.keys(obj).length === 0

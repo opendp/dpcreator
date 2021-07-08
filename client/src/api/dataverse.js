@@ -1,4 +1,5 @@
 import session from './session';
+const camelcaseKeys = require('camelcase-keys');
 
 export default {
 
@@ -11,9 +12,9 @@ export default {
      * @returns {Promise<AxiosResponse<any>>} DataverseUser object
      */
     updateFileInfo(openDPUserId, handoffId) {
-        console.log('calling API updateFileInfo ' + openDPUserId + ',' + handoffId)
         return session.post('/api/dv-file/',
             {handoff_id: handoffId, creator: openDPUserId})
+            .then(resp => camelcaseKeys(resp, {deep: true}))
     },
     /**
      *  check if there is a DataverseUser for this openDPUserId and siteUrl.
@@ -24,12 +25,10 @@ export default {
      * @returns {Promise<AxiosResponse<any>>} DataverseUser object
      */
     updateDataverseUser(openDPUserId, handoffId) {
-        console.log('calling API updateDataverseUser ' + openDPUserId + ',' + handoffId)
         return session.post('/api/dv-user/',
             {dv_handoff: handoffId, user: openDPUserId});
     },
     testHandoff(site_url, fileId, datasetPid, filePid, token) {
-        console.log('posting to dv-handoff')
         const formData = new FormData()
         formData.append("site_url", site_url)
         formData.append("apiGeneralToken", token)
