@@ -60,6 +60,10 @@
               label="Public information."
               value="public"
               data-test="public"
+              :on="{
+              change: () =>
+                handleInvalidDataset('radioBestDescribes')
+            }"
           />
           <RadioItem value="notHarmButConfidential"
                      data-test="notHarmButConfidential">
@@ -89,7 +93,13 @@
               </div>
             </template>
           </RadioItem>
-          <RadioItem value="wouldCauseSevereHarm">
+          <RadioItem
+              value="wouldCauseSevereHarm"
+              :on="{
+              change: () =>
+                handleInvalidDataset('radioBestDescribes')
+            }"
+          >
             <template v-slot:label>
               <div>
                 Information that
