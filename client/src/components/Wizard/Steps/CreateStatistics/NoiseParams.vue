@@ -7,7 +7,7 @@
 		  pa-3 top-borders-radius noise-params d-flex 
 		  justify-space-between"
         >
-          <span>Epsilon (x)</span>
+          <span>Epsilon (&epsilon;)</span>
           <span>
             {{ epsilon }}
             <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
@@ -23,7 +23,7 @@
 		  pa-3 top-borders-radius noise-params d-flex 
 		  justify-space-between"
         >
-          <span>Delta (x)</span>
+          <span>Delta (&delta;)</span>
           <span>
             {{ delta }}
             <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
@@ -37,14 +37,14 @@
         <div
             class="borderBottom soft_primary grey--text text--darken-2 pa-3 top-borders-radius noise-params d-flex justify-space-between"
         >
-          <span>Confidence level</span>
+          <span>Confidence Level</span>
           <span>
             {{ confidenceLevel }}
             <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
           </span>
         </div>
         <a href="http://" class="primary--text caption">
-          More information about Confidence Level
+          More information about Confidence Levels
         </a>
       </v-col>
     </v-row>

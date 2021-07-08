@@ -13,7 +13,7 @@
       >
       <v-card-title>
         <h2 class="title-size-2 mb-5">
-          Please confirm the epsilon (x) and delta (x) values.
+          Please confirm the epsilon (&epsilon;) and delta (&delta;) values.
         </h2>
       </v-card-title>
       <v-card-text class="text--primary">
@@ -34,7 +34,7 @@
         <div
             class="borderBottom soft_primary grey--text text--darken-2 pa-3 my-5 top-borders-radius noise-params d-flex justify-space-between width50"
         >
-          <span>Epsilon (x)</span>
+          <span>Epsilon (&epsilon;)</span>
           <input
               class="text-right font-weight-bold"
               type="number"
