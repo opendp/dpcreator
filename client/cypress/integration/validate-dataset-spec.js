@@ -6,6 +6,7 @@
                 console.log('runnable', runnable)
                 return false
             })
+            cy.clearData()
             cy.createMockDataset()
             // click on the start Process button on the welcome page,
             // to navigate to the Validate Dataset step of the Wizard
