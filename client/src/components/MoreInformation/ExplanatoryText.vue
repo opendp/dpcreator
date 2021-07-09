@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col offset-sm="1" sm="10" md="12" offset-md="0">
-        <h2 class="title-size-1 text-center mb-10">DP Creator Concepts</h2>
+        <h2 class="title-size-1 text-center mb-10">{{ $t('more information.title') }}</h2>
         <LinearBox
             :class="{
             'mb-6': $vuetify.breakpoint.xsOnly,
@@ -10,8 +10,8 @@
           }"
         >
           <template v-slot:content>
-            <h2 class="title-size-1">More Information on Epsilon</h2>
-            <p class="grey--text text--darken-2">More information epsilon text</p>
+            <h2 class="title-size-1">{{ $t('more information.epsilon title') }}</h2>
+            <p class="grey--text text--darken-2">{{ $t('more information.epsilon text') }}</p>
           </template>
         </LinearBox>
         <LinearBox
@@ -22,8 +22,8 @@
           }"
         >
           <template v-slot:content>
-            <h2 class="title-size-1">More Information on Delta</h2>
-            <p class="grey--text text--darken-2">More information delta text</p>
+            <h2 class="title-size-1">{{ $t('more information.delta title') }}</h2>
+            <p class="grey--text text--darken-2">{{ $t('more information.delta text') }}</p>
           </template>
         </LinearBox>
         <LinearBox
@@ -34,8 +34,10 @@
           }"
         >
           <template v-slot:content>
-            <h2 class="title-size-1">More Information on Confidence Level</h2>
-            <p id="more-info-confidence" class="grey--text text--darken-2">more information confidence Level Text</p>
+            <h2 class="title-size-1">{{ $t('more information.confidence title') }}</h2>
+            <p id="more-info-confidence" class="grey--text text--darken-2">{{
+                $t('more information.confidence text')
+              }}</p>
           </template>
         </LinearBox>
 
