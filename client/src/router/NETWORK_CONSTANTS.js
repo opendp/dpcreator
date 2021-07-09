@@ -42,5 +42,9 @@ export default {
     MOCK_DV: {
         PATH: "/mock-dv",
         NAME: "MockDV"
+    },
+    MORE_INFORMATION: {
+        PATH: "/more-information",
+        NAME: "MoreInformation"
     }
 };
