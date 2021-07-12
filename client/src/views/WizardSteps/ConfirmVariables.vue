@@ -192,55 +192,55 @@ export default {
       this.loadingVariables = false;
       this.variables = [
         {
-          name: "Age",
-          label: "Focus Child Age",
+          name: "V207",
+          label: "Birth Year",
           type: "Numerical",
           additional_information: {},
           editDisabled: true
         },
         {
-          name: "DOB",
-          label: "Focus Child Date of Birth",
-          type: "Numerical",
+          name: "V208",
+          label: "Gender",
+          type: "Categorical",
           additional_information: {},
           editDisabled: true
         },
         {
-          name: "Income",
+          name: "V246",
           label: "Household Income",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Group",
-          label: "Program Group ID",
           type: "Categorical",
           additional_information: {},
           editDisabled: true
         },
         {
-          name: "Provider",
-          label: "Provider Type",
+          name: "V211",
+          label: "Race",
           type: "Categorical",
           additional_information: {},
           editDisabled: true
         },
         {
-          name: "Visit",
-          label: "Visit Type",
-          type: "Boolean",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Provider",
-          label: "Provider Center",
+          name: "V214",
+          label: "Marital Status",
           type: "Categorical",
           additional_information: {},
           editDisabled: true
         },
 
+        {
+          name: "V259",
+          label: "State",
+          type: "Categorical",
+          additional_information: {},
+          editDisabled: true
+        },
+        {
+          name: "V256",
+          label: "Voted 2016",
+          type: "Boolean",
+          additional_information: {},
+          editDisabled: true
+        },
       ];
       this.$emit("stepCompleted", 1, true);
     }, 3000);
