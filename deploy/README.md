@@ -70,7 +70,7 @@ Deployment currently requires the building of two Docker images:
     ```
     # Switch to the "deploy/nginx-setup" directory 
     #  (from the top-level of the dpcreator repository)
-    cd deploy/nginx-setup
+    cd ../deploy/nginx-setup
       
     # Build/Push DPCreator nginx
     #  -- change YYYY-MMDD to the current date
