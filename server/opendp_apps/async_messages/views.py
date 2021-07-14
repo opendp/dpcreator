@@ -13,6 +13,8 @@ from opendp_apps.async_messages.consumers import ChatConsumer
 from opendp_apps.async_messages import static_vals as mstatic
 from opendp_apps.dataset.models import DataSetInfo
 
+
+from opendp_apps.async_messages import static_vals as async_static
 from opendp_apps.async_messages.utils import get_websocket_id
 from opendp_apps.async_messages.websocket_message import WebsocketMessage
 from opendp_apps.async_messages.tasks import send_test_msg
@@ -48,14 +50,16 @@ def ajax_profile_by_dataset_object_id(request):
 
     if not 'dataset_object_id' in json_data:
         ws_msg = WebsocketMessage.get_fail_message(
-            'TYPE_OF_MESSAGE',
+            async_static.WS_MSG_TYPE_PROFILE,
             f'({datetime.now()}) The dataset has been materialized {datetime.now()}')
     else:
         ws_msg = WebsocketMessage.get_success_message(
-            'TYPE_OF_MESSAGE',
+            async_static.WS_MSG_TYPE_PROFILE,
             f'({datetime.now()}) Looking good, ready for the next step')
 
     ws_msg.send_message(websocket_id)
+    send_test_msg.delay(websocket_id)
+
 
     return JsonResponse(dict(success=True, message='should be sending a websocket message...'))
 

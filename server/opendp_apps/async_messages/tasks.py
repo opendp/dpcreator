@@ -9,6 +9,8 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 
 from opendp_project.celery import celery_app
+
+from opendp_apps.async_messages import static_vals as async_static
 from opendp_apps.async_messages.websocket_message import WebsocketMessage
 
 from opendp_apps.profiler.tasks import ProfileHandler
@@ -33,14 +35,14 @@ def send_test_msg(websocket_id):
         user_msg = f'error: {profiler.get_err_msg()}'
         print(user_msg)
         ws_msg = WebsocketMessage.get_fail_message( \
-            'TYPE_OF_MESSAGE',
+             async_static.WS_MSG_TYPE_PROFILE,
             user_msg)
     else:
         profile_str = json.dumps(profiler.data_profile, cls=DjangoJSONEncoder, indent=4)
         #print('-' * 40)
         #print(profile_str)
         ws_msg = WebsocketMessage.get_success_message( \
-            'TYPE_OF_MESSAGE',
+             async_static.WS_MSG_TYPE_PROFILE,
             f'Profile worked {datetime.now()}',
             data=dict(profile_str=profile_str))
         #print('profiled!')

@@ -1,2 +1,4 @@
 
 MESSAGE_TYPE = 'chat_message'
+
+WS_MSG_TYPE_PROFILE = 'PROFILE_MESSAGE'
