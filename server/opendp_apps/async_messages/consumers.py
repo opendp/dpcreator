@@ -9,13 +9,13 @@ from opendp_apps.async_messages import static_vals as mstatic
 class ChatConsumer(WebsocketConsumer):
 
     @staticmethod
-    def get_group_name(room_name):
+    def get_group_name(ws_identifier):
         """Method for """
-        return f"{room_name}-{datetime.now().strftime('%Y-%m-%d')}"
+        return f"{ws_identifier}-{datetime.now().strftime('%Y-%m-%d')}"
 
     def connect(self):
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
-        self.room_group_name = ChatConsumer.get_group_name(self.room_name)
+        self.ws_identifier = self.scope['url_route']['kwargs']['ws_identifier']
+        self.room_group_name = ChatConsumer.get_group_name(self.ws_identifier)
         print('connect', self.room_group_name)
         # Join room group
         async_to_sync(self.channel_layer.group_add)(

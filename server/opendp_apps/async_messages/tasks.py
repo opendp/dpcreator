@@ -35,14 +35,14 @@ def send_test_msg(websocket_id):
         user_msg = f'error: {profiler.get_err_msg()}'
         print(user_msg)
         ws_msg = WebsocketMessage.get_fail_message( \
-             async_static.WS_MSG_TYPE_PROFILE,
+             async_static.WS_MSG_TYPE_PROFILER,
             user_msg)
     else:
         profile_str = json.dumps(profiler.data_profile, cls=DjangoJSONEncoder, indent=4)
         #print('-' * 40)
         #print(profile_str)
         ws_msg = WebsocketMessage.get_success_message( \
-             async_static.WS_MSG_TYPE_PROFILE,
+             async_static.WS_MSG_TYPE_PROFILER,
             f'Profile worked {datetime.now()}',
             data=dict(profile_str=profile_str))
         #print('profiled!')

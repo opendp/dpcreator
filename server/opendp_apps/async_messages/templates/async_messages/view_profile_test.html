@@ -67,11 +67,14 @@ Example of using async/websockets.
 </table>
 <!-- End: Table Listing DataSetInfo objects -->
 
-    <h5>response from ajax</h5>
+    <h5>Response from initial Http POST</h5>
     <div id="postResult" style="border:1px solid #006699;margin:20px;">&nbsp;</div>
 
-    <h5>response from websocket</h5>
-    <pre id="webSocketResult" style="border:1px solid #006699;margin:30px;">(nuthin' yet)</pre>
+    <h5>User Message from websocket</h5>
+    <pre id="webSocketUserMessage" style="border:1px solid #006699;margin:30px;">(nuthin' yet)</pre>
+
+    <h5>Profile Result from websocket</h5>
+    <div id="webSocketProfileResult" style="border:1px solid #006699;margin:30px;">(no profile yet)</div>
 
 <!-- START: jQuery, Popper.js, Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
@@ -82,41 +85,73 @@ Example of using async/websockets.
     {#% csrf_token %#}
 
 <script>
-    /* Start a new websocket */
+    /* ---------------------------------------------- */
+    /* Start a new websocket upon page load           */
+    /* ---------------------------------------------- */
     const chatSocket = new WebSocket(
-        '{{ WEBSOCKET_PREFIX }}' + window.location.host + '/async_messages/ws/chat/{{ websocket_id }}' + '/'
-    );
-    chatSocket.onmessage = function(e) {
-        console.log(e);
-        console.log(e.data);
-        const ws_data = JSON.parse(e.data);
-        const ws_msg = ws_data.message
-        console.log('----------------');
-        console.log(ws_msg.msg_type);
-        console.log(ws_msg.success);
-        console.log('----------------');
 
-        if (ws_msg.msg_type = 'PROFILE_MESSAGE') {
-            console.log('>> message type: ' + ws_msg.msg_type);
+        '{{ WEBSOCKET_PREFIX }}' + window.location.host + '/async_messages/ws/profile/{{ websocket_id }}' + '/'
+    );
+
+    /* ---------------------------------------------- */
+    /* Add a handler for incoming websocket messages  */
+    /* ---------------------------------------------- */
+    chatSocket.onmessage = function(e) {
+
+        // parse the incoming JSON to a .js object
+        const ws_data = JSON.parse(e.data);
+
+        /* "ws_msg" attributes are the defined in the Python WebsocketMessage object
+             msg_type (str): expected "PROFILER_MESSAGE"
+             success (boolean):  error detected?
+             user_message (str): description of what happened
+             msg_cnt (int): Not used for the profiler
+             data: Profile data, if it exists, JSON
+             timestamp: timestamp
+
+            - reference: opendp_apps/async_messages/websocket_message.py
+        */
+        const ws_msg = ws_data.message
+
+        // "ws_msg.msg_type": should be 'PROFILER_MESSAGE'
+        if (ws_msg.msg_type !== 'PROFILER_MESSAGE') {
+
+            console.log('unknown msg_type: ' + ws_msg.msg_type);
+        } else {
+
+            // ---------------------------------------
+            // "ws_msg.success": Did it work?
+            // ---------------------------------------
             if (ws_msg.success) {
                 console.log('-- it worked!')
             } else {
                 console.log('-- error occurred!')
+                return;
             }
             console.log('ws_msg.user_message: ' + ws_msg.user_message);
-            updatedHtml = ws_msg.user_message + '<br />' +document.querySelector('#webSocketResult').innerHTML;
-            document.querySelector('#webSocketResult').innerHTML = updatedHtml;
 
-            // Is the profile there?
+            // ---------------------------------------
+            // ws_msg.user_message: Append "user_message"
+            //  to the div "#webSocketUserMessage"
+            // ---------------------------------------
+            updatedHtml = ws_msg.user_message + '<br />' + document.querySelector('#webSocketUserMessage').innerHTML;
+            document.querySelector('#webSocketUserMessage').innerHTML = updatedHtml;
+
+            // ---------------------------------------
+            // ws_msg.data: Is the profile there?
+            // ---------------------------------------
             if( ws_msg?.data) {
-                console.log('>>DATA<< ws_msg.data: ' + ws_msg.data);
+                //console.log(typeof 42);
+
+                const profileStr = JSON.stringify(JSON.parse(ws_msg.data.profile_str), null, 2);
+                console.log(typeof ws_msg.data);
+                console.log('>>DATA<< ws_msg.data: ' + profileStr);
+
+                // Yes, add it to the div "#webSocketProfileResult"
+                document.querySelector('#webSocketProfileResult').innerHTML = '<pre>' + profileStr + '<pre>';
             }
 
-
-        } else {
-            console.log('unknown msg_type: ' + ws_msg.msg_type);
         }
-
 
         chatSocket.onclose = function (e) {
             console.error('Chat socket closed unexpectedly');
