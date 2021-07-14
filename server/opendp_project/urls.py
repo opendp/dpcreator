@@ -44,6 +44,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'terms-of-access', TermsOfAccessViewSet)
+router.register(r'terms-of-access-agreement', TermsOfAccessAgreementViewSet)
 router.register(r'dataset-info', DataSetInfoViewSet)
 router.register(r'test', TermsOfAccessAgreementViewSet)
 router.register(r'dv-user', DataverseUserView, basename='dv-user')
