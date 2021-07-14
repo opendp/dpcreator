@@ -5,10 +5,11 @@ import {
   LOGIN_FAILURE,
   LOGIN_SUCCESS,
   LOGOUT,
-  REMOVE_TOKEN, SET_TERMS_ACCEPTED,
+  REMOVE_TOKEN, SET_CURRENT_TERMS, SET_TERMS_ACCEPTED, SET_TERMS_LOG,
   SET_TOKEN,
   SET_USER,
 } from './types';
+import terms from "@/api/terms";
 
 const TOKEN_STORAGE_KEY = 'TOKEN_STORAGE_KEY';
 const isProduction = process.env.NODE_ENV === 'production';
@@ -18,12 +19,22 @@ const initialState = {
   error: false,
   token: null,
   user: null,
-  termsAccepted: false
+  currentTerms: null,
+  termsOfAccessLog: null
+
 };
 
 const getters = {
   isAuthenticated: state => !!state.token,
-  isTermsAccepted: state => state.termsAccepted,
+  isTermsAccepted: state => {
+
+    return (state.user !== null
+        && state.termsOfAccessLog !== null
+        && state.termsOfAccessLog.filter(
+            function (obj) {
+              return obj.objectId === state.currentTerms.objectId;
+            }) !== null)
+  },
   getUser: state => {
     return state.user
   },
@@ -77,8 +88,14 @@ const actions = {
       return Promise.resolve()
     }
   },
-  setTermsAccepted({commit, state}, termsAccepted) {
-    commit('SET_TERMS_ACCEPTED', state, termsAccepted)
+  setCurrentTerms({commit, state}) {
+    return terms.getCurrentTerms().then((response) => {
+      commit('SET_CURRENT_TERMS', response)
+    })
+  },
+  setTermsLog({commit, state}, openDPUserId) {
+    return terms.getTermsOfUseLog(openDPUserId).then(response =>
+        commit(SET_TERMS_LOG, response))
   },
   initialize({commit}) {
     const token = localStorage.getItem(TOKEN_STORAGE_KEY);
@@ -124,9 +141,12 @@ const mutations = {
   [SET_USER](state, username) {
     state.user = username;
   },
-  [SET_TERMS_ACCEPTED](state, termsAccepted) {
-    state.termsAccepted = termsAccepted;
+  [SET_CURRENT_TERMS](state, currentTerms) {
+    state.currentTerms = currentTerms
   },
+  [SET_TERMS_LOG](state, termsLog) {
+    state.termsOfAccessLog = termsLog
+  }
 };
 
 export default {

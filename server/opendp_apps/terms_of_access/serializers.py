@@ -6,7 +6,7 @@ from opendp_apps.terms_of_access.models import TermsOfAccess, TermsOfAccessLog
 class TermsOfAccessSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = TermsOfAccess
-        fields = ['name', 'active', 'description', 'version', 'notes']
+        fields = ['name', 'active', 'description', 'version', 'notes', 'created']
 
 
 class TermsOfAccessLogSerializer(serializers.HyperlinkedModelSerializer):
