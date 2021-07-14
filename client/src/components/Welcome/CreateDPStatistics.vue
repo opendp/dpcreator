@@ -8,7 +8,7 @@
   >
     <h2 class="title-size-2 mb-6 font-weight-bold">Create DP Statistics</h2>
     <p>
-      You have been redirected to OpenDP from the Harvard Dataverse to create DP
+      You have been redirected to DP Creator from the <b>{{ fileInfo.installationName }}</b> to create DP
       statistics for this dataset:
     </p>
     <a href="" class="text-decoration-none font-weight-bold my-6 d-block">

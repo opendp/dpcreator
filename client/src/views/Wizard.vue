@@ -8,9 +8,8 @@
             <v-stepper-items>
               <span class="d-block mt-5"
               >Used dataset:
-                <!-- TODO: This name should be the original from the loaded dataset -->
                 <a href="http://" class="text-decoration-none"
-                >California Demographic Dataset
+                >{{ datasetInfo.name }}
                   <v-icon small color="primary">mdi-open-in-new</v-icon></a
                 ></span
               >
