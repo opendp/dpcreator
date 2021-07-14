@@ -1,7 +1,10 @@
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+
 from requests.utils import quote
+
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
 from opendp_apps.dataverses.models import DataverseHandoff, RegisteredDataverse
 from opendp_apps.dataverses.serializers import DataverseHandoffSerializer
@@ -22,12 +25,31 @@ class DataverseHandoffView(BaseModelViewSet):
         serializer = DataverseHandoffSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
 
+    @action(methods=['get'], detail=False)
+    def dv_orig_create(self, request):
+        """Access Create via a GET. This is temporary until the Dataverse signed urls are available"""
+        print('--- createbyget ---')
+        request_data = request.query_params.copy()
+        return self.process_dataverse_data(request_data)
+
+        #return Response({"From Hello": "Got it"})
+
     def create(self, request, *args, **kwargs):
         """
         Temporarily save the Dataverse paramemeters +
         redirect to the Vue page
         """
+        print('--- create! ---')
         request_data = request.data.copy()
+        return self.process_dataverse_data(request_data)
+
+
+    def process_dataverse_data(self, request_data):
+        """Process incoming Dataverse data
+        - Used by both the GET and POST endpoints
+        """
+        print('--- process_dataverse_data ---')
+
         if dv_static.DV_PARAM_SITE_URL in request_data:
             init_site_url = request_data[dv_static.DV_PARAM_SITE_URL]
             request_data[dv_static.DV_PARAM_SITE_URL] = RegisteredDataverse.format_dv_url(init_site_url)

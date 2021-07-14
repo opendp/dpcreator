@@ -13,9 +13,7 @@
             <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
           </span>
         </div>
-        <a href="http://" class="primary--text caption"
-        >More information about Epsilon
-        </a>
+        <router-link to="/more-information" class="primary--text caption">More information about Epsilon</router-link>
       </v-col>
       <v-col>
         <div
@@ -29,9 +27,9 @@
             <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
           </span>
         </div>
-        <a href="http://" class="primary--text caption">
-          More information about Epsilon
-        </a>
+        <router-link to="/more-information#more-info-delta" class="primary--text caption">More information about Delta
+        </router-link>
+
       </v-col>
       <v-col>
         <div
@@ -43,9 +41,10 @@
             <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
           </span>
         </div>
-        <a href="http://" class="primary--text caption">
-          More information about Epsilon
-        </a>
+        <router-link to="/more-information#more-info-confidence" class="primary--text caption">More information about
+          Confidence Level
+        </router-link>
+
       </v-col>
     </v-row>
   </div>

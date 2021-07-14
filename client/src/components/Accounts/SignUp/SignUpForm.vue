@@ -136,8 +136,7 @@ export default {
               if (this.handoffId) {
                 this.$store.dispatch('dataverse/updateDataverseUser', openDPUserId, this.handoffId)
                     .then((dvUserObjectId) => {
-                      console.log('returned from updateUser:' + JSON.stringify(dvUserObjectId))
-                      this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
+                       this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
                           .catch(({data}) => console.log("error: " + data))
 
                     })
@@ -152,10 +151,39 @@ export default {
         this.$router.push(`${NETWORK_CONSTANTS.SIGN_UP.PATH}/confirmation`);
       }
     },
-    loginGoogle: function () {
-      //TODO: Implement Login with Google logic here
-      alert("login with Google!");
+    loginGoogle(access_token) {
+      this.$store.dispatch('auth/googleLogin', access_token)
+          .then(() => {
+            this.processLogin();
+          })
     },
+
+    processLogin() {
+      if (this.handoffId) {
+        this.$store.dispatch('auth/fetchUser')
+            .then((data) => {
+              this.$store.dispatch('dataverse/updateDataverseUser', this.user['object_id'], this.handoffId)
+                  .then((dvUserObjectId) => {
+                    this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
+                        .catch(({data}) => console.log("error: " + data))
+                        .then(() => {
+                          this.$router.push('/welcome')
+                        })
+                  })
+                  .catch((data) => console.log(data))
+              this.errorMessage = data
+            })
+            .catch((data) => {
+              console.log(data)
+              this.errorMessage = data
+            });
+      } else {
+        if (this.errorMessage == null) {
+          this.$router.push('/welcome')
+        }
+      }
+    },
+
     loginGithub: function () {
       //TODO: Implement Login with Github logic here
       alert("login with Github!");

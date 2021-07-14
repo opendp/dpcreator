@@ -192,145 +192,55 @@ export default {
       this.loadingVariables = false;
       this.variables = [
         {
-          name: "Age 1",
-          label: "Variable label 3",
+          name: "V207",
+          label: "Birth Year",
           type: "Numerical",
           additional_information: {},
           editDisabled: true
         },
         {
-          name: "Age 2",
-          label: "Variable label 5",
+          name: "V208",
+          label: "Gender",
           type: "Categorical",
           additional_information: {},
           editDisabled: true
         },
         {
-          name: "Age 4",
-          label: "Variable label 4",
+          name: "V246",
+          label: "Household Income",
+          type: "Categorical",
+          additional_information: {},
+          editDisabled: true
+        },
+        {
+          name: "V211",
+          label: "Race",
+          type: "Categorical",
+          additional_information: {},
+          editDisabled: true
+        },
+        {
+          name: "V214",
+          label: "Marital Status",
+          type: "Categorical",
+          additional_information: {},
+          editDisabled: true
+        },
+
+        {
+          name: "V259",
+          label: "State",
+          type: "Categorical",
+          additional_information: {},
+          editDisabled: true
+        },
+        {
+          name: "V256",
+          label: "Voted 2016",
           type: "Boolean",
           additional_information: {},
           editDisabled: true
         },
-        {
-          name: "Age 5",
-          label: "Variable label 2",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Age 3",
-          label: "Variable label 6",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Age 6",
-          label: "Variable label 1",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Age 1",
-          label: "Variable label 3",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Age 2",
-          label: "Variable label 5",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Age 4",
-          label: "Variable label 4",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Age 5",
-          label: "Variable label 2",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Age 3",
-          label: "Variable label 6",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Age 6",
-          label: "Variable label 1",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Age 1",
-          label: "Variable label 3",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Age 2",
-          label: "Variable label 5",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Age 4",
-          label: "Variable label 4",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Age 5",
-          label: "Variable label 2",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Age 3",
-          label: "Variable label 6",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Age 6",
-          label: "Variable label 1",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Age 3",
-          label: "Variable label 6",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Age 6",
-          label: "Variable label 1",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        }
       ];
       this.$emit("stepCompleted", 1, true);
     }, 3000);

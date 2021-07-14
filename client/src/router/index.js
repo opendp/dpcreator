@@ -14,6 +14,7 @@ const {
   CONTACT_US,
   MY_PROFILE,
   MOCK_DV,
+  MORE_INFORMATION,
   TERMS_AND_CONDITIONS,
   FORGOT_YOUR_PASSWORD
 } = NETWORK_CONSTANTS;
@@ -27,8 +28,9 @@ const routes = [
     component: Home
   },
   {
-    path: WIZARD.PATH,
+    path: `${WIZARD.PATH}/:id`,
     name: WIZARD.NAME,
+    // dynamic segments start with a colon
     component: () => import("../views/Wizard.vue")
   },
   {
@@ -87,6 +89,11 @@ const routes = [
     component: () => import("../views/MockDV.vue")
   },
   {
+    path: MORE_INFORMATION.PATH,
+    name: MORE_INFORMATION.NAME,
+    component: () => import("../views/MoreInformation.vue")
+  },
+  {
     path: "*",
     name: "NotFoundPage",
     component: () => import("../views/NotFoundPage.vue")
@@ -96,7 +103,15 @@ const routes = [
 const router = new VueRouter({
   mode: "history",
   // base: process.env.BASE_URL,
-  routes
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (to.hash) {
+      return {
+        selector: to.hash,
+        behavior: 'smooth',
+      }
+    }
+  }
 });
 
 router.afterEach(() => {

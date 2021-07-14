@@ -200,6 +200,10 @@ class ProfileHandler(BasicErrCheck):
         except pd.errors.ParserError as err_obj:
             user_msg = f'{self.ERR_FAILED_TO_READ_DATASET} (ParserError: {err_obj})'
             return err_resp(user_msg)
+        except UnicodeDecodeError as err_obj:
+            user_msg = f'{self.ERR_FAILED_TO_READ_DATASET} (UnicodeDecodeError: {err_obj})'
+            return err_resp(user_msg)
+
 
     def run_profiler(self):
         """Run the profiler"""

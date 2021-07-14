@@ -136,7 +136,7 @@ class ProfilerTest(TestCase):
         # print(f'!! error: {profiler.get_err_msg()}')
         self.assertTrue(profiler.has_error())
         self.assertTrue(profiler.get_err_msg().find(ProfileHandler.ERR_FAILED_TO_READ_DATASET) > -1)
-        self.assertTrue(profiler.get_err_msg().find('ParserError') > -1)
+        self.assertTrue(profiler.get_err_msg().find('UnicodeDecodeError') > -1)
 
         # Bad file: empty file
         #
