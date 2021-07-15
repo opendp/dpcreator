@@ -35,4 +35,4 @@ class TermsOfAccessLog(TimestampedModelWithUUID):
     ordering = ('-created', 'user')
 
     def __str__(self):
-        return f'{self.user} - {self.dataset_info} - {self.terms_of_access}'
+        return f'{self.user} - {self.terms_of_access}'
