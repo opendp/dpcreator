@@ -57,7 +57,9 @@ class UploadFileInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UploadFileInfo
-        fields = ['object_id', 'name', 'created', 'creator', 'data_file', 'status', 'status_name']
+        fields = ['object_id', 'name', 'created', 'creator',
+                  #'source_file',
+                  'status', 'status_name']
         extra_kwargs = {
             'url': {'view_name': 'dataset-info-list'},
         }

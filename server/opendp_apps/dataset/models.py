@@ -41,7 +41,7 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     data_profile = encrypt(models.JSONField(default=None, null=True, blank=True, encoder=DjangoJSONEncoder))
 
     # Switch to encryption!
-    #
+    #  - off the webpath
     source_file = models.FileField(storage=UPLOADED_FILE_STORAGE,
                                    upload_to='source-file/%Y/%m/%d/',
                                    blank=True, null=True)
@@ -136,7 +136,9 @@ class DataverseFileInfo(DataSetInfo):
     file_doi = models.CharField(max_length=255, blank=True)
     dataset_schema_info = models.JSONField(null=True, blank=True)
     file_schema_info = models.JSONField(null=True, blank=True)
-    depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo', on_delete=models.PROTECT, null=True)
+    depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo',
+                                                on_delete=models.PROTECT,
+                                                null=True, blank=True)
 
     class Meta:
         verbose_name = 'Dataverse File Information'
@@ -204,14 +206,9 @@ class UploadFileInfo(DataSetInfo):
     """
     Refers to a file uploaded independently of DV
     """
-
-    # user uploaded files, keep them off of the web path
-    #
-    data_file = models.FileField('User uploaded files',
-                    storage=UPLOADED_FILE_STORAGE,
-                    upload_to='user-files/%Y/%m/%d/')
-
-    depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo', on_delete=models.PROTECT, null=True)
+    depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo',
+                                                on_delete=models.PROTECT,
+                                                null=True, blank=True)
 
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the STEP
@@ -232,14 +229,15 @@ class UploadFileInfo(DataSetInfo):
     def as_dict(self):
         """
         Return as dict
+        DO NOT INCLUDE 'source_file'
         """
         info = dict(self.id,
                     name=self.name,
                     creator=str(self.creator),
                     source=str(self.source),
-                    data_file=self.data_file,
                     updated=str(self.updated),
                     created=str(self.created),
                     object_id=self.object_id.hex)
+
 
         return info

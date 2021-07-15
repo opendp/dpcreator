@@ -7,7 +7,10 @@ from rest_framework.exceptions import APIException, ParseError
 from rest_framework.views import exception_handler
 
 
-def get_json_error(err_msg, errors=None):
+def get_json_err(err_msg: str, errors=None) -> OrderedDict:
+    return get_json_error(err_msg, errors)
+
+def get_json_error(err_msg: str, errors=None) -> OrderedDict:
     """return an OrderedDict with success=False + message"""
     info = OrderedDict()
     info['success'] = False
@@ -17,7 +20,7 @@ def get_json_error(err_msg, errors=None):
     return info
 
 
-def get_json_success(user_msg, **kwargs):
+def get_json_success(user_msg: str, **kwargs) -> OrderedDict:
     """return an OrderedDict with success=True + message + optional 'data'"""
     info = OrderedDict()
     info['success'] = True

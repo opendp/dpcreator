@@ -38,7 +38,7 @@ class UploadFileInfoAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_filter = ('source', 'creator')
     list_display = ('name',
-                    'data_file',
+                    'source_file',
                     'creator',
                     'updated',
                     'created',)
