@@ -9,10 +9,10 @@
       <v-row>
         <v-col offset-sm="1" sm="10" offset-md="2" cols="12" md="6">
           <h1 class="title-size-1">Terms of use</h1>
-          <template v-if="!loading"> {{ currentTerms.description }}
-          </template>
+          <div v-if="!loading" v-html="currentTerms.description">
+          </div>
           <template v-if="!loading">
-            <p class="grey--text text--darken-2">{{ currentTerms.created }}</p>
+            <p class="grey--text text--darken-2">Last updated: {{ currentTerms.created }}</p>
           </template>
         </v-col>
       </v-row>
