@@ -12,4 +12,4 @@ class TermsOfAccessSerializer(serializers.HyperlinkedModelSerializer):
 class TermsOfAccessLogSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = TermsOfAccessLog
-        fields = ['user', 'dataset_info', 'terms_of_access']
+        fields = ['user', 'terms_of_access']
