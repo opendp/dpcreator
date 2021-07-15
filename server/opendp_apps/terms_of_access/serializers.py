@@ -10,6 +10,8 @@ class TermsOfAccessSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class TermsOfAccessLogSerializer(serializers.HyperlinkedModelSerializer):
+    terms_of_access = TermsOfAccessSerializer(read_only=True)
+
     class Meta:
         model = TermsOfAccessLog
         fields = ['user', 'terms_of_access']
