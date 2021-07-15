@@ -40,8 +40,7 @@ the dataset would not want publicly shared in their name and should be marked �
 corporations, natural phenomena, etc., that are public record and can be publicly distributed, does not depend on private
 information.","For example, information about persons, their behavior, beliefs and attributes is generally private information that individuals in
 the dataset would not want publicly shared in their name and should be marked “yes”. Information that is solely about instituons,
-corporations, natural phenomena, etc., that are public record and can be publicly distributed, does not depend on private
-information."
+corporations, natural phenomena, etc., that are public record and can be publicly distributed, does not depend on private information."
 set epsilon,help data public,"For example, the number of observations in a dataset containing a 5% sample of California voters is public, but the number of observations in a dataset containing all cancer patients in a particular hospital may not be public, as it could be combined with auxiliary information to reveal whether or not a patient has cancer.","For example, the number of observations in a dataset containing a 5% sample of California voters is public, but the number of observations in a dataset containing all cancer patients in a particular hospital may not be public, as it could be combined with auxiliary information to reveal whether or not a patient has cancer."
 create statistics,statistics intro,Create the statistics you would like to release. Confirm the default levels or edit them to change the degree of noise or interference you'd like to add. The default values distribute epsilon evenly across variables. ,"Create the statistics you would like to release. Please edit and confirm the degree of noise or interference you'd like to
 add to the statistics."
