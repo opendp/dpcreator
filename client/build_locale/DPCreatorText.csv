@@ -28,13 +28,8 @@ the differential privacy release. To adjust the necessary parameters to complete
 range depending on the variable's type in the table below."
 confirm variables,help variable,"E.g. Numerical: minX - max: Y; Categorical: cat1,cat2,cat3","E.g. Numerical: minX - max: Y; Categorical: cat1,cat2,cat3"
 confirm variables,help type,"Type is inferred when data is imported. If it is not inferred correctly, cancel the release, and edit the original file.",Type is inferred. Edit it in the original file
-set epsilon,epsilon intro,"Epsilon is a metric of privacy loss. The smaller the value is, the better the 
-privacy protection. To determine the epsilon value, we need to confirm your dataset's characteristics with some questions about
-the sample.","To determine the epsilon value, we need to confirm your dataset's characteristics with some questions about
-the sample."
-set epsilon,help epsilon,"Epsilon is a metric of privacy loss at a differentially change in data (adding, removing 1 entry). The smaller the value is, the better
-privacy protection.","Epsilon is a metric of privacy loss at a differentially change in data (adding, removing 1 entry). The smaller the value is, the better
-privacy protection."
+set epsilon,epsilon intro,"Epsilon is a metric of privacy loss. The smaller the value is, the better the privacy protection. To determine the epsilon value, we need to confirm your dataset's characteristics with some questions about the sample.","To determine the epsilon value, we need to confirm your dataset's characteristics with some questions about the sample."
+set epsilon,help epsilon,"Epsilon is a metric of privacy loss at a differentially change in data (adding, removing 1 entry). The smaller the value is, the better privacy protection.","Epsilon is a metric of privacy loss at a differentially change in data (adding, removing 1 entry). The smaller the value is, the better privacy protection."
 set epsilon,help data secret,"For example, information about persons, their behavior, beliefs and attributes is generally private information that individuals in
 the dataset would not want publicly shared in their name and should be marked “yes”. Information that is solely about instituons,
 corporations, natural phenomena, etc., that are public record and can be publicly distributed, does not depend on private
