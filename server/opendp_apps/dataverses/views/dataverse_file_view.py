@@ -55,7 +55,8 @@ class DataverseFileView(BaseModelViewSet):
                                           file_doi=handoff.filePid,
                                           dataset_schema_info=None,
                                           file_schema_info=None,
-                                          creator=dataverse_user.user)
+                                          creator=dataverse_user.user,
+                                          api_general_token=handoff.apiGeneralToken)
 
         # If file info doesn't exist, call to Dataverse to get the data and
         # populate the relevant fields

@@ -136,9 +136,13 @@ class DataverseFileInfo(DataSetInfo):
     file_doi = models.CharField(max_length=255, blank=True)
     dataset_schema_info = models.JSONField(null=True, blank=True)
     file_schema_info = models.JSONField(null=True, blank=True)
+
+    api_general_token = encrypt(models.CharField(max_length=255, blank=True))
+
     depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo',
                                                 on_delete=models.PROTECT,
                                                 null=True, blank=True)
+
 
     class Meta:
         verbose_name = 'Dataverse File Information'
@@ -202,9 +206,19 @@ class DataverseFileInfo(DataSetInfo):
         return info
 
 
+class DataverseSignedUrls(TimestampedModelWithUUID):
+    """
+    For upcoming Dataverse feature for urls, putting token here for now
+    """
+    dv_file_info = models.ForeignKey(DataverseFileInfo,
+                                     on_delete=models.CASCADE)
+
+
+
+
 class UploadFileInfo(DataSetInfo):
     """
-    Refers to a file uploaded independently of DV
+    Refers to a file uploaded independently of Dataverse of other data repository
     """
     depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo',
                                                 on_delete=models.PROTECT,

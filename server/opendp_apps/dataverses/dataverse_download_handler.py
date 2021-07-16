@@ -55,7 +55,10 @@ class DataverseDownloadHandler(BasicErrCheck):
 
         # Download to a TemporaryFile
         with TemporaryFile() as tf:
-            r = requests.get(self.content_url, stream=True)
+
+            headers = {'X-Dataverse-key': self.dv_file_info.api_general_token}
+
+            r = requests.get(self.content_url, headers=headers, stream=True)
             for chunk in r.iter_content(chunk_size=4096):
                 tf.write(chunk)
 
@@ -107,6 +110,15 @@ class DataverseDownloadHandler(BasicErrCheck):
         if not self.content_url:
             self.add_err_msg((f'The file schema info does not contain well-formed'
                               f' {dv_static.SCHEMA_KEY_CONTENTURL}. (code: dv_download_050)'))
+            return False
+
+
+        # --------------------------------------
+        # Is an access token available for download?
+        # --------------------------------------
+        if not self.dv_file_info.api_general_token:
+            self.add_err_msg((f'The DataverseFileInfo does not have a an access permissions.'
+                              f' (code: dv_download_060)'))
             return False
 
         # --------------------------------------

@@ -133,10 +133,13 @@ class ProfilerTest(TestCase):
 
         profiler = profiler_tasks.run_profile_by_filepath(filepath)
 
-        # print(f'!! error: {profiler.get_err_msg()}')
+        print(f'!! error: {profiler.get_err_msg()}')
         self.assertTrue(profiler.has_error())
-        self.assertTrue(profiler.get_err_msg().find(ProfileHandler.ERR_FAILED_TO_READ_DATASET) > -1)
-        self.assertTrue(profiler.get_err_msg().find('UnicodeDecodeError') > -1)
+        error_msg = profiler.get_err_msg()
+        self.assertTrue(error_msg.find(ProfileHandler.ERR_FAILED_TO_READ_DATASET) > -1)
+
+        self.assertTrue(error_msg.find('UnicodeDecodeError') > -1 or \
+                        error_msg.find('ParserError') > -1)
 
         # Bad file: empty file
         #
