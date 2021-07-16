@@ -20,7 +20,7 @@
               File is locked by another user
             </template>
           </ColoredBorderAlert>
-          <CreateDPStatistics v-if="!loading && !fileLocked" v-bind:fileInfo="uploadedFile"/>
+          <CreateDPStatistics v-if="uploadedFile && !fileLocked" v-bind:fileInfo="uploadedFile"/>
           <h2
               class="title-size-2 font-weight-bold mt-16"
               :class="{
@@ -30,7 +30,7 @@
             My Data
           </h2>
           <MyDataTable
-              v-if="!loading"
+              v-if="datasetList"
               :class="{
               'my-7': $vuetify.breakpoint.xsOnly,
               'my-5': $vuetify.breakpoint.smAndUp
@@ -64,7 +64,6 @@ import MyDataTable from "../components/MyData/MyDataTable.vue";
 import SupportBanner from "../components/SupportBanner.vue";
 import CreateDPStatistics from "../components/Welcome/CreateDPStatistics.vue";
 import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
-import depositorSetup from "@/api/depositorSetup";
 import {mapGetters, mapState} from 'vuex';
 
 export default {
@@ -79,14 +78,8 @@ export default {
   },
 
   created() {
-    //  depositorSetup.patchDepositorSetup('9255c067-e435-43bd-8af1-33a6987ffc9b')
-    Promise.all(
-        [this.$store.dispatch('auth/fetchUser'),
-          this.$store.dispatch('dataset/setDatasetList')])
-        .then(() => {
-          this.loading = false
-        })
-
+    this.$store.dispatch('auth/fetchUser')
+    this.$store.dispatch('dataset/setDatasetList')
   },
   computed: {
     ...mapGetters('auth', ['isAuthenticated']),
@@ -101,7 +94,6 @@ export default {
     }
   },
   data: () => ({
-    loading: true,
     variables: [
       {
         dataset: "California Demographic Dataset",
