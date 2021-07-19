@@ -34,6 +34,9 @@ DEBUG = True
 # Application definition
 
 INSTALLED_APPS = [
+    'channels', # Django channels..
+    'opendp_apps.async_messages',
+    #
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,8 +46,6 @@ INSTALLED_APPS = [
     'django_extensions',
     'django.contrib.sites',
     #
-    # Djnago channels..
-    'channels',
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
