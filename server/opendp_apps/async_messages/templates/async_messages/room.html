@@ -1,0 +1,83 @@
+<!-- chat/templates/chat/room.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Test profile</title>
+</head>
+<p>
+    {% comment %}
+    <textarea id="chat-log" cols="100" rows="10"></textarea><br>
+    <input id="chat-message-input" type="text" size="100"><br>
+    <input id="chat-message-submit" type="button" value="Send">
+    {{ room_name|json_script:"room-name" }}
+    {% endcomment %}
+    <p><a href="{%  url 'view_push_test' %}" target="_blank">run async profile</a></p>
+    <div id="json-splat1" style="border:1px solid #006699;margin:30px;"></div>
+    <pre id="json-splat2" style="border:1px solid #006699;margin:30px;"></pre>
+
+    <script>
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/async_messages/ws/chat/{{ ws_name }}'
+            //+ roomName
+            + '/'
+        );
+        chatSocket.onmessage = function(e) {
+            console.log(e);
+            console.log(e.data);
+            const data = JSON.parse(e.data);
+
+            console.log('--------------------');
+            console.log(JSON.stringify(data));
+            console.log('--------------------');
+
+            document.querySelector('#chat-log').value += (data.message.user_message + '\n');
+            if (data.message.data) {
+                msg_data = data.message.data
+                let data_str = JSON.stringify(msg_data);
+                //console.log(data_str)
+
+                if (msg_data.profile_str){
+                    let info = JSON.parse(msg_data.profile_str);
+                    let var_names = Object.keys(info.variables);
+                    console.log(var_names);
+                    //var keys = Object.keys(foo);
+                    document.querySelector('#json-splat1').innerHTML += var_names.join(' | ');
+
+                    //document.querySelector('#json-splat2').innerHTML += msg_data.profile_str + '\n';
+                    document.querySelector('#json-splat2').innerHTML += (JSON.stringify(info, null, '\t') + '\n');
+
+                }else {
+                    //document.querySelector('#json-splat2').innerHTML += (JSON.stringify(msg_data) + '\n');
+                    //document.querySelector('#chat-log').value += (JSON.stringify(data.message.data) + '\n');
+                }
+            }
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.querySelector('#chat-message-input').focus();
+        document.querySelector('#chat-message-input').onkeyup = function(e) {
+            if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function(e) {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
+            messageInputDom.value = '';
+        };
+
+    </script>
+</body>
+</html>

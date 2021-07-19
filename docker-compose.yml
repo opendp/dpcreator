@@ -58,18 +58,24 @@ services:
     depends_on:
       - client
       - db
-#  task-queue:
-#    build: "./server"
-    # For production we will need to set
-    # these variables to point to a standalone instance
-#    env_file:
-#      - .env
-#    #command: celery -A opendp_project worker -l info -n worker_dpcreator
-#    command: celery -A opendp_project worker -l INFO
-#    volumes:
-#      - .:/code
-#    ports:
-#      - "8070:8070"
-#    depends_on:
-#      - db
-#      - redis
+# ---------------------------------
+# Celery Task Queue
+# - Used for profiling, other longer
+#   running tasks
+# ---------------------------------
+  celery-queue:
+    build: "./server"
+    environment:
+      - DJANGO_SETTINGS_MODULE=opendp_project.settings.development
+    env_file:
+      - .env
+    command: celery -A opendp_project worker -l info -n worker_dpcreator
+    #  command: celery -A opendp_project worker -l INFO
+    volumes:
+      - .:/code
+    ports:
+      - "8070:8070"
+    depends_on:
+      - db
+      - redis
+      - server

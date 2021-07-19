@@ -16,7 +16,7 @@ from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.profiler.tasks import ProfileHandler
 from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadHandler
 from opendp_apps.profiler import tasks as profiler_tasks
-from opendp_apps.utils.view_helper import get_json_err, get_json_success
+from opendp_apps.utils.view_helper import get_json_error, get_json_success
 
 
 def send_websocket_profiler_err_msg(user_msg, websocket_id):
@@ -56,7 +56,7 @@ def profile_dataset_info(ds_info_object_id, websocket_id=None):
     except DataSetInfo.DoesNotExist:
         user_msg = f'The DataSetInfo object was not found. (object_id: {ds_info_object_id}'
         send_websocket_profiler_err_msg(user_msg)  # websocket error message
-        return get_json_err(user_msg)  # direct error message
+        return get_json_error(user_msg)  # direct error message
 
     # (2) Is the file downloaded?
     if not dsi.source_file:
@@ -64,7 +64,7 @@ def profile_dataset_info(ds_info_object_id, websocket_id=None):
         if not dsi.source == DataSetInfo.SourceChoices.Dataverse:
             user_msg = f'The DataSetInfo source file is not available. (object_id: {ds_info_object_id}'
             send_websocket_profiler_err_msg(user_msg)  # websocket error message
-            return get_json_err(user_msg)  # direct error message
+            return get_json_error(user_msg)  # direct error message
         else:
             # It's a Dataverse file, retrieve it
             user_msg = 'Copying the Dataverse file to DP Creator.'
@@ -74,7 +74,7 @@ def profile_dataset_info(ds_info_object_id, websocket_id=None):
             if download_handler.has_error():
                 user_msg = download_handler.get_error_message()
                 send_websocket_profiler_err_msg(user_msg)  # websocket error message
-                return get_json_err(user_msg)  # direct error message
+                return get_json_error(user_msg)  # direct error message
 
             # Send successful download message
             #
