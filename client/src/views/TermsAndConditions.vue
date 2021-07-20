@@ -24,6 +24,7 @@
             </template>
             <template v-slot:actions>
               <Checkbox
+                  data-test="confirmTermsCheckbox"
                   :value.sync="confirmTerms"
                   text="I have read and agree to the Terms of Service."
                   v-on:update:value="handleUpdate($event)"
@@ -80,7 +81,7 @@ export default {
         console.log('user:' + this.user.objectId)
         console.log('termsId:' + this.currentTerms.objectId)
         console.log('received event: ' + accepted)
-        if (accepted) {
+        if (accepted && this.user) {
           this.$store.dispatch('auth/acceptTerms', {
             user: this.user.objectId,
             termsOfAccess: this.currentTerms.objectId

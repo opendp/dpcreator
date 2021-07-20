@@ -1,6 +1,7 @@
 {
     describe('Dataverse Handoff mock-dv test', () => {
         it('Displays correct file on Welcome Page', () => {
+            Cypress.Cookies.debug(true)
             cy.clearData()
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
@@ -33,6 +34,9 @@
             cy.get('[data-test="username"]').type('dev_admin');
             cy.get('[data-test="password"]').type('admin');
             cy.get('[data-test="Log in"]').click();
+            // first we will be routed to the Terms of Conditions page for the user
+            cy.get('[data-test="confirmTermsCheckbox"]').click({force: true});
+            // Next the Welcome page, with the Dataset  message
             cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
                 ' doi:10.7910/DVN/PUXVDH | Replication Data for: Eye-typing experiment | Fatigue_data.tab ')
         }),
@@ -51,6 +55,9 @@
                 cy.get('[data-test="username"]').type('test_user');
                 cy.get('[data-test="password"]').type('dpcreator');
                 cy.get('[data-test="Log in"]').click();
+                // first we will be routed to the Terms of Conditions page for the user
+                cy.get('[data-test="confirmTermsCheckbox"]').click({force: true});
+                // Next the Welcome page, with the File Locked message
                 cy.get('.v-alert__wrapper').should('contain', 'File is locked by another user')
             })
     })
