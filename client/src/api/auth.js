@@ -1,8 +1,10 @@
 import session from './session';
+const camelcaseKeys = require('camelcase-keys');
 
 export default {
   login(username, password) {
     return session.post('/rest-auth/login/', {username, password})
+        .then(data => camelcaseKeys(data, {deep: true}))
         .catch(function (data) {
           if (data.response) {
             if (data.response.status == 400) {
@@ -65,7 +67,7 @@ export default {
           });
   },
   getAccountDetails() {
-    return session.get('/rest-auth/user/');
+      return session.get('/rest-auth/user/').then(data => camelcaseKeys(data, {deep: true}));
   },
   updateAccountDetails(data) {
     return session.patch('/rest-auth/user/', data);

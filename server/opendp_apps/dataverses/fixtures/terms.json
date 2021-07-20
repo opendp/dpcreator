@@ -1,0 +1,12 @@
+[
+  {
+    "model": "terms_of_access.termsofaccess",
+    "pk": 1,
+    "fields": {
+      "description": "Initial Terms of Service",
+      "version": 1,
+      "created": "2021-09-01 06:00:00.000000-08:00",
+      "updated": "2021-09-01 06:00:00.000000-08:00"
+    }
+  }
+]
