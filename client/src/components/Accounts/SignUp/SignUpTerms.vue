@@ -7,36 +7,19 @@
       <strong>1/2. </strong>Check and accept Terms of Use:
     </h2>
     <ShadowBoxWithScroll>
-      <template v-slot:title>
-        Terms for depositing a DP release back to Dataverse
-      </template>
       <template v-slot:scrollable-area>
-        <span v-html="$t('new account.TOU Creating DP')"></span>
+        <span v-html="currentTerms.description"></span>
       </template>
       <template v-slot:actions>
         <Checkbox
-            :value.sync="confirmTerms1"
+            :value.sync="confirmTerms"
             text="I have read and agree to the Terms of Service."
         />
       </template>
     </ShadowBoxWithScroll>
 
-    <ShadowBoxWithScroll>
-      <template v-slot:title>
-        Terms for depositing a DP release back to Dataverse
-      </template>
-      <template v-slot:scrollable-area>
-        <span v-html="$t('new account.TOU Dataverse')"></span>
-      </template>
-      <template v-slot:actions>
-        <Checkbox
-            :value.sync="confirmTerms2"
-            text="I have read and agree to the Terms of Service."
-        />
-      </template>
-    </ShadowBoxWithScroll>
     <Button
-        :disabled="!confirmTerms1 || !confirmTerms2"
+        :disabled="!confirmTerms"
         classes="mt-6"
         :class="{
         'width80 mx-auto d-block': $vuetify.breakpoint.xsOnly,
@@ -74,12 +57,12 @@ import NETWORK_CONSTANTS from "../../../router/NETWORK_CONSTANTS";
 export default {
   components: {ShadowBoxWithScroll, Checkbox, Button},
   name: "SignUpTerms",
-  props: ["signUpStep"],
+  props: ["signUpStep", "currentTerms"],
   data: () => ({
-    confirmTerms1: false,
-    confirmTerms2: false,
+    confirmTerms: false,
     NETWORK_CONSTANTS
   }),
+
   methods: {
     handleContinue: function () {
       window.scrollTo(0, 0);

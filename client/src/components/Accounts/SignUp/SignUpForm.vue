@@ -108,11 +108,12 @@ import Button from "../../DesignSystem/Button.vue";
 import SocialLoginButton from "../SocialLoginButton.vue";
 import SocialLoginSeparator from "../SocialLoginSeparator.vue";
 import NETWORK_CONSTANTS from "../../../router/NETWORK_CONSTANTS";
-import {mapState} from "vuex";
+import {mapState, mapGetters} from "vuex";
 
 export default {
   components: {SocialLoginButton, SocialLoginSeparator, Button},
   name: "SignUpForm",
+  props: ["termsId"],
   methods: {
     confirmPasswordVerification() {
       return this.password === this.confirmPassword || `Passwords don't match`;
@@ -133,10 +134,15 @@ export default {
         this.$store.dispatch('signup/createAccount', inputs)
             .then((resp) => {
               const openDPUserId = resp.data[0]
+              // now that we have a user object,
+              // save user's acceptance of terms of use (step 1 of sign up)
+              if (!this.isTermsAccepted) {
+                this.$store.dispatch('auth/acceptTerms', openDPUserId)
+              }
               if (this.handoffId) {
                 this.$store.dispatch('dataverse/updateDataverseUser', openDPUserId, this.handoffId)
                     .then((dvUserObjectId) => {
-                       this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
+                      this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
                           .catch(({data}) => console.log("error: " + data))
 
                     })
@@ -162,7 +168,7 @@ export default {
       if (this.handoffId) {
         this.$store.dispatch('auth/fetchUser')
             .then((data) => {
-              this.$store.dispatch('dataverse/updateDataverseUser', this.user['object_id'], this.handoffId)
+              this.$store.dispatch('dataverse/updateDataverseUser', this.user.objectId, this.handoffId)
                   .then((dvUserObjectId) => {
                     this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
                         .catch(({data}) => console.log("error: " + data))
@@ -195,6 +201,7 @@ export default {
       'registrationLoading']),
     ...mapState('dataverse', ['handoffId', 'dataverseUser']),
     ...mapState('auth', ['user']),
+    ...mapGetters('auth', ['isTermsAccepted']),
 
     registrationErrors() {
       let errs = [];

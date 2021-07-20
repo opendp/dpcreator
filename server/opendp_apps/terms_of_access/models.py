@@ -4,7 +4,7 @@ from opendp_apps.model_helpers.models import \
     (TimestampedModel, TimestampedModelWithUUID)
 
 
-class TermsOfAccess(TimestampedModel):
+class TermsOfAccess(TimestampedModelWithUUID):
     """
     Terms of Access Content
     """

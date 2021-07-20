@@ -13,7 +13,6 @@ export default {
 
         return session.get('/api/terms-of-access/')
             .then(resp => {
-
                 return camelcaseKeys(resp.data, {deep: true}).results[0]
 
             })
@@ -26,5 +25,16 @@ export default {
      */
     getTermsOfUseLog(OpenDPUserId) {
         return session.get('/api/terms-of-access-agreement/' + OpenDPUserId);
+    },
+    /**
+     *    return session.post('/api/dv-file/',
+     {handoff_id: handoffId, creator: openDPUserId})
+     .then(resp => camelcaseKeys(resp, {deep: true}))
+     * Inserts a row in the termsOfUseAccessLog table, to record user acceptance
+     */
+    acceptTermsOfUse(user, termsOfAccess) {
+        console.log('api user:' + user)
+        console.log('api terms:' + termsOfAccess)
+        return session.post('/api/terms-of-access-agreement/', {user: user, terms_of_access: termsOfAccess})
     }
 }

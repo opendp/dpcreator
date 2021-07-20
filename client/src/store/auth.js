@@ -27,13 +27,14 @@ const initialState = {
 const getters = {
   isAuthenticated: state => !!state.token,
   isTermsAccepted: state => {
-
-    return (state.user !== null
+    const retVal = (state.user !== null
         && state.termsOfAccessLog !== null
         && state.termsOfAccessLog.filter(
             function (obj) {
               return obj.objectId === state.currentTerms.objectId;
             }) !== null)
+    console.log('returning ' + retVal)
+    return retVal
   },
   getUser: state => {
     return state.user
@@ -76,6 +77,7 @@ const actions = {
     if (state.token!=null) {
       return auth.getAccountDetails()
           .then(response => {
+
             commit('SET_USER', response.data)
             return Promise.resolve()
           })
@@ -96,6 +98,9 @@ const actions = {
   setTermsLog({commit, state}, openDPUserId) {
     return terms.getTermsOfUseLog(openDPUserId).then(response =>
         commit(SET_TERMS_LOG, response))
+  },
+  acceptTerms({commit, state}, {user, termsOfAccess}) {
+    terms.acceptTermsOfUse(user, termsOfAccess).then(console.log('updated terms'))
   },
   initialize({commit}) {
     const token = localStorage.getItem(TOKEN_STORAGE_KEY);

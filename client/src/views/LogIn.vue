@@ -94,13 +94,14 @@ import SocialLoginButton from "../components/Accounts/SocialLoginButton.vue";
 import SocialLoginSeparator from "../components/Accounts/SocialLoginSeparator.vue";
 import Button from "../components/DesignSystem/Button.vue";
 import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
-import {mapState} from 'vuex';
+import {mapState, mapGetters} from 'vuex';
 
 export default {
   name: "MyData",
   components: {SocialLoginButton, SocialLoginSeparator, Button},
   computed: {
     ...mapState('auth', ['error', 'user']),
+    ...mapGetters('auth', ['isTermsAccepted']),
     ...mapState('dataverse', ['handoffId']),
   },
   methods: {
@@ -122,13 +123,16 @@ export default {
       if (this.handoffId) {
         this.$store.dispatch('auth/fetchUser')
             .then((data) => {
-
-              this.$store.dispatch('dataverse/updateDataverseUser', this.user['object_id'], this.handoffId)
+              this.$store.dispatch('dataverse/updateDataverseUser', this.user.objectId, this.handoffId)
                   .then((dvUserObjectId) => {
                     this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
                         .catch(({data}) => console.log("error: " + data))
                         .then(() => {
-                          this.$router.push('/welcome')
+                          if (this.isTermsAccepted) {
+                            this.$router.push(NETWORK_CONSTANTS.WELCOME.PATH)
+                          } else {
+                            this.$router.push(NETWORK_CONSTANTS.TERMS_AND_CONDITIONS.PATH)
+                          }
                         })
                   })
                   .catch((data) => console.log(data))
@@ -139,8 +143,12 @@ export default {
               this.errorMessage = data
             });
       } else {
-        if (this.errorMessage == null) {
-          this.$router.push('/welcome')
+        if (!this.errorMessage) {
+          if (this.isTermsAccepted) {
+            this.$router.push(NETWORK_CONSTANTS.WELCOME.PATH)
+          } else {
+            this.$router.push(NETWORK_CONSTANTS.TERMS_AND_CONDITIONS.PATH)
+          }
         }
       }
     },
