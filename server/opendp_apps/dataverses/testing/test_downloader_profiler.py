@@ -12,10 +12,8 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
 from opendp_apps.dataverses import static_vals as dv_static
-from opendp_apps.dataverses.models import ManifestTestParams, DataverseHandoff
 from opendp_apps.user.models import DataverseUser
 from opendp_apps.model_helpers.msg_util import msg, msgt
-from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.profiler import tasks as profiler_tasks
 from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadHandler
@@ -55,7 +53,6 @@ class DownloadProfileTests(TestCase):
         """(10) Test successful download + profile"""
         msgt(self.test_10_download_profile_success.__doc__)
 
-        self.assertTrue('blue' == 'blue')
         dfi = DataverseFileInfo.objects.get(pk=3)
         self.assertTrue(not dfi.source_file)
 
@@ -101,3 +98,108 @@ class DownloadProfileTests(TestCase):
         json_profile = json.dumps(profile_handler.data_profile, cls=DjangoJSONEncoder, indent=4)
         for fn in ['WARCRI', 'WARCASE',	'SCMEDIAN']:
             self.assertTrue(json_profile.find(fn) > -1)
+
+
+    def test_20_error_no_file_schema(self):
+        """(20) Error: No file_schema_info"""
+        msgt(self.test_20_error_no_file_schema.__doc__)
+
+        dfi = DataverseFileInfo.objects.get(pk=3)
+        self.assertTrue(not dfi.source_file)
+
+        # Set bad data
+        #
+        file_schema_info = dfi.file_schema_info
+        dfi.file_schema_info = ''
+
+        # Run DataverseDownloadHandler
+        #
+        dhandler = DataverseDownloadHandler(dfi)
+
+        #print('dhandler.has_error()', dhandler.has_error())
+        self.assertTrue(dhandler.has_error())
+
+        print(dhandler.get_err_msg())
+        self.assertTrue(dhandler.get_err_msg().find('dv_download_020') > -1)
+
+    def test_30_error_no_content_url(self):
+        """(30) Error: No "contentUrl" key in file_schema_info"""
+        msgt(self.test_30_error_no_content_url.__doc__)
+
+        dfi = DataverseFileInfo.objects.get(pk=3)
+        self.assertTrue(not dfi.source_file)
+
+        # set bad data
+        bad_file_schema_info = dfi.file_schema_info
+        bad_file_schema_info.pop(dv_static.SCHEMA_KEY_CONTENTURL)
+        dfi.file_schema_info = bad_file_schema_info
+
+        # Run DataverseDownloadHandler
+        #
+        dhandler = DataverseDownloadHandler(dfi)
+
+        #print('dhandler.has_error()', dhandler.has_error())
+        self.assertTrue(dhandler.has_error())
+
+        print(dhandler.get_err_msg())
+        self.assertTrue(dhandler.get_err_msg().find('dv_download_040') > -1)
+
+    def test_40_error_empty_content_url(self):
+        """(40) Error: Empty "contentUrl" in file_schema_info"""
+        msgt(self.test_40_error_empty_content_url.__doc__)
+
+        dfi = DataverseFileInfo.objects.get(pk=3)
+        self.assertTrue(not dfi.source_file)
+
+        # set bad data
+        bad_file_schema_info = dfi.file_schema_info
+        bad_file_schema_info[dv_static.SCHEMA_KEY_CONTENTURL] = '    '
+        dfi.file_schema_info = bad_file_schema_info
+
+        # Run DataverseDownloadHandler
+        #
+        dhandler = DataverseDownloadHandler(dfi)
+        #print('dhandler.has_error()', dhandler.has_error())
+        self.assertTrue(dhandler.has_error())
+
+        print(dhandler.get_err_msg())
+        self.assertTrue(dhandler.get_err_msg().find('dv_download_050') > -1)
+
+
+
+    def test_50_no_dataverse_user(self):
+        """(50) Error: No DataverseUser connected to the DataverseFileInfo.creator"""
+        msgt(self.test_50_no_dataverse_user.__doc__)
+
+        dfi = DataverseFileInfo.objects.get(pk=3)
+        self.assertTrue(not dfi.source_file)
+
+        # set bad data
+        du = DataverseUser.objects.get(pk=3)
+        du.delete()
+
+        dhandler = DataverseDownloadHandler(dfi)
+        #print('dhandler.has_error()', dhandler.has_error())
+        self.assertTrue(dhandler.has_error())
+        print(dhandler.get_err_msg())
+        self.assertTrue(dhandler.get_err_msg().find('dv_download_070') > -1)
+
+
+    def test_60_no_dataverse_user_token(self):
+        """(60) Error: DataverseUser doesn't have a token"""
+        msgt(self.test_60_no_dataverse_user_token.__doc__)
+
+        dfi = DataverseFileInfo.objects.get(pk=3)
+        self.assertTrue(not dfi.source_file)
+
+        # set bad data
+        du = DataverseUser.objects.get(pk=3)
+        du.dv_general_token = ''
+        du.save()
+
+        dhandler = DataverseDownloadHandler(dfi)
+        #print('dhandler.has_error()', dhandler.has_error())
+        self.assertTrue(dhandler.has_error())
+        print(dhandler.get_err_msg())
+        self.assertTrue(dhandler.get_err_msg().find('dv_download_080') > -1)
+
