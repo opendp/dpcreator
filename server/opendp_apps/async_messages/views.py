@@ -17,7 +17,7 @@ from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.async_messages import static_vals as async_static
 from opendp_apps.async_messages.utils import get_websocket_id
 from opendp_apps.async_messages.websocket_message import WebsocketMessage
-from opendp_apps.async_messages.tasks import send_test_msg
+from opendp_apps.async_messages.tasks import profile_dataset_info, send_test_msg
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -40,13 +40,14 @@ def ajax_profile_by_dataset_object_id(request):
     In a POST, send 'dataset_object_id'
     """
     json_data = json.loads(request.body)
-    print('json_data->>', json_data)
+    print('json_data ->>', json_data)
 
     if not request.user.is_superuser:
         return JsonResponse(dict(success=False, message='nope'),
                             status=status.HTTP_403_FORBIDDEN)
 
     websocket_id = get_websocket_id(request)
+    print('websocket_id ->>', websocket_id)
 
     if not 'dataset_object_id' in json_data:
         ws_msg = WebsocketMessage.get_fail_message(
@@ -58,8 +59,9 @@ def ajax_profile_by_dataset_object_id(request):
             f'({datetime.now()}) Looking good, ready for the next step')
 
     ws_msg.send_message(websocket_id)
-    send_test_msg.delay(websocket_id)
-
+    #send_test_msg.delay(websocket_id)
+    print("json_data['dataset_object_id'] ->>", json_data['dataset_object_id'])
+    profile_dataset_info.delay(json_data['dataset_object_id'], websocket_id=websocket_id)
 
     return JsonResponse(dict(success=True, message='should be sending a websocket message...'))
 

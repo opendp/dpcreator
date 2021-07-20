@@ -1,9 +1,8 @@
 from os.path import abspath, dirname, isdir, isfile, join
 import json
 import responses
-from io import BytesIO
 
-from unittest import skip
+#from unittest import skip
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.core.serializers.json import DjangoJSONEncoder
@@ -79,6 +78,10 @@ class DownloadProfileTests(TestCase):
 
         print('dfi.source_file', dfi.source_file)
         self.assertTrue(dfi.source_file)
+
+        print('>>> new_file_name', dhandler.new_file_name)
+        self.assertEqual(dhandler.new_file_name, 'crisis.tab')
+
 
         # ---------------------------
         # Run the Profile Handler!
@@ -203,3 +206,45 @@ class DownloadProfileTests(TestCase):
         print(dhandler.get_err_msg())
         self.assertTrue(dhandler.get_err_msg().find('dv_download_080') > -1)
 
+    @responses.activate
+    def test_70_download_no_schema_file_name(self):
+        """(70) File Name not in schema, use download file name and add ".tab" """
+        msgt(self.test_70_download_no_schema_file_name.__doc__)
+
+        dfi = DataverseFileInfo.objects.get(pk=3)
+        self.assertTrue(not dfi.source_file)
+
+        # remove the "name" from the file_schema_info
+        #
+        updated_file_schema_info = dfi.file_schema_info
+        updated_file_schema_info.pop(dv_static.SCHEMA_KEY_NAME)
+        dfi.file_schema_info = updated_file_schema_info
+        dfi.save()
+
+
+        crisis_filepath = join(TEST_DATA_DIR, 'crisis.tab')
+        print('crisis_filepath', crisis_filepath)
+        self.assertTrue(isfile(crisis_filepath))
+
+        with open(crisis_filepath, "rb") as data_file:
+            responses.add(
+                responses.GET,
+                "https://dataverse.harvard.edu/api/access/datafile/101649",
+                body=data_file.read(),
+                status=200,
+                content_type="text/tab-separated-values",
+                stream=True,
+            )
+
+        # ---------------------------
+        # Run the Downloader!
+        # ---------------------------
+        dhandler = DataverseDownloadHandler(dfi)
+        #print('dhandler.has_error()', dhandler.has_error())
+        self.assertTrue(not dhandler.has_error())
+
+        print('dfi.source_file', dfi.source_file)
+        self.assertTrue(dfi.source_file)
+
+        print('>>> new_file_name', dhandler.new_file_name)
+        self.assertEqual(dhandler.new_file_name, '101649.tab')

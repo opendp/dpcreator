@@ -42,15 +42,22 @@ Example of using async/websockets.
             <!-- name --><td>{{ ds.name}}<br />({{ ds.polymorphic_ctype.name }})</td>
             <!-- object_id --><td>{{ ds.object_id}}</td>
             <!-- source file -->
-            <td>{% if ds.source_file %}}
+            <td>{% if ds.source_file and ds.data_profile  %}
+                    <!-- file and data profile exist -->
+                    <i class="bi bi-emoji-sunglasses"></i>
+                    Profile Done!
+                {% elif ds.source_file %}
                     <!-- file exists -->
-                    <i class="bi bi-file"></i>
+                    <i class="bi table"></i>
+                    (source file exists)
+                    <a href="#" id="{{ ds.object_id}}" class="profile-btn btn btn-sm btn-primary">Download + Profile!</a>
+                {% elif ds.data_profile %}
+                    Hmm, data_profile but not source...
                 {% else %}
-                    <!-- file doesn't exist: show profile button! -->
-                    <i class="bi bi-exclamation-square"></i>
+                    <!-- neither file nor data_profile exists -->
+                    <i class="bi bi-exclamation-diamond"></i>
                         (not available)
-                        <!-- note: "profile-btn" class connected to .js events later -->
-                        <a href="#" id="{{ ds.object_id}}" class="profile-btn btn btn-sm btn-primary">Download + Profile!</a>
+                     <a href="#" id="{{ ds.object_id}}" class="profile-btn btn btn-sm btn-primary">Download + Profile!</a>
                 {% endif %}
             </td>
             <td>{% if ds.data_profile %}
@@ -122,8 +129,11 @@ Example of using async/websockets.
             // ---------------------------------------
             // "ws_msg.success": Did it work?
             // ---------------------------------------
-            if (ws_msg.success) {
-                console.log('-- it worked!')
+            if (ws_msg.success === true) {
+                console.log('-- success message');
+            } else if (ws_msg.success === false){
+                console.log('-- error message');
+                alert(ws_msg.user_message);
             } else {
                 console.log('-- error occurred!')
                 return;
