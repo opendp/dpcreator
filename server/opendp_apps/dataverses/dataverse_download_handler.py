@@ -14,6 +14,7 @@ from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses import static_vals as dv_static
+from opendp_apps.user.models import DataverseUser
 
 
 class DataverseDownloadHandler(BasicErrCheck):
@@ -28,6 +29,7 @@ class DataverseDownloadHandler(BasicErrCheck):
         self.dv_file_info = dv_file_info
         self.content_url = None
         self.new_file_name = None
+        self.dv_user = None
 
         self.run_download_process()
 
@@ -56,7 +58,7 @@ class DataverseDownloadHandler(BasicErrCheck):
         # Download to a TemporaryFile
         with TemporaryFile() as tf:
 
-            headers = {'X-Dataverse-key': self.dv_file_info.api_general_token}
+            headers = {'X-Dataverse-key': self.dv_user.dv_general_token}
 
             r = requests.get(self.content_url, headers=headers, stream=True)
             for chunk in r.iter_content(chunk_size=4096):
@@ -116,9 +118,22 @@ class DataverseDownloadHandler(BasicErrCheck):
         # --------------------------------------
         # Is an access token available for download?
         # --------------------------------------
-        if not self.dv_file_info.api_general_token:
-            self.add_err_msg((f'The DataverseFileInfo does not have a an access permissions.'
+        if not self.dv_file_info.creator:
+            self.add_err_msg((f'The DataverseFileInfo does not have a "creator" attribute.'
                               f' (code: dv_download_060)'))
+            return False
+
+        try:
+            self.dv_user = DataverseUser.objects.get(user=self.dv_file_info.creator,
+                                                     dv_installation=self.dv_file_info.dv_installation)
+        except DataverseUser.DoesNotExist:
+            self.add_err_msg((f'The DataverseUser is not available.'
+                              f' (code: dv_download_070)'))
+            return False
+
+        if not self.dv_user.dv_general_token:
+            self.add_err_msg((f'The DataverseUser ({self.dv_user.id}) does not have access permissions.'
+                              f' (code: dv_download_080)'))
             return False
 
         # --------------------------------------
@@ -142,3 +157,12 @@ class DataverseDownloadHandler(BasicErrCheck):
             self.new_file_name = f'{self.new_file_name}.tab'
 
         return True
+
+"""
+from opendp_apps.dataset.models import DataverseFileInfo
+from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadHandler
+
+
+dfi = DataverseFileInfo.objects.get(pk=3)
+dhandler = DataverseDownloadHandler(dfi)
+"""
