@@ -21,7 +21,7 @@ from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadH
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(CURRENT_DIR), 'test_files')
 
-class DownloadProfileTests(TestCase):
+class DownloadHandlerTests(TestCase):
 
     fixtures = ['test_profile_dataset_01.json',]
 
