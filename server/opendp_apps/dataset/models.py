@@ -175,13 +175,6 @@ class UploadFileInfo(DataSetInfo):
     """
     Refers to a file uploaded independently of DV
     """
-
-    # user uploaded files, keep them off of the web path
-    #
-    data_file = models.FileField('User uploaded files',
-                    storage=UPLOADED_FILE_STORAGE,
-                    upload_to='user-files/%Y/%m/%d/')
-
     depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo', on_delete=models.PROTECT, null=True)
 
     def save(self, *args, **kwargs):
@@ -208,7 +201,7 @@ class UploadFileInfo(DataSetInfo):
                     name=self.name,
                     creator=str(self.creator),
                     source=str(self.source),
-                    data_file=self.data_file,
+                    #data_file=self.data_file,
                     updated=str(self.updated),
                     created=str(self.created),
                     object_id=self.object_id.hex)

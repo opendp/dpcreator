@@ -178,10 +178,22 @@ class ProfileHandler(BasicErrCheck):
 
         df_read_params = dict(sep=sep_char)
 
+
+        ds_pointer_for_pandas = self.dataset_pointer
+        if self.dataset_is_django_filefield:
+            if not hasattr(self.dataset_pointer, 'path'):
+                user_msg = f'The Django FileField path was not found.'
+                return err_resp(user_msg)
+
+            ds_pointer_for_pandas = self.dataset_pointer.path
+
+        print('self.dataset_pointer', self.dataset_pointer)
+        print('ds_pointer_for_pandas', ds_pointer_for_pandas)
+
         try:
             # Read the 1st row only; to determine the number of features/columns
             #
-            df_for_size = pd.read_csv(self.dataset_pointer, nrows=1, **df_read_params)
+            df_for_size = pd.read_csv(ds_pointer_for_pandas, nrows=1, **df_read_params)
             num_rows, self.num_original_features = df_for_size.shape
             # print(f'size: {df_for_size.shape}')
 
@@ -191,7 +203,7 @@ class ProfileHandler(BasicErrCheck):
                 df_read_params['usecols'] = self.chosen_column_indices
 
             # read the full file into the dataframe
-            df = pd.read_csv(self.dataset_pointer, **df_read_params)
+            df = pd.read_csv(ds_pointer_for_pandas, **df_read_params)
             return ok_resp(df)
 
         except pd.errors.EmptyDataError as err_obj:

@@ -53,6 +53,8 @@ router.register(r'dv-file', DataverseFileView, basename='dv-file')
 router.registry.extend(dataverse_router.registry)
 
 urlpatterns = [
+    path('async_messages/', include('opendp_apps.async_messages.urls')),
+
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('api/', include(router.urls)),
