@@ -34,6 +34,7 @@
           </ShadowBoxWithScroll>
 
           <Button
+              data-test="confirmTermsContinue"
               :disabled="!confirmTerms"
               classes="mt-6"
               :class="{

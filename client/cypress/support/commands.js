@@ -41,13 +41,14 @@ the included it on jquery headers as follow
             }
         });
 */
-    cy.request('/cypress-tests/clear-test-data/').then(
-        () => {
-            cy.fixture("termsOfAccess.json").then((terms) => {
-                let headers = {"X-CSRFToken": token}
-                cy.request({method: 'POST', url: '/api/terms-of-access/', body: terms, headers: headers})
-            })
-        })
+    cy.request('/cypress-tests/clear-test-data/')
+    //   .then(
+    //    () => {
+    //        cy.fixture("termsOfAccess.json").then((terms) => {
+    //            let headers = {"X-CSRFToken": token}
+    //           cy.request({method: 'POST', url: '/api/terms-of-access/', body: terms, headers: headers})
+    //      })
+    //  })
 
 })
 
@@ -70,6 +71,9 @@ Cypress.Commands.add('createMockDataset', () => {
     cy.get('[data-test="username"]').type('dev_admin');
     cy.get('[data-test="password"]').type('admin');
     cy.get('[data-test="Log in"]').click();
+    // first we will be routed to the Terms of Conditions page for the user
+    cy.get('[data-test="confirmTermsCheckbox"]').click({force: true});
+    cy.get('[data-test="confirmTermsContinue"]').click();
     cy.url().should('contain', 'welcome')
 })
 
