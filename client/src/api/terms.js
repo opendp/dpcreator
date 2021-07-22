@@ -1,5 +1,5 @@
 import session from './session';
-
+import axios from "axios";
 const camelcaseKeys = require('camelcase-keys');
 
 export default {
@@ -24,7 +24,21 @@ export default {
      * @returns {Promise<AxiosResponse<any>>}
      */
     getTermsOfUseLog(OpenDPUserId) {
-        return session.get('/api/terms-of-access-agreement/' + OpenDPUserId);
+        return axios.get('/api/terms-of-access-agreement/' + OpenDPUserId + '/')
+            .catch(resp => {
+                if (resp.response.status === 404) {
+                    console.log('404 err!')
+                    // 404 error means that this user hasn't agreed to any terms yet, so
+                    // just return an empty list
+                    return []
+                }
+            }).then(resp => {
+                if (!(resp.data === undefined)) {
+                    console.log("did we get here?" + JSON.stringify(resp.data))
+                } else {
+                    return resp
+                }
+            })
     },
     /**
      *    return session.post('/api/dv-file/',

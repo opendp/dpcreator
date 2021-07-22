@@ -27,12 +27,26 @@ const initialState = {
 const getters = {
   isAuthenticated: state => !!state.token,
   isTermsAccepted: state => {
+    console.log(state.user !== null)
+    console.log(state.termsOfAccessLog !== null)
+    console.log(state.termsOfAccessLog !== [])
+    console.log(state.termsOfAccessLog)
+    if (state.termsOfAccessLog !== null)
+      console.log(
+          state.termsOfAccessLog.filter(
+              function (obj) {
+                console.log('comparing ' + obj.objectId + ' ' + state.currentTerms.objectId)
+                return obj.objectId === state.currentTerms.objectId;
+              }).length !== 0)
+
     const retVal = (state.user !== null
         && state.termsOfAccessLog !== null
         && state.termsOfAccessLog.filter(
             function (obj) {
+              console.log('comparing ' + obj.objectId + ' ' + state.currentTerms.objectId)
               return obj.objectId === state.currentTerms.objectId;
-            }) !== null)
+            }).length !== 0
+    )
     console.log('returning ' + retVal)
     return retVal
   },
@@ -48,7 +62,6 @@ const actions = {
     return auth.login(username, password)
       .then(({ data }) => {
         commit(SET_TOKEN, data.key)
-        commit(SET_USER, username)
       })
       .then(() => commit(LOGIN_SUCCESS))
       .catch((data) => {  commit(LOGIN_FAILURE); return Promise.reject(data)} );
@@ -96,10 +109,13 @@ const actions = {
     })
   },
   setTermsLog({commit, state}, openDPUserId) {
-    return terms.getTermsOfUseLog(openDPUserId).then(response =>
-        commit(SET_TERMS_LOG, response))
+    return terms.getTermsOfUseLog(openDPUserId).then(response => {
+      console.log('in auth store, response: ' + JSON.stringify(response))
+      commit(SET_TERMS_LOG, response)
+    })
   },
   acceptTerms({commit, state}, {user, termsOfAccess}) {
+    console.log("accepting terms ")
     terms.acceptTermsOfUse(user, termsOfAccess).then(console.log('updated terms'))
   },
   initialize({commit}) {

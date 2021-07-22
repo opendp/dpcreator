@@ -62,9 +62,11 @@ export default {
   components: {ShadowBoxWithScroll, Checkbox, Button},
   name: "TermsAndConditions",
   created() {
-    this.$store.dispatch('auth/setCurrentTerms')
-    console.log('isTermsAccepted: ' + this.isTermsAccepted)
-    this.loading = false
+    Promise.all([
+      this.$store.dispatch('auth/setCurrentTerms')
+      //  this.$store.dispatch('auth/setTermsLog',this.user.objectId)
+    ]).then(() => this.loading = false)
+
   },
   computed: {
     ...mapState('auth', ['currentTerms', 'user']),

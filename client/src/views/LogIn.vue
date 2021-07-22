@@ -144,11 +144,16 @@ export default {
             });
       } else {
         if (!this.errorMessage) {
-          if (this.isTermsAccepted) {
-            this.$router.push(NETWORK_CONSTANTS.WELCOME.PATH)
-          } else {
-            this.$router.push(NETWORK_CONSTANTS.TERMS_AND_CONDITIONS.PATH)
-          }
+          console.log('fetching user')
+          this.$store.dispatch('auth/fetchUser')
+              .then(() => {
+                if (this.isTermsAccepted) {
+                  this.$router.push(NETWORK_CONSTANTS.WELCOME.PATH)
+                } else {
+                  this.$router.push(NETWORK_CONSTANTS.TERMS_AND_CONDITIONS.PATH)
+                }
+              })
+
         }
       }
     },
