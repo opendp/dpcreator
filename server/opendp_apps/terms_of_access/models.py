@@ -26,9 +26,8 @@ class TermsOfAccessLog(TimestampedModelWithUUID):
     """
     Records a Terms of Access agreement
     """
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, to_field="object_id", db_column="user", on_delete=models.PROTECT)
-    terms_of_access = models.ForeignKey(TermsOfAccess, to_field="object_id", db_column="terms_of_access",
-                                        on_delete=models.PROTECT)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    terms_of_access = models.ForeignKey(TermsOfAccess, on_delete=models.PROTECT)
 
     verbose_name = 'Terms of Access Log'
     verbose_name_plural = 'Terms of Access Logs'
