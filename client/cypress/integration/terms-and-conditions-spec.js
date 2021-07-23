@@ -14,6 +14,11 @@
             cy.url().should('contain', 'welcome')
         }),
             it('goes directly to Welcome page when terms are already accepted', () => {
+                cy.on('uncaught:exception', (e, runnable) => {
+                    console.log('error', e)
+                    console.log('runnable', runnable)
+                    return false
+                })
                 cy.login('dev_admin', 'admin')
                 cy.url().should('contain', 'welcome')
             })
