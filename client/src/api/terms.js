@@ -10,7 +10,6 @@ export default {
     getCurrentTerms() {
         // This will return a list of termsOfAccess, ordered by creation time.
         // We return the first element of the list as the current one
-
         return session.get('/api/terms-of-access/')
             .then(resp => {
                 return camelcaseKeys(resp.data, {deep: true}).results[0]
@@ -18,12 +17,11 @@ export default {
             })
 
     },
-    /**
+    /*
      * Returns a history of agreed Terms of Access for this user
-     * @param OpenDPUserId
-     * @returns {Promise<AxiosResponse<any>>}
+     * @returns {Promise<<any>>}
      */
-    getTermsOfUseLog(OpenDPUserId) {
+    getTermsOfUseLog() {
         return axios.get('/api/terms-of-access-agreement/')
             .catch(resp => {
                 if (resp.response.status === 404) {

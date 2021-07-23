@@ -97,14 +97,19 @@ const actions = {
       commit('SET_CURRENT_TERMS', response)
     })
   },
-  fetchTermsLog({commit, state}, openDPUserId) {
-    return terms.getTermsOfUseLog(openDPUserId).then(response => {
+  fetchTermsLog({commit, state}) {
+    return terms.getTermsOfUseLog().then(response => {
       commit(SET_TERMS_LOG, response)
     })
   },
   acceptTerms({commit, state}, {user, termsOfAccess}) {
     console.log("accepting terms ")
     terms.acceptTermsOfUse(user, termsOfAccess).then(console.log('updated terms'))
+        .then(() => {
+          terms.getTermsOfUseLog().then(response => {
+            commit(SET_TERMS_LOG, response)
+          })
+        })
   },
   initialize({commit}) {
     const token = localStorage.getItem(TOKEN_STORAGE_KEY);

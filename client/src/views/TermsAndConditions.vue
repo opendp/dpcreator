@@ -27,7 +27,6 @@
                   data-test="confirmTermsCheckbox"
                   :value.sync="confirmTerms"
                   text="I have read and agree to the Terms of Service."
-                  v-on:update:value="handleUpdate($event)"
               />
             </template>
 
@@ -42,13 +41,12 @@
         'mr-2': $vuetify.breakpoint.smAndUp
       }"
               color="primary"
-              :click="() => $router.push(NETWORK_CONSTANTS.WELCOME.PATH)"
+              :click="() => handleUpdate()"
               label="Continue"
           />
         </v-col>
       </v-row>
     </v-container>
-    <template v-if="confirmTerms">terms confirmed!</template>
   </div>
 </template>
 
@@ -79,22 +77,12 @@ export default {
     NETWORK_CONSTANTS
   }),
   methods: {
-    handleUpdate(accepted) {
-      if (!this.loading) {
-        console.log('user:' + this.user.objectId)
-        console.log('termsId:' + this.currentTerms.objectId)
-        console.log('received event: ' + accepted)
-        if (accepted && this.user) {
-          this.$store.dispatch('auth/acceptTerms', {
-            user: this.user.objectId,
-            termsOfAccess: this.currentTerms.objectId
-          }).then(
-              // update the Vuex store with the new log data
-              this.$store.dispatch('auth/fetchTermsLog')
-          )
-        }
-      }
-
+    handleUpdate() {
+      this.$store.dispatch('auth/acceptTerms', {
+        user: this.user.objectId,
+        termsOfAccess: this.currentTerms.objectId
+      })
+      this.$router.push(NETWORK_CONSTANTS.WELCOME.PATH)
     }
   }
 };
