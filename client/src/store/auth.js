@@ -27,28 +27,17 @@ const initialState = {
 const getters = {
   isAuthenticated: state => !!state.token,
   isTermsAccepted: state => {
-    console.log(state.user !== null)
-    console.log(state.termsOfAccessLog !== null)
-    console.log(state.termsOfAccessLog !== [])
-    console.log(state.termsOfAccessLog)
-    if (state.termsOfAccessLog !== null)
-      console.log(
-          state.termsOfAccessLog.filter(
-              function (obj) {
-                console.log('comparing ' + obj.objectId + ' ' + state.currentTerms.objectId)
-                return obj.objectId === state.currentTerms.objectId;
-              }).length !== 0)
+    let accepted = false
+    if (state.termsOfAccessLog !== null && state.termsOfAccessLog.length > 0) {
+      for (let i in state.termsOfAccessLog) {
+        if (state.termsOfAccessLog[i].user === state.user.objectId
+            && state.termsOfAccessLog[i].termsOfAccess === state.currentTerms.objectId) {
+          accepted = true
+        }
 
-    const retVal = (state.user !== null
-        && state.termsOfAccessLog !== null
-        && state.termsOfAccessLog.filter(
-            function (obj) {
-              console.log('comparing ' + obj.objectId + ' ' + state.currentTerms.objectId)
-              return obj.objectId === state.currentTerms.objectId;
-            }).length !== 0
-    )
-    console.log('returning ' + retVal)
-    return retVal
+      }
+    }
+    return accepted
   },
   getUser: state => {
     return state.user
@@ -103,14 +92,13 @@ const actions = {
       return Promise.resolve()
     }
   },
-  setCurrentTerms({commit, state}) {
+  fetchCurrentTerms({commit, state}) {
     return terms.getCurrentTerms().then((response) => {
       commit('SET_CURRENT_TERMS', response)
     })
   },
-  setTermsLog({commit, state}, openDPUserId) {
+  fetchTermsLog({commit, state}, openDPUserId) {
     return terms.getTermsOfUseLog(openDPUserId).then(response => {
-      console.log('in auth store, response: ' + JSON.stringify(response))
       commit(SET_TERMS_LOG, response)
     })
   },

@@ -50,7 +50,7 @@ export default {
   name: "SignUp",
   components: {SignUpTerms, SignUpForm},
   created() {
-    this.$store.dispatch('auth/setCurrentTerms')
+    this.$store.dispatch('auth/fetchCurrentTerms')
   },
   computed: {
     ...mapState('auth', ['currentTerms']),

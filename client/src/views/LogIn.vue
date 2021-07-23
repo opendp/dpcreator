@@ -99,6 +99,12 @@ import {mapState, mapGetters} from 'vuex';
 export default {
   name: "MyData",
   components: {SocialLoginButton, SocialLoginSeparator, Button},
+  created() {
+    Promise.all([
+      this.$store.dispatch('auth/fetchCurrentTerms'),
+      this.$store.dispatch('auth/fetchTermsLog')
+    ]).then(() => this.loading = false)
+  },
   computed: {
     ...mapState('auth', ['error', 'user']),
     ...mapGetters('auth', ['isTermsAccepted']),

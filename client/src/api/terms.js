@@ -24,26 +24,19 @@ export default {
      * @returns {Promise<AxiosResponse<any>>}
      */
     getTermsOfUseLog(OpenDPUserId) {
-        return axios.get('/api/terms-of-access-agreement/' + OpenDPUserId + '/')
+        return axios.get('/api/terms-of-access-agreement/')
             .catch(resp => {
                 if (resp.response.status === 404) {
-                    console.log('404 err!')
                     // 404 error means that this user hasn't agreed to any terms yet, so
                     // just return an empty list
                     return []
                 }
             }).then(resp => {
-                if (!(resp.data === undefined)) {
-                    console.log("did we get here?" + JSON.stringify(resp.data))
-                } else {
-                    return resp
-                }
+                return camelcaseKeys(resp.data.results, {deep: true})
+
             })
     },
     /**
-     *    return session.post('/api/dv-file/',
-     {handoff_id: handoffId, creator: openDPUserId})
-     .then(resp => camelcaseKeys(resp, {deep: true}))
      * Inserts a row in the termsOfUseAccessLog table, to record user acceptance
      */
     acceptTermsOfUse(user, termsOfAccess) {

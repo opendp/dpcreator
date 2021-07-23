@@ -64,8 +64,8 @@ export default {
   name: "TermsAndConditions",
   created() {
     Promise.all([
-      this.$store.dispatch('auth/setCurrentTerms')
-      //  this.$store.dispatch('auth/setTermsLog',this.user.objectId)
+      this.$store.dispatch('auth/fetchCurrentTerms'),
+      this.$store.dispatch('auth/fetchTermsLog')
     ]).then(() => this.loading = false)
 
   },
@@ -88,7 +88,10 @@ export default {
           this.$store.dispatch('auth/acceptTerms', {
             user: this.user.objectId,
             termsOfAccess: this.currentTerms.objectId
-          })
+          }).then(
+              // update the Vuex store with the new log data
+              this.$store.dispatch('auth/fetchTermsLog')
+          )
         }
       }
 
