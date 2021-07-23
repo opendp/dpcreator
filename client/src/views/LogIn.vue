@@ -99,12 +99,6 @@ import {mapState, mapGetters} from 'vuex';
 export default {
   name: "MyData",
   components: {SocialLoginButton, SocialLoginSeparator, Button},
-  created() {
-    Promise.all([
-      this.$store.dispatch('auth/fetchCurrentTerms'),
-      this.$store.dispatch('auth/fetchTermsLog')
-    ]).then(() => this.loading = false)
-  },
   computed: {
     ...mapState('auth', ['error', 'user']),
     ...mapGetters('auth', ['isTermsAccepted']),
@@ -124,7 +118,18 @@ export default {
             this.processLogin();
           })
     },
-
+    routeToNextPage() {
+      Promise.all([
+        this.$store.dispatch('auth/fetchCurrentTerms'),
+        this.$store.dispatch('auth/fetchTermsLog')
+      ]).then(() => {
+        if (this.isTermsAccepted) {
+          this.$router.push(NETWORK_CONSTANTS.WELCOME.PATH)
+        } else {
+          this.$router.push(NETWORK_CONSTANTS.TERMS_AND_CONDITIONS.PATH)
+        }
+      })
+    },
     processLogin() {
       if (this.handoffId) {
         this.$store.dispatch('auth/fetchUser')
@@ -134,35 +139,23 @@ export default {
                     this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
                         .catch(({data}) => console.log("error: " + data))
                         .then(() => {
-                          if (this.isTermsAccepted) {
-                            this.$router.push(NETWORK_CONSTANTS.WELCOME.PATH)
-                          } else {
-                            this.$router.push(NETWORK_CONSTANTS.TERMS_AND_CONDITIONS.PATH)
-                          }
+                          this.routeToNextPage()
                         })
+
                   })
-                  .catch((data) => console.log(data))
-              this.errorMessage = data
             })
             .catch((data) => {
               console.log(data)
               this.errorMessage = data
             });
       } else {
-        if (!this.errorMessage) {
-          console.log('fetching user')
-          this.$store.dispatch('auth/fetchUser')
-              .then(() => {
-                if (this.isTermsAccepted) {
-                  this.$router.push(NETWORK_CONSTANTS.WELCOME.PATH)
-                } else {
-                  this.$router.push(NETWORK_CONSTANTS.TERMS_AND_CONDITIONS.PATH)
-                }
-              })
+        this.$store.dispatch('auth/fetchUser')
+            .then(() => {
+              this.routeToNextPage()
+            })
 
-        }
       }
-    },
+    }
   },
   data: () => ({
     validLoginForm: false,
