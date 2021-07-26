@@ -6,70 +6,44 @@
     }"
   >
     <v-container>
-      <v-row>
+      <v-row v-if="isTermsAccepted && currentTerms">
         <v-col offset-sm="1" sm="10" offset-md="2" cols="12" md="6">
           <h1 class="title-size-1">Terms of use</h1>
-          <template v-html="$('terms of use.TOU text')">
+          <div v-html="currentTerms.description">
+          </div>
+          <template>
+            <p class="grey--text text--darken-2">Last updated: {{ currentTerms.created }}</p>
           </template>
-          <p>
-            The following Terms govern all use of the Harvard Web Publishing
-            website (the Site), the web publishing platforms (the Tools), and
-            the services available to the Harvard Community (the Service). By
-            using the Tools, the Service or the Site, you are agreeing to be
-            legally bound by these Terms.
-          </p>
-          <h2 class="title-size-2 title-size-2--small">
-            <strong>Lorem ipsum</strong>
-          </h2>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididun ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet,
-            consectetur adipiscing elit, sed do eiusmod tempor incididun ut
-            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-            exercitation ullamco laboris nisi ut aliquip ex ea commodo
-            consequat.
-          </p>
-          <h2 class="title-size-2 title-size-2--small">
-            <strong>Lorem ipsum</strong>
-          </h2>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididun ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat.
-          </p>
-          <h2 class="title-size-2 title-size-2--small">
-            <strong>Lorem ipsum</strong>
-          </h2>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididun ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet,
-            consectetur adipiscing elit, sed do eiusmod tempor incididun ut
-            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-            exercitation ullamco laboris nisi ut aliquip ex ea commodo
-            consequat. Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-            sed do eiusmod tempor incididun ut labore et dolore magna aliqua. Ut
-            enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi
-            ut aliquip ex ea commodo consequat.
-          </p>
-          <h2 class="title-size-2 title-size-2--small">
-            <strong>Lorem ipsum</strong>
-          </h2>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididun ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat. Lorem ipsum dolor sit amet,
-            consectetur adipiscing elit, sed do eiusmod tempor incididun ut
-            labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-            exercitation ullamco laboris nisi ut aliquip ex ea link here.
-          </p>
+        </v-col>
+      </v-row>
+      <v-row v-if="!isTermsAccepted && currentTerms">
+        <v-col offset-sm="1" sm="10" offset-md="2" cols="12" md="6">
+          <ShadowBoxWithScroll>
+            <template v-slot:scrollable-area>
+              <span v-html="currentTerms.description"></span>
+            </template>
+            <template v-slot:actions>
+              <Checkbox
+                  data-test="confirmTermsCheckbox"
+                  :value.sync="confirmTerms"
+                  text="I have read and agree to the Terms of Service."
+              />
+            </template>
 
-          <p class="grey--text text--darken-2">Last updated: April 6, 2021.</p>
+          </ShadowBoxWithScroll>
+
+          <Button
+              data-test="confirmTermsContinue"
+              :disabled="!confirmTerms"
+              classes="mt-6"
+              :class="{
+        'width80 mx-auto d-block': $vuetify.breakpoint.xsOnly,
+        'mr-2': $vuetify.breakpoint.smAndUp
+      }"
+              color="primary"
+              :click="() => handleUpdate()"
+              label="Continue"
+          />
         </v-col>
       </v-row>
     </v-container>
@@ -77,7 +51,39 @@
 </template>
 
 <script>
+import {mapGetters, mapState} from "vuex";
+import ShadowBoxWithScroll from "../components/DesignSystem/Boxes/ShadowBoxWithScroll.vue";
+import Button from "../components/DesignSystem/Button.vue";
+import Checkbox from "../components/DesignSystem/Checkbox.vue";
+import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
+
 export default {
-  name: "TermsAndConditions"
+  components: {ShadowBoxWithScroll, Checkbox, Button},
+  name: "TermsAndConditions",
+  created() {
+    Promise.all([
+      this.$store.dispatch('auth/fetchCurrentTerms'),
+      this.$store.dispatch('auth/fetchTermsLog')
+    ]).then(() => this.loading = false)
+
+  },
+  computed: {
+    ...mapState('auth', ['currentTerms', 'user']),
+    ...mapGetters('auth', ['isTermsAccepted'])
+  },
+  data: () => ({
+    loading: true,
+    confirmTerms: false,
+    NETWORK_CONSTANTS
+  }),
+  methods: {
+    handleUpdate() {
+      this.$store.dispatch('auth/acceptTerms', {
+        user: this.user.objectId,
+        termsOfAccess: this.currentTerms.objectId
+      })
+      this.$router.push(NETWORK_CONSTANTS.WELCOME.PATH)
+    }
+  }
 };
 </script>

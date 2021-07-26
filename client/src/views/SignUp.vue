@@ -4,12 +4,12 @@
       <v-row>
         <v-col offset-md="2" md="8">
           <h1 class="title-size-1">Create new account</h1>
-          <v-stepper v-model="signUpStep">
+          <v-stepper v-if="currentTerms" v-model="signUpStep">
             <v-stepper-content :complete="signUpStep > 1" step="1">
-              <SignUpTerms :signUpStep.sync="signUpStep"/>
+              <SignUpTerms :current-terms="currentTerms" :signUpStep.sync="signUpStep"/>
             </v-stepper-content>
             <v-stepper-content :complete="signUpStep > 2" step="2">
-              <SignUpForm/>
+              <SignUpForm :terms-id="currentTerms.objectId"/>
             </v-stepper-content>
             <div class="my-5 pl-6">
               <span
@@ -44,13 +44,20 @@
 <script>
 import SignUpForm from "../components/Accounts/SignUp/SignUpForm.vue";
 import SignUpTerms from "../components/Accounts/SignUp/SignUpTerms.vue";
+import {mapState} from "vuex";
 
 export default {
   name: "SignUp",
   components: {SignUpTerms, SignUpForm},
-
+  created() {
+    this.$store.dispatch('auth/fetchCurrentTerms')
+  },
+  computed: {
+    ...mapState('auth', ['currentTerms']),
+  },
   data: () => ({
-    signUpStep: 1
+    signUpStep: 1,
+
   })
 };
 </script>

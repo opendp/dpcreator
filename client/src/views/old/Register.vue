@@ -156,7 +156,7 @@ export default {
                 .then(() => {
                   if (this.handoffId) {
                     this.$store.dispatch('dataverse/updateDataverseUser',
-                        this.user['object_id'])
+                        this.user.objectId)
                   }
                 })
           })

@@ -24,6 +24,10 @@
             cy.get('[data-test="username"]').type('dev_admin');
             cy.get('[data-test="password"]').type('admin');
             cy.get('[data-test="Log in"]').click();
+
+            // first we will be routed to the Terms of Conditions page for the user
+            cy.get('[data-test="confirmTermsCheckbox"]').click({force: true});
+            cy.get('[data-test="confirmTermsContinue"]').click();
             // This test is necessary to prevent cypress from canceling the
             // the POST to login to  the server (right now, login redirects to the welcome page)
             cy.url().should('contain', 'welcome')

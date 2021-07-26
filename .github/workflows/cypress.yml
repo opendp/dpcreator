@@ -10,3 +10,9 @@ jobs:
         run: docker-compose -f docker-compose-ci-step1.yml up
       - name: Build server and test
         run: docker-compose -f  docker-compose-ci-step2.yml up --exit-code-from cypress
+      - name: Archive Cypress test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: cypress-videos
+          path: client/cypress/videos
+          retention-days: 3
