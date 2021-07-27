@@ -88,7 +88,13 @@
         "creator": 1,
         "created": "2021-03-23T17:22:50.889Z",
         "updated": "2021-03-30T20:39:14.177Z",
-        "object_id": "9255c067-e435-43bd-8af1-33a6987ffc9b"
+        "object_id": "9255c067-e435-43bd-8af1-33a6987ffc9b",
+        "is_complete": false,
+        "user_step": "step_100",
+        "epsilon": null,
+        "dataset_questions": null,
+        "variable_ranges": null,
+        "variable_categories": null
     }
 },
 {
@@ -102,8 +108,8 @@
         "name": "Fatigue_data.tab",
         "creator": 1,
         "source": "dataverse",
-        "data_profile": "\"blank\"",
-        "source_file": ""
+        "data_profile": null,
+        "source_file": null
     }
 },
 {

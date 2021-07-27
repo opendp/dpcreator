@@ -44,6 +44,13 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     def __str__(self):
         return f'{self.dataversefileinfo} - {self.user_step}'
 
+    def set_user_step(self, new_step:DepositorSteps) -> bool:
+        """Set a new user step. Does *not* save the object."""
+        assert isinstance(new_step, DepositorSetupInfo.DepositorSteps), \
+            "new_step must be a valid choice in DepositorSteps"
+        self.user_step = new_step
+        return True
+    
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the STEP
         #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.

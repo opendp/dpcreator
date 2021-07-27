@@ -96,7 +96,6 @@ Example of using async/websockets.
     /* Start a new websocket upon page load           */
     /* ---------------------------------------------- */
     const chatSocket = new WebSocket(
-
         '{{ WEBSOCKET_PREFIX }}' + window.location.host + '/async_messages/ws/profile/{{ websocket_id }}' + '/'
     );
 
@@ -106,19 +105,19 @@ Example of using async/websockets.
     chatSocket.onmessage = function(e) {
 
         // parse the incoming JSON to a .js object
-        const ws_data = JSON.parse(e.data);
+        const ws_data = JSON.parse(e.data);  // JSON -> javascript object
+        const ws_msg = ws_data.message;      // "message" object sent from the backend
 
         /* "ws_msg" attributes are the defined in the Python WebsocketMessage object
-             msg_type (str): expected "PROFILER_MESSAGE"
-             success (boolean):  error detected?
-             user_message (str): description of what happened
-             msg_cnt (int): Not used for the profiler
-             data: Profile data, if it exists, JSON
-             timestamp: timestamp
+             - msg_type (str): expected "PROFILER_MESSAGE"
+             - success (boolean):  error detected?
+             - user_message (str): description of what happened
+             - data: Profile data, if it exists, JSON
+             - timestamp: timestamp
+            - msg_cnt (int): Not used for the profiler
 
             - reference: opendp_apps/async_messages/websocket_message.py
         */
-        const ws_msg = ws_data.message
 
         // "ws_msg.msg_type": should be 'PROFILER_MESSAGE'
         if (ws_msg.msg_type !== 'PROFILER_MESSAGE') {
@@ -173,13 +172,12 @@ Example of using async/websockets.
         $("a.profile-btn").click(function() {
             let dataset_id = this.id
             console.log('profile! ' + dataset_id);//Do stuff when clicked
+
+            // POST params
             params = {'dataset_object_id': dataset_id};
-
-            const request = new Request(
-                "{% url 'ajax_profile_by_dataset_object_id' %}",
-                // {headers: {'X-CSRFToken': csrftoken}}
-            );
-
+            ajax_url = "{% url 'ajax_profile_by_dataset_object_id' %}";
+            console.log('ajax_url', ajax_url)
+            const request = new Request(ajax_url);
             fetch(request, {
               method: "POST",
               mode: 'same-origin',  // Do not send CSRF token to another domain.
