@@ -34,7 +34,7 @@ def view_profile_test(request):
     return render(request, 'async_messages/view_profile_test.html', info)
 
 @csrf_exempt
-@user_passes_test(lambda u: u.is_superuser)
+# @user_passes_test(lambda u: u.is_superuser)
 def ajax_profile_by_dataset_object_id(request):
     """Profile DataSetInfo based on ajax input from 'view_profile_test'
     In a POST, send 'dataset_object_id'
@@ -42,9 +42,9 @@ def ajax_profile_by_dataset_object_id(request):
     json_data = json.loads(request.body)
     print('json_data ->>', json_data)
 
-    if not request.user.is_superuser:
-        return JsonResponse(dict(success=False, message='nope'),
-                            status=status.HTTP_403_FORBIDDEN)
+    # if not request.user.is_superuser:
+    #     return JsonResponse(dict(success=False, message='nope'),
+    #                        status=status.HTTP_403_FORBIDDEN)
 
     websocket_id = get_websocket_id(request)
     print('websocket_id ->>', websocket_id)

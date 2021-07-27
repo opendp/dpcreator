@@ -178,6 +178,8 @@ import ColoredBorderAlert from "../../components/DynamicHelpResources/ColoredBor
 import LoadingBar from "../../components/LoadingBar.vue";
 import ChipSelectItem from "../../components/DesignSystem/ChipSelectItem.vue";
 import DynamicQuestionIconTooltip from "@/components/DynamicHelpResources/DynamicQuestionIconTooltip";
+import {mapState, mapGetters} from 'vuex';
+
 export default {
   name: "ConfirmVariables",
   components: {
@@ -187,9 +189,20 @@ export default {
     ColoredBorderAlert,
     ChipSelectItem
   },
+  props: ["stepperPosition"],
+  computed: {
+    ...mapState('auth', ['error', 'user']),
+    ...mapState('dataset', ['datasetInfo']),
+    ...mapGetters('dataset', ['getDepositorSetupInfo']),
+  },
+  /**
+   *  When View is mounted, check whether a variable list exists for this dataset.
+   *  If not, use WebSocket to call the profiler and wait for a result
+   */
   mounted: function () {
+    console.log('mounted!')
     setTimeout(() => {
-      this.loadingVariables = false;
+      this.loadingVariables = true;
       this.variables = [
         {
           name: "V207",
@@ -266,7 +279,8 @@ export default {
           variable.additional_information["categories"].indexOf(category),
           1
       );
-    }
+    },
+
   }
 };
 </script>
