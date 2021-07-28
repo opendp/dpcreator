@@ -102,7 +102,7 @@
         "name": "Fatigue_data.tab",
         "creator": 1,
         "source": "dataverse",
-        "data_profile": "\"blank\"",
+        "data_profile": "",
         "source_file": ""
     }
 },

@@ -1,0 +1,21 @@
+[
+   {
+      "name":"ccode",
+      "label":"Country Code",
+      "type":"categorical",
+      "categories":null
+   },
+   {
+      "name":"country",
+      "label":"Country Name",
+      "type":"categorical",
+      "categories":null
+   },
+   {
+      "name":"age",
+      "label":"Age in years",
+      "type":"numeric",
+      "min":null,
+      "max":null
+   }
+]

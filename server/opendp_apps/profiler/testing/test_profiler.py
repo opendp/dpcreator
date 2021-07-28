@@ -126,7 +126,7 @@ class ProfilerTest(TestCase):
         print('-- Profiler output is the same as the output saved to the DataSetInfo object')
         profile_json_str2 = json.dumps(info, cls=DjangoJSONEncoder, indent=4)
         self.assertTrue(profile_json_str1, profile_json_str2)
-
+        print(profile_json_str2)
 
     def test_020_bad_files(self):
         """(20) Test bad file type"""
@@ -142,8 +142,10 @@ class ProfilerTest(TestCase):
 
         # print(f'!! error: {profiler.get_err_msg()}')
         self.assertTrue(profiler.has_error())
+        error_msg = profiler.get_err_msg()
         self.assertTrue(profiler.get_err_msg().find(ProfileHandler.ERR_FAILED_TO_READ_DATASET) > -1)
-        self.assertTrue(profiler.get_err_msg().find('UnicodeDecodeError') > -1)
+        self.assertTrue(error_msg.find('UnicodeDecodeError') > -1 or \
+                        error_msg.find('ParserError') > -1)
 
         # Bad file: empty file
         #
@@ -153,11 +155,10 @@ class ProfilerTest(TestCase):
 
         profiler = profiler_tasks.run_profile_by_filepath(filepath)
 
-        #print(f'!! error: {profiler.get_err_msg()}')
+        # print(f'!! error: {profiler.get_err_msg()}')
         self.assertTrue(profiler.has_error())
         self.assertTrue(profiler.get_err_msg().find(ProfileHandler.ERR_FAILED_TO_READ_DATASET) > -1)
         self.assertTrue(profiler.get_err_msg().find('EmptyDataError') > -1)
-
 
 
     def test_30_filefield_empty(self):

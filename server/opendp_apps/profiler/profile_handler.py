@@ -13,6 +13,7 @@ from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.profiler import static_vals as pstatic
+from opendp_apps.profiler.profile_formatter import ProfileFormatter
 from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
 
 
@@ -39,6 +40,8 @@ class ProfileHandler(BasicErrCheck):
         self.dataset_is_django_filefield = kwargs.get(pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD, False)
 
         self.data_profile = None    # Data profile information
+        self.profile_variables = None
+
         self.num_original_features = None
 
         # -------------------------------------
@@ -122,6 +125,8 @@ class ProfileHandler(BasicErrCheck):
         if self.dataset_info_object:
             # print('type data_profile', type(self.data_profile))
             self.dataset_info_object.data_profile = self.data_profile
+            self.dataset_info_object.profile_variables = self.profile_variables
+
             self.dataset_info_object.save()
 
 
@@ -306,17 +311,33 @@ class ProfileHandler(BasicErrCheck):
 
         self.prune_profile()
 
+
     def prune_profile(self):
         """Remove un-needed info from the profile
         TODO: Add these options directly into the TwoRavens preprocess code"""
         if self.has_error():
             return
 
-        if 'variableDisplay' in self.data_profile:
-            del self.data_profile['variableDisplay']
+        # -----------------------
+        # Step 1: Prune profile
+        # -----------------------
+        profile_info = ProfileFormatter.prune_profile(self.data_profile)
+        if not profile_info.success:
+            self.add_err_msg(profile_info.message)
+            return
 
+        # Pruned profile!
+        self.data_profile = profile_info.data
 
-        #if ph.has_error():
-        #    print(f'error: {ph.get_err_msg()}')
-        #else:
-        #   print('profiled!')
+        print('self.data_profile', self.data_profile)
+
+        # -----------------------
+        # Step 2: Profile variables
+        # -----------------------
+        fmt_info = ProfileFormatter.format_profile_variables(self.data_profile)
+        if not fmt_info.success:
+            self.add_err_msg(fmt_info.message)
+            return
+
+        # Profile variables formatted!
+        self.profile_variables = fmt_info.data
