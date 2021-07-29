@@ -93,8 +93,7 @@
         "user_step": "step_100",
         "epsilon": null,
         "dataset_questions": null,
-        "variable_ranges": null,
-        "variable_categories": null
+        "variable_info": null
     }
 },
 {
