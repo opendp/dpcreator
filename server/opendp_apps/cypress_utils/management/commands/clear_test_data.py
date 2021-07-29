@@ -22,6 +22,7 @@ class Command(BaseCommand):
                            ('dataset', ['UploadFileInfo', 'DataverseFileInfo', 'DataSetInfo']),
                            ('analysis', ['ReleaseInfo', 'AnalysisPlan', 'DepositorSetupInfo']),
                            ('dataverses', ['DataverseHandoff']),
+                           ('user', ['DataverseUser'])
                            ]
 
         self.stdout.write(self.style.WARNING('Preparing to delete test data'))
