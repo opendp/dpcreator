@@ -3,7 +3,7 @@
     <v-container v-if="!loading">
       <v-row>
         <v-col>
-          <v-stepper v-on:change="alertChange" v-model="stepperPosition" id="wizard-content" alt-labels>
+          <v-stepper v-model="stepperPosition" id="wizard-content" alt-labels>
             <StepperHeader :steps="steps" :stepperPosition="stepperPosition"/>
             <v-stepper-items>
               <span class="d-block mt-5"
@@ -72,7 +72,7 @@ import StepperHeader from "../components/Wizard/StepperHeader.vue";
 import WizardNavigationButtons from "../components/Wizard/WizardNavigationButtons.vue";
 import ValidateDataset from "./WizardSteps/ValidateDataset.vue";
 import stepInformation from "@/data/stepInformation";
-import dataset from "@/api/dataset";
+
 
 import {mapState, mapGetters} from "vuex";
 
@@ -98,14 +98,8 @@ export default {
 
   },
   methods: {
-    alertChange(step) {
-      console.log("change!" + step)
-      if (step === 1) {
-        this.runProfiler()
-      }
-    },
+
     updateStepStatus: function (stepNumber, completedStatus) {
-      console.log('update step!')
       this.steps[stepNumber].completed = completedStatus;
     },
     // Set the current Wizard stepper position based on the
@@ -113,76 +107,15 @@ export default {
     initStepperPosition: function () {
       this.stepperPosition = stepInformation[this.getDepositorSetupInfo.userStep].wizardStepper
     },
-    runProfiler() {
-      dataset.startProfiler(this.datasetInfo.objectId).then(() => console.log('posted to profiler'))
-
-      const prefix = 'ws://'
-      const websocketId = 'ws_' + this.user.objectId
-      console.log("running profiler, before chatsocket")
-      const chatSocket = new WebSocket(
-          prefix + window.location.host + '/async_messages/ws/profile/' + websocketId + '/'
-      );
-
-      /* ---------------------------------------------- */
-      /* Add a handler for incoming websocket messages  */
-      /* ---------------------------------------------- */
-      chatSocket.onmessage = function (e) {
-
-        // parse the incoming JSON to a .js object
-        const ws_data = JSON.parse(e.data);
-
-        /* "ws_msg" attributes are the defined in the Python WebsocketMessage object
-             msg_type (str): expected "PROFILER_MESSAGE"
-             success (boolean):  error detected?
-             user_message (str): description of what happened
-             msg_cnt (int): Not used for the profiler
-             data: Profile data, if it exists, JSON
-             timestamp: timestamp
-
-            - reference: opendp_apps/async_messages/websocket_message.py
-        */
-        const ws_msg = ws_data.message
-
-        // "ws_msg.msg_type": should be 'PROFILER_MESSAGE'
-        if (ws_msg.msg_type !== 'PROFILER_MESSAGE') {
-
-          console.log('unknown msg_type: ' + ws_msg.msg_type);
-        } else {
-
-          // ---------------------------------------
-          // "ws_msg.success": Did it work?
-          // ---------------------------------------
-          if (ws_msg.success === true) {
-            console.log('-- success message');
-          } else if (ws_msg.success === false) {
-            console.log('-- error message');
-            alert(ws_msg.user_message);
-          } else {
-            console.log('-- error occurred!')
-            return;
-          }
-          console.log('ws_msg.user_message: ' + ws_msg.user_message);
-
-
-          if (ws_msg.data) {
-            //console.log(typeof 42);
-
-            const profileStr = JSON.stringify(JSON.parse(ws_msg.data.profile_str), null, 2);
-            console.log(typeof ws_msg.data);
-            console.log('>>DATA<< ws_msg.data: ' + profileStr);
-
-
-          }
-
-        }
-
-        chatSocket.onclose = function (e) {
-          console.error('Chat socket closed unexpectedly');
-        };
-        chatSocket.onerror = function (e) {
-          console.error('onerror: ' + e);
-        };
-      };
+    // If we are on the Confirm Variables step, and the DepositorSetup variables
+    // are not set, then run the Profiler
+    checkProfileData(step) {
+      console.log('checkProfile')
+      if (step === 1 && this.getDepositorSetupInfo.variableRanges === null) {
+        console.log('dispatch profiler')
+        const payload = {userId: this.user.objectId}
+        this.$store.dispatch('dataset/runProfiler', payload)
+      }
 
     }
   },
@@ -190,6 +123,12 @@ export default {
     ...mapState('dataset', ['datasetInfo']),
     ...mapGetters('dataset', ['getDepositorSetupInfo']),
     ...mapState('auth', ['user']),
+  },
+  watch: {
+    stepperPosition: function (val, oldVal) {
+      console.log('stepper watch! val=' + val)
+      this.checkProfileData(val)
+    }
   },
   data: () => ({
     loading: true,
