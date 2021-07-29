@@ -90,6 +90,7 @@ class ProfileFormatter:
         # Create OrderedDict to hold the formatted profile
         #
         profile_formatted = OrderedDict([('dataset', profile_data['dataset']),])
+        profile_variables = OrderedDict()
 
         # Iterate through the variables
         #
@@ -134,8 +135,10 @@ class ProfileFormatter:
             elif var_type == pstatic.VAR_TYPE_CATEGORICAL:
                 fmt_var_info.append(('categories', None))
 
-            profile_formatted[vname] = OrderedDict(fmt_var_info)
+            profile_variables[vname] = OrderedDict(fmt_var_info)
 
-        import json; print('profile_formatted', json.dumps(profile_formatted, indent=4))
+        profile_formatted['variables'] = profile_variables
+
+        #import json; print('profile_formatted', json.dumps(profile_formatted, indent=4))
 
         return ok_resp(profile_formatted)

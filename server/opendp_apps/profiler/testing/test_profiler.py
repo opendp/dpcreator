@@ -63,6 +63,12 @@ class ProfilerTest(TestCase):
         num_features_in_profile = len(info['variables'].keys())
         self.assertEqual(num_features_in_profile, num_features_profile)
 
+        pvars = profiler.profile_variables
+        self.assertTrue('variables' in info)
+        self.assertTrue(len(pvars['variables']) <= len(settings.PROFILER_DEFAULT_COLUMN_INDICES))
+        self.assertEqual(len(pvars['variables']), info['dataset']['variableCount'])
+
+
 
     def test_005_profile_good_files(self):
         """(05) Profile several good files"""
@@ -127,6 +133,9 @@ class ProfilerTest(TestCase):
         profile_json_str2 = json.dumps(info, cls=DjangoJSONEncoder, indent=4)
         self.assertTrue(profile_json_str1, profile_json_str2)
         print(profile_json_str2)
+
+        self.assertEqual(dsi.profile_variables['dataset']['variableCount'],
+                         len(settings.PROFILER_DEFAULT_COLUMN_INDICES))
 
     def test_020_bad_files(self):
         """(20) Test bad file type"""
@@ -209,7 +218,7 @@ class ProfilerTest(TestCase):
         # Run the profile using the Django file field
         profiler = profiler_tasks.run_profile_by_filefield(dsi.object_id)
 
-        # Error!
+        # Should be no error an correct number of features
         self.assertTrue(profiler.has_error() is False)
         self.assertEqual(profiler.num_original_features, 69)
 
@@ -225,3 +234,10 @@ class ProfilerTest(TestCase):
 
         self.assertEqual(dsi2.depositor_setup_info.user_step, \
                          DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
+
+        #print('dsi2.profile_variables', dsi2.profile_variables)
+        self.assertEqual(len(dsi2.profile_variables['variables'].keys()),
+                         len(settings.PROFILER_DEFAULT_COLUMN_INDICES))
+
+        self.assertEqual(dsi2.profile_variables['dataset']['variableCount'],
+                         len(settings.PROFILER_DEFAULT_COLUMN_INDICES))

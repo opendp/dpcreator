@@ -33,8 +33,9 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
                                  default=DepositorSteps.STEP_0100_UPLOADED)
     epsilon = models.FloatField(null=True, blank=True)
     dataset_questions = models.JSONField(null=True, blank=True)
-    variable_ranges = models.JSONField(null=True, blank=True)
-    variable_categories = models.JSONField(null=True, blank=True)
+
+    # Includes variable ranges and categories
+    variable_info = models.JSONField(null=True, blank=True)
 
     class Meta:
         verbose_name = 'Depositor Setup Data'
@@ -88,9 +89,11 @@ class AnalysisPlan(TimestampedModelWithUUID):
     is_complete = models.BooleanField(default=False)
     user_step = models.CharField(max_length=128,
                                  choices=AnalystSteps.choices)
-    variable_ranges = models.JSONField(null=True)
-    variable_categories = models.JSONField(null=True)
-    custom_variables = models.JSONField(null=True)
+
+    # Includes variable ranges and categories
+    variable_info = models.JSONField(null=True, blank=True)
+
+    #custom_variables = models.JSONField(null=True)
     dp_statistics = models.JSONField(null=True)
 
     def __str__(self):

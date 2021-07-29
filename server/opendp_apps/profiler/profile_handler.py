@@ -129,16 +129,21 @@ class ProfileHandler(BasicErrCheck):
 
             self.dataset_info_object.save()
 
+    def get_profile_variables(self):
+        """Return the data profile as a Python dict"""
+        assert self.has_error() is False, "Call .has_error() before using this method"
+        return self.profile_variables
+
 
     def get_data_profile(self):
         """Return the data profile as a Python dict"""
         assert self.has_error() is False, "Call .has_error() before using this method"
         return self.data_profile
 
-    def get_data_profile_as_json(self):
-        """Return the data profile as a Python dict"""
-        assert self.has_error() is False, "Call .has_error() before using this method"
-        return self.data_profile
+    #def get_data_profile_as_json(self):
+    #    """Return the data profile as a Python dict"""
+    #    assert self.has_error() is False, "Call .has_error() before using this method"
+    #    return self.data_profile
 
 
     def retrieve_dataset_info_object(self):
@@ -329,7 +334,7 @@ class ProfileHandler(BasicErrCheck):
         # Pruned profile!
         self.data_profile = profile_info.data
 
-        print('self.data_profile', self.data_profile)
+        #print('self.data_profile', self.data_profile)
 
         # -----------------------
         # Step 2: Profile variables
