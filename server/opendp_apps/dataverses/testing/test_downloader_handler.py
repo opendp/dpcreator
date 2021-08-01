@@ -2,7 +2,7 @@ from os.path import abspath, dirname, isdir, isfile, join
 import json
 import responses
 
-#from unittest import skip
+from unittest import skip
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.core.serializers.json import DjangoJSONEncoder
@@ -293,3 +293,37 @@ class DownloadHandlerTests(TestCase):
         dfi2 = DataverseFileInfo.objects.get(pk=3)
         self.assertEqual(dfi2.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
+
+
+    @skip
+    @responses.activate
+    def test_80_direct_profile(self):
+        """(80) Run download and profile endpoint """
+        msgt(self.test_80_direct_profile.__doc__)
+
+        dfi = DataverseFileInfo.objects.get(pk=3)
+        self.assertTrue(not dfi.source_file)
+
+        crisis_filepath = join(TEST_DATA_DIR, 'crisis.tab')
+        print('crisis_filepath', crisis_filepath)
+        self.assertTrue(isfile(crisis_filepath))
+
+        with open(crisis_filepath, "rb") as data_file:
+            responses.add(
+                responses.GET,
+                "https://dataverse.harvard.edu/api/access/datafile/101649",
+                body=data_file.read(),
+                status=200,
+                content_type="text/tab-separated-values",
+                stream=True,
+            )
+
+        # ---------------------------
+        # Run the Profiler!
+        # ---------------------------
+        response = self.client.post('/api/profile/run-direct-profile/',
+                                   data={"object_id": dfi.object_id},
+                                   content_type='application/json')
+        print(response.json())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json().get('success'), True)
