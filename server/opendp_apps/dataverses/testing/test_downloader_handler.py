@@ -10,12 +10,13 @@ from django.core.serializers.json import DjangoJSONEncoder
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
-from opendp_apps.dataverses import static_vals as dv_static
-from opendp_apps.user.models import DataverseUser
-from opendp_apps.model_helpers.msg_util import msg, msgt
+from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.dataset.models import DataverseFileInfo
-from opendp_apps.profiler import tasks as profiler_tasks
+from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadHandler
+from opendp_apps.model_helpers.msg_util import msg, msgt
+from opendp_apps.profiler import tasks as profiler_tasks
+from opendp_apps.user.models import DataverseUser
 
 
 CURRENT_DIR = dirname(abspath(__file__))
@@ -74,7 +75,7 @@ class DownloadHandlerTests(TestCase):
         # ---------------------------
         dhandler = DataverseDownloadHandler(dfi)
         print('dhandler.has_error()', dhandler.has_error())
-        self.assertTrue(not dhandler.has_error())
+        self.assertTrue(dhandler.has_error() is False)
 
         print('dfi.source_file', dfi.source_file)
         self.assertTrue(dfi.source_file)
@@ -102,6 +103,11 @@ class DownloadHandlerTests(TestCase):
         for fn in ['WARCRI', 'WARCASE',	'SCMEDIAN']:
             self.assertTrue(json_profile.find(fn) > -1)
 
+        # Check the status on depositor_setup_info.DepositorSetupInfo
+        #
+        dfi2 = DataverseFileInfo.objects.get(pk=3)
+        self.assertEqual(dfi2.depositor_setup_info.user_step,
+                         DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
 
     def test_20_error_no_file_schema(self):
         """(20) Error: No file_schema_info"""
@@ -110,9 +116,8 @@ class DownloadHandlerTests(TestCase):
         dfi = DataverseFileInfo.objects.get(pk=3)
         self.assertTrue(not dfi.source_file)
 
-        # Set bad data
+        # Set bad data, e.g. no file_schema_info
         #
-        file_schema_info = dfi.file_schema_info
         dfi.file_schema_info = ''
 
         # Run DataverseDownloadHandler
@@ -124,6 +129,15 @@ class DownloadHandlerTests(TestCase):
 
         print(dhandler.get_err_msg())
         self.assertTrue(dhandler.get_err_msg().find('dv_download_020') > -1)
+
+        # Check the status on depositor_setup_info.DepositorSetupInfo
+        #
+        dfi2 = DataverseFileInfo.objects.get(pk=3)
+        #self.assertTrue(not dfi2.depositor_setup_info)
+        self.assertEqual(dfi2.depositor_setup_info.user_step,
+                         DepositorSetupInfo.DepositorSteps.STEP_9200_DATAVERSE_DOWNLOAD_FAILED)
+
+
 
     def test_30_error_no_content_url(self):
         """(30) Error: No "contentUrl" key in file_schema_info"""
@@ -147,6 +161,14 @@ class DownloadHandlerTests(TestCase):
         print(dhandler.get_err_msg())
         self.assertTrue(dhandler.get_err_msg().find('dv_download_040') > -1)
 
+        # Check the status on depositor_setup_info.DepositorSetupInfo
+        #
+        dfi2 = DataverseFileInfo.objects.get(pk=3)
+        self.assertEqual(dfi2.depositor_setup_info.user_step,
+                         DepositorSetupInfo.DepositorSteps.STEP_9200_DATAVERSE_DOWNLOAD_FAILED)
+
+
+
     def test_40_error_empty_content_url(self):
         """(40) Error: Empty "contentUrl" in file_schema_info"""
         msgt(self.test_40_error_empty_content_url.__doc__)
@@ -168,6 +190,11 @@ class DownloadHandlerTests(TestCase):
         print(dhandler.get_err_msg())
         self.assertTrue(dhandler.get_err_msg().find('dv_download_050') > -1)
 
+        # Check the status on depositor_setup_info.DepositorSetupInfo
+        #
+        dfi2 = DataverseFileInfo.objects.get(pk=3)
+        self.assertEqual(dfi2.depositor_setup_info.user_step,
+                         DepositorSetupInfo.DepositorSteps.STEP_9200_DATAVERSE_DOWNLOAD_FAILED)
 
 
     def test_50_no_dataverse_user(self):
@@ -187,6 +214,12 @@ class DownloadHandlerTests(TestCase):
         print(dhandler.get_err_msg())
         self.assertTrue(dhandler.get_err_msg().find('dv_download_070') > -1)
 
+        # Check the status on depositor_setup_info.DepositorSetupInfo
+        #
+        dfi2 = DataverseFileInfo.objects.get(pk=3)
+        self.assertEqual(dfi2.depositor_setup_info.user_step,
+                         DepositorSetupInfo.DepositorSteps.STEP_9200_DATAVERSE_DOWNLOAD_FAILED)
+
 
     def test_60_no_dataverse_user_token(self):
         """(60) Error: DataverseUser doesn't have a token"""
@@ -205,6 +238,12 @@ class DownloadHandlerTests(TestCase):
         self.assertTrue(dhandler.has_error())
         print(dhandler.get_err_msg())
         self.assertTrue(dhandler.get_err_msg().find('dv_download_080') > -1)
+
+        # Check the status on depositor_setup_info.DepositorSetupInfo
+        #
+        dfi2 = DataverseFileInfo.objects.get(pk=3)
+        self.assertEqual(dfi2.depositor_setup_info.user_step,
+                         DepositorSetupInfo.DepositorSteps.STEP_9200_DATAVERSE_DOWNLOAD_FAILED)
 
     @responses.activate
     def test_70_download_no_schema_file_name(self):
@@ -248,3 +287,9 @@ class DownloadHandlerTests(TestCase):
 
         print('>>> new_file_name', dhandler.new_file_name)
         self.assertEqual(dhandler.new_file_name, '101649.tab')
+
+        # Check the status on depositor_setup_info.DepositorSetupInfo
+        #
+        dfi2 = DataverseFileInfo.objects.get(pk=3)
+        self.assertEqual(dfi2.depositor_setup_info.user_step,
+                         DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)

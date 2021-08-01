@@ -60,7 +60,7 @@ class ProfileHandler(BasicErrCheck):
         self.run_profile_process()
 
     def add_err_msg(self, err_msg):
-        """OverwAdd an error message"""
+        """Add an error message and update the DepositorSetupInfo status"""
         super().add_err_msg(err_msg)
         self.set_depositor_info_status(DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
 
