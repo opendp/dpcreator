@@ -48,7 +48,7 @@ class DatasetObjectIdSerializer(serializers.Serializer):
             dsi = DataSetInfo.objects.get(object_id=self.validated_data.get('object_id'),
                                           creator=user)
         except DataSetInfo.DoesNotExist:
-            return err_resp("DataSetInfo object not found")
+            return err_resp("DataSetInfo object not found for current user.")
 
         return ok_resp(dsi)
 
@@ -63,21 +63,30 @@ class ProfilingViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def list(self, request):
-        return Response(get_json_success('list'))
+        return Response(get_json_success('ProfilingViewSet: custom actions only. In API docs, see "Extra Actions"'))
 
     @csrf_exempt
     @action(methods=['post'], detail=False, url_path='retrieve-profile')
     def retrieve_profile(self, request, *args, **kwargs):
-        """Retrieve the dataset profile or None"""
+        """Retrieve the DataSetInfo.profile_variables in JSON format.
+        - Input: DataSetInfo.object_id (UUID in string format)
+        \t\t- NOTE: The logged in user must match the DataSetInfo.creator
+        - Output: DataSetInfo.profile_variables in JSON format
+        """
 
         print('\n>>request', request)
         print('\n>>request.data', request.data, type(request.data))
 
-        # Is this a valid object_id?
+        # Is this a object_id a valid UUID?
         #
         ois = DatasetObjectIdSerializer(data=request.data)
         if not ois.is_valid():
-            return Response(get_json_error('"object_id" must be a UUID'),
+            print(ois.errors)
+            if 'object_id' in ois.errors:
+                user_msg = '"object_id" error: %s' % (ois.errors['object_id'][0])
+            else:
+                user_msg = 'Not a valid "object_id"'
+            return Response(get_json_error(user_msg),
                             status=status.HTTP_400_BAD_REQUEST)
 
         # Is there a related DataSetInfo where the logged in user is the
