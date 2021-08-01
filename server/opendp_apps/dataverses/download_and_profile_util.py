@@ -41,6 +41,17 @@ class DownloadAndProfileUtil(BasicErrCheck):
         # Run
         self.run_process()
 
+
+    def get_profile_variables(self):
+        """Re-retrieve the DataSetInfo object which should have the profile_variables"""
+        assert self.has_error() is False, "Check that .is_valid() is True before calling this method"
+        try:
+            dsi = DataSetInfo.objects.get(object_id=self.dataset_object_id)
+        except DataSetInfo.DoesNotExist:
+            return None
+
+        return dsi.get_profile_variables()
+
     def send_websocket_profiler_err_msg(self, user_msg):
         """Send a websocket error message of type WS_MSG_TYPE_PROFILER"""
         if not self.websocket_id:

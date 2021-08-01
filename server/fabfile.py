@@ -259,6 +259,21 @@ def celery_run(context):
 
     fab_local(celery_cmd)
 
+
+@task
+def celery_run(context):
+    """Clear redis and Start celery"""
+    import random, string
+    rand_str = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
+
+    redis_clear(context)
+
+    export_cmd = get_export_db_val_cmds()
+    celery_cmd = (f'{export_cmd}; '
+                  f'celery -A opendp_project worker'
+                  f' -l info -n worker_{rand_str}@%%h')
+
+    fab_local(celery_cmd)
 """
 export DB_HOST=localhost DB_NAME=opendp_app DB_USER=opendp_user DB_PASSWORD=opendp_test_data
 """

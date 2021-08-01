@@ -89,7 +89,9 @@ Example of using async/websockets.
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <!-- END: jQuery, Popper.js, Bootstrap JS -->
 
-    {#% csrf_token %#}
+<!-- Start: Hidden HTML input element for the Django CSRF token -->
+{% csrf_token %}
+<!-- End: Hidden HTML input lement for the Django CSRF token -->
 
 <script>
     /* ---------------------------------------------- */
@@ -167,20 +169,48 @@ Example of using async/websockets.
         };
     };
 
-
+    // ------------------------------------------------
+    //  Button handlers and AJAX call to kickoff the
+    //   profiling process
+    // ------------------------------------------------
     $(document).ready(function() {
+
+        // Retrieve the csrfmiddlewaretoken in the hidden HTML form field
+        //
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // The Profile button has been clicked....
+        //
         $("a.profile-btn").click(function() {
+
+            // Get the dataset object_id
             let dataset_id = this.id
             console.log('profile! ' + dataset_id);//Do stuff when clicked
 
-            // POST params
-            params = {'dataset_object_id': dataset_id};
-            ajax_url = "{% url 'ajax_profile_by_dataset_object_id' %}";
+            // Set the POST params
+            //
+            params = {'object_id': dataset_id};
+
+            // API endpoint defined in the DRF router. See the project's urls.py
+            //
+            ajax_url = '/api/profile/run-async-profile/'
+
             console.log('ajax_url', ajax_url)
+
+            // Create a new Request object
+            //
             const request = new Request(ajax_url);
+
+            // Send in a POST request with JSON params and the CSRF token for auth
+            //
             fetch(request, {
+              //credentials: 'include',
               method: "POST",
               mode: 'same-origin',  // Do not send CSRF token to another domain.
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': csrftoken
+              },
               body: JSON.stringify(params)
             })
             .then(response => response.json())
@@ -193,8 +223,6 @@ Example of using async/websockets.
               document.querySelector('#postResult').innerHTML = error;
 
             });
-
-              //$( "#postResult" ).html( data );
         });
     });
 

@@ -78,6 +78,16 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
         return info
 
+    def get_profile_variables(self):
+        """Return the profile_variables and DataSetInfo object_id as an OrderedDict or None."""
+        if not self.profile_variables:
+            return None
+
+        od = OrderedDict(dict(object_id=self.object_id))
+        od.update(self.profile_variables)
+
+        return od
+
     def data_profile_as_dict(self):
         """Return the dataprofile as a dict or None. Messy in that this is an encrypted JSONField"""
         if not self.data_profile:
