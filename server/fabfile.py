@@ -142,12 +142,14 @@ def create_user(username, last_name, first_name, **kwargs):
         - email: default ''
         - group_names: default []"""
     print(f'\nCreating user: {username}')
-    for key, val in get_test_db_vals().items():
-        os.environ[key] = val
 
     from django.conf import settings
     if not settings.DEBUG:
         sys.exit('Only do this when testing')
+
+    for key, val in get_test_db_vals().items():
+        fmt_key = key.replace('DB_', '')
+        settings.DATABASES["default"][fmt_key] = val
 
     from django.contrib.auth import get_user_model
     User = get_user_model()
@@ -232,6 +234,15 @@ def redis_restart(context):
     redis_stop(context)
     redis_run(context)
 
+@task
+def db_vars(context):
+    """Show the export command for the db variables"""
+    init_db(context)
+    create_django_superuser(context)
+
+    export_cmd = get_export_db_val_cmds()
+
+    print(export_cmd)
 
 @task
 def celery_run(context):

@@ -22,6 +22,7 @@ from django.views.generic import TemplateView, RedirectView
 from rest_framework import routers, serializers
 
 from opendp_apps.dataset.views import DepositorSetupViewSet, DataSetInfoViewSet
+from opendp_apps.dataset.views_profile import ProfilingViewSet
 from opendp_apps.dataverses.urls import router as dataverse_router
 from opendp_apps.dataverses.views.dataverse_file_view import DataverseFileView
 from opendp_apps.dataverses.views.dataverse_handoff_view import DataverseHandoffView
@@ -50,6 +51,7 @@ router.register(r'dv-user', DataverseUserView, basename='dv-user')
 router.register(r'deposit', DepositorSetupViewSet, basename='deposit')
 router.register(r'dv-handoff', DataverseHandoffView, basename='dv-handoff')
 router.register(r'dv-file', DataverseFileView, basename='dv-file')
+router.register(r'profile', ProfilingViewSet, basename='profile')
 router.registry.extend(dataverse_router.registry)
 
 urlpatterns = [
