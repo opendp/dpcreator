@@ -308,32 +308,33 @@ class DownloadHandlerTests(TestCase):
         print('crisis_filepath', crisis_filepath)
         self.assertTrue(isfile(crisis_filepath))
 
-        with open(crisis_filepath, "rb") as data_file:
-            responses.add(
-                responses.GET,
-                "https://dataverse.harvard.edu/api/access/datafile/101649",
-                body=data_file.read(),
-                status=200,
-                content_type="text/tab-separated-values",
-                stream=True,
-            )
+        with responses.RequestsMock() as rsps:
+            with open(crisis_filepath, "rb") as data_file:
+                rsps.add(
+                    responses.GET,
+                    "https://dataverse.harvard.edu/api/access/datafile/101649",
+                    body=data_file.read(),
+                    status=200,
+                    content_type="text/tab-separated-values",
+                    stream=True,
+                )
 
-        # ---------------------------
-        # Run the Profiler!
-        # ---------------------------
-        response = self.client.post('/api/profile/run-direct-profile/',
-                                   json.dumps({"object_id": "af0d01d4-073c-46fa-a2ff-829193828b82"}),
-                                   content_type='application/json')
+                # ---------------------------
+                # Run the Profiler!
+                # ---------------------------
+                response = self.client.post('/api/profile/run-direct-profile/',
+                                           json.dumps({"object_id": "af0d01d4-073c-46fa-a2ff-829193828b82"}),
+                                           content_type='application/json')
 
-        #print('response.content', response.content)
-        self.assertEqual(response.status_code, 200)
-        jresp = response.json()
-        self.assertEqual(jresp.get('success'), True)
-        self.assertEqual(jresp['data']['dataset']['variableCount'], 19)
-        self.assertEqual(len(jresp['data']['variables']), 19)
-        self.assertEqual(jresp['data']['variables']['SCMEDIAN']['type'], pstatic.VAR_TYPE_NUMERICAL)
+                #print('response.content', response.content)
+                self.assertEqual(response.status_code, 200)
+                jresp = response.json()
+                self.assertEqual(jresp.get('success'), True)
+                self.assertEqual(jresp['data']['dataset']['variableCount'], 19)
+                self.assertEqual(len(jresp['data']['variables']), 19)
+                self.assertEqual(jresp['data']['variables']['SCMEDIAN']['type'], pstatic.VAR_TYPE_NUMERICAL)
 
-
+    #@skip
     @responses.activate
     def test_90_direct_profile_download_fail(self):
         """(90) API endpoint: fail to download file"""
@@ -342,22 +343,24 @@ class DownloadHandlerTests(TestCase):
         dfi = DataverseFileInfo.objects.get(pk=3)
         self.assertTrue(not dfi.source_file)
 
-        responses.add(\
-            responses.GET,
-            "https://dataverse.harvard.edu/api/access/datafile/101649",
-            json={'error': 'not found'},
-            status=404)
+        with responses.RequestsMock() as rsps:
+
+            rsps.add(\
+                responses.GET,
+                "https://dataverse.harvard.edu/api/access/datafile/101649",
+                json={'error': 'not found'},
+                status=404)
 
 
-        # ---------------------------
-        # Run the Profiler!
-        # ---------------------------
-        response = self.client.post('/api/profile/run-direct-profile/',
-                                   json.dumps({"object_id": "af0d01d4-073c-46fa-a2ff-829193828b82"}),
-                                   content_type='application/json')
+            # ---------------------------
+            # Run the Profiler!
+            # ---------------------------
+            response = self.client.post('/api/profile/run-direct-profile/',
+                                       json.dumps({"object_id": "af0d01d4-073c-46fa-a2ff-829193828b82"}),
+                                       content_type='application/json')
 
 
-        self.assertEqual(response.status_code, 200)
-        jresp = response.json()
-        self.assertEqual(jresp.get('success'), False)
-        self.assertTrue(jresp.get('message').find('failed') > -1)
+            self.assertEqual(response.status_code, 200)
+            jresp = response.json()
+            self.assertEqual(jresp.get('success'), False)
+            self.assertTrue(jresp.get('message').find('failed') > -1)
