@@ -15,7 +15,7 @@ from opendp_apps.async_messages.websocket_message import WebsocketMessage
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadHandler
 from opendp_apps.profiler import tasks as profiler_tasks
-from opendp_apps.utils.view_helper import get_json_error, get_json_success
+from opendp_apps.model_helpers.basic_response import BasicResponse, ok_resp, err_resp
 from opendp_apps.dataverses.download_and_profile_util import DownloadAndProfileUtil
 
 def send_websocket_profiler_err_msg(user_msg, websocket_id):
@@ -41,7 +41,7 @@ def send_websocket_success_msg(user_msg, websocket_id, profile_str=None):
 
 
 @celery_app.task
-def profile_dataset_info(dataset_object_id, websocket_id=None):
+def profile_dataset_info(dataset_object_id: DataSetInfo.object_id, websocket_id=None) -> BasicResponse:
     """
     Using the DataSetInfo object_id, download and profile a dataset.
     If the "websocket_id" is defined, send back websocket messages
@@ -50,9 +50,9 @@ def profile_dataset_info(dataset_object_id, websocket_id=None):
     """
     dp_util = DownloadAndProfileUtil(dataset_object_id, websocket_id)
     if dp_util.has_error():
-        return get_json_error(dp_util.get_err_msg())  # direct error message
+        return err_resp(dp_util.get_err_msg())  # direct error message
 
-    return get_json_success(f'Profile is complete {datetime.now()}')
+    return ok_resp(dp_util)
 
 
 @celery_app.task

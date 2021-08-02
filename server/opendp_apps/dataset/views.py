@@ -26,7 +26,7 @@ class DepositorSetupViewSet(BaseModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrBlocked]
 
     def partial_update(self, request, *args, **kwargs):
-        acceptable_fields = ['user_step', 'dataset_questions', 'variable_ranges', 'variable_categories']
+        acceptable_fields = ['user_step', 'dataset_questions', 'variable_info']
         problem_fields = []
         for field in request.data.keys():
             if field not in acceptable_fields:

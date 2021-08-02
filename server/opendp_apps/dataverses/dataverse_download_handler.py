@@ -13,6 +13,7 @@ from django.core.files import File
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 from opendp_apps.dataset.models import DataverseFileInfo
+from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.user.models import DataverseUser
 
@@ -41,6 +42,25 @@ class DataverseDownloadHandler(BasicErrCheck):
         return self.dv_file_info.source_file
 
 
+    def set_depositor_info_status(self, new_step: DepositorSetupInfo.DepositorSteps) -> bool:
+        """Update the status on the DepositorSetupInfo object.
+        Only available if the dv_file_info is populated"""
+        if not self.dv_file_info:
+            return
+
+        # Update the step
+        self.dv_file_info.depositor_setup_info.set_user_step(new_step)
+
+        # save it
+        self.dv_file_info.depositor_setup_info.save()
+
+
+    def add_err_msg(self, err_msg):
+        """Add an error message and update the DepositorSetupInfo status"""
+        super().add_err_msg(err_msg)
+        self.set_depositor_info_status(DepositorSetupInfo.DepositorSteps.STEP_9200_DATAVERSE_DOWNLOAD_FAILED)
+
+
     def run_download_process(self):
         """Run the download process!"""
         if self.has_error():    # currently does nothing, but if code added prior to this
@@ -61,6 +81,12 @@ class DataverseDownloadHandler(BasicErrCheck):
             headers = {'X-Dataverse-key': self.dv_user.dv_general_token}
 
             r = requests.get(self.content_url, headers=headers, stream=True)
+            if r.status_code != 200:
+                user_msg = (f'Dataset download attempt failed with'
+                            f' HTTP status code "{r.status_code}"')
+                self.add_err_msg(user_msg)
+                return
+
             for chunk in r.iter_content(chunk_size=4096):
                 tf.write(chunk)
 

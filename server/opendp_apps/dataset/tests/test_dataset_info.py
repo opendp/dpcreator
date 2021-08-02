@@ -34,8 +34,7 @@ class TestDepositorInfo(BaseEndpointTest):
                          {'id': 1, 'creator': 1, 'created': '2021-03-23T17:22:50.889000Z',
                           'object_id': '9255c067-e435-43bd-8af1-33a6987ffc9b',
                           'is_complete': False, 'user_step': 'step_100', 'epsilon': None,
-                          'dataset_questions': None, 'variable_ranges': None,
-                          'variable_categories': None})
+                          'dataset_questions': None, 'variable_info': None})
 
     def test_unsuccessful_patch(self, req_mocker):
         msgt(self.test_unsuccessful_patch.__doc__)

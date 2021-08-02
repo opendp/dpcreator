@@ -34,11 +34,23 @@ class DownloadAndProfileUtil(BasicErrCheck):
         self.websocket_id = websocket_id
 
         # To gather
-        self.dataset_info = None
-        self.data_profile = None
+        self.dataset_info = None    # DataSetInfo object
+        self.data_profile = None    # Profiler output; saved to DataSetInfo object
+        self.profile_variables = None   # Formatted profiler output; saved to DataSetInfo object
 
         # Run
         self.run_process()
+
+
+    def get_profile_variables(self):
+        """Re-retrieve the DataSetInfo object which should have the profile_variables"""
+        assert self.has_error() is False, "Check that .is_valid() is True before calling this method"
+        try:
+            dsi = DataSetInfo.objects.get(object_id=self.dataset_object_id)
+        except DataSetInfo.DoesNotExist:
+            return None
+
+        return dsi.get_profile_variables()
 
     def send_websocket_profiler_err_msg(self, user_msg):
         """Send a websocket error message of type WS_MSG_TYPE_PROFILER"""
@@ -54,7 +66,7 @@ class DownloadAndProfileUtil(BasicErrCheck):
         """Send a websocket success message of type WS_MSG_TYPE_PROFILER"""
         if not self.websocket_id:
             return
-        print('profile_str', profile_str)
+
         if profile_str:
             data_dict = dict(profile_str=profile_str)
         else:
@@ -70,6 +82,8 @@ class DownloadAndProfileUtil(BasicErrCheck):
 
     def run_process(self):
         """Run the download/profile process"""
+        if self.has_error():
+            return
 
         try:
             self.dataset_info = DataSetInfo.objects.get(object_id=self.dataset_object_id)
@@ -149,10 +163,13 @@ class DownloadAndProfileUtil(BasicErrCheck):
             return
 
 
-        self.data_profile = ph.get_data_profile()
+        #self.data_profile = ph.get_data_profile()
+        self.profile_variables = ph.get_profile_variables()
+        profile_str = json.dumps(self.profile_variables, cls=DjangoJSONEncoder, indent=4)
+
 
         self.send_websocket_success_msg('Profile complete!',
-                                        profile_str=self.get_data_profile_as_json_str())
+                                        profile_str=profile_str)
                                         # profile_str=self.get_data_profile())
 
     def get_data_profile(self):
@@ -163,10 +180,10 @@ class DownloadAndProfileUtil(BasicErrCheck):
         return self.data_profile
 
 
-    def get_data_profile_as_json_str(self):
-        assert (self.has_error() is False), \
-            "Check that .has_error() is False before accessing this method"
-
-        profile_str = json.dumps(self.get_data_profile(), cls=DjangoJSONEncoder, indent=4)
-
-        return profile_str
+    #def get_data_profile_as_json_str(self):
+    #    assert (self.has_error() is False), \
+    #        "Check that .has_error() is False before accessing this method"
+    #
+    #    profile_str = json.dumps(self.get_data_profile(), cls=DjangoJSONEncoder, indent=4)
+    #
+    #    return profile_str

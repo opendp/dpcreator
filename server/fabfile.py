@@ -142,12 +142,14 @@ def create_user(username, last_name, first_name, **kwargs):
         - email: default ''
         - group_names: default []"""
     print(f'\nCreating user: {username}')
-    for key, val in get_test_db_vals().items():
-        os.environ[key] = val
 
     from django.conf import settings
     if not settings.DEBUG:
         sys.exit('Only do this when testing')
+
+    for key, val in get_test_db_vals().items():
+        fmt_key = key.replace('DB_', '')
+        settings.DATABASES["default"][fmt_key] = val
 
     from django.contrib.auth import get_user_model
     User = get_user_model()
@@ -232,6 +234,12 @@ def redis_restart(context):
     redis_stop(context)
     redis_run(context)
 
+@task
+def show_db_vars(context):
+    """Show the export command for the db variables"""
+    export_cmd = get_export_db_val_cmds()
+
+    print(export_cmd)
 
 @task
 def celery_run(context):
@@ -248,6 +256,21 @@ def celery_run(context):
 
     fab_local(celery_cmd)
 
+
+@task
+def celery_run(context):
+    """Clear redis and Start celery"""
+    import random, string
+    rand_str = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
+
+    redis_clear(context)
+
+    export_cmd = get_export_db_val_cmds()
+    celery_cmd = (f'{export_cmd}; '
+                  f'celery -A opendp_project worker'
+                  f' -l info -n worker_{rand_str}@%%h')
+
+    fab_local(celery_cmd)
 """
 export DB_HOST=localhost DB_NAME=opendp_app DB_USER=opendp_user DB_PASSWORD=opendp_test_data
 """

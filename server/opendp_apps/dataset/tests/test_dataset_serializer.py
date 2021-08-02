@@ -63,8 +63,7 @@ class TestDataSetSerializer(BaseEndpointTest):
                                                 'id': 2,
                                                 'is_complete': False,
                                                 'user_step': 'step_100',
-                                                'variable_categories': None,
-                                                'variable_ranges': None})
+                                                'variable_info': None})
 
         # Tests against response with depositor info
         response_json.pop('object_id')

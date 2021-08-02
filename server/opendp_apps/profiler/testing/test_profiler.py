@@ -13,6 +13,7 @@ from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
 from opendp_apps.profiler.profile_handler import ProfileHandler
 from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.analysis.models import DepositorSetupInfo
 from django.core.serializers.json import DjangoJSONEncoder
 
 
@@ -35,7 +36,8 @@ class ProfilerTest(TestCase):
         """
 
     def profile_good_file(self, filename, num_features_orig, num_features_profile, **kwargs):
-        """Test profile a valid file"""
+        """Used by multiple tests...."""
+
         # File to profile
         #
         filepath1 = join(TEST_DATA_DIR, filename)
@@ -60,6 +62,12 @@ class ProfilerTest(TestCase):
         self.assertTrue('variables' in info)
         num_features_in_profile = len(info['variables'].keys())
         self.assertEqual(num_features_in_profile, num_features_profile)
+
+        pvars = profiler.profile_variables
+        self.assertTrue('variables' in info)
+        self.assertTrue(len(pvars['variables']) <= len(settings.PROFILER_DEFAULT_COLUMN_INDICES))
+        self.assertEqual(len(pvars['variables']), info['dataset']['variableCount'])
+
 
 
     def test_005_profile_good_files(self):
@@ -92,6 +100,8 @@ class ProfilerTest(TestCase):
         # Retrieve DataSetInfo, save the file to this object
         #
         dsi = DataSetInfo.objects.get(object_id=self.ds_01_object_id)
+        self.assertEqual(dsi.depositor_setup_info.user_step, \
+                         DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
 
         # Run profiler
         #
@@ -111,6 +121,9 @@ class ProfilerTest(TestCase):
         # Re-retrieve object and data profile
         dsi = DataSetInfo.objects.get(object_id=dsi.object_id)
         info = dsi.data_profile_as_dict()
+        print('end step:', dsi.depositor_setup_info.user_step)
+        self.assertEqual(dsi.depositor_setup_info.user_step, \
+                         DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
 
         print('-- Profiler reads only first 20 features')
         self.assertTrue('variables' in info)
@@ -119,7 +132,10 @@ class ProfilerTest(TestCase):
         print('-- Profiler output is the same as the output saved to the DataSetInfo object')
         profile_json_str2 = json.dumps(info, cls=DjangoJSONEncoder, indent=4)
         self.assertTrue(profile_json_str1, profile_json_str2)
+        print(profile_json_str2)
 
+        self.assertEqual(dsi.profile_variables['dataset']['variableCount'],
+                         len(settings.PROFILER_DEFAULT_COLUMN_INDICES))
 
     def test_020_bad_files(self):
         """(20) Test bad file type"""
@@ -135,8 +151,10 @@ class ProfilerTest(TestCase):
 
         # print(f'!! error: {profiler.get_err_msg()}')
         self.assertTrue(profiler.has_error())
+        error_msg = profiler.get_err_msg()
         self.assertTrue(profiler.get_err_msg().find(ProfileHandler.ERR_FAILED_TO_READ_DATASET) > -1)
-        self.assertTrue(profiler.get_err_msg().find('UnicodeDecodeError') > -1)
+        self.assertTrue(error_msg.find('UnicodeDecodeError') > -1 or \
+                        error_msg.find('ParserError') > -1)
 
         # Bad file: empty file
         #
@@ -146,11 +164,10 @@ class ProfilerTest(TestCase):
 
         profiler = profiler_tasks.run_profile_by_filepath(filepath)
 
-        #print(f'!! error: {profiler.get_err_msg()}')
+        # print(f'!! error: {profiler.get_err_msg()}')
         self.assertTrue(profiler.has_error())
         self.assertTrue(profiler.get_err_msg().find(ProfileHandler.ERR_FAILED_TO_READ_DATASET) > -1)
         self.assertTrue(profiler.get_err_msg().find('EmptyDataError') > -1)
-
 
 
     def test_30_filefield_empty(self):
@@ -160,12 +177,21 @@ class ProfilerTest(TestCase):
         # Retrieve DataSetInfo
         #
         dsi = DataSetInfo.objects.get(object_id=self.ds_01_object_id)
+        self.assertEqual(dsi.depositor_setup_info.user_step, \
+                         DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
 
         # Try to profile and empty Django FileField
         profiler = profiler_tasks.run_profile_by_filefield(dsi.object_id)
 
         # Error!
-        self.assertTrue(profiler.get_err_msg, ProfileHandler.ERR_DATASET_POINTER_NOT_SET)
+        print(profiler.get_err_msg())
+        # print('dsi2.depositor_setup_info.user_step', dsi2.depositor_setup_info.user_step)
+        self.assertTrue(profiler.get_err_msg(), ProfileHandler.ERR_DATASET_POINTER_NOT_SET)
+
+        # Retrieve the saved DataSetInfo, the DepositorSetupInfo should have a new status
+        dsi2 = DataSetInfo.objects.get(object_id=self.ds_01_object_id)
+        self.assertEqual(dsi2.depositor_setup_info.user_step, \
+                         DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
 
 
     def test_40_filefield_correct(self):
@@ -175,6 +201,8 @@ class ProfilerTest(TestCase):
         # Retrieve DataSetInfo
         #
         dsi = DataSetInfo.objects.get(object_id=self.ds_01_object_id)
+        self.assertEqual(dsi.depositor_setup_info.user_step, \
+                         DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
 
         # Attach the file to the DataSetInfo's file field
         #
@@ -187,10 +215,10 @@ class ProfilerTest(TestCase):
         dsi.source_file.save(filename, django_file)
         dsi.save()
 
-        # Try to profile and empty Django FileField
+        # Run the profile using the Django file field
         profiler = profiler_tasks.run_profile_by_filefield(dsi.object_id)
 
-        # Error!
+        # Should be no error an correct number of features
         self.assertTrue(profiler.has_error() is False)
         self.assertEqual(profiler.num_original_features, 69)
 
@@ -203,3 +231,13 @@ class ProfilerTest(TestCase):
         print('-- Profiler reads only first 20 features')
         self.assertTrue('variables' in info)
         self.assertEqual(len(info['variables'].keys()), len(settings.PROFILER_DEFAULT_COLUMN_INDICES))
+
+        self.assertEqual(dsi2.depositor_setup_info.user_step, \
+                         DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
+
+        #print('dsi2.profile_variables', dsi2.profile_variables)
+        self.assertEqual(len(dsi2.profile_variables['variables'].keys()),
+                         len(settings.PROFILER_DEFAULT_COLUMN_INDICES))
+
+        self.assertEqual(dsi2.profile_variables['dataset']['variableCount'],
+                         len(settings.PROFILER_DEFAULT_COLUMN_INDICES))

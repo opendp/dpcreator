@@ -11,7 +11,9 @@ from raven_preprocess.preprocess_runner import PreprocessRunner
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.profiler import static_vals as pstatic
+from opendp_apps.profiler.profile_formatter import ProfileFormatter
 from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
 
 
@@ -38,6 +40,8 @@ class ProfileHandler(BasicErrCheck):
         self.dataset_is_django_filefield = kwargs.get(pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD, False)
 
         self.data_profile = None    # Data profile information
+        self.profile_variables = None
+
         self.num_original_features = None
 
         # -------------------------------------
@@ -53,10 +57,54 @@ class ProfileHandler(BasicErrCheck):
 
         #start_row = kwargs.get('start_row')
         #num_rows = kwargs.get('num_rows', None)
+        self.run_profile_process()
 
+    def add_err_msg(self, err_msg):
+        """Add an error message and update the DepositorSetupInfo status"""
+        super().add_err_msg(err_msg)
+        self.set_depositor_info_status(DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
+
+
+    def run_profile_process(self):
+        """Run through the profiling steps, updating statuses as needed"""
+        # ----------------------------------------------------------
+        # If specified retrieve the DataSetInfo object by object_id
+        # ----------------------------------------------------------
+        if not self.retrieve_dataset_info_object():
+            # Note: the DataSetInfo object is optional.
+            #  Only returns False if the DataSetInfo object_id is specified and no object is found
+            return
+
+        # ----------------------------------------------------------
+        # If the dataset_info_object AND data_profile already exists, then stop here
+        # ----------------------------------------------------------
+        if self.dataset_info_object and self.dataset_info_object.data_profile:
+            self.data_profile = self.dataset_info_object.data_profile
+            return
+
+        # ----------------------------------------------------------
+        # Set status to profile processing
+        # ----------------------------------------------------------
+        self.set_depositor_info_status(DepositorSetupInfo.DepositorSteps.STEP_0300_PROFILING_PROCESSING)
+
+        # ----------------------------------------------------------
+        # Let's profile!
+        # ----------------------------------------------------------
         if self.check_parameters():
             self.run_profiler()
             self.save_to_dataset_info_object()
+
+
+        # ----------------------------------------------------------
+        # Update status to success or error
+        # ----------------------------------------------------------
+        if self.has_error():
+            # Set status to profiling failed
+            self.set_depositor_info_status(DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
+        else:
+            # Set status to profiling is complete
+            self.set_depositor_info_status(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
+
 
     def get_dataset_info_object(self):
         """Return the data profile as a Python dict"""
@@ -75,7 +123,14 @@ class ProfileHandler(BasicErrCheck):
         if self.dataset_info_object:
             # print('type data_profile', type(self.data_profile))
             self.dataset_info_object.data_profile = self.data_profile
+            self.dataset_info_object.profile_variables = self.profile_variables
+
             self.dataset_info_object.save()
+
+    def get_profile_variables(self):
+        """Return the data profile as a Python dict"""
+        assert self.has_error() is False, "Call .has_error() before using this method"
+        return self.profile_variables
 
 
     def get_data_profile(self):
@@ -83,11 +138,29 @@ class ProfileHandler(BasicErrCheck):
         assert self.has_error() is False, "Call .has_error() before using this method"
         return self.data_profile
 
-    def get_data_profile_as_json(self):
-        """Return the data profile as a Python dict"""
-        assert self.has_error() is False, "Call .has_error() before using this method"
-        return self.data_profile
+    #def get_data_profile_as_json(self):
+    #    """Return the data profile as a Python dict"""
+    #    assert self.has_error() is False, "Call .has_error() before using this method"
+    #    return self.data_profile
 
+
+    def retrieve_dataset_info_object(self):
+        """If specified in kwargs, retrieve the related DataSetInfo object"""
+        if self.has_error():
+            return False
+
+        # Is there a DataSetInfo object involved. If so, retrieve it
+        #
+        if self.dataset_info_object_id is not None:
+            try:
+                self.dataset_info_object = DataSetInfo.objects.get(object_id=self.dataset_info_object_id)
+            except DataSetInfo.DoesNotExist:
+                self.dataset_info_object = None
+                user_msg = f'DataSetInfo object not found for id {self.dataset_info_object_id}'
+                self.add_err_msg(user_msg)
+                return False
+
+        return True
 
 
     def check_parameters(self):
@@ -101,17 +174,6 @@ class ProfileHandler(BasicErrCheck):
             #user_msg = 'In order to profile the data, the "dataset_pointer" must be set.'
             self.add_err_msg(self.ERR_DATASET_POINTER_NOT_SET)
             return False
-
-        # Is there a DataSetInfo object involved. If so, retrieve it
-        #
-        if self.dataset_info_object_id is not None:
-            try:
-                self.dataset_info_object = DataSetInfo.objects.get(object_id=self.dataset_info_object_id)
-            except DataSetInfo.DoesNotExist:
-                self.dataset_info_object = None
-                user_msg = f'DataSetInfo object not found for id {self.dataset_info_object_id}'
-                self.add_err_msg(user_msg)
-                return False
 
         # Distinguish between a file path and an object
         #
@@ -217,6 +279,20 @@ class ProfileHandler(BasicErrCheck):
             return err_resp(user_msg)
 
 
+    def set_depositor_info_status(self, new_step: DepositorSetupInfo.DepositorSteps) -> bool:
+        """Update the status on the DepositorSetupInfo object.
+        Only available if the dataset_info_object is populated"""
+        if not self.dataset_info_object:
+            return
+
+        # Update the step
+        self.dataset_info_object.depositor_setup_info.set_user_step(new_step)
+
+        # save it
+        self.dataset_info_object.depositor_setup_info.save()
+
+
+
     def run_profiler(self):
         """Run the profiler"""
         if self.has_error():
@@ -238,17 +314,33 @@ class ProfileHandler(BasicErrCheck):
 
         self.prune_profile()
 
+
     def prune_profile(self):
         """Remove un-needed info from the profile
         TODO: Add these options directly into the TwoRavens preprocess code"""
         if self.has_error():
             return
 
-        if 'variableDisplay' in self.data_profile:
-            del self.data_profile['variableDisplay']
+        # -----------------------
+        # Step 1: Prune profile
+        # -----------------------
+        profile_info = ProfileFormatter.prune_profile(self.data_profile)
+        if not profile_info.success:
+            self.add_err_msg(profile_info.message)
+            return
 
+        # Pruned profile!
+        self.data_profile = profile_info.data
 
-        #if ph.has_error():
-        #    print(f'error: {ph.get_err_msg()}')
-        #else:
-        #   print('profiled!')
+        #print('self.data_profile', self.data_profile)
+
+        # -----------------------
+        # Step 2: Profile variables
+        # -----------------------
+        fmt_info = ProfileFormatter.format_profile_variables(self.data_profile)
+        if not fmt_info.success:
+            self.add_err_msg(fmt_info.message)
+            return
+
+        # Profile variables formatted!
+        self.profile_variables = fmt_info.data

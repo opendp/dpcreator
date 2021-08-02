@@ -33,8 +33,9 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
                                  default=DepositorSteps.STEP_0100_UPLOADED)
     epsilon = models.FloatField(null=True, blank=True)
     dataset_questions = models.JSONField(null=True, blank=True)
-    variable_ranges = models.JSONField(null=True, blank=True)
-    variable_categories = models.JSONField(null=True, blank=True)
+
+    # Includes variable ranges and categories
+    variable_info = models.JSONField(null=True, blank=True)
 
     class Meta:
         verbose_name = 'Depositor Setup Data'
@@ -44,6 +45,13 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     def __str__(self):
         return f'{self.dataversefileinfo} - {self.user_step}'
 
+    def set_user_step(self, new_step:DepositorSteps) -> bool:
+        """Set a new user step. Does *not* save the object."""
+        assert isinstance(new_step, DepositorSetupInfo.DepositorSteps), \
+            "new_step must be a valid choice in DepositorSteps"
+        self.user_step = new_step
+        return True
+    
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the STEP
         #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
@@ -81,9 +89,11 @@ class AnalysisPlan(TimestampedModelWithUUID):
     is_complete = models.BooleanField(default=False)
     user_step = models.CharField(max_length=128,
                                  choices=AnalystSteps.choices)
-    variable_ranges = models.JSONField(null=True)
-    variable_categories = models.JSONField(null=True)
-    custom_variables = models.JSONField(null=True)
+
+    # Includes variable ranges and categories
+    variable_info = models.JSONField(null=True, blank=True)
+
+    #custom_variables = models.JSONField(null=True)
     dp_statistics = models.JSONField(null=True)
 
     def __str__(self):

@@ -1,10 +1,61 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
+
 from rest_polymorphic.serializers import PolymorphicSerializer
 
 from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.dataset.models import DataSetInfo, DataverseFileInfo, UploadFileInfo
 from opendp_apps.dataverses.models import RegisteredDataverse
+from opendp_apps.model_helpers.basic_response import BasicResponse, ok_resp, err_resp
 from opendp_apps.user.models import OpenDPUser
+
+
+
+class DatasetObjectIdSerializer(serializers.Serializer):
+    """Ensure input is a valid UUID and connected to a valid DataSetInfo object"""
+    object_id = serializers.UUIDField()
+
+    def validate_object_id(self, value):
+        """
+        Check that the blog post is about Django.
+        """
+        try:
+            dsi = DataSetInfo.objects.get(object_id=value)
+            self.dataset_info = dsi
+        except DataSetInfo.DoesNotExist:
+            raise serializers.ValidationError("DataSetInfo object not found")
+
+        return value
+
+    def get_dataset_info(self) -> BasicResponse:
+        """Get the related DataSetInfo object"""
+        assert self.is_valid(), "Do not call this method before checking \".is_valid()\""
+
+        try:
+            dsi = DataSetInfo.objects.get(object_id=self.validated_data.get('object_id'))
+        except DataSetInfo.DoesNotExist:
+            return err_resp("DataSetInfo object not found")
+
+        return ok_resp(dsi)
+
+    def get_object_id(self):
+        """Return the object_id, this will be a str or None"""
+        assert self.is_valid(), "Do not call this method before checking \".is_valid()\""
+
+        return self.validated_data.get('object_id')
+
+
+    def get_dataset_info_with_user_check(self, user: get_user_model()) -> BasicResponse:
+        """Get the related DataSetInfo object and check that the user matches the creator"""
+        assert self.is_valid(), "Do not call this method before checking \".is_valid()\""
+
+        try:
+            dsi = DataSetInfo.objects.get(object_id=self.validated_data.get('object_id'),
+                                          creator=user)
+        except DataSetInfo.DoesNotExist:
+            return err_resp("DataSetInfo object not found for current user.")
+
+        return ok_resp(dsi)
 
 
 class DataSetInfoSerializer(serializers.ModelSerializer):
