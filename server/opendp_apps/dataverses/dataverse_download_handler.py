@@ -81,6 +81,12 @@ class DataverseDownloadHandler(BasicErrCheck):
             headers = {'X-Dataverse-key': self.dv_user.dv_general_token}
 
             r = requests.get(self.content_url, headers=headers, stream=True)
+            if r.status_code != 200:
+                user_msg = (f'Dataset download attempt failed with'
+                            f' HTTP status code "{r.status_code}"')
+                self.add_err_msg(user_msg)
+                return
+
             for chunk in r.iter_content(chunk_size=4096):
                 tf.write(chunk)
 

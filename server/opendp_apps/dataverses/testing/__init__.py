@@ -9,7 +9,8 @@ python manage.py test opendp_apps.dataverses.testing.test_endpoints.DataversePos
 
 docker-compose run server python manage.py test opendp_apps.dataverses.testing.test_downloader_profiler.DownloadProfileTests.test_20_download_errors
 
-docker-compose run server python manage.py test opendp_apps.dataverses.testing.test_downloader_handler.DownloadHandlerTests.test_80_direct_profile
+docker-compose run server
+python manage.py test opendp_apps.dataverses.testing.test_downloader_handler.DownloadHandlerTests.test_80_direct_profile
 
 
 

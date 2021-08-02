@@ -235,11 +235,8 @@ def redis_restart(context):
     redis_run(context)
 
 @task
-def db_vars(context):
+def show_db_vars(context):
     """Show the export command for the db variables"""
-    init_db(context)
-    create_django_superuser(context)
-
     export_cmd = get_export_db_val_cmds()
 
     print(export_cmd)

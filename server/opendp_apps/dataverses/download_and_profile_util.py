@@ -66,7 +66,7 @@ class DownloadAndProfileUtil(BasicErrCheck):
         """Send a websocket success message of type WS_MSG_TYPE_PROFILER"""
         if not self.websocket_id:
             return
-        print('profile_str', profile_str)
+
         if profile_str:
             data_dict = dict(profile_str=profile_str)
         else:
@@ -82,6 +82,8 @@ class DownloadAndProfileUtil(BasicErrCheck):
 
     def run_process(self):
         """Run the download/profile process"""
+        if self.has_error():
+            return
 
         try:
             self.dataset_info = DataSetInfo.objects.get(object_id=self.dataset_object_id)

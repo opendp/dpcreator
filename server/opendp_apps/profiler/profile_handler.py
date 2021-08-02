@@ -99,11 +99,9 @@ class ProfileHandler(BasicErrCheck):
         # Update status to success or error
         # ----------------------------------------------------------
         if self.has_error():
-            print('run_profile_process 5a')
             # Set status to profiling failed
             self.set_depositor_info_status(DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
         else:
-            print('run_profile_process 5b')
             # Set status to profiling is complete
             self.set_depositor_info_status(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
 

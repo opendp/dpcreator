@@ -130,7 +130,7 @@ class ProfilingViewSet(viewsets.ViewSet):
         #
         ois = DatasetObjectIdSerializer(data=request.data)
         if not ois.is_valid():
-            print(ois.errors)
+            #print(ois.errors)
             if 'object_id' in ois.errors:
                 user_msg = '"object_id" error: %s' % (ois.errors['object_id'][0])
             else:
@@ -145,7 +145,6 @@ class ProfilingViewSet(viewsets.ViewSet):
         if not dsi_info.success:
             return Response(get_json_error(dsi_info.message),
                             status=status.HTTP_404_NOT_FOUND)
-
 
         websocket_id = get_websocket_id(request)
 

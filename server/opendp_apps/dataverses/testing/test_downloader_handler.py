@@ -16,6 +16,7 @@ from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadHandler
 from opendp_apps.model_helpers.msg_util import msg, msgt
 from opendp_apps.profiler import tasks as profiler_tasks
+from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.user.models import DataverseUser
 
 
@@ -295,10 +296,9 @@ class DownloadHandlerTests(TestCase):
                          DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
 
 
-    @skip
     @responses.activate
     def test_80_direct_profile(self):
-        """(80) Run download and profile endpoint """
+        """(80) API endpoint: sucessfully run download and profile  """
         msgt(self.test_80_direct_profile.__doc__)
 
         dfi = DataverseFileInfo.objects.get(pk=3)
@@ -322,8 +322,42 @@ class DownloadHandlerTests(TestCase):
         # Run the Profiler!
         # ---------------------------
         response = self.client.post('/api/profile/run-direct-profile/',
-                                   data={"object_id": dfi.object_id},
+                                   json.dumps({"object_id": "af0d01d4-073c-46fa-a2ff-829193828b82"}),
                                    content_type='application/json')
-        print(response.json())
+
+        #print('response.content', response.content)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json().get('success'), True)
+        jresp = response.json()
+        self.assertEqual(jresp.get('success'), True)
+        self.assertEqual(jresp['data']['dataset']['variableCount'], 19)
+        self.assertEqual(len(jresp['data']['variables']), 19)
+        self.assertEqual(jresp['data']['variables']['SCMEDIAN']['type'], pstatic.VAR_TYPE_NUMERICAL)
+
+
+    @responses.activate
+    def test_90_direct_profile_download_fail(self):
+        """(90) API endpoint: fail to download file"""
+        msgt(self.test_90_direct_profile_download_fail.__doc__)
+
+        dfi = DataverseFileInfo.objects.get(pk=3)
+        self.assertTrue(not dfi.source_file)
+
+        responses.add(\
+            responses.GET,
+            "https://dataverse.harvard.edu/api/access/datafile/101649",
+            json={'error': 'not found'},
+            status=404)
+
+
+        # ---------------------------
+        # Run the Profiler!
+        # ---------------------------
+        response = self.client.post('/api/profile/run-direct-profile/',
+                                   json.dumps({"object_id": "af0d01d4-073c-46fa-a2ff-829193828b82"}),
+                                   content_type='application/json')
+
+
+        self.assertEqual(response.status_code, 200)
+        jresp = response.json()
+        self.assertEqual(jresp.get('success'), False)
+        self.assertTrue(jresp.get('message').find('failed') > -1)
