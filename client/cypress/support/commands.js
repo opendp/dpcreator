@@ -19,8 +19,6 @@ Cypress.Commands.add('clearData', () => {
 Cypress.Commands.add('createMockDataset', () => {
     cy.visit('/mock-dv');
     cy.get('[data-test="submit button"]').click();
-    cy.visit('/mock-dv');
-    cy.get('[data-test="submit button"]').click();
     cy.url().should('contains', '/?id=');
     cy.scrollTo("bottom");
     cy.get('[data-test="termsOfServiceCheckbox"]').click({force: true});
