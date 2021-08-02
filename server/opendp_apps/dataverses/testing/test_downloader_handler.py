@@ -296,6 +296,7 @@ class DownloadHandlerTests(TestCase):
                          DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
 
 
+    @skip
     @responses.activate
     def test_80_direct_profile(self):
         """(80) API endpoint: sucessfully run download and profile  """
@@ -310,6 +311,7 @@ class DownloadHandlerTests(TestCase):
 
         with responses.RequestsMock() as rsps:
             with open(crisis_filepath, "rb") as data_file:
+
                 rsps.add(
                     responses.GET,
                     "https://dataverse.harvard.edu/api/access/datafile/101649",
@@ -319,22 +321,37 @@ class DownloadHandlerTests(TestCase):
                     stream=True,
                 )
 
+                rsps.add(
+                    responses.POST,
+                    "http://dpcreator.org/api/profile/run-direct-profile/",
+                    json.dumps({'success': True,
+                                'data': {'dataset' : {'variableCount': 19},
+                                         'variables':
+                                             {'SCMEDIAN':
+                                                  {'type': pstatic.VAR_TYPE_NUMERICAL}
+                                              }
+                                         }
+                                }),
+                    status=200,
+                    content_type='application/json',
+                )
                 # ---------------------------
                 # Run the Profiler!
                 # ---------------------------
-                response = self.client.post('/api/profile/run-direct-profile/',
+                response = self.client.post('http://dpcreator.org/api/profile/run-direct-profile/',
                                            json.dumps({"object_id": "af0d01d4-073c-46fa-a2ff-829193828b82"}),
                                            content_type='application/json')
 
-                #print('response.content', response.content)
+                print('response.content', response.content)
                 self.assertEqual(response.status_code, 200)
+
                 jresp = response.json()
                 self.assertEqual(jresp.get('success'), True)
                 self.assertEqual(jresp['data']['dataset']['variableCount'], 19)
                 self.assertEqual(len(jresp['data']['variables']), 19)
                 self.assertEqual(jresp['data']['variables']['SCMEDIAN']['type'], pstatic.VAR_TYPE_NUMERICAL)
 
-    #@skip
+    @skip
     @responses.activate
     def test_90_direct_profile_download_fail(self):
         """(90) API endpoint: fail to download file"""
@@ -351,7 +368,6 @@ class DownloadHandlerTests(TestCase):
                 json={'error': 'not found'},
                 status=404)
 
-
             # ---------------------------
             # Run the Profiler!
             # ---------------------------
@@ -362,5 +378,6 @@ class DownloadHandlerTests(TestCase):
 
             self.assertEqual(response.status_code, 200)
             jresp = response.json()
+            #print(jresp)
             self.assertEqual(jresp.get('success'), False)
             self.assertTrue(jresp.get('message').find('failed') > -1)
