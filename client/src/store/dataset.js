@@ -73,7 +73,8 @@ const actions = {
         /* ---------------------------------------------- */
         /* Add a handler for incoming websocket messages  */
         /* ---------------------------------------------- */
-        chatSocket.onmessage = function (e) {
+
+        chatSocket.onmessage = (e) => {
             // parse the incoming JSON to a .js object
 
             const wsData = camelcaseKeys(JSON.parse(e.data), {deep: true});
@@ -110,13 +111,15 @@ const actions = {
                 console.log('ws_msg.user_message: ' + wsMsg.userMessage);
 
                 if (wsMsg.data) {
-                    const profileStr = JSON.stringify(JSON.parse(wsMsg.data.profileStr), null, 2);
+                    const profileData = JSON.parse(wsMsg.data.profileStr)
+                    const profileStr = JSON.stringify(profileData, null, 2);
                     console.log(typeof wsMsg.data);
                     console.log('>>DATA<< ws_msg.data: ' + profileStr.substr(1, 1000));
-                    dataset.getDatasetInfo(state.datasetInfo.objectId)
-                        .then((resp) => {
-                            commit(SET_DATASET_INFO, resp.data)
-                        })
+
+                    // update depositorSetupInfo with variableInfo contained in the message
+                    const props = {variable_info: profileData.variables}
+                    const payload = {objectId: state.datasetInfo.depositorSetupInfo.objectId, props: props}
+                    this.dispatch('dataset/updateDepositorSetupInfo', payload)
                     return (wsMsg.userMessage)
                 }
 

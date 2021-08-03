@@ -111,7 +111,7 @@ export default {
     // are not set, then run the Profiler
     checkProfileData(step) {
       console.log('checkProfile')
-      if (step === 1 && this.getDepositorSetupInfo.variableRanges === null) {
+      if (step === 1 && this.getDepositorSetupInfo.variableInfo === null) {
         console.log('dispatch profiler')
         const payload = {userId: this.user.objectId}
         this.$store.dispatch('dataset/runProfiler', payload)

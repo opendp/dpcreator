@@ -27,6 +27,5 @@ const app = new Vue({
   render: h => h(App)
 }).$mount("#app");
 
-if (window.Cypress) {
-  window.app = app
-}
+
+window.app = app

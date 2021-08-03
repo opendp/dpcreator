@@ -15,6 +15,11 @@ Cypress.Commands.add('clearData', () => {
 
 })
 
+Cypress.Commands.add('vuex', () =>
+    cy.window()
+        .its('app.$store')
+)
+
 
 Cypress.Commands.add('createMockDataset', () => {
     cy.visit('/mock-dv');
