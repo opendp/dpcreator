@@ -112,9 +112,9 @@ const actions = {
 
                 if (wsMsg.data) {
                     const profileData = JSON.parse(wsMsg.data.profileStr)
-                    const profileStr = JSON.stringify(profileData, null, 2);
+                    const profileStr = JSON.stringify(profileData.variables, null, 2);
                     console.log(typeof wsMsg.data);
-                    console.log('>>DATA<< ws_msg.data: ' + profileStr.substr(1, 1000));
+                    console.log('>>DATA<< ws_msg.data: ' + profileStr);
 
                     // update depositorSetupInfo with variableInfo contained in the message
                     const props = {variable_info: profileData.variables}
