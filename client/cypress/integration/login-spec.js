@@ -2,6 +2,11 @@
     describe('Login', () => {
         const getStore = () => cy.window().its('app.$store')
         it('successfully updates vuex store', () => {
+            cy.on('uncaught:exception', (e, runnable) => {
+                console.log('error', e)
+                console.log('runnable', runnable)
+                return false
+            })
             cy.visit('/')
             getStore().its('state.auth.user').should('deep.equal', null)
             cy.login('dev_admin', 'admin')

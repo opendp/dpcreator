@@ -42,12 +42,32 @@ services:
       - "8000:8000"
     depends_on:
       - db
-
+  # ---------------------------------
+  # Celery Task Queue
+  # - Used for profiling, other longer
+  #   running tasks
+  # ---------------------------------
+  celery-queue:
+    build: "./server"
+    environment:
+      - DJANGO_SETTINGS_MODULE=opendp_project.settings.development
+    env_file:
+      - .env
+    command: celery -A opendp_project worker -l info -n worker_dpcreator
+    #  command: celery -A opendp_project worker -l INFO
+    volumes:
+      - .:/code
+    ports:
+      - "8070:8070"
+    depends_on:
+      - db
+      - redis
+      - server
   cypress:
     image: "cypress/included:7.2.0"
     command: "--config-file cypress_github_ci.json"
     depends_on:
-      - server
+      - celery-queue
     # Note: the environment vars have been moved to a custom config file: cypress_github_ci.json
     #environment:
     #  - CYPRESS_BASE_URL=http://server:8000
