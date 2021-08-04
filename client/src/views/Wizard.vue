@@ -110,9 +110,7 @@ export default {
     // If we are on the Confirm Variables step, and the DepositorSetup variables
     // are not set, then run the Profiler
     checkProfileData(step) {
-      console.log('checkProfile')
       if (step === 1 && this.getDepositorSetupInfo.variableInfo === null) {
-        console.log('dispatch profiler')
         const payload = {userId: this.user.objectId}
         this.$store.dispatch('dataset/runProfiler', payload)
       }
@@ -126,13 +124,13 @@ export default {
   },
   watch: {
     stepperPosition: function (val, oldVal) {
-      console.log('stepper watch! val=' + val)
       this.checkProfileData(val)
     }
   },
   data: () => ({
     loading: true,
     stepperPosition: 0,
+    variableList: null,
     steps: [
       {
         title: "Validate Dataset",

@@ -54,8 +54,7 @@ const actions = {
     /**
      * POST a request to start the profiler for current dataset,
      * then open a websocket to receive messages about profiler status.
-     * If profiler completes successfully, get an updated version of the dataset,
-     * which will contain profilerData and variable info from the profiler results.
+     * If profiler completes successfully, update depositorSetupInfo with the variableInfo = returned variables from profiler
      * @param commit
      * @param state
      * @param userId used for websocket URL

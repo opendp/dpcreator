@@ -195,72 +195,14 @@ export default {
     ...mapState('dataset', ['datasetInfo']),
     ...mapGetters('dataset', ['getDepositorSetupInfo']),
   },
-  /**
-   *  When View is mounted, check whether a variable list exists for this dataset.
-   *  If not, use WebSocket to call the profiler and wait for a result
-   */
-  mounted: function () {
-    console.log('mounted!')
-    setTimeout(() => {
-      this.loadingVariables = true;
-      this.variables = [
-        {
-          name: "V207",
-          label: "Birth Year",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "V208",
-          label: "Gender",
-          type: "Categorical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "V246",
-          label: "Household Income",
-          type: "Categorical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "V211",
-          label: "Race",
-          type: "Categorical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "V214",
-          label: "Marital Status",
-          type: "Categorical",
-          additional_information: {},
-          editDisabled: true
-        },
-
-        {
-          name: "V259",
-          label: "State",
-          type: "Categorical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "V256",
-          label: "Voted 2016",
-          type: "Boolean",
-          additional_information: {},
-          editDisabled: true
-        },
-      ];
-      this.$emit("stepCompleted", 1, true);
-    }, 3000);
+  created: function () {
+    if (this.datasetInfo.depositorSetupInfo.variableInfo !== null) {
+      this.createVariableList()
+    }
   },
+
   data: () => ({
     loadingVariables: true,
-    filename: "California Demographic Dataset",
     headers: [
       {value: "index"},
       {text: "Variable name", value: "name"},
@@ -280,7 +222,35 @@ export default {
           1
       );
     },
+    createVariableList() {
+      let vars = this.datasetInfo.depositorSetupInfo.variableInfo
+      for (const property in vars) {
+        //  console.log(`${property}: ${vars[property]}`);
+        let row = vars[property]
+        row['additional_information'] = {}
+        row['editDisabled'] = true
+        this.variables.push(row)
+      }
+      this.loadingVariables = false
+    }
+  },
+  /**
+   * Watch for the variableInfo object to be populated by the Run Profiler action.
+   * When it is populated, create a local variableList for the data table
+   */
+  watch: {
+    '$store.state.dataset.datasetInfo': function () {
+      if (this.datasetInfo.depositorSetupInfo.variableInfo !== null) {
+        // the watch will be triggered multiple times,
+        // so check if we have already created the variableList
+        if (this.variables.length === 0) {
+          this.createVariableList()
 
+        } else {
+          this.loadingVariables = false
+        }
+      }
+    }
   }
 };
 </script>
