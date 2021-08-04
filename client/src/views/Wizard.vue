@@ -17,7 +17,7 @@
                 <ValidateDataset v-on:stepCompleted="updateStepStatus"/>
               </v-stepper-content>
               <v-stepper-content :complete="stepperPosition > 1" step="1">
-                <ConfirmVariables v-on:stepCompleted="updateStepStatus"/>
+                <ConfirmVariables :stepperPosition="stepperPosition" v-on:stepCompleted="updateStepStatus"/>
               </v-stepper-content>
               <v-stepper-content :complete="stepperPosition > 2" step="2">
                 <SetEpsilonValue v-on:stepCompleted="updateStepStatus"/>
@@ -73,6 +73,7 @@ import WizardNavigationButtons from "../components/Wizard/WizardNavigationButton
 import ValidateDataset from "./WizardSteps/ValidateDataset.vue";
 import stepInformation from "@/data/stepInformation";
 
+
 import {mapState, mapGetters} from "vuex";
 
 export default {
@@ -97,6 +98,7 @@ export default {
 
   },
   methods: {
+
     updateStepStatus: function (stepNumber, completedStatus) {
       this.steps[stepNumber].completed = completedStatus;
     },
@@ -104,11 +106,29 @@ export default {
     // depositorSetup userStep
     initStepperPosition: function () {
       this.stepperPosition = stepInformation[this.getDepositorSetupInfo.userStep].wizardStepper
+    },
+    // If we are on the Confirm Variables step, and the DepositorSetup variables
+    // are not set, then run the Profiler
+    checkProfileData(step) {
+      console.log('checkProfile')
+      if (step === 1 && this.getDepositorSetupInfo.variableInfo === null) {
+        console.log('dispatch profiler')
+        const payload = {userId: this.user.objectId}
+        this.$store.dispatch('dataset/runProfiler', payload)
+      }
+
     }
   },
   computed: {
     ...mapState('dataset', ['datasetInfo']),
-    ...mapGetters('dataset', ['getDepositorSetupInfo'])
+    ...mapGetters('dataset', ['getDepositorSetupInfo']),
+    ...mapState('auth', ['user']),
+  },
+  watch: {
+    stepperPosition: function (val, oldVal) {
+      console.log('stepper watch! val=' + val)
+      this.checkProfileData(val)
+    }
   },
   data: () => ({
     loading: true,

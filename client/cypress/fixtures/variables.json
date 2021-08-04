@@ -1,0 +1,134 @@
+{
+  "subject": {
+    "name": "Subject",
+    "label": "",
+    "type": "Categorical",
+    "categories": null
+  },
+  "language": {
+    "name": "Language",
+    "label": "",
+    "type": "Boolean"
+  },
+  "session": {
+    "name": "Session",
+    "label": "",
+    "type": "Boolean"
+  },
+  "objectiveTaskDifficulty": {
+    "name": "ObjectiveTaskDifficulty",
+    "label": "",
+    "type": "Boolean"
+  },
+  "trial": {
+    "name": "Trial",
+    "label": "",
+    "type": "Categorical",
+    "categories": null
+  },
+  "typingSpeed": {
+    "name": "TypingSpeed",
+    "label": "",
+    "type": "Numerical",
+    "min": null,
+    "max": null
+  },
+  "correctedError": {
+    "name": "CorrectedError",
+    "label": "",
+    "type": "Numerical",
+    "min": null,
+    "max": null
+  },
+  "readTextEventsRatio": {
+    "name": "ReadTextEventsRatio",
+    "label": "",
+    "type": "Numerical",
+    "min": null,
+    "max": null
+  },
+  "attendedButNotSelectedRate": {
+    "name": "AttendedButNotSelectedRate",
+    "label": "",
+    "type": "Numerical",
+    "min": null,
+    "max": null
+  },
+  "uncorrectedErrorRate": {
+    "name": "UncorrectedErrorRate",
+    "label": "",
+    "type": "Numerical",
+    "min": null,
+    "max": null
+  },
+  "baselinePupilDiameter": {
+    "name": "BaselinePupilDiameter",
+    "label": "",
+    "type": "Numerical",
+    "min": null,
+    "max": null
+  },
+  "blinkFrequency": {
+    "name": "BlinkFrequency",
+    "label": "",
+    "type": "Numerical",
+    "min": null,
+    "max": null
+  },
+  "blinkDuration": {
+    "name": "BlinkDuration",
+    "label": "",
+    "type": "Numerical",
+    "min": null,
+    "max": null
+  },
+  "blinkInterval": {
+    "name": "BlinkInterval",
+    "label": "",
+    "type": "Numerical",
+    "min": null,
+    "max": null
+  },
+  "blinkBurstRatio": {
+    "name": "BlinkBurstRatio",
+    "label": "",
+    "type": "Numerical",
+    "min": null,
+    "max": null
+  },
+  "saccadeAmplitude": {
+    "name": "SaccadeAmplitude",
+    "label": "",
+    "type": "Numerical",
+    "min": null,
+    "max": null
+  },
+  "saccadeDuration": {
+    "name": "SaccadeDuration",
+    "label": "",
+    "type": "Numerical",
+    "min": null,
+    "max": null
+  },
+  "saccadeVelocity": {
+    "name": "SaccadeVelocity",
+    "label": "",
+    "type": "Numerical",
+    "min": null,
+    "max": null
+  },
+  "saccadePeakVelocity": {
+    "name": "SaccadePeakVelocity",
+    "label": "",
+    "type": "Numerical",
+    "min": null,
+    "max": null
+  },
+  "eyeHeight": {
+    "name": "EyeHeight",
+    "label": "",
+    "type": "Numerical",
+    "min": null,
+    "max": null
+  }
+}

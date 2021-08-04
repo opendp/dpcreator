@@ -11,6 +11,7 @@ jobs:
       - name: Build server and test
         run: docker-compose -f  docker-compose-ci-step2.yml up --exit-code-from cypress
       - name: Archive Cypress test results
+        if: ${{ always() }}
         uses: actions/upload-artifact@v2
         with:
           name: cypress-videos
