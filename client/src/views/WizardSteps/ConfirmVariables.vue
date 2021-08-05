@@ -227,6 +227,7 @@ export default {
           1
       );
     },
+    // Create a list version of variableInfo. A deep copy, so we can edit locally
     createVariableList() {
       let vars = this.datasetInfo.depositorSetupInfo.variableInfo
       for (const key in vars) {
@@ -241,7 +242,8 @@ export default {
           row.additional_information.min = vars[key].min
         }
         if (row.type === 'Categorical') {
-          row.additional_information.categories = null
+          // make a deep copy of the categories, so we can edit locally
+          row.additional_information.categories = JSON.parse(JSON.stringify(vars[key].categories))
         }
         row['editDisabled'] = true
         this.variables.push(row)
@@ -249,7 +251,6 @@ export default {
       this.loadingVariables = false
     },
     saveUserInput(elem) {
-      console.log('saveUserInput')
       this.$store.dispatch('dataset/updateVariableInfo', elem)
 
     },
