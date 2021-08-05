@@ -52,6 +52,32 @@ const actions = {
 
     },
     /**
+     * Save user edits to the variables in the Confirm Variables page
+     * @param commit
+     * @param state
+     * @param variableInput
+     */
+    updateVariableInfo({commit, state}, variableInput) {
+        //  Get a local copy of variableInfo, for editing
+        let variableInfo = JSON.parse(JSON.stringify(state.datasetInfo.depositorSetupInfo.variableInfo))
+        let targetVar = variableInfo[variableInput.key]
+        targetVar.name = variableInput.name
+        targetVar.label = variableInput.label
+        if (variableInput.type === 'Numerical') {
+            targetVar.min = variableInput.additional_information.min
+            targetVar.max = variableInput.additional_information.max
+        }
+        if (variableInput.type === 'Categorical') {
+            targetVar.categories = variableInput.additional_information.categories
+        }
+        const patch = {
+            variableInfo: variableInfo
+        }
+        const payload = {objectId: state.datasetInfo.depositorSetupInfo.objectId, props: patch}
+        this.dispatch('dataset/updateDepositorSetupInfo', payload)
+
+    },
+    /**
      * POST a request to start the profiler for current dataset,
      * then open a websocket to receive messages about profiler status.
      * If profiler completes successfully, update depositorSetupInfo with the variableInfo = returned variables from profiler

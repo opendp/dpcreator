@@ -60,6 +60,7 @@
             :readonly="item.editDisabled"
             :append-outer-icon="'mdi-check'"
             @click:append-outer="item.editDisabled = !item.editDisabled"
+            v-on:change="saveUserInput(item)"
         ></v-text-field>
       </template>
       <template v-slot:[`item.additional_information`]="{ item: variable }">
@@ -71,6 +72,7 @@
               multiple
               class="my-0 py-0"
               background-color="soft_primary my-0"
+              v-on:change="saveUserInput(variable)"
           >
             <template v-slot:selection="{ attrs, item, select, selected }">
               <ChipSelectItem
@@ -90,6 +92,7 @@
               label="Add min"
               v-model="variable.additional_information['min']"
               class="text-center py-0"
+              v-on:change="saveUserInput(variable)"
           ></v-text-field>
           <v-text-field
               background-color="soft_primary mb-0"
@@ -97,6 +100,7 @@
               label="Add max"
               v-model="variable.additional_information['max']"
               class="text-center py-0"
+              v-on:change="saveUserInput(variable)"
           ></v-text-field>
         </div>
       </template>
@@ -202,6 +206,7 @@ export default {
   },
 
   data: () => ({
+    componentKey: 0,
     loadingVariables: true,
     headers: [
       {value: "index"},
@@ -224,15 +229,31 @@ export default {
     },
     createVariableList() {
       let vars = this.datasetInfo.depositorSetupInfo.variableInfo
-      for (const property in vars) {
-        //  console.log(`${property}: ${vars[property]}`);
-        let row = vars[property]
-        row['additional_information'] = {}
+      for (const key in vars) {
+        let row = {}
+        row.key = key
+        row.name = vars[key].name
+        row.type = vars[key].type
+        row.label = vars[key].label
+        row.additional_information = {}
+        if (row.type === 'Numerical') {
+          row.additional_information.max = vars[key].max
+          row.additional_information.min = vars[key].min
+        }
+        if (row.type === 'Categorical') {
+          row.additional_information.categories = null
+        }
         row['editDisabled'] = true
         this.variables.push(row)
       }
       this.loadingVariables = false
-    }
+    },
+    saveUserInput(elem) {
+      console.log('saveUserInput')
+      this.$store.dispatch('dataset/updateVariableInfo', elem)
+
+    },
+
   },
   /**
    * Watch for the variableInfo object to be populated by the Run Profiler action.
