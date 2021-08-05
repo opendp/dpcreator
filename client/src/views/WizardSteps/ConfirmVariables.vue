@@ -254,11 +254,12 @@ export default {
       const valid = (variable.name !== null && minmaxValid)
       return valid
     },
-    removeCategoryFromVariable: (category, variable) => {
+    removeCategoryFromVariable(category, variable) {
       variable.additional_information["categories"].splice(
           variable.additional_information["categories"].indexOf(category),
           1
       );
+      this.saveUserInput(variable)
     },
     // Create a list version of variableInfo. A deep copy, so we can edit locally
     createVariableList() {
@@ -305,7 +306,6 @@ export default {
         // so check if we have already created the variableList
         if (this.variables.length === 0) {
           this.createVariableList()
-
         } else {
           this.loadingVariables = false
         }
