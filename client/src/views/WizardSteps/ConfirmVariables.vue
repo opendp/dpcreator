@@ -72,6 +72,7 @@
               multiple
               class="my-0 py-0"
               background-color="soft_primary my-0"
+              v-on:click="currentRow=variable.index"
               v-on:change="saveUserInput(variable)"
           >
             <template v-slot:selection="{ attrs, item, select, selected }">
@@ -92,14 +93,18 @@
               label="Add min"
               v-model="variable.additional_information['min']"
               class="text-center py-0"
+              :rules="[checkMin]"
+              v-on:click="currentRow=variable.index"
               v-on:change="saveUserInput(variable)"
           ></v-text-field>
           <v-text-field
               background-color="soft_primary mb-0"
               type="number"
               label="Add max"
+              :rules="[checkMax]"
               v-model="variable.additional_information['max']"
               class="text-center py-0"
+              v-on:click="currentRow=variable.index"
               v-on:change="saveUserInput(variable)"
           ></v-text-field>
         </div>
@@ -206,7 +211,7 @@ export default {
   },
 
   data: () => ({
-    componentKey: 0,
+    currentRow: null,
     loadingVariables: true,
     headers: [
       {value: "index"},
@@ -221,6 +226,34 @@ export default {
     variables: []
   }),
   methods: {
+    checkMin(value) {
+      if (this.currentRow !== null) {
+        const currentMax = this.variables[this.currentRow].additional_information.max
+        if (currentMax !== null && currentMax < Number(value)) {
+          return false
+        }
+      }
+      return true
+    },
+    checkMax(value) {
+      if (this.currentRow !== null) {
+        const currentMin = this.variables[this.currentRow].additional_information.min
+        if (currentMin !== null && currentMin > Number(value)) {
+          return false
+        }
+      }
+      return true
+    },
+    isValidRow(variable) {
+      let minmaxValid = true
+      if (variable.type == 'Numerical') {
+        if (variable.additional_information.max !== null && variable.additional_information.min !== null) {
+          minmaxValid = (Number(variable.additional_information.min) < Number(variable.additional_information.max))
+        }
+      }
+      const valid = (variable.name !== null && minmaxValid)
+      return valid
+    },
     removeCategoryFromVariable: (category, variable) => {
       variable.additional_information["categories"].splice(
           variable.additional_information["categories"].indexOf(category),
@@ -230,8 +263,10 @@ export default {
     // Create a list version of variableInfo. A deep copy, so we can edit locally
     createVariableList() {
       let vars = this.datasetInfo.depositorSetupInfo.variableInfo
+      let index = 0;
       for (const key in vars) {
         let row = {}
+        row.index = index
         row.key = key
         row.name = vars[key].name
         row.type = vars[key].type
@@ -247,11 +282,14 @@ export default {
         }
         row['editDisabled'] = true
         this.variables.push(row)
+        index += 1
       }
       this.loadingVariables = false
     },
     saveUserInput(elem) {
-      this.$store.dispatch('dataset/updateVariableInfo', elem)
+      if (this.isValidRow(elem)) {
+        this.$store.dispatch('dataset/updateVariableInfo', elem)
+      }
 
     },
 
