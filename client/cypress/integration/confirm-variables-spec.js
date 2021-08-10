@@ -19,7 +19,6 @@
             // click on continue to go to trigger the profiler and go to the Confirm Variables Page
             cy.get('[data-test="wizardContinueButton"]').last().click();
             cy.get('h1').should('contain', 'Confirm Variables')
-            cy.get('table').contains('td', 'Trial').should('be.visible')
             cy.fixture('variables').then((varsFixture) => {
                 for (const key in varsFixture) {
                     cy.get('table').contains('td', varsFixture[key].name).should('be.visible')
