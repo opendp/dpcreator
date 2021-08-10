@@ -293,9 +293,10 @@ ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/log-in/'
 # Profiler - Dataset reading
 #   - default parameters
 # ---------------------------
-PROFILER_FIRST_20_VARIABLE_INDICES = ', '.join([str(x) for x in range(0,20)])
+PROFILER_VARIABLE_INDICES = '[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]'
+# ', '.join([str(x) for x in range(0,20)])
 PROFILER_DEFAULT_COLUMN_INDICES = json.loads(os.environ.get('PROFILER_DEFAULT_COLUMN_INDICES',
-                                                   f"[{PROFILER_FIRST_20_VARIABLE_INDICES}]"))
+                                                            PROFILER_VARIABLE_INDICES))
 
 
 # -----------------------------------------------
