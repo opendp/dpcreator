@@ -1,6 +1,6 @@
 <template>
   <div class="confirmVariablesPage">
-    <h1 class="title-size-1">Confirm variables</h1>
+    <h1 class="title-size-1">Confirm Variables</h1>
     <p>
       {{ $t('confirm variables.confirm variables intro') }}
     </p>

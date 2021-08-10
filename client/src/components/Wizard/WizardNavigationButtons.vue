@@ -46,6 +46,7 @@
       </Button>
 
       <Button
+          data-test="wizardContinueButton"
           v-if="stepperPosition !== LAST_STEP_INDEX"
           classes="d-block"
           :class="{
@@ -55,6 +56,7 @@
           :click="handleContinue"
           :disabled="isContinueDisabled"
           label="Continue"
+
       />
 
       <Button
