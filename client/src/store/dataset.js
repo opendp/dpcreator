@@ -64,8 +64,8 @@ const actions = {
         targetVar.name = variableInput.name
         targetVar.label = variableInput.label
         if (variableInput.type === 'Numerical') {
-            targetVar.min = variableInput.additional_information.min
-            targetVar.max = variableInput.additional_information.max
+            targetVar.min = Number(variableInput.additional_information.min)
+            targetVar.max = Number(variableInput.additional_information.max)
         }
         if (variableInput.type === 'Categorical') {
             targetVar.categories = variableInput.additional_information.categories
