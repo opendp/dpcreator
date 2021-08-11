@@ -69,6 +69,15 @@ const actions = {
         }
         if (variableInput.type === 'Categorical') {
             targetVar.categories = variableInput.additional_information.categories
+            let numericValues = [];
+            variableInput.additional_information.categories.forEach(item => {
+                if (!isNaN(item)) {
+                    numericValues.push(Number(item))
+                }
+            })
+            if (numericValues.length === variableInput.additional_information.categories.length) {
+                targetVar.categories = numericValues
+            }
         }
         const patch = {
             variableInfo: variableInfo
