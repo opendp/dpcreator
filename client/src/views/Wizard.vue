@@ -100,6 +100,7 @@ export default {
   methods: {
 
     updateStepStatus: function (stepNumber, completedStatus) {
+      console.log('updating step status: ' + stepNumber + ', ' + completedStatus)
       this.steps[stepNumber].completed = completedStatus;
     },
     // Set the current Wizard stepper position based on the
@@ -124,6 +125,9 @@ export default {
   },
   watch: {
     stepperPosition: function (val, oldVal) {
+      const nextStep = {userStep: stepInformation[this.getDepositorSetupInfo.userStep].nextStep}
+      const payload = {objectId: this.getDepositorSetupInfo.objectId, props: nextStep}
+      this.$store.dispatch('dataset/updateDepositorSetupInfo', payload)
       this.checkProfileData(val)
     }
   },

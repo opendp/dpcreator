@@ -310,7 +310,16 @@ export default {
           this.loadingVariables = false
         }
       }
+    },
+    // If additional information has been added for all variables, then
+    // send stepCompleted event to the wizard (will enable the continue button
+    variables: function (newValue) {
+      // for now, for ease of use, we will not require additional info for all variables.
+      // TODO: add validation later, or make it conditional to running in dev mode
+      this.$emit("stepCompleted", 1, true);
+      //  }
     }
+
   }
 };
 </script>
