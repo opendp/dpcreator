@@ -226,7 +226,7 @@ metadata:
     tier: load-balancer
 spec:
   type: LoadBalancer
-  # IP mapped to dpcreator.2ravens.org
+  # IP mapped to dev.dpcreator.org
   loadBalancerIP: 52.191.30.153
   selector:
     app: dpcreator

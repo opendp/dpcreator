@@ -64,4 +64,15 @@ Note: When viewing this new address through the web admin, the "routing preferen
 
 
 
+## Note: PSI service IP generation
 
+    ```
+    az network public-ip create \
+         --resource-group MC_DPCreator_dp-creator-cluster_eastus \
+         --name ip-psiprivacy-org \
+         --sku Standard \
+         --allocation-method static \
+         --query publicIp.ipAddress -o tsv
+    ```
+
+  - Result: `52.249.185.246`
