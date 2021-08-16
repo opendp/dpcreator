@@ -1,4 +1,4 @@
-# Azure Deployment
+# Kubernetes Deployment
 
 This document contains steps for a basic deployment of the DPCreator application on Azure. 
 
