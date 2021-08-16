@@ -9,7 +9,7 @@ specs_01 = dict(bird='song',
                 #
                 DEFAULT_FROM_EMAIL='smartnoise@opendp.org',
                 # Make these two the same!!!
-                ALLOWED_HOSTS="13.92.177.209,dev.dpcreator.org,127.0.0.1,0.0.0.0",
-                loadBalancerIP="13.92.177.209",
+                ALLOWED_HOSTS="52.191.30.153,dev.dpcreator.org,127.0.0.1,0.0.0.0",
+                loadBalancerIP="52.191.30.153",
                 #
                 )

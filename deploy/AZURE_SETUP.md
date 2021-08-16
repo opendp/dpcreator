@@ -1,5 +1,7 @@
 # Setting up Kubernetes (K8s) on Azure
 
+Note: These resources were created under a "Resource Group" named `DPCreator`
+
 Through the Azure admin:
 - Create a "Kubernetes Service" using these specs and default values for other attributes
   - **Node Size**: D2as_v4
@@ -9,6 +11,7 @@ Through the Azure admin:
 ### Log In
 
 - Use the Azure admin instructions to launch a web-based Cloud Shell and connect to the cluster
+- Cluster name (suggestion): `dp-creator-cluster`
 
 ### Clone repository
 
@@ -29,14 +32,36 @@ cd dpcreator-deploy/k8s_maker/rendered/
 
 ```
 
-### Make a static IP
+### Make a static IP address through the Cloud Shell
 
-Use the Azure web admin to create a "Public IP address"
+1. Determine the resource group name
+    ```
+    az aks show --resource-group DPCreator \
+     --name dp-creator-cluster \
+     --query nodeResourceGroup -o tsv
+    ```
+    - Result: `MC_DPCreator_dp-creator-cluster_eastus`
 
-- **Name**: ip-dev-dpcreator-org
-- **DNS name label**: dev-dpcreator-org
-- **Routing preference**: Microsoft network
+2. Generate the public IP address
+  - Inputs: 
+    - Resource group (from above): `MC_DPCreator_dp-creator`
+    - IP address label: `ip-dev-dpcreator-org`
+    ```
+    az network public-ip create \
+     --resource-group MC_DPCreator_dp-creator-cluster_eastus \
+     --name ip-dev-dpcreator-org \
+     --sku Standard \
+     --allocation-method static \
+     --query publicIp.ipAddress -o tsv
+    ```
+  - Result: `52.191.30.153`
+
+Note: When viewing this new address through the web admin, the "routing preference" should be "Microsoft network"
 
 -> **Resulting IP Address**: 13.92.177.209
+
+### Assign the IP address to the appropriate domain name
+
+
 
 
