@@ -46,16 +46,16 @@
       <template v-slot:[`item.index`]="{ index }">
         <span class="index-td grey--text">{{ index + 1 }}</span>
       </template>
-      <template v-slot:[`item.name`]="{ item }">
+      <template v-slot:[`item.label`]="{ item }">
         <div v-if="item.editDisabled">
-          <span>{{ item.name }}</span>
+          <span>{{ item.label }}</span>
           <v-icon right @click="item.editDisabled = !item.editDisabled">
             mdi-pencil
           </v-icon>
         </div>
         <v-text-field
             v-else
-            v-model="item.name"
+            v-model="item.label"
             type="text"
             :readonly="item.editDisabled"
             :append-outer-icon="'mdi-check'"
@@ -271,7 +271,11 @@ export default {
         row.key = key
         row.name = vars[key].name
         row.type = vars[key].type
-        row.label = vars[key].label
+        if (vars[key].label === '') {
+          row.label = vars[key].name
+        } else {
+          row.label = vars[key].label
+        }
         row.additional_information = {}
         if (row.type === 'Numerical') {
           row.additional_information.max = vars[key].max
@@ -310,7 +314,16 @@ export default {
           this.loadingVariables = false
         }
       }
+    },
+    // If additional information has been added for all variables, then
+    // send stepCompleted event to the wizard (will enable the continue button
+    variables: function (newValue) {
+      // for now, for ease of use, we will not require additional info for all variables.
+      // TODO: add validation later, or make it conditional to running in dev mode
+      this.$emit("stepCompleted", 1, true);
+      //  }
     }
+
   }
 };
 </script>

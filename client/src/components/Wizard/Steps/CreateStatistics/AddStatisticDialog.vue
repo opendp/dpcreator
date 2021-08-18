@@ -46,8 +46,8 @@
                 class="rounded-pill mr-2"
                 v-for="(variable, index) in variables"
                 :key="variable + index"
-                :label="variable"
-                :value="variable"
+                :label="variable['label']"
+                :value="variable['key']"
                 on-icon="mdi-check"
             ></v-radio>
           </v-radio-group>
@@ -166,7 +166,7 @@ import Button from "../../../DesignSystem/Button.vue";
 export default {
   name: "AddStatisticDialog",
   components: {Button},
-  props: ["formTitle", "dialog", "editedIndex", "editedItem"],
+  props: ["formTitle", "dialog", "editedIndex", "editedItem", "variableInfo"],
   computed: {
     isButtonDisabled: function () {
       return (
@@ -177,6 +177,20 @@ export default {
     },
     isMultiple: function () {
       return this.editedIndex === -1;
+    },
+    variables: function () {
+      let displayVars = []
+      for (const key in this.variableInfo) {
+        if (this.variableInfo[key].label === '') {
+          this.variableInfo[key].label = this.variableInfo[key].name
+        }
+        this.variableInfo[key].key = key
+        if (this.variableInfo[key].type === 'Numerical') {
+          displayVars.push(this.variableInfo[key])
+        }
+
+      }
+      return displayVars
     }
   },
   watch: {
@@ -188,8 +202,6 @@ export default {
   data: () => ({
     //TODO: These should be connected with the variables loaded on the previous step
     singleVariableStatistics: ["Mean", "Histogram", "Quantile"],
-    variables: ["Birth Year", "Gender",
-      "Marital Status", "Race", "Education", "Voted 2016"],
     editedItemDialog: {
       statistic: "",
       variable: [],
@@ -208,6 +220,7 @@ export default {
   }),
   methods: {
     save() {
+      console.log('saving: ' + JSON.stringify(this.editedItemDialog))
       this.$emit("saveConfirmed", this.editedItemDialog);
     },
     close() {

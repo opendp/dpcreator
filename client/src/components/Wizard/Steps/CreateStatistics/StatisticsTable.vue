@@ -92,7 +92,7 @@ export default {
     headers: [
       {value: "num"},
       {text: "Statistic", value: "statistic"},
-      {text: "Variable", value: "variable"},
+      {text: "Variable", value: "label"},
       {text: "Epsilon", value: "epsilon"},
       {text: "Error", value: "error"},
       {text: "", value: "actions"}

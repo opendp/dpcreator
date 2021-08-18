@@ -29,6 +29,7 @@
     />
 
     <AddStatisticDialog
+        :variable-info="datasetInfo.depositorSetupInfo.variableInfo"
         :formTitle="formTitle"
         :dialog="dialogAddStatistic"
         :editedIndex="editedIndex"
@@ -81,6 +82,7 @@ import EditNoiseParamsConfirmationDialog
   from "../../components/Wizard/Steps/CreateStatistics/EditNoiseParamsConfirmation.vue";
 import NoiseParams from "../../components/Wizard/Steps/CreateStatistics/NoiseParams.vue";
 import StatisticsTable from "../../components/Wizard/Steps/CreateStatistics/StatisticsTable.vue";
+import {mapGetters, mapState} from "vuex";
 export default {
   name: "CreateStatistics",
   components: {
@@ -93,6 +95,9 @@ export default {
     NoiseParams
   },
   computed: {
+    ...mapState('auth', ['error', 'user']),
+    ...mapState('dataset', ['datasetInfo']),
+    ...mapGetters('dataset', ['getDepositorSetupInfo']),
     formTitle() {
       return this.isEditionMode
           ? "Edit your statistic"
@@ -154,8 +159,9 @@ export default {
         Object.assign(this.statistics[this.editedIndex], this.editedItem);
       } else {
         for (let variable of this.editedItem.variable) {
+          const label = this.datasetInfo.depositorSetupInfo.variableInfo[variable].label
           this.statistics.push(
-              Object.assign({}, this.editedItem, {variable})
+              Object.assign({}, this.editedItem, {variable}, {label})
           );
         }
       }
