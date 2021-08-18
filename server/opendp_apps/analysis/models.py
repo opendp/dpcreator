@@ -69,14 +69,12 @@ class AnalysisPlan(TimestampedModelWithUUID):
         """
         Enumeration for statuses during the analysis process
         """
-        STEP_0500_VARIABLES_CONFIRMED = 'step_500', 'Step 5: Variables Confirmed'
-        # Skipping 0600 because it is a Depositor Step, Set Epsilon
-        # TODO: confirm that skipping 0600 here is ok
-        STEP_0700_STATISTICS_CREATED = 'step_700', 'Step 7: Statistics Created'
-        STEP_0800_STATISTICS_SUBMITTED = 'step_800', 'Step 8: Statistics Submitted'
-        STEP_0900_RELEASE_COMPLETE = 'step_900', 'Step 9: Release Complete'
-        STEP_1000_DV_RELEASE_DEPOSITED = 'step_1000', 'Step 10: Dataverse Release Deposited'  # Dataverse Only
-        STEP_1100_PROCESS_COMPLETE = 'step_1100', 'Step 11: Process Complete'
+        STEP_0700_VARIABLES_CONFIRMED = 'step_700', 'Step 7: Variables Confirmed'
+        STEP_0800_STATISTICS_CREATED = 'step_800', 'Step 8: Statistics Created'
+        STEP_0900_STATISTICS_SUBMITTED = 'step_900', 'Step 9: Statistics Submitted'
+        STEP_1000_RELEASE_COMPLETE = 'step_1000', 'Step 10: Release Complete'
+        STEP_1100_DV_RELEASE_DEPOSITED = 'step_1100', 'Step 11: Dataverse Release Deposited'  # Dataverse Only
+        STEP_1200_PROCESS_COMPLETE = 'step_1200', 'Step 12: Process Complete'
         # Error statuses should begin with 9
         STEP_9500_RELEASE_CREATION_FAILED = 'error_9500', 'Error 5: Release Creation Failed'
         STEP_9600_RELEASE_DEPOSIT_FAILED = 'error_9600', 'Error 6: Release Deposit Failed'

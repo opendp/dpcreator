@@ -6,11 +6,12 @@ export const STEP_0300_PROFILE_PROCESSING = 'step_300'
 export const STEP_0400_PROFILING_COMPLETE = 'step_400'
 export const STEP_0500_VARIABLE_DEFAULTS_CONFIRMED = 'step_500'
 export const STEP_0600_EPSILON_SET = 'step_600'
-export const STEP_0700_STATISTICS_CREATED = 'step_700'
-export const STEP_0800_STATISTICS_SUBMITTED = 'step_800'
-export const STEP_0900_RELEASE_COMPLETE = 'step_900'
-export const STEP_1000_DV_RELEASE_DEPOSITED = 'step_1000'
-export const STEP_1100_PROCESS_COMPLETE = 'step_1100'
+export const STEP_0700_VARIABLES_CONFIRMED = 'step_700'
+export const STEP_0800_STATISTICS_CREATED = 'step_800'
+export const STEP_0900_STATISTICS_SUBMITTED = 'step_900'
+export const STEP_1000_RELEASE_COMPLETE = 'step_1000'
+export const STEP_1100_DV_RELEASE_DEPOSITED = 'step_1100'
+export const STEP_1200_PROCESS_COMPLETE = 'step_1200'
 
 // Error statuses should begin with 9
 export const STEP_9100_VALIDATION_FAILED = 'step_9100'
@@ -19,6 +20,24 @@ export const STEP_9300_PROFILING_FAILED = 'step_9300'
 export const STEP_9400_CREATE_RELEASE_FAILED = 'step_9400'
 export const STEP_9500_RELEASE_CREATION_FAILED = 'error_9500'
 export const STEP_9600_RELEASE_DEPOSIT_FAILED = 'error_9600'
+
+export const depositorSteps = [
+    STEP_0100_UPLOADED,
+    STEP_0200_VALIDATED,
+    STEP_0300_PROFILE_PROCESSING,
+    STEP_0400_PROFILING_COMPLETE,
+    STEP_0500_VARIABLE_DEFAULTS_CONFIRMED,
+    STEP_0600_EPSILON_SET
+]
+
+export const analystSteps = [
+    STEP_0700_VARIABLES_CONFIRMED,
+    STEP_0800_STATISTICS_CREATED,
+    STEP_0900_STATISTICS_SUBMITTED,
+    STEP_1000_RELEASE_COMPLETE,
+    STEP_1100_DV_RELEASE_DEPOSITED,
+    STEP_1200_PROCESS_COMPLETE
+]
 
 export default {
     // STEP_0100_UPLOADED
@@ -55,7 +74,7 @@ export default {
     step_600: {
         workflowStatus: statusInformation.statuses.IN_PROGRESS,
         wizardStepper: 3,
-        nextStep: STEP_0700_STATISTICS_CREATED
+        nextStep: STEP_0800_STATISTICS_CREATED
 
     },
     // STEP_9100_VALIDATION_FAILED
