@@ -16,7 +16,6 @@ export default {
 
     },
     runProfiler(datasetId, userId) {
-        console.log('posting to profiler....')
         session.post('/api/profile/run-async-profile/',
             {object_id: datasetId})
             .then(resp => camelcaseKeys(resp, {deep: true}))

@@ -70,13 +70,17 @@ const actions = {
         if (variableInput.type === 'Categorical') {
             targetVar.categories = variableInput.additional_information.categories
             let numericValues = [];
-            variableInput.additional_information.categories.forEach(item => {
-                if (!isNaN(item)) {
-                    numericValues.push(Number(item))
+            if (variableInput.additional_information.categories !== null) {
+                variableInput.additional_information.categories.forEach(item => {
+                    if (!isNaN(item)) {
+                        numericValues.push(Number(item))
+                    }
+                })
+            }
+            if (numericValues !== null) {
+                if (numericValues.length === variableInput.additional_information.categories.length) {
+                    targetVar.categories = numericValues
                 }
-            })
-            if (numericValues.length === variableInput.additional_information.categories.length) {
-                targetVar.categories = numericValues
             }
         }
         const patch = {

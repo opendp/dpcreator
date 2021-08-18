@@ -235,8 +235,7 @@ export default {
       this.$router.push(`${NETWORK_CONSTANTS.MY_DATA.PATH}/${item.datasetId}`);
     },
     continueWorkflow(item) {
-      //TODO: Implement Continue Workflow handler
-      alert("continue workflow " + item.dataset);
+       this.$router.push(`${NETWORK_CONSTANTS.WIZARD.PATH}/${item.objectId}`);
     },
     cancelExecution(item) {
       //TODO: Implement Cancel Execution handler
