@@ -14,7 +14,7 @@
           md="7"
       >
         <h2 class="title-size-1 home-title mx-auto mb-7">
-          {{ $t("home.stepsTitle") }}
+          {{ $t("home.stepsTitle") }}Hello
         </h2>
         <p v-html="$t('home.stepsDescription')"
            class="grey--text text--darken-2 home-description"
