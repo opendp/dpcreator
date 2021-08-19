@@ -17,7 +17,7 @@ class DatasetObjectIdSerializer(serializers.Serializer):
 
     def validate_object_id(self, value):
         """
-        Check that the blog post is about Django.
+        Check that the object_id belongs to an existing DataSetInfo object
         """
         try:
             dsi = DataSetInfo.objects.get(object_id=value)
