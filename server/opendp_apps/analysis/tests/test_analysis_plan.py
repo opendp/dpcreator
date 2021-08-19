@@ -49,6 +49,7 @@ class AnalysisPlanTest(TestCase):
             'dv_handoff': '9e7e5506-dd1a-4979-a2c1-ec6e59e4769c',
         }
 
+    @skip
     @responses.activate
     def test_10_download_profile_success(self):
         """(10) Test successful download + profile"""
