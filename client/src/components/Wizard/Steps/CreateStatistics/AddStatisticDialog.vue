@@ -181,14 +181,14 @@ export default {
     variables: function () {
       let displayVars = []
       for (const key in this.variableInfo) {
-        if (this.variableInfo[key].label === '') {
-          this.variableInfo[key].label = this.variableInfo[key].name
-        }
-        this.variableInfo[key].key = key
         if (this.variableInfo[key].type === 'Numerical') {
-          displayVars.push(this.variableInfo[key])
+          let displayVar = JSON.parse(JSON.stringify(this.variableInfo[key]))
+          displayVar.key = key
+          if (displayVar.label === '') {
+            displayVar.label = displayVar.name
+          }
+          displayVars.push(displayVar)
         }
-
       }
       return displayVars
     }
