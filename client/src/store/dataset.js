@@ -13,7 +13,9 @@ const initialState = {
     datasetList: null,
     datasetInfo: null,
     profilerStatus: null,
-    profilerMsg: null
+    profilerMsg: null,
+    updatedTime: null,
+    analysisPlan: null
 };
 const getters = {
     getDatasetList: state => {
@@ -28,7 +30,42 @@ const getters = {
         } else {
             return null
         }
+    },
+    getUpdatedTime: state => {
+        if (state.analysisPlan) {
+            return state.analysisPlan.updated
+        } else if (state.datasetInfo.depositorSetupInfo) {
+            let d = new Date(state.datasetInfo.depositorSetupInfo.updated)
+            return d.toLocaleString()
+        } else {
+            return 'not found'
+        }
+    },
+    getCreatedTime: state => {
+        return state.datasetInfo.created
+    },
+    getTimeRemaining: state => {
+        const millisInDay = 1000 * 60 * 60 * 24
+        const millisInHour = 1000 * 60 * 60
+        const millisInMin = 1000 * 60
+        const createdDate = new Date(state.datasetInfo.created)
+        // console.log('createdDate: '+createdDate)
+        const expirationDate = createdDate.getTime() + (3 * millisInDay)
+
+        const diffTime = expirationDate - (new Date().getTime())
+        // console.log('exp date '+new Date(expirationDate))
+
+        if (diffTime < 0) {
+            return ('Time has expired')
+        } else {
+            const diffDays = Math.floor(diffTime / (millisInDay))
+            const diffHours = Math.floor((diffTime - (diffDays * millisInDay)) / millisInHour)
+            const diffMin = Math.floor((diffTime - (diffDays * millisInDay + diffHours * millisInHour)) / millisInMin)
+            return '' + diffDays + 'd ' + diffHours + 'h ' + diffMin + 'min'
+        }
+
     }
+
 };
 const actions = {
   setDatasetList({commit, state}) {
