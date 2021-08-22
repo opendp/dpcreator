@@ -159,7 +159,10 @@ export default {
         Object.assign(this.statistics[this.editedIndex], this.editedItem);
       } else {
         for (let variable of this.editedItem.variable) {
-          const label = this.datasetInfo.depositorSetupInfo.variableInfo[variable].label
+          let label = this.datasetInfo.depositorSetupInfo.variableInfo[variable].label
+          if (label === '') {
+            label = this.datasetInfo.depositorSetupInfo.variableInfo[variable].name
+          }
           this.statistics.push(
               Object.assign({}, this.editedItem, {variable}, {label})
           );
