@@ -153,16 +153,22 @@ export default {
       this.delta = delta;
       this.confidenceLevel = confidenceLevel;
     },
+    // Label may not be set for all variables, so use name as the label if needed
+    getVarLabel(key) {
+      let label = this.datasetInfo.depositorSetupInfo.variableInfo[key].label
+      if (label === '') {
+        label = this.datasetInfo.depositorSetupInfo.variableInfo[key].name
+      }
+      return label
+    },
     save(editedItemFromDialog) {
       this.editedItem = Object.assign({}, editedItemFromDialog);
       if (this.isEditionMode) {
-        Object.assign(this.statistics[this.editedIndex], this.editedItem);
+        const label = this.getVarLabel(this.editedItem.variable)
+        Object.assign(this.statistics[this.editedIndex], this.editedItem, {label});
       } else {
         for (let variable of this.editedItem.variable) {
-          let label = this.datasetInfo.depositorSetupInfo.variableInfo[variable].label
-          if (label === '') {
-            label = this.datasetInfo.depositorSetupInfo.variableInfo[variable].name
-          }
+          let label = this.getVarLabel(variable)
           this.statistics.push(
               Object.assign({}, this.editedItem, {variable}, {label})
           );
