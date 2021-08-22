@@ -39,6 +39,7 @@
     />
     <DeleteStatisticDialog
         :dialogDelete="dialogDelete"
+        :editedItem="editedItem"
         v-on:cancel="closeDelete"
         v-on:confirm="deleteItemConfirm"
     />
