@@ -17,6 +17,15 @@
       <template v-slot:[`item.num`]="{ index }">
         <span class="index-td">{{ index + 1 }}</span>
       </template>
+      <template v-slot:[`item.epsilon`]="{ item }">
+        <v-text-field
+            v-model="item.epsilon"
+            type="text"
+            v-on:change="$emit('editStatistic', item)"
+        >
+        </v-text-field>
+      </template>
+
       <template v-slot:[`item.actions`]="{ item }">
         <div class="d-flex justify-space-between">
           <v-tooltip bottom max-width="220px">
