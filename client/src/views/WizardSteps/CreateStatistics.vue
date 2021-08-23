@@ -77,6 +77,7 @@
 </style>
 
 <script>
+import Decimal from 'decimal.js';
 import ColoredBorderAlert from "../../components/DynamicHelpResources/ColoredBorderAlert.vue";
 import AddStatisticDialog from "../../components/Wizard/Steps/CreateStatistics/AddStatisticDialog.vue";
 import DeleteStatisticDialog from "../../components/Wizard/Steps/CreateStatistics/DeleteStatisticDialog.vue";
@@ -184,18 +185,18 @@ export default {
     redistributeEpsilon() {
       // for all statistics with locked == false, update so that the unlocked epsilon
       // is shared equally among them.
-      let lockedEpsilon = 0.0;
-      let lockedCount = 0;
+      let lockedEpsilon = new Decimal('0.0');
+      let lockedCount = new Decimal('0');
       this.statistics.forEach(function (item) {
         if (item.locked) {
-          lockedEpsilon += item.epsilon
-          lockedCount++;
+          lockedEpsilon = lockedEpsilon.plus(item.epsilon)
+          lockedCount = lockedCount.plus(1);
         }
       });
-      const remaining = this.epsilon - lockedEpsilon
+      const remaining = new Decimal(this.epsilon).minus(lockedEpsilon)
       const unlockedCount = this.statistics.length - lockedCount
       if (unlockedCount > 0) {
-        const epsilonShare = remaining / unlockedCount
+        const epsilonShare = remaining.div(unlockedCount)
         this.statistics.forEach(function (item) {
           if (!item.locked) {
             item.epsilon = epsilonShare
