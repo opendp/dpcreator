@@ -200,7 +200,6 @@ export default {
   },
   //TODO: Define the default epsilon and error values for new statistics
   data: () => ({
-    //TODO: These should be connected with the variables loaded on the previous step
     singleVariableStatistics: ["Mean", "Histogram", "Quantile"],
     editedItemDialog: {
       statistic: "",
@@ -210,7 +209,7 @@ export default {
       missingValuesHandling: "",
       handleAsFixed: false,
       fixedValue: "0",
-      locked: "false"
+      locked: false
     },
     missingValuesHandling: [
       "Drop them",

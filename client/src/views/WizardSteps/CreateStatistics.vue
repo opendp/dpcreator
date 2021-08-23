@@ -21,8 +21,10 @@
 
     <StatisticsTable
         :statistics="statistics"
+        :total-epsilon="epsilon"
         v-on:newStatisticButtonPressed="dialogAddStatistic = true"
         v-on:editStatistic="editItem"
+        v-on:editEpsilon="editEpsilon"
         v-on:changeLockStatus="changeLockStatus"
         v-on:deleteStatistic="deleteItem"
         class="mb-10"
@@ -131,7 +133,7 @@ export default {
       missingValuesHandling: "",
       handleAsFixed: false,
       fixedValue: "0",
-      locked: "false"
+      locked: false
     },
     defaultItem: {
       statistic: "",
@@ -141,7 +143,7 @@ export default {
       missingValuesHandling: "",
       handleAsFixed: false,
       fixedValue: "0",
-      locked: "false"
+      locked: false
     }
   }),
   methods: {
@@ -174,16 +176,49 @@ export default {
               Object.assign({}, this.editedItem, {variable}, {label})
           );
         }
+        this.redistributeEpsilon()
       }
+      console.log('saved: ' + JSON.stringify(this.statistics))
       this.close();
     },
+    redistributeEpsilon() {
+      // for all statistics with locked == false, update so that the unlocked epsilon
+      // is shared equally among them.
+      let lockedEpsilon = 0.0;
+      let lockedCount = 0;
+      this.statistics.forEach(function (item) {
+        if (item.locked) {
+          lockedEpsilon += item.epsilon
+          lockedCount++;
+        }
+      });
+      const remaining = this.epsilon - lockedEpsilon
+      const unlockedCount = this.statistics.length - lockedCount
+      if (unlockedCount > 0) {
+        const epsilonShare = remaining / unlockedCount
+        this.statistics.forEach(function (item) {
+          if (!item.locked) {
+            item.epsilon = epsilonShare
+          }
+        })
+
+      }
+
+
+    },
+    editEpsilon(item) {
+      console.log('calling EDIT EPSILON ' + JSON.stringify(item))
+
+    },
     editItem(item) {
+
       this.editedIndex = this.statistics.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialogAddStatistic = true;
     },
     changeLockStatus(item) {
       item.locked = !item.locked;
+      console.log('changing locked status: ' + item.locked)
     },
     deleteItem(item) {
       this.editedIndex = this.statistics.indexOf(item);

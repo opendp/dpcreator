@@ -20,8 +20,11 @@
       <template v-slot:[`item.epsilon`]="{ item }">
         <v-text-field
             v-model="item.epsilon"
-            type="text"
-            v-on:change="$emit('editStatistic', item)"
+            type="number"
+            :rules="[validateEpsilon]"
+            v-on:click="currentItem=item"
+            :disabled="!item.locked"
+            v-on:change="$emit('editEpsilon', item)"
         >
         </v-text-field>
       </template>
@@ -96,7 +99,7 @@ import QuestionIconTooltip from "../../../DynamicHelpResources/QuestionIconToolt
 export default {
   components: {QuestionIconTooltip, Button},
   name: "StatisticsTable",
-  props: ["statistics"],
+  props: ["statistics", "totalEpsilon"],
   data: () => ({
     headers: [
       {value: "num"},
@@ -105,7 +108,19 @@ export default {
       {text: "Epsilon", value: "epsilon"},
       {text: "Error", value: "error"},
       {text: "", value: "actions"}
-    ]
-  })
+    ],
+    currentItem: null
+  }),
+  methods: {
+    validateEpsilon(value) {
+      if (this.currentItem !== null) {
+        if (this.currentItem.epsilon >= this.totalEpsilon)
+          return false
+      }
+      return true
+    }
+  }
+
+
 };
 </script>
