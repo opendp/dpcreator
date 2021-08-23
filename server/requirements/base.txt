@@ -13,6 +13,7 @@ django-rest-polymorphic==0.1.9
 django-cors-headers==3.6.0
 idna==2.10
 lxml==4.6.3
+opendp -e git@github.com:opendp/opendp.git@301ccc61c4953d6ccb6987df3d9ea05ae0efdcf2
 packaging==20.4
 psycopg2-binary==2.8.6
 pyDataverse==0.3.0
