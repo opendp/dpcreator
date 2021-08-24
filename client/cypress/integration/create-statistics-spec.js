@@ -2,6 +2,11 @@
     describe('Create Statistics Wizard Step tests', () => {
 
         beforeEach(() => {
+            cy.on('uncaught:exception', (e, runnable) => {
+                console.log('error', e)
+                console.log('runnable', runnable)
+                return false
+            })
             cy.clearData()
             cy.login('dev_admin', 'admin')
             cy.fixture('datasetInfoStep600.json').then(dataset => {
