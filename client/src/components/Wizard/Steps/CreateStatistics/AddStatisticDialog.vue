@@ -30,6 +30,8 @@
                 :label="statistic"
                 :value="statistic"
                 on-icon="mdi-check"
+                @click="() => updateSelectedStatistic(statistic)"
+                :data-test="statistic"
             ></v-radio>
           </v-radio-group>
         </div>
@@ -181,14 +183,16 @@ export default {
     variables: function () {
       let displayVars = []
       for (const key in this.variableInfo) {
-        if (this.variableInfo[key].type === 'Numerical') {
-          let displayVar = JSON.parse(JSON.stringify(this.variableInfo[key]))
-          displayVar.key = key
-          if (displayVar.label === '') {
-            displayVar.label = displayVar.name
-          }
+        let displayVar = JSON.parse(JSON.stringify(this.variableInfo[key]))
+        displayVar.key = key
+        if (displayVar.label === '') {
+          displayVar.label = displayVar.name
+        }
+        if ((this.selectedStatistic !== 'Mean') ||
+            (this.selectedStatistic === 'Mean' && this.variableInfo[key].type === 'Numerical')) {
           displayVars.push(displayVar)
         }
+
       }
       return displayVars
     }
@@ -201,6 +205,7 @@ export default {
   //TODO: Define the default epsilon and error values for new statistics
   data: () => ({
     singleVariableStatistics: ["Mean", "Histogram", "Quantile"],
+    selectedStatistic: null,
     editedItemDialog: {
       statistic: "",
       variable: [],
@@ -224,6 +229,9 @@ export default {
     },
     close() {
       this.$emit("close");
+    },
+    updateSelectedStatistic(statistic) {
+      this.selectedStatistic = statistic
     },
     updateFixedInputVisibility(handlingOption) {
       this.editedItemDialog.handleAsFixed =

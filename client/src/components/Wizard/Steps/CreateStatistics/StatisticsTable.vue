@@ -78,6 +78,7 @@
         color="soft_primary primary--text"
         width="100%"
         depressed
+        data-test="Add Statistic"
         :click="() => $emit('newStatisticButtonPressed')"
     >
       <v-icon left>mdi-plus-box</v-icon>
@@ -95,6 +96,7 @@
 <script>
 import Button from "../../../DesignSystem/Button.vue";
 import QuestionIconTooltip from "../../../DynamicHelpResources/QuestionIconTooltip.vue";
+import Decimal from "decimal.js";
 
 export default {
   components: {QuestionIconTooltip, Button},
@@ -114,7 +116,13 @@ export default {
   methods: {
     validateEpsilon(value) {
       if (this.currentItem !== null) {
-        if (this.currentItem.epsilon >= this.totalEpsilon)
+        let lockedEpsilon = new Decimal('0.0');
+        this.statistics.forEach(function (item) {
+          if (item.locked) {
+            lockedEpsilon = lockedEpsilon.plus(item.epsilon)
+          }
+        })
+        if (lockedEpsilon > this.totalEpsilon)
           return false
       }
       return true

@@ -208,7 +208,7 @@ export default {
 
     },
     editEpsilon(item) {
-      console.log('calling EDIT EPSILON ' + JSON.stringify(item))
+      this.redistributeEpsilon()
 
     },
     editItem(item) {
@@ -228,6 +228,7 @@ export default {
     },
     deleteItemConfirm() {
       this.statistics.splice(this.editedIndex, 1);
+      this.redistributeEpsilon()
       this.closeDelete();
     },
     close() {
