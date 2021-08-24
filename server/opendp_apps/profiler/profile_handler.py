@@ -13,6 +13,7 @@ from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.profiler import static_vals as pstatic
+from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.profiler.profile_formatter import ProfileFormatter
 from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
 
@@ -156,7 +157,8 @@ class ProfileHandler(BasicErrCheck):
                 self.dataset_info_object = DataSetInfo.objects.get(object_id=self.dataset_info_object_id)
             except DataSetInfo.DoesNotExist:
                 self.dataset_info_object = None
-                user_msg = f'DataSetInfo object not found for id {self.dataset_info_object_id}'
+                user_msg = (f'{dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND}'
+                            f' for id {self.dataset_info_object_id}')
                 self.add_err_msg(user_msg)
                 return False
 

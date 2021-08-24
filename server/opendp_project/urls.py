@@ -30,12 +30,13 @@ from opendp_apps.dataverses.views.dataverse_user_view import DataverseUserView
 from opendp_apps.dataverses.views.registered_dataverse_view import RegisteredDataverseView
 
 from opendp_apps.terms_of_access.views import TermsOfAccessViewSet, TermsOfAccessAgreementViewSet
-from opendp_apps.user.models import OpenDPUser
+from opendp_apps.analysis.views.analysis_plan_view import AnalysisPlanViewSet
+
 from opendp_apps.user.views import GoogleLogin, OpenDPRegister
 from opendp_apps.user.views import UserViewSet
 
-admin.site.site_header = 'OpenDP App Admin Panel'
-admin.site.site_title = 'OpenDP App Admin Panel'
+admin.site.site_header = 'DP Creator Admin Panel'
+admin.site.site_title = 'DP Creator Admin Panel'
 
 
 router = routers.DefaultRouter()
@@ -45,10 +46,12 @@ router.register(r'terms-of-access-agreement', TermsOfAccessAgreementViewSet)
 router.register(r'dataset-info', DataSetInfoViewSet)
 router.register(r'dv-user', DataverseUserView, basename='dv-user')
 router.register(r'deposit', DepositorSetupViewSet, basename='deposit')
+router.register(r'analyze', AnalysisPlanViewSet, basename='analyze')
 router.register(r'dv-handoff', DataverseHandoffView, basename='dv-handoff')
 router.register(r'dv-file', DataverseFileView, basename='dv-file')
 router.register(r'profile', ProfilingViewSet, basename='profile')
 router.register(r'registered-dvs', RegisteredDataverseView, basename='registered-dvs')
+
 router.registry.extend(dataverse_router.registry)
 
 urlpatterns = [
