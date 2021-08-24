@@ -13,6 +13,31 @@ class AnalysisPlanUtil:
     """Functions used by API endpoints"""
 
     @staticmethod
+    def retrieve_analysis(analysis_object_id: str,  opendp_user: get_user_model()) -> BasicResponse:
+        """
+        Retrieve an existing AnalysisPlan object by it's object_id and analyst
+        """
+        if not analysis_object_id:
+            return err_resp(astatic.ERR_MSG_ANALYSIS_ID_REQUIRED,
+                            data=status.HTTP_400_BAD_REQUEST)
+        if not isinstance(opendp_user, get_user_model()):
+            return err_resp(astatic.ERR_MSG_USER_REQUIRED,
+                            data=status.HTTP_400_BAD_REQUEST)
+
+        # -------------------------------
+        # Retrieve AnalysisPlan object
+        # -------------------------------
+        try:
+            plan = AnalysisPlan.objects.get(object_id=analysis_object_id,
+                                              analyst=opendp_user)
+        except AnalysisPlan.DoesNotExist:
+            return err_resp(astatic.ERR_MSG_NO_ANALYSIS_PLAN,
+                            data=status.HTTP_400_BAD_REQUEST)
+
+        return ok_resp(plan, message='Plan created!')
+
+
+    @staticmethod
     def create_plan(dataset_object_id: str, opendp_user: get_user_model()) -> BasicResponse:
         """
         Create an AnalysisPlan object

@@ -16,6 +16,7 @@ from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.models import AnalysisPlan
 from opendp_apps.dataset.models import DataSetInfo  #DataverseFileInfo
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.model_helpers.msg_util import msg, msgt
 
@@ -34,20 +35,9 @@ class AnalysisPlanTest(TestCase):
 
         self.user_obj, _created = get_user_model().objects.get_or_create(username='dev_admin')
 
-        # Object Ids used for most calls
-        self.dp_user_object_id = self.user_obj.id
-
         self.client.force_login(self.user_obj)
 
-        self.dv_user_invalid_token = {
-            "status": "ERROR",
-            "message": "User with token 7957c20e-5316-47d5-bd23-2afd19f2d00a not found."
-        }
 
-        self.dv_user_api_input_01 = {
-            'user': '4472310a-f591-403a-b8d6-dfb562f8b32f',
-            'dv_handoff': '9e7e5506-dd1a-4979-a2c1-ec6e59e4769c',
-        }
 
     #@skip
     #@responses.activate
@@ -79,6 +69,58 @@ class AnalysisPlanTest(TestCase):
                          dataset_info.depositor_setup_info.variable_info)
         self.assertEqual(the_plan.dp_statistics, None)
 
+    def test_15_create_plan_via_api(self):
+        """(15) Create AnalysisPlan using the API"""
+        msgt(self.test_15_create_plan_via_api.__doc__)
+
+        dataset_info = DataSetInfo.objects.get(id=4)
+
+
+        payload = json.dumps({"object_id": str(dataset_info.object_id)})
+        response = self.client.post('/api/analyze/',
+                                    payload,
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 201)
+        jresp = response.json()
+        self.assertEqual(jresp.get('success'), True)
+
+        the_plan = jresp['data']
+
+        # should have same user and dataset
+        plan_object_id = the_plan['object_id']
+        plan_name = the_plan['name']
+        self.assertEqual(the_plan['analyst'], str(self.user_obj.object_id))
+        self.assertEqual(the_plan['dataset'], str(dataset_info.object_id))
+
+        # check default settings
+        self.assertFalse(the_plan['is_complete'])
+        self.assertEqual(the_plan['user_step'],
+                         AnalysisPlan.AnalystSteps.STEP_0700_VARIABLES_CONFIRMED)
+        self.assertEqual(the_plan['variable_info'],
+                         dataset_info.depositor_setup_info.variable_info)
+        self.assertEqual(the_plan['dp_statistics'], None)
+
+
+        # -----------------------------------------
+        # Retrieve the new Analysis Plan via API
+        # -----------------------------------------
+        response = self.client.get(f'/api/analyze/{plan_object_id}/',
+                                   content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
+        jresp = response.json()
+        the_plan2 = jresp['data']
+        self.assertEqual(jresp.get('success'), True)
+        self.assertEqual(the_plan2['object_id'], plan_object_id)
+        self.assertEqual(the_plan2['name'], plan_name)
+
+        self.assertFalse(the_plan2['is_complete'])
+        self.assertEqual(the_plan2['user_step'],
+                         AnalysisPlan.AnalystSteps.STEP_0700_VARIABLES_CONFIRMED)
+        self.assertEqual(the_plan2['variable_info'],
+                         dataset_info.depositor_setup_info.variable_info)
+        self.assertEqual(the_plan2['dp_statistics'], None)
 
     def test_20_fail_no_dataset_id(self):
         """(20) Fail b/c no dataset id"""
@@ -127,3 +169,36 @@ class AnalysisPlanTest(TestCase):
         self.assertFalse(plan_util.success)
         self.assertEqual(plan_util.message, astatic.ERR_MSG_SETUP_INCOMPLETE)
 
+    def test_60_bad_dataset_id_via_api(self):
+        """(60) Fail using bad dataset id (not a UUID) via the API"""
+        msgt(self.test_60_bad_dataset_id_via_api.__doc__)
+
+        payload = json.dumps({"object_id": 'mickey mouse'})#str(dataset_info.object_id)})
+        response = self.client.post('/api/analyze/',
+                                    payload,
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 400)
+        jresp = response.json()
+        self.assertEqual(jresp['success'], False)
+        self.assertTrue(jresp['message'].find('Must be a valid UUID') > -1)
+
+
+    def test_70_invalid_dataset_id_via_api(self):
+        """(70) Fail using invalid dataset ID (but it is a valid UUID)"""
+        msgt(self.test_70_invalid_dataset_id_via_api.__doc__)
+
+        dataset_info = DataSetInfo.objects.get(id=4)
+
+        nonsense_dataset_id = uuid.uuid4()
+
+        payload = json.dumps({"object_id": str(nonsense_dataset_id)})
+        response = self.client.post('/api/analyze/',
+                                    payload,
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 400)
+        jresp = response.json()
+        self.assertEqual(jresp['success'], False)
+        self.assertTrue(jresp['message'].find(\
+                        dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND) > -1)

@@ -5,6 +5,7 @@ from rest_polymorphic.serializers import PolymorphicSerializer
 
 from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.dataset.models import DataSetInfo, DataverseFileInfo, UploadFileInfo
+from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.basic_response import BasicResponse, ok_resp, err_resp
 from opendp_apps.user.models import OpenDPUser
@@ -23,7 +24,7 @@ class DatasetObjectIdSerializer(serializers.Serializer):
             dsi = DataSetInfo.objects.get(object_id=value)
             self.dataset_info = dsi
         except DataSetInfo.DoesNotExist:
-            raise serializers.ValidationError("DataSetInfo object not found")
+            raise serializers.ValidationError(dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND)
 
         return value
 
@@ -34,7 +35,7 @@ class DatasetObjectIdSerializer(serializers.Serializer):
         try:
             dsi = DataSetInfo.objects.get(object_id=self.validated_data.get('object_id'))
         except DataSetInfo.DoesNotExist:
-            return err_resp("DataSetInfo object not found")
+            return err_resp(dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND)
 
         return ok_resp(dsi)
 
@@ -53,7 +54,7 @@ class DatasetObjectIdSerializer(serializers.Serializer):
             dsi = DataSetInfo.objects.get(object_id=self.validated_data.get('object_id'),
                                           creator=user)
         except DataSetInfo.DoesNotExist:
-            return err_resp("DataSetInfo object not found for current user.")
+            return err_resp(dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND_CURRENT_USER)
 
         return ok_resp(dsi)
 

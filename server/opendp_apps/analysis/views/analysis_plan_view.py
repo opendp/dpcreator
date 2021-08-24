@@ -9,7 +9,9 @@ from opendp_project.views import BaseModelViewSet
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.analysis.models import AnalysisPlan
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
-from opendp_apps.analysis.serializers import AnalysisPlanSerializer
+from opendp_apps.analysis.serializers import \
+    AnalysisPlanSerializer, \
+    AnalysisPlanObjectIdSerializer
 from opendp_apps.dataset.serializers import DatasetObjectIdSerializer
 from opendp_apps.utils.view_helper import get_object_or_error_response
 
@@ -18,7 +20,6 @@ from opendp_apps.utils.view_helper import get_json_error, get_json_success
 
 class AnalysisPlanViewSet(BaseModelViewSet): #viewsets.ModelViewSet):
     """Publicly available listing of registered Dataverses"""
-    #serializer_class = AnalysisPlanSerializer
     serializer_classes = {
         'list': AnalysisPlanSerializer,
         'retrieve': AnalysisPlanSerializer,
@@ -41,20 +42,37 @@ class AnalysisPlanViewSet(BaseModelViewSet): #viewsets.ModelViewSet):
                         status=status.HTTP_501_NOT_IMPLEMENTED)
 
 
-    #def retrieve_unfinished_plan(self, request, ):
-    #    """Retrieve an AnalysisPlan that is not yet complete--e.g. doesn't have a Release"""
-    #    plans = AnalysisPlan.objects.filter(analyst=request.user)
+
+    @csrf_exempt
+    def retrieve(self, request, object_id=None):
+        """Retrieve an AnalysisPlan by it's object id and analyst"""
+        ais = AnalysisPlanObjectIdSerializer(data=dict(object_id=object_id))
+
+        if not ais.is_valid():
+            #print(ois.errors)
+            if 'object_id' in ais.errors:
+                user_msg = '"object_id" error: %s' % (ais.errors['object_id'][0])
+            else:
+                user_msg = 'Not a valid "object_id"'
+            return Response(get_json_error(user_msg),
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
-    def retrieve(self, request, pk=None):
-        """Retrieve one AnalysisPlan"""
-        analysis_plan = get_object_or_error_response(AnalysisPlan,
-                                                     object_id=pk,
-                                                     analyst=request.user)
-        serializer = AnalysisPlanSerializer(analysis_plan)
+        plan_util = AnalysisPlanUtil.retrieve_analysis(ais.get_object_id(), request.user)
 
-        return Response(get_json_success('AnalysisPlan retrieved', data=serializer.data),
-                        status=status.HTTP_200_OK)
+        # Was an AnalysisPlan retrieved?
+        if plan_util.success:
+            # Yes, it worked!
+            serializer = AnalysisPlanSerializer(plan_util.data)  # serialize the data
+
+            # Return it
+            return Response(get_json_success('AnalysisPlan retrieved', data=serializer.data),
+                            status=status.HTTP_200_OK)
+
+        # Nope! Error encountered!
+        return Response(get_json_error(plan_util.message),
+                        status=plan_util.data)
+
 
 
     @csrf_exempt
