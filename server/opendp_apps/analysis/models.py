@@ -57,6 +57,12 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
         #       depending on the data
         #
+        if self.variable_info and self.epsilon \
+            and self.user_step == self.DepositorSteps.STEP_0600_EPSILON_SET:
+            self.is_complete = True
+        else:
+            self.is_complete = False
+
         super(DepositorSetupInfo, self).save(*args, **kwargs)
 
 

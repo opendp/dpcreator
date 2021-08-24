@@ -6,7 +6,6 @@ from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.user.models import DataverseUser, OpenDPUser
 
 
-#class RegisteredDataverseSerializer(serializers.HyperlinkedModelSerializer):
 class RegisteredDataverseSerializer(serializers.ModelSerializer):
     class Meta:
         model = RegisteredDataverse

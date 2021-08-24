@@ -78,7 +78,8 @@ class TestDataSetSerializer(BaseEndpointTest):
                                          'status_name': 'Step 1: Uploaded',
                                          'resourcetype': 'DataverseFileInfo',
                                          'dataset_schema_info': None,
-                                         'file_schema_info': None})
+                                         'file_schema_info': None,
+                                         'analysis_plans':[]})
         self.assertEqual(response.status_code, 201)
 
     def test_unsuccessful_post(self, req_mocker):

@@ -22,7 +22,12 @@ class ProfilingViewSet(viewsets.ViewSet):
 
     def list(self, request):
         """Only used so that these endpoints show up in the docs"""
-        return Response(get_json_success('ProfilingViewSet: custom actions only. In API docs, see "Extra Actions"'))
+        user_msg = ('ProfilingViewSet: custom actions only.'
+                    ' In API docs, see "Extra Actions"')
+        return Response(get_json_error(user_msg),
+                        status=status.HTTP_501_NOT_IMPLEMENTED)
+
+        return Response(get_json_success())
 
 
     @csrf_exempt
