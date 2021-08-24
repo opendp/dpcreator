@@ -13,7 +13,7 @@
         </h2>
       </v-card-title>
       <v-card-text class="text--primary">
-        This will delete this statistic forever.
+        This will delete statistic "{{ editedItem.statistic }}" for variable "{{ editedItem.label }}".
       </v-card-text>
       <v-card-actions>
         <Button color="primary" :click="() => $emit('confirm')" label="OK"/>
@@ -33,6 +33,6 @@ import Button from "../../../DesignSystem/Button.vue";
 export default {
   components: {Button},
   name: "DeleteStatisticDialog",
-  props: ["dialogDelete"]
+  props: ["dialogDelete", "editedItem"]
 };
 </script>

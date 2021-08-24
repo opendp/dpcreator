@@ -10,8 +10,39 @@
           }"
         >
           <template v-slot:content>
+            <h2 class="title-size-1">{{ $t('more information.differential privacy title') }}</h2>
+            <p id="more-info-dp" class="grey--text text--darken-2">{{
+                $t('more information.differential privacy text')
+              }}</p>
+          </template>
+        </LinearBox>
+        <LinearBox
+            :class="{
+            'mb-6': $vuetify.breakpoint.xsOnly,
+            'mb-12': $vuetify.breakpoint.smAndUp
+          }"
+        >
+          <template v-slot:content>
+            <h2 class="title-size-1">{{ $t('more information.registered dataverses title') }}</h2>
+            <p id="more-info-dataverses" class="grey--text text--darken-2">
+              {{ $t('more information.registered dataverses text') }}</p>
+            <ul>
+              <li v-for="item in registeredDvs">
+                <a :href="item.dataverseUrl">{{ item.name }}</a>
+              </li>
+            </ul>
+
+          </template>
+        </LinearBox>
+        <LinearBox
+            :class="{
+            'mb-6': $vuetify.breakpoint.xsOnly,
+            'mb-12': $vuetify.breakpoint.smAndUp
+          }"
+        >
+          <template v-slot:content>
             <h2 class="title-size-1">{{ $t('more information.epsilon title') }}</h2>
-            <p class="grey--text text--darken-2">{{ $t('more information.epsilon text') }}</p>
+            <p id="more-info-epsilon" class="grey--text text--darken-2">{{ $t('more information.epsilon text') }}</p>
           </template>
         </LinearBox>
         <LinearBox
@@ -58,6 +89,7 @@ import LinearBox from "../DesignSystem/Boxes/LinearBox.vue";
 
 export default {
   components: {LinearBox},
-  name: "ExplanatoryText"
+  name: "ExplanatoryText",
+  props: ["registeredDvs"]
 };
 </script>

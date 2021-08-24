@@ -69,6 +69,11 @@ export default {
                 console.log(response);
             })
 
-    }
+    },
+    // Gets the DatasetInfo object for the given objectId
+    getRegisteredDataverses() {
+        return session.get('/api/registered-dvs/').then(resp => camelcaseKeys(resp, {deep: true}))
+
+    },
 
 };

@@ -1,7 +1,7 @@
 ,,Question about the audience for the text: who will the first DP Creator installation be for/open to? Only Harvard Dataverse uses? Who if not? Will installations in the future be able to change the text on the home page to suit their installation?,
 Page,Section,Text,Older Text
 home,stepsTitle,Introduce noise into your statistics to protect privacy,Introduce noise into your statistics to protect privacy
-home,stepsDescription,DP Creator allows researchers to easily <strong>introduce noise into variables</strong> masking specific details to <strong>keep private data private</strong>.,DP Creator allows researchers to easily <strong>introduce noise into variables</strong> masking specific details to <strong>keep private data private</strong>.
+home,stepsDescription,DP Creator is a tool for use with  <a href="/more-information#more-info-dvs" >registered Dataverse repositories</a> for masking specific details using <a href="/more-information" >differential privacy</a> algorithms to keep private data private.,
 home,step1 title,Review requirements,Sign Up
 home ,step1 text,"Make sure your data is ready and appropriate to be processed with DP Creator by checking the Tips for Use, then create your account to get started.","Before starting, you have to <strong>make sure your data is appropriate </strong> to be processed with this tool by checking the following tips and terms of use."
 home ,step2 title,Connect a dataset,Start the process
@@ -69,4 +69,8 @@ more information,delta title,More Information on Delta,
 more information,confidence title,More Information on Confidence Level,
 more information,epsilon text,More information epsilon text,
 more information,delta text,More information delta text,
+more information,differential privacy title,Differential Privacy,
+more information,differential privacy text,Explanatory text for differential privacy,
+more information,registered dataverses title,Registered Dataverses,
+more information,registered dataverses text,Here is a list of Registered dataverses
 more information,confidence text,More information confidence text,ç

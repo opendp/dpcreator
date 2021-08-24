@@ -6,14 +6,21 @@
         color="header"
         flat
         extended
-        extension-height="40px"
+        extension-height="50px"
     >
       <v-container class="my-5 fill-height">
         <v-col class="logo" cols="3">
           <router-link class="router-link" :to="NETWORK_CONSTANTS.HOME.PATH"
-          >DP Creator
+          >
+            <v-img
+                :src="require('../../assets/DPCreator_from_OpenDP.svg')"
+                contain
+                aspect-ratio="4"
+            ></v-img>
           </router-link
           >
+
+
         </v-col>
 
         <v-spacer></v-spacer>
