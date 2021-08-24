@@ -13,9 +13,19 @@
         })
 
         it('Goes to the correct wizard step', () => {
+            cy.on('uncaught:exception', (e, runnable) => {
+                console.log('error', e)
+                console.log('runnable', runnable)
+                return false
+            })
             cy.get('h1').should('contain', 'Create the statistics')
         })
         it('Contains correct variables in the Add Statistics dialog ', () => {
+            cy.on('uncaught:exception', (e, runnable) => {
+                console.log('error', e)
+                console.log('runnable', runnable)
+                return false
+            })
             cy.fixture('variables').then((varsFixture) => {
                 // Create your statistic
                 cy.get('[data-test="Add Statistic"]').click({force: true});
