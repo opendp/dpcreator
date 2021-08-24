@@ -50,7 +50,7 @@
 
     </div>
     <small class="font-weight-regular">
-      (Last saved at {{ getUpdatedTime }})</small
+      Last saved: {{ getUpdatedTime }}</small
     ><br></br>
     <v-icon left>mdi-timer</v-icon>
     <small>Remaining: {{ getTimeRemaining }}</small>
