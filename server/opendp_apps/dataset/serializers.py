@@ -9,6 +9,7 @@ from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.basic_response import BasicResponse, ok_resp, err_resp
 from opendp_apps.user.models import OpenDPUser
+from opendp_apps.analysis.serializers import AnalysisPlanSerializer
 
 
 
@@ -65,9 +66,11 @@ class DataSetInfoSerializer(serializers.ModelSerializer):
                                            slug_field='username',
                                            read_only=False)
 
+    analysis_plans = AnalysisPlanSerializer(many=True, read_only=True, source='analysisplan_set')
+
     class Meta:
         model = DataSetInfo
-        fields = ['object_id', 'name', 'created', 'creator', 'source', 'status', 'status_name']
+        fields = ['object_id', 'name', 'created', 'creator', 'source', 'status', 'status_name',]
 
 
 class DepositorSetupInfoSerializer(serializers.ModelSerializer):
@@ -92,11 +95,15 @@ class DataverseFileInfoSerializer(DataSetInfoSerializer):
 
     file_schema_info = serializers.JSONField(read_only=True)
 
+    analysis_plans = AnalysisPlanSerializer(many=True,
+                                            read_only=True,
+                                            source='analysisplan_set')
+
     class Meta:
         model = DataverseFileInfo
         fields = ['object_id', 'name', 'created', 'creator', 'installation_name', 'dataverse_file_id', 'dataset_doi',
                   'file_doi', 'status', 'status_name', 'depositor_setup_info', 'dataset_schema_info',
-                  'file_schema_info']
+                  'file_schema_info', 'analysis_plans']
         extra_kwargs = {
             'url': {'view_name': 'dataset-info-list'},
         }
@@ -107,17 +114,22 @@ class UploadFileInfoSerializer(serializers.ModelSerializer):
                                            slug_field='username',
                                            read_only=False)
 
+    analysis_plans = AnalysisPlanSerializer(many=True,
+                                            read_only=True,
+                                            source='analysisplan_set')
+
     class Meta:
         model = UploadFileInfo
         fields = ['object_id', 'name', 'created', 'creator',
                   #'data_file',
-                  'status', 'status_name']
+                  'status', 'status_name', 'analysis_plans']
         extra_kwargs = {
             'url': {'view_name': 'dataset-info-list'},
         }
 
 
 class DataSetInfoPolymorphicSerializer(PolymorphicSerializer):
+
     model_serializer_mapping = {
         DataSetInfo: DataSetInfoSerializer,
         DataverseFileInfo: DataverseFileInfoSerializer,
