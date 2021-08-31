@@ -13,7 +13,18 @@
                 dataset.created = '' + new Date()
                 dataset.depositorSetupInfo.updated = dataset.created
                 cy.intercept('GET', '/api/dataset-info/' + dataset.objectId + '/', {body: dataset})
-                cy.visit('/wizard/' + dataset.objectId)
+                cy.intercept('GET', '/api/dataset-info/', {
+                    body: {
+                        "count": 1,
+                        "next": null,
+                        "previous": null,
+                        "results": [dataset]
+                    }
+                })
+                cy.visit('/my-data')
+                cy.get('tr').should('contain',
+                    'Replication Data for: Eye-typing experiment')
+                cy.get('[data-test="continueWorkflow"]').click({force: true})
             })
         })
 
