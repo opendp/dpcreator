@@ -31,7 +31,15 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     user_step = models.CharField(max_length=128,
                                  choices=DepositorSteps.choices,
                                  default=DepositorSteps.STEP_0100_UPLOADED)
-    epsilon = models.FloatField(null=True, blank=True)
+
+    # Epsilon related fields
+    epsilon_questions = models.JSONField(null=True, blank=True)
+    default_epsilon = models.FloatField(null=True, blank=True, help_text='Default based on answers to epsilon_questions.')
+    epsilon = models.FloatField(null=True, blank=True,
+                                help_text=('Used for OpenDP operations, starts as the "default_epsilon"'
+                                           ' value but may be overridden by the user.'))
+
+
     dataset_questions = models.JSONField(null=True, blank=True)
 
     # Includes variable ranges and categories
