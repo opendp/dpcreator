@@ -88,7 +88,7 @@ class AnalysisPlanViewSet(BaseModelViewSet): #viewsets.ModelViewSet):
 
     def partial_update(self, request, *args, **kwargs):
         """Make updates to the AnalysisPlan object"""
-        acceptable_fields = ['variable_info', 'dp_statistics']
+        acceptable_fields = ['variable_info', 'dp_statistics', 'user_step']
         problem_fields = []
         fields_to_update = []
         for field in request.data.keys():

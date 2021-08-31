@@ -48,7 +48,7 @@
           <MyDataTable
               v-if="!loading"
               :class="{ 'my-5': $vuetify.breakpoint.smAndUp }"
-              :datasets="datasetList"
+              :datasets="getMyDataList"
               :searchTerm="search"
               :itemsPerPage="5"
           />
@@ -75,7 +75,8 @@ export default {
 
   },
   computed: {
-    ...mapState('dataset', ['datasetList']),
+
+    ...mapGetters('dataset', ['getMyDataList'])
   },
   data: () => ({
     loading: true,

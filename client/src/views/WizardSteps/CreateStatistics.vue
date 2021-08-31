@@ -100,7 +100,7 @@ export default {
   },
   computed: {
     ...mapState('auth', ['error', 'user']),
-    ...mapState('dataset', ['datasetInfo']),
+    ...mapState('dataset', ['datasetInfo', "analysisPlan"]),
     ...mapGetters('dataset', ['getDepositorSetupInfo']),
     formTitle() {
       return this.isEditionMode
@@ -109,6 +109,14 @@ export default {
     },
     isEditionMode() {
       return this.editedIndex > -1;
+    }
+  },
+  created: function () {
+    if (this.analysisPlan !== null && this.analysisPlan.dpStatistics !== null) {
+      // make a deep copy of the Vuex state so it can be edited locally
+      this.statistics = JSON.parse(JSON.stringify(this.analysisPlan.dpStatistics))
+    } else {
+      this.statistics = []
     }
   },
   watch: {
@@ -179,7 +187,7 @@ export default {
         }
         this.redistributeEpsilon()
       }
-      console.log('saved: ' + JSON.stringify(this.statistics))
+      this.saveUserInput()
       this.close();
     },
     redistributeEpsilon() {
@@ -197,15 +205,33 @@ export default {
       const unlockedCount = this.statistics.length - lockedCount
       if (unlockedCount > 0) {
         const epsilonShare = remaining.div(unlockedCount)
+        // Assign espilon shares and convert everything back from Decimal to Number
+        // before saving
         this.statistics.forEach(function (item) {
           if (!item.locked) {
-            item.epsilon = epsilonShare
+            item.epsilon = epsilonShare.toNumber()
+          } else {
+            item.epsilon = item.epsilon.toNumber()
           }
+
         })
 
       }
 
+    },
+    saveUserInput() {
+      // convert everything back from Decimal to Number
+      // before saving
+      this.statistics.forEach(function (item) {
+        item.epsilon = +item.epsilon
+      })
 
+      if (this.analysisPlan === null) {
+        this.$store.dispatch('dataset/createAnalysisPlan', this.datasetInfo.objectId)
+            .then(() => this.$store.dispatch('dataset/updateDPStatistics', this.statistics))
+      } else {
+        this.$store.dispatch('dataset/updateDPStatistics', this.statistics)
+      }
     },
     editEpsilon(item) {
       this.redistributeEpsilon()

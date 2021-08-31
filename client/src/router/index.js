@@ -28,11 +28,12 @@ const routes = [
     component: Home
   },
   {
-    path: `${WIZARD.PATH}/:id`,
+    path: `${WIZARD.PATH}/`,
     name: WIZARD.NAME,
     // dynamic segments start with a colon
     component: () => import("../views/Wizard.vue")
   },
+
   {
     path: MY_DATA.PATH,
     name: MY_DATA.NAME,
