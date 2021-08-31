@@ -53,7 +53,7 @@ services:
       - DJANGO_SETTINGS_MODULE=opendp_project.settings.development
     env_file:
       - .env
-    command: ./wait-for-it.sh && celery -A opendp_project worker -l info -n worker_dpcreator
+    command: celery -A opendp_project worker -l info -n worker_dpcreator
     #  command: celery -A opendp_project worker -l INFO
     volumes:
       - .:/code
@@ -64,8 +64,8 @@ services:
       - redis
       - server
   cypress:
-    image: "cypress/included:7.2.0"
-    command: "--config-file cypress_github_ci.json"
+    build: "./client/cypress"
+    entrypoint: ""
     depends_on:
       - celery-queue
     # Note: the environment vars have been moved to a custom config file: cypress_github_ci.json
@@ -74,3 +74,5 @@ services:
     working_dir: /e2e
     volumes:
       - ./client:/e2e
+    environment:
+      WAIT_HOSTS: server:8000
