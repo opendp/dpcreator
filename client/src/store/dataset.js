@@ -95,7 +95,6 @@ const actions = {
     createAnalysisPlan({commit, state}, datasetId) {
         return analysis.createAnalysisPlan(datasetId)
             .then((resp) => {
-                console.log('response from create:' + JSON.stringify(resp))
                 commit('SET_ANALYSIS_PLAN', resp)
             }).catch((error) => {
                 console.log(error.response.data);
@@ -122,14 +121,12 @@ const actions = {
     setDatasetList({commit, state}) {
         return dataset.getUserDatasets()
             .then((resp) => {
-                console.log('response: ' + JSON.stringify(resp))
                 commit(SET_DATASET_LIST, resp.data.results)
             })
     },
     setDatasetInfo({commit}, objectId) {
         return dataset.getDatasetInfo(objectId)
             .then((resp) => {
-                console.log('setDatasetInfo, resp: ' + JSON.stringify(resp))
                 commit(SET_DATASET_INFO, resp.data)
             })
     },
@@ -207,7 +204,6 @@ const actions = {
 
         const prefix = 'ws://'
         const websocketId = 'ws_' + userId
-        console.log("running profiler, before chatsocket")
         const chatSocket = new WebSocket(
             prefix + window.location.host + '/async_messages/ws/profile/' + websocketId + '/'
         );
