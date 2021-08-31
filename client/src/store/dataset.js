@@ -1,20 +1,21 @@
 import dataset from "@/api/dataset";
-import depositorSetup from "@/api/depositorSetup";
+import analysis from "@/api/analysis";
 const camelcaseKeys = require('camelcase-keys');
 
 import {
     SET_DATASET_LIST,
     SET_DATASET_INFO,
     SET_PROFILER_MSG,
-    SET_PROFILER_STATUS
+    SET_PROFILER_STATUS,
+    SET_ANALYSIS_PLAN
 } from './types';
+import dataverse from "@/api/dataverse";
 
 const initialState = {
     datasetList: null,
     datasetInfo: null,
     profilerStatus: null,
     profilerMsg: null,
-    updatedTime: null,
     analysisPlan: null
 };
 const getters = {
@@ -30,6 +31,29 @@ const getters = {
         } else {
             return null
         }
+    },
+    // List of items for the MyData table, which flattens the nested AnalysisPlan array.
+    // If a Dataset contains multiple AnalysisPlan objects,
+    // create an item in the list for each AnalysisPlan.
+    getMyDataList: state => {
+        let myData = []
+        if (state.datasetList) {
+            state.datasetList.forEach(dataset => {
+                let myDataElem = {}
+                if (dataset.analysisPlans && dataset.analysisPlans.length > 0) {
+                    myDataElem.datasetInfo = dataset
+                    dataset.analysisPlans.forEach(analysisPlan => {
+                        myDataElem.analysisPlan = analysisPlan
+                        myData.push(myDataElem)
+                    })
+                } else {
+                    myDataElem.datasetInfo = dataset
+                    myDataElem.analysisPlan = null;
+                    myData.push(myDataElem)
+                }
+            })
+        }
+        return myData
     },
     getUpdatedTime: state => {
         if (state.analysisPlan) {
@@ -68,20 +92,49 @@ const getters = {
 
 };
 const actions = {
-  setDatasetList({commit, state}) {
-      return dataset.getUserDatasets()
-          .then((resp) => {
-              commit(SET_DATASET_LIST, resp.data.results)
-          })
-  },
+    createAnalysisPlan({commit, state}, datasetId) {
+        return analysis.createAnalysisPlan(datasetId)
+            .then((resp) => {
+                console.log('response from create:' + JSON.stringify(resp))
+                commit('SET_ANALYSIS_PLAN', resp)
+            }).catch((error) => {
+                console.log(error.response.data);
+                console.log(error.response.status);
+            })
+    },
+    setAnalysisPlan({commit, state}, analysisId) {
+        return analysis.getAnalysisPlan(analysisId)
+            .then((resp) => {
+                commit('SET_ANALYSIS_PLAN', resp)
+            }).catch((error) => {
+                console.log(error.response.data);
+                console.log(error.response.status);
+            })
+    },
+    updateAnalysisPlan({commit, state}, {objectId, props}) {
+        return analysis.patchAnalysisPlan(objectId, props)
+            .then(() => this.dispatch('dataset/setAnalysisPlan', state.analysisPlan.objectId)
+                .catch((data) => {
+                    return Promise.reject(data)
+                }))
+
+    },
+    setDatasetList({commit, state}) {
+        return dataset.getUserDatasets()
+            .then((resp) => {
+                console.log('response: ' + JSON.stringify(resp))
+                commit(SET_DATASET_LIST, resp.data.results)
+            })
+    },
     setDatasetInfo({commit}, objectId) {
         return dataset.getDatasetInfo(objectId)
             .then((resp) => {
+                console.log('setDatasetInfo, resp: ' + JSON.stringify(resp))
                 commit(SET_DATASET_INFO, resp.data)
             })
     },
     updateDepositorSetupInfo({commit, state}, {objectId, props}) {
-        return depositorSetup.patchDepositorSetup(objectId, props)
+        return analysis.patchDepositorSetup(objectId, props)
             .then(() => this.dispatch('dataset/setDatasetInfo', state.datasetInfo.objectId)
                 .catch((data) => {
                     return Promise.reject(data)
@@ -125,6 +178,20 @@ const actions = {
         }
         const payload = {objectId: state.datasetInfo.depositorSetupInfo.objectId, props: patch}
         this.dispatch('dataset/updateDepositorSetupInfo', payload)
+
+    },
+    /**
+     * Save user edits to the statistics table in the Create Statistics page
+     * @param commit
+     * @param state
+     * @param statInput - Array of JSON objects from statistics table
+     */
+    updateDPStatistics({commit, state}, statList) {
+        const patch = {
+            dpStatistics: statList
+        }
+        const payload = {objectId: state.analysisPlan.objectId, props: patch}
+        this.dispatch('dataset/updateAnalysisPlan', payload)
 
     },
     /**
@@ -213,6 +280,9 @@ const actions = {
 };
 
 const mutations = {
+    [SET_ANALYSIS_PLAN](state, analysisPlan) {
+        state.analysisPlan = analysisPlan
+    },
     [SET_DATASET_LIST](state, datasetList) {
         state.datasetList = datasetList
     },
