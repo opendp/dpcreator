@@ -88,13 +88,11 @@ export default {
     ValidateDataset
   },
   created() {
-    const objectId = this.$route.params.id
-    this.$store.dispatch('dataset/setDatasetInfo', objectId)
-        .then(() => {
+
           this.initStepperPosition()
+
           this.loading = false
 
-        })
 
   },
   methods: {
@@ -119,7 +117,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('dataset', ['datasetInfo']),
+    ...mapState('dataset', ['datasetInfo', 'analysisPlan']),
     ...mapGetters('dataset', ['getDepositorSetupInfo']),
     ...mapState('auth', ['user']),
   },
@@ -135,8 +133,11 @@ export default {
         if (depositorSteps.includes(nextStep)) {
           const payload = {objectId: this.getDepositorSetupInfo.objectId, props: nextStepProp}
           this.$store.dispatch('dataset/updateDepositorSetupInfo', payload)
+
         } else {
           console.log('update analysis plan with the next step: ' + nextStep)
+          const payload = {objectId: this.analysisPlan.objectId, props: nextStepProp}
+          this.$store.dispatch('dataset/updateAnalysisPlan', payload)
         }
       }
       this.checkProfileData(val)

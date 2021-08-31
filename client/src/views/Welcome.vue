@@ -20,7 +20,7 @@
               File is locked by another user
             </template>
           </ColoredBorderAlert>
-          <CreateDPStatistics v-if="uploadedFile && !fileLocked" v-bind:fileInfo="uploadedFile"/>
+          <CreateDPStatistics v-if="uploadedFile && !fileLocked" v-bind:datasetInfo="uploadedFile"/>
           <h2
               class="title-size-2 font-weight-bold mt-16"
               :class="{
@@ -30,12 +30,12 @@
             My Data
           </h2>
           <MyDataTable
-              v-if="datasetList"
+              v-if="getMyDataList"
               :class="{
               'my-7': $vuetify.breakpoint.xsOnly,
               'my-5': $vuetify.breakpoint.smAndUp
             }"
-              :datasets="datasetList"
+              :datasets="getMyDataList"
               :paginationVisible="false"
               :itemsPerPage="5"
           />
@@ -83,6 +83,8 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['isAuthenticated']),
+    ...mapGetters('dataset', ['getMyDataList']),
+
     ...mapState('auth', ['user']),
     ...mapState('dataverse', ['fileLocked']),
     ...mapState('dataset', ['datasetList']),
@@ -94,38 +96,6 @@ export default {
     }
   },
   data: () => ({
-    variables: [
-      {
-        dataset: "California Demographic Dataset",
-        status: "in_progress",
-        remainingTime: "Expired",
-        datasetId: "exampleInProgress"
-      },
-      {
-        dataset: "California Demographic Dataset",
-        status: "in_progress",
-        remainingTime: "10h",
-        datasetId: "exampleInProgress"
-      },
-      {
-        dataset: "Tokio Demographic Dataset",
-        status: "in_execution",
-        remainingTime: "10h 30m",
-        datasetId: "exampleInExecution"
-      },
-      {
-        dataset: "Tokio Demographic Dataset",
-        status: "error",
-        remainingTime: "-",
-        datasetId: "exampleError"
-      },
-      {
-        dataset: "Tokio Demographic Dataset",
-        status: "completed",
-        remainingTime: "-",
-        datasetId: "exampleCompleted"
-      }
-    ],
     NETWORK_CONSTANTS
   })
 };
