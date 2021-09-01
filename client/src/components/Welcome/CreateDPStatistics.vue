@@ -8,11 +8,11 @@
   >
     <h2 class="title-size-2 mb-6 font-weight-bold">Create DP Statistics</h2>
     <p>
-      You have been redirected to DP Creator from the <b>{{ fileInfo.installationName }}</b> to create DP
+      You have been redirected to DP Creator from the <b>{{ datasetInfo.installationName }}</b> to create DP
       statistics for this dataset:
     </p>
     <a href="" class="text-decoration-none font-weight-bold my-6 d-block">
-      {{ fileInfo.datasetDoi }} | {{ fileInfo.datasetSchemaInfo.name }} | {{ fileInfo.fileSchemaInfo.name }}
+      {{ datasetInfo.datasetDoi }} | {{ datasetInfo.datasetSchemaInfo.name }} | {{ datasetInfo.fileSchemaInfo.name }}
     </a>
 
     <Button
@@ -23,7 +23,7 @@
         'width100 mx-auto': $vuetify.breakpoint.xsOnly
       }"
         :disabled="$vuetify.breakpoint.xsOnly"
-        :click="() => $router.push(wizardPath)"
+        :click="() => beginWizard()"
         label="Start the process"
     />
   </div>
@@ -36,16 +36,21 @@ import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
 export default {
   components: {Button},
   name: "CreateDPStatistics",
-  props: ["fileInfo"],
+  props: ["datasetInfo"],
 
 
   data: () => ({
     NETWORK_CONSTANTS
 
   }),
-  computed: {
-    wizardPath() {
-       return NETWORK_CONSTANTS.WIZARD.PATH + '/' + this.fileInfo.objectId
+
+  methods: {
+    beginWizard() {
+      this.$store.dispatch('dataset/setDatasetInfo', this.datasetInfo.objectId)
+          .then(() => {
+            this.$router.push(`${NETWORK_CONSTANTS.WIZARD.PATH}`)
+
+          })
     }
   }
 };

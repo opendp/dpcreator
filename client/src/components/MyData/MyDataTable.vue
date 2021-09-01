@@ -28,19 +28,20 @@
         <span class="index-td hidden-xs-only grey--text">{{ index + 1 }}</span>
       </template>
       <template v-slot:[`item.status`]="{ item }">
-        <StatusTag :status="stepInformation[item.status].workflowStatus"/>
+        <StatusTag :status="stepInformation[item.datasetInfo.status].workflowStatus"/>
       </template>
       <template v-slot:[`item.remainingTime`]="{ item }">
         <span
             :class="{
-            'error_status__color--text': item.remainingTime === 'Expired'
+            'error_status__color--text': item.datasetInfo.remainingTime === 'Expired'
           }"
         >{{ item.remainingTime }}</span
         >
       </template>
       <template v-slot:[`item.options`]="{ item }">
         <Button
-            v-for="(action, index) in statusInformation[stepInformation[item.status].workflowStatus]
+            :data-test="action"
+            v-for="(action, index) in statusInformation[stepInformation[item.datasetInfo.status].workflowStatus]
             .availableActions"
             :key="action + '-' + index"
             small
@@ -214,8 +215,8 @@ export default {
       search: "",
       headers: [
         {value: "num"},
-        {text: "Dataset", value: "name"},
-        {text: "Status", value: "status"},
+        {text: "Dataset", value: "datasetInfo.name"},
+        {text: "Status", value: "datasetInfostatus"},
         //  {text: "Remaining time to complete release", value: "remainingTime"},
         {text: "Options", value: "options", align: "end"}
       ],
@@ -229,13 +230,22 @@ export default {
   },
   methods: {
     handleButtonClick(action, item) {
-      this[action](item);
+      this[action](item)
     },
     viewDetails(item) {
-      this.$router.push(`${NETWORK_CONSTANTS.MY_DATA.PATH}/${item.datasetId}`);
+      this.$router.push(`${NETWORK_CONSTANTS.MY_DATA.PATH}/${item.datasetId}`)
     },
     continueWorkflow(item) {
-       this.$router.push(`${NETWORK_CONSTANTS.WIZARD.PATH}/${item.objectId}`);
+      this.$store.dispatch('dataset/setDatasetInfo', item.datasetInfo.objectId)
+          .then(() => {
+            if (item.analysisPlan) {
+              this.$store.dispatch('dataset/setAnalysisPlan', item.analysisPlan.objectId).then(() => {
+                this.$router.push(`${NETWORK_CONSTANTS.WIZARD.PATH}`)
+              })
+            } else {
+              this.$router.push(`${NETWORK_CONSTANTS.WIZARD.PATH}`)
+            }
+          })
     },
     cancelExecution(item) {
       //TODO: Implement Cancel Execution handler
