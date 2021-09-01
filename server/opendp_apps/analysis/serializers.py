@@ -1,10 +1,7 @@
 from rest_framework import serializers
 
-from opendp_apps.analysis.models import AnalysisPlan
+from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis import static_vals as astatic
-
-from opendp_apps.model_helpers.basic_response import BasicResponse, ok_resp, err_resp
-
 
 
 class AnalysisPlanObjectIdSerializer(serializers.Serializer):
@@ -30,8 +27,6 @@ class AnalysisPlanObjectIdSerializer(serializers.Serializer):
         return self.validated_data.get('object_id')
 
 
-
-
 class AnalysisPlanSerializer(serializers.ModelSerializer):
     analyst = serializers.SlugRelatedField(slug_field='object_id', read_only=True)
     dataset = serializers.SlugRelatedField(slug_field='object_id', read_only=True)
@@ -43,4 +38,25 @@ class AnalysisPlanSerializer(serializers.ModelSerializer):
                   'is_complete', 'user_step',
                   'variable_info', 'dp_statistics',
                   'created', 'updated']
+
+
+class DPStatisticSerializer(serializers.Serializer):
+    statistic_type = serializers.ChoiceField(choices=['mean', 'sum', 'count', 'histogram', 'quantile'])
+    epsilon = serializers.FloatField()
+    missing_values = serializers.ChoiceField(choices=['drop', 'insert_random', 'insert_fixed'])
+
+
+class ReleaseInfoSerializer(serializers.ModelSerializer):
+    dp_statistics = serializers.ListField(child=DPStatisticSerializer())
+
+    class Meta:
+        model = ReleaseInfo
+
+    def save(self, **kwargs):
+        stats_valid = []
+        for dp_stat in self.dp_statistics:
+            # Do some validation and append to stats_valid
+            pass
+        super(ReleaseInfoSerializer).save(**kwargs)
+        return stats_valid
 
