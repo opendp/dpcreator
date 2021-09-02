@@ -13,7 +13,7 @@ class AnalysisPlanObjectIdSerializer(serializers.Serializer):
 
     def validate_object_id(self, value):
         """
-        Check that the object_id belongs to an existing DataSetInfo object
+        Check that the object_id belongs to an existing AnalysisPlan object
         """
         try:
             plan = AnalysisPlan.objects.get(object_id=value)
@@ -28,8 +28,6 @@ class AnalysisPlanObjectIdSerializer(serializers.Serializer):
         assert self.is_valid(), "Do not call this method before checking \".is_valid()\""
 
         return self.validated_data.get('object_id')
-
-
 
 
 class AnalysisPlanSerializer(serializers.ModelSerializer):

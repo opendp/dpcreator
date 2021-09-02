@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from opendp_apps.dataverses.testing.test_endpoints import BaseEndpointTest
+from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.utils.extra_validators import VALIDATE_MSG_ZERO_OR_GREATER
 from opendp_apps.model_helpers.msg_util import msgt
 
 
@@ -20,24 +22,42 @@ class TestDepositorInfo(BaseEndpointTest):
         self.user_obj, _created = get_user_model().objects.get_or_create(pk=1)
         self.client.force_login(self.user_obj)
 
-    def test_successful_patch(self, req_mocker):
+    def test_10_successful_patch(self, req_mocker):
         """(10) Successful patch"""
-        msgt(self.test_successful_patch.__doc__)
+        msgt(self.test_10_successful_patch.__doc__)
         self.set_mock_requests(req_mocker)
         response = self.client.patch(reverse("deposit-detail",
-                                             kwargs={'object_id': "9255c067-e435-43bd-8af1-33a6987ffc9b"}), {})
+                                             kwargs={'object_id': "9255c067-e435-43bd-8af1-33a6987ffc9b"}),
+                                     {'default_epsilon': 1.0,
+                                      'epsilon': 0.9,
+                                      'default_delta': DepositorSetupInfo.DELTA_0,
+                                      'delta': DepositorSetupInfo.DELTA_10_NEG_6,
+                                      'confidence_interval': DepositorSetupInfo.CI_99})
+        print('(10 resp)', response.json())
         self.assertEqual(response.status_code, 200)
-        # print(response.json())
         response = response.json()
+
         response.pop('updated')
         self.assertEqual(response,
-                         {'id': 1, 'creator': 1, 'created': '2021-03-23T17:22:50.889000Z',
+                         {'id': 1,
+                          'creator': 1,
+                          'created': '2021-03-23T17:22:50.889000Z',
                           'object_id': '9255c067-e435-43bd-8af1-33a6987ffc9b',
-                          'is_complete': False, 'user_step': 'step_100', 'epsilon': None,
-                          'dataset_questions': None, 'variable_info': None})
+                          'dataset_questions': None,
+                          'epsilon_questions': None,
+                          'is_complete': False,
+                          'user_step': 'step_100',
+                          'default_epsilon': 1.0,
+                          'epsilon': 0.9,
+                          'default_delta': DepositorSetupInfo.DELTA_0,
+                          'delta': DepositorSetupInfo.DELTA_10_NEG_6,
+                          'confidence_interval': DepositorSetupInfo.CI_99,
+                          'variable_info': None})
 
-    def test_unsuccessful_patch(self, req_mocker):
-        msgt(self.test_unsuccessful_patch.__doc__)
+
+    def test_20_patch_restricted_field(self, req_mocker):
+        """Try to patch a field that isn't allowed"""
+        msgt(self.test_20_patch_restricted_field.__doc__)
         self.set_mock_requests(req_mocker)
         response = self.client.patch(reverse("deposit-detail",
                                              kwargs={'object_id': "9255c067-e435-43bd-8af1-33a6987ffc9b"}),
@@ -49,3 +69,27 @@ class TestDepositorInfo(BaseEndpointTest):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'message': 'These fields are not updatable',
                                            'fields': ['dataset_schema_info']})
+
+
+    def test_30_patch_bad_values(self, req_mocker):
+        """(30) Attempt a patch with a invalid values for updateable fields"""
+        msgt(self.test_30_patch_bad_values.__doc__)
+        self.set_mock_requests(req_mocker)
+        response = self.client.patch(reverse("deposit-detail",
+                                             kwargs={'object_id': "9255c067-e435-43bd-8af1-33a6987ffc9b"}),
+                                     {'confidence_interval': 0.48,
+                                      'default_epsilon': -2,
+                                      'epsilon': 0.0,
+                                      'default_delta': -0.1,
+                                      'delta': -3})
+
+        self.assertEqual(response.status_code, 400)
+        print(f"get response: {response.json()}")
+
+        expected_msg = {'confidence_interval': ['"0.48" is not a valid choice.'],
+                        'default_delta': [VALIDATE_MSG_ZERO_OR_GREATER],
+                        'delta': [VALIDATE_MSG_ZERO_OR_GREATER],
+                        'default_epsilon': [VALIDATE_MSG_ZERO_OR_GREATER],
+                        #'epsilon': [VALIDATE_MSG_ZERO_OR_GREATER]
+                        }
+        self.assertEqual(response.json(), expected_msg)

@@ -19,14 +19,32 @@ class DataSetInfoViewSet(BaseModelViewSet):
         """
         return self.queryset.filter(creator=self.request.user)
 
+"""
+{
+  "object_id": "b962d2c0-c3cd-4d5b-8a25-309a3b997cb9",
+  "delta": 9.9
+}
+"""
 
 class DepositorSetupViewSet(BaseModelViewSet):
     queryset = DepositorSetupInfo.objects.all()
     serializer_class = DepositorSetupInfoSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrBlocked]
 
+    def get_queryset(self):
+        """
+        This restricts the queryset to the DepositorSetupInfo objects where the
+            creator is the logged in user
+        """
+        return self.queryset.filter(creator=self.request.user)
+
     def partial_update(self, request, *args, **kwargs):
-        acceptable_fields = ['user_step', 'dataset_questions', 'variable_info', 'epsilon']
+        acceptable_fields = ['user_step',
+                             'dataset_questions', 'epsilon_questions',
+                             'variable_info',
+                             'default_epsilon', 'epsilon',
+                             'default_delta', 'delta',
+                             'confidence_interval']
         problem_fields = []
         for field in request.data.keys():
             if field not in acceptable_fields:
@@ -34,4 +52,5 @@ class DepositorSetupViewSet(BaseModelViewSet):
         if problem_fields:
             return Response({'message': 'These fields are not updatable', 'fields': problem_fields},
                             status=status.HTTP_400_BAD_REQUEST)
+
         return super(DepositorSetupViewSet, self).partial_update(request, *args, **kwargs)
