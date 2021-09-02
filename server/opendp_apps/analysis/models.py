@@ -24,26 +24,66 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         STEP_9300_PROFILING_FAILED = 'error_9300', 'Error 3: Profiling Failed'
         STEP_9400_CREATE_RELEASE_FAILED = 'error_9400', 'Error 4: Create Release Failed'
 
-    # user who initially added/uploaded data
+    """
+    Confidence Interval choices
+    """
+    CI_95 = 0.05
+    CI_99 = 0.01
+    CI_CHOICES = (
+        (CI_95, '95% CI'),
+        (CI_99, '99% CI'),
+    )
+
+    # User who initially added/uploaded data
     creator = models.ForeignKey(settings.AUTH_USER_MODEL,
                                 on_delete=models.PROTECT)
-    is_complete = models.BooleanField(default=False)
+
+    # Set on save
+    is_complete = models.BooleanField(default=False,
+                                      help_text='auto-populated on save')
+
+    # Track workflow based on DepositorSteps
     user_step = models.CharField(max_length=128,
                                  choices=DepositorSteps.choices,
                                  default=DepositorSteps.STEP_0100_UPLOADED)
 
-    # Epsilon related fields
+    # Populated from the UI
+    dataset_questions = models.JSONField(null=True, blank=True)
     epsilon_questions = models.JSONField(null=True, blank=True)
-    default_epsilon = models.FloatField(null=True, blank=True, help_text='Default based on answers to epsilon_questions.')
+
+    # Includes variable ranges and categories
+    variable_info = models.JSONField(null=True, blank=True)
+
+    #
+    # Epsilon related fields
+    #
+    default_epsilon = models.FloatField(null=True,
+                                        blank=True,
+                                        help_text='Default based on answers to epsilon_questions.')
     epsilon = models.FloatField(null=True, blank=True,
                                 help_text=('Used for OpenDP operations, starts as the "default_epsilon"'
                                            ' value but may be overridden by the user.'))
 
+    #
+    # Delta related fields
+    #
+    default_delta = models.FloatField(null=True,
+                                      blank=True,
+                                      default=0.0,
+                                      help_text='Default based on answers to epsilon_questions.')
 
-    dataset_questions = models.JSONField(null=True, blank=True)
+    delta = models.FloatField(null=True,
+                              blank=True,
+                              default=0.0,
+                              help_text=('Used for OpenDP operations, starts as the "default_delta"'
+                                           ' value but may be overridden by the user.'))
 
-    # Includes variable ranges and categories
-    variable_info = models.JSONField(null=True, blank=True)
+    confidence_interval = models.FloatField(\
+                            choices=CI_CHOICES,
+                            default=CI_95,
+                            help_text=('Used for OpenDP operations, starts as the "default_delta"'
+                                       ' value but may be overridden by the user.'))
+
 
     class Meta:
         verbose_name = 'Depositor Setup Data'

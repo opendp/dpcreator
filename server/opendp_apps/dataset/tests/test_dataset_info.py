@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from opendp_apps.dataverses.testing.test_endpoints import BaseEndpointTest
+from opendp_apps.analysis.models import DepositorSetupInfo
+
 from opendp_apps.model_helpers.msg_util import msgt
 
 
@@ -31,10 +33,21 @@ class TestDepositorInfo(BaseEndpointTest):
         response = response.json()
         response.pop('updated')
         self.assertEqual(response,
-                         {'id': 1, 'creator': 1, 'created': '2021-03-23T17:22:50.889000Z',
+                         {'id': 1,
+                          'creator': 1,
+                          'created': '2021-03-23T17:22:50.889000Z',
                           'object_id': '9255c067-e435-43bd-8af1-33a6987ffc9b',
-                          'is_complete': False, 'user_step': 'step_100', 'epsilon': None,
-                          'dataset_questions': None, 'variable_info': None})
+                          'dataset_questions': None,
+                          'epsilon_questions': None,
+                          'is_complete': False,
+                          'user_step': 'step_100',
+                          'default_epsilon': None,
+                          'epsilon': None,
+                          'default_delta': 0.0,
+                          'delta': 0.0,
+                          'confidence_interval': DepositorSetupInfo.CI_95,
+                          'variable_info': None})
+
 
     def test_unsuccessful_patch(self, req_mocker):
         msgt(self.test_unsuccessful_patch.__doc__)

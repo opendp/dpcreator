@@ -13,7 +13,7 @@ class AnalysisPlanObjectIdSerializer(serializers.Serializer):
 
     def validate_object_id(self, value):
         """
-        Check that the object_id belongs to an existing DataSetInfo object
+        Check that the object_id belongs to an existing AnalysisPlan object
         """
         try:
             plan = AnalysisPlan.objects.get(object_id=value)
@@ -29,6 +29,19 @@ class AnalysisPlanObjectIdSerializer(serializers.Serializer):
 
         return self.validated_data.get('object_id')
 
+
+
+class DepositorSetupInfoSerializer(serializers.ModelSerializer):
+    analyst = serializers.SlugRelatedField(slug_field='object_id', read_only=True)
+    dataset = serializers.SlugRelatedField(slug_field='object_id', read_only=True)
+
+    class Meta:
+        model = AnalysisPlan
+        fields = ['name', 'object_id',
+                  'analyst', 'dataset',
+                  'is_complete', 'user_step',
+                  'variable_info', 'dp_statistics',
+                  'created', 'updated']
 
 
 
