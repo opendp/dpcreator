@@ -2,7 +2,8 @@ from django.db import models
 from django.conf import settings
 from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
-
+from opendp_apps.utils.extra_validators import \
+    validate_not_negative, validate_not_negative_or_none
 
 class DepositorSetupInfo(TimestampedModelWithUUID):
     """
@@ -34,6 +35,14 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         (CI_99, '99% CI'),
     )
 
+    """
+    Often used Delta values
+    """
+    DELTA_0 = 0.0
+    DELTA_10_NEG_5 = 10.0**-5
+    DELTA_10_NEG_6 = 10.0**-6
+    DELTA_10_NEG_7 = 10.0**-7
+
     # User who initially added/uploaded data
     creator = models.ForeignKey(settings.AUTH_USER_MODEL,
                                 on_delete=models.PROTECT)
@@ -59,24 +68,29 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     #
     default_epsilon = models.FloatField(null=True,
                                         blank=True,
-                                        help_text='Default based on answers to epsilon_questions.')
+                                        help_text='Default based on answers to epsilon_questions.',
+                                        validators=[validate_not_negative_or_none])
+    
     epsilon = models.FloatField(null=True, blank=True,
                                 help_text=('Used for OpenDP operations, starts as the "default_epsilon"'
-                                           ' value but may be overridden by the user.'))
+                                           ' value but may be overridden by the user.'),
+                                validators=[validate_not_negative_or_none])
 
     #
     # Delta related fields
     #
     default_delta = models.FloatField(null=True,
                                       blank=True,
-                                      default=0.0,
-                                      help_text='Default based on answers to epsilon_questions.')
+                                      default=DELTA_0,
+                                      help_text='Default based on answers to epsilon_questions.',
+                                      validators=[validate_not_negative])
 
     delta = models.FloatField(null=True,
                               blank=True,
-                              default=0.0,
+                              default=DELTA_0,
                               help_text=('Used for OpenDP operations, starts as the "default_delta"'
-                                           ' value but may be overridden by the user.'))
+                                         ' value but may be overridden by the user.'),
+                              validators=[validate_not_negative])
 
     confidence_interval = models.FloatField(\
                             choices=CI_CHOICES,
@@ -172,7 +186,9 @@ class ReleaseInfo(TimestampedModelWithUUID):
     analysis_plan = models.ForeignKey(AnalysisPlan,
                                       on_delete=models.PROTECT)
 
-    epsilon_used = models.FloatField(null=False, blank=False)
+    epsilon_used = models.FloatField(null=False,
+                                     blank=False,
+                                     validators=[validate_not_negative])
     dp_release = models.JSONField()
 
     class Meta:
