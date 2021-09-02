@@ -19,6 +19,7 @@ from opendp_apps.model_helpers.msg_util import msg, msgt
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(CURRENT_DIR), 'test_files')
 
+
 class AnalysisPlanTest(TestCase):
 
     fixtures = ['test_analysis_001.json',]

@@ -34,7 +34,6 @@ class RegisteredDataverseView(viewsets.ModelViewSet):
         return Response(get_json_error(message),
                         status=status.HTTP_404_NOT_FOUND)
 
-
     def retrieve(self, request, pk=None):
         """Retrieve one RegisteredDataverse"""
         registered_dv = get_object_or_error_response(RegisteredDataverse, object_id=pk)
