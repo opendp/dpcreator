@@ -1,6 +1,6 @@
 <template>
   <div class="confirmVariablesPage">
-    <h1 class="title-size-1">Confirm variables</h1>
+    <h1 class="title-size-1">Confirm Variables</h1>
     <p>
       {{ $t('confirm variables.confirm variables intro') }}
     </p>
@@ -46,20 +46,21 @@
       <template v-slot:[`item.index`]="{ index }">
         <span class="index-td grey--text">{{ index + 1 }}</span>
       </template>
-      <template v-slot:[`item.name`]="{ item }">
+      <template v-slot:[`item.label`]="{ item }">
         <div v-if="item.editDisabled">
-          <span>{{ item.name }}</span>
+          <span>{{ item.label }}</span>
           <v-icon right @click="item.editDisabled = !item.editDisabled">
             mdi-pencil
           </v-icon>
         </div>
         <v-text-field
             v-else
-            v-model="item.name"
+            v-model="item.label"
             type="text"
             :readonly="item.editDisabled"
             :append-outer-icon="'mdi-check'"
             @click:append-outer="item.editDisabled = !item.editDisabled"
+            v-on:change="saveUserInput(item)"
         ></v-text-field>
       </template>
       <template v-slot:[`item.additional_information`]="{ item: variable }">
@@ -71,6 +72,8 @@
               multiple
               class="my-0 py-0"
               background-color="soft_primary my-0"
+              v-on:click="currentRow=variable.index"
+              v-on:change="saveUserInput(variable)"
           >
             <template v-slot:selection="{ attrs, item, select, selected }">
               <ChipSelectItem
@@ -90,13 +93,19 @@
               label="Add min"
               v-model="variable.additional_information['min']"
               class="text-center py-0"
+              :rules="[checkMin]"
+              v-on:click="currentRow=variable.index"
+              v-on:change="saveUserInput(variable)"
           ></v-text-field>
           <v-text-field
               background-color="soft_primary mb-0"
               type="number"
               label="Add max"
+              :rules="[checkMax]"
               v-model="variable.additional_information['max']"
               class="text-center py-0"
+              v-on:click="currentRow=variable.index"
+              v-on:change="saveUserInput(variable)"
           ></v-text-field>
         </div>
       </template>
@@ -178,6 +187,8 @@ import ColoredBorderAlert from "../../components/DynamicHelpResources/ColoredBor
 import LoadingBar from "../../components/LoadingBar.vue";
 import ChipSelectItem from "../../components/DesignSystem/ChipSelectItem.vue";
 import DynamicQuestionIconTooltip from "@/components/DynamicHelpResources/DynamicQuestionIconTooltip";
+import {mapState, mapGetters} from 'vuex';
+
 export default {
   name: "ConfirmVariables",
   components: {
@@ -187,67 +198,21 @@ export default {
     ColoredBorderAlert,
     ChipSelectItem
   },
-  mounted: function () {
-    setTimeout(() => {
-      this.loadingVariables = false;
-      this.variables = [
-        {
-          name: "Age",
-          label: "Focus Child Age",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "DOB",
-          label: "Focus Child Date of Birth",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Income",
-          label: "Household Income",
-          type: "Numerical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Group",
-          label: "Program Group ID",
-          type: "Categorical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Provider",
-          label: "Provider Type",
-          type: "Categorical",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Visit",
-          label: "Visit Type",
-          type: "Boolean",
-          additional_information: {},
-          editDisabled: true
-        },
-        {
-          name: "Provider",
-          label: "Provider Center",
-          type: "Categorical",
-          additional_information: {},
-          editDisabled: true
-        },
-
-      ];
-      this.$emit("stepCompleted", 1, true);
-    }, 3000);
+  props: ["stepperPosition"],
+  computed: {
+    ...mapState('auth', ['error', 'user']),
+    ...mapState('dataset', ['datasetInfo']),
+    ...mapGetters('dataset', ['getDepositorSetupInfo']),
   },
+  created: function () {
+    if (this.datasetInfo.depositorSetupInfo.variableInfo !== null) {
+      this.createVariableList()
+    }
+  },
+
   data: () => ({
+    currentRow: null,
     loadingVariables: true,
-    filename: "California Demographic Dataset",
     headers: [
       {value: "index"},
       {text: "Variable name", value: "name"},
@@ -261,12 +226,104 @@ export default {
     variables: []
   }),
   methods: {
-    removeCategoryFromVariable: (category, variable) => {
+    checkMin(value) {
+      if (this.currentRow !== null) {
+        const currentMax = this.variables[this.currentRow].additional_information.max
+        if (currentMax !== null && currentMax < Number(value)) {
+          return false
+        }
+      }
+      return true
+    },
+    checkMax(value) {
+      if (this.currentRow !== null) {
+        const currentMin = this.variables[this.currentRow].additional_information.min
+        if (currentMin !== null && currentMin > Number(value)) {
+          return false
+        }
+      }
+      return true
+    },
+    isValidRow(variable) {
+      let minmaxValid = true
+      if (variable.type == 'Numerical') {
+        if (variable.additional_information.max !== null && variable.additional_information.min !== null) {
+          minmaxValid = (Number(variable.additional_information.min) < Number(variable.additional_information.max))
+        }
+      }
+      const valid = (variable.name !== null && minmaxValid)
+      return valid
+    },
+    removeCategoryFromVariable(category, variable) {
       variable.additional_information["categories"].splice(
           variable.additional_information["categories"].indexOf(category),
           1
       );
+      this.saveUserInput(variable)
+    },
+    // Create a list version of variableInfo. A deep copy, so we can edit locally
+    createVariableList() {
+      let vars = this.datasetInfo.depositorSetupInfo.variableInfo
+      let index = 0;
+      for (const key in vars) {
+        let row = {}
+        row.index = index
+        row.key = key
+        row.name = vars[key].name
+        row.type = vars[key].type
+        if (vars[key].label === '') {
+          row.label = vars[key].name
+        } else {
+          row.label = vars[key].label
+        }
+        row.additional_information = {}
+        if (row.type === 'Numerical') {
+          row.additional_information.max = vars[key].max
+          row.additional_information.min = vars[key].min
+        }
+        if (row.type === 'Categorical') {
+          // make a deep copy of the categories, so we can edit locally
+          row.additional_information.categories = JSON.parse(JSON.stringify(vars[key].categories))
+        }
+        row['editDisabled'] = true
+        this.variables.push(row)
+        index += 1
+      }
+      this.loadingVariables = false
+    },
+    saveUserInput(elem) {
+      if (this.isValidRow(elem)) {
+        this.$store.dispatch('dataset/updateVariableInfo', elem)
+      }
+
+    },
+
+  },
+  /**
+   * Watch for the variableInfo object to be populated by the Run Profiler action.
+   * When it is populated, create a local variableList for the data table
+   */
+  watch: {
+    '$store.state.dataset.datasetInfo': function () {
+      if (this.datasetInfo.depositorSetupInfo.variableInfo !== null) {
+        // the watch will be triggered multiple times,
+        // so check if we have already created the variableList
+        if (this.variables.length === 0) {
+          this.createVariableList()
+        } else {
+          this.loadingVariables = false
+        }
+      }
+    },
+    // If additional information has been added for all variables, then
+    // send stepCompleted event to the wizard (will enable the continue button
+    variables: function (newValue) {
+      // for now, for ease of use, we will not require additional info for all variables.
+      // TODO: add validation later, or make it conditional to running in dev mode
+      this.$emit("stepCompleted", 1, true);
+      //  }
     }
+
   }
 };
 </script>

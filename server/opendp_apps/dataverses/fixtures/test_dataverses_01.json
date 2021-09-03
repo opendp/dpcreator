@@ -38,5 +38,18 @@
       "created": "2020-11-09T17:55:43.854Z",
       "updated": "2020-11-09T17:55:43.854Z"
     }
+},
+  {
+    "model": "dataverses.registereddataverse",
+    "pk": 3,
+    "fields": {
+        "created": "2021-07-12T18:56:37.011Z",
+        "updated": "2021-07-12T18:56:59.730Z",
+        "object_id": "b16d47b3-c1c7-403e-9b66-e32d49aa7a5f",
+        "name": "Test Dataverse EC2",
+        "dataverse_url": "http://ec2-18-232-125-211.compute-1.amazonaws.com",
+        "active": true,
+        "notes": "Test Dataverse. Created on 7/12/2021"
+    }
 }
 ]

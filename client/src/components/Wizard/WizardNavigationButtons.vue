@@ -1,4 +1,5 @@
 <template>
+
   <div
       class="wizard-buttons-wrapper sticky-wizard rounded text-center wizard_navigator"
       :class="{
@@ -6,46 +7,16 @@
       'py-5': $vuetify.breakpoint.smAndDown
     }"
   >
-    <div
-        class="mt-3"
-        :class="{
-        'mb-12': $vuetify.breakpoint.mdAndUp,
-        'mb-6': $vuetify.breakpoint.smAndDown
-      }"
-    >
-      <v-icon left>mdi-timer</v-icon>
-      <small>Remaining: {{ remainingTime }}</small>
-    </div>
+
 
     <div
         :class="{ 'd-flex justify-space-around': $vuetify.breakpoint.smAndDown }"
     >
-      <Button
-          :disabled="stepperPosition === 0"
-          color="primary"
-          outlined
-          :click="() => (dialogGoBack = true)"
-          classes="mb-2 d-block"
-          :class="{
-          'mx-auto': $vuetify.breakpoint.mdAndUp
-        }"
-          label="Back"
-      />
+
+
 
       <Button
-          color="primary"
-          outlined
-          :click="handleSave"
-          classes="px-0 mb-2 d-block"
-          :class="{
-          'mx-auto': $vuetify.breakpoint.mdAndUp
-        }"
-      >Save<small class="font-weight-regular">
-        (Last saved at {{ lastSavedAt }})</small
-      >
-      </Button>
-
-      <Button
+          data-test="wizardContinueButton"
           v-if="stepperPosition !== LAST_STEP_INDEX"
           classes="d-block"
           :class="{
@@ -55,6 +26,7 @@
           :click="handleContinue"
           :disabled="isContinueDisabled"
           label="Continue"
+
       />
 
       <Button
@@ -67,9 +39,23 @@
           label="Submit statistics"
       />
     </div>
+    <div
+        class="mt-3"
+        :class="{
+        'mb-12': $vuetify.breakpoint.mdAndUp,
+        'mb-6': $vuetify.breakpoint.smAndDown
+      }"
+    >
 
-    <GoBackDialog v-on:confirm="handleBack" :dialog.sync="dialogGoBack"/>
+
+    </div>
+    <small class="font-weight-regular">
+      Last saved: {{ getUpdatedTime }}</small
+    ><br></br>
+    <v-icon left>mdi-timer</v-icon>
+    <small>Remaining: {{ getTimeRemaining }}</small>
   </div>
+
 </template>
 
 <style lang="scss" scoped>
@@ -83,6 +69,7 @@
 <script>
 import Button from "../DesignSystem/Button.vue";
 import GoBackDialog from "./GoBackDialog.vue";
+import {mapState, mapGetters} from "vuex";
 
 export default {
   components: {Button, GoBackDialog},
@@ -98,10 +85,7 @@ export default {
       this.dialogGoBack = false;
       this.$emit("update:stepperPosition", this.stepperPosition - 1);
     },
-    handleSave: function () {
-      //TODO: Implement Save handler
-      alert("save!");
-    }
+
   },
   data: () => ({
     LAST_STEP_INDEX: 4,
@@ -109,8 +93,12 @@ export default {
     remainingTime: "2d 14h 36min",
     dialogGoBack: false
   }),
+
   computed: {
+    ...mapGetters('dataset', ['getUpdatedTime', 'getTimeRemaining']),
+
     isContinueDisabled: function () {
+      console.log('saved time: ' + this.savedTime + 'type: ' + typeof (this.savedTime))
       return !this.steps[this.stepperPosition].completed;
     }
   }

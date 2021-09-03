@@ -1,0 +1,19 @@
+{
+  "variables": {
+    "ccode": {
+      "variableName": "ccode",
+      "description": "",
+      "numchar": "numeric",
+      "nature": "ordinal",
+      "binary": false,
+      "interval": "discrete"
+    },
+    "country": {
+    "variableName": "country",
+    "description": "",
+    "numchar": "character",
+    "nature": "nominal",
+    "binary": false,
+    "interval": "discrete"
+    }
+}}

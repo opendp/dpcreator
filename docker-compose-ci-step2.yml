@@ -34,7 +34,7 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=opendp_project.settings.cypress_settings
       #- DJANGO_SETTINGS_MODULE=opendp_project.settings.development
-    command: sh -c "./migrate.sh && python manage.py show_debug_params && python manage.py runserver 0.0.0.0:8000"
+    command: sh -c "./migrate.sh && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
       - ./server/static:/server/static
@@ -42,15 +42,37 @@ services:
       - "8000:8000"
     depends_on:
       - db
-
-  cypress:
-    image: "cypress/included:7.2.0"
-    command: "--config-file cypress_github_ci.json"
+  # ---------------------------------
+  # Celery Task Queue
+  # - Used for profiling, other longer
+  #   running tasks
+  # ---------------------------------
+  celery-queue:
+    build: "./server"
+    environment:
+      - DJANGO_SETTINGS_MODULE=opendp_project.settings.development
+    env_file:
+      - .env
+    command: celery -A opendp_project worker -l info -n worker_dpcreator
+    #  command: celery -A opendp_project worker -l INFO
+    volumes:
+      - .:/code
+    ports:
+      - "8070:8070"
     depends_on:
+      - db
+      - redis
       - server
+  cypress:
+    build: "./client/cypress"
+    entrypoint: ""
+    depends_on:
+      - celery-queue
     # Note: the environment vars have been moved to a custom config file: cypress_github_ci.json
     #environment:
     #  - CYPRESS_BASE_URL=http://server:8000
     working_dir: /e2e
     volumes:
       - ./client:/e2e
+    environment:
+      WAIT_HOSTS: server:8000

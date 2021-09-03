@@ -30,6 +30,8 @@
                 :label="statistic"
                 :value="statistic"
                 on-icon="mdi-check"
+                @click="() => updateSelectedStatistic(statistic)"
+                :data-test="statistic"
             ></v-radio>
           </v-radio-group>
         </div>
@@ -46,8 +48,8 @@
                 class="rounded-pill mr-2"
                 v-for="(variable, index) in variables"
                 :key="variable + index"
-                :label="variable"
-                :value="variable"
+                :label="variable['label']"
+                :value="variable['key']"
                 on-icon="mdi-check"
             ></v-radio>
           </v-radio-group>
@@ -166,7 +168,7 @@ import Button from "../../../DesignSystem/Button.vue";
 export default {
   name: "AddStatisticDialog",
   components: {Button},
-  props: ["formTitle", "dialog", "editedIndex", "editedItem"],
+  props: ["formTitle", "dialog", "editedIndex", "editedItem", "variableInfo"],
   computed: {
     isButtonDisabled: function () {
       return (
@@ -177,6 +179,22 @@ export default {
     },
     isMultiple: function () {
       return this.editedIndex === -1;
+    },
+    variables: function () {
+      let displayVars = []
+      for (const key in this.variableInfo) {
+        let displayVar = JSON.parse(JSON.stringify(this.variableInfo[key]))
+        displayVar.key = key
+        if (displayVar.label === '') {
+          displayVar.label = displayVar.name
+        }
+        if ((this.selectedStatistic !== 'Mean') ||
+            (this.selectedStatistic === 'Mean' && this.variableInfo[key].type === 'Numerical')) {
+          displayVars.push(displayVar)
+        }
+
+      }
+      return displayVars
     }
   },
   watch: {
@@ -186,10 +204,8 @@ export default {
   },
   //TODO: Define the default epsilon and error values for new statistics
   data: () => ({
-    //TODO: These should be connected with the variables loaded on the previous step
     singleVariableStatistics: ["Mean", "Histogram", "Quantile"],
-    variables: ["Age", "DOB",
-      "Income", "Visit", "Program", "Provider"],
+    selectedStatistic: null,
     editedItemDialog: {
       statistic: "",
       variable: [],
@@ -198,7 +214,7 @@ export default {
       missingValuesHandling: "",
       handleAsFixed: false,
       fixedValue: "0",
-      locked: "false"
+      locked: false
     },
     missingValuesHandling: [
       "Drop them",
@@ -208,10 +224,14 @@ export default {
   }),
   methods: {
     save() {
+      console.log('saving: ' + JSON.stringify(this.editedItemDialog))
       this.$emit("saveConfirmed", this.editedItemDialog);
     },
     close() {
       this.$emit("close");
+    },
+    updateSelectedStatistic(statistic) {
+      this.selectedStatistic = statistic
     },
     updateFixedInputVisibility(handlingOption) {
       this.editedItemDialog.handleAsFixed =

@@ -36,6 +36,20 @@ export default {
         formData.append('fileId', fileId)
         formData.append("filePid", filePid)
 
+
+        /* INSECURE */
+        /* Using the GET endpoint - For testing prior to Dataverse signed urls */
+        const asQueryString = new URLSearchParams(formData).toString();
+        session.get('/api/dv-handoff/dv_orig_create/?' + asQueryString)
+            .then(function (response) {
+                window.location = response.request.responseURL; // full URI to redirect to
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+
+        /* Using the POST endpoint */
+        /*
         session.post('/api/dv-handoff/', formData)
             .then(function (response) {
                 window.location = response.request.responseURL; // full URI to redirect to
@@ -43,6 +57,7 @@ export default {
             .catch((error) => {
                 console.log(error)
             })
+        */
     },
     getDataverseHandoff(handoffId) {
         return session.get('/api/dv-handoff/', {
@@ -54,6 +69,11 @@ export default {
                 console.log(response);
             })
 
-    }
+    },
+    // Gets the DatasetInfo object for the given objectId
+    getRegisteredDataverses() {
+        return session.get('/api/registered-dvs/').then(resp => camelcaseKeys(resp, {deep: true}))
+
+    },
 
 };

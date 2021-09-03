@@ -8,9 +8,8 @@
             <v-stepper-items>
               <span class="d-block mt-5"
               >Used dataset:
-                <!-- TODO: This name should be the original from the loaded dataset -->
                 <a href="http://" class="text-decoration-none"
-                >California Demographic Dataset
+                >{{ datasetInfo.name }}
                   <v-icon small color="primary">mdi-open-in-new</v-icon></a
                 ></span
               >
@@ -18,13 +17,13 @@
                 <ValidateDataset v-on:stepCompleted="updateStepStatus"/>
               </v-stepper-content>
               <v-stepper-content :complete="stepperPosition > 1" step="1">
-                <ConfirmVariables v-on:stepCompleted="updateStepStatus"/>
+                <ConfirmVariables :stepperPosition="stepperPosition" v-on:stepCompleted="updateStepStatus"/>
               </v-stepper-content>
               <v-stepper-content :complete="stepperPosition > 2" step="2">
-                <SetEpsilonValue v-on:stepCompleted="updateStepStatus"/>
+                <SetEpsilonValue :stepperPosition="stepperPosition" v-on:stepCompleted="updateStepStatus"/>
               </v-stepper-content>
               <v-stepper-content :complete="stepperPosition > 3" step="3">
-                <CreateStatistics v-on:stepCompleted="updateStepStatus"/>
+                <CreateStatistics :stepperPosition="stepperPosition" v-on:stepCompleted="updateStepStatus"/>
               </v-stepper-content>
               <v-stepper-content :complete="stepperPosition > 4" step="4">
                 <GenerateDPRelease v-on:stepCompleted="updateStepStatus"/>
@@ -72,7 +71,8 @@ import GenerateDPRelease from "./WizardSteps/GenerateDPRelease.vue";
 import StepperHeader from "../components/Wizard/StepperHeader.vue";
 import WizardNavigationButtons from "../components/Wizard/WizardNavigationButtons.vue";
 import ValidateDataset from "./WizardSteps/ValidateDataset.vue";
-import stepInformation from "@/data/stepInformation";
+import stepInformation, {depositorSteps} from "@/data/stepInformation";
+
 
 import {mapState, mapGetters} from "vuex";
 
@@ -88,32 +88,65 @@ export default {
     ValidateDataset
   },
   created() {
-    const objectId = this.$route.params.id
-    this.$store.dispatch('dataset/setDatasetInfo', objectId)
-        .then(() => {
+
           this.initStepperPosition()
+
           this.loading = false
 
-        })
 
   },
   methods: {
+
     updateStepStatus: function (stepNumber, completedStatus) {
+      console.log('updating step status: ' + stepNumber + ', ' + completedStatus)
       this.steps[stepNumber].completed = completedStatus;
     },
     // Set the current Wizard stepper position based on the
     // depositorSetup userStep
     initStepperPosition: function () {
       this.stepperPosition = stepInformation[this.getDepositorSetupInfo.userStep].wizardStepper
+    },
+    // If we are on the Confirm Variables step, and the DepositorSetup variables
+    // are not set, then run the Profiler
+    checkProfileData(step) {
+      if (step === 1 && this.getDepositorSetupInfo.variableInfo === null) {
+        const payload = {userId: this.user.objectId}
+        this.$store.dispatch('dataset/runProfiler', payload)
+      }
+
     }
   },
   computed: {
-    ...mapState('dataset', ['datasetInfo']),
-    ...mapGetters('dataset', ['getDepositorSetupInfo'])
+    ...mapState('dataset', ['datasetInfo', 'analysisPlan']),
+    ...mapGetters('dataset', ['getDepositorSetupInfo']),
+    ...mapState('auth', ['user']),
+  },
+  watch: {
+    stepperPosition: function (val, oldVal) {
+      console.log('watching stepperPos ' + val + ' ' + oldVal)
+      // if the new val is more than one step ahead of the oldVal, that means that val is being initialized because
+      // the user has come from the 'Continue Workflow' button on the my data page.  So we don't need to go to the
+      // next step.
+      if (val - oldVal === 1) {
+        const nextStep = stepInformation[this.getDepositorSetupInfo.userStep].nextStep
+        const nextStepProp = {userStep: nextStep}
+        if (depositorSteps.includes(nextStep)) {
+          const payload = {objectId: this.getDepositorSetupInfo.objectId, props: nextStepProp}
+          this.$store.dispatch('dataset/updateDepositorSetupInfo', payload)
+
+        } else {
+          console.log('update analysis plan with the next step: ' + nextStep)
+          const payload = {objectId: this.analysisPlan.objectId, props: nextStepProp}
+          this.$store.dispatch('dataset/updateAnalysisPlan', payload)
+        }
+      }
+      this.checkProfileData(val)
+    }
   },
   data: () => ({
     loading: true,
     stepperPosition: 0,
+    variableList: null,
     steps: [
       {
         title: "Validate Dataset",

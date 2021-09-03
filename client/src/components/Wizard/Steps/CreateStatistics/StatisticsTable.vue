@@ -17,6 +17,18 @@
       <template v-slot:[`item.num`]="{ index }">
         <span class="index-td">{{ index + 1 }}</span>
       </template>
+      <template v-slot:[`item.epsilon`]="{ item }">
+        <v-text-field
+            v-model="item.epsilon"
+            type="number"
+            :rules="[validateEpsilon]"
+            v-on:click="currentItem=item"
+            :disabled="!item.locked"
+            v-on:change="$emit('editEpsilon', item)"
+        >
+        </v-text-field>
+      </template>
+
       <template v-slot:[`item.actions`]="{ item }">
         <div class="d-flex justify-space-between">
           <v-tooltip bottom max-width="220px">
@@ -66,6 +78,7 @@
         color="soft_primary primary--text"
         width="100%"
         depressed
+        data-test="Add Statistic"
         :click="() => $emit('newStatisticButtonPressed')"
     >
       <v-icon left>mdi-plus-box</v-icon>
@@ -83,20 +96,39 @@
 <script>
 import Button from "../../../DesignSystem/Button.vue";
 import QuestionIconTooltip from "../../../DynamicHelpResources/QuestionIconTooltip.vue";
+import Decimal from "decimal.js";
 
 export default {
   components: {QuestionIconTooltip, Button},
   name: "StatisticsTable",
-  props: ["statistics"],
+  props: ["statistics", "totalEpsilon"],
   data: () => ({
     headers: [
       {value: "num"},
       {text: "Statistic", value: "statistic"},
-      {text: "Variable", value: "variable"},
+      {text: "Variable", value: "label"},
       {text: "Epsilon", value: "epsilon"},
       {text: "Error", value: "error"},
       {text: "", value: "actions"}
-    ]
-  })
+    ],
+    currentItem: null
+  }),
+  methods: {
+    validateEpsilon(value) {
+      if (this.currentItem !== null) {
+        let lockedEpsilon = new Decimal('0.0');
+        this.statistics.forEach(function (item) {
+          if (item.locked) {
+            lockedEpsilon = lockedEpsilon.plus(item.epsilon)
+          }
+        })
+        if (lockedEpsilon > this.totalEpsilon)
+          return false
+      }
+      return true
+    }
+  }
+
+
 };
 </script>

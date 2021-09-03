@@ -30,6 +30,7 @@ class DataverseFileInfoAdmin(admin.ModelAdmin):
                     'dv_installation',
                     'updated',
                     'created',)
+    list_display_links = ('id', 'name')
     readonly_fields = ('id', 'object_id', 'source', 'created', 'updated',)
 admin.site.register(DataverseFileInfo, DataverseFileInfoAdmin)
 
@@ -38,7 +39,7 @@ class UploadFileInfoAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_filter = ('source', 'creator')
     list_display = ('name',
-                    'data_file',
+                    #'data_file',
                     'creator',
                     'updated',
                     'created',)

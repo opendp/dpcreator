@@ -1,23 +1,27 @@
 Cypress.Commands.add('login', (email, password) => {
+    Cypress.Cookies.debug(true)
     cy.visit('/log-in')
     cy.get('[data-test="username"]').type(email);
     cy.get('[data-test="password"]').type(password);
     cy.get('[data-test="Log in"]').click();
-
-    // This test is necessary to prevent cypress from canceling the
-    // the POST to login to  the server (right now, login redirects to the welcome page)
-    cy.url().should('contain', 'welcome')
+    // to force the login click, test that the browser went to the next  page
+    cy.url().should('not.contain', 'log-in')
 
 })
 Cypress.Commands.add('clearData', () => {
     cy.login('dev_admin', 'admin')
     cy.request('/cypress-tests/clear-test-data/')
+
+
 })
+
+Cypress.Commands.add('vuex', () =>
+    cy.window()
+        .its('app.$store')
+)
 
 
 Cypress.Commands.add('createMockDataset', () => {
-    cy.visit('/mock-dv');
-    cy.get('[data-test="submit button"]').click();
     cy.visit('/mock-dv');
     cy.get('[data-test="submit button"]').click();
     cy.url().should('contains', '/?id=');
@@ -33,6 +37,9 @@ Cypress.Commands.add('createMockDataset', () => {
     cy.get('[data-test="username"]').type('dev_admin');
     cy.get('[data-test="password"]').type('admin');
     cy.get('[data-test="Log in"]').click();
+    // first we will be routed to the Terms of Conditions page for the user
+    cy.get('[data-test="confirmTermsCheckbox"]').click({force: true});
+    cy.get('[data-test="confirmTermsContinue"]').click();
     cy.url().should('contain', 'welcome')
 })
 

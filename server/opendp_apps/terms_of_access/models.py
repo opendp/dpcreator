@@ -1,11 +1,9 @@
 from django.db import models
 from django.conf import settings
-from opendp_apps.dataset.models import DataSetInfo
-from opendp_apps.model_helpers.models import \
-    (TimestampedModel, TimestampedModelWithUUID)
+from opendp_apps.model_helpers.models import TimestampedModelWithUUID
 
 
-class TermsOfAccess(TimestampedModel):
+class TermsOfAccess(TimestampedModelWithUUID):
     """
     Terms of Access Content
     """
@@ -29,7 +27,6 @@ class TermsOfAccessLog(TimestampedModelWithUUID):
     Records a Terms of Access agreement
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
-    dataset_info = models.ForeignKey(DataSetInfo, on_delete=models.PROTECT)
     terms_of_access = models.ForeignKey(TermsOfAccess, on_delete=models.PROTECT)
 
     verbose_name = 'Terms of Access Log'
@@ -37,4 +34,4 @@ class TermsOfAccessLog(TimestampedModelWithUUID):
     ordering = ('-created', 'user')
 
     def __str__(self):
-        return f'{self.user} - {self.dataset_info} - {self.terms_of_access}'
+        return f'{self.user} - {self.terms_of_access}'

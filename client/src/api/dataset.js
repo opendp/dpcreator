@@ -14,5 +14,11 @@ export default {
     getDatasetInfo(objectId) {
         return session.get('/api/dataset-info/' + objectId + '/').then(resp => camelcaseKeys(resp, {deep: true}))
 
+    },
+    runProfiler(datasetId, userId) {
+        session.post('/api/profile/run-async-profile/',
+            {object_id: datasetId})
+            .then(resp => camelcaseKeys(resp, {deep: true}))
+
     }
 }

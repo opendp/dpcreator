@@ -39,8 +39,7 @@ export default {
     if (handoffId) {
       this.$store.dispatch('dataverse/setHandoffId', handoffId)
     } else {
-      this.showAlert = true
-      this.alertText = 'To create a DP Release, please make a request from a registered Dataverse installation.'
+      console.log('no handoffId')
     }
   },
   data: () => ({

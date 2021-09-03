@@ -101,6 +101,7 @@
 import RadioItem from "../../components/DesignSystem/RadioItem.vue";
 import AdditionalInformationAlert from "../../components/DynamicHelpResources/AdditionalInformationAlert.vue";
 import BorderTopAlertDismissible from "../../components/DynamicHelpResources/BorderTopAlertDismissible.vue";
+import {mapGetters, mapState} from "vuex";
 
 export default {
   name: "SetEpsilonValue",
@@ -115,13 +116,22 @@ export default {
     populationSize: ""
   }),
   computed: {
+    ...mapState('auth', ['error', 'user']),
+    ...mapState('dataset', ['datasetInfo']),
+    ...mapGetters('dataset', ['getDepositorSetupInfo']),
     radioObservationsNumberShouldBeDisabled: function () {
       return this.secretSample === "";
     }
   },
   watch: {
-    observationsNumberCanBePublic: function (newValue) {
+
+    observationsNumberCanBePublic: function (newValue, oldValue) {
+      console.log("in watch for observation numbers")
       if (newValue !== "") {
+        console.log('updating isComplete')
+        const payload = {objectId: this.datasetInfo.depositorSetupInfo.objectId, props: {epsilon: .25}}
+        this.$store.dispatch('dataset/updateDepositorSetupInfo',
+            payload)
         this.$emit("stepCompleted", 2, true);
       }
     }

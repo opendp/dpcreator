@@ -148,7 +148,13 @@
               change: () => handleInvalidDataset('radioOnlyOneIndividualPerRow')
             }"
           />
-          <RadioItem label="I'm unsure." value="unsure"/>
+          <RadioItem
+              label="I'm unsure."
+              value="unsure"
+               :on="{
+              change: () => handleInvalidDataset('radioOnlyOneIndividualPerRow')
+            }"
+          />
         </v-radio-group>
       </div>
     </div>

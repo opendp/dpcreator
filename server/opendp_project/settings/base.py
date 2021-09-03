@@ -34,6 +34,9 @@ DEBUG = True
 # Application definition
 
 INSTALLED_APPS = [
+    'channels', # Django channels..
+    'opendp_apps.async_messages',
+    #
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,8 +46,6 @@ INSTALLED_APPS = [
     'django_extensions',
     'django.contrib.sites',
     #
-    # Djnago channels..
-    'channels',
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
@@ -96,10 +97,35 @@ TEMPLATES = [
     },
 ]
 
+
+# -----------------------------------------------
+# REDIS settings
+# -----------------------------------------------
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+REDIS_PORT = os.environ.get('REDIS_PORT', 6379)
+REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD', '')
+
+# reference: https://docs.celeryproject.org/en/stable/getting-started/brokers/redis.html
+if REDIS_PASSWORD:
+    REDIS_URL = f'redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}'
+else:
+    REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}'
+
+
+# -----------------------------------------------
+# ASGI, Channels settings
+# -----------------------------------------------
 #WSGI_APPLICATION = 'opendp_project.wsgi.application'
 
 ASGI_APPLICATION = "opendp_project.asgi.application"
-
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [REDIS_URL],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
@@ -267,9 +293,19 @@ ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/log-in/'
 # Profiler - Dataset reading
 #   - default parameters
 # ---------------------------
-PROFILER_FIRST_20_VARIABLE_INDICES = ', '.join([str(x) for x in range(0,20)])
+PROFILER_VARIABLE_INDICES = '[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]'
+# ', '.join([str(x) for x in range(0,20)])
 PROFILER_DEFAULT_COLUMN_INDICES = json.loads(os.environ.get('PROFILER_DEFAULT_COLUMN_INDICES',
-                                                   f"[{PROFILER_FIRST_20_VARIABLE_INDICES}]"))
+                                                            PROFILER_VARIABLE_INDICES))
+
+
+# -----------------------------------------------
+# Websocket prefix.
+# When using https, set it to 'wss://'
+# -----------------------------------------------
+WEBSOCKET_PREFIX = os.environ.get('WEBSOCKET_PREFIX', 'ws://')
+assert WEBSOCKET_PREFIX in ('ws://', 'wss://'), \
+    "Django settings error: 'WEBSOCKET_PREFIX' must be set to 'ws://' or 'wss://'"
 
 # ---------------------------
 # Celery Configuration Options
@@ -277,16 +313,6 @@ PROFILER_DEFAULT_COLUMN_INDICES = json.loads(os.environ.get('PROFILER_DEFAULT_CO
 #CELERY_TIMEZONE = os.environ.get('America/New_York', 'CELERY_TIMEZONE')
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
-
-REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
-REDIS_PORT = os.environ.get('REDIS_PORT', 6379)
-REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD', '')
-
-# reference: https://docs.celeryproject.org/en/stable/getting-started/brokers/redis.html
-if REDIS_PASSWORD:
-    REDIS_URL = f'redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}'
-else:
-    REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}'
 
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL

@@ -38,7 +38,18 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
     # Switch to encryption!
     #
-    data_profile = encrypt(models.JSONField(default=None, null=True, blank=True, encoder=DjangoJSONEncoder))
+    data_profile = models.JSONField(default=None,
+                                    null=True, blank=True,
+                                    encoder=DjangoJSONEncoder)
+
+    profile_variables = models.JSONField(default=None,
+                                    null=True, blank=True,
+                                    encoder=DjangoJSONEncoder)
+
+    #data_profile = encrypt(models.JSONField(default=None, null=True, blank=True, encoder=DjangoJSONEncoder))
+
+    # Formatted version of the "data_profile"
+    # profile_variables = encrypt(models.JSONField(default=None, null=True, blank=True, encoder=DjangoJSONEncoder))
 
     # Switch to encryption!
     #
@@ -66,6 +77,16 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
                     object_id=self.object_id.hex)
 
         return info
+
+    def get_profile_variables(self):
+        """Return the profile_variables and DataSetInfo object_id as an OrderedDict or None."""
+        if not self.profile_variables:
+            return None
+
+        od = OrderedDict(dict(object_id=self.object_id))
+        od.update(self.profile_variables)
+
+        return od
 
     def data_profile_as_dict(self):
         """Return the dataprofile as a dict or None. Messy in that this is an encrypted JSONField"""
@@ -175,13 +196,6 @@ class UploadFileInfo(DataSetInfo):
     """
     Refers to a file uploaded independently of DV
     """
-
-    # user uploaded files, keep them off of the web path
-    #
-    data_file = models.FileField('User uploaded files',
-                    storage=UPLOADED_FILE_STORAGE,
-                    upload_to='user-files/%Y/%m/%d/')
-
     depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo', on_delete=models.PROTECT, null=True)
 
     def save(self, *args, **kwargs):
@@ -208,7 +222,7 @@ class UploadFileInfo(DataSetInfo):
                     name=self.name,
                     creator=str(self.creator),
                     source=str(self.source),
-                    data_file=self.data_file,
+                    #data_file=self.data_file,
                     updated=str(self.updated),
                     created=str(self.created),
                     object_id=self.object_id.hex)

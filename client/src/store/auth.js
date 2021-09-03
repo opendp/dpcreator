@@ -5,10 +5,11 @@ import {
   LOGIN_FAILURE,
   LOGIN_SUCCESS,
   LOGOUT,
-  REMOVE_TOKEN, SET_TERMS_ACCEPTED,
+  REMOVE_TOKEN, SET_CURRENT_TERMS, SET_TERMS_ACCEPTED, SET_TERMS_LOG,
   SET_TOKEN,
   SET_USER,
 } from './types';
+import terms from "@/api/terms";
 
 const TOKEN_STORAGE_KEY = 'TOKEN_STORAGE_KEY';
 const isProduction = process.env.NODE_ENV === 'production';
@@ -18,12 +19,26 @@ const initialState = {
   error: false,
   token: null,
   user: null,
-  termsAccepted: false
+  currentTerms: null,
+  termsOfAccessLog: null
+
 };
 
 const getters = {
   isAuthenticated: state => !!state.token,
-  isTermsAccepted: state => state.termsAccepted,
+  isTermsAccepted: state => {
+    let accepted = false
+    if (state.termsOfAccessLog !== null && state.termsOfAccessLog.length > 0) {
+      for (let i in state.termsOfAccessLog) {
+        if (state.termsOfAccessLog[i].user === state.user.objectId
+            && state.termsOfAccessLog[i].termsOfAccess === state.currentTerms.objectId) {
+          accepted = true
+        }
+
+      }
+    }
+    return accepted
+  },
   getUser: state => {
     return state.user
   },
@@ -36,7 +51,6 @@ const actions = {
     return auth.login(username, password)
       .then(({ data }) => {
         commit(SET_TOKEN, data.key)
-        commit(SET_USER, username)
       })
       .then(() => commit(LOGIN_SUCCESS))
       .catch((data) => {  commit(LOGIN_FAILURE); return Promise.reject(data)} );
@@ -65,6 +79,7 @@ const actions = {
     if (state.token!=null) {
       return auth.getAccountDetails()
           .then(response => {
+
             commit('SET_USER', response.data)
             return Promise.resolve()
           })
@@ -77,8 +92,24 @@ const actions = {
       return Promise.resolve()
     }
   },
-  setTermsAccepted({commit, state}, termsAccepted) {
-    commit('SET_TERMS_ACCEPTED', state, termsAccepted)
+  fetchCurrentTerms({commit, state}) {
+    return terms.getCurrentTerms().then((response) => {
+      commit('SET_CURRENT_TERMS', response)
+    })
+  },
+  fetchTermsLog({commit, state}) {
+    return terms.getTermsOfUseLog().then(response => {
+      commit(SET_TERMS_LOG, response)
+    })
+  },
+  acceptTerms({commit, state}, {user, termsOfAccess}) {
+    console.log("accepting terms ")
+    terms.acceptTermsOfUse(user, termsOfAccess).then(console.log('updated terms'))
+        .then(() => {
+          terms.getTermsOfUseLog().then(response => {
+            commit(SET_TERMS_LOG, response)
+          })
+        })
   },
   initialize({commit}) {
     const token = localStorage.getItem(TOKEN_STORAGE_KEY);
@@ -124,9 +155,12 @@ const mutations = {
   [SET_USER](state, username) {
     state.user = username;
   },
-  [SET_TERMS_ACCEPTED](state, termsAccepted) {
-    state.termsAccepted = termsAccepted;
+  [SET_CURRENT_TERMS](state, currentTerms) {
+    state.currentTerms = currentTerms
   },
+  [SET_TERMS_LOG](state, termsLog) {
+    state.termsOfAccessLog = termsLog
+  }
 };
 
 export default {

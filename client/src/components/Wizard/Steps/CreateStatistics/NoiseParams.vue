@@ -4,7 +4,7 @@
       <v-col>
         <div
             class="borderBottom soft_primary grey--text text--darken-2
-		  pa-3 top-borders-radius noise-params d-flex 
+		  pa-3 top-borders-radius noise-params d-flex
 		  justify-space-between"
         >
           <span>Epsilon (&epsilon;)</span>
@@ -13,14 +13,12 @@
             <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
           </span>
         </div>
-        <a href="http://" class="primary--text caption"
-        >More information about Epsilon
-        </a>
+        <router-link to="/more-information" class="primary--text caption">More information about Epsilon</router-link>
       </v-col>
       <v-col>
         <div
             class="borderBottom soft_primary grey--text text--darken-2
-		  pa-3 top-borders-radius noise-params d-flex 
+		  pa-3 top-borders-radius noise-params d-flex
 		  justify-space-between"
         >
           <span>Delta (&delta;)</span>
@@ -29,9 +27,9 @@
             <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
           </span>
         </div>
-        <a href="http://" class="primary--text caption">
-          More information about Delta
-        </a>
+        <router-link to="/more-information#more-info-delta" class="primary--text caption">More information about Delta
+        </router-link>
+
       </v-col>
       <v-col>
         <div
@@ -43,9 +41,10 @@
             <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
           </span>
         </div>
-        <a href="http://" class="primary--text caption">
-          More information about Confidence Levels
-        </a>
+        <router-link to="/more-information#more-info-confidence" class="primary--text caption">More information about
+          Confidence Level
+        </router-link>
+
       </v-col>
     </v-row>
   </div>

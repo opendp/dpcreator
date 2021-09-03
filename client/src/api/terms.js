@@ -1,16 +1,45 @@
 import session from './session';
+import axios from "axios";
+const camelcaseKeys = require('camelcase-keys');
 
 export default {
 
     /**
-     * Returns a TermsOfUse object, if it is needed for this user, else returns null
-     * @param OpenDPUserId
-     * @returns {Promise<AxiosResponse<any>>}
+     * Get the most recent terms of use
      */
-    getTermsOfUse(OpenDPUserId) {
-        const formData = new FormData();
-        formData.append("OpenDPUserId", apiGeneralToken);
+    getCurrentTerms() {
+        // This will return a list of termsOfAccess, ordered by creation time.
+        // We return the first element of the list as the current one
+        return session.get('/api/terms-of-access/')
+            .then(resp => {
+                return camelcaseKeys(resp.data, {deep: true}).results[0]
 
-        return session.post('/api/terms/', formData);
+            })
+
+    },
+    /*
+     * Returns a history of agreed Terms of Access for this user
+     * @returns {Promise<<any>>}
+     */
+    getTermsOfUseLog() {
+        return axios.get('/api/terms-of-access-agreement/')
+            .catch(resp => {
+                if (resp.response.status === 404) {
+                    // 404 error means that this user hasn't agreed to any terms yet, so
+                    // just return an empty list
+                    return []
+                }
+            }).then(resp => {
+                return camelcaseKeys(resp.data.results, {deep: true})
+
+            })
+    },
+    /**
+     * Inserts a row in the termsOfUseAccessLog table, to record user acceptance
+     */
+    acceptTermsOfUse(user, termsOfAccess) {
+        console.log('api user:' + user)
+        console.log('api terms:' + termsOfAccess)
+        return session.post('/api/terms-of-access-agreement/', {user: user, terms_of_access: termsOfAccess})
     }
 }
