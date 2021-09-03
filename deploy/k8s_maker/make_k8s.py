@@ -14,12 +14,12 @@ def xmake_k8s_template():
 def make_k8s_template():
 
     # Database
-    db_template_name = 'azure_k8s_04_database.yaml'
+    db_template_name = 'azure_k8s_05_database.yaml'
     tf = TemplateFormatter(specs_01.specs_01, db_template_name)
     db_content = tf.formatted_output
 
     # App
-    app_template_name = 'azure_k8s_04_app.yaml'
+    app_template_name = 'azure_k8s_05_app.yaml'
     output_file = f'dpcreator_05_{get_yyyy_mmdd()}.yaml'
 
     tf2 = TemplateFormatter(specs_01.specs_01, app_template_name)

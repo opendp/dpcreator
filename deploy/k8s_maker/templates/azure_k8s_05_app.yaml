@@ -1,93 +1,4 @@
 ---
-# reference: https://github.com/kubernetes-operators-book/chapters/blob/master/ch05/database.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: dpcreator-db-data-configmap
-data:
-  #
-  # Database settings for postgres and Django
-  #
-  DB_HOST: "dpcreator-postgres-service"
-  DB_PORT: "5432"
-  DB_ENGINE: "django.db.backends.postgresql_psycopg2"
-  #
-  # These two variables should have the same value (kludge):
-  POSTGRES_DB: "db_dpcreator"
-  DB_NAME: "db_dpcreator"
----
-# ---------------------------
-# DPCreator - Postgres Deployment
-# ---------------------------
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: dpcreator-database
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: dpcreator
-      tier: postgres
-  template:
-    metadata:
-      labels:
-        app: dpcreator
-        tier: postgres
-    spec:
-      volumes:
-        # Persistent Disk space to store Postgres files
-        #  Used by dpcreator-postgres container
-        #- name: postgres-persistent-volume
-        #  azureDisk:
-        #    kind: Managed
-        #    diskName: dpcreator-postgres-02
-        #    diskURI: /subscriptions/14d2f886-16d9-4a5b-87f0-7aa1c4608026/resourceGroups/MC_DPCreatorResourceGroup_DPCreatorCluster01_eastus/providers/Microsoft.Compute/disks/dpcreator-postgres-02
-      containers:
-        - name: dpcreator-postgres
-          image: postgres:13
-          imagePullPolicy: Always
-          ports:
-            - name: postgres-port
-              containerPort: 5432
-              protocol: TCP
-          # Persistent Disk space to store Postgres files
-          #volumeMounts:
-          #- name: postgres-persistent-volume
-          #  mountPath: /var/lib/postgresql/data
-          envFrom:
-          - configMapRef:
-              name: dpcreator-db-data-configmap
-          env:
-            - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-auth-secret
-                  key: db_username
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: postgres-auth-secret
-                  key: db_password
----
-# ---------------------------
-# DPCreator - Postgres Service
-# ---------------------------
-apiVersion: v1
-kind: Service
-metadata:
-  name: dpcreator-postgres-service
-  labels:
-    app: dpcreator
-    tier: postgres
-spec:
-  clusterIP: None
-  ports:
-    - port: 5432
-  selector:
-    app: dpcreator
-    tier: postgres
----
 # ----------------------------------------
 # Configmap used for:
 #  dpcreator-app, dpcreator-celery
@@ -145,7 +56,7 @@ spec:
         # (1) Nginx frontend: Separate requests to static files vs. Django app
         # -------------------------------------------------
         - name: dpcreator-nginx
-          image: ghcr.io/opendp/dpcreator/nginx:2021-0903
+          image: {{ dpcreator_nginx_container }}:{{ dpcreator_container_tag }}
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -174,7 +85,7 @@ spec:
         # (3) Core application: Django + bundled static files
         # -------------------------------------------------
         - name: dpcreator-app
-          image: ghcr.io/opendp/dpcreator/app:2021-0903
+          image: {{ dpcreator_app_container }}:{{ dpcreator_container_tag }}
           imagePullPolicy: Always
           command: [ "azure_start_01.sh" ]
           #command: [ "/bin/sh" ]
@@ -200,7 +111,7 @@ spec:
             - name: DJANGO_SETTINGS_MODULE
               value: opendp_project.settings.azure_test_01
             - name: ALLOWED_HOSTS
-              value: "52.191.30.153,dev.dpcreator.org,127.0.0.1,0.0.0.0"
+              value: "{{ ALLOWED_HOSTS }}"
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
@@ -225,7 +136,7 @@ spec:
         # (4) Celery Queue - same image/settings as except for "command"
         # -------------------------------------------------
         - name: celery-worker
-          image: ghcr.io/opendp/dpcreator/app:2021-0903
+          image: {{ dpcreator_app_container }}:{{ dpcreator_container_tag }}
           imagePullPolicy: Always
           command: ['celery', '-A', 'opendp_project worker', '-l', 'info', '-n', 'worker_dpcreator']
           ports:
@@ -249,7 +160,7 @@ spec:
             - name: DJANGO_SETTINGS_MODULE
               value: opendp_project.settings.azure_test_01
             - name: ALLOWED_HOSTS
-              value: "52.191.30.153,dev.dpcreator.org,127.0.0.1,0.0.0.0"
+              value: "{{ ALLOWED_HOSTS }}"
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
@@ -284,7 +195,7 @@ metadata:
 spec:
   type: LoadBalancer
   # IP mapped to dpcreator.2ravens.org
-  loadBalancerIP: 52.191.30.153
+  loadBalancerIP: {{ loadBalancerIP }}
   selector:
     app: dpcreator
     tier: app
