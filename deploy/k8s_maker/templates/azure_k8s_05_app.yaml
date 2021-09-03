@@ -138,7 +138,7 @@ spec:
         - name: celery-worker
           image: {{ dpcreator_app_container }}:{{ dpcreator_container_tag }}
           imagePullPolicy: Always
-          command: ['celery', '-A', 'opendp_project worker', '-l', 'info', '-n', 'worker_dpcreator']
+          command: ['celery', '-A', 'opendp_project', 'worker', '-l', 'info', '-n', 'worker_dpcreator']
           ports:
             - name: dpcreator
               containerPort: 8080

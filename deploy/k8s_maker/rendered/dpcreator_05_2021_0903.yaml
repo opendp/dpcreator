@@ -227,7 +227,7 @@ spec:
         - name: celery-worker
           image: ghcr.io/opendp/dpcreator/app:2021-0903
           imagePullPolicy: Always
-          command: ['celery', '-A', 'opendp_project worker', '-l', 'info', '-n', 'worker_dpcreator']
+          command: ['celery', '-A', 'opendp_project', 'worker', '-l', 'info', '-n', 'worker_dpcreator']
           ports:
             - name: dpcreator
               containerPort: 8080
