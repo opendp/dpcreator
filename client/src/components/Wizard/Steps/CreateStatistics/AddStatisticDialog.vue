@@ -210,6 +210,7 @@ export default {
       statistic: "",
       variable: [],
       epsilon: "",
+      delta: "",
       error: "",
       missingValuesHandling: "",
       handleAsFixed: false,

@@ -23,7 +23,8 @@
                 <SetEpsilonValue :stepperPosition="stepperPosition" v-on:stepCompleted="updateStepStatus"/>
               </v-stepper-content>
               <v-stepper-content :complete="stepperPosition > 3" step="3">
-                <CreateStatistics :stepperPosition="stepperPosition" v-on:stepCompleted="updateStepStatus"/>
+                <CreateStatistics :stepperPosition="stepperPosition.sync"
+                                  v-on:stepCompleted="updateStepStatus"/>
               </v-stepper-content>
               <v-stepper-content :complete="stepperPosition > 4" step="4">
                 <GenerateDPRelease v-on:stepCompleted="updateStepStatus"/>
@@ -104,6 +105,7 @@ export default {
     // Set the current Wizard stepper position based on the
     // depositorSetup userStep
     initStepperPosition: function () {
+      console.log('initializing wizard stepper position')
       this.stepperPosition = stepInformation[this.getDepositorSetupInfo.userStep].wizardStepper
     },
     // If we are on the Confirm Variables step, and the DepositorSetup variables
@@ -130,6 +132,8 @@ export default {
       if (val - oldVal === 1) {
         const nextStep = stepInformation[this.getDepositorSetupInfo.userStep].nextStep
         const nextStepProp = {userStep: nextStep}
+        // Update the user step on the DepositorSetup or the Analysis Plan, depending
+        // where we are in the Wizard
         if (depositorSteps.includes(nextStep)) {
           const payload = {objectId: this.getDepositorSetupInfo.objectId, props: nextStepProp}
           this.$store.dispatch('dataset/updateDepositorSetupInfo', payload)

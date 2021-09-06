@@ -86,6 +86,7 @@ import EditNoiseParamsConfirmationDialog
   from "../../components/Wizard/Steps/CreateStatistics/EditNoiseParamsConfirmation.vue";
 import NoiseParams from "../../components/Wizard/Steps/CreateStatistics/NoiseParams.vue";
 import StatisticsTable from "../../components/Wizard/Steps/CreateStatistics/StatisticsTable.vue";
+import statsInformation from "@/data/statsInformation";
 import {mapGetters, mapState} from "vuex";
 export default {
   name: "CreateStatistics",
@@ -98,10 +99,14 @@ export default {
     StatisticsTable,
     NoiseParams
   },
+  props: [
+    "stepperPosition"
+  ],
   computed: {
     ...mapState('auth', ['error', 'user']),
     ...mapState('dataset', ['datasetInfo', "analysisPlan"]),
     ...mapGetters('dataset', ['getDepositorSetupInfo']),
+
     formTitle() {
       return this.isEditionMode
           ? "Edit your statistic"
@@ -111,22 +116,25 @@ export default {
       return this.editedIndex > -1;
     }
   },
-  created: function () {
-    if (this.analysisPlan !== null && this.analysisPlan.dpStatistics !== null) {
-      // make a deep copy of the Vuex state so it can be edited locally
-      this.statistics = JSON.parse(JSON.stringify(this.analysisPlan.dpStatistics))
-    } else {
-      this.statistics = []
-    }
+  created() {
+    this.initializeForm()
   },
   watch: {
     statistics: function (newStatisticsArray) {
       this.$emit("stepCompleted", 3, newStatisticsArray.length !== 0);
+    },
+    stepperPosition: function (val, oldVal) {
+      // If the wizard has landed on the CreateStatistics Step,
+      // initialize the form with data from Vuex store
+      if (val === 3) {
+        this.initializeForm()
+      }
     }
+
   },
   data: () => ({
-    epsilon: 0.25,
-    delta: 0.000001,
+    epsilon: null,
+    delta: null,
     confidenceLevel: "99%",
     statistics: [],
     dialogAddStatistic: false,
@@ -156,6 +164,18 @@ export default {
     }
   }),
   methods: {
+    initializeForm() {
+      if (this.analysisPlan !== null && this.analysisPlan.dpStatistics !== null) {
+        // make a deep copy of the Vuex state so it can be edited locally
+        this.statistics = JSON.parse(JSON.stringify(this.analysisPlan.dpStatistics))
+      } else {
+        this.statistics = []
+      }
+      this.delta = this.getDepositorSetupInfo.delta
+      this.epsilon = this.getDepositorSetupInfo.epsilon
+
+    },
+
     handleOpenEditNoiseParamsDialog() {
       this.dialogEditNoiseParamsConfirmation = false;
       this.dialogEditNoiseParams = true;
@@ -181,39 +201,49 @@ export default {
       } else {
         for (let variable of this.editedItem.variable) {
           let label = this.getVarLabel(variable)
+          if (!statsInformation.isDeltaStat(this.editedItem.statistic)) {
+            this.editedItem.delta = ""
+          }
           this.statistics.push(
               Object.assign({}, this.editedItem, {variable}, {label})
           );
         }
-        this.redistributeEpsilon()
       }
+      this.redistributeValues()
       this.saveUserInput()
       this.close();
     },
-    redistributeEpsilon() {
-      // for all statistics with locked == false, update so that the unlocked epsilon
+
+    redistributeValue(totalValue, property) {
+      // for all statistics that use this value -
+      // if locked == false, update so that the unlocked value
       // is shared equally among them.
-      let lockedEpsilon = new Decimal('0.0');
+      let lockedValue = new Decimal('0.0');
       let lockedCount = new Decimal('0');
-      this.statistics.forEach(function (item) {
-        if (item.locked) {
-          lockedEpsilon = lockedEpsilon.plus(item.epsilon)
-          lockedCount = lockedCount.plus(1);
+      let unlockedCount = new Decimal('0')
+      this.statistics.forEach((item) => {
+        if (statsInformation.statisticUsesValue(property, item.statistic)) {
+          if (item.locked) {
+            lockedValue = lockedValue.plus(item[property])
+            lockedCount = lockedCount.plus(1);
+          } else {
+            unlockedCount = unlockedCount.plus(1)
+          }
         }
       });
-      const remaining = new Decimal(this.epsilon).minus(lockedEpsilon)
-      const unlockedCount = this.statistics.length - lockedCount
+      const remaining = new Decimal(totalValue).minus(lockedValue)
       if (unlockedCount > 0) {
-        const epsilonShare = remaining.div(unlockedCount)
-        // Assign espilon shares and convert everything back from Decimal to Number
+        const valueShare = remaining.div(unlockedCount)
+        // Assign value shares and convert everything back from Decimal to Number
         // before saving
-        this.statistics.forEach(function (item) {
-          if (!item.locked) {
-            item.epsilon = epsilonShare.toNumber()
-          } else {
-            item.epsilon = item.epsilon.toNumber()
+        this.statistics.forEach((item) => {
+          if (statsInformation.statisticUsesValue(property, item.statistic)) {
+            if (!item.locked) {
+              item[property] = valueShare.toNumber()
+            } else {
+              item[property] = item[property].toNumber()
+            }
           }
-
         })
 
       }
@@ -224,6 +254,7 @@ export default {
       // before saving
       this.statistics.forEach(function (item) {
         item.epsilon = +item.epsilon
+        item.delta = +item.delta
       })
 
       if (this.analysisPlan === null) {
@@ -234,7 +265,7 @@ export default {
       }
     },
     editEpsilon(item) {
-      this.redistributeEpsilon()
+      this.redistributeValue(this.epsilon, 'epsilon')
 
     },
     editItem(item) {
@@ -245,7 +276,6 @@ export default {
     },
     changeLockStatus(item) {
       item.locked = !item.locked;
-      console.log('changing locked status: ' + item.locked)
     },
     deleteItem(item) {
       this.editedIndex = this.statistics.indexOf(item);
@@ -254,7 +284,7 @@ export default {
     },
     deleteItemConfirm() {
       this.statistics.splice(this.editedIndex, 1);
-      this.redistributeEpsilon()
+      this.redistributeValues()
       this.closeDelete();
     },
     close() {

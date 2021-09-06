@@ -108,6 +108,7 @@ export default {
       {text: "Statistic", value: "statistic"},
       {text: "Variable", value: "label"},
       {text: "Epsilon", value: "epsilon"},
+      {text: "Delta", value: "delta"},
       {text: "Error", value: "error"},
       {text: "", value: "actions"}
     ],

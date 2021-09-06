@@ -268,7 +268,7 @@ export default {
       const payload = {objectId: this.getDepositorSetupInfo.objectId, props: userInput}
       this.$store.dispatch('dataset/updateDepositorSetupInfo',
           payload)
-      this.updateEpsilonDelta()
+
     },
     /* Epsilon & Delta are derived from the answers to the level of harm question,
      taken from the original PSI application:
@@ -330,6 +330,7 @@ export default {
   watch: {
     radioOnlyOneIndividualPerRow: function (newValue) {
       if (newValue !== "" && newValue !== "no") {
+        this.updateEpsilonDelta()
         this.$emit("stepCompleted", 0, true);
       }
     }
