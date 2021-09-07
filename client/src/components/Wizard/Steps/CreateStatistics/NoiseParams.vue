@@ -24,7 +24,7 @@
           <span>Delta (x)</span>
           <span>
             {{ delta }}
-            <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
+            <v-icon right :disabled="delta === 0" @click="emitEditEvent">mdi-pencil</v-icon>
           </span>
         </div>
         <router-link to="/more-information#more-info-delta" class="primary--text caption">More information about Delta

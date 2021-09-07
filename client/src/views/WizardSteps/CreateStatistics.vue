@@ -22,9 +22,11 @@
     <StatisticsTable
         :statistics="statistics"
         :total-epsilon="epsilon"
+        :total-delta="delta"
         v-on:newStatisticButtonPressed="dialogAddStatistic = true"
         v-on:editStatistic="editItem"
         v-on:editEpsilon="editEpsilon"
+        v-on:editDelta="editDelta"
         v-on:changeLockStatus="changeLockStatus"
         v-on:deleteStatistic="deleteItem"
         class="mb-10"
@@ -173,6 +175,9 @@ export default {
       }
       this.delta = this.getDepositorSetupInfo.delta
       this.epsilon = this.getDepositorSetupInfo.epsilon
+      if (!statsInformation.statisticsUseDelta(this.statistics)) {
+        this.delta = 0
+      }
 
     },
 
@@ -184,6 +189,7 @@ export default {
       this.epsilon = epsilon;
       this.delta = delta;
       this.confidenceLevel = confidenceLevel;
+      this.redistributeValues()
     },
     // Label may not be set for all variables, so use name as the label if needed
     getVarLabel(key) {
@@ -213,7 +219,16 @@ export default {
       this.saveUserInput()
       this.close();
     },
-
+    redistributeValues() {
+      if (statsInformation.statisticsUseDelta(this.statistics) && this.delta == 0) {
+        this.delta = this.getDepositorSetupInfo.defaultDelta
+      }
+      if (!statsInformation.statisticsUseDelta(this.statistics)) {
+        this.delta = 0
+      }
+      this.redistributeValue(this.epsilon, 'epsilon')
+      this.redistributeValue(this.delta, 'delta')
+    },
     redistributeValue(totalValue, property) {
       // for all statistics that use this value -
       // if locked == false, update so that the unlocked value
@@ -241,8 +256,11 @@ export default {
             if (!item.locked) {
               item[property] = valueShare.toNumber()
             } else {
-              item[property] = item[property].toNumber()
+              if (typeof (item[property]) == Decimal) {
+                item[property] = item[property].toNumber()
+              }
             }
+
           }
         })
 
@@ -268,6 +286,9 @@ export default {
       this.redistributeValue(this.epsilon, 'epsilon')
 
     },
+    editDelta(item) {
+      this.redistributeValue(this.delta, 'delta')
+    },
     editItem(item) {
 
       this.editedIndex = this.statistics.indexOf(item);
@@ -285,6 +306,7 @@ export default {
     deleteItemConfirm() {
       this.statistics.splice(this.editedIndex, 1);
       this.redistributeValues()
+      this.saveUserInput()
       this.closeDelete();
     },
     close() {

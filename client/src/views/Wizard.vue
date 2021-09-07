@@ -23,7 +23,7 @@
                 <SetEpsilonValue :stepperPosition="stepperPosition" v-on:stepCompleted="updateStepStatus"/>
               </v-stepper-content>
               <v-stepper-content :complete="stepperPosition > 3" step="3">
-                <CreateStatistics :stepperPosition="stepperPosition.sync"
+                <CreateStatistics ref="createStatComponent" :stepperPosition="stepperPosition.sync"
                                   v-on:stepCompleted="updateStepStatus"/>
               </v-stepper-content>
               <v-stepper-content :complete="stepperPosition > 4" step="4">
@@ -99,13 +99,11 @@ export default {
   methods: {
 
     updateStepStatus: function (stepNumber, completedStatus) {
-      console.log('updating step status: ' + stepNumber + ', ' + completedStatus)
       this.steps[stepNumber].completed = completedStatus;
     },
     // Set the current Wizard stepper position based on the
     // depositorSetup userStep
     initStepperPosition: function () {
-      console.log('initializing wizard stepper position')
       this.stepperPosition = stepInformation[this.getDepositorSetupInfo.userStep].wizardStepper
     },
     // If we are on the Confirm Variables step, and the DepositorSetup variables
@@ -125,7 +123,6 @@ export default {
   },
   watch: {
     stepperPosition: function (val, oldVal) {
-      console.log('watching stepperPos ' + val + ' ' + oldVal)
       // if the new val is more than one step ahead of the oldVal, that means that val is being initialized because
       // the user has come from the 'Continue Workflow' button on the my data page.  So we don't need to go to the
       // next step.
@@ -139,11 +136,14 @@ export default {
           this.$store.dispatch('dataset/updateDepositorSetupInfo', payload)
 
         } else {
-          console.log('update analysis plan with the next step: ' + nextStep)
           const payload = {objectId: this.analysisPlan.objectId, props: nextStepProp}
           this.$store.dispatch('dataset/updateAnalysisPlan', payload)
         }
       }
+      if (val == 3) {
+        this.$refs.createStatComponent.initializeForm();
+      }
+
       this.checkProfileData(val)
     }
   },
