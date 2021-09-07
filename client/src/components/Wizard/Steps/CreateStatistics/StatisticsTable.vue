@@ -29,15 +29,20 @@
         </v-text-field>
       </template>
       <template v-slot:[`item.delta`]="{ item }">
-        <v-text-field
-            v-model="item.delta"
-            type="number"
-            :rules="[validateDelta]"
-            v-on:click="currentItem=item"
-            :disabled="!(item.locked && isDeltaStat(item))"
-            v-on:change="$emit('editDelta', item)"
-        >
-        </v-text-field>
+        <div v-if="isDeltaStat(item)">
+          <v-text-field
+              v-model="item.delta"
+              type="number"
+              :rules="[validateDelta]"
+              v-on:click="currentItem=item"
+              :disabled="!(item.locked)"
+              v-on:change="$emit('editDelta', item)"
+          >
+          </v-text-field>
+        </div>
+        <div v-if="!isDeltaStat(item)">
+          NA
+        </div>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
         <div class="d-flex justify-space-between">
