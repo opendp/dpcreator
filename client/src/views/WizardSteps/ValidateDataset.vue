@@ -66,7 +66,12 @@
             }"
           />
           <RadioItem :value="this.privacyTypes.NOT_HARM"
-                     :data-test="this.privacyTypes.NOT_HARM">
+                     :data-test="this.privacyTypes.NOT_HARM"
+                     :on="{
+                change: () =>
+                  handleRadioBestDescribes(this.privacyTypes.NOT_HARM)
+                }"
+          >
             <template v-slot:label>
               <div>
                 Information that, if disclosed,
@@ -75,7 +80,13 @@
               </div>
             </template>
           </RadioItem>
-          <RadioItem :value="this.privacyTypes.COULD_HARM">
+          <RadioItem
+              :value="this.privacyTypes.COULD_HARM"
+              :on="{
+              change: () =>
+                handleRadioBestDescribes(this.privacyTypes.COULD_HARM)
+            }"
+          >
             <template v-slot:label>
               <div>
                 Information that
@@ -84,7 +95,13 @@
               </div>
             </template>
           </RadioItem>
-          <RadioItem :value="this.privacyTypes.LIKELY_HARM">
+          <RadioItem
+              :value="this.privacyTypes.LIKELY_HARM"
+              :on="{
+              change: () =>
+                handleRadioBestDescribes(this.privacyTypes.LIKELY_HARM)
+            }"
+          >
             <template v-slot:label>
               <div>
                 Information that
@@ -282,33 +299,33 @@ export default {
       Information that would likely cause serious harm to individuals
       or the University if disclosed: (ε=.05, δ=10-7=0.0000001)
      */
-    updateEpsilonDelta() {
+    updateEpsilonDelta(option) {
       let epsilon = null
       let delta = null
       // Set epsilon for the three valid privacyTypes.
       // The other types will require the user to go back and change their
       // answer, so in that case set the values to null.
-      if (this.radioBestDescribes === this.privacyTypes.NOT_HARM) {
+      if (option === this.privacyTypes.NOT_HARM) {
         epsilon = 1
         delta = 0.00001
-      } else if (this.radioBestDescribes === this.privacyTypes.COULD_HARM) {
+      } else if (option === this.privacyTypes.COULD_HARM) {
         epsilon = .25
         delta = 0.000001
-      } else if (this.radioBestDescribes === this.privacyTypes.LIKELY_HARM) {
+      } else if (option === this.privacyTypes.LIKELY_HARM) {
         epsilon = .05
         delta = .0000001
       }
       let props = {
-        epsilon: epsilon,
         defaultEpsilon: epsilon,
-        delta: delta,
         defaultDelta: delta,
       }
       const payload = {objectId: this.getDepositorSetupInfo.objectId, props: props}
       this.$store.dispatch('dataset/updateDepositorSetupInfo',
           payload)
     },
-
+    handleRadioBestDescribes: function (option) {
+      this.updateEpsilonDelta(option)
+    },
     handleInvalidDataset: function (invalidOption) {
       this.optionToUnset = invalidOption;
       this.suitableDatasetDialogIsOpen = true;
@@ -330,7 +347,6 @@ export default {
   watch: {
     radioOnlyOneIndividualPerRow: function (newValue) {
       if (newValue !== "" && newValue !== "no") {
-        this.updateEpsilonDelta()
         this.$emit("stepCompleted", 0, true);
       }
     }

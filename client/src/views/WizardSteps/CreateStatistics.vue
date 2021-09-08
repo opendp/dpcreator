@@ -10,7 +10,7 @@
     <NoiseParams
         :epsilon="epsilon"
         :delta="delta"
-        :confidenceLevel="confidenceLevel"
+        :confidenceInterval="confidenceInterval"
         v-on:editNoiseParams="dialogEditNoiseParamsConfirmation = true"
     />
 
@@ -56,7 +56,7 @@
         v-on:noiseParamsUpdated="handleSaveEditNoiseParamsDialog"
         :epsilon="epsilon"
         :delta="delta"
-        :confidenceLevel="confidenceLevel"
+        :confidenceInterval="confidenceInterval"
     />
   </div>
 </template>
@@ -137,7 +137,7 @@ export default {
   data: () => ({
     epsilon: null,
     delta: null,
-    confidenceLevel: "99%",
+    confidenceInterval: null,
     statistics: [],
     dialogAddStatistic: false,
     dialogDelete: false,
@@ -173,10 +173,23 @@ export default {
       } else {
         this.statistics = []
       }
-      this.delta = this.getDepositorSetupInfo.delta
-      this.epsilon = this.getDepositorSetupInfo.epsilon
+      if (this.getDepositorSetupInfo.epsilon == null) {
+        this.epsilon = this.getDepositorSetupInfo.defaultEpsilon
+      } else {
+        this.epsilon = this.getDepositorSetupInfo.epsilon
+      }
+      if (this.getDepositorSetupInfo.confidenceInterval == null) {
+        this.confidenceInterval = .01
+      } else {
+        this.confidenceInterval = this.getDepositorSetupInfo.confidenceInterval
+      }
+
       if (!statsInformation.statisticsUseDelta(this.statistics)) {
         this.delta = 0
+      } else if (this.getDepositorSetupInfo.delta == null) {
+        this.delta = this.getDepositorSetupInfo.defaultDelta
+      } else {
+        this.delta = this.getDepositorSetupInfo.delta
       }
 
     },
@@ -185,11 +198,12 @@ export default {
       this.dialogEditNoiseParamsConfirmation = false;
       this.dialogEditNoiseParams = true;
     },
-    handleSaveEditNoiseParamsDialog(epsilon, delta, confidenceLevel) {
+    handleSaveEditNoiseParamsDialog(epsilon, delta, confidenceInterval) {
       this.epsilon = epsilon;
       this.delta = delta;
-      this.confidenceLevel = confidenceLevel;
+      this.confidenceInterval = confidenceInterval;
       this.redistributeValues()
+      this.saveUserInput()
     },
     // Label may not be set for all variables, so use name as the label if needed
     getVarLabel(key) {
@@ -268,26 +282,41 @@ export default {
 
     },
     saveUserInput() {
-      // convert everything back from Decimal to Number
+      // convert statistics back from Decimal to Number
       // before saving
       this.statistics.forEach(function (item) {
         item.epsilon = +item.epsilon
         item.delta = +item.delta
       })
-
-      if (this.analysisPlan === null) {
-        this.$store.dispatch('dataset/createAnalysisPlan', this.datasetInfo.objectId)
-            .then(() => this.$store.dispatch('dataset/updateDPStatistics', this.statistics))
-      } else {
-        this.$store.dispatch('dataset/updateDPStatistics', this.statistics)
+      // Save the epsilon and delta,
+      // so the DepositorSetupInfo is completed
+      // before creating an AnalysisPlan
+      let props = {
+        epsilon: this.epsilon,
+        delta: this.delta,
+        confidenceInterval: this.confidenceInterval
       }
+      const payload = {objectId: this.getDepositorSetupInfo.objectId, props: props}
+      this.$store.dispatch('dataset/updateDepositorSetupInfo',
+          payload).then(() => {
+        if (this.analysisPlan === null) {
+          this.$store.dispatch('dataset/createAnalysisPlan', this.datasetInfo.objectId)
+              .then(() => {
+                this.$store.dispatch('dataset/updateDPStatistics', this.statistics)
+              })
+        } else {
+          this.$store.dispatch('dataset/updateDPStatistics', this.statistics)
+        }
+      })
     },
+
     editEpsilon(item) {
       this.redistributeValue(this.epsilon, 'epsilon')
-
+      this.saveUserInput()
     },
     editDelta(item) {
       this.redistributeValue(this.delta, 'delta')
+      this.saveUserInput()
     },
     editItem(item) {
 

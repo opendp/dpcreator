@@ -37,7 +37,7 @@
         >
           <span>Confidence level</span>
           <span>
-            {{ confidenceLevel }}
+            {{ confidenceInterval }}
             <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
           </span>
         </div>
@@ -59,7 +59,7 @@
 <script>
 export default {
   name: "NoiseParams",
-  props: ["epsilon", "delta", "confidenceLevel"],
+  props: ["epsilon", "delta", "confidenceInterval"],
   methods: {
     emitEditEvent: function () {
       this.$emit("editNoiseParams");
