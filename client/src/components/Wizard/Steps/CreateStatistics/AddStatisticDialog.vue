@@ -88,6 +88,13 @@
             ></v-text-field>
           </div>
         </div>
+
+        <ColoredBorderAlert type="warning" v-if="validationError">
+          <template v-slot:content>
+            Statistic already exists on the statistics table.
+          </template>
+        </ColoredBorderAlert>
+
       </v-card-text>
 
       <v-card-actions>
@@ -107,6 +114,7 @@
             label="Close"
         />
       </v-card-actions>
+
     </v-card>
   </v-dialog>
 </template>
@@ -164,11 +172,12 @@
 
 <script>
 import Button from "../../../DesignSystem/Button.vue";
+import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
 
 export default {
   name: "AddStatisticDialog",
-  components: {Button},
-  props: ["formTitle", "dialog", "editedIndex", "editedItem", "variableInfo"],
+  components: {Button, ColoredBorderAlert},
+  props: ["formTitle", "dialog", "editedIndex", "editedItem", "variableInfo", "statistics"],
   computed: {
     isButtonDisabled: function () {
       return (
@@ -206,6 +215,7 @@ export default {
   data: () => ({
     singleVariableStatistics: ["Mean", "Histogram", "Quantile"],
     selectedStatistic: null,
+    validationError: false,
     editedItemDialog: {
       statistic: "",
       variable: [],
@@ -225,11 +235,38 @@ export default {
   }),
   methods: {
     save() {
-      console.log('saving: ' + JSON.stringify(this.editedItemDialog))
-      this.$emit("saveConfirmed", this.editedItemDialog);
+      if (this.validate()) {
+        this.$emit("saveConfirmed", this.editedItemDialog)
+      } else {
+        this.validationError = true
+      }
+    },
+    validate() {
+      let valid = true
+      if (this.statistics) {
+        this.editedItemDialog.variable.forEach((variable) => {
+          // Check for duplicate in the current statistics list
+          this.statistics.forEach((stat) => {
+            if (stat.statistic === this.editedItemDialog.statistic
+                && stat.variable === variable
+                && stat.missingValuesHandling === this.editedItemDialog.missingValuesHandling
+                && stat.fixedValue === this.editedItemDialog.fixedValue) {
+              valid = false
+            }
+          })
+        })
+      }
+      return valid
+
     },
     close() {
+      this.validationError = false
       this.$emit("close");
+    },
+    updateSelectedVariable(variable, index) {
+      if (this.editedItemDialog.variable.includes(variable)) {
+        this.editedItemDialog.variable.splice(index, 1);
+      }
     },
     updateSelectedStatistic(statistic) {
       this.selectedStatistic = statistic

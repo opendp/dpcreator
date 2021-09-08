@@ -34,6 +34,7 @@
 
     <AddStatisticDialog
         :variable-info="datasetInfo.depositorSetupInfo.variableInfo"
+        :statistics="statistics"
         :formTitle="formTitle"
         :dialog="dialogAddStatistic"
         :editedIndex="editedIndex"
