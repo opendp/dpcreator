@@ -38,6 +38,10 @@
           <RadioItem
               label="I'm unsure."
               value="unsure"
+              :on="{
+              change: () =>
+                handleInvalidDataset('radioDependOnPrivateInformation')
+            }"
           />
         </v-radio-group>
       </div>
