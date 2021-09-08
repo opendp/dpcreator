@@ -11,7 +11,8 @@
         >
           <template v-slot:content>
             <h2 class="title-size-1">{{ $t('home.service1 title') }}</h2>
-            <p class="grey--text text--darken-2">{{ $t('home.service1 text') }}</p>
+            <p class="grey--text text--darken-2" v-html="$t('home.service1 text')"></p>
+
           </template>
         </LinearBox>
         <LinearBox
@@ -22,7 +23,7 @@
         >
           <template v-slot:content>
             <h2 class="title-size-1">{{ $t('home.service2 title') }}</h2>
-            <p class="grey--text text--darken-2">{{ $t('home.service2 text') }}</p>
+            <p class="grey--text text--darken-2" v-html="$t('home.service2 text')"></p>
           </template>
         </LinearBox>
         <LinearBox
@@ -33,7 +34,7 @@
         >
           <template v-slot:content>
             <h2 class="title-size-1">{{ $t('home.service3 title') }}</h2>
-            <p class="grey--text text--darken-2">{{ $t('home.service3 text') }}</p>
+            <p class="grey--text text--darken-2" v-html="$t('home.service3 text')"></p>
           </template>
         </LinearBox>
         <LinearBox
@@ -44,7 +45,7 @@
         >
           <template v-slot:content>
             <h2 class="title-size-1">{{ $t('home.service4 title') }}</h2>
-            <p class="grey--text text--darken-2">{{ $t('home.service4 text') }}</p>
+            <p class="grey--text text--darken-2" v-html="$t('home.service4 text')"></p>
           </template>
         </LinearBox>
       </v-col>
