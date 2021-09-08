@@ -18,10 +18,14 @@ def validate_not_negative_or_none(value):
     return validate_not_negative(value)
 
 def validate_epsilon_or_none(value):
-    """Rule of thumb from the non-technical primer: It is not recommended to have an epsilon > 1 or less than 0.001 (1/1000th)"""
+    """
+    As a rule of thumb, however, epsilon should be thought of as a small number,
+    between approximately  1/100 and 1
+    source: https://admindatahandbook.mit.edu/book/v1.0/diffpriv.html
+    """
     if value is None:
         # okay value!
         return
 
-    if value > 1 or value < 0.001:
+    if value > 1 or value < 0.01:
         raise ValidationError(VALIDATE_MSG_EPSILON)

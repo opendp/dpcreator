@@ -12,6 +12,8 @@
           <template v-slot:content>
             <h2 class="title-size-1">{{ $t('home.service1 title') }}</h2>
             <p class="grey--text text--darken-2" v-html="$t('home.service1 text')"></p>
+            <p class="grey--text text--darken-2"> <router-link to="/more-information#more-info-dp" class="">(Learn more about differential privacy.)
+        </router-link></p>
 
           </template>
         </LinearBox>

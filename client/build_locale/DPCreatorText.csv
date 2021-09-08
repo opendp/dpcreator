@@ -13,14 +13,20 @@ home,step4 title,Review and submit,Check the release
 home,step4 text,"After processing, review the DP Release in DP Creator. If you choose, DP Creator will deposit the DP release back in the referring Dataverse repository dataset for sharing and publication.","After processing, review the release in DP Creator. When you're ready, submit the release to the referring Dataverse repository dataset for sharing and publication."
 home,service section title,Tips for Use,Tips for Use
 home,service1 title,Who should use this tool and why?,Who should use this tool and why?
-home,service1 text,"If you have deposited restricted datasets in a registered Dataverse repository, DP Creator allows you to create differentially private statistics. While your datasets remain restricted, the differentially private statistics are available to anyone. You should not use DP Creator if sharing the data could cause severe harm.  [To do: Link to Dataverse defined classification table, similar to <a href=""https://security.harvard.edu/data-security-levels-research-data-examples"">data security levels</a>].","If you have deposited restricted datasets in a registerd Dataverse repository, DP Creator allows you to create differentially private statistics. While your datasets remain restricted, the differentially private statistics are open to anyone. You should not use DP Creator if sharing the data could cause severe harm.  [To do: Link to Dataverse defined classification table, similar to <a href=""https://security.harvard.edu/data-security-levels-research-data-examples"">data security levels</a>]."
+home,service1 text,"<p>If you have deposited restricted datasets in a registered Dataverse repository, DP Creator allows you to create differentially private statistics. While your datasets remain restricted, the differentially private statistics are available to anyone. You should not use DP Creator if sharing the data could cause severe harm.</p>  
+<p>For more information on data security levels, please <a href=""https://docs.opendp.org/en/stable/contact/index.html"" target=""_blank"">contact us</a>.</p>","<p>If you have deposited restricted datasets in a registerd Dataverse repository, DP Creator allows you to create differentially private statistics. While your datasets remain restricted, the differentially private statistics are open to anyone. You should not use DP Creator if sharing the data could cause severe harm.</p>
+"
 home,service2 title,What statistics can be released using this tool?,What statistics can be released using this tool?
-home,service2 text,"Count, sum, mean, covariance, [Update with full list of statistics, see <a href=""https://github.com/opendp/dpcreator/issues/233"">issue 233</a>","Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi iusto in, voluptas quia fugiat soluta labore consectetur harum repellendus accusamus quisquam quasi velit vero totam, optio assumenda atque obcaecati eum!"
+home,service2 text,"<p>DP Creator generates statistics using the <a href=""https://github.com/opendp/opendp"" target=""_blank"">OpenDP library</a>. Currently, you may create differentially private versions of Count, Sum, Mean, Variance, and Histogram. We plan to add more statistics regularly.</p>","Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi iusto in, voluptas quia fugiat soluta labore consectetur harum repellendus accusamus quisquam quasi velit vero totam, optio assumenda atque obcaecati eum!"
 home,service3 title,How does it work?,What type of files are appropriate?
 home ,service3 text,"[This section needs input] Types of files... First 20 variables... Gaussian, Laplace, and Geometric algorithms applied to common statistics...
 epsilon and delta...variables you select will be released with noise for privacy protection. Link to find out more","Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi iusto in, voluptas quia fugiat soluta labore consectetur harum repellendus accusamus quisquam quasi velit vero totam, optio assumenda atque obcaecati eum!"
 home,service4 title,What can be done with the DP Release?,What can be done with the DP Release?
-home,service4 text,A DP release includes 2 files; in PDF and machine readable JSON formats. These files are deposited back to the Dataverse repository installation and are published as part of the original dataset. They provide a sense of what's in the data. (Add: can it be cited? etc)  ,"Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi iusto in, voluptas quia fugiat soluta labore consectetur harum repellendus accusamus quisquam quasi velit vero totam, optio assumenda atque obcaecati eum!"
+home,service4 text,"<p>A differentially private (DP) Release includes the statistic or statistics that you have requested. The DP Release consists of two files:</p>
+<ul>
+<li>PDF report for easy reading</li>
+<li>A machine readable JSON file</li>
+<p>Both files include the resulting statistics and how they were calculated.</p> ","Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi iusto in, voluptas quia fugiat soluta labore consectetur harum repellendus accusamus quisquam quasi velit vero totam, optio assumenda atque obcaecati eum!"
 home,checkbox,I have read the tips for use,
 home ,footer title,This is a sentence about Open DP,This is a sentence <br/> about Open DP
 home,footer text,"OpenDP is a community effort to build trustworthy, open-source software tools for the statistical analysis of sensitive private data. These tools offer the rigorous protections of differential privacy for the individuals who may be represented in confidential data and statistically valid methods of analysis for researchers who study the data.","Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi iusto in, voluptas quia fugiat soluta labore consectetur harum repellendus accusamus quisquam quasi velit vero totam, optio assumenda atque obcaecati eum!"
@@ -212,20 +218,23 @@ more information,differential privacy text,"<p>Differential privacy (DP) provide
 
 <p>Additional resources, including the foundational book <a href=""https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf"" target=""_blank"">The Algorithmic Foundations of Differential Privacy</a>, by Cynthia Dwork and Aaron Roth, may be found at <a href=""https://differentialprivacy.org/resources/"" target=""_blank"">differentialprivacy.org/resources</a> and <a href=""https://privacytools.seas.harvard.edu/courses-educational-materials"" target=""_blank"">privacytools.seas.harvard.edu/courses-educational-materials</a>.</p>",
 more information,registered dataverses title,What is a registered Dataverse?,
-more information,registered dataverses text,"<p><a href=""https://dataverse.org/"">Dataverse</a> is an open source web application to share, preserve, cite, explore, and analyze research data. Registering a Dataverse installation with the DP Creator application, allows Dataverse users to create differentially private releases from their datasets.</p>
+more information,registered dataverses text,"<p><a href=""https://dataverse.org/"">Dataverse</a> is an open source web application to share, preserve, cite, explore, and analyze research data. Currently there are over 60 Dataverse installations throughout the world. Registering a Dataverse installation with the DP Creator application, allows Dataverse users to create differentially private releases from their datasets.</p>
 
-<p>The registration process uses Dataverse's <a href=""https://guides.dataverse.org/en/latest/admin/external-tools.html"">external tools framework</a>.</p>
+<p>The registration process uses Dataverse's <a href=""https://guides.dataverse.org/en/latest/admin/external-tools.html"">external tools framework</a>. Alternately, DP Creator may be installed for a specific Dataverse's installation to conform with an organization's security requirements.</p>
 
 <p>For more information, please <a href=""https://docs.opendp.org/en/stable/contact/index.html"">contact us</a>.</p> ",
 more information,epsilon title,What is epsilon?,
-more information,epsilon text,"The level of privacy protection for individuals in the dataset is governed by two privacy-loss parameters - Epsilon (&epsilon;) and Delta (&delta;).  <a href=""javascript:alert('to do')"">Watch video to learn more.</a>
+more information,epsilon text,"<p>An essential component of a differentially private computation is the privacy loss parameter, usually denoted by the Greek letter <b>&epsilon;</b> (epsilon). This parameter determines how much noise is added to the computation. Choosing a value for the privacy loss parameter can be thought of as a tuning knob for balancing privacy and accuracy.</p>
 
-The recommended values below are based on the questions you answered earlier.
+<p>A lower <b>&epsilon;</b> value for corresponds to stronger privacy protection and also a larger decrease in accuracy, whereas a higher value for <b>&epsilon;</b> corresponds to weaker privacy protection and also a smaller decrease in accuracy.</p> 
 
-Note: Larger epsilon (&epsilon;) corresponds to larger privacy loss budget, and hence, less privacy. We do not recommend &epsilon; exceeding 1.
+<ul>
+<li>Lower <b>&epsilon;</b> value --> stronger privacy, less accuracy</li>
+<li>Higher <b>&epsilon;</b>; value --> weaker privacy, more accuracy</li>
+</ul>
+<p> As a rule of thumb, however, <b>&epsilon;</b> should be thought of as a small number, between approximately 1/100 and 1.</p>
 
-Note: Delta (&delta;) is the probability of a blatant privacy violation. &delta; values larger than the reciprocal of the dataset size are not allowed.
-",
+<p><i>(Note: This information has been excerpted from the book chapter <a href=""https://admindatahandbook.mit.edu/book/v1.0/diffpriv.html"" target=""_blank"">Designing Access with Differential Privacy</a>, which also contains illustrative examples.)</i></p> ",
 more information,delta title,What is delta?,
 more information,delta text,Delta is....,
 more information,confidence title,What is a confidence interval?,

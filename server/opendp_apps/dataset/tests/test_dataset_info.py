@@ -80,7 +80,7 @@ class TestDepositorInfo(BaseEndpointTest):
                                              kwargs={'object_id': "9255c067-e435-43bd-8af1-33a6987ffc9b"}),
                                      {'confidence_interval': 0.48,
                                       'default_epsilon': -2,
-                                      'epsilon': 0.0001,
+                                      'epsilon': 0.001,
                                       'default_delta': -0.1,
                                       'delta': -3})
 

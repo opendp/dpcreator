@@ -23,7 +23,6 @@
             'mb-10': $vuetify.breakpoint.smAndUp
           }"
         >
-
         </p>
       </v-col>
     </v-row>
