@@ -232,10 +232,14 @@ more information,epsilon text,"<p>An essential component of a differentially pri
 <li>Lower <b>&epsilon;</b> value --> stronger privacy, less accuracy</li>
 <li>Higher <b>&epsilon;</b>; value --> weaker privacy, more accuracy</li>
 </ul>
+
 <p> As a rule of thumb, however, <b>&epsilon;</b> should be thought of as a small number, between approximately 1/100 and 1.</p>
 
 <p><i>(Note: This information has been excerpted from the book chapter <a href=""https://admindatahandbook.mit.edu/book/v1.0/diffpriv.html"" target=""_blank"">Designing Access with Differential Privacy</a>, which also contains illustrative examples.)</i></p> ",
 more information,delta title,What is delta?,
-more information,delta text,Delta is....,
+more information,delta text,"<p>Delta (&delta;) is a second privacy-loss parameter used when calculating some differentially private statistics.</p>  
+
+<p>This parameter  controls the probability that a privacy breach event would happen, and hence should be kept
+very small (e.g., one in a billion).</p>  ",
 more information,confidence title,What is a confidence interval?,
 more information,confidence text,CI is ,

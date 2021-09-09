@@ -23,8 +23,7 @@
         >
           <template v-slot:content>
             <h2 class="title-size-1" id="more-info-dataverses">{{ $t('more information.registered dataverses title') }}</h2>
-            <p class="grey--text text--darken-2" v-html="$t('more information.registered dataverses text')">
-              {{ $t('more information.registered dataverses text') }}</p>
+            <p class="grey--text text--darken-2" v-html="$t('more information.registered dataverses text')"></p>
 
             <!-- List the currently registered Dataverses -->
             <div v-if="registeredDvs.length > 0">
@@ -64,6 +63,7 @@
             <p class="grey--text text--darken-2" v-html="$t('more information.delta text')"></p>
           </template>
         </LinearBox>
+<!--
         <LinearBox
 
             :class="{
@@ -76,7 +76,7 @@
             <p class="grey--text text--darken-2" v-html="$t('more information.confidence text')"></p>
           </template>
         </LinearBox>
-
+-->
       </v-col>
     </v-row>
     <span></span>

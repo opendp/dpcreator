@@ -40,11 +40,12 @@
             {{ confidenceLevel }}
             <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
           </span>
-        </div>
+        </div><span>&nbsp;</span>
+        <!--
         <router-link to="/more-information#more-info-confidence" class="primary--text caption">More information about
           Confidence Level
         </router-link>
-
+        -->
       </v-col>
     </v-row>
   </div>
