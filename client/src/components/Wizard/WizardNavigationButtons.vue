@@ -98,7 +98,6 @@ export default {
     ...mapGetters('dataset', ['getUpdatedTime', 'getTimeRemaining']),
 
     isContinueDisabled: function () {
-      console.log('saved time: ' + this.savedTime + 'type: ' + typeof (this.savedTime))
       return !this.steps[this.stepperPosition].completed;
     }
   }

@@ -28,7 +28,22 @@
         >
         </v-text-field>
       </template>
-
+      <template v-slot:[`item.delta`]="{ item }">
+        <div v-if="isDeltaStat(item)">
+          <v-text-field
+              v-model="item.delta"
+              type="number"
+              :rules="[validateDelta]"
+              v-on:click="currentItem=item"
+              :disabled="!(item.locked)"
+              v-on:change="$emit('editDelta', item)"
+          >
+          </v-text-field>
+        </div>
+        <div v-if="!isDeltaStat(item)">
+          NA
+        </div>
+      </template>
       <template v-slot:[`item.actions`]="{ item }">
         <div class="d-flex justify-space-between">
           <v-tooltip bottom max-width="220px">
@@ -97,23 +112,35 @@
 import Button from "../../../DesignSystem/Button.vue";
 import QuestionIconTooltip from "../../../DynamicHelpResources/QuestionIconTooltip.vue";
 import Decimal from "decimal.js";
+import statsInformation from "@/data/statsInformation";
 
 export default {
   components: {QuestionIconTooltip, Button},
   name: "StatisticsTable",
-  props: ["statistics", "totalEpsilon"],
+  props: ["statistics", "totalEpsilon", "totalDelta"],
   data: () => ({
     headers: [
       {value: "num"},
       {text: "Statistic", value: "statistic"},
       {text: "Variable", value: "label"},
       {text: "Epsilon", value: "epsilon"},
+      {text: "Delta", value: "delta"},
       {text: "Error", value: "error"},
       {text: "", value: "actions"}
     ],
     currentItem: null
   }),
+  computed:
+      {
+        deltaDisabled(item) {
+          return !(item.locked && statsInformation.isDeltaStat(item.statistic))
+        }
+      },
   methods: {
+    isDeltaStat(item) {
+      return statsInformation.isDeltaStat(item.statistic)
+    },
+
     validateEpsilon(value) {
       if (this.currentItem !== null) {
         let lockedEpsilon = new Decimal('0.0');
@@ -123,6 +150,19 @@ export default {
           }
         })
         if (lockedEpsilon > this.totalEpsilon)
+          return false
+      }
+      return true
+    },
+    validateDelta(value) {
+      if (this.currentItem !== null) {
+        let lockedDelta = new Decimal('0.0');
+        this.statistics.forEach(function (item) {
+          if (item.locked && statsInformation.isDeltaStat(item.statistic)) {
+            lockedDelta = lockedDelta.plus(item.delta)
+          }
+        })
+        if (lockedDelta > this.totalDelta)
           return false
       }
       return true

@@ -1,12 +1,17 @@
-Cypress.Commands.add('login', (email, password) => {
+Cypress.Commands.add('login', (username, password) => {
     Cypress.Cookies.debug(true)
     cy.visit('/log-in')
-    cy.get('[data-test="username"]').type(email);
+    cy.get('[data-test="username"]').type(username);
     cy.get('[data-test="password"]').type(password);
     cy.get('[data-test="Log in"]').click();
     // to force the login click, test that the browser went to the next  page
     cy.url().should('not.contain', 'log-in')
 
+})
+Cypress.Commands.add('loginAPI', (username, password) => {
+    cy.request('POST', '/rest-auth/login/', {username, password}).then((response) => {
+        expect(response.body).to.have.property('username', 'dev_admin')
+    })
 })
 Cypress.Commands.add('clearData', () => {
     cy.login('dev_admin', 'admin')

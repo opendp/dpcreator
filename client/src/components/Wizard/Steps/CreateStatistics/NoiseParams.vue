@@ -24,7 +24,7 @@
           <span>Delta (&delta;)</span>
           <span>
             {{ delta }}
-            <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
+            <v-icon right :disabled="delta === 0" @click="emitEditEvent">mdi-pencil</v-icon>
           </span>
         </div>
         <router-link to="/more-information#more-info-delta" class="primary--text caption">More information about Delta
@@ -37,7 +37,7 @@
         >
           <span>Confidence Level</span>
           <span>
-            {{ confidenceLevel }}
+            {{ confidenceInterval }}
             <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
           </span>
         </div><span>&nbsp;</span>
@@ -60,7 +60,7 @@
 <script>
 export default {
   name: "NoiseParams",
-  props: ["epsilon", "delta", "confidenceLevel"],
+  props: ["epsilon", "delta", "confidenceInterval"],
   methods: {
     emitEditEvent: function () {
       this.$emit("editNoiseParams");
