@@ -236,6 +236,7 @@ export default {
   methods: {
     save() {
       if (this.validate()) {
+        this.validationError = false
         this.$emit("saveConfirmed", this.editedItemDialog)
       } else {
         this.validationError = true
