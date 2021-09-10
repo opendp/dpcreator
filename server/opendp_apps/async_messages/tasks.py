@@ -45,15 +45,23 @@ def profile_dataset_info(dataset_object_id: DataSetInfo.object_id, websocket_id=
     """
     Using the DataSetInfo object_id, download and profile a dataset.
     If the "websocket_id" is defined, send back websocket messages
-    - Used w/o a websocket, this function also returns a dict:
+
+    Assumes: if websocket_id is None, then assume this is being called w/o celery
+        and can return complex objects such as the DownloadAndProfileUtil.
+
+        If websocket_id is defined, this function returns a dict:
          {'success': True/False, 'message': "A user message"}
     """
     dp_util = DownloadAndProfileUtil(dataset_object_id, websocket_id)
     if dp_util.has_error():
+        if websocket_id:
+            return dict(success=False, messsage=dp_util.get_err_msg())
         return err_resp(dp_util.get_err_msg())  # direct error message
 
-    return ok_resp(dp_util)
+    if websocket_id:
+        return dict(success=True, messsage='Profile in process')
 
+    return ok_resp(dp_util)
 
 @celery_app.task
 def send_test_msg(websocket_id):

@@ -17,7 +17,8 @@
           </ColoredBorderAlert>
           <ColoredBorderAlert type="warning" v-if="fileLocked">
             <template v-slot:content>
-              File is locked by another user
+              Sorry, the file is locked. Another Dataverse user is currently working on this file.
+              It will not be available on DP Creator until she/he/they have completed their work.
             </template>
           </ColoredBorderAlert>
           <CreateDPStatistics v-if="uploadedFile && !fileLocked" v-bind:datasetInfo="uploadedFile"/>

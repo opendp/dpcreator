@@ -71,12 +71,15 @@ class DataSetInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = DataSetInfo
         fields = ['object_id', 'name', 'created', 'creator', 'source', 'status', 'status_name',]
+        read_only_fields = ['object_id', 'id', 'created', 'updated']
 
 
 class DepositorSetupInfoSerializer(serializers.ModelSerializer):
+    """Serializer for the DepositorSetupInfo"""
     class Meta:
         model = DepositorSetupInfo
         fields = '__all__'
+        read_only_fields = ['object_id', 'id', 'created', 'updated']
 
 
 class DataverseFileInfoSerializer(DataSetInfoSerializer):

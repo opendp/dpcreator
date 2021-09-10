@@ -4,10 +4,10 @@
       <v-col>
         <div
             class="borderBottom soft_primary grey--text text--darken-2
-		  pa-3 top-borders-radius noise-params d-flex 
+		  pa-3 top-borders-radius noise-params d-flex
 		  justify-space-between"
         >
-          <span>Epsilon (x)</span>
+          <span>Epsilon (&epsilon;)</span>
           <span>
             {{ epsilon }}
             <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
@@ -18,13 +18,13 @@
       <v-col>
         <div
             class="borderBottom soft_primary grey--text text--darken-2
-		  pa-3 top-borders-radius noise-params d-flex 
+		  pa-3 top-borders-radius noise-params d-flex
 		  justify-space-between"
         >
-          <span>Delta (x)</span>
+          <span>Delta (&delta;)</span>
           <span>
             {{ delta }}
-            <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
+            <v-icon right :disabled="delta === 0" @click="emitEditEvent">mdi-pencil</v-icon>
           </span>
         </div>
         <router-link to="/more-information#more-info-delta" class="primary--text caption">More information about Delta
@@ -35,16 +35,17 @@
         <div
             class="borderBottom soft_primary grey--text text--darken-2 pa-3 top-borders-radius noise-params d-flex justify-space-between"
         >
-          <span>Confidence level</span>
+          <span>Confidence Level</span>
           <span>
-            {{ confidenceLevel }}
+            {{ confidenceInterval }}
             <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
           </span>
-        </div>
+        </div><span>&nbsp;</span>
+        <!--
         <router-link to="/more-information#more-info-confidence" class="primary--text caption">More information about
           Confidence Level
         </router-link>
-
+        -->
       </v-col>
     </v-row>
   </div>
@@ -59,7 +60,7 @@
 <script>
 export default {
   name: "NoiseParams",
-  props: ["epsilon", "delta", "confidenceLevel"],
+  props: ["epsilon", "delta", "confidenceInterval"],
   methods: {
     emitEditEvent: function () {
       this.$emit("editNoiseParams");

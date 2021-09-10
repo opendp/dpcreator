@@ -11,8 +11,9 @@
       You have been redirected to DP Creator from the <b>{{ datasetInfo.installationName }}</b> to create DP
       statistics for this dataset:
     </p>
-    <a href="" class="text-decoration-none font-weight-bold my-6 d-block">
-      {{ datasetInfo.datasetDoi }} | {{ datasetInfo.datasetSchemaInfo.name }} | {{ datasetInfo.fileSchemaInfo.name }}
+    <a v-bind:class="beginWizard" @click="beginWizard" class="text-decoration-none font-weight-bold my-6 d-block">{{ datasetInfo.datasetDoi }}
+      | {{ datasetInfo.datasetSchemaInfo.name }}
+      | {{ datasetInfo.fileSchemaInfo.name }}
     </a>
 
     <Button

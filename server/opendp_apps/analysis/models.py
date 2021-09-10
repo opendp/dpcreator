@@ -2,6 +2,10 @@ from django.db import models
 from django.conf import settings
 from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
+from opendp_apps.utils.extra_validators import \
+    (validate_not_negative,
+     validate_not_negative_or_none,
+     validate_epsilon_or_none)
 
 
 class DepositorSetupInfo(TimestampedModelWithUUID):
@@ -24,18 +28,79 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         STEP_9300_PROFILING_FAILED = 'error_9300', 'Error 3: Profiling Failed'
         STEP_9400_CREATE_RELEASE_FAILED = 'error_9400', 'Error 4: Create Release Failed'
 
-    # user who initially added/uploaded data
+    """
+    Confidence Interval choices
+    """
+    CI_95 = 0.05
+    CI_99 = 0.01
+    CI_CHOICES = (
+        (CI_95, '95% CI'),
+        (CI_99, '99% CI'),
+    )
+
+    """
+    Often used Delta values
+    """
+    DELTA_0 = 0.0
+    DELTA_10_NEG_5 = 10.0**-5
+    DELTA_10_NEG_6 = 10.0**-6
+    DELTA_10_NEG_7 = 10.0**-7
+
+    # User who initially added/uploaded data
     creator = models.ForeignKey(settings.AUTH_USER_MODEL,
                                 on_delete=models.PROTECT)
-    is_complete = models.BooleanField(default=False)
+
+    # Set on save
+    is_complete = models.BooleanField(default=False,
+                                      help_text='auto-populated on save')
+
+    # Track workflow based on DepositorSteps
     user_step = models.CharField(max_length=128,
                                  choices=DepositorSteps.choices,
                                  default=DepositorSteps.STEP_0100_UPLOADED)
-    epsilon = models.FloatField(null=True, blank=True)
+
+    # Populated from the UI
     dataset_questions = models.JSONField(null=True, blank=True)
+    epsilon_questions = models.JSONField(null=True, blank=True)
 
     # Includes variable ranges and categories
     variable_info = models.JSONField(null=True, blank=True)
+
+    #
+    # Epsilon related fields
+    #
+    default_epsilon = models.FloatField(null=True,
+                                        blank=True,
+                                        help_text='Default based on answers to epsilon_questions.',
+                                        validators=[validate_epsilon_or_none])
+    
+    epsilon = models.FloatField(null=True, blank=True,
+                                help_text=('Used for OpenDP operations, starts as the "default_epsilon"'
+                                           ' value but may be overridden by the user.'),
+                                validators=[validate_epsilon_or_none])
+
+    #
+    # Delta related fields
+    #
+    default_delta = models.FloatField(null=True,
+                                      blank=True,
+                                      default=DELTA_0,
+                                      help_text='Default based on answers to epsilon_questions.',
+                                      validators=[validate_not_negative])
+
+    delta = models.FloatField(null=True,
+                              blank=True,
+                              default=DELTA_0,
+                              help_text=('Used for OpenDP operations, starts as the "default_delta"'
+                                         ' value but may be overridden by the user.'),
+                              validators=[validate_not_negative])
+
+    confidence_interval = models.FloatField(\
+                            choices=CI_CHOICES,
+                            default=CI_95,
+                            help_text=('Used for OpenDP operations, starts as the "default_delta"'
+                                       ' value but may be overridden by the user.'))
+
 
     class Meta:
         verbose_name = 'Depositor Setup Data'
@@ -124,7 +189,9 @@ class ReleaseInfo(TimestampedModelWithUUID):
     analysis_plan = models.ForeignKey(AnalysisPlan,
                                       on_delete=models.PROTECT)
 
-    epsilon_used = models.FloatField(null=False, blank=False)
+    epsilon_used = models.FloatField(null=False,
+                                     blank=False,
+                                     validators=[validate_not_negative])
     dp_release = models.JSONField()
 
     class Meta:

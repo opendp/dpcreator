@@ -20,7 +20,7 @@
     ><v-icon color="primary" left>mdi-play</v-icon> Is your data a secret and
       simple random sample from a larger population?
     </span>
-    <v-radio-group v-model="secretSample" class="pl-2">
+    <v-radio-group v-model="secretSample" class="pl-2" v-on:change="saveUserInput">
       <RadioItem label="Yes." value="yes"/>
       <div
           :class="
@@ -35,6 +35,7 @@
             placeholder="E.g. 5,000,000"
             type="number"
             background-color="soft_primary"
+            v-on:change="saveUserInput"
         />
         <strong>people</strong>
       </div>
@@ -56,6 +57,7 @@
           v-model="observationsNumberCanBePublic"
           class="pl-2"
           :disabled="radioObservationsNumberShouldBeDisabled"
+          v-on:change="saveUserInput"
       >
         <RadioItem label="Yes." value="yes"/>
         <RadioItem label="No." value="no"/>
@@ -115,6 +117,19 @@ export default {
     observationsNumberCanBePublic: "",
     populationSize: ""
   }),
+  created() {
+    // Initialize questions with previously input values,
+    // if they exist
+    if (this.getDepositorSetupInfo.epsilonQuestions !== null) {
+      this.secretSample =
+          this.getDepositorSetupInfo.epsilonQuestions.secretSample
+      this.observationsNumberCanBePublic =
+          this.getDepositorSetupInfo.epsilonQuestions.observationsNumberCanBePublic
+      this.populationSize =
+          this.getDepositorSetupInfo.epsilonQuestions.populationSize
+
+    }
+  },
   computed: {
     ...mapState('auth', ['error', 'user']),
     ...mapState('dataset', ['datasetInfo']),
@@ -123,15 +138,27 @@ export default {
       return this.secretSample === "";
     }
   },
+  methods: {
+    saveUserInput() {
+      const userInput = {
+        epsilonQuestions: {
+          secretSample: this.secretSample,
+          populationSize: this.populationSize,
+          observationsNumberCanBePublic: this.observationsNumberCanBePublic,
+        }
+      }
+      const payload = {objectId: this.getDepositorSetupInfo.objectId, props: userInput}
+      this.$store.dispatch('dataset/updateDepositorSetupInfo',
+          payload)
+    }
+  },
   watch: {
 
     observationsNumberCanBePublic: function (newValue, oldValue) {
-      console.log("in watch for observation numbers")
       if (newValue !== "") {
         console.log('updating isComplete')
-        const payload = {objectId: this.datasetInfo.depositorSetupInfo.objectId, props: {epsilon: .25}}
-        this.$store.dispatch('dataset/updateDepositorSetupInfo',
-            payload)
+
+
         this.$emit("stepCompleted", 2, true);
       }
     }
