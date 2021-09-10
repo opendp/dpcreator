@@ -17,7 +17,7 @@
             it('correctly renders locale text', () => {
                 cy.visit('/')
                 cy.get('p')
-                    .should('contain', 'DP Creator is a tool for use with')
+                    .should('contain', 'DP Creator allows researchers to create high utility statistics')
             })
         })
 }

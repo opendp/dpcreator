@@ -3,7 +3,10 @@ from django.conf import settings
 from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
 from opendp_apps.utils.extra_validators import \
-    validate_not_negative, validate_not_negative_or_none
+    (validate_not_negative,
+     validate_not_negative_or_none,
+     validate_epsilon_or_none)
+
 
 class DepositorSetupInfo(TimestampedModelWithUUID):
     """
@@ -69,12 +72,12 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     default_epsilon = models.FloatField(null=True,
                                         blank=True,
                                         help_text='Default based on answers to epsilon_questions.',
-                                        validators=[validate_not_negative_or_none])
+                                        validators=[validate_epsilon_or_none])
     
     epsilon = models.FloatField(null=True, blank=True,
                                 help_text=('Used for OpenDP operations, starts as the "default_epsilon"'
                                            ' value but may be overridden by the user.'),
-                                validators=[validate_not_negative_or_none])
+                                validators=[validate_epsilon_or_none])
 
     #
     # Delta related fields

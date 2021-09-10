@@ -37,7 +37,7 @@
         </div>
 
         <div>
-          <span> Which<strong> variables </strong>would you like to use? </span>
+          <span> Which<strong> variable </strong>would you like to use? </span>
           <v-radio-group
               row
               :multiple="editedIndex === -1"
