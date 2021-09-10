@@ -271,8 +271,11 @@ export default {
           resolve(false);
         });
       } else {
+        return new Promise(function (resolve, reject) {
+          resolve(true);
+        });
         // call release validator
-        return this.validateStatistics()
+        //  return this.validateStatistics()
       }
 
     },

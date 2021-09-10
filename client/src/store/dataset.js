@@ -289,6 +289,9 @@ const mutations = {
         state.profilerStatus = status
     },
     [SET_DATASET_INFO](state, datasetInfo) {
+        if (datasetInfo.depositorSetupInfo.defaultEpsilon === null) {
+            console.log("EPSILON NULL")
+        }
         state.datasetInfo = datasetInfo
     },
 };

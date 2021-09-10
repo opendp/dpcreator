@@ -138,6 +138,7 @@ export default {
             // with epsilon and delta, and create the AnalysisPlan before continuing on to the
             // Create Statistics wizard step
             if (completedStep === STEP_0600_EPSILON_SET) {
+              console.log("SETTING EPSILON & DELTA")
               // Save the epsilon and delta,
               // so the DepositorSetupInfo is completed
               // before creating an AnalysisPlan

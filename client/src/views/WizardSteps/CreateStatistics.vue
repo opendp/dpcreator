@@ -206,6 +206,7 @@ export default {
       this.delta = delta;
       this.confidenceInterval = confidenceInterval;
       this.redistributeValues()
+ //     statsInformation.redistributeValues(this.statistics,this.epsilon,this.delta, this.getDepositorSetupInfo.defaultDelta)
       this.saveUserInput()
     },
     // Label may not be set for all variables, so use name as the label if needed
@@ -233,14 +234,9 @@ export default {
         }
       }
       this.redistributeValues()
-      this.validateStatistics().then((validation) => {
-        if (validation.valid === true) {
-          this.saveUserInput()
-          this.close();
-        } else {
-          // show validation error message on AddStatistics dialog
-        }
-      })
+      this.saveUserInput()
+      this.close()
+
     },
     redistributeValues() {
       if (this.statistics) {

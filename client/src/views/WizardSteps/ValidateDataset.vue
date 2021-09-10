@@ -328,6 +328,7 @@ export default {
           payload)
     },
     handleRadioBestDescribes: function (option) {
+      console.log('updating epsilon/delta for radioBestDescribes = ' + option)
       this.updateEpsilonDelta(option)
     },
     handleInvalidDataset: function (invalidOption) {
