@@ -3,6 +3,7 @@ import requests_mock
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
+from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.dataverses.testing.test_endpoints import BaseEndpointTest
 from opendp_apps.model_helpers.msg_util import msgt
 
@@ -58,9 +59,14 @@ class TestDataSetSerializer(BaseEndpointTest):
         depositor_setup_info.pop('created')
         depositor_setup_info.pop('updated')
         depositor_setup_info.pop('creator')
-        self.assertEqual(depositor_setup_info, {'dataset_questions': None,
+        self.assertEqual(depositor_setup_info, {'id': 5,
+                                                'dataset_questions': None,
+                                                'epsilon_questions': None,
+                                                'default_epsilon': None,
                                                 'epsilon': None,
-                                                'id': 5,
+                                                'default_delta': 0.0,
+                                                'delta': 0.0,
+                                                'confidence_interval': DepositorSetupInfo.CI_95,
                                                 'is_complete': False,
                                                 'user_step': 'step_100',
                                                 'variable_info': None})

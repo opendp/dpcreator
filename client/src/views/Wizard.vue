@@ -23,7 +23,8 @@
                 <SetEpsilonValue :stepperPosition="stepperPosition" v-on:stepCompleted="updateStepStatus"/>
               </v-stepper-content>
               <v-stepper-content :complete="stepperPosition > 3" step="3">
-                <CreateStatistics :stepperPosition="stepperPosition" v-on:stepCompleted="updateStepStatus"/>
+                <CreateStatistics ref="createStatComponent" :stepperPosition="stepperPosition.sync"
+                                  v-on:stepCompleted="updateStepStatus"/>
               </v-stepper-content>
               <v-stepper-content :complete="stepperPosition > 4" step="4">
                 <GenerateDPRelease v-on:stepCompleted="updateStepStatus"/>
@@ -98,7 +99,6 @@ export default {
   methods: {
 
     updateStepStatus: function (stepNumber, completedStatus) {
-      console.log('updating step status: ' + stepNumber + ', ' + completedStatus)
       this.steps[stepNumber].completed = completedStatus;
     },
     // Set the current Wizard stepper position based on the
@@ -123,23 +123,27 @@ export default {
   },
   watch: {
     stepperPosition: function (val, oldVal) {
-      console.log('watching stepperPos ' + val + ' ' + oldVal)
       // if the new val is more than one step ahead of the oldVal, that means that val is being initialized because
       // the user has come from the 'Continue Workflow' button on the my data page.  So we don't need to go to the
       // next step.
       if (val - oldVal === 1) {
         const nextStep = stepInformation[this.getDepositorSetupInfo.userStep].nextStep
         const nextStepProp = {userStep: nextStep}
+        // Update the user step on the DepositorSetup or the Analysis Plan, depending
+        // where we are in the Wizard
         if (depositorSteps.includes(nextStep)) {
           const payload = {objectId: this.getDepositorSetupInfo.objectId, props: nextStepProp}
           this.$store.dispatch('dataset/updateDepositorSetupInfo', payload)
 
         } else {
-          console.log('update analysis plan with the next step: ' + nextStep)
           const payload = {objectId: this.analysisPlan.objectId, props: nextStepProp}
           this.$store.dispatch('dataset/updateAnalysisPlan', payload)
         }
       }
+      if (val == 3) {
+        this.$refs.createStatComponent.initializeForm();
+      }
+
       this.checkProfileData(val)
     }
   },
