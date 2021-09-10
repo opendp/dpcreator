@@ -1,9 +1,7 @@
 <template>
   <div class="confirmVariablesPage">
     <h1 class="title-size-1">Confirm Variables</h1>
-    <p>
-      {{ $t('confirm variables.confirm variables intro') }}
-    </p>
+    <p v-html="$t('confirm variables.confirm variables intro')"></p>
     <ColoredBorderAlert type="warning">
       <template v-slot:content>
         The DPcreator takes the first 20 variables of the dataset. The default

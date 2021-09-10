@@ -10,10 +10,9 @@
           }"
         >
           <template v-slot:content>
-            <h2 class="title-size-1">{{ $t('more information.differential privacy title') }}</h2>
-            <p id="more-info-dp" class="grey--text text--darken-2">{{
-                $t('more information.differential privacy text')
-              }}</p>
+
+            <h2 id="more-info-dp" class="title-size-1" v-html="$t('more information.differential privacy title')"></h2>
+            <p class="grey--text text--darken-2" v-html="$t('more information.differential privacy text')"></p>
           </template>
         </LinearBox>
         <LinearBox
@@ -23,14 +22,22 @@
           }"
         >
           <template v-slot:content>
-            <h2 class="title-size-1">{{ $t('more information.registered dataverses title') }}</h2>
-            <p id="more-info-dataverses" class="grey--text text--darken-2">
-              {{ $t('more information.registered dataverses text') }}</p>
-            <ul>
-              <li v-for="item in registeredDvs">
-                <a :href="item.dataverseUrl">{{ item.name }}</a>
-              </li>
-            </ul>
+            <h2 class="title-size-1" id="more-info-dataverses" v-html="$t('more information.registered dataverses title')"></h2>
+            <p class="grey--text text--darken-2" v-html="$t('more information.registered dataverses text')"></p>
+
+            <!-- List the currently registered Dataverses -->
+            <div v-if="registeredDvs.length > 0">
+              <hr /><br />
+              <p>
+                Dataverses currently registered:
+              </p>
+
+              <ul>
+                <li v-for="item in registeredDvs">
+                  <a :href="item.dataverseUrl" target="_blank">{{ item.name }}</a>
+                </li>
+              </ul>
+            </div>
 
           </template>
         </LinearBox>
@@ -41,22 +48,22 @@
           }"
         >
           <template v-slot:content>
-            <h2 class="title-size-1">{{ $t('more information.epsilon title') }}</h2>
-            <p id="more-info-epsilon" class="grey--text text--darken-2">{{ $t('more information.epsilon text') }}</p>
+            <h2 id="more-info-epsilon" class="title-size-1" v-html="$t('more information.epsilon title')"></h2>
+            <p class="grey--text text--darken-2" v-html="$t('more information.epsilon text')"></p>
           </template>
         </LinearBox>
         <LinearBox
-            id="more-info-delta"
             :class="{
             'mb-6': $vuetify.breakpoint.xsOnly,
             'mb-12': $vuetify.breakpoint.smAndUp
           }"
         >
           <template v-slot:content>
-            <h2 class="title-size-1">{{ $t('more information.delta title') }}</h2>
-            <p class="grey--text text--darken-2">{{ $t('more information.delta text') }}</p>
+            <h2 class="title-size-1" id="more-info-delta" v-html="$t('more information.delta title')"></h2>
+            <p class="grey--text text--darken-2" v-html="$t('more information.delta text')"></p>
           </template>
         </LinearBox>
+<!--
         <LinearBox
 
             :class="{
@@ -65,13 +72,11 @@
           }"
         >
           <template v-slot:content>
-            <h2 class="title-size-1">{{ $t('more information.confidence title') }}</h2>
-            <p id="more-info-confidence" class="grey--text text--darken-2">{{
-                $t('more information.confidence text')
-              }}</p>
+            <h2 class="title-size-1" id="more-info-confidence">{{ $t('more information.confidence title') }}</h2>
+            <p class="grey--text text--darken-2" v-html="$t('more information.confidence text')"></p>
           </template>
         </LinearBox>
-
+-->
       </v-col>
     </v-row>
     <span></span>

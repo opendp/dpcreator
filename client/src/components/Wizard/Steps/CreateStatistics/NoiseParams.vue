@@ -4,10 +4,10 @@
       <v-col>
         <div
             class="borderBottom soft_primary grey--text text--darken-2
-		  pa-3 top-borders-radius noise-params d-flex 
+		  pa-3 top-borders-radius noise-params d-flex
 		  justify-space-between"
         >
-          <span>Epsilon (x)</span>
+          <span>Epsilon (&epsilon;)</span>
           <span>
             {{ epsilon }}
             <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
@@ -18,10 +18,10 @@
       <v-col>
         <div
             class="borderBottom soft_primary grey--text text--darken-2
-		  pa-3 top-borders-radius noise-params d-flex 
+		  pa-3 top-borders-radius noise-params d-flex
 		  justify-space-between"
         >
-          <span>Delta (x)</span>
+          <span>Delta (&delta;)</span>
           <span>
             {{ delta }}
             <v-icon right :disabled="delta === 0" @click="emitEditEvent">mdi-pencil</v-icon>
@@ -35,16 +35,17 @@
         <div
             class="borderBottom soft_primary grey--text text--darken-2 pa-3 top-borders-radius noise-params d-flex justify-space-between"
         >
-          <span>Confidence level</span>
+          <span>Confidence Level</span>
           <span>
             {{ confidenceInterval }}
             <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
           </span>
-        </div>
+        </div><span>&nbsp;</span>
+        <!--
         <router-link to="/more-information#more-info-confidence" class="primary--text caption">More information about
           Confidence Level
         </router-link>
-
+        -->
       </v-col>
     </v-row>
   </div>

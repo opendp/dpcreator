@@ -5,7 +5,8 @@ from django.urls import reverse
 
 from opendp_apps.dataverses.testing.test_endpoints import BaseEndpointTest
 from opendp_apps.analysis.models import DepositorSetupInfo
-from opendp_apps.utils.extra_validators import VALIDATE_MSG_ZERO_OR_GREATER
+from opendp_apps.utils.extra_validators import \
+    VALIDATE_MSG_ZERO_OR_GREATER, VALIDATE_MSG_EPSILON
 from opendp_apps.model_helpers.msg_util import msgt
 
 
@@ -79,7 +80,7 @@ class TestDepositorInfo(BaseEndpointTest):
                                              kwargs={'object_id': "9255c067-e435-43bd-8af1-33a6987ffc9b"}),
                                      {'confidence_interval': 0.48,
                                       'default_epsilon': -2,
-                                      'epsilon': 0.0,
+                                      'epsilon': 0.001,
                                       'default_delta': -0.1,
                                       'delta': -3})
 
@@ -89,7 +90,7 @@ class TestDepositorInfo(BaseEndpointTest):
         expected_msg = {'confidence_interval': ['"0.48" is not a valid choice.'],
                         'default_delta': [VALIDATE_MSG_ZERO_OR_GREATER],
                         'delta': [VALIDATE_MSG_ZERO_OR_GREATER],
-                        'default_epsilon': [VALIDATE_MSG_ZERO_OR_GREATER],
-                        #'epsilon': [VALIDATE_MSG_ZERO_OR_GREATER]
+                        'default_epsilon': [VALIDATE_MSG_EPSILON],
+                        'epsilon': [VALIDATE_MSG_EPSILON]
                         }
         self.assertEqual(response.json(), expected_msg)
