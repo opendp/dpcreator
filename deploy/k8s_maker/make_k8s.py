@@ -22,7 +22,7 @@ def make_k8s_template(specs, output_prefix=''):
     app_template_name = 'azure_k8s_05_app.yaml'
     output_file = f'{output_prefix}dpcreator_05_{get_yyyy_mmdd()}.yaml'
 
-    tf2 = TemplateFormatter(specs_01.specs_01, app_template_name)
+    tf2 = TemplateFormatter(specs, app_template_name)
     app_content = tf2.formatted_output
 
     full_content = f'{db_content}\n{app_content}'
