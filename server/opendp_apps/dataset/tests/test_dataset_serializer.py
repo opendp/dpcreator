@@ -60,7 +60,7 @@ class TestDataSetSerializer(BaseEndpointTest):
         depositor_setup_info.pop('creator')
         self.assertEqual(depositor_setup_info, {'dataset_questions': None,
                                                 'epsilon': None,
-                                                'id': 2,
+                                                'id': 5,
                                                 'is_complete': False,
                                                 'user_step': 'step_100',
                                                 'variable_info': None})
