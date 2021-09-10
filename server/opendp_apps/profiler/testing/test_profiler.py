@@ -4,6 +4,7 @@ CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
 import json
+from unittest import skip
 
 from django.test import TestCase #Client, tag
 from django.conf import settings
@@ -65,11 +66,18 @@ class ProfilerTest(TestCase):
 
         pvars = profiler.profile_variables
         self.assertTrue('variables' in info)
-        self.assertTrue(len(pvars['variables']) <= len(settings.PROFILER_DEFAULT_COLUMN_INDICES))
+        self.assertTrue(len(pvars['variables']) <= settings.PROFILER_COLUMN_LIMIT)
         self.assertEqual(len(pvars['variables']), info['dataset']['variableCount'])
 
+        self.assertEqual(info['dataset']['variableCount'],
+                         len(info['dataset']['variableOrder']))
 
+        # make the sure the "dataset.variableOrder" column names are in the "variables" dict
+        #
+        for idx, colname in info['dataset']['variableOrder']:
+            self.assertTrue(colname in info['variables'])
 
+    #@skip
     def test_005_profile_good_files(self):
         """(05) Profile several good files"""
         msgt(self.test_005_profile_good_files.__doc__)
@@ -127,7 +135,7 @@ class ProfilerTest(TestCase):
 
         print('-- Profiler reads only first 20 features')
         self.assertTrue('variables' in info)
-        self.assertEqual(len(info['variables'].keys()), len(settings.PROFILER_DEFAULT_COLUMN_INDICES))
+        self.assertEqual(len(info['variables'].keys()), settings.PROFILER_COLUMN_LIMIT)
 
         print('-- Profiler output is the same as the output saved to the DataSetInfo object')
         profile_json_str2 = json.dumps(info, cls=DjangoJSONEncoder, indent=4)
@@ -135,8 +143,18 @@ class ProfilerTest(TestCase):
         print(profile_json_str2)
 
         self.assertEqual(dsi.profile_variables['dataset']['variableCount'],
-                         len(settings.PROFILER_DEFAULT_COLUMN_INDICES))
+                         settings.PROFILER_COLUMN_LIMIT)
 
+        self.assertEqual(dsi.profile_variables['dataset']['variableCount'],
+                         len(dsi.profile_variables['dataset']['variableOrder']))
+
+        # make the sure the "dataset.variableOrder" column names are in the "variables" dict
+        #
+        for idx, colname in dsi.profile_variables['dataset']['variableOrder']:
+            self.assertTrue(colname in dsi.profile_variables['variables'])
+
+
+    #@skip
     def test_020_bad_files(self):
         """(20) Test bad file type"""
         msgt(self.test_020_bad_files.__doc__)
@@ -170,6 +188,7 @@ class ProfilerTest(TestCase):
         self.assertTrue(profiler.get_err_msg().find('EmptyDataError') > -1)
 
 
+    #@skip
     def test_30_filefield_empty(self):
         """(30) Test with empty file field"""
         msgt(self.test_30_filefield_empty.__doc__)
@@ -194,6 +213,7 @@ class ProfilerTest(TestCase):
                          DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
 
 
+    #@skip
     def test_40_filefield_correct(self):
         """(40) Test using file file with legit file"""
         msgt(self.test_40_filefield_correct.__doc__)
@@ -230,14 +250,22 @@ class ProfilerTest(TestCase):
 
         print('-- Profiler reads only first 20 features')
         self.assertTrue('variables' in info)
-        self.assertEqual(len(info['variables'].keys()), len(settings.PROFILER_DEFAULT_COLUMN_INDICES))
+        self.assertEqual(len(info['variables'].keys()), settings.PROFILER_COLUMN_LIMIT)
 
         self.assertEqual(dsi2.depositor_setup_info.user_step, \
                          DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
 
         #print('dsi2.profile_variables', dsi2.profile_variables)
         self.assertEqual(len(dsi2.profile_variables['variables'].keys()),
-                         len(settings.PROFILER_DEFAULT_COLUMN_INDICES))
+                         settings.PROFILER_COLUMN_LIMIT)
 
         self.assertEqual(dsi2.profile_variables['dataset']['variableCount'],
-                         len(settings.PROFILER_DEFAULT_COLUMN_INDICES))
+                         settings.PROFILER_COLUMN_LIMIT)
+
+        self.assertEqual(dsi2.profile_variables['dataset']['variableCount'],
+                         len(dsi2.profile_variables['dataset']['variableOrder']))
+
+        # make the sure the "dataset.variableOrder" column names are in the "variables" dict
+        #
+        for idx, colname in dsi2.profile_variables['dataset']['variableOrder']:
+            self.assertTrue(colname in dsi2.profile_variables['variables'])

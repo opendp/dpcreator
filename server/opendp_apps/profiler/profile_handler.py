@@ -41,6 +41,8 @@ class ProfileHandler(BasicErrCheck):
         self.dataset_is_django_filefield = kwargs.get(pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD, False)
 
         self.data_profile = None    # Data profile information
+        self.variable_order = None    # Added to the profile
+
         self.profile_variables = None
 
         self.num_original_features = None
@@ -49,7 +51,8 @@ class ProfileHandler(BasicErrCheck):
         # Optional
         # -------------------------------------
         # Indices of columns to profile. Default is the 1st 20 indices
-        self.chosen_column_indices = kwargs.get('chosen_column_indices', settings.PROFILER_DEFAULT_COLUMN_INDICES)
+        self.max_num_features = kwargs.get('max_num_features', settings.PROFILER_COLUMN_LIMIT)
+        self.save_row_count = kwargs.get('save_row_count', True)    # set to False depending on epsilon question
 
         # If a DataSetInfo object is specified, the profile will be saved to the object
         self.dataset_info_object_id = kwargs.get(pstatic.KEY_DATASET_OBJECT_ID)
@@ -238,8 +241,11 @@ class ProfileHandler(BasicErrCheck):
         sep_resp = self.get_row_separator()
         if not sep_resp.success:
             return
+
         sep_char = sep_resp.data
 
+        # dataframe read parameters
+        #
         df_read_params = dict(sep=sep_char)
 
 
@@ -263,11 +269,20 @@ class ProfileHandler(BasicErrCheck):
 
             # If there are more than the expected number of columns, for the full read, only use the 1st 20
             #
-            if self.num_original_features > len(self.chosen_column_indices):
-                df_read_params['usecols'] = self.chosen_column_indices
+            if self.num_original_features > self.max_num_features:
+                #
+                # usecols=['foo', 'bar'])[['bar', 'foo']] for ['bar', 'foo']
+                df_chosen_columns = df_for_size.columns[:self.max_num_features]
+                self.variable_order = [[idx, colname] for idx, colname in enumerate(df_chosen_columns)]
 
-            # read the full file into the dataframe
-            df = pd.read_csv(ds_pointer_for_pandas, **df_read_params)
+                df_read_params['usecols'] = df_chosen_columns
+                df = pd.read_csv(ds_pointer_for_pandas, **df_read_params)[df_chosen_columns]
+
+            else:
+                self.variable_order = [[idx, colname] for idx, colname in enumerate(df_for_size.columns)]
+                # read the full file into the dataframe
+                df = pd.read_csv(ds_pointer_for_pandas, **df_read_params)   #[self.chosen_column_indices]
+
             return ok_resp(df)
 
         except pd.errors.EmptyDataError as err_obj:
@@ -313,6 +328,8 @@ class ProfileHandler(BasicErrCheck):
             return
 
         self.data_profile = prunner.get_final_dict()
+        print('variable_order', self.variable_order)
+        self.data_profile['dataset']['variableOrder'] = self.variable_order
 
         self.prune_profile()
 
@@ -326,10 +343,11 @@ class ProfileHandler(BasicErrCheck):
         # -----------------------
         # Step 1: Prune profile
         # -----------------------
-        profile_info = ProfileFormatter.prune_profile(self.data_profile)
+        profile_info = ProfileFormatter.prune_profile(self.data_profile, save_row_count=self.save_row_count)
         if not profile_info.success:
             self.add_err_msg(profile_info.message)
             return
+
 
         # Pruned profile!
         self.data_profile = profile_info.data

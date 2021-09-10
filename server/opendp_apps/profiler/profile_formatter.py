@@ -11,7 +11,7 @@ from opendp_apps.profiler import static_vals as pstatic
 class ProfileFormatter:
 
     @staticmethod
-    def prune_profile(profile_data: dict) -> BasicResponse:
+    def prune_profile(profile_data: dict, save_row_count: bool=True) -> BasicResponse:
         """Remove fields from the output of the TwoRavens preprocesser"""
         if not isinstance(profile_data, dict):
             user_msg = 'The data profile must be a Python dict.'
@@ -24,17 +24,21 @@ class ProfileFormatter:
         if 'variableDisplay' in profile_data:
             del profile_data['variableDisplay']
 
-        # Remove the "dataset" field, but keep the "variableCount"
-        #   and move it to the top level
+        # Remove everything from the "dataset" field, except "variableCount", "variableOrder"
+        #   and (sometimes) "rowCount" move it to the top level
         #
-        variable_count = None
         if 'dataset' in profile_data:
-            if 'variableCount' in profile_data['dataset']:
-                variable_count = profile_data['dataset']['variableCount']
-                del profile_data['dataset']
-        if variable_count:
-            profile_data['dataset'] = {}
-            profile_data['dataset']['variableCount'] = variable_count
+            features_to_keep = [ "variableCount", "variableOrder"]
+            if save_row_count is True:
+                features_to_keep.append('rowCount')
+            features_to_del = []
+
+            for key in profile_data['dataset']:
+                if not key in features_to_keep:
+                    features_to_del.append(key)
+
+            for del_key in features_to_del:
+                del profile_data['dataset'][del_key]
 
         # Prune variables, keeping only these:
         #
