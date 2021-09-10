@@ -63,8 +63,8 @@ Deployment currently requires the building of two Docker images:
     docker push ghcr.io/opendp/dpcreator/app:YYYY-MMDD   
    
     # Example:
-    # docker build -t ghcr.io/opendp/dpcreator/app:2021-0906 .
-    # docker push ghcr.io/opendp/dpcreator/app:2021-0906  
+    # docker build -t ghcr.io/opendp/dpcreator/app:2021-0910 .
+    # docker push ghcr.io/opendp/dpcreator/app:2021-0910  
     ```
 
 ### (B) DPCreator nginx
@@ -82,8 +82,8 @@ Deployment currently requires the building of two Docker images:
     docker push ghcr.io/opendp/dpcreator/nginx:YYYY-MMDD
   
     # Example:
-    # docker build -t ghcr.io/opendp/dpcreator/nginx:2021-0906 .
-    # docker push ghcr.io/opendp/dpcreator/nginx:2021-0906
+    # docker build -t ghcr.io/opendp/dpcreator/nginx:2021-0910 .
+    # docker push ghcr.io/opendp/dpcreator/nginx:2021-0910
 
     ```
 
