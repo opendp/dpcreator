@@ -90,7 +90,9 @@ import EditNoiseParamsConfirmationDialog
 import NoiseParams from "../../components/Wizard/Steps/CreateStatistics/NoiseParams.vue";
 import StatisticsTable from "../../components/Wizard/Steps/CreateStatistics/StatisticsTable.vue";
 import statsInformation from "@/data/statsInformation";
+import release from "@/api/release";
 import {mapGetters, mapState} from "vuex";
+
 export default {
   name: "CreateStatistics",
   components: {
@@ -231,18 +233,26 @@ export default {
         }
       }
       this.redistributeValues()
-      this.saveUserInput()
-      this.close();
+      this.validateStatistics().then((validation) => {
+        if (validation.valid === true) {
+          this.saveUserInput()
+          this.close();
+        } else {
+          // show validation error message on AddStatistics dialog
+        }
+      })
     },
     redistributeValues() {
-      if (statsInformation.statisticsUseDelta(this.statistics) && this.delta == 0) {
-        this.delta = this.getDepositorSetupInfo.defaultDelta
+      if (this.statistics) {
+        if (statsInformation.statisticsUseDelta(this.statistics) && this.delta == 0) {
+          this.delta = this.getDepositorSetupInfo.defaultDelta
+        }
+        if (!statsInformation.statisticsUseDelta(this.statistics)) {
+          this.delta = 0
+        }
+        this.redistributeValue(this.epsilon, 'epsilon')
+        this.redistributeValue(this.delta, 'delta')
       }
-      if (!statsInformation.statisticsUseDelta(this.statistics)) {
-        this.delta = 0
-      }
-      this.redistributeValue(this.epsilon, 'epsilon')
-      this.redistributeValue(this.delta, 'delta')
     },
     redistributeValue(totalValue, property) {
       // for all statistics that use this value -
@@ -289,6 +299,16 @@ export default {
         item.epsilon = +item.epsilon
         item.delta = +item.delta
       })
+      let props = {
+        epsilon: this.epsilon,
+        delta: this.delta,
+        confidenceInterval: this.confidenceInterval
+      }
+      const payload = {objectId: this.getDepositorSetupInfo.objectId, props: props}
+      this.$store.dispatch('dataset/updateDepositorSetupInfo',
+          payload)
+      this.$store.dispatch('dataset/updateDPStatistics', this.statistics)
+      /*
       // Save the epsilon and delta,
       // so the DepositorSetupInfo is completed
       // before creating an AnalysisPlan
@@ -308,7 +328,7 @@ export default {
         } else {
           this.$store.dispatch('dataset/updateDPStatistics', this.statistics)
         }
-      })
+      })*/
     },
 
     editEpsilon(item) {
@@ -350,7 +370,8 @@ export default {
     resetEditedItem() {
       this.editedItem = Object.assign({}, this.defaultItem);
       this.editedIndex = -1;
-    }
+    },
+
   }
 };
 </script>

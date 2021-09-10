@@ -192,6 +192,7 @@ export default {
   }),
   methods: {
     logoutHandler() {
+      console.log('calling logoutHandler')
       this.isLoggedUser = undefined;
       localStorage.removeItem("isLoggedUser");
       this.$router.go();

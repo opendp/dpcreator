@@ -72,7 +72,7 @@ import GenerateDPRelease from "./WizardSteps/GenerateDPRelease.vue";
 import StepperHeader from "../components/Wizard/StepperHeader.vue";
 import WizardNavigationButtons from "../components/Wizard/WizardNavigationButtons.vue";
 import ValidateDataset from "./WizardSteps/ValidateDataset.vue";
-import stepInformation, {depositorSteps} from "@/data/stepInformation";
+import stepInformation, {depositorSteps, STEP_0600_EPSILON_SET} from "@/data/stepInformation";
 
 
 import {mapState, mapGetters} from "vuex";
@@ -127,18 +127,38 @@ export default {
       // the user has come from the 'Continue Workflow' button on the my data page.  So we don't need to go to the
       // next step.
       if (val - oldVal === 1) {
-        const nextStep = stepInformation[this.getDepositorSetupInfo.userStep].nextStep
-        const nextStepProp = {userStep: nextStep}
+        const completedStep = stepInformation[this.getDepositorSetupInfo.userStep].nextStep
+        const completedStepProp = {userStep: completedStep}
         // Update the user step on the DepositorSetup or the Analysis Plan, depending
         // where we are in the Wizard
-        if (depositorSteps.includes(nextStep)) {
-          const payload = {objectId: this.getDepositorSetupInfo.objectId, props: nextStepProp}
-          this.$store.dispatch('dataset/updateDepositorSetupInfo', payload)
+        if (depositorSteps.includes(completedStep)) {
+          const payload = {objectId: this.getDepositorSetupInfo.objectId, props: completedStepProp}
+          this.$store.dispatch('dataset/updateDepositorSetupInfo', payload).then(() => {
+            // if the step that has just been completed is  STEP_0600_EPSILON_SET, then update the depositorsetupInfo
+            // with epsilon and delta, and create the AnalysisPlan before continuing on to the
+            // Create Statistics wizard step
+            if (completedStep === STEP_0600_EPSILON_SET) {
+              // Save the epsilon and delta,
+              // so the DepositorSetupInfo is completed
+              // before creating an AnalysisPlan
+              let props = {
+                epsilon: this.getDepositorSetupInfo.defaultEpsilon,
+                delta: this.getDepositorSetupInfo.defaultDelta,
+                confidenceInterval: .01
+              }
+              const payload = {objectId: this.getDepositorSetupInfo.objectId, props: props}
+              this.$store.dispatch('dataset/updateDepositorSetupInfo', payload)
+                  .then(() => {
+                    this.$store.dispatch('dataset/createAnalysisPlan', this.datasetInfo.objectId)
+                  })
+            }
+          })
 
         } else {
-          const payload = {objectId: this.analysisPlan.objectId, props: nextStepProp}
+          const payload = {objectId: this.analysisPlan.objectId, props: completedStepProp}
           this.$store.dispatch('dataset/updateAnalysisPlan', payload)
         }
+
       }
       if (val == 3) {
         this.$refs.createStatComponent.initializeForm();

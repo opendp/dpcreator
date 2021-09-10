@@ -173,6 +173,7 @@
 <script>
 import Button from "../../../DesignSystem/Button.vue";
 import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
+import release from "@/api/release";
 
 export default {
   name: "AddStatisticDialog",
@@ -216,6 +217,7 @@ export default {
     singleVariableStatistics: ["Mean", "Histogram", "Quantile"],
     selectedStatistic: null,
     validationError: false,
+    releaseValidateMsg: null
     editedItemDialog: {
       statistic: "",
       variable: [],
@@ -235,15 +237,17 @@ export default {
   }),
   methods: {
     save() {
-      if (this.validate()) {
-        this.validationError = false
-        this.$emit("saveConfirmed", this.editedItemDialog)
-      } else {
-        this.validationError = true
-      }
+      this.validate().then((valid) => {
+        if (valid) {
+          this.validationError = false
+          this.$emit("saveConfirmed", this.editedItemDialog)
+        } else {
+          this.validationError = true
+        }
+      })
     },
-    validate() {
-      let valid = true
+    checkForDuplicates() {
+      let duplicates = false
       if (this.statistics) {
         this.editedItemDialog.variable.forEach((variable) => {
           // Check for duplicate in the current statistics list
@@ -252,14 +256,44 @@ export default {
                 && stat.variable === variable
                 && stat.missingValuesHandling === this.editedItemDialog.missingValuesHandling
                 && stat.fixedValue === this.editedItemDialog.fixedValue) {
-              valid = false
+              duplicates = true
             }
           })
         })
       }
-      return valid
+      return duplicates
+    },
+    validate() {
+      if (this.checkForDuplicates()) {
+        // if there are duplicates in the list, then
+        // no need to check release validation, just return false
+        return new Promise(function (resolve, reject) {
+          resolve(false);
+        });
+      } else {
+        // call release validator
+        return this.validateStatistics()
+      }
 
     },
+
+    validateStatistics() {
+      //TODO: instead of using this.statistics, create a local list that
+      // includes the statistic the user wants to add to the table
+      release.validate(this.analysisPlan.id, this.statistics)
+          .then((resp) => {
+            this.releaseValidateMsg = resp.valid
+            let valid = true
+            resp.valid.forEach((item) => {
+              if (item.valid !== true) {
+                valid = false;
+              }
+            })
+            // change response value to simple true/false
+            resp = valid
+          })
+    },
+
     close() {
       this.validationError = false
       this.$emit("close");
