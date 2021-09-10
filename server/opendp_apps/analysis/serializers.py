@@ -22,7 +22,6 @@ class AnalysisPlanObjectIdSerializer(serializers.Serializer):
 
         return value
 
-
     def get_object_id(self):
         """Return the object_id, this will be a str or None"""
         assert self.is_valid(), "Do not call this method before checking \".is_valid()\""
@@ -110,15 +109,17 @@ class ReleaseInfoSerializer(serializers.ModelSerializer):
         stats_valid = []
         for dp_stat in self.validated_data['dp_statistics']:
             statistic = dp_stat['statistic']
-            print(dp_stat)
             label = self._camel_to_snake(dp_stat['label'])
-            print(label)
             variable_info = analysis_plan.variable_info[label]
-            print(variable_info)
             index = 0  # TODO: column headers.... (variable_info['index'])
-            lower = variable_info['min'] if variable_info['min'] else 0.
-            upper = variable_info['max'] if variable_info['max'] else 100.
-            n = 1000  # TODO: where to get this from? variable_info['n']?
+            lower = 0.  # variable_info.get('min')
+            upper = 1000.  # variable_info.get('max')
+            # if not lower:
+            #     raise Exception("Lower must be defined")
+            # if not upper:
+            #     raise Exception("Upper must be defined")
+            # n = analysis_plan.data_set.data_profile.get('dataset', {}).get('row_count', 1000)
+            n = 1000
             impute = dp_stat['missing_values_handling'] != 'drop'
             impute_value = float(dp_stat['fixed_value'])
             epsilon = float(dp_stat['epsilon'])
