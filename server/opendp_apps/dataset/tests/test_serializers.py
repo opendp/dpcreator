@@ -11,7 +11,6 @@ from opendp_apps.model_helpers.msg_util import msgt
 
 
 class TestReleaseInfoSerializer(TestCase):
-
     fixtures = ['test_dataset_data_001.json', ]
 
     def setUp(self):
@@ -23,27 +22,29 @@ class TestReleaseInfoSerializer(TestCase):
         self.client.force_login(self.user_obj)
 
         self.request = {
-            "analysis_plan_id": 0,
-            "dp_statistics": [{
-                 "error": "",
-                 "label": "EyeHeight",
-                 "locked": False,
-                 "epsilon": 0.0625,
-                 "variable": "eyeHeight",
-                 "statistic": "mean",
-                 "fixed_value": "5",
-                 "handle_as_fixed": True,
-                 "missing_values_handling": "insert_fixed"
-                 }]
-         }
+            "analysis_plan_id": "98f5ec0d-33ae-45e2-af0e-125276376ef2",
+            "dp_statistics": [
+                {
+                    "statistic": "mean",
+                    "variable": "eye_height",
+                    "epsilon": 1,
+                    "delta": 0,
+                    "error": "",
+                    "missing_values_handling": "insert_fixed",
+                    "handle_as_fixed": False,
+                    "fixed_value": "5.0",
+                    "locked": False,
+                    "label": "EyeHeight"
+                }
+            ]
+        }
 
     def test_save(self):
         msgt(self.test_save.__doc__)
 
         dataset_info = DataSetInfo.objects.get(id=4)
 
-        resp = AnalysisPlanUtil.create_plan(dataset_info.object_id,
-                                            self.user_obj)
+        AnalysisPlanUtil.create_plan(dataset_info.object_id, self.user_obj)
         analysis_plan = AnalysisPlan.objects.first()
         self.request['analysis_plan_id'] = analysis_plan.object_id
         serializer = ReleaseInfoSerializer(data=self.request)

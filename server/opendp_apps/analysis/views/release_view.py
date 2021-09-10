@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 
 from opendp_apps.analysis.serializers import AnalysisPlanSerializer, \
@@ -16,7 +16,7 @@ class ReleaseView(viewsets.ViewSet):
         """
         release_info_serializer = ReleaseInfoSerializer(data=request.data)
         if not release_info_serializer.is_valid():
-            raise Exception("Invalid DPStatistics objects")
+            raise Exception(f"Invalid DPStatistics objects: {release_info_serializer.errors}")
         stats_valid = release_info_serializer.save()
-        return Response({'valid': stats_valid})
+        return Response({'valid': stats_valid}, status=status.HTTP_201_CREATED)
 

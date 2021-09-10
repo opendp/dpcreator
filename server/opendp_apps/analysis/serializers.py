@@ -112,12 +112,12 @@ class ReleaseInfoSerializer(serializers.ModelSerializer):
             label = self._camel_to_snake(dp_stat['label'])
             variable_info = analysis_plan.variable_info[label]
             index = 0  # TODO: column headers.... (variable_info['index'])
-            lower = 0.  # variable_info.get('min')
-            upper = 1000.  # variable_info.get('max')
-            # if not lower:
-            #     raise Exception("Lower must be defined")
-            # if not upper:
-            #     raise Exception("Upper must be defined")
+            lower = variable_info.get('min')
+            upper = variable_info.get('max')
+            if lower is None:
+                raise Exception(f"Lower must be defined: {variable_info}")
+            if upper is None:
+                raise Exception(f"Upper must be defined: {variable_info}")
             # n = analysis_plan.data_set.data_profile.get('dataset', {}).get('row_count', 1000)
             n = 1000
             impute = dp_stat['missing_values_handling'] != 'drop'
