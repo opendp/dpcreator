@@ -6,11 +6,12 @@ from opendp_apps.profiler import static_vals as pstatic
 
 
 @celery_app.task(ignore_result=True)
-def run_profile_by_filepath(filepath, dataset_object_id=None):
+def run_profile_by_filepath(filepath, dataset_object_id=None, **kwargs):
     """Run the profiler using a valid filepath"""
     params = {pstatic.KEY_DATASET_IS_FILEPATH: True}
 
     params[pstatic.KEY_DATASET_OBJECT_ID] = dataset_object_id
+    params[pstatic.KEY_SAVE_ROW_COUNT] = kwargs.get(pstatic.KEY_SAVE_ROW_COUNT, True)
 
     ph = ProfileHandler(dataset_pointer=filepath, **params)
 
@@ -21,7 +22,9 @@ def run_profile_by_filepath(filepath, dataset_object_id=None):
 def run_profile_by_filefield(dataset_info_object_id, **kwargs):
     """Run the profiler using a valid filepath"""
     params = {pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD: True,
-              pstatic.KEY_DATASET_OBJECT_ID: dataset_info_object_id}
+              pstatic.KEY_DATASET_OBJECT_ID: dataset_info_object_id,
+              pstatic.KEY_SAVE_ROW_COUNT: kwargs.get(pstatic.KEY_SAVE_ROW_COUNT, True)
+              }
 
     try:
         ds_info = DataSetInfo.objects.get(object_id=dataset_info_object_id)

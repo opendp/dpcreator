@@ -4,6 +4,7 @@ CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
 import json
+from unittest import skip
 
 from django.test import TestCase #Client, tag
 from django.conf import settings
@@ -12,6 +13,8 @@ from django.core.files import File
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
 from opendp_apps.profiler.profile_handler import ProfileHandler
+from opendp_apps.profiler import static_vals as pstatic
+
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.analysis.models import DepositorSetupInfo
 from django.core.serializers.json import DjangoJSONEncoder
@@ -35,7 +38,7 @@ class ProfilerTest(TestCase):
         self.mock_params = ManifestTestParams.objects.filter(use_mock_dv_api=True).first()
         """
 
-    def profile_good_file(self, filename, num_features_orig, num_features_profile, **kwargs):
+    def profile_good_file(self, filename, num_features_orig, num_features_profile, num_rows, **kwargs):
         """Used by multiple tests...."""
 
         # File to profile
@@ -45,7 +48,8 @@ class ProfilerTest(TestCase):
 
         # Run profiler
         #
-        profiler = profiler_tasks.run_profile_by_filepath(filepath1)
+        save_row_count = kwargs.get(pstatic.KEY_SAVE_ROW_COUNT, True)
+        profiler = profiler_tasks.run_profile_by_filepath(filepath1, **kwargs)
 
         # Shouldn't have errors
         if profiler.has_error():
@@ -65,26 +69,43 @@ class ProfilerTest(TestCase):
 
         pvars = profiler.profile_variables
         self.assertTrue('variables' in info)
-        self.assertTrue(len(pvars['variables']) <= len(settings.PROFILER_DEFAULT_COLUMN_INDICES))
+        self.assertTrue(len(pvars['variables']) <= settings.PROFILER_COLUMN_LIMIT)
         self.assertEqual(len(pvars['variables']), info['dataset']['variableCount'])
 
+        self.assertEqual(info['dataset']['variableCount'],
+                         len(info['dataset']['variableOrder']))
 
+        print('rows! ->', info['dataset']['rowCount'])
 
+        if save_row_count is True:
+            self.assertTrue(info['dataset']['rowCount'] == num_rows)
+        else:
+            self.assertTrue(info['dataset']['rowCount'] == None)
+
+        # make the sure the "dataset.variableOrder" column names are in the "variables" dict
+        #
+        for idx, colname in info['dataset']['variableOrder']:
+            self.assertTrue(colname in info['variables'])
+
+    #@skip
     def test_005_profile_good_files(self):
         """(05) Profile several good files"""
         msgt(self.test_005_profile_good_files.__doc__)
 
         msgt('-- Profile gking-crisis.tab')
         # https://dataverse.harvard.edu/file.xhtml?persistentId=doi:10.7910/DVN/OLD7MB/ZI4N3J&version=4.2
-        self.profile_good_file('gking-crisis.tab', 19, 19)
+        self.profile_good_file('gking-crisis.tab', 19, 19, 3345)
 
         msgt('-- Profile voter_validation_lwd.csv')
         # https://github.com/privacytoolsproject/PSI-Service/blob/develop/data/voter_validation_lwd.csv
-        self.profile_good_file('voter_validation_lwd.csv', 35, 20)
+        self.profile_good_file('voter_validation_lwd.csv', 35, 20, 20771)
 
         msgt('-- Profile teacher_climate_survey_lwd.csv')
         # https://github.com/privacytoolsproject/PSI-Service/blob/develop/data/teacher_climate_survey_lwd.csv
-        self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 20)
+        self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 20, 1500)
+
+        # Don't save row count
+        self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 20, 1500, **dict(save_row_count=False))
 
 
     def test_010_profile_good_file(self):
@@ -127,7 +148,7 @@ class ProfilerTest(TestCase):
 
         print('-- Profiler reads only first 20 features')
         self.assertTrue('variables' in info)
-        self.assertEqual(len(info['variables'].keys()), len(settings.PROFILER_DEFAULT_COLUMN_INDICES))
+        self.assertEqual(len(info['variables'].keys()), settings.PROFILER_COLUMN_LIMIT)
 
         print('-- Profiler output is the same as the output saved to the DataSetInfo object')
         profile_json_str2 = json.dumps(info, cls=DjangoJSONEncoder, indent=4)
@@ -135,8 +156,18 @@ class ProfilerTest(TestCase):
         print(profile_json_str2)
 
         self.assertEqual(dsi.profile_variables['dataset']['variableCount'],
-                         len(settings.PROFILER_DEFAULT_COLUMN_INDICES))
+                         settings.PROFILER_COLUMN_LIMIT)
 
+        self.assertEqual(dsi.profile_variables['dataset']['variableCount'],
+                         len(dsi.profile_variables['dataset']['variableOrder']))
+
+        # make the sure the "dataset.variableOrder" column names are in the "variables" dict
+        #
+        for idx, colname in dsi.profile_variables['dataset']['variableOrder']:
+            self.assertTrue(colname in dsi.profile_variables['variables'])
+
+
+    #@skip
     def test_020_bad_files(self):
         """(20) Test bad file type"""
         msgt(self.test_020_bad_files.__doc__)
@@ -170,6 +201,7 @@ class ProfilerTest(TestCase):
         self.assertTrue(profiler.get_err_msg().find('EmptyDataError') > -1)
 
 
+    #@skip
     def test_30_filefield_empty(self):
         """(30) Test with empty file field"""
         msgt(self.test_30_filefield_empty.__doc__)
@@ -194,6 +226,7 @@ class ProfilerTest(TestCase):
                          DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
 
 
+    #@skip
     def test_40_filefield_correct(self):
         """(40) Test using file file with legit file"""
         msgt(self.test_40_filefield_correct.__doc__)
@@ -230,14 +263,22 @@ class ProfilerTest(TestCase):
 
         print('-- Profiler reads only first 20 features')
         self.assertTrue('variables' in info)
-        self.assertEqual(len(info['variables'].keys()), len(settings.PROFILER_DEFAULT_COLUMN_INDICES))
+        self.assertEqual(len(info['variables'].keys()), settings.PROFILER_COLUMN_LIMIT)
 
         self.assertEqual(dsi2.depositor_setup_info.user_step, \
                          DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
 
         #print('dsi2.profile_variables', dsi2.profile_variables)
         self.assertEqual(len(dsi2.profile_variables['variables'].keys()),
-                         len(settings.PROFILER_DEFAULT_COLUMN_INDICES))
+                         settings.PROFILER_COLUMN_LIMIT)
 
         self.assertEqual(dsi2.profile_variables['dataset']['variableCount'],
-                         len(settings.PROFILER_DEFAULT_COLUMN_INDICES))
+                         settings.PROFILER_COLUMN_LIMIT)
+
+        self.assertEqual(dsi2.profile_variables['dataset']['variableCount'],
+                         len(dsi2.profile_variables['dataset']['variableOrder']))
+
+        # make the sure the "dataset.variableOrder" column names are in the "variables" dict
+        #
+        for idx, colname in dsi2.profile_variables['dataset']['variableOrder']:
+            self.assertTrue(colname in dsi2.profile_variables['variables'])
