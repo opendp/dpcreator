@@ -59,7 +59,7 @@ class TestDataSetSerializer(BaseEndpointTest):
         depositor_setup_info.pop('created')
         depositor_setup_info.pop('updated')
         depositor_setup_info.pop('creator')
-        self.assertEqual(depositor_setup_info, {'id': 2,
+        self.assertEqual(depositor_setup_info, {'id': 5,
                                                 'dataset_questions': None,
                                                 'epsilon_questions': None,
                                                 'default_epsilon': None,
