@@ -16,23 +16,25 @@ export default {
         })
         dpStatistics = snakecaseKeys(dpStatistics, {deep: true})
         console.log(JSON.stringify(dpStatistics));
-        /*
-            comment out until this is ready
-             return session.post('/api/release/',
+
+
+        return session.post('/api/release/',
                  {analysis_plan_id: analysisPlanId, dp_statistics: dpStatistics})
                  .then(resp => camelcaseKeys(resp.data, {deep: true}))
 
-         */
+
         // Return an object with valid:true for each statistic, to mimic the API
-        let resp = {}
-        resp['valid'] = []
-        dpStatistics.forEach((item) => {
-            resp['valid'].push({"valid": true})
-        })
-        const myPromise = new Promise((resolve, reject) => {
-            resolve(resp);
-        });
-        return myPromise
+        /*    let resp = {}
+            resp['valid'] = []
+            dpStatistics.forEach((item) => {
+                resp['valid'].push({"valid": true})
+            })
+            const myPromise = new Promise((resolve, reject) => {
+                resolve(resp);
+            });
+            return myPromise
+            */
+
     },
 
 };

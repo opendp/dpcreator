@@ -174,12 +174,14 @@
 import Button from "../../../DesignSystem/Button.vue";
 import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
 import release from "@/api/release";
+import {mapState} from "vuex";
 
 export default {
   name: "AddStatisticDialog",
   components: {Button, ColoredBorderAlert},
   props: ["formTitle", "dialog", "editedIndex", "editedItem", "variableInfo", "statistics"],
   computed: {
+    ...mapState('dataset', ['analysisPlan']),
     isButtonDisabled: function () {
       return (
           !this.editedItemDialog.statistic ||
@@ -271,6 +273,8 @@ export default {
           resolve(false);
         });
       } else {
+        // Test - call release.validate, but don't use the results yet
+        this.validateStatistics()
         return new Promise(function (resolve, reject) {
           resolve(true);
         });
@@ -283,8 +287,9 @@ export default {
     validateStatistics() {
       //TODO: instead of using this.statistics, create a local list that
       // includes the statistic the user wants to add to the table
-      release.validate(this.analysisPlan.id, this.statistics)
+      release.validate(this.analysisPlan.objectId, this.statistics)
           .then((resp) => {
+            console.log('validate response: ' + JSON.stringify(resp))
             this.releaseValidateMsg = resp.valid
             let valid = true
             resp.valid.forEach((item) => {
