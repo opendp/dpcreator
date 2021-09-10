@@ -76,19 +76,24 @@ class DPMeanLaPlace:
             return None
 
         try:
+            bounds = (lower, upper)
             preprocessor = (
                 # Convert data into Vec<Vec<String>>
                     make_split_dataframe(separator=",", col_names=col_names) >>
                     # Selects a column of df, Vec<str>
-                    make_select_column(key=index, T=str) >>
+                    make_select_column(key=index, TOA=str) >>
                     # Cast the column as Vec<Optional<Float>>
-                    make_cast(TI=str, TO=float) >>
+                    make_cast(TIA=str, TOA=float) >>
                     # Impute missing values to 0 Vec<Float>
                     make_impute_constant(0.) >>
                     # Clamp age values
-                    make_clamp(lower, upper) >>
-                    make_resize_bounded(0., n, lower, upper) >>
-                    make_bounded_mean(lower, upper, n=n, T=float)
+                    make_clamp(bounds) >>
+                    #make_bounded_resize(0., n, lower, upper) >>
+                    make_bounded_resize(n, bounds, 0.) >>
+
+                    make_sized_bounded_mean(n, bounds)
+
+                    #make_bounded_mean(lower, upper, n=n, T=float)
             )
             scale = binary_search(lambda s: check_scale(s, preprocessor, 1, epsilon), (0., 10.))
             preprocessor = preprocessor >> make_base_laplace(scale)
