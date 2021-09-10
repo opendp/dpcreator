@@ -217,7 +217,7 @@ export default {
     singleVariableStatistics: ["Mean", "Histogram", "Quantile"],
     selectedStatistic: null,
     validationError: false,
-    releaseValidateMsg: null
+    releaseValidateMsg: null,
     editedItemDialog: {
       statistic: "",
       variable: [],
