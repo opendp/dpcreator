@@ -203,8 +203,8 @@ create statistics,confirm 4,The level of privacy protection for individuals in t
 generate DP,generate text,"The final step is to submit the statistics and generate the differential privacy release. This will finalize the current
 selections and spend your allocated privacy budget on them.","The final step is to submit the statistics and generate the differential privacy release. This will finalize the currentselections and spend your allocated privacy budget on them."
 generate DP,generate status,"(Include a summary of the statistics being requested/work to be done. The equivalent of reviewing a shopping cart before confirming the order. Note this is missing from the Agile Monkeys files, but is in the Miro file)",
-more information,title,More information!,
-more information,differential privacy title,More about Differential Privacy,
+more information,title,DP Creator Concepts,
+more information,differential privacy title,Differential Privacy,
 more information,differential privacy text,"<p>Differential privacy (DP) provides a mathematically measurable privacy guarantee to individuals by adding a carefully tuned amount of statistical noise to sensitive data. It promises significantly higher privacy protection levels than commonly used disclosure limitation practices like data anonymization.</p>
 
 <p>To learn more about differential privacy, we recommend starting with these two resources:</p>
@@ -223,7 +223,7 @@ more information,registered dataverses text,"<p><a href=""https://dataverse.org/
 <p>The registration process uses Dataverse's <a href=""https://guides.dataverse.org/en/latest/admin/external-tools.html"">external tools framework</a>. Alternately, DP Creator may be installed for a specific Dataverse's installation to conform with an organization's security requirements.</p>
 
 <p>For more information, please <a href=""https://docs.opendp.org/en/stable/contact/index.html"">contact us</a>.</p> ",
-more information,epsilon title,What is epsilon?,
+more information,epsilon title,What is epsilon (&epsilon;)?,
 more information,epsilon text,"<p>An essential component of a differentially private computation is the privacy loss parameter, usually denoted by the Greek letter <b>&epsilon;</b> (epsilon). This parameter determines how much noise is added to the computation. Choosing a value for the privacy loss parameter can be thought of as a tuning knob for balancing privacy and accuracy.</p>
 
 <p>A lower <b>&epsilon;</b> value for corresponds to stronger privacy protection and also a larger decrease in accuracy, whereas a higher value for <b>&epsilon;</b> corresponds to weaker privacy protection and also a smaller decrease in accuracy.</p> 
@@ -236,7 +236,7 @@ more information,epsilon text,"<p>An essential component of a differentially pri
 <p> As a rule of thumb, however, <b>&epsilon;</b> should be thought of as a small number, between approximately 1/100 and 1.</p>
 
 <p><i>(Note: This information has been excerpted from the book chapter <a href=""https://admindatahandbook.mit.edu/book/v1.0/diffpriv.html"" target=""_blank"">Designing Access with Differential Privacy</a>, which also contains illustrative examples.)</i></p> ",
-more information,delta title,What is delta?,
+more information,delta title,What is delta (&delta;)?,
 more information,delta text,"<p>Delta (&delta;) is a second privacy-loss parameter used when calculating some differentially private statistics.</p>  
 
 <p>This parameter  controls the probability that a privacy breach event would happen, and hence should be kept
