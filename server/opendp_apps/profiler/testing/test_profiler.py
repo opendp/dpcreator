@@ -13,6 +13,8 @@ from django.core.files import File
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
 from opendp_apps.profiler.profile_handler import ProfileHandler
+from opendp_apps.profiler import static_vals as pstatic
+
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.analysis.models import DepositorSetupInfo
 from django.core.serializers.json import DjangoJSONEncoder
@@ -36,7 +38,7 @@ class ProfilerTest(TestCase):
         self.mock_params = ManifestTestParams.objects.filter(use_mock_dv_api=True).first()
         """
 
-    def profile_good_file(self, filename, num_features_orig, num_features_profile, **kwargs):
+    def profile_good_file(self, filename, num_features_orig, num_features_profile, num_rows, **kwargs):
         """Used by multiple tests...."""
 
         # File to profile
@@ -46,7 +48,8 @@ class ProfilerTest(TestCase):
 
         # Run profiler
         #
-        profiler = profiler_tasks.run_profile_by_filepath(filepath1)
+        save_row_count = kwargs.get(pstatic.KEY_SAVE_ROW_COUNT, True)
+        profiler = profiler_tasks.run_profile_by_filepath(filepath1, **kwargs)
 
         # Shouldn't have errors
         if profiler.has_error():
@@ -72,6 +75,13 @@ class ProfilerTest(TestCase):
         self.assertEqual(info['dataset']['variableCount'],
                          len(info['dataset']['variableOrder']))
 
+        print('rows! ->', info['dataset']['rowCount'])
+
+        if save_row_count is True:
+            self.assertTrue(info['dataset']['rowCount'] == num_rows)
+        else:
+            self.assertTrue(info['dataset']['rowCount'] == None)
+
         # make the sure the "dataset.variableOrder" column names are in the "variables" dict
         #
         for idx, colname in info['dataset']['variableOrder']:
@@ -84,15 +94,18 @@ class ProfilerTest(TestCase):
 
         msgt('-- Profile gking-crisis.tab')
         # https://dataverse.harvard.edu/file.xhtml?persistentId=doi:10.7910/DVN/OLD7MB/ZI4N3J&version=4.2
-        self.profile_good_file('gking-crisis.tab', 19, 19)
+        self.profile_good_file('gking-crisis.tab', 19, 19, 3345)
 
         msgt('-- Profile voter_validation_lwd.csv')
         # https://github.com/privacytoolsproject/PSI-Service/blob/develop/data/voter_validation_lwd.csv
-        self.profile_good_file('voter_validation_lwd.csv', 35, 20)
+        self.profile_good_file('voter_validation_lwd.csv', 35, 20, 20771)
 
         msgt('-- Profile teacher_climate_survey_lwd.csv')
         # https://github.com/privacytoolsproject/PSI-Service/blob/develop/data/teacher_climate_survey_lwd.csv
-        self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 20)
+        self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 20, 1500)
+
+        # Don't save row count
+        self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 20, 1500, **dict(save_row_count=False))
 
 
     def test_010_profile_good_file(self):

@@ -29,13 +29,20 @@ class ProfileFormatter:
         #
         if 'dataset' in profile_data:
             features_to_keep = [ "variableCount", "variableOrder"]
+            features_to_nullify = []
             if save_row_count is True:
                 features_to_keep.append('rowCount')
+            else:
+                features_to_nullify.append('rowCount')
+
             features_to_del = []
 
             for key in profile_data['dataset']:
                 if not key in features_to_keep:
-                    features_to_del.append(key)
+                    if key in features_to_nullify:
+                        profile_data['dataset'][key] = None
+                    else:
+                        features_to_del.append(key)
 
             for del_key in features_to_del:
                 del profile_data['dataset'][del_key]

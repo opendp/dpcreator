@@ -52,7 +52,7 @@ class ProfileHandler(BasicErrCheck):
         # -------------------------------------
         # Indices of columns to profile. Default is the 1st 20 indices
         self.max_num_features = kwargs.get('max_num_features', settings.PROFILER_COLUMN_LIMIT)
-        self.save_row_count = kwargs.get('save_row_count', True)    # set to False depending on epsilon question
+        self.save_row_count = kwargs.get(pstatic.KEY_SAVE_ROW_COUNT, True)    # set to False depending on epsilon question
 
         # If a DataSetInfo object is specified, the profile will be saved to the object
         self.dataset_info_object_id = kwargs.get(pstatic.KEY_DATASET_OBJECT_ID)
@@ -328,7 +328,7 @@ class ProfileHandler(BasicErrCheck):
             return
 
         self.data_profile = prunner.get_final_dict()
-        print('variable_order', self.variable_order)
+        #print('variable_order', self.variable_order)
         self.data_profile['dataset']['variableOrder'] = self.variable_order
 
         self.prune_profile()
