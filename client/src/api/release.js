@@ -7,10 +7,16 @@ const snakecaseKeys = require('snakecase-keys');
 export default {
 
     validate(analysisPlanId, dpStatistics) {
-        // convert handle missing values
+        // TODO: Update AddStatisticDialog so that it has separate Label/values to handle this
         dpStatistics.forEach((item) => {
             if (item['missingValuesHandling'] === 'Drop them') {
                 item['missingValuesHandling'] = 'drop'
+            }
+            if (item['missingValuesHandling'] === 'Insert random value') {
+                item['missingValuesHandling'] = 'insert_random'
+            }
+            if (item['missingValuesHandling'] === 'Insert fixed value') {
+                item['missingValuesHandling'] = 'insert_fixed'
             }
             item['statistic'] = item['statistic'].toLowerCase()
         })

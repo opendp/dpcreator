@@ -251,19 +251,34 @@ export default {
     checkForDuplicates() {
       let duplicates = false
       if (this.statistics) {
-        this.editedItemDialog.variable.forEach((variable) => {
-          // Check for duplicate in the current statistics list
-          this.statistics.forEach((stat) => {
-            if (stat.statistic === this.editedItemDialog.statistic
-                && stat.variable === variable
-                && stat.missingValuesHandling === this.editedItemDialog.missingValuesHandling
-                && stat.fixedValue === this.editedItemDialog.fixedValue) {
+        // "variable" property may be a string (edit mode)
+        // or an array of strings (create mode)
+        if (typeof this.editedItemDialog.variable === 'string' ||
+            this.editedItemDialog.variable instanceof String) {
+          duplicates = this.isMatchingStatistic(this.editedItemDialog.variable)
+        } else {
+          this.editedItemDialog.variable.forEach((variable) => {
+            // Check for duplicate in the current statistics list
+            if (this.isMatchingStatistic(variable)) {
               duplicates = true
             }
           })
-        })
+
+        }
       }
       return duplicates
+    },
+    isMatchingStatistic(variable) {
+      let isMatching = false
+      this.statistics.forEach((stat) => {
+        if (stat.statistic === this.editedItemDialog.statistic
+            && stat.variable === variable
+            && stat.missingValuesHandling === this.editedItemDialog.missingValuesHandling
+            && stat.fixedValue === this.editedItemDialog.fixedValue) {
+          isMatching = true
+        }
+      })
+      return isMatching
     },
     validate() {
       if (this.checkForDuplicates()) {

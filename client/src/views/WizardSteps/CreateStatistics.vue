@@ -304,27 +304,7 @@ export default {
       this.$store.dispatch('dataset/updateDepositorSetupInfo',
           payload)
       this.$store.dispatch('dataset/updateDPStatistics', this.statistics)
-      /*
-      // Save the epsilon and delta,
-      // so the DepositorSetupInfo is completed
-      // before creating an AnalysisPlan
-      let props = {
-        epsilon: this.epsilon,
-        delta: this.delta,
-        confidenceInterval: this.confidenceInterval
-      }
-      const payload = {objectId: this.getDepositorSetupInfo.objectId, props: props}
-      this.$store.dispatch('dataset/updateDepositorSetupInfo',
-          payload).then(() => {
-        if (this.analysisPlan === null) {
-          this.$store.dispatch('dataset/createAnalysisPlan', this.datasetInfo.objectId)
-              .then(() => {
-                this.$store.dispatch('dataset/updateDPStatistics', this.statistics)
-              })
-        } else {
-          this.$store.dispatch('dataset/updateDPStatistics', this.statistics)
-        }
-      })*/
+
     },
 
     editEpsilon(item) {
