@@ -58,7 +58,6 @@
             :disabled="radioBestDescribesShouldBeDisabled"
             v-model="radioBestDescribes"
             class="pl-2"
-            v-on:change="saveUserInput"
         >
           <RadioItem
               label="Public information."
@@ -324,12 +323,14 @@ export default {
         defaultDelta: delta,
       }
       const payload = {objectId: this.getDepositorSetupInfo.objectId, props: props}
-      this.$store.dispatch('dataset/updateDepositorSetupInfo',
+      return this.$store.dispatch('dataset/updateDepositorSetupInfo',
           payload)
     },
     handleRadioBestDescribes: function (option) {
       console.log('updating epsilon/delta for radioBestDescribes = ' + option)
-      this.updateEpsilonDelta(option)
+      this.updateEpsilonDelta(option).then(() => {
+        this.saveUserInput()
+      })
     },
     handleInvalidDataset: function (invalidOption) {
       this.optionToUnset = invalidOption;
