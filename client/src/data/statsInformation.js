@@ -57,7 +57,7 @@ export default {
             // Assign value shares and convert everything back from Decimal to Number
             // before saving
             statistics.forEach((item) => {
-                if (statsInformation.statisticUsesValue(property, item.statistic)) {
+                if (this.statisticUsesValue(property, item.statistic)) {
                     if (!item.locked) {
                         item[property] = valueShare.toNumber()
                     } else {

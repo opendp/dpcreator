@@ -174,14 +174,16 @@
 import Button from "../../../DesignSystem/Button.vue";
 import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
 import release from "@/api/release";
-import {mapState} from "vuex";
+import {mapState, mapGetters} from "vuex";
+import statsInformation from "@/data/statsInformation";
 
 export default {
   name: "AddStatisticDialog",
   components: {Button, ColoredBorderAlert},
   props: ["formTitle", "dialog", "editedIndex", "editedItem", "variableInfo", "statistics"],
   computed: {
-    ...mapState('dataset', ['analysisPlan']),
+    ...mapState('dataset', ['analysisPlan', "datasetInfo"]),
+    ...mapGetters('dataset', ['getDepositorSetupInfo']),
     isButtonDisabled: function () {
       return (
           !this.editedItemDialog.statistic ||
@@ -293,16 +295,28 @@ export default {
         return new Promise(function (resolve, reject) {
           resolve(true);
         });
-        // call release validator
-        //  return this.validateStatistics()
+
       }
 
     },
 
     validateStatistics() {
-      //TODO: instead of using this.statistics, create a local list that
-      // includes the statistic the user wants to add to the table
-      release.validate(this.analysisPlan.objectId, this.statistics)
+      // create a local list that
+      // includes the statistic the user wants to add or edit
+      let tempStats = JSON.parse(JSON.stringify(this.statistics))
+      if (this.editedIndex > -1) {
+        tempStats[this.editedIndex] = this.editedItemDialog
+      } else {
+        this.editedItemDialog.variable.forEach((variable) => {
+          const label = variable
+          tempStats.push(
+              Object.assign({}, this.editedItemDialog, {variable}, {label})
+          );
+        })
+      }
+      statsInformation.redistributeValue(this.getDepositorSetupInfo.epsilon, 'epsilon', tempStats)
+      statsInformation.redistributeValue(this.getDepositorSetupInfo.delta, 'delta', tempStats)
+      release.validate(this.analysisPlan.objectId, tempStats)
           .then((resp) => {
             console.log('validate response: ' + JSON.stringify(resp))
             this.releaseValidateMsg = resp.valid
