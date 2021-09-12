@@ -91,7 +91,20 @@
 
         <ColoredBorderAlert type="warning" v-if="validationError">
           <template v-slot:content>
-            Statistic already exists on the statistics table.
+
+            <ul v-if="errorCount > 1">
+              <li v-if="item.message" v-for="item in validationErrorMsg" :key="item.message">
+                {{ item.message }}
+              </li>
+            </ul>
+            <div v-if="errorCount==1" v-for="item in validationErrorMsg" :key="item.message">
+              {{ item.message }}
+            </div>
+            <!--v-list-item v-for="item in validationErrorMsg">
+              <v-list-item-content>
+               {{ item.message }}
+              </v-list-item-content>
+            </v-list-item-->
           </template>
         </ColoredBorderAlert>
 
@@ -184,6 +197,17 @@ export default {
   computed: {
     ...mapState('dataset', ['analysisPlan', "datasetInfo"]),
     ...mapGetters('dataset', ['getDepositorSetupInfo']),
+    errorCount: function () {
+      let count = 0;
+      if (this.validationErrorMsg) {
+        this.validationErrorMsg.forEach((item) => {
+          if (item.message) {
+            count++
+          }
+        })
+      }
+      return count
+    },
     isButtonDisabled: function () {
       return (
           !this.editedItemDialog.statistic ||
@@ -221,7 +245,7 @@ export default {
     singleVariableStatistics: ["Mean", "Histogram", "Quantile"],
     selectedStatistic: null,
     validationError: false,
-    releaseValidateMsg: null,
+    validationErrorMsg: null,
     editedItemDialog: {
       statistic: "",
       variable: [],
@@ -249,6 +273,19 @@ export default {
           this.validationError = true
         }
       })
+    },
+    validate() {
+      if (this.checkForDuplicates()) {
+        // if there are duplicates in the list, then
+        // no need to check release validation, just return false
+        // Use the same format for the error message as the release validation
+        this.validationErrorMsg = [{"valid": false, "message": "Statistic already exists on the statistics table."}]
+        return new Promise(function (resolve, reject) {
+          resolve(false);
+        });
+      } else {
+        return this.validateStatistics()
+      }
     },
     checkForDuplicates() {
       let duplicates = false
@@ -282,23 +319,6 @@ export default {
       })
       return isMatching
     },
-    validate() {
-      if (this.checkForDuplicates()) {
-        // if there are duplicates in the list, then
-        // no need to check release validation, just return false
-        return new Promise(function (resolve, reject) {
-          resolve(false);
-        });
-      } else {
-        // Test - call release.validate, but don't use the results yet
-        this.validateStatistics()
-        return new Promise(function (resolve, reject) {
-          resolve(true);
-        });
-
-      }
-
-    },
 
     validateStatistics() {
       // create a local list that
@@ -316,23 +336,27 @@ export default {
       }
       statsInformation.redistributeValue(this.getDepositorSetupInfo.epsilon, 'epsilon', tempStats)
       statsInformation.redistributeValue(this.getDepositorSetupInfo.delta, 'delta', tempStats)
-      release.validate(this.analysisPlan.objectId, tempStats)
+      return release.validate(this.analysisPlan.objectId, tempStats)
           .then((resp) => {
             console.log('validate response: ' + JSON.stringify(resp))
-            this.releaseValidateMsg = resp.valid
+            this.validationErrorMsg = resp.valid
             let valid = true
             resp.valid.forEach((item) => {
               if (item.valid !== true) {
                 valid = false;
               }
             })
-            // change response value to simple true/false
-            resp = valid
+            return valid
+          })
+          .catch((error) => {
+            this.validationErrorMsg = [{"valid": false, "message": error}]
+            return false
           })
     },
 
     close() {
       this.validationError = false
+      this.validationErrorMsg = ""
       this.$emit("close");
     },
     updateSelectedVariable(variable, index) {
