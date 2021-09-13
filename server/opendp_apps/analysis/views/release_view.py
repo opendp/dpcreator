@@ -14,6 +14,7 @@ class ReleaseView(viewsets.ViewSet):
         """
         Run validation for a list of release requests
         """
+        print('>> ReleaseView.create >>>', request.data)
         release_info_serializer = ReleaseValidationSerializer(data=request.data)
         if not release_info_serializer.is_valid():
             raise Exception(f"Invalid DPStatistics objects: {release_info_serializer.errors}")

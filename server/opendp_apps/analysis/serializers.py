@@ -7,7 +7,7 @@ from rest_framework.relations import PrimaryKeyRelatedField
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.tools.dp_mean import dp_mean
-
+from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
 
 class AnalysisPlanObjectIdSerializer(serializers.Serializer):
     """Ensure input is a valid UUID and connected to a valid DataSetInfo object"""
@@ -45,15 +45,25 @@ class AnalysisPlanSerializer(serializers.ModelSerializer):
 
 
 class DPStatisticSerializer(serializers.Serializer):
+    """
+    Serializer used for each statistic sent via the API as JSON
+    Note: Note "complete" validation" isn't done here -- is instead done in the
+    ReleaseValidationSerializer in order to have the possibility of multiple/specific error messages.
+    """
     error = serializers.CharField(allow_blank=True)
     label = serializers.CharField()
     locked = serializers.BooleanField()
     epsilon = serializers.FloatField()
     variable = serializers.CharField()
-    statistic = serializers.ChoiceField(choices=['mean', 'sum', 'count', 'histogram', 'quantile'])
+
+    # e.g. ['mean', 'sum', 'count', 'histogram', 'quantile'] etc.
+    statistic = serializers.ChoiceField(choices=astatic.DP_STATS_CHOICES)
+
     fixed_value = serializers.CharField()
     handle_as_fixed = serializers.BooleanField()
-    missing_values_handling = serializers.ChoiceField(choices=['drop', 'insert_random', 'insert_fixed'])
+
+    # e.g. ['drop', 'insert_random', 'insert_fixed']
+    missing_values_handling = serializers.ChoiceField(choices=astatic.MISSING_VAL_HANDLING_TYPES)
 
 
 class AnalysisPlanPKRelatedField(PrimaryKeyRelatedField):
@@ -122,6 +132,10 @@ class ComputationChainSerializer(serializers.Serializer):
 
 
 class ReleaseValidationSerializer(serializers.ModelSerializer):
+    """
+    The purpose of this serializer is to validate individual statistic specifications--with
+    each specification described by the DPStatisticSerializer
+    """
     dp_statistics = serializers.ListField(child=DPStatisticSerializer())
     analysis_plan_id = serializers.UUIDField()
 
@@ -172,6 +186,25 @@ class ReleaseValidationSerializer(serializers.ModelSerializer):
         :param kwargs:
         :return:
         """
+        analysis_plan_id = self.validated_data['analysis_plan_id']
+        dp_statistics = self.validated_data['dp_statistics']
+
+        # is the user accessible here?!
+        opendp_user = request.user # ??
+
+        validate_util = ValidateReleaseUtil(opendp_user, analysis_plan_id, dp_statistics)
+        if validate_util.has_error():
+            # This is a big error, before evaluating individual statistics
+            #
+            user_msg = validate_util.get_err_msg()
+            # Can you return a 400 here with the error message
+
+        return validate_util.validation_info
+
+        # -------------------------------------------------
+        # Original code below....
+        # -------------------------------------------------
+
         analysis_plan = AnalysisPlan.objects.get(object_id=self.validated_data['analysis_plan_id'])
         stats_valid = []
         for dp_stat in self.validated_data['dp_statistics']:
@@ -187,11 +220,11 @@ class ReleaseValidationSerializer(serializers.ModelSerializer):
                 raise Exception(f"Upper must be defined: {variable_info}")
             # n = analysis_plan.data_set.data_profile.get('dataset', {}).get('row_count', 1000)
             n = 1000
-            impute = dp_stat['missing_values_handling'] != 'drop'
+            impute = dp_stat['missing_values_handling'] != astatic.MISSING_VAL_DROP
             impute_value = float(dp_stat['fixed_value'])
             epsilon = float(dp_stat['epsilon'])
             # Do some validation and append to stats_valid
-            if statistic == 'mean':
+            if statistic == astatic.DP_MEAN:
                 try:
                     # print(index, lower, upper, n, impute_value, dp_stat['epsilon'])
                     # print(list(map(type, (index, lower, upper, n, impute_value, dp_stat['epsilon']))))
@@ -217,3 +250,6 @@ class ReleaseValidationSerializer(serializers.ModelSerializer):
         # super(ReleaseInfoSerializer).save(**kwargs)
         return stats_valid
 
+"""
+Releasing Mean for the variable age. With at least probability 0.95 the output mean will differ from the true mean by at most 0.8328 units. Here the units are the same units the variable has in the dataset.
+"""

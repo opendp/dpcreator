@@ -15,7 +15,7 @@ class AnalysisPlanUtil:
     @staticmethod
     def retrieve_analysis(analysis_object_id: str,  opendp_user: get_user_model()) -> BasicResponse:
         """
-        Retrieve an existing AnalysisPlan object by it's object_id and analyst
+        Retrieve an existing AnalysisPlan object by its object_id and analyst
         """
         if not analysis_object_id:
             return err_resp(astatic.ERR_MSG_ANALYSIS_ID_REQUIRED,

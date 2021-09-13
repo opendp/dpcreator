@@ -13,6 +13,7 @@ from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
+from opendp_apps.model_helpers.basic_response import ok_resp, err_resp, BasicResponse
 
 
 UPLOADED_FILE_STORAGE = FileSystemStorage(location=settings.UPLOADED_FILE_STORAGE_ROOT)
@@ -77,6 +78,61 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
                     object_id=self.object_id.hex)
 
         return info
+
+    def get_dataset_size(self) -> BasicResponse:
+        """Retrieve the rowCount index from the data_profile -- not always avaiable"""
+        if not self.data_profile:
+            return err_resp('Data profile not available')
+
+        if not 'dataset' in self.data_profile:
+            return err_resp('Dataset information not available in profile')
+
+        if not 'rowCount' in self.data_profile['dataset']:
+            return err_resp('"rowCount" information not available in profile.')
+
+        row_count = self.data_profile['dataset']['rowCount']
+        if row_count is None:
+            return err_resp('"rowCount" information not available in profile (id:2')
+
+        return ok_resp(self.data_profile['dataset']['rowCount'])
+
+
+    def get_variable_index(self, var_name: str) -> BasicResponse:
+        """Retrieve the variable index from the data_profile
+         Example data structure:
+          {"dataset":{
+              "rowCount":6610,
+              "variableCount":20,
+              "variableOrder":[
+                 [0, "ccode"],
+                 [1, "country"],
+                 [2, "cname" ],
+                ]
+            }
+            etc
+          }
+        """
+        if not self.data_profile:
+            return err_resp('Data profile not available')
+
+        if not 'dataset' in self.data_profile:
+            return err_resp('Dataset information not available in profile')
+
+        if not 'variableOrder' in self.data_profile['dataset']:
+            return err_resp('"variableOrder" information not available in profile (id:2')
+
+        variable_order = self.data_profile['dataset']['variableOrder']
+        if not variable_order:
+            return err_resp('Bad "variableOrder" information in profile.')
+
+        try:
+            for idx, feature in self.data_profile['dataset']['variableOrder']:
+                if feature == var_name:
+                    return ok_resp(idx)
+        except ValueError:
+            return err_resp('Bad "variableOrder" information in profile. (id:3)')
+
+        return err_resp(f'Index not found for variable {var_name}')
 
     def get_profile_variables(self):
         """Return the profile_variables and DataSetInfo object_id as an OrderedDict or None."""
