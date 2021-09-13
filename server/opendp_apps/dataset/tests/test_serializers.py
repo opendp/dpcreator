@@ -5,7 +5,7 @@ from rest_framework.test import APIClient
 
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.models import AnalysisPlan
-from opendp_apps.analysis.serializers import ReleaseInfoSerializer
+from opendp_apps.analysis.serializers import ReleaseValidationSerializer
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.model_helpers.msg_util import msgt
 
@@ -47,7 +47,7 @@ class TestReleaseInfoSerializer(TestCase):
         AnalysisPlanUtil.create_plan(dataset_info.object_id, self.user_obj)
         analysis_plan = AnalysisPlan.objects.first()
         self.request['analysis_plan_id'] = analysis_plan.object_id
-        serializer = ReleaseInfoSerializer(data=self.request)
+        serializer = ReleaseValidationSerializer(data=self.request)
         valid = serializer.is_valid()
         self.assertTrue(valid)
         self.assertTrue(serializer.errors == {})
