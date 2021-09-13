@@ -133,6 +133,8 @@ class ReleaseInfoSerializer(serializers.ModelSerializer):
                 # TODO: add column index and statistic to result
                 except Exception as ex:
                     stats_valid.append({
+                        'column_index': index,
+                        'statistic': statistic,
                         'valid': False,
                         'message': str(ex)
                     })
@@ -140,6 +142,8 @@ class ReleaseInfoSerializer(serializers.ModelSerializer):
             else:
                 # For now, everything else is invalid
                 stats_valid.append({
+                    'column_index': index,
+                    'statistic': statistic,
                     'valid': False,
                     'message': f'Statistic \'{statistic}\' is not supported'
                 })
