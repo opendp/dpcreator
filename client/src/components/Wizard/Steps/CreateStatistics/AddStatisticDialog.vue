@@ -93,18 +93,14 @@
           <template v-slot:content>
 
             <ul v-if="errorCount > 1">
-              <li v-if="item.message" v-for="item in validationErrorMsg" :key="item.message">
-                {{ item.message }}
+              <li v-if="item.message" v-for="item in validationErrorMsg">
+                {{ item.stat.statistic }} / {{ item.stat.variable }}: {{ item.message }}
               </li>
             </ul>
-            <div v-if="errorCount==1" v-for="item in validationErrorMsg" :key="item.message">
+            <div v-if="errorCount==1" v-for="item in validationErrorMsg">
               {{ item.message }}
             </div>
-            <!--v-list-item v-for="item in validationErrorMsg">
-              <v-list-item-content>
-               {{ item.message }}
-              </v-list-item-content>
-            </v-list-item-->
+
           </template>
         </ColoredBorderAlert>
 
@@ -240,7 +236,6 @@ export default {
       this.editedItemDialog = Object.assign({}, newEditedItem);
     }
   },
-  //TODO: Define the default epsilon and error values for new statistics
   data: () => ({
     singleVariableStatistics: ["Mean", "Histogram", "Quantile"],
     selectedStatistic: null,
@@ -339,13 +334,14 @@ export default {
       return release.validate(this.analysisPlan.objectId, tempStats)
           .then((resp) => {
             console.log('validate response: ' + JSON.stringify(resp))
-            this.validationErrorMsg = resp.valid
             let valid = true
-            resp.valid.forEach((item) => {
+            resp.valid.forEach((item, index) => {
               if (item.valid !== true) {
+                item.stat = tempStats[index]
                 valid = false;
               }
             })
+            this.validationErrorMsg = resp.valid
             return valid
           })
           .catch((error) => {
