@@ -293,11 +293,8 @@ ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/log-in/'
 # Profiler - Dataset reading
 #   - default parameters
 # ---------------------------
-PROFILER_VARIABLE_INDICES = '[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]'
-# ', '.join([str(x) for x in range(0,20)])
-PROFILER_DEFAULT_COLUMN_INDICES = json.loads(os.environ.get('PROFILER_DEFAULT_COLUMN_INDICES',
-                                                            PROFILER_VARIABLE_INDICES))
-
+PROFILER_COLUMN_LIMIT = int(os.environ.get('PROFILER_COLUMN_LIMIT', 20))
+assert PROFILER_COLUMN_LIMIT >= 1, 'PROFILER_COLUMN_LIMIT must be at least 1'
 
 # -----------------------------------------------
 # Websocket prefix.
