@@ -848,8 +848,8 @@
                     "label": ""
                 },
                 "eye_height": {
-                    "max": null,
-                    "min": null,
+                    "max": 100.0,
+                    "min": 0.0,
                     "name": "EyeHeight",
                     "type": "Numerical",
                     "label": ""
