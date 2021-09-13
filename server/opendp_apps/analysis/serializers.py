@@ -1,6 +1,8 @@
 import re
+import pandas as pd
 
 from rest_framework import serializers
+from rest_framework.relations import PrimaryKeyRelatedField
 
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis import static_vals as astatic
@@ -21,7 +23,6 @@ class AnalysisPlanObjectIdSerializer(serializers.Serializer):
             raise serializers.ValidationError(astatic.ERR_MSG_NO_ANALYSIS_PLAN)
 
         return value
-
 
     def get_object_id(self):
         """Return the object_id, this will be a str or None"""
@@ -55,7 +56,72 @@ class DPStatisticSerializer(serializers.Serializer):
     missing_values_handling = serializers.ChoiceField(choices=['drop', 'insert_random', 'insert_fixed'])
 
 
-class ReleaseInfoSerializer(serializers.ModelSerializer):
+class AnalysisPlanPKRelatedField(PrimaryKeyRelatedField):
+
+    def __init__(self, **kwargs):
+        self.pk_field = 'object_id'
+        super(AnalysisPlanPKRelatedField, self).__init__(**kwargs)
+
+    def get_queryset(self):
+        return AnalysisPlan.objects.all()
+
+    def to_representation(self, value):
+        return value.object_id
+
+
+class ComputationChainSerializer(serializers.Serializer):
+    dp_statistics = serializers.ListField(child=DPStatisticSerializer())
+    analysis_plan_id = serializers.UUIDField()
+
+    def run_computation_chain(self):
+        analysis_plan = AnalysisPlan.objects.get(object_id=self.validated_data['analysis_plan_id'])
+        results = []
+        df = pd.read_csv(analysis_plan.dataset.source_file.file, delimiter='\t')
+
+        for dp_stat in self.validated_data['dp_statistics']:
+            statistic = dp_stat['statistic']
+            label = dp_stat['label']
+            variable_info = analysis_plan.variable_info[label]
+            index = 'SCM'  # TODO: column headers.... (variable_info['index'])
+            column = df[index]
+            lower = variable_info.get('min')
+            upper = variable_info.get('max')
+            if lower is None:
+                raise Exception(f"Lower must be defined: {variable_info}")
+            if upper is None:
+                raise Exception(f"Upper must be defined: {variable_info}")
+            # n = analysis_plan.data_set.data_profile.get('dataset', {}).get('row_count', 1000)
+            n = 1000
+            impute = dp_stat['missing_values_handling'] != 'drop'
+            impute_value = float(dp_stat['fixed_value'])
+            epsilon = float(dp_stat['epsilon'])
+            # Do some validation and append to stats_valid
+            if statistic == 'mean':
+                try:
+                    preprocessor = dp_mean(index, lower, upper, n, impute_value, epsilon)
+                    results.append({'column': column, 'statistic': statistic, 'result': preprocessor(column)})
+                # TODO: add column index and statistic to result
+                except Exception as ex:
+                    results.append({
+                        'column': column,
+                        'statistic': statistic,
+                        'valid': False,
+                        'message': str(ex)
+                    })
+                    raise ex
+            else:
+                # For now, everything else is invalid
+                results.append({
+                    'column_index': index,
+                    'statistic': statistic,
+                    'valid': False,
+                    'message': f'Statistic \'{statistic}\' is not supported'
+                })
+        return results
+
+
+
+class ReleaseValidationSerializer(serializers.ModelSerializer):
     dp_statistics = serializers.ListField(child=DPStatisticSerializer())
     analysis_plan_id = serializers.UUIDField()
 
@@ -110,15 +176,17 @@ class ReleaseInfoSerializer(serializers.ModelSerializer):
         stats_valid = []
         for dp_stat in self.validated_data['dp_statistics']:
             statistic = dp_stat['statistic']
-            print(dp_stat)
             label = self._camel_to_snake(dp_stat['label'])
-            print(label)
             variable_info = analysis_plan.variable_info[label]
-            print(variable_info)
             index = 0  # TODO: column headers.... (variable_info['index'])
-            lower = variable_info['min'] if variable_info['min'] else 0.
-            upper = variable_info['max'] if variable_info['max'] else 100.
-            n = 1000  # TODO: where to get this from? variable_info['n']?
+            lower = variable_info.get('min')
+            upper = variable_info.get('max')
+            if lower is None:
+                raise Exception(f"Lower must be defined: {variable_info}")
+            if upper is None:
+                raise Exception(f"Upper must be defined: {variable_info}")
+            # n = analysis_plan.data_set.data_profile.get('dataset', {}).get('row_count', 1000)
+            n = 1000
             impute = dp_stat['missing_values_handling'] != 'drop'
             impute_value = float(dp_stat['fixed_value'])
             epsilon = float(dp_stat['epsilon'])
@@ -132,6 +200,8 @@ class ReleaseInfoSerializer(serializers.ModelSerializer):
                 # TODO: add column index and statistic to result
                 except Exception as ex:
                     stats_valid.append({
+                        'column_index': index,
+                        'statistic': statistic,
                         'valid': False,
                         'message': str(ex)
                     })
@@ -139,6 +209,8 @@ class ReleaseInfoSerializer(serializers.ModelSerializer):
             else:
                 # For now, everything else is invalid
                 stats_valid.append({
+                    'column_index': index,
+                    'statistic': statistic,
                     'valid': False,
                     'message': f'Statistic \'{statistic}\' is not supported'
                 })

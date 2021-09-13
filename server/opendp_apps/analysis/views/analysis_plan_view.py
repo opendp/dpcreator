@@ -1,25 +1,20 @@
 from django.views.decorators.csrf import csrf_exempt
 
-from rest_framework import viewsets, status
+from rest_framework import status
 from rest_framework.response import Response
-from rest_framework import viewsets
-from rest_framework.decorators import action
 
 from opendp_project.views import BaseModelViewSet
-from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.analysis.models import AnalysisPlan
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.serializers import \
-    AnalysisPlanSerializer, \
-    AnalysisPlanObjectIdSerializer
+    AnalysisPlanSerializer
 from opendp_apps.dataset.serializers import DatasetObjectIdSerializer
-from opendp_apps.utils.view_helper import get_object_or_error_response
 
-from opendp_apps.utils.view_helper import get_json_error, get_json_success
+from opendp_apps.utils.view_helper import get_json_error
 
 
-class AnalysisPlanViewSet(BaseModelViewSet): #viewsets.ModelViewSet):
+class AnalysisPlanViewSet(BaseModelViewSet):
     """Publicly available listing of registered Dataverses"""
     serializer_classes = {
         'list': AnalysisPlanSerializer,
@@ -39,8 +34,6 @@ class AnalysisPlanViewSet(BaseModelViewSet): #viewsets.ModelViewSet):
         AnalysisPlans for the currently authenticated user.
         """
         return AnalysisPlan.objects.filter(analyst=self.request.user)
-
-
 
     @csrf_exempt
     def create(self, request, *args, **kwargs):
@@ -85,7 +78,6 @@ class AnalysisPlanViewSet(BaseModelViewSet): #viewsets.ModelViewSet):
         return Response(get_json_error(plan_util.message),
                         status=plan_util.data)
 
-
     def partial_update(self, request, *args, **kwargs):
         """Make updates to the AnalysisPlan object"""
         acceptable_fields = ['variable_info', 'dp_statistics', 'user_step']
@@ -105,6 +97,5 @@ class AnalysisPlanViewSet(BaseModelViewSet): #viewsets.ModelViewSet):
         if not fields_to_update:
             return Response(get_json_error(f'There are no fields to update'),
                             status=status.HTTP_400_BAD_REQUEST)
-
 
         return super(AnalysisPlanViewSet, self).partial_update(request, *args, **kwargs)
