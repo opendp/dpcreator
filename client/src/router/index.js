@@ -8,6 +8,7 @@ const {
   HOME,
   WELCOME,
   MY_DATA,
+  MY_DATA_DETAILS,
   WIZARD,
   SIGN_UP,
   LOGIN,
@@ -40,7 +41,7 @@ const routes = [
     component: () => import("../views/MyData.vue")
   },
   {
-    path: `${MY_DATA.PATH}/:id`,
+    path: `${MY_DATA_DETAILS.PATH}`,
     name: "MyDataDetails",
     component: () => import("../views/MyDataDetails.vue")
   },

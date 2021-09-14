@@ -233,9 +233,13 @@ export default {
       this[action](item)
     },
     viewDetails(item) {
-      this.$router.push(`${NETWORK_CONSTANTS.MY_DATA.PATH}/${item.datasetId}`)
+      this.goToPage(item, `${NETWORK_CONSTANTS.MY_DATA_DETAILS.PATH}`)
+      //  this.$router.push(`${NETWORK_CONSTANTS.MY_DATA.PATH}/${item.datasetId}`)
     },
     continueWorkflow(item) {
+      this.goToPage(item, `${NETWORK_CONSTANTS.WIZARD.PATH}`)
+    },
+    /*
       this.$store.dispatch('dataset/setDatasetInfo', item.datasetInfo.objectId)
           .then(() => {
             if (item.analysisPlan) {
@@ -244,6 +248,18 @@ export default {
               })
             } else {
               this.$router.push(`${NETWORK_CONSTANTS.WIZARD.PATH}`)
+            }
+          })
+    },*/
+    goToPage(item, path) {
+      this.$store.dispatch('dataset/setDatasetInfo', item.datasetInfo.objectId)
+          .then(() => {
+            if (item.analysisPlan) {
+              this.$store.dispatch('dataset/setAnalysisPlan', item.analysisPlan.objectId).then(() => {
+                this.$router.push(path)
+              })
+            } else {
+              this.$router.push(path)
             }
           })
     },
