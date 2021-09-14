@@ -9,6 +9,10 @@ DP_HISTOGRAM = 'histogram'
 DP_QUANTILE = 'quantile'
 DP_STATS_CHOICES = [DP_MEAN, DP_SUM, DP_COUNT, DP_HISTOGRAM, DP_QUANTILE]
 
+DP_STAT_NEED_MIN_MAX = {DP_MEAN: True,
+                        DP_HISTOGRAM: False}
+
+
 # --------------------------------------
 # Missing value handling
 # --------------------------------------
@@ -31,4 +35,4 @@ ERR_MSG_SETUP_INCOMPLETE = 'Depositor setup is not complete'
 ERR_MSG_NO_ANALYSIS_PLAN = 'AnalysisPlan object not found for this object_id and creator'
 ERR_MSG_FIELDS_NOT_UPDATEABLE = 'These fields are not updatable'
 
-
+ERR_MSG_BAD_TOTAL_EPSILON = 'The depositor setup info has an invalid epsilon value'

@@ -82,6 +82,16 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
         return info
 
+    def get_depositor_setup_info(self):
+        """Hack; need to address https://github.com/opendp/dpcreator/issues/257"""
+        if hasattr(self, 'dataversefileinfo'):
+            return self.dataversefileinfo.depositor_setup_info
+        elif hasattr(self, 'uploadfileinfo'):
+            return self.uploadfileinfo.depositor_setup_info
+
+        raise AttributeError('Unknown DataSetinfo type. No access to depositor_setup_info')
+
+
     def get_dataset_size(self) -> BasicResponse:
         """Retrieve the rowCount index from the data_profile -- not always avaiable"""
         if not self.data_profile:

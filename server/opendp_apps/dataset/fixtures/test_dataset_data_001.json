@@ -549,14 +549,14 @@
                     "type": "Numerical",
                     "label": ""
                 },
-                "typing_speed": {
+                "TypingSpeed": {
                     "max": null,
                     "min": null,
                     "name": "TypingSpeed",
                     "type": "Numerical",
                     "label": ""
                 },
-                "blink_duration": {
+                "BlinkDuration": {
                     "max": null,
                     "min": null,
                     "name": "BlinkDuration",
