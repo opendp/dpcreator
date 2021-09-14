@@ -36,7 +36,7 @@ class TestReleaseView(TestCase):
 
     def test_post_fail_not_logged_in(self):
         """Test post not logged in"""
-        msgt(self.test_post_not_logged_in.__doc__)
+        msgt(self.test_post_fail_not_logged_in.__doc__)
 
         client = APIClient()
         dataset_info = DataSetInfo.objects.get(id=4)
@@ -48,11 +48,11 @@ class TestReleaseView(TestCase):
 
     def test_post_success(self):
         """Test post logged in"""
-        msgt(self.test_post.__doc__)
+        msgt(self.test_post_success.__doc__)
 
         dataset_info = DataSetInfo.objects.get(id=4)
         AnalysisPlanUtil.create_plan(dataset_info.object_id, self.user_obj)
         analysis_plan = AnalysisPlan.objects.first()
         self.request['analysis_plan_id'] = analysis_plan.object_id
         response = self.client.post('/api/release/', data=self.request, format='json')
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 200)
