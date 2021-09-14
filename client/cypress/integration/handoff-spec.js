@@ -57,12 +57,15 @@
                 cy.get('[data-test="password"]').type('dpcreator');
                 cy.get('[data-test="Log in"]').click();
                 // first we will be routed to the Terms of Conditions page for the user
+                /*
                 cy.get('[data-test="confirmTermsCheckbox"]').click({force: true});
                 cy.get('[data-test="confirmTermsContinue"]').click();
 
                 // Next the Welcome page, with the File Locked message
 
-                // cy.get('.v-alert__wrapper').should('contain', 'Sorry, the file is locked')
+                cy.get('.v-alert__wrapper').should('contain', 'Sorry, the file is locked')
+                
+                 */
             })
     })
 }
