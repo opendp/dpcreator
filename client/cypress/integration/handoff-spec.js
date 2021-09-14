@@ -58,6 +58,8 @@
                 cy.get('[data-test="Log in"]').click();
                 // first we will be routed to the Terms of Conditions page for the user
                 /*
+                # commented out b/c cypress test failed!
+                #
                 cy.get('[data-test="confirmTermsCheckbox"]').click({force: true});
                 cy.get('[data-test="confirmTermsContinue"]').click();
 
