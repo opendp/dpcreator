@@ -210,8 +210,7 @@ class ReleaseValidationSerializer(serializers.ModelSerializer):
             # How should this be used?
             return err_resp(user_msg)   #dict(success=False, message=user_msg)
 
-        print('validate_util.validation_info', validate_util.validation_info)
-
+        print('(validate_util.validation_info)', validate_util.validation_info)
         return ok_resp(validate_util.validation_info)
         #return validate_util.validation_info
 

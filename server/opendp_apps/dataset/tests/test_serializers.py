@@ -111,7 +111,6 @@ class TestReleaseInfoSerializer(TestCase):
 
         # Send the dp_statistics for validation
         #
-        self.request['analysis_plan_id'] = analysis_plan.object_id
         stat_spec =  { \
                 "statistic": astatic.DP_MEAN,
                 "variable": "EyeHeight",
@@ -145,6 +144,37 @@ class TestReleaseInfoSerializer(TestCase):
         print('stats_info.data', stats_info.data)
         self.assertEqual(expected_result, stats_info.data)
 
+    def test_15_api_validate_stats(self):
+        """(15) Test a working stat via API"""
+        msgt(self.test_15_api_validate_stats.__doc__)
+
+        analysis_plan = self.retrieve_new_plan()
+
+        # Send the dp_statistics for validation
+        #
+        stat_spec = { \
+            "statistic": astatic.DP_MEAN,
+            "variable": "EyeHeight",
+            "epsilon": 1,
+            "delta": 0,
+            "error": "",
+            "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
+            "handle_as_fixed": False,
+            "fixed_value": "5.0",
+            "locked": False,
+            "label": "EyeHeight"}
+
+        request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
+                            dp_statistics=[stat_spec])
+
+        response = self.client.post('/api/release/',
+                                    json.dumps(request_plan),
+                                    content_type='application/json')
+
+        jresp = response.json()
+        self.assertEqual(response.status_code, 200)
+
+        self.assertTrue(jresp['success'])
 
     def test_20_fail_unsupported_stat(self):
         """(20) Fail: Test a known but unsupported statistic"""
@@ -154,7 +184,6 @@ class TestReleaseInfoSerializer(TestCase):
 
         # Send the dp_statistics for validation
         #
-        self.request['analysis_plan_id'] = analysis_plan.object_id
         stat_spec =  { \
                     "statistic": astatic.DP_SUM,
                     "variable": "EyeHeight",
@@ -191,6 +220,44 @@ class TestReleaseInfoSerializer(TestCase):
         self.assertEqual(expected_result, stats_info.data)
 
 
+    def test_25_api_fail_unsupported_stat(self):
+        """(25) Fail: API, Test a known but unsupported statistic"""
+        msgt(self.test_25_api_fail_unsupported_stat.__doc__)
+
+        analysis_plan = self.retrieve_new_plan()
+
+        # Send the dp_statistics for validation
+        #
+        stat_spec =  { \
+                    "statistic": astatic.DP_SUM,
+                    "variable": "EyeHeight",
+                    "epsilon": 1,
+                    "delta": 0,
+                    "error": "",
+                    "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
+                    "handle_as_fixed": False,
+                    "fixed_value": "5.0",
+                    "locked": False,
+                    "label": "EyeHeight"}
+
+        request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
+                            dp_statistics=[stat_spec])
+
+        response = self.client.post('/api/release/',
+                                    json.dumps(request_plan),
+                                    content_type='application/json')
+
+        jresp = response.json()
+        self.assertEqual(response.status_code, 200)
+
+        self.assertTrue(jresp['success'])
+
+        expected_result = [ \
+                {'var_name': 'EyeHeight', 'statistic': astatic.DP_SUM, 'valid': False,
+                  'message': 'Statistic "sum" will be supported soon!'}]
+
+        self.assertEqual(expected_result, jresp['data'])
+
 
     def test_30_fail_bad_min_max(self):
         """(30) Fail: Add bad min/max values"""
@@ -207,7 +274,6 @@ class TestReleaseInfoSerializer(TestCase):
 
         # Send the dp_statistics for validation
         #
-        self.request['analysis_plan_id'] = analysis_plan.object_id
         stat_spec =  { \
                         "statistic": astatic.DP_MEAN,
                         "variable": "TypingSpeed",
@@ -243,10 +309,54 @@ class TestReleaseInfoSerializer(TestCase):
         self.assertEqual(expected_result, stats_valid.data)
 
 
+    def test_35_api_fail_bad_min_max(self):
+        """(35) Fail: API, Add bad min/max values"""
+        msgt(self.test_35_api_fail_bad_min_max.__doc__)
 
-    def test_40_fail_exceed_epsilon(self):
-        """(40) Fail: Exceed total epsilon"""
-        msgt(self.test_40_fail_exceed_epsilon.__doc__)
+        analysis_plan = self.retrieve_new_plan()
+
+        variable_info_mod = analysis_plan.variable_info
+        # invalid min/max
+        variable_info_mod['TypingSpeed']['min'] = 120
+        variable_info_mod['TypingSpeed']['max'] = 5
+        analysis_plan.variable_info = variable_info_mod
+        analysis_plan.save()
+
+        # Send the dp_statistics for validation
+        #
+        stat_spec =  { \
+                        "statistic": astatic.DP_MEAN,
+                        "variable": "TypingSpeed",
+                        "epsilon": 1,
+                        "delta": 0,
+                        "error": "",
+                        "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
+                        "handle_as_fixed": False,
+                        "fixed_value": "5.0",
+                        "locked": False,
+                        "label": "EyeHeight"}
+
+        request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
+                            dp_statistics=[stat_spec])
+
+        response = self.client.post('/api/release/',
+                                    json.dumps(request_plan),
+                                    content_type='application/json')
+
+        jresp = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(jresp['success'])
+
+        expected_result = [{'var_name': 'TypingSpeed', 'statistic': astatic.DP_MEAN,
+                            'valid': False,
+                            'message': 'lower bound may not be greater than upper bound'}]
+
+        self.assertEqual(expected_result, jresp['data'])
+       
+
+    def test_40_fail_single_stat_bad_epsilon(self):
+        """(40) Fail: Single stat exceeds total epsilon"""
+        msgt(self.test_40_fail_single_stat_bad_epsilon.__doc__)
 
         analysis_plan = self.retrieve_new_plan()
 
@@ -259,7 +369,6 @@ class TestReleaseInfoSerializer(TestCase):
 
         # Send the dp_statistics for validation
         #
-        self.request['analysis_plan_id'] = analysis_plan.object_id
         stat_spec =  { \
                     "statistic": astatic.DP_MEAN,
                     "variable": "BlinkDuration",
@@ -294,6 +403,58 @@ class TestReleaseInfoSerializer(TestCase):
         self.assertEqual(expected_result, stats_valid.data)
 
 
+    def test_45_api_fail_single_stat_bad_epsilon(self):
+        """(45) Fail: API, Single stat exceeds total epsilon"""
+        msgt(self.test_45_api_fail_single_stat_bad_epsilon.__doc__)
+
+        analysis_plan = self.retrieve_new_plan()
+
+        variable_info_mod = analysis_plan.variable_info
+        # valid min/max
+        variable_info_mod['BlinkDuration']['min'] = 1
+        variable_info_mod['BlinkDuration']['max'] = 400
+        analysis_plan.variable_info = variable_info_mod
+        analysis_plan.save()
+
+        # Send the dp_statistics for validation
+        #
+        stat_spec =  { \
+                    "statistic": astatic.DP_MEAN,
+                    "variable": "BlinkDuration",
+                    "epsilon": 1.5,
+                    "delta": 0,
+                    "error": "",
+                    "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
+                    "handle_as_fixed": False,
+                    "fixed_value": "5.0",
+                    "locked": False,
+                    "label": "EyeHeight"}
+
+        request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
+                            dp_statistics=[stat_spec])
+
+        # Check the basics
+        #
+        serializer = ReleaseValidationSerializer(data=request_plan)
+        valid = serializer.is_valid()
+        self.assertTrue(valid)
+        self.assertTrue(serializer.errors == {})
+
+        response = self.client.post('/api/release/',
+                                    json.dumps(request_plan),
+                                    content_type='application/json')
+
+        jresp = response.json()
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(jresp['success'])
+
+        expected_result =  [{'var_name': 'BlinkDuration', 'statistic': astatic.DP_MEAN,
+                             'valid': False,
+                             'message': VALIDATE_MSG_EPSILON}]
+
+        self.assertEqual(expected_result, jresp['data'])
+
+
     def test_50_bad_total_epsilon(self):
         """(50) Fail: Bad total epsilon"""
         msgt(self.test_50_bad_total_epsilon.__doc__)
@@ -306,7 +467,6 @@ class TestReleaseInfoSerializer(TestCase):
 
         # Send the dp_statistics for validation
         #
-        self.request['analysis_plan_id'] = analysis_plan.object_id
         stat_spec = { \
             "statistic": astatic.DP_MEAN,
             "variable": "EyeHeight",
@@ -338,6 +498,43 @@ class TestReleaseInfoSerializer(TestCase):
 
 
 
+    def test_55_api_bad_total_epsilon(self):
+        """(50) Fail: API, Bad total epsilon"""
+        msgt(self.test_55_api_bad_total_epsilon.__doc__)
+
+        analysis_plan = self.retrieve_new_plan()
+
+        setup_info = analysis_plan.dataset.get_depositor_setup_info()
+        setup_info.epsilon = 4
+        setup_info.save()
+
+        # Send the dp_statistics for validation
+        #
+        stat_spec = { \
+            "statistic": astatic.DP_MEAN,
+            "variable": "EyeHeight",
+            "epsilon": 1,
+            "delta": 0,
+            "error": "",
+            "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
+            "handle_as_fixed": False,
+            "fixed_value": "5.0",
+            "locked": False,
+            "label": "EyeHeight"}
+
+        request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
+                            dp_statistics=[stat_spec])
+
+        response = self.client.post('/api/release/',
+                                    json.dumps(request_plan),
+                                    content_type='application/json')
+
+        jresp = response.json()
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(jresp['success'])
+
+        self.assertTrue(jresp['message'].find(astatic.ERR_MSG_BAD_TOTAL_EPSILON) > -1)
+
     def test_60_bad_running_epsilon(self):
         """(60) Fail: Total epsilon from dp_statistics > depositor_setup_info.epsilon"""
         msgt(self.test_60_bad_running_epsilon.__doc__)
@@ -356,7 +553,6 @@ class TestReleaseInfoSerializer(TestCase):
 
         # Send the dp_statistics for validation
         #
-        self.request['analysis_plan_id'] = analysis_plan.object_id
         stat_specs = [\
                 { \
                     "statistic": astatic.DP_MEAN,
@@ -396,16 +592,79 @@ class TestReleaseInfoSerializer(TestCase):
         # Now run the validator
         #
         stats_valid = serializer.save(**dict(opendp_user=self.user_obj))
-        print('stats_valid', stats_valid)
+        self.assertTrue(stats_valid.success)
 
-        expected_result = [{'var_name': 'EyeHeight', 'statistic': 'mean', 'valid': False,
+        sample_result_data = [{'var_name': 'EyeHeight', 'statistic': 'mean', 'valid': False,
                             'message': 'constant must be a member of DA'},
                            {'var_name': 'BlinkDuration', 'statistic': 'mean', 'valid': False,
                             'message': 'The running epsilon (1.05) exceeds the max epsilon (1.0)'}]
 
-        self.assertTrue(expected_result[0]['valid'] is False)
-        self.assertTrue(expected_result[1]['valid'] is False)
-        self.assertTrue(expected_result[1]['message'].find('exceeds the max epsilon') > -1)
+        self.assertTrue(stats_valid.data[0]['valid'] is False)
+        self.assertTrue(stats_valid.data[1]['valid'] is False)
+        self.assertTrue(stats_valid.data[1]['message'].find('exceeds the max epsilon') > -1)
+
+    def test_65_bad_running_epsilon(self):
+        """(65) Fail: API,  Total epsilon from dp_statistics > depositor_setup_info.epsilon"""
+        msgt(self.test_65_bad_running_epsilon.__doc__)
+
+        analysis_plan = self.retrieve_new_plan()
+
+        variable_info_mod = analysis_plan.variable_info
+        # valid min/max
+        variable_info_mod['EyeHeight']['min'] = 0.2
+        variable_info_mod['EyeHeight']['max'] = 4.1
+
+        variable_info_mod['BlinkDuration']['min'] = 1
+        variable_info_mod['BlinkDuration']['max'] = 400
+        analysis_plan.variable_info = variable_info_mod
+        analysis_plan.save()
+
+        # Send the dp_statistics for validation
+        #
+        stat_specs = [ \
+            { \
+                "statistic": astatic.DP_MEAN,
+                "variable": "EyeHeight",
+                "epsilon": 0.6,
+                "delta": 0,
+                "error": "",
+                "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
+                "handle_as_fixed": False,
+                "fixed_value": "5.0",
+                "locked": False,
+                "label": "EyeHeight",
+            },
+            { \
+                "statistic": astatic.DP_MEAN,
+                "variable": "BlinkDuration",
+                "epsilon": 0.45,
+                "delta": 0,
+                "error": "",
+                "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
+                "handle_as_fixed": False,
+                "fixed_value": "5.0",
+                "locked": False,
+                "label": "BlinkDuration",
+            }]
+
+        request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
+                            dp_statistics=stat_specs)
+
+        response = self.client.post('/api/release/',
+                                    json.dumps(request_plan),
+                                    content_type='application/json')
+
+        jresp = response.json()
+        self.assertEqual(response.status_code, 200)
+
+        sample_result_data = [{'var_name': 'EyeHeight', 'statistic': 'mean', 'valid': False,
+                               'message': 'constant must be a member of DA'},
+                              {'var_name': 'BlinkDuration', 'statistic': 'mean', 'valid': False,
+                               'message': 'The running epsilon (1.05) exceeds the max epsilon (1.0)'}]
+
+        self.assertTrue(jresp['data'][0]['valid'] is False)
+        self.assertTrue(jresp['data'][1]['valid'] is False)
+        self.assertTrue(jresp['data'][1]['message'].find('exceeds the max epsilon') > -1)
 
     @skip
     def test_70_show_add_file(self):

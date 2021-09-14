@@ -17,7 +17,7 @@ class ReleaseView(viewsets.ViewSet):
         """
         Run validation for a list of release requests
         """
-        print('>> ReleaseView.create >>>', request.data)
+        #print('>> ReleaseView.create >>>', request.data)
         release_info_serializer = ReleaseValidationSerializer(data=request.data)
         if not release_info_serializer.is_valid():
             raise Exception(f"Invalid fDPStatistics objects: {release_info_serializer.errors}")
@@ -31,9 +31,9 @@ class ReleaseView(viewsets.ViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
 
         print(save_result.data)
-
-        return Response(get_json_error(save_result.data),
-                        status=status.HTTP_201_CREATED)
+        return Response(get_json_success('validation results returned',
+                                         data=save_result.data),
+                        status=status.HTTP_200_OK)
 
         #print('stats_valid', stats_valid)
         #return Response({'valid': stats_valid}, status=status.HTTP_201_CREATED)
