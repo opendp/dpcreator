@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
 from opendp_apps.utils.extra_validators import \
@@ -31,12 +32,9 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     """
     Confidence Interval choices
     """
-    CI_95 = 0.05
-    CI_99 = 0.01
-    CI_CHOICES = (
-        (CI_95, '95% CI'),
-        (CI_99, '99% CI'),
-    )
+    CI_95 = astatic.CI_95
+    CI_99 = astatic.CI_99
+    CI_CHOICES = astatic.CI_CHOICES
 
     """
     Often used Delta values
@@ -105,10 +103,15 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     class Meta:
         verbose_name = 'Depositor Setup Data'
         verbose_name_plural = 'Depositor Setup Data'
-        ordering = ('dataversefileinfo', '-created', )
+        ordering = ('-created', )
 
     def __str__(self):
-        return f'{self.dataversefileinfo} - {self.user_step}'
+        if hasattr(self, 'dataversefileinfo'):
+            return f'{self.dataversefileinfo} - {self.user_step}'
+        elif hasattr(self, 'uploadfileinfo'):
+            return f'{self.uploadfileinfo} - {self.user_step}'
+        else:
+            return f'{self.object_id} - {self.user_step}'
 
     def set_user_step(self, new_step:DepositorSteps) -> bool:
         """Set a new user step. Does *not* save the object."""
@@ -193,6 +196,8 @@ class ReleaseInfo(TimestampedModelWithUUID):
                                      blank=False,
                                      validators=[validate_not_negative])
     dp_release = models.JSONField()
+
+    #pdf_release
 
     class Meta:
         verbose_name = 'Release Information'

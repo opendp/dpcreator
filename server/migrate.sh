@@ -32,7 +32,8 @@ echo "-----------------------"
 echo "| Load fixtures       |"
 echo "| (for dev)           |"
 echo "-----------------------"
-python /code/server/manage.py loaddata opendp_apps/dataverses/fixtures/*.json \
-  opendp_apps/dataset/fixtures/*.json
+python /code/server/manage.py loaddata opendp_apps/dataverses/fixtures/*.json
+#\
+#  opendp_apps/dataset/fixtures/*.json
 exec "$@"
 echo
