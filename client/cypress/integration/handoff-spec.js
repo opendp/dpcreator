@@ -39,7 +39,7 @@
             // Next the Welcome page, with the Dataset  message
             cy.url().should('contain', 'welcome')
             cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
-                ' doi:10.7910/DVN/PUXVDH | Replication Data for: Eye-typing experiment | Fatigue_data.tab ')*/
+                ' doi:10.7910/DVN/PUXVDH | Replication Data for: Eye-typing experiment | Fatigue_data.tab ')
         }),
             it('Correctly displays locked file message', () => {
                 cy.on('uncaught:exception', (e, runnable) => {
