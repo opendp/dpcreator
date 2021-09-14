@@ -1,6 +1,13 @@
+from os.path import abspath, dirname, isdir, isfile, join
+
+CURRENT_DIR = dirname(abspath(__file__))
+TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
+
+import json
+from django.contrib.auth import get_user_model
+from django.core.files import File
 from django.test.testcases import TestCase
 
-from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
@@ -9,8 +16,10 @@ from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.serializers import ReleaseValidationSerializer
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.model_helpers.msg_util import msgt
+from opendp_apps.profiler import tasks as profiler_tasks
 from opendp_apps.utils.extra_validators import \
     (VALIDATE_MSG_EPSILON,)
+
 
 
 class TestReleaseInfoSerializer(TestCase):
@@ -59,6 +68,37 @@ class TestReleaseInfoSerializer(TestCase):
         self.assertEqual(orig_plan.object_id, analysis_plan.object_id)
 
         return analysis_plan
+
+    def add_source_file(self, dataset_info: DataSetInfo, filename: str, add_profile: bool=False):
+        """Add a source file -- example...
+        - filepath - file under dpcreator/test_data
+        """
+
+        # File to attach: Must be in "dpcreator/test_data"
+        #
+        filepath = join(TEST_DATA_DIR, filename)
+        self.assertTrue(isfile(filepath))
+
+        # Attach the file to the  `dataset_info.source_file` field
+        #
+        django_file = File(open(filepath, 'rb'))
+        dataset_info.source_file.save(filename, django_file)
+        dataset_info.save()
+
+        # If specified, profile the file
+        #
+        if add_profile is True:
+            profile_handler = profiler_tasks.run_profile_by_filefield(dataset_info.object_id)
+            print('profile_handler.has_error()', profile_handler.has_error())
+            self.assertTrue(profile_handler.has_error() is False)
+
+            # Shouldn't have errors
+            if profile_handler.has_error():
+                print(f'!! error: {profiler.get_err_msg()}')
+
+        return dataset_info
+
+
 
     def test_10_validate_stats(self):
         """(10) Test a working stat"""
@@ -244,7 +284,6 @@ class TestReleaseInfoSerializer(TestCase):
         self.assertEqual(expected_result, stats_valid)
 
 
-
     def test_50_bad_total_epsilon(self):
         """(50) Fail: Bad total epsilon"""
         msgt(self.test_50_bad_total_epsilon.__doc__)
@@ -288,6 +327,100 @@ class TestReleaseInfoSerializer(TestCase):
         self.assertTrue('message' in result)
         self.assertTrue(result['message'].find(astatic.ERR_MSG_BAD_TOTAL_EPSILON) > -1)
 
+
+
+    def test_60_bad_running_epsilon(self):
+        """(60) Fail: Total epsilon from dp_statistics > depositor_setup_info.epsilon"""
+        msgt(self.test_60_bad_running_epsilon.__doc__)
+
+        analysis_plan = self.retrieve_new_plan()
+
+        variable_info_mod = analysis_plan.variable_info
+        # valid min/max
+        variable_info_mod['EyeHeight']['min'] = 0.2
+        variable_info_mod['EyeHeight']['max'] = 4.1
+
+        variable_info_mod['BlinkDuration']['min'] = 1
+        variable_info_mod['BlinkDuration']['max'] = 400
+        analysis_plan.variable_info = variable_info_mod
+        analysis_plan.save()
+
+        # Send the dp_statistics for validation
+        #
+        self.request['analysis_plan_id'] = analysis_plan.object_id
+        stat_specs = [\
+                { \
+                    "statistic": astatic.DP_MEAN,
+                    "variable": "EyeHeight",
+                    "epsilon": 0.6,
+                    "delta": 0,
+                    "error": "",
+                    "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
+                    "handle_as_fixed": False,
+                    "fixed_value": "5.0",
+                    "locked": False,
+                    "label": "EyeHeight",
+                },
+                { \
+                    "statistic": astatic.DP_MEAN,
+                    "variable": "BlinkDuration",
+                    "epsilon": 0.45,
+                    "delta": 0,
+                    "error": "",
+                    "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
+                    "handle_as_fixed": False,
+                    "fixed_value": "5.0",
+                    "locked": False,
+                    "label": "BlinkDuration",
+                }]
+
+        request_plan = dict(analysis_plan_id=analysis_plan.object_id,
+                            dp_statistics=stat_specs)
+
+        # Check the basics
+        #
+        serializer = ReleaseValidationSerializer(data=request_plan)
+        valid = serializer.is_valid()
+        self.assertTrue(valid)
+        self.assertTrue(serializer.errors == {})
+
+        # Now run the validator
+        #
+        stats_valid = serializer.save(**dict(opendp_user=self.user_obj))
+        print('stats_valid', stats_valid)
+
+        expected_result = [{'var_name': 'EyeHeight', 'statistic': 'mean', 'valid': False,
+                            'message': 'constant must be a member of DA'},
+                           {'var_name': 'BlinkDuration', 'statistic': 'mean', 'valid': False,
+                            'message': 'The running epsilon (1.05) exceeds the max epsilon (1.0)'}]
+
+        self.assertTrue(expected_result[0]['valid'] is False)
+        self.assertTrue(expected_result[1]['valid'] is False)
+        self.assertTrue(expected_result[1]['message'].find('exceeds the max epsilon') > -1)
+
+    def test_70_show_add_file(self):
+        """(70) Sample of attaching file to a DataSetInfo object"""
+        msgt(self.test_70_show_add_file.__doc__)
+
+        analysis_plan = self.retrieve_new_plan()
+
+        dataset_info_1 = analysis_plan.dataset
+        dataset_info_1.data_profile = None
+        dataset_info_1.profile_variables = None
+        dataset_info_1.save()
+
+        self.add_source_file(analysis_plan.dataset, 'Fatigue_data.tab', True)
+
+        dataset_info_2 = DataSetInfo.objects.get(object_id=dataset_info_1.object_id)
+
+        self.assertTrue('variables' in dataset_info_2.data_profile)
+        self.assertTrue('dataset' in dataset_info_2.data_profile)
+
+        self.assertTrue('variables' in dataset_info_2.profile_variables)
+        self.assertTrue('dataset' in dataset_info_2.profile_variables)
+
+        # print(json.dumps(dataset_info_2.data_profile, indent=4))
+        # print(json.dumps(dataset_info_2.profile_variables, indent=4))
 
 
 """

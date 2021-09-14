@@ -542,7 +542,7 @@
                     "type": "Boolean",
                     "label": ""
                 },
-                "eye_height": {
+                "EyeHeight": {
                     "max": 100.0,
                     "min": 0.0,
                     "name": "EyeHeight",
