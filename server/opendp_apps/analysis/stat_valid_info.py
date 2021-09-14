@@ -22,8 +22,10 @@ class StatValidInfo:
         if self.valid is False:
             return info
 
-        info['value'] = self.value
-        info['accuracy'] = self.accuracy
+        # info['value'] = self.value
+        if self.accuracy:
+            info['accuracy'] = self.accuracy
+
         return info
 
     @staticmethod
@@ -32,7 +34,7 @@ class StatValidInfo:
 
     @staticmethod
     def get_error_msg_dict(var_name, statistic, message=None):
-        return StatValidInfo.get_error_msg(var_name, statistic, False, message).as_dict()
+        return StatValidInfo.get_error_msg(var_name, statistic, message).as_dict()
 
     @staticmethod
     def get_success_msg(var_name, statistic, message=None, value=None, accuracy=None):
@@ -40,7 +42,7 @@ class StatValidInfo:
 
     @staticmethod
     def get_success_msg_dict(var_name, statistic, message=None, value=None, accuracy=None):
-        return StatValidInfo.get_success_msg(var_name, statistic, True, message, value, accuracy).as_dict()
+        return StatValidInfo.get_success_msg(var_name, statistic, message, value, accuracy).as_dict()
 
 """
 from opendp_apps.analysis.stat_valid_info import StatValidInfo

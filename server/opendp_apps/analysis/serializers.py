@@ -3,6 +3,7 @@ import pandas as pd
 
 from rest_framework import serializers
 from rest_framework.relations import PrimaryKeyRelatedField
+from django.contrib.auth import get_user_model
 
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis import static_vals as astatic
@@ -187,68 +188,27 @@ class ReleaseValidationSerializer(serializers.ModelSerializer):
         :return:
         """
         analysis_plan_id = self.validated_data['analysis_plan_id']
-        dp_statistics = self.validated_data['dp_statistics']
 
-        # is the user accessible here?!
-        opendp_user = request.user # ??
+        dp_statistics = self.validated_data['dp_statistics']
+        # import json; print('dp_statistics', json.dumps(dp_statistics, indent=4))
+
+        #opendp_user = request.user  # is the user in "save(...)" ?
+        opendp_user = kwargs.get('opendp_user')
 
         validate_util = ValidateReleaseUtil(opendp_user, analysis_plan_id, dp_statistics)
         if validate_util.has_error():
-            # This is a big error, before evaluating individual statistics
+            # This is a big error, check for it before evaluating individual statistics
             #
             user_msg = validate_util.get_err_msg()
-            # Can you return a 400 here with the error message
+            # Can you return a 400 / raise an Exception here with the error message?
+            # How should this be used?
+            return dict(success=False, message=user_msg)
+
+        print('validate_util.validation_info', validate_util.validation_info)
 
         return validate_util.validation_info
 
-        # -------------------------------------------------
-        # Original code below....
-        # -------------------------------------------------
 
-        analysis_plan = AnalysisPlan.objects.get(object_id=self.validated_data['analysis_plan_id'])
-        stats_valid = []
-        for dp_stat in self.validated_data['dp_statistics']:
-            statistic = dp_stat['statistic']
-            label = self._camel_to_snake(dp_stat['label'])
-            variable_info = analysis_plan.variable_info[label]
-            index = 0  # TODO: column headers.... (variable_info['index'])
-            lower = variable_info.get('min')
-            upper = variable_info.get('max')
-            if lower is None:
-                raise Exception(f"Lower must be defined: {variable_info}")
-            if upper is None:
-                raise Exception(f"Upper must be defined: {variable_info}")
-            # n = analysis_plan.data_set.data_profile.get('dataset', {}).get('row_count', 1000)
-            n = 1000
-            impute = dp_stat['missing_values_handling'] != astatic.MISSING_VAL_DROP
-            impute_value = float(dp_stat['fixed_value'])
-            epsilon = float(dp_stat['epsilon'])
-            # Do some validation and append to stats_valid
-            if statistic == astatic.DP_MEAN:
-                try:
-                    # print(index, lower, upper, n, impute_value, dp_stat['epsilon'])
-                    # print(list(map(type, (index, lower, upper, n, impute_value, dp_stat['epsilon']))))
-                    preprocessor = dp_mean(index, lower, upper, n, impute_value, epsilon)
-                    stats_valid.append({'valid': True})
-                # TODO: add column index and statistic to result
-                except Exception as ex:
-                    stats_valid.append({
-                        'column_index': index,
-                        'statistic': statistic,
-                        'valid': False,
-                        'message': str(ex)
-                    })
-                    raise ex
-            else:
-                # For now, everything else is invalid
-                stats_valid.append({
-                    'column_index': index,
-                    'statistic': statistic,
-                    'valid': False,
-                    'message': f'Statistic \'{statistic}\' is not supported'
-                })
-        # super(ReleaseInfoSerializer).save(**kwargs)
-        return stats_valid
 
 """
 Releasing Mean for the variable age. With at least probability 0.95 the output mean will differ from the true mean by at most 0.8328 units. Here the units are the same units the variable has in the dataset.

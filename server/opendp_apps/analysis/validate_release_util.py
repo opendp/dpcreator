@@ -8,6 +8,9 @@ from opendp_apps.analysis.tools.dp_mean import dp_mean
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
+
+# Temp workaround!!! See Issue #300
+# https://github.com/opendp/dpcreator/issues/300
 from opendp_apps.utils.camel_to_snake import camel_to_snake
 
 
@@ -24,6 +27,14 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.dp_statistics = dp_statistics
 
         self.validation_info = []      # list of StatValidInfo objects as dicts to return to UI
+
+        self.run_validation_process()
+
+        if release_run:
+            pass
+            # do some more stuff
+            # self.run_release()
+
 
     def run_release(self):
         """Run the release process"""
@@ -45,10 +56,17 @@ class ValidateReleaseUtil(BasicErrCheck):
         for dp_stat in self.dp_statistics:
             stat_num += 1       # not used yet...
             statistic = dp_stat['statistic']
-            var_name = camel_to_snake(dp_stat['variable'])  # User "variable", NOT "label"
+            var_name = dp_stat['variable']  # User "variable", NOT "label"
 
             # Get the variable info
+            #
             variable_info = self.analysis_plan.variable_info.get(var_name)
+            if not variable_info:
+                # Temp workaround!!! See Issue #300
+                # https://github.com/opendp/dpcreator/issues/300
+                variable_info = self.analysis_plan.variable_info.get(camel_to_snake(var_name))
+
+
             if not variable_info:
                 info = StatValidInfo.get_error_msg_dict(var_name, statistic, 'Variable info not found.')
                 self.validation_info.append(info)
@@ -74,6 +92,7 @@ class ValidateReleaseUtil(BasicErrCheck):
                 info = StatValidInfo.get_error_msg_dict(var_name, statistic, col_idx_info.message)
                 self.validation_info.append(info)
                 continue  # to the next dp_stat specification
+
             col_idx = col_idx_info.data
 
             # Retrieve the dataset size
@@ -104,10 +123,18 @@ class ValidateReleaseUtil(BasicErrCheck):
                     continue  # to the next dp_stat specification
                 except Exception as ex:
                     info = StatValidInfo.get_error_msg_dict(var_name, statistic, str(ex))
+                    self.validation_info.append(info)
                     continue  # to the next dp_stat specification
-            else:
-                user_msg = f'Statistic \'{statistic}\' is not supported'
+            elif statistic in astatic.DP_STATS_CHOICES:
+                user_msg = f'Statistic "{statistic}" will be supported soon!'
                 info = StatValidInfo.get_error_msg_dict(var_name, statistic, user_msg)
+                self.validation_info.append(info)
+                continue  # to the next dp_stat specification
+
+            else:
+                user_msg = f'Statistic "{statistic}" is not supported'
+                info = StatValidInfo.get_error_msg_dict(var_name, statistic, user_msg)
+                self.validation_info.append(info)
                 continue  # to the next dp_stat specification
 
 
@@ -117,8 +144,8 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         # Retrieve the Analysis Plan
         #
-        ap_info = AnalysisPlanUtil.retrieve_analysis(self.opendp_user.object_id, self.opendp_user)
-        if not ap_info.succsss:
+        ap_info = AnalysisPlanUtil.retrieve_analysis(self.analysis_plan_id, self.opendp_user)
+        if not ap_info.success:
             self.add_err_msg(ap_info.message)
             return False
 

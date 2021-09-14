@@ -15,6 +15,9 @@ from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp, BasicResponse
 
+# Temp workaround!!! See Issue #300
+# https://github.com/opendp/dpcreator/issues/300
+from opendp_apps.utils.camel_to_snake import camel_to_snake
 
 UPLOADED_FILE_STORAGE = FileSystemStorage(location=settings.UPLOADED_FILE_STORAGE_ROOT)
 
@@ -129,10 +132,15 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
             for idx, feature in self.data_profile['dataset']['variableOrder']:
                 if feature == var_name:
                     return ok_resp(idx)
+                elif feature == camel_to_snake(var_name):  # Temp workaround!!!
+                    # Temp workaround!!! See Issue #300
+                    # https://github.com/opendp/dpcreator/issues/300
+                    return ok_resp(idx)
+
         except ValueError:
             return err_resp('Bad "variableOrder" information in profile. (id:3)')
 
-        return err_resp(f'Index not found for variable {var_name}')
+        return err_resp(f'Index not found for variable "{var_name}"')
 
     def get_profile_variables(self):
         """Return the profile_variables and DataSetInfo object_id as an OrderedDict or None."""
@@ -184,7 +192,7 @@ class DataverseFileInfo(DataSetInfo):
     file_doi = models.CharField(max_length=255, blank=True)
     dataset_schema_info = models.JSONField(null=True, blank=True)
     file_schema_info = models.JSONField(null=True, blank=True)
-    depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo', on_delete=models.PROTECT, null=True)
+    depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo', on_delete=models.CASCADE, null=True)
 
     class Meta:
         verbose_name = 'Dataverse File Information'
@@ -252,7 +260,7 @@ class UploadFileInfo(DataSetInfo):
     """
     Refers to a file uploaded independently of DV
     """
-    depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo', on_delete=models.PROTECT, null=True)
+    depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo', on_delete=models.CASCADE, null=True)
 
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the STEP

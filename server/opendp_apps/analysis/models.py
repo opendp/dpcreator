@@ -105,10 +105,15 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     class Meta:
         verbose_name = 'Depositor Setup Data'
         verbose_name_plural = 'Depositor Setup Data'
-        ordering = ('dataversefileinfo', '-created', )
+        ordering = ('-created', )
 
     def __str__(self):
-        return f'{self.dataversefileinfo} - {self.user_step}'
+        if hasattr(self, 'dataversefileinfo'):
+            return f'{self.dataversefileinfo} - {self.user_step}'
+        elif hasattr(self, 'uploadfileinfo'):
+            return f'{self.uploadfileinfo} - {self.user_step}'
+        else:
+            return f'{self.object_id} - {self.user_step}'
 
     def set_user_step(self, new_step:DepositorSteps) -> bool:
         """Set a new user step. Does *not* save the object."""
