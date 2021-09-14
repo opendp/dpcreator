@@ -162,3 +162,7 @@ class StatSpec(BasicErrCheckList):
 
         return True
 
+    def print_debug(self):
+        """show params"""
+        for key, val in self.__dict__.items():
+            print(f'{key}: {val}')

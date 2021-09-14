@@ -20,11 +20,11 @@ class StatSpecTest(TestCase):
         msgt(self.test_10_dp_mean.__doc__)
 
         spec_props = dict(var_name="hours_sleep",
-                          col_index=3,
-                          variable_info=dict(min=0, max=24, type=pstatic.VAR_TYPE_FLOAT),
+                          col_index=1,
+                          variable_info=dict(min=1.0, max=16.0, type=pstatic.VAR_TYPE_FLOAT),
                           statistic=astatic.DP_MEAN,
-                          impute_constant=5,
-                          dataset_size=365,
+                          impute_constant=8.0,
+                          dataset_size=7,
                           epsilon=0.5,
                           ci=astatic.CI_95)
 
@@ -34,9 +34,13 @@ class StatSpecTest(TestCase):
             print(dp_mean.get_error_messages())
         self.assertFalse(dp_mean.has_error())
 
+        # dp_mean.print_debug()
+
         print('(2) dp_mean.is_valid()', dp_mean.is_valid())
         if dp_mean.has_error():
             print(dp_mean.get_error_messages())
+
+        dp_mean.create_statistic()
         #self.assertTrue(dp_mean.has_error())
         #print('dp_mean.is_valid()', dp_mean.is_valid())
         #print('dp_mean.has_error()', dp_mean.has_error())
