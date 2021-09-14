@@ -2,6 +2,7 @@ from os.path import abspath, dirname, isdir, isfile, join
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
+from unittest import skip
 
 import json
 from django.contrib.auth import get_user_model
@@ -135,12 +136,14 @@ class TestReleaseInfoSerializer(TestCase):
 
         # Now run the validator
         #
-        stats_valid = serializer.save(**dict(opendp_user=self.user_obj))
-        print('stats_valid', stats_valid)
+        stats_info = serializer.save(**dict(opendp_user=self.user_obj))
+        print('stats_info.success', stats_info.success)
+        self.assertTrue(stats_info.success)
+
         expected_result = [{'var_name': 'EyeHeight', 'statistic': astatic.DP_MEAN,
                             'valid': True, 'message': None}]
-
-        self.assertEqual(expected_result, stats_valid)
+        print('stats_info.data', stats_info.data)
+        self.assertEqual(expected_result, stats_info.data)
 
 
     def test_20_fail_unsupported_stat(self):
@@ -176,13 +179,16 @@ class TestReleaseInfoSerializer(TestCase):
 
         # Now run the validator
         #
-        stats_valid = serializer.save(**dict(opendp_user=self.user_obj))
-        print('stats_valid', stats_valid)
+        stats_info = serializer.save(**dict(opendp_user=self.user_obj))
+        print('stats_info.success', stats_info.success)
+        self.assertTrue(stats_info.success)
+
+        print('stats_info.data', stats_info.data)
         expected_result = [ \
                 {'var_name': 'EyeHeight', 'statistic': astatic.DP_SUM, 'valid': False,
                   'message': 'Statistic "sum" will be supported soon!'}]
 
-        self.assertEqual(expected_result, stats_valid)
+        self.assertEqual(expected_result, stats_info.data)
 
 
 
@@ -227,13 +233,14 @@ class TestReleaseInfoSerializer(TestCase):
         # Now run the validator
         #
         stats_valid = serializer.save(**dict(opendp_user=self.user_obj))
-        print('stats_valid', stats_valid)
+        print('stats_valid.success', stats_valid.success)
+        self.assertTrue(stats_valid.success)
+
+
         expected_result = [ {'var_name': 'TypingSpeed', 'statistic': astatic.DP_MEAN,
                              'valid': False,
                              'message': 'lower bound may not be greater than upper bound'}]
-
-
-        self.assertEqual(expected_result, stats_valid)
+        self.assertEqual(expected_result, stats_valid.data)
 
 
 
@@ -278,12 +285,13 @@ class TestReleaseInfoSerializer(TestCase):
         # Now run the validator
         #
         stats_valid = serializer.save(**dict(opendp_user=self.user_obj))
-        print('stats_valid', stats_valid)
+        self.assertTrue(stats_valid.success)
+
         expected_result =  [{'var_name': 'BlinkDuration', 'statistic': astatic.DP_MEAN,
                              'valid': False,
                              'message': VALIDATE_MSG_EPSILON}]
 
-        self.assertEqual(expected_result, stats_valid)
+        self.assertEqual(expected_result, stats_valid.data)
 
 
     def test_50_bad_total_epsilon(self):
@@ -323,11 +331,10 @@ class TestReleaseInfoSerializer(TestCase):
 
         # Now run the validator
         #
-        result = serializer.save(**dict(opendp_user=self.user_obj))
-        print('stats_valid', result)
+        stats_valid = serializer.save(**dict(opendp_user=self.user_obj))
+        self.assertFalse(stats_valid.success)
 
-        self.assertTrue('message' in result)
-        self.assertTrue(result['message'].find(astatic.ERR_MSG_BAD_TOTAL_EPSILON) > -1)
+        self.assertTrue(stats_valid.message.find(astatic.ERR_MSG_BAD_TOTAL_EPSILON) > -1)
 
 
 
@@ -400,6 +407,7 @@ class TestReleaseInfoSerializer(TestCase):
         self.assertTrue(expected_result[1]['valid'] is False)
         self.assertTrue(expected_result[1]['message'].find('exceeds the max epsilon') > -1)
 
+    @skip
     def test_70_show_add_file(self):
         """(70) Sample of attaching file to a DataSetInfo object"""
         msgt(self.test_70_show_add_file.__doc__)

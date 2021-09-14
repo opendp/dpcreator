@@ -1,9 +1,0 @@
-{
-    "typing_speed": {
-        "max": null,
-        "min": null,
-        "name": "TypingSpeed",
-        "type": "Numerical",
-        "label": ""
-    }
-}

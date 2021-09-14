@@ -9,6 +9,7 @@ from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.tools.dp_mean import dp_mean
 from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
+from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 
 class AnalysisPlanObjectIdSerializer(serializers.Serializer):
     """Ensure input is a valid UUID and connected to a valid DataSetInfo object"""
@@ -187,13 +188,18 @@ class ReleaseValidationSerializer(serializers.ModelSerializer):
         :param kwargs:
         :return:
         """
+        opendp_user = kwargs.get('opendp_user')
+        if not isinstance(opendp_user, get_user_model()):
+            user_msg = 'Not an OpenDP User'
+            return err_resp(user_msg)
+
         analysis_plan_id = self.validated_data['analysis_plan_id']
 
         dp_statistics = self.validated_data['dp_statistics']
         # import json; print('dp_statistics', json.dumps(dp_statistics, indent=4))
 
         #opendp_user = request.user  # is the user in "save(...)" ?
-        opendp_user = kwargs.get('opendp_user')
+
 
         validate_util = ValidateReleaseUtil(opendp_user, analysis_plan_id, dp_statistics)
         if validate_util.has_error():
@@ -202,11 +208,12 @@ class ReleaseValidationSerializer(serializers.ModelSerializer):
             user_msg = validate_util.get_err_msg()
             # Can you return a 400 / raise an Exception here with the error message?
             # How should this be used?
-            return dict(success=False, message=user_msg)
+            return err_resp(user_msg)   #dict(success=False, message=user_msg)
 
         print('validate_util.validation_info', validate_util.validation_info)
 
-        return validate_util.validation_info
+        return ok_resp(validate_util.validation_info)
+        #return validate_util.validation_info
 
 
 
