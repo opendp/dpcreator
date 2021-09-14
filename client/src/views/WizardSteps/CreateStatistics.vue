@@ -220,11 +220,11 @@ export default {
     save(editedItemFromDialog) {
       this.editedItem = Object.assign({}, editedItemFromDialog);
       if (this.isEditionMode) {
-        const label = this.getVarLabel(this.editedItem.variable)
+        const label = this.editedItem.variable
         Object.assign(this.statistics[this.editedIndex], this.editedItem, {label});
       } else {
         for (let variable of this.editedItem.variable) {
-          let label = this.getVarLabel(variable)
+          let label = variable
           if (!statsInformation.isDeltaStat(this.editedItem.statistic)) {
             this.editedItem.delta = ""
           }
