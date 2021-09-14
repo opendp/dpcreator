@@ -19,40 +19,46 @@ from opendp_apps.analysis.stat_valid_info import StatValidInfo
 class StatSpec:
     __metaclass__ = ABCMeta
 
-    prop_validators = dict(min=validate_not_negative,
-                            max=validate_not_negative,
-                            dataset_size=validate_int_greater_than_zero,
-                            epsilon=validate_epsilon_not_null,
-                            statistic=validate_statistic,
-                            impute_constant=validate_not_empty_or_none, # more complex check
-                            delta=validate_float,  # add something more!
-                            ci=validate_confidence_interval,
-                            accuracy=validate_not_negative)
+    prop_validators = dict(statistic=validate_statistic,
+                           dataset_size=validate_int_greater_than_zero,
+                           #
+                           epsilon=validate_epsilon_not_null,
+                           delta=validate_float,  # add something more!
+                           ci=validate_confidence_interval,
+                           #
+                           min=validate_not_negative,
+                           max=validate_not_negative,
+                           categories=validate_not_empty_or_none,  # ?
+                           #
+                           impute_constant=validate_not_empty_or_none, # more complex check
+                           #
+                           accuracy=validate_not_negative)
 
 
     def __init__(self, props: dict):
         """Set the internals using the props dict"""
         self.var_name = props.get('var_name')
         self.statistic = props.get('statistic')
-        self.impute_constant = props.get('impute_constant')
-
-        self.min = props.get('min')
-        self.max = props.get('max')
-        self.bounds = (self.min, self.max)
-
-        self.categories = props.get('categories')
-
         self.dataset_size = props.get('dataset_size')
+        #
         self.epsilon = props.get('epsilon')
         self.delta = props.get('delta')
         self.ci = props.get('ci')
+        #
         self.accuracy = props.get('accuracy')
+        self.impute_constant = props.get('impute_constant')
+        #
+        # Note: min, max, categories are sent in via variable_info
+        self.variable_info = props.get('variable_info', {}) # derive the min/max if needed
+        self.min = self.variable_info.get('min')
+        self.max = self.variable_info.get('max')
+        self.bounds = (self.min, self.max)
+        self.categories = self.variable_info.get('categories')
 
         self.value = None
 
         self.has_error = False
         self.error_messages = []
-
 
         self.run_basic_validation()
         #self.run_additional_validation()
