@@ -34,24 +34,6 @@ class TestReleaseInfoSerializer(TestCase):
 
         self.client.force_login(self.user_obj)
 
-        self.request = {
-            "analysis_plan_id": "98f5ec0d-33ae-45e2-af0e-125276376ef2",
-            "dp_statistics": [
-                {
-                    "statistic": astatic.DP_MEAN,
-                    "variable": "BlinkDuration",
-                    "epsilon": 1.0,
-                    "delta": 0,
-                    "error": "",
-                    "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
-                    "handle_as_fixed": False,
-                    "fixed_value": "5.0",
-                    "locked": False,
-                    "label": "EyeHeight"
-                }
-            ]
-        }
-
     def retrieve_new_plan(self):
         """Convenience method to create a new plan"""
 
@@ -542,9 +524,6 @@ class TestReleaseInfoSerializer(TestCase):
         analysis_plan = self.retrieve_new_plan()
 
         variable_info_mod = analysis_plan.variable_info
-        # valid min/max
-        variable_info_mod['EyeHeight']['min'] = 0.2
-        variable_info_mod['EyeHeight']['max'] = 4.1
 
         variable_info_mod['BlinkDuration']['min'] = 1
         variable_info_mod['BlinkDuration']['max'] = 400
@@ -594,12 +573,12 @@ class TestReleaseInfoSerializer(TestCase):
         stats_valid = serializer.save(**dict(opendp_user=self.user_obj))
         self.assertTrue(stats_valid.success)
 
-        sample_result_data = [{'var_name': 'EyeHeight', 'statistic': 'mean', 'valid': False,
+        _sample_result_data = [{'var_name': 'EyeHeight', 'statistic': 'mean', 'valid': False,
                             'message': 'constant must be a member of DA'},
                            {'var_name': 'BlinkDuration', 'statistic': 'mean', 'valid': False,
                             'message': 'The running epsilon (1.05) exceeds the max epsilon (1.0)'}]
 
-        self.assertTrue(stats_valid.data[0]['valid'] is False)
+        self.assertTrue(stats_valid.data[0]['valid'] is True)
         self.assertTrue(stats_valid.data[1]['valid'] is False)
         self.assertTrue(stats_valid.data[1]['message'].find('exceeds the max epsilon') > -1)
 
@@ -610,9 +589,6 @@ class TestReleaseInfoSerializer(TestCase):
         analysis_plan = self.retrieve_new_plan()
 
         variable_info_mod = analysis_plan.variable_info
-        # valid min/max
-        variable_info_mod['EyeHeight']['min'] = 0.2
-        variable_info_mod['EyeHeight']['max'] = 4.1
 
         variable_info_mod['BlinkDuration']['min'] = 1
         variable_info_mod['BlinkDuration']['max'] = 400
@@ -622,19 +598,17 @@ class TestReleaseInfoSerializer(TestCase):
         # Send the dp_statistics for validation
         #
         stat_specs = [ \
-            { \
-                "statistic": astatic.DP_MEAN,
+            {   "statistic": astatic.DP_MEAN,
                 "variable": "EyeHeight",
-                "epsilon": 0.6,
+                "epsilon": 1,
                 "delta": 0,
                 "error": "",
                 "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
                 "handle_as_fixed": False,
                 "fixed_value": "5.0",
                 "locked": False,
-                "label": "EyeHeight",
-            },
-            { \
+                "label": "EyeHeight"},
+            {
                 "statistic": astatic.DP_MEAN,
                 "variable": "BlinkDuration",
                 "epsilon": 0.45,
@@ -649,20 +623,20 @@ class TestReleaseInfoSerializer(TestCase):
 
         request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
                             dp_statistics=stat_specs)
-
         response = self.client.post('/api/release/',
                                     json.dumps(request_plan),
                                     content_type='application/json')
 
         jresp = response.json()
         self.assertEqual(response.status_code, 200)
+        print(json.dumps(jresp, indent=4))
 
-        sample_result_data = [{'var_name': 'EyeHeight', 'statistic': 'mean', 'valid': False,
+        _sample_result_data = [{'var_name': 'EyeHeight', 'statistic': 'mean', 'valid': False,
                                'message': 'constant must be a member of DA'},
                               {'var_name': 'BlinkDuration', 'statistic': 'mean', 'valid': False,
                                'message': 'The running epsilon (1.05) exceeds the max epsilon (1.0)'}]
 
-        self.assertTrue(jresp['data'][0]['valid'] is False)
+        self.assertTrue(jresp['data'][0]['valid'] is True)
         self.assertTrue(jresp['data'][1]['valid'] is False)
         self.assertTrue(jresp['data'][1]['message'].find('exceeds the max epsilon') > -1)
 

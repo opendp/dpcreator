@@ -15,7 +15,88 @@ class ReleaseView(viewsets.ViewSet):
 
     def create(self, request, *args, **kwargs):
         """
-        Run validation for a list of release requests
+        Note: No 'create' is actually done. This endpoint is used for validation.
+
+        Example input:
+            {
+                "analysis_plan_id": "616b5167-4ce8-4def-85dc-6f0d8de2316c",
+                "dp_statistics": [
+                    {
+                        "statistic": "mean",
+                        "variable": "EyeHeight",
+                        "epsilon": 0.6,
+                        "delta": 0,
+                        "error": "",
+                        "missing_values_handling": "insert_fixed",
+                        "handle_as_fixed": false,
+                        "fixed_value": "5.0",
+                        "locked": false,
+                        "label": "EyeHeight"
+                    }
+                ]
+            }
+
+        -- Example outputs --
+
+        (1) Overall error
+            Status code: 400
+                {
+                    "success": false,
+                    "message": "The depositor setup info has an invalid epsilon value: 4.0"
+                }
+
+        (2) Single statistic error -- even if only 1 statistic submitted
+            Status code: 200  - NOTE status code is 200!
+            {
+                "success": true,
+                "message": "validation results returned",
+                "data": [
+                    {
+                        "var_name": "BlinkDuration",
+                        "statistic": "mean",
+                        "valid": false,
+                        "message": "As a rule of thumb, epsilon should not be less than 0.001 nor greater than 1."
+                    }
+                ]
+            }
+
+        (2) Single statistic success -- even if only 1 statistic submitted
+            Status code: 200  - NOTE status code is 200!
+
+            {
+                "success": true,
+                "message": "validation results returned",
+                "data": [
+                    {
+                        "var_name": "EyeHeight",
+                        "statistic": "mean",
+                        "valid": true,
+                        "message": null
+                    }
+                ]
+            }
+
+        (3) Mixed success and error -- even if only 1 statistic submitted
+            Status code: 200  - NOTE status code is 200!
+            {
+                "success": true,
+                "message": "validation results returned",
+                "data": [
+                    {
+                        "var_name": "EyeHeight",
+                        "statistic": "mean",
+                        "valid": true,
+                        "message": null
+                    },
+                    {
+                        "var_name": "BlinkDuration",
+                        "statistic": "mean",
+                        "valid": false,
+                        "message": "The running epsilon (1.45) exceeds the max epsilon (1.0)"
+                    }
+                ]
+            }
+
         """
         #print('>> ReleaseView.create >>>', request.data)
         release_info_serializer = ReleaseValidationSerializer(data=request.data)
