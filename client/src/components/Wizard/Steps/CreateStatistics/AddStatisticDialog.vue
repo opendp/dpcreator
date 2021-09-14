@@ -49,7 +49,7 @@
                 v-for="(variable, index) in variables"
                 :key="variable + index"
                 :label="variable['label']"
-                :value="variable['key']"
+                :value="variable['label']"
                 on-icon="mdi-check"
             ></v-radio>
           </v-radio-group>
@@ -334,14 +334,15 @@ export default {
       return release.validate(this.analysisPlan.objectId, tempStats)
           .then((resp) => {
             console.log('validate response: ' + JSON.stringify(resp))
+            console.log('validate response: ' + JSON.stringify(resp.data))
             let valid = true
-            resp.valid.forEach((item, index) => {
+            resp.data.forEach((item, index) => {
               if (item.valid !== true) {
                 item.stat = tempStats[index]
                 valid = false;
               }
             })
-            this.validationErrorMsg = resp.valid
+            this.validationErrorMsg = resp.data
             return valid
           })
           .catch((error) => {
