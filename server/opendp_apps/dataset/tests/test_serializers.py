@@ -69,7 +69,7 @@ class TestReleaseInfoSerializer(TestCase):
 
         return analysis_plan
 
-    def add_source_file(self, dataset_info: DataSetInfo, filename: str, add_profile: bool=False):
+    def add_source_file(self, dataset_info: DataSetInfo, filename: str, add_profile: bool=False) -> DataSetInfo:
         """Add a source file -- example...
         - filepath - file under dpcreator/test_data
         """
@@ -90,13 +90,15 @@ class TestReleaseInfoSerializer(TestCase):
         if add_profile is True:
             profile_handler = profiler_tasks.run_profile_by_filefield(dataset_info.object_id)
             print('profile_handler.has_error()', profile_handler.has_error())
-            self.assertTrue(profile_handler.has_error() is False)
 
             # Shouldn't have errors
             if profile_handler.has_error():
                 print(f'!! error: {profiler.get_err_msg()}')
 
-        return dataset_info
+            self.assertTrue(profile_handler.has_error() is False)
+
+        # re-retrieve it...
+        return DataSetInfo.objects.get(object_id=dataset_info.object_id)
 
 
 
@@ -409,15 +411,13 @@ class TestReleaseInfoSerializer(TestCase):
         dataset_info_1.profile_variables = None
         dataset_info_1.save()
 
-        self.add_source_file(analysis_plan.dataset, 'Fatigue_data.tab', True)
+        dataset_info_updated = self.add_source_file(analysis_plan.dataset, 'Fatigue_data.tab', True)
 
-        dataset_info_2 = DataSetInfo.objects.get(object_id=dataset_info_1.object_id)
+        self.assertTrue('variables' in dataset_info_updated.data_profile)
+        self.assertTrue('dataset' in dataset_info_updated.data_profile)
 
-        self.assertTrue('variables' in dataset_info_2.data_profile)
-        self.assertTrue('dataset' in dataset_info_2.data_profile)
-
-        self.assertTrue('variables' in dataset_info_2.profile_variables)
-        self.assertTrue('dataset' in dataset_info_2.profile_variables)
+        self.assertTrue('variables' in dataset_info_updated.profile_variables)
+        self.assertTrue('dataset' in dataset_info_updated.profile_variables)
 
         # print(json.dumps(dataset_info_2.data_profile, indent=4))
         # print(json.dumps(dataset_info_2.profile_variables, indent=4))
