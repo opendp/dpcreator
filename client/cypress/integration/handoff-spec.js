@@ -64,7 +64,7 @@
                 // Next the Welcome page, with the File Locked message
 
                 cy.get('.v-alert__wrapper').should('contain', 'Sorry, the file is locked')
-                
+
                  */
             })
     })

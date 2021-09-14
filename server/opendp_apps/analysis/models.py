@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
 from opendp_apps.utils.extra_validators import \
@@ -31,12 +32,9 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     """
     Confidence Interval choices
     """
-    CI_95 = 0.05
-    CI_99 = 0.01
-    CI_CHOICES = (
-        (CI_95, '95% CI'),
-        (CI_99, '99% CI'),
-    )
+    CI_95 = astatic.CI_95
+    CI_99 = astatic.CI_99
+    CI_CHOICES = astatic.CI_CHOICES
 
     """
     Often used Delta values
