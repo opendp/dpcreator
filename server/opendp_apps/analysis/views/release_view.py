@@ -15,9 +15,11 @@ class ReleaseView(viewsets.ViewSet):
 
     def create(self, request, *args, **kwargs):
         """
-        Note: No 'create' is actually done. This endpoint is used for validation.
+        Note: No data is saved. This endpoint is used for validation.
 
-        Example input:
+        endpoint: /api/release/
+
+        Example POST input:
             {
                 "analysis_plan_id": "616b5167-4ce8-4def-85dc-6f0d8de2316c",
                 "dp_statistics": [
