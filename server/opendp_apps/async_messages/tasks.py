@@ -56,7 +56,7 @@ def profile_dataset_info(dataset_object_id: DataSetInfo.object_id, websocket_id=
     if dp_util.has_error():
         if websocket_id:
             return dict(success=False, messsage=dp_util.get_err_msg())
-        return err_resp(dp_util.get_err_msg())  # direct error message
+        return err_resp(dp_util.get_err_msg())  # direct error `message`
 
     if websocket_id:
         return dict(success=True, messsage='Profile in process')

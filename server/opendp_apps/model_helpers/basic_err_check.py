@@ -32,6 +32,36 @@ class BasicErrCheck():
         self.add_err_msg(err_msg)
 
 
+class BasicErrCheckList():
+
+    error_found = False
+    error_messages = []
+
+    def has_error(self):
+        """Did an error occur?"""
+        return self.error_found
+
+    def get_error_messages(self):
+        """Return the error message if 'has_error' is True"""
+        assert self.has_error(),\
+            "Please check that '.has_error()' is True before using this method"
+
+        return self.error_messages
+
+    def get_err_msgs(self):
+        """Return the error message if 'has_error' is True"""
+        return self.get_error_messages()
+
+    def add_err_msg(self, err_msg):
+        """Add an error message"""
+        self.error_found = True
+        self.error_messages.append(err_msg)
+
+    def add_error_message(self, err_msg):
+        """Add an error message -- same as "add_err_msg" """
+        self.add_err_msg(err_msg)
+
+
 def try_it():
     """quick check"""
     b = BasicErrCheck()

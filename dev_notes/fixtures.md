@@ -8,5 +8,8 @@ docker-compose run server python manage.py dumpdata dataverses.registereddataver
     analysis.depositorsetupinfo \
     dataset.dataversefileinfo \
     --indent=4 \
-    > server/opendp_apps/analysis/fixtures/test_analysis_001.json
+    > server/opendp_apps/dataset/fixtures/test_dataset_001.json
+    
+    
+#    > server/opendp_apps/analysis/fixtures/test_analysis_001.json
 ```
