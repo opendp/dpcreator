@@ -145,6 +145,8 @@ class ReleaseValidationSerializer(serializers.ModelSerializer):
         model = ReleaseInfo
         fields = ('dp_statistics', 'analysis_plan_id', )
 
+    # Temp workaround!!! See Issue #300
+    # https://github.com/opendp/dpcreator/issues/300
     def _camel_to_snake(self, name):
         """
         Front end is passing camelCase, but JSON in DB is using snake_case

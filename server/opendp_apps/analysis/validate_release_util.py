@@ -26,7 +26,8 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         self.analysis_plan_id = analysis_plan_id
         self.analysis_plan = None       # to be retrieved
-        self.max_epsilon = None         # to be retrieved
+
+        self.max_epsilon = None         # from DepositorSetupInfo
 
         self.dp_statistics = dp_statistics
 
@@ -89,6 +90,8 @@ class ValidateReleaseUtil(BasicErrCheck):
                 self.add_stat_error(var_name, statistic, 'Variable info not found.')
                 continue # to the next dp_stat specification
 
+
+
             if astatic.DP_STAT_NEED_MIN_MAX.get(statistic) is True:
                 # Find the min/max in the variable info
                 lower = variable_info.get('min')
@@ -144,7 +147,7 @@ class ValidateReleaseUtil(BasicErrCheck):
                 try:
                     # print(index, lower, upper, n, impute_value, dp_stat['epsilon'])
                     # print(list(map(type, (index, lower, upper, n, impute_value, dp_stat['epsilon']))))
-                    preprocessor = dp_mean(col_idx, lower, upper, dataset_size, impute_value, epsilon)
+                    _preprocessor = dp_mean(col_idx, lower, upper, dataset_size, impute_value, epsilon)
 
                     #
                     # TODO: add column index and statistic to result (maybe

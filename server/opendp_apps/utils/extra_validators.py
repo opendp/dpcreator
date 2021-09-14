@@ -40,6 +40,14 @@ def validate_int_greater_than_zero(value):
     if value < 1:
         raise ValidationError(VALIDATE_MSG_ONE_OR_GREATER)
 
+def validate_int_not_negative(value):
+    """Validate int greater >= 0"""
+    if not isinstance(value, int):
+        raise ValidationError(VALIDATE_MSG_NOT_INT)
+
+    if value < 0:
+        raise ValidationError(VALIDATE_MSG_ZERO_OR_GREATER)
+
 
 def validate_not_negative_or_none(value):
     """Valid values are None or non-negative numbers"""
@@ -62,8 +70,15 @@ def validate_epsilon_or_none(value):
 
 def validate_not_empty_or_none(value):
 
-    if not value:
+    if value == 0:
+        pass
+    elif not value:
         raise ValidationError('The value cannot be empty.')
+
+def validate_not_none(value):
+
+    if value is None:
+        raise ValidationError('The value cannot be None.')
 
 def validate_epsilon_not_null(value):
     """

@@ -2,6 +2,7 @@
 Convenience class for holding statistic validation information
 """
 
+
 class StatValidInfo:
     """Class to hold the result of a single stat validation"""
     def __init__(self, var_name: str, statistic: str, valid: bool, message: str=None, value=None, accuracy: float=None):
