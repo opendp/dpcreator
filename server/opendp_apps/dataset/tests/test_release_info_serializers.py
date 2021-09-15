@@ -73,7 +73,7 @@ class TestReleaseInfoSerializer(TestCase):
 
             # Shouldn't have errors
             if profile_handler.has_error():
-                print(f'!! error: {profiler.get_err_msg()}')
+                print(f'!! error: {profile_handler.get_err_msg()}')
 
             self.assertTrue(profile_handler.has_error() is False)
 
@@ -160,7 +160,7 @@ class TestReleaseInfoSerializer(TestCase):
         request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
                             dp_statistics=[stat_spec])
 
-        response = self.client.post('/api/release/',
+        response = self.client.post('/api/validation/',
                                     json.dumps(request_plan),
                                     content_type='application/json')
 
@@ -238,12 +238,13 @@ class TestReleaseInfoSerializer(TestCase):
         request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
                             dp_statistics=[stat_spec])
 
-        response = self.client.post('/api/release/',
+        response = self.client.post('/api/validation/',
                                     json.dumps(request_plan),
                                     content_type='application/json')
 
         jresp = response.json()
-        self.assertEqual(response.status_code, 201)
+        print(jresp)
+        self.assertEqual(response.status_code, 200)
 
         self.assertTrue(jresp['success'])
 
@@ -335,7 +336,7 @@ class TestReleaseInfoSerializer(TestCase):
         request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
                             dp_statistics=[stat_spec])
 
-        response = self.client.post('/api/release/',
+        response = self.client.post('/api/validation/',
                                     json.dumps(request_plan),
                                     content_type='application/json')
 
@@ -435,7 +436,7 @@ class TestReleaseInfoSerializer(TestCase):
         self.assertTrue(valid)
         self.assertTrue(serializer.errors == {})
 
-        response = self.client.post('/api/release/',
+        response = self.client.post('/api/validation/',
                                     json.dumps(request_plan),
                                     content_type='application/json')
 
@@ -521,7 +522,7 @@ class TestReleaseInfoSerializer(TestCase):
         request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
                             dp_statistics=[stat_spec])
 
-        response = self.client.post('/api/release/',
+        response = self.client.post('/api/validation/',
                                     json.dumps(request_plan),
                                     content_type='application/json')
 
@@ -621,7 +622,7 @@ class TestReleaseInfoSerializer(TestCase):
 
         request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
                             dp_statistics=stat_specs)
-        response = self.client.post('/api/release/',
+        response = self.client.post('/api/validation/',
                                     json.dumps(request_plan),
                                     content_type='application/json')
 

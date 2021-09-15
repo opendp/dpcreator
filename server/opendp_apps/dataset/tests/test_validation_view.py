@@ -8,7 +8,7 @@ from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.model_helpers.msg_util import msgt
 
 
-class TestReleaseView(TestCase):
+class TestValidationView(TestCase):
 
     fixtures = ['test_dataset_data_001.json', ]
 
@@ -43,7 +43,7 @@ class TestReleaseView(TestCase):
         AnalysisPlanUtil.create_plan(dataset_info.object_id, self.user_obj)
         analysis_plan = AnalysisPlan.objects.first()
         self.request['analysis_plan_id'] = analysis_plan.object_id
-        response = client.post('/api/release/', data=self.request, format='json')
+        response = client.post('/api/validation/', data=self.request, format='json')
         self.assertEqual(response.status_code, 400)
 
     def test_post_success(self):
@@ -54,5 +54,5 @@ class TestReleaseView(TestCase):
         AnalysisPlanUtil.create_plan(dataset_info.object_id, self.user_obj)
         analysis_plan = AnalysisPlan.objects.first()
         self.request['analysis_plan_id'] = analysis_plan.object_id
-        response = self.client.post('/api/release/', data=self.request, format='json')
+        response = self.client.post('/api/validation/', data=self.request, format='json')
         self.assertEqual(response.status_code, 200)
