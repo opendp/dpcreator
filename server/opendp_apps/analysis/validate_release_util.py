@@ -86,6 +86,7 @@ class ValidateReleaseUtil(BasicErrCheck):
                     "locked": False,
                     "label": "EyeHeight"},
             """
+            print('dp_stat', dp_stat)
             variable = dp_stat.get('variable')
             statistic = dp_stat.get('statistic', 'shrug?')
             epsilon = dp_stat.get('epsilon')

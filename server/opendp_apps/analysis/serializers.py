@@ -56,8 +56,8 @@ class DPStatisticSerializer(serializers.Serializer):
     label = serializers.CharField()
     locked = serializers.BooleanField()
     epsilon = serializers.FloatField()
-    delta = serializers.FloatField()
-    ci = serializers.FloatField()
+    delta = serializers.FloatField(required=False, default=0.0)
+    ci = serializers.FloatField(default=astatic.CI_95)
     variable = serializers.CharField()
 
     # e.g. ['mean', 'sum', 'count', 'histogram', 'quantile'] etc.
