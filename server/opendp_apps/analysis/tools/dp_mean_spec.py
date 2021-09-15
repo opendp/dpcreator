@@ -3,6 +3,7 @@ Wrapper class for DP Mean functionality
 
 
 """
+from opendp.accuracy import laplacian_scale_to_accuracy
 from opendp.meas import make_base_laplace
 from opendp.mod import binary_search, enable_features
 from opendp.trans import \
@@ -41,7 +42,6 @@ class DPMeanSpec(StatSpec):
         """
         return ['min', 'max', 'ci', 'impute_constant']
 
-
     def run_initial_handling(self):
         """
         Make sure values are consistently floats
@@ -57,8 +57,6 @@ class DPMeanSpec(StatSpec):
                 return
 
         self.floatify_int_values()
-
-
 
     def check_scale(self, scale, preprocessor, dataset_distance, epsilon):
         """
@@ -92,14 +90,21 @@ class DPMeanSpec(StatSpec):
             make_sized_bounded_mean(self.dataset_size, self.get_bounds())
         )
 
-        scale = binary_search(lambda s: self.check_scale(s, preprocessor, 1, self.epsilon),
-                              bounds=(0.0, 1000.0))
-        preprocessor = preprocessor >> make_base_laplace(scale)
-
-        #laplacian_scale_to_accuracy(self.preprocessor, self.ci)
+        self.scale = binary_search(lambda s: self.check_scale(s, preprocessor, 1, self.epsilon), bounds=(0.0, 1000.0))
+        preprocessor = preprocessor >> make_base_laplace(self.scale)
 
         self.preprocessor = preprocessor
         return preprocessor
+
+    def set_accuracy(self):
+        """Return the accuracy measure using Laplace and the confidence interval as alpha"""
+        if not self.preprocessor:
+            self.preprocessor = self.get_preprocessor()
+        self.accuracy_val = laplacian_scale_to_accuracy(self.scale, self.ci)
+        self.accuracy_message = f"Releasing {self.statistic} for the variable {self.variable}. " \
+                                f"With at least probability {1-self.ci} the output {self.statistic} " \
+                                f"will differ from the true mean by at most {self.accuracy_val} units. " \
+                                f"Here the units are the same units the variable has in the dataset."
 
 
     def create_statistic(self):

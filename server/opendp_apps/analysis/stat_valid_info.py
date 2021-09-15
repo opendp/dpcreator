@@ -5,7 +5,7 @@ Convenience class for holding statistic validation information
 
 class StatValidInfo:
     """Class to hold the result of a single stat validation"""
-    def __init__(self, var_name, statistic, valid, message, **kwargs):
+    def __init__(self, var_name, statistic, valid, message, value=None, accuracy_val=None, accuracy_msg=None):
         """
         :param variable str
         :param statistic str
@@ -19,9 +19,9 @@ class StatValidInfo:
         self.statistic = statistic
         self.valid = valid
         self.message = message
-        self.value = kwargs.get('value')
-        self.accuracy_val = kwargs.get('accuracy_val')
-        self.accuracy_msg = kwargs.get('accuracy_msg')
+        self.value = value
+        self.accuracy_val = accuracy_val
+        self.accuracy_msg = accuracy_msg
 
 
     def as_dict(self):
@@ -68,8 +68,8 @@ class StatValidInfo:
         :param accuracy_val  (optional)
         :param accuracy_msg  (optional)
         """
-        return StatValidInfo(variable, statistic, True, message,
-                             accuracy_val=None, accuracy_msg=None).as_dict()
+        return StatValidInfo(variable, statistic, True, message, value=None,
+                             accuracy_val=accuracy_val, accuracy_msg=accuracy_msg).as_dict()
 
 
     @staticmethod

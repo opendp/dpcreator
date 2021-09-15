@@ -53,7 +53,6 @@ class StatSpec(BasicErrCheckList):
                            #
                            accuracy=validate_not_negative)
 
-
     def __init__(self, props: dict):
         """Set the internals using the props dict"""
         self.variable = props.get('variable')
@@ -82,6 +81,7 @@ class StatSpec(BasicErrCheckList):
 
         self.preprocessor = None    # set this each time get_preprocessor is called--hopefully once
         self.value = None
+        self.scale = None
 
         self.run_initial_handling()
         self.run_basic_validation()
@@ -105,7 +105,6 @@ class StatSpec(BasicErrCheckList):
         `   return ['min', 'max', 'ci']`
         """
         return []
-
 
     @abstractmethod
     def check_scale(self, scale, preprocessor, dataset_distance):
@@ -138,14 +137,9 @@ class StatSpec(BasicErrCheckList):
             return
         pass
 
-
-    def get_accuracy(self):
-        """Return the accuracy measure using Laplace and the confidence interval as alpha"""
-        if not self.preprocessor:
-            self.preprocessor = self.get_preprocessor()
-
-        return laplacian_scale_to_accuracy(self.preprocessor, self.ci)
-
+    @abstractmethod
+    def set_accuracy(self):
+        pass
 
     def get_bounds(self):
         """Return bounds based on the min/max values
@@ -154,7 +148,6 @@ class StatSpec(BasicErrCheckList):
         """
         return (self.min, self.max)
 
-
     def is_valid(self):
         """Checking validity is accomplished by building the preprocessor"""
         if self.has_error():
@@ -162,6 +155,7 @@ class StatSpec(BasicErrCheckList):
 
         try:
             self.get_preprocessor()
+            self.set_accuracy()
         except OpenDPException as ex_obj:
             self.add_err_msg(f'{ex_obj.message} (OpenDPException)')
             return False
@@ -281,13 +275,11 @@ class StatSpec(BasicErrCheckList):
                                                   accuracy_val=self.accuracy_val,
                                                   accuracy_msg=self.accuracy_message)
 
-
     def get_error_msg_dict(self):
         """Get invalid info dict"""
         return StatValidInfo.get_error_msg_dict(self.variable,
                                                 self.statistic,
                                                 self.get_err_msgs()[0])
-
 
     def print_debug(self):
         """show params"""
