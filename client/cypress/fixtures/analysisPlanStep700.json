@@ -1,0 +1,145 @@
+{
+  "name": "Plan 5LVB3AA",
+  "objectId": "d18bc23a-c7ce-48b3-b61e-2fb465d83e9a",
+  "analyst": "b579c31c-5ffa-411f-8830-31466d4cb641",
+  "dataset": "be0e39ad-6330-485e-89d3-4a6eb2452164",
+  "isComplete": false,
+  "userStep": "step_700",
+  "variableInfo": {
+    "trial": {
+      "name": "Trial",
+      "type": "Categorical",
+      "label": "",
+      "categories": null
+    },
+    "session": {
+      "name": "Session",
+      "type": "Boolean",
+      "label": ""
+    },
+    "subject": {
+      "name": "Subject",
+      "type": "Categorical",
+      "label": "",
+      "categories": null
+    },
+    "language": {
+      "name": "Language",
+      "type": "Boolean",
+      "label": ""
+    },
+    "eyeHeight": {
+      "max": 100,
+      "min": 1,
+      "name": "EyeHeight",
+      "type": "Numerical",
+      "label": "EyeHeight"
+    },
+    "typingSpeed": {
+      "max": null,
+      "min": null,
+      "name": "TypingSpeed",
+      "type": "Numerical",
+      "label": ""
+    },
+    "blinkDuration": {
+      "max": null,
+      "min": null,
+      "name": "BlinkDuration",
+      "type": "Numerical",
+      "label": ""
+    },
+    "blinkInterval": {
+      "max": null,
+      "min": null,
+      "name": "BlinkInterval",
+      "type": "Numerical",
+      "label": ""
+    },
+    "blinkFrequency": {
+      "max": null,
+      "min": null,
+      "name": "BlinkFrequency",
+      "type": "Numerical",
+      "label": ""
+    },
+    "correctedError": {
+      "max": null,
+      "min": null,
+      "name": "CorrectedError",
+      "type": "Numerical",
+      "label": ""
+    },
+    "saccadeDuration": {
+      "max": null,
+      "min": null,
+      "name": "SaccadeDuration",
+      "type": "Numerical",
+      "label": ""
+    },
+    "saccadeVelocity": {
+      "max": null,
+      "min": null,
+      "name": "SaccadeVelocity",
+      "type": "Numerical",
+      "label": ""
+    },
+    "blinkBurstRatio": {
+      "max": null,
+      "min": null,
+      "name": "BlinkBurstRatio",
+      "type": "Numerical",
+      "label": ""
+    },
+    "saccadeAmplitude": {
+      "max": null,
+      "min": null,
+      "name": "SaccadeAmplitude",
+      "type": "Numerical",
+      "label": ""
+    },
+    "saccadePeakVelocity": {
+      "max": null,
+      "min": null,
+      "name": "SaccadePeakVelocity",
+      "type": "Numerical",
+      "label": ""
+    },
+    "readTextEventsRatio": {
+      "max": null,
+      "min": null,
+      "name": "ReadTextEventsRatio",
+      "type": "Numerical",
+      "label": ""
+    },
+    "uncorrectedErrorRate": {
+      "max": null,
+      "min": null,
+      "name": "UncorrectedErrorRate",
+      "type": "Numerical",
+      "label": ""
+    },
+    "baselinePupilDiameter": {
+      "max": null,
+      "min": null,
+      "name": "BaselinePupilDiameter",
+      "type": "Numerical",
+      "label": ""
+    },
+    "objectiveTaskDifficulty": {
+      "name": "ObjectiveTaskDifficulty",
+      "type": "Boolean",
+      "label": ""
+    },
+    "attendedButNotSelectedRate": {
+      "max": null,
+      "min": null,
+      "name": "AttendedButNotSelectedRate",
+      "type": "Numerical",
+      "label": ""
+    }
+  },
+  "dpStatistics": null,
+  "created": "2021-09-15T19:37:41.248119Z",
+  "updated": "2021-09-15T19:37:41.248158Z"
+}

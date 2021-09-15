@@ -39,7 +39,7 @@
         />
         <strong>people</strong>
       </div>
-      <RadioItem label="No." value="no"/>
+      <RadioItem data-test="Larger Population - no" label="No." value="no"/>
       <RadioItem label="I'm unsure." value="unsure"/>
     </v-radio-group>
 
@@ -59,7 +59,7 @@
           :disabled="radioObservationsNumberShouldBeDisabled"
           v-on:change="saveUserInput"
       >
-        <RadioItem label="Yes." value="yes"/>
+        <RadioItem label="Yes." data-test="Public Observations - yes" value="yes"/>
         <RadioItem label="No." value="no"/>
         <RadioItem label="I'm unsure." value="unsure"/>
       </v-radio-group>
