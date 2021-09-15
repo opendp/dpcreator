@@ -90,7 +90,9 @@ import EditNoiseParamsConfirmationDialog
 import NoiseParams from "../../components/Wizard/Steps/CreateStatistics/NoiseParams.vue";
 import StatisticsTable from "../../components/Wizard/Steps/CreateStatistics/StatisticsTable.vue";
 import statsInformation from "@/data/statsInformation";
+import release from "@/api/release";
 import {mapGetters, mapState} from "vuex";
+
 export default {
   name: "CreateStatistics",
   components: {
@@ -204,6 +206,7 @@ export default {
       this.delta = delta;
       this.confidenceInterval = confidenceInterval;
       this.redistributeValues()
+ //     statsInformation.redistributeValues(this.statistics,this.epsilon,this.delta, this.getDepositorSetupInfo.defaultDelta)
       this.saveUserInput()
     },
     // Label may not be set for all variables, so use name as the label if needed
@@ -217,11 +220,11 @@ export default {
     save(editedItemFromDialog) {
       this.editedItem = Object.assign({}, editedItemFromDialog);
       if (this.isEditionMode) {
-        const label = this.getVarLabel(this.editedItem.variable)
+        const label = this.editedItem.variable
         Object.assign(this.statistics[this.editedIndex], this.editedItem, {label});
       } else {
         for (let variable of this.editedItem.variable) {
-          let label = this.getVarLabel(variable)
+          let label = variable
           if (!statsInformation.isDeltaStat(this.editedItem.statistic)) {
             this.editedItem.delta = ""
           }
@@ -232,17 +235,20 @@ export default {
       }
       this.redistributeValues()
       this.saveUserInput()
-      this.close();
+      this.close()
+
     },
     redistributeValues() {
-      if (statsInformation.statisticsUseDelta(this.statistics) && this.delta == 0) {
-        this.delta = this.getDepositorSetupInfo.defaultDelta
+      if (this.statistics) {
+        if (statsInformation.statisticsUseDelta(this.statistics) && this.delta == 0) {
+          this.delta = this.getDepositorSetupInfo.defaultDelta
+        }
+        if (!statsInformation.statisticsUseDelta(this.statistics)) {
+          this.delta = 0
+        }
+        this.redistributeValue(this.epsilon, 'epsilon')
+        this.redistributeValue(this.delta, 'delta')
       }
-      if (!statsInformation.statisticsUseDelta(this.statistics)) {
-        this.delta = 0
-      }
-      this.redistributeValue(this.epsilon, 'epsilon')
-      this.redistributeValue(this.delta, 'delta')
     },
     redistributeValue(totalValue, property) {
       // for all statistics that use this value -
@@ -289,9 +295,6 @@ export default {
         item.epsilon = +item.epsilon
         item.delta = +item.delta
       })
-      // Save the epsilon and delta,
-      // so the DepositorSetupInfo is completed
-      // before creating an AnalysisPlan
       let props = {
         epsilon: this.epsilon,
         delta: this.delta,
@@ -299,16 +302,9 @@ export default {
       }
       const payload = {objectId: this.getDepositorSetupInfo.objectId, props: props}
       this.$store.dispatch('dataset/updateDepositorSetupInfo',
-          payload).then(() => {
-        if (this.analysisPlan === null) {
-          this.$store.dispatch('dataset/createAnalysisPlan', this.datasetInfo.objectId)
-              .then(() => {
-                this.$store.dispatch('dataset/updateDPStatistics', this.statistics)
-              })
-        } else {
-          this.$store.dispatch('dataset/updateDPStatistics', this.statistics)
-        }
-      })
+          payload)
+      this.$store.dispatch('dataset/updateDPStatistics', this.statistics)
+
     },
 
     editEpsilon(item) {
@@ -350,7 +346,8 @@ export default {
     resetEditedItem() {
       this.editedItem = Object.assign({}, this.defaultItem);
       this.editedIndex = -1;
-    }
+    },
+
   }
 };
 </script>

@@ -49,7 +49,7 @@
                 v-for="(variable, index) in variables"
                 :key="variable + index"
                 :label="variable['label']"
-                :value="variable['key']"
+                :value="variable['label']"
                 on-icon="mdi-check"
             ></v-radio>
           </v-radio-group>
@@ -91,7 +91,16 @@
 
         <ColoredBorderAlert type="warning" v-if="validationError">
           <template v-slot:content>
-            Statistic already exists on the statistics table.
+
+            <ul v-if="errorCount > 1">
+              <li v-if="item.message" v-for="item in validationErrorMsg">
+                {{ item.stat.statistic }} / {{ item.stat.variable }}: {{ item.message }}
+              </li>
+            </ul>
+            <div v-if="errorCount==1" v-for="item in validationErrorMsg">
+              {{ item.message }}
+            </div>
+
           </template>
         </ColoredBorderAlert>
 
@@ -173,12 +182,28 @@
 <script>
 import Button from "../../../DesignSystem/Button.vue";
 import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
+import release from "@/api/release";
+import {mapState, mapGetters} from "vuex";
+import statsInformation from "@/data/statsInformation";
 
 export default {
   name: "AddStatisticDialog",
   components: {Button, ColoredBorderAlert},
   props: ["formTitle", "dialog", "editedIndex", "editedItem", "variableInfo", "statistics"],
   computed: {
+    ...mapState('dataset', ['analysisPlan', "datasetInfo"]),
+    ...mapGetters('dataset', ['getDepositorSetupInfo']),
+    errorCount: function () {
+      let count = 0;
+      if (this.validationErrorMsg) {
+        this.validationErrorMsg.forEach((item) => {
+          if (item.message) {
+            count++
+          }
+        })
+      }
+      return count
+    },
     isButtonDisabled: function () {
       return (
           !this.editedItemDialog.statistic ||
@@ -211,11 +236,11 @@ export default {
       this.editedItemDialog = Object.assign({}, newEditedItem);
     }
   },
-  //TODO: Define the default epsilon and error values for new statistics
   data: () => ({
     singleVariableStatistics: ["Mean", "Histogram", "Quantile"],
     selectedStatistic: null,
     validationError: false,
+    validationErrorMsg: null,
     editedItemDialog: {
       statistic: "",
       variable: [],
@@ -235,33 +260,100 @@ export default {
   }),
   methods: {
     save() {
-      if (this.validate()) {
-        this.validationError = false
-        this.$emit("saveConfirmed", this.editedItemDialog)
-      } else {
-        this.validationError = true
-      }
+      this.validate().then((valid) => {
+        if (valid) {
+          this.validationError = false
+          this.$emit("saveConfirmed", this.editedItemDialog)
+        } else {
+          this.validationError = true
+        }
+      })
     },
     validate() {
-      let valid = true
+      if (this.checkForDuplicates()) {
+        // if there are duplicates in the list, then
+        // no need to check release validation, just return false
+        // Use the same format for the error message as the release validation
+        this.validationErrorMsg = [{"valid": false, "message": "Statistic already exists on the statistics table."}]
+        return new Promise(function (resolve, reject) {
+          resolve(false);
+        });
+      } else {
+        return this.validateStatistics()
+      }
+    },
+    checkForDuplicates() {
+      let duplicates = false
       if (this.statistics) {
-        this.editedItemDialog.variable.forEach((variable) => {
-          // Check for duplicate in the current statistics list
-          this.statistics.forEach((stat) => {
-            if (stat.statistic === this.editedItemDialog.statistic
-                && stat.variable === variable
-                && stat.missingValuesHandling === this.editedItemDialog.missingValuesHandling
-                && stat.fixedValue === this.editedItemDialog.fixedValue) {
-              valid = false
+        // "variable" property may be a string (edit mode)
+        // or an array of strings (create mode)
+        if (typeof this.editedItemDialog.variable === 'string' ||
+            this.editedItemDialog.variable instanceof String) {
+          duplicates = this.isMatchingStatistic(this.editedItemDialog.variable)
+        } else {
+          this.editedItemDialog.variable.forEach((variable) => {
+            // Check for duplicate in the current statistics list
+            if (this.isMatchingStatistic(variable)) {
+              duplicates = true
             }
           })
+
+        }
+      }
+      return duplicates
+    },
+    isMatchingStatistic(variable) {
+      let isMatching = false
+      this.statistics.forEach((stat) => {
+        if (stat.statistic === this.editedItemDialog.statistic
+            && stat.variable === variable
+            && stat.missingValuesHandling === this.editedItemDialog.missingValuesHandling
+            && stat.fixedValue === this.editedItemDialog.fixedValue) {
+          isMatching = true
+        }
+      })
+      return isMatching
+    },
+
+    validateStatistics() {
+      // create a local list that
+      // includes the statistic the user wants to add or edit
+      let tempStats = JSON.parse(JSON.stringify(this.statistics))
+      if (this.editedIndex > -1) {
+        tempStats[this.editedIndex] = this.editedItemDialog
+      } else {
+        this.editedItemDialog.variable.forEach((variable) => {
+          const label = variable
+          tempStats.push(
+              Object.assign({}, this.editedItemDialog, {variable}, {label})
+          );
         })
       }
-      return valid
-
+      statsInformation.redistributeValue(this.getDepositorSetupInfo.epsilon, 'epsilon', tempStats)
+      statsInformation.redistributeValue(this.getDepositorSetupInfo.delta, 'delta', tempStats)
+      return release.validate(this.analysisPlan.objectId, tempStats)
+          .then((resp) => {
+            console.log('validate response: ' + JSON.stringify(resp))
+            console.log('validate response: ' + JSON.stringify(resp.data))
+            let valid = true
+            resp.data.forEach((item, index) => {
+              if (item.valid !== true) {
+                item.stat = tempStats[index]
+                valid = false;
+              }
+            })
+            this.validationErrorMsg = resp.data
+            return valid
+          })
+          .catch((error) => {
+            this.validationErrorMsg = [{"valid": false, "message": error}]
+            return false
+          })
     },
+
     close() {
       this.validationError = false
+      this.validationErrorMsg = ""
       this.$emit("close");
     },
     updateSelectedVariable(variable, index) {

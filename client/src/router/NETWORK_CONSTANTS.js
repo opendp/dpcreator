@@ -11,6 +11,10 @@ export default {
         PATH: "/my-data",
         NAME: "MyData"
     },
+    MY_DATA_DETAILS: {
+        PATH: "/my-data-details",
+        NAME: "MyDataDetails"
+    },
     WIZARD: {
         PATH: "/wizard",
         NAME: "Wizard"
