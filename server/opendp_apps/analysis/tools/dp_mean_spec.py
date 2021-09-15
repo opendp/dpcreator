@@ -112,7 +112,9 @@ class DPMeanSpec(StatSpec):
         # Use make_split_dataframe to build df
         # Select column (call it data)
         # Call res = self.preprocessor(data)
+        print('column_names', column_names)
         pass
+
 
     def create_statistic(self):
         """Create the statistic"""

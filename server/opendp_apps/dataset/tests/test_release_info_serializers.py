@@ -18,9 +18,6 @@ from opendp_apps.analysis.serializers import ReleaseValidationSerializer
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
-from opendp_apps.utils.extra_validators import \
-    (VALIDATE_MSG_EPSILON,)
-
 
 
 class TestReleaseInfoSerializer(TestCase):
@@ -128,7 +125,7 @@ class TestReleaseInfoSerializer(TestCase):
                                 'val': 1.6370121873967791,
                                 'message': 'Releasing mean for the variable EyeHeight. With at least probability 0.95 the output mean will differ from the true mean by at most 1.6370121873967791 units. Here the units are the same units the variable has in the dataset.'}}]
 
-        print('stats_info.data', stats_info.data)
+        #print('stats_info.data', stats_info.data)
         self.assertEqual(stats_info.data[0]['valid'], True)
 
         # Were accuracy results included?

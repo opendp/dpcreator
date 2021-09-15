@@ -61,8 +61,19 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.validation_info = []
         stat_num = 0
 
-
+        # track total epsilon
+        #
         running_epsilon = 0
+
+        # variable indices for actual data calculation
+        #
+        variable_indices_info = self.analysis_plan.dataset.get_variable_order(as_indices=True)
+        if variable_indices_info.success:
+            variable_indices = variable_indices_info.data
+        else:
+            self.add_err_msg(variable_indices_info.message)
+            return
+
         # max_epsilon - set in run_preliminary_steps
 
         for dp_stat in self.dp_statistics:
