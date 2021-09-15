@@ -7,6 +7,7 @@ from opendp.mod import OpenDPException
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.stat_valid_info import StatValidInfo
 from opendp_apps.analysis.tools.dp_mean import dp_mean
+from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.utils.extra_validators import \
     (validate_epsilon_not_null,)
@@ -87,6 +88,12 @@ class ValidateReleaseUtil(BasicErrCheck):
             """
             variable = dp_stat.get('variable')
             statistic = dp_stat.get('statistic', 'shrug?')
+            epsilon = dp_stat.get('epsilon')
+            # Does the epsilon exceed the max epsilon?
+            if epsilon > self.max_epsilon:
+                self.add_stat_error(variable, statistic,
+                                    f'{epsilon} exceeds max epsilon of {self.max_epsilon}')
+                continue  # to the next dp_stat specification
 
             # (1) Variable is not in the spec
             #

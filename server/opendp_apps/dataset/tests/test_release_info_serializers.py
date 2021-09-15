@@ -122,7 +122,7 @@ class TestReleaseInfoSerializer(TestCase):
         #print('stats_info.success', stats_info.success)
         self.assertTrue(stats_info.success)
 
-        expected_result = [{'var_name': 'EyeHeight', 'statistic': astatic.DP_MEAN,
+        expected_result = [{'variable': 'EyeHeight', 'statistic': astatic.DP_MEAN,
                             'valid': True, 'message': None}]
         #print('stats_info.data', stats_info.data)
         self.assertEqual(expected_result, stats_info.data)
@@ -199,7 +199,7 @@ class TestReleaseInfoSerializer(TestCase):
 
         #print('stats_info.data', stats_info.data)
         expected_result = [ \
-                {'var_name': 'EyeHeight', 'statistic': astatic.DP_SUM, 'valid': False,
+                {'variable': 'EyeHeight', 'statistic': astatic.DP_SUM, 'valid': False,
                   'message': 'Statistic "sum" will be supported soon!'}]
 
         self.assertEqual(expected_result, stats_info.data)
@@ -239,7 +239,7 @@ class TestReleaseInfoSerializer(TestCase):
         self.assertTrue(jresp['success'])
 
         expected_result = [ \
-                {'var_name': 'EyeHeight', 'statistic': astatic.DP_SUM, 'valid': False,
+                {'variable': 'EyeHeight', 'statistic': astatic.DP_SUM, 'valid': False,
                   'message': 'Statistic "sum" will be supported soon!'}]
 
         self.assertEqual(expected_result, jresp['data'])
@@ -290,7 +290,7 @@ class TestReleaseInfoSerializer(TestCase):
         self.assertTrue(stats_valid.success)
 
 
-        expected_result = [ {'var_name': 'TypingSpeed', 'statistic': astatic.DP_MEAN,
+        expected_result = [ {'variable': 'TypingSpeed', 'statistic': astatic.DP_MEAN,
                              'valid': False,
                              'message': astatic.ERR_MSG_INVALID_MIN_MAX}]
         self.assertEqual(expected_result, stats_valid.data)
@@ -334,7 +334,7 @@ class TestReleaseInfoSerializer(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(jresp['success'])
 
-        expected_result = [{'var_name': 'TypingSpeed', 'statistic': astatic.DP_MEAN,
+        expected_result = [{'variable': 'TypingSpeed', 'statistic': astatic.DP_MEAN,
                             'valid': False,
                             'message': astatic.ERR_MSG_INVALID_MIN_MAX}]
 
@@ -385,7 +385,7 @@ class TestReleaseInfoSerializer(TestCase):
         self.assertTrue(stats_valid.success)
 
         self.assertEqual(stats_valid.data[0]['valid'], False)
-        self.assertTrue(stats_valid.data[0]['message'].find(VALIDATE_MSG_EPSILON) > -1)
+        self.assertTrue(stats_valid.data[0]['message'].find('exceeds max epsilon') > -1)
 
     def test_45_api_fail_single_stat_bad_epsilon(self):
         """(45) Fail: API, Single stat exceeds total epsilon"""
@@ -395,9 +395,9 @@ class TestReleaseInfoSerializer(TestCase):
 
         variable_info_mod = analysis_plan.variable_info
         # valid min/max
-        variable_info_mod['BlinkDuration']['min'] = 1
-        variable_info_mod['BlinkDuration']['max'] = 400
-        analysis_plan.variable_info = variable_info_mod
+        analysis_plan.variable_info['BlinkDuration']['min'] = 1.0
+        analysis_plan.variable_info['BlinkDuration']['max'] = 400.0
+        #analysis_plan.variable_info = variable_info_mod
         analysis_plan.save()
 
         # Send the dp_statistics for validation
@@ -437,7 +437,7 @@ class TestReleaseInfoSerializer(TestCase):
         print('jresp', jresp)
 
         self.assertEqual(jresp['data'][0]['valid'], False)
-        self.assertTrue(jresp['data'][0]['message'].find(VALIDATE_MSG_EPSILON) > -1)
+        self.assertTrue(jresp['data'][0]['message'].find('exceeds max epsilon') > -1)
 
 
     def test_50_bad_total_epsilon(self):
@@ -584,9 +584,9 @@ class TestReleaseInfoSerializer(TestCase):
         stats_valid = serializer.save(**dict(opendp_user=self.user_obj))
         self.assertTrue(stats_valid.success)
 
-        _sample_result_data = [{'var_name': 'EyeHeight', 'statistic': 'mean', 'valid': False,
+        _sample_result_data = [{'variable': 'EyeHeight', 'statistic': 'mean', 'valid': False,
                             'message': 'constant must be a member of DA'},
-                           {'var_name': 'BlinkDuration', 'statistic': 'mean', 'valid': False,
+                           {'variable': 'BlinkDuration', 'statistic': 'mean', 'valid': False,
                             'message': 'The running epsilon (1.05) exceeds the max epsilon (1.0)'}]
 
         self.assertTrue(stats_valid.data[0]['valid'] is True)
@@ -620,9 +620,9 @@ class TestReleaseInfoSerializer(TestCase):
         self.assertEqual(response.status_code, 200)
         # print(json.dumps(jresp, indent=4))
 
-        _sample_result_data = [{'var_name': 'EyeHeight', 'statistic': 'mean', 'valid': False,
+        _sample_result_data = [{'variable': 'EyeHeight', 'statistic': 'mean', 'valid': False,
                                'message': 'constant must be a member of DA'},
-                              {'var_name': 'BlinkDuration', 'statistic': 'mean', 'valid': False,
+                              {'variable': 'BlinkDuration', 'statistic': 'mean', 'valid': False,
                                'message': 'The running epsilon (1.05) exceeds the max epsilon (1.0)'}]
 
         self.assertTrue(jresp['data'][0]['valid'] is True)
@@ -656,7 +656,7 @@ class TestReleaseInfoSerializer(TestCase):
 """
 
            
-            {'var_name': 'TypingSpeed', 'statistic': 'mean', 'valid': False,
+            {'variable': 'TypingSpeed', 'statistic': 'mean', 'valid': False,
              'message': 'lower bound may not be greater than upper bound'}]
    
      # Set bad min/max for a variable

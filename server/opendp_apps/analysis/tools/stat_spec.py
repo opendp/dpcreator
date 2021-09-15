@@ -210,6 +210,7 @@ class StatSpec(BasicErrCheckList):
 
         if not self.var_type in pstatic.VALID_VAR_TYPES:
             self.add_err_msg(f'Invalid variable type: "{self.var_type}"')
+            return
 
         # Add additional required properties.
         #   e.g. min, max, delta, etc.
@@ -223,6 +224,8 @@ class StatSpec(BasicErrCheckList):
             if 'min' in self.additional_required_props() and \
                     'max' in self.additional_required_props():
                 if not self.max > self.min:
+                    #print('min', self.min, type(min))
+                    #print('max', self.max, type(max))
                     self.add_err_msg(astatic.ERR_MSG_INVALID_MIN_MAX)
                     return
 
@@ -230,6 +233,9 @@ class StatSpec(BasicErrCheckList):
 
     def validate_property(self, prop_name: str, validator=None) -> bool:
         """Validate a property name using a validator"""
+        if self.has_error():
+            return
+
         if validator is None:
             validator = self.prop_validators.get(prop_name)
             if validator is None:
@@ -263,6 +269,7 @@ class StatSpec(BasicErrCheckList):
 
         return True
 
+
     def get_success_msg_dict(self):
         """Get success info"""
         assert self.has_error() is False, \
@@ -270,6 +277,7 @@ class StatSpec(BasicErrCheckList):
 
         # Need to add accuracy...
         return StatValidInfo.get_success_msg_dict(self.variable, self.statistic)
+
 
     def get_error_msg_dict(self):
         """Get invalid info dict"""

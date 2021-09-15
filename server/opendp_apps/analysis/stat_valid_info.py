@@ -6,7 +6,7 @@ Convenience class for holding statistic validation information
 class StatValidInfo:
     """Class to hold the result of a single stat validation"""
     def __init__(self, var_name: str, statistic: str, valid: bool, message: str=None, value=None, accuracy: float=None):
-        self.var_name = var_name
+        self.variable = var_name
         self.statistic = statistic
         self.valid = valid
         self.message = message
@@ -15,7 +15,7 @@ class StatValidInfo:
 
     def as_dict(self):
         """Return as a dict"""
-        info = dict(var_name=self.var_name,
+        info = dict(variable=self.variable,
                         statistic=self.statistic,
                         valid=self.valid,
                         message=self.message)
@@ -30,20 +30,20 @@ class StatValidInfo:
         return info
 
     @staticmethod
-    def get_error_msg(var_name, statistic, message=None):
-        return StatValidInfo(var_name, statistic, False, message)
+    def get_error_msg(variable, statistic, message=None):
+        return StatValidInfo(variable, statistic, False, message)
 
     @staticmethod
-    def get_error_msg_dict(var_name, statistic, message=None):
-        return StatValidInfo.get_error_msg(var_name, statistic, message).as_dict()
+    def get_error_msg_dict(variable, statistic, message=None):
+        return StatValidInfo.get_error_msg(variable, statistic, message).as_dict()
 
     @staticmethod
-    def get_success_msg(var_name, statistic, message=None, value=None, accuracy=None):
-        return StatValidInfo(var_name, statistic, True, message, value, accuracy)
+    def get_success_msg(variable, statistic, message=None, value=None, accuracy=None):
+        return StatValidInfo(variable, statistic, True, message, value, accuracy)
 
     @staticmethod
-    def get_success_msg_dict(var_name, statistic, message=None, value=None, accuracy=None):
-        return StatValidInfo.get_success_msg(var_name, statistic, message, value, accuracy).as_dict()
+    def get_success_msg_dict(variable, statistic, message=None, value=None, accuracy=None):
+        return StatValidInfo.get_success_msg(variable, statistic, message, value, accuracy).as_dict()
 
 """
 from opendp_apps.analysis.stat_valid_info import StatValidInfo
