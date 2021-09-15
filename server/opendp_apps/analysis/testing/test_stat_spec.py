@@ -29,8 +29,8 @@ class StatSpecTest(TestCase):
                       #'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'impute_constant': '0',
-                      'variable_info': {'max': 100.0,
-                                        'min': 0.0,
+                      'variable_info': {'min': 0,
+                                        'max': 100,
                                         'type': 'Float',},
                       }
 
@@ -38,15 +38,20 @@ class StatSpecTest(TestCase):
         print('(1) Run initial check, before using the OpenDp library')
         print('  - Error found?', dp_mean.has_error())
         if dp_mean.has_error():
+            print('\n-- Errors --')
             print(dp_mean.get_error_messages())
+            print('\nUI info:', json.dumps(dp_mean.get_error_msg_dict()))
             return
 
         print('(2) Use the OpenDP library to check validity')
         print('  - Is valid?', dp_mean.is_valid())
         if dp_mean.has_error():
+            print('\n-- Errors --')
             print(dp_mean.get_error_messages())
+            print('\nUI info:', json.dumps(dp_mean.get_error_msg_dict()))
         else:
-            print('\nLooks good!')
+            print('\n-- Looks good! --')
+            print('\nUI info:', json.dumps(dp_mean.get_success_msg_dict()))
 
 
     @skip

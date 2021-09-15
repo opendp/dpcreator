@@ -65,7 +65,8 @@ class StatSpec(BasicErrCheckList):
         self.delta = props.get('delta')
         self.ci = props.get('ci')
         #
-        self.accuracy = props.get('accuracy')
+        self.accuracy_val = None
+        self.accuracy_message = None
         #
         self.missing_values_handling = props.get('missing_values_handling')
         self.impute_constant = props.get('impute_constant')
@@ -276,7 +277,9 @@ class StatSpec(BasicErrCheckList):
             "Make sure .has_error() is False before calling this method"
 
         # Need to add accuracy...
-        return StatValidInfo.get_success_msg_dict(self.variable, self.statistic)
+        return StatValidInfo.get_success_msg_dict(self.variable, self.statistic,
+                                                  accuracy_val=self.accuracy_val,
+                                                  accuracy_msg=self.accuracy_message)
 
 
     def get_error_msg_dict(self):
