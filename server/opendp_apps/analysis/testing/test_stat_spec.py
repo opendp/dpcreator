@@ -5,7 +5,7 @@ import uuid
 #from unittest import skip
 from django.test import TestCase
 from opendp_apps.analysis.tools.stat_spec import StatSpec
-from opendp_apps.analysis.tools.dp_mean_spec import DPMeanInfo
+from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 
 from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.analysis import static_vals as astatic
@@ -29,7 +29,7 @@ class StatSpecTest(TestCase):
                           epsilon=1.0,
                           ci=astatic.CI_95)
 
-        dp_mean = DPMeanInfo(spec_props)
+        dp_mean = DPMeanSpec(spec_props)
         print('(1) Setup dp_mean.has_error()', dp_mean.has_error())
         if dp_mean.has_error():
             print(dp_mean.get_error_messages())

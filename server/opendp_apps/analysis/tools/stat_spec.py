@@ -14,7 +14,9 @@ from django.core.exceptions import ValidationError
 from opendp.mod import OpenDPException
 
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheckList
+from opendp_apps.analysis.stat_valid_info import StatValidInfo
 
+from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.utils.extra_validators import \
     (validate_confidence_interval,
@@ -221,7 +223,7 @@ class StatSpec(BasicErrCheckList):
             if 'min' in self.additional_required_props() and \
                     'max' in self.additional_required_props():
                 if not self.max > self.min:
-                    self.add_err_msg('The "max" must be greater than the "min"')
+                    self.add_err_msg(astatic.ERR_MSG_INVALID_MIN_MAX)
                     return
 
 
@@ -261,7 +263,22 @@ class StatSpec(BasicErrCheckList):
 
         return True
 
-def print_debug(self):
-        """show params"""
-        for key, val in self.__dict__.items():
-            print(f'{key}: {val}')
+    def get_success_msg_dict(self):
+        """Get success info"""
+        assert self.has_error() is False, \
+            "Make sure .has_error() is False before calling this method"
+
+        # Need to add accuracy...
+        return StatValidInfo.get_success_msg_dict(self.variable, self.statistic)
+
+    def get_error_msg_dict(self):
+        """Get invalid info dict"""
+        return StatValidInfo.get_error_msg_dict(self.variable,
+                                                self.statistic,
+                                                self.get_err_msgs()[0])
+
+
+    def print_debug(self):
+            """show params"""
+            for key, val in self.__dict__.items():
+                print(f'{key}: {val}')

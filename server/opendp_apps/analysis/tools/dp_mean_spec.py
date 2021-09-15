@@ -20,7 +20,7 @@ from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis import static_vals as astatic
 
 
-class DPMeanInfo(StatSpec):
+class DPMeanSpec(StatSpec):
     """
     Initiate with dict of properties. Example of needed properties:
 

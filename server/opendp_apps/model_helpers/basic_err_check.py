@@ -52,6 +52,12 @@ class BasicErrCheckList():
         """Return the error message if 'has_error' is True"""
         return self.get_error_messages()
 
+    def get_err_msgs_concat(self, sep_char=' '):
+        return f'{sep_char}'.join(self.get_error_messages())
+
+    def get_error_messages_concat(self, sep_char=' '):
+        return self.get_err_msgs_concat(sep_char)
+
     def add_err_msg(self, err_msg):
         """Add an error message"""
         self.error_found = True

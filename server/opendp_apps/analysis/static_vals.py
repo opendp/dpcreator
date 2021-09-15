@@ -43,3 +43,4 @@ ERR_MSG_NO_ANALYSIS_PLAN = 'AnalysisPlan object not found for this object_id and
 ERR_MSG_FIELDS_NOT_UPDATEABLE = 'These fields are not updatable'
 
 ERR_MSG_BAD_TOTAL_EPSILON = 'The depositor setup info has an invalid epsilon value'
+ERR_MSG_INVALID_MIN_MAX = 'The "max" must be greater than the "min"'

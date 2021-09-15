@@ -7,6 +7,7 @@ from opendp.mod import OpenDPException
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.stat_valid_info import StatValidInfo
 from opendp_apps.analysis.tools.dp_mean import dp_mean
+from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.utils.extra_validators import \
     (validate_epsilon_not_null,)
 from opendp_apps.analysis import static_vals as astatic
@@ -91,14 +92,14 @@ class ValidateReleaseUtil(BasicErrCheck):
             #
             if not variable:
                 user_msg = f'"variable" is missing from this DP Stat specification'
-                self.add_stat_error(var_name, statistic, user_msg)
+                self.add_stat_error(variable, statistic, user_msg)
                 continue  # to the next dp_stat specification
 
             # (2) Is this a known statistic? If not stop here.
             #
             if not statistic in astatic.DP_STATS_CHOICES:  # also checked in the DPStatisticSerializer
                 user_msg = f'Statistic "{statistic}" is not supported'
-                self.add_stat_error(var_name, statistic, user_msg)
+                self.add_stat_error(variable, statistic, user_msg)
                 continue  # to the next dp_stat specification
 
             # (2) Begin building the property dict
@@ -107,41 +108,69 @@ class ValidateReleaseUtil(BasicErrCheck):
             props['impute_constant'] = dp_stat.get('fixed_value', None)   # one bit of renaming
 
 
-            # (3) Retrieve variable info which has min/max/categories, variable type, etc.
+            # (3) Add variable_info which has min/max/categories, variable type, etc.
             #
-            variable_info = self.analysis_plan.variable_info.get(var_name)
+            variable_info = self.analysis_plan.variable_info.get(variable)
             if not variable_info:
                 # Temp workaround!!! See Issue #300
                 # https://github.com/opendp/dpcreator/issues/300
-                variable_info = self.analysis_plan.variable_info.get(camel_to_snake(var_name))
+                variable_info = self.analysis_plan.variable_info.get(camel_to_snake(variable))
 
             if variable_info:
                 props['variable_info'] = variable_info
             else:
-                self.add_stat_error(var_name, statistic, 'Variable info not found.')
+                self.add_stat_error(variable, statistic, 'Variable info not found.')
                 continue # to the next dp_stat specification
 
 
             # (4) Retrieve the column index
             #
-            col_idx_info = self.analysis_plan.dataset.get_variable_index(var_name)
+            col_idx_info = self.analysis_plan.dataset.get_variable_index(variable)
             if col_idx_info.success:
                 props['col_index'] = col_idx_info.data
             else:
-                self.add_stat_error(var_name, statistic, col_idx_info.message)
+                self.add_stat_error(variable, statistic, col_idx_info.message)
                 continue  # to the next dp_stat specification
 
 
-            # (5) Dataset size
+            # (5) Add the Dataset size
+            #   - Logic here to see if dataset size should be added
             #
             dataset_size_info = self.analysis_plan.dataset.get_dataset_size()
             if not dataset_size_info.success:
-                self.add_stat_error(var_name, statistic, dataset_size_info.message)
+                self.add_stat_error(variable, statistic, dataset_size_info.message)
                 continue  # to the next dp_stat specification
             else:
                 props['dataset_size'] = dataset_size_info.data
 
+            # Okay, "props" are built! Let's see if they work!
+            #
+            if statistic == astatic.DP_MEAN:
+                stat_spec = DPMeanSpec(props)
+            elif statistic == astatic.DP_HISTOGRAM:
+                user_msg = f'"{statistic}" will be supported soon! (hist)'
+                self.add_stat_error(variable, statistic, user_msg)
+                continue
+            elif statistic in astatic.DP_STATS_CHOICES:
+                user_msg = f'Statistic "{statistic}" will be supported soon!'
+                self.add_stat_error(variable, statistic, user_msg)
+                continue
+            else:
+                # Shouldn't reach here, unknown stats are captured up above
+                pass
 
+            if stat_spec.is_valid():
+                running_epsilon += stat_spec.epsilon
+                if running_epsilon > self.max_epsilon:
+                    user_msg = (f'The running epsilon ({running_epsilon}) exceeds'
+                                f' the max epsilon ({self.max_epsilon})')
+                    self.add_stat_error(variable, statistic, user_msg)
+                else:
+                    self.validation_info.append(stat_spec.get_success_msg_dict())
+            else:
+                self.validation_info.append(stat_spec.get_error_msg_dict())
+
+            continue  # to the next dp_stat specification!
 
             # -----------------------------------
             # original looping code below
