@@ -1,11 +1,20 @@
 {
     describe('Confirm Variables Page', () => {
+
+        beforeEach(() => {
+            cy.on("window:before:load", (win) => {
+                cy.spy(win.console, "log");
+                cy.spy(win.console, "error")
+            })
+        })
+
         it('displays the variables correctly', () => {
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
                 console.log('runnable', runnable)
                 return false
             })
+
             cy.clearData()
             cy.createMockDataset()
             // click on the start Process button on the welcome page,
