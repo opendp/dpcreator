@@ -125,6 +125,7 @@ class DPMeanSpec(StatSpec):
                                                col_names=column_names)
 
         computation_chain = parse_dataframe >> self.preprocessor
+
         print('-' * 40)
         dp_result = computation_chain(file_obj.read())
 
@@ -136,45 +137,3 @@ class DPMeanSpec(StatSpec):
                f"\nColumn index: {self.accuracy_val}"
                f"\nColumn index: {self.accuracy_message}"
                f"\n\nDP Mean: {dp_result}" ))
-
-
-    def xcreate_statistic(self):
-        """Create the statistic"""
-        if self.has_error():
-            return
-
-        # Repeating the validity check...
-        if not self.is_valid():
-            return
-
-        # Assume this works b/c just tried the is_valid() check
-        preprocessor = self.get_preprocessor()
-
-        import random
-        outlines = []
-        sleep_total = 0
-        num_rows = 1000
-        for x in range(num_rows):
-            age = random.randint(6, 88)
-            sleep = random.randint(4, 16)
-            sleep_total += sleep
-            outlines.append(f'{age}, {sleep}')
-        data = '\n'.join(outlines)
-        #print(data)
-
-        parse_dataframe = make_split_dataframe(separator=",",
-                                               col_names=[0, 1])
-
-        everything = parse_dataframe >> preprocessor
-        print('-' * 40)
-        dp_result = everything(data)
-
-        print((f"Epsilon: {self.epsilon}"
-               f"\nColumn name: {self.variable}"
-               f"\nColumn index: {self.col_index}"
-               f"\nDP Mean: {dp_result}"
-               f"\nActual Mean: {sleep_total/num_rows}" ))
-
-
-
-
