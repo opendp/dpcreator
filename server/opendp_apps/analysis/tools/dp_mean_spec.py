@@ -106,6 +106,13 @@ class DPMeanSpec(StatSpec):
                                 f"will differ from the true mean by at most {self.accuracy_val} units. " \
                                 f"Here the units are the same units the variable has in the dataset."
 
+    def run_chain(self, file_obj, column_names):
+        # Column_names needs to be list of integers 0...n-1
+        # Read file
+        # Use make_split_dataframe to build df
+        # Select column (call it data)
+        # Call res = self.preprocessor(data)
+        pass
 
     def create_statistic(self):
         """Create the statistic"""
