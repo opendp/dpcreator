@@ -2,7 +2,7 @@ from os.path import abspath, dirname, join
 import json
 import uuid
 
-#from unittest import skip
+from unittest import skip
 from django.test import TestCase
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
@@ -15,9 +15,44 @@ from opendp_apps.model_helpers.msg_util import msgt
 
 class StatSpecTest(TestCase):
 
-    def test_10_dp_mean(self):
+    def test_10_debug_mean(self):
         """(10) Test DP Mean Spec"""
-        msgt(self.test_10_dp_mean.__doc__)
+        msgt(self.test_10_debug_mean.__doc__)
+
+        spec_props = {'variable': 'EyeHeight',
+                      'col_index': 19,
+                      'statistic': 'mean',
+                      'dataset_size': 183,
+                      'epsilon': 1.0,
+                      'delta': 0.0,
+                      'ci': 0.05,
+                      #'accuracy': None,
+                      'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+                      'impute_constant': '0',
+                      'variable_info': {'max': 100.0,
+                                        'min': 0.0,
+                                        'type': 'Float',},
+                      }
+
+        dp_mean = DPMeanSpec(spec_props)
+        print('(1) Run initial check, before using the OpenDp library')
+        print('  - Error found?', dp_mean.has_error())
+        if dp_mean.has_error():
+            print(dp_mean.get_error_messages())
+            return
+
+        print('(2) Use the OpenDP library to check validity')
+        print('  - Is valid?', dp_mean.is_valid())
+        if dp_mean.has_error():
+            print(dp_mean.get_error_messages())
+        else:
+            print('\nLooks good!')
+
+
+    @skip
+    def test_15_dp_mean(self):
+        """(15) Test DP Mean Spec"""
+        msgt(self.test_15_dp_mean.__doc__)
 
         spec_props = dict(var_name="hours_sleep",
                           col_index=1,
@@ -52,3 +87,5 @@ class StatSpecTest(TestCase):
         #print('dp_mean.is_valid()', dp_mean.is_valid())
         #print('dp_mean.has_error()', dp_mean.has_error())
         #print(dp_mean.get_error_messages())
+
+

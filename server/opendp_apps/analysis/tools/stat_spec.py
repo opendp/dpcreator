@@ -287,6 +287,8 @@ class StatSpec(BasicErrCheckList):
 
 
     def print_debug(self):
-            """show params"""
-            for key, val in self.__dict__.items():
-                print(f'{key}: {val}')
+        """show params"""
+        print('-' * 40)
+        print(self.__dict__)
+        #for key, val in self.__dict__.items():
+        #    print(f'{key}: {val}')

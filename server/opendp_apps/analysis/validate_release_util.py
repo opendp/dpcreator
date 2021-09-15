@@ -177,6 +177,8 @@ class ValidateReleaseUtil(BasicErrCheck):
                     self.validation_info.append(stat_spec.get_success_msg_dict())
             else:
                 self.validation_info.append(stat_spec.get_error_msg_dict())
+                stat_spec.print_debug()
+                #print(stat_spec.props)
 
         # End of loop!
 
