@@ -77,6 +77,11 @@ class DPMeanSpec(StatSpec):
         if self.has_error():
             return
 
+        # We've already assembled it!
+        #
+        if self.preprocessor is not None:
+            return self.preprocessor
+
         preprocessor = (
             # Selects a column of df, Vec<str>
             make_select_column(key=self.col_index, TOA=str) >>
@@ -93,7 +98,9 @@ class DPMeanSpec(StatSpec):
         self.scale = binary_search(lambda s: self.check_scale(s, preprocessor, 1, self.epsilon), bounds=(0.0, 1000.0))
         preprocessor = preprocessor >> make_base_laplace(self.scale)
 
+        # keep a point to preprocessor in case it's re-used
         self.preprocessor = preprocessor
+
         return preprocessor
 
     def set_accuracy(self):
@@ -106,17 +113,32 @@ class DPMeanSpec(StatSpec):
                                 f"will differ from the true mean by at most {self.accuracy_val} units. " \
                                 f"Here the units are the same units the variable has in the dataset."
 
-    def run_chain(self, file_obj, column_names):
+    def run_chain(self, column_names, file_obj, sep_char=","):
         # Column_names needs to be list of integers 0...n-1
         # Read file
         # Use make_split_dataframe to build df
         # Select column (call it data)
         # Call res = self.preprocessor(data)
         print('column_names', column_names)
-        pass
+
+        parse_dataframe = make_split_dataframe(separator=sep_char,
+                                               col_names=column_names)
+
+        computation_chain = parse_dataframe >> self.preprocessor
+        print('-' * 40)
+        dp_result = computation_chain(file_obj.read())
+
+        self.value = dp_result
+
+        print((f"Epsilon: {self.epsilon}"
+               f"\nColumn name: {self.variable}"
+               f"\nColumn index: {self.col_index}"
+               f"\nColumn index: {self.accuracy_val}"
+               f"\nColumn index: {self.accuracy_message}"
+               f"\n\nDP Mean: {dp_result}" ))
 
 
-    def create_statistic(self):
+    def xcreate_statistic(self):
         """Create the statistic"""
         if self.has_error():
             return

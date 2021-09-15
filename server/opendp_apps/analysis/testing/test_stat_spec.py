@@ -152,23 +152,7 @@ class StatSpecTest(TestCase):
         """(30) Run DP mean calculation"""
         msgt(self.test_30_run_calculation.__doc__)
 
-        '''
-        Some actual stats:
-            "invalidCount": 0,
-            "validCount": 183,
-            "uniqueCount": 183,
-            "median": -0.851190845,
-            "mean": -0.9503854412185792,
-            "max": 4.846733074,
-            "min": -7.953123756,
-            "mode": [
-                -0.453860599,
-                2.120359194,
-                3.045188197,
-                2.803143496,
-                -0.641054302
-            ],
-        '''
+
         spec_props = {'variable': 'EyeHeight',
                       'col_index': 19,
                       'statistic': 'mean',
@@ -215,11 +199,30 @@ class StatSpecTest(TestCase):
         print('eye_fatigue_filepath', eye_fatigue_filepath)
         self.assertTrue(isfile(eye_fatigue_filepath))
 
-        file_obj = open(eye_fatigue_filepath, 'rb')
+        file_obj = open(eye_fatigue_filepath, 'r')
 
         # Call run_chain
         #
-        dp_mean.run_chain(file_obj, col_indexes)
+        dp_mean.run_chain(col_indexes, file_obj, sep_char="\t")
+
+        print('Actual mean: -0.9503854412185792')
+        '''
+           Some actual stats:
+               "invalidCount": 0,
+               "validCount": 183,
+               "uniqueCount": 183,
+               "median": -0.851190845,
+               "mean": -0.9503854412185792,
+               "max": 4.846733074,
+               "min": -7.953123756,
+               "mode": [
+                   -0.453860599,
+                   2.120359194,
+                   3.045188197,
+                   2.803143496,
+                   -0.641054302
+               ],
+        '''
 
 """
 from raven_preprocess.preprocess_runner import PreprocessRunner
