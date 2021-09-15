@@ -24,8 +24,8 @@ class StatSpecTest(TestCase):
                           variable_info=dict(min=1.0, max=16.0, type=pstatic.VAR_TYPE_FLOAT),
                           statistic=astatic.DP_MEAN,
                           impute_constant=8.0,
-                          dataset_size=7,
-                          epsilon=0.5,
+                          dataset_size=1000,
+                          epsilon=1.0,
                           ci=astatic.CI_95)
 
         dp_mean = DPMeanInfo(spec_props)

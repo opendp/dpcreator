@@ -65,12 +65,10 @@ class DPMeanInfo(StatSpec):
             make_clamp(self.bounds) >>
             make_bounded_resize(self.dataset_size, self.bounds, self.impute_constant) >>
             make_sized_bounded_mean(self.dataset_size, self.bounds)
-
-            # make_bounded_mean(lower, upper, n=n, T=float)
         )
 
         scale = binary_search(lambda s: self.check_scale(s, preprocessor, 1, self.epsilon),
-                              bounds=self.bounds)  #self.bounds)
+                              bounds=(0.0, 1000.0))  #self.bounds)
         preprocessor = preprocessor >> make_base_laplace(scale)
         return preprocessor
 
@@ -87,12 +85,18 @@ class DPMeanInfo(StatSpec):
         # Assume this works b/c just tried the is_valid() check
         preprocessor = self.get_preprocessor()
 
-        data = """17, 10.2
-                6, 15.3
-                24, 6.5
-                32, 7
-                27, 9
-                42, 8.5"""
+        import random
+        outlines = []
+        sleep_total = 0
+        num_rows = 1000
+        for x in range(num_rows):
+            age = random.randint(6, 88)
+            sleep = random.randint(4, 16)
+            sleep_total += sleep
+            outlines.append(f'{age}, {sleep}')
+        data = '\n'.join(outlines)
+        print(data)
+
         parse_dataframe = make_split_dataframe(separator=",",
                                                col_names=[0, 1])
 
@@ -103,7 +107,8 @@ class DPMeanInfo(StatSpec):
         print((f"Epsilon: {self.epsilon}"
                f"\nColumn name: {self.var_name}"
                f"\nColumn index: {self.col_index}"
-               f"\nDP Mean: {dp_result}"))
+               f"\nDP Mean: {dp_result}"
+               f"\nActual Mean: {sleep_total/num_rows}" ))
 
 
 
