@@ -243,7 +243,7 @@ class TestReleaseInfoSerializer(TestCase):
                                     content_type='application/json')
 
         jresp = response.json()
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
 
         self.assertTrue(jresp['success'])
 

@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.tools.dp_mean import dp_mean
+from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 
@@ -87,8 +88,16 @@ class ComputationChainSerializer(serializers.Serializer):
     dp_statistics = serializers.ListField(child=DPStatisticSerializer())
     analysis_plan_id = serializers.UUIDField()
 
+    def _get_index_from_column_name(self, variable_order, column_name):
+        for x in variable_order:
+            if x[1] == column_name:
+                return x[0]
+
     def run_computation_chain(self):
         analysis_plan = AnalysisPlan.objects.get(object_id=self.validated_data['analysis_plan_id'])
+        dataset_size = analysis_plan.dataset.data_profile['dataset']['rowCount']
+        columns = [x[0] for x in analysis_plan.dataset.data_profile['dataset']['variableOrder']]
+        file_obj = analysis_plan.dataset.source_file
         results = []
         df = pd.read_csv(analysis_plan.dataset.source_file.file, delimiter='\t')
 
@@ -96,28 +105,32 @@ class ComputationChainSerializer(serializers.Serializer):
             statistic = dp_stat['statistic']
             label = dp_stat['label']
             variable_info = analysis_plan.variable_info[label]
-            index = 'SCM'  # TODO: column headers.... (variable_info['index'])
-            column = df[index]
-            lower = variable_info.get('min')
-            upper = variable_info.get('max')
-            if lower is None:
-                raise Exception(f"Lower must be defined: {variable_info}")
-            if upper is None:
-                raise Exception(f"Upper must be defined: {variable_info}")
-            # n = analysis_plan.data_set.data_profile.get('dataset', {}).get('row_count', 1000)
-            n = 1000
-            impute = dp_stat['missing_values_handling'] != 'drop'
-            impute_value = float(dp_stat['fixed_value'])
-            epsilon = float(dp_stat['epsilon'])
+            print(dp_stat['variable'], analysis_plan.dataset.data_profile['dataset']['variableOrder'])
+            index = self._get_index_from_column_name(analysis_plan.dataset.data_profile['dataset']['variableOrder'],
+                                                     dp_stat['variable'])
+            min = variable_info.get('min')
+            max = variable_info.get('max')
+            if min is None:
+                raise Exception(f"Min must be defined: {variable_info}")
+            if max is None:
+                raise Exception(f"Max must be defined: {variable_info}")
+
+            props = dp_stat
+            props['dataset_size'] = dataset_size
+            props['min'] = min
+            props['max'] = max
+            props['col_index'] = index
             # Do some validation and append to stats_valid
             if statistic == 'mean':
                 try:
-                    preprocessor = dp_mean(index, lower, upper, n, impute_value, epsilon)
-                    results.append({'column': column, 'statistic': statistic, 'result': preprocessor(column)})
+                    dp_mean_spec = DPMeanSpec(props)
+                    dp_mean_spec.is_valid()
+                    dp_mean_spec.run_chain(columns, file_obj)
+                    results.append({'column': index, 'statistic': statistic, 'result': dp_mean_spec.value})
                 # TODO: add column index and statistic to result
                 except Exception as ex:
                     results.append({
-                        'column': column,
+                        'column': index,
                         'statistic': statistic,
                         'valid': False,
                         'message': str(ex)

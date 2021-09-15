@@ -119,6 +119,9 @@ class DPMeanSpec(StatSpec):
         # Use make_split_dataframe to build df
         # Select column (call it data)
         # Call res = self.preprocessor(data)
+        if self.has_error():
+            return
+
         print('column_names', column_names)
 
         parse_dataframe = make_split_dataframe(separator=sep_char,
