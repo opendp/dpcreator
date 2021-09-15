@@ -245,16 +245,16 @@ export default {
       statistic: "",
       variable: [],
       epsilon: "",
-      delta: 0.0,
-      ci: 0.05,
+      delta: null,
+      ci: null,
       error: "",
       missingValuesHandling: "",
       handleAsFixed: false,
-      fixedValue: "0",
+      fixedValue: 0,
       locked: false
     },
     missingValuesHandling: [
-      "Drop them",
+      // "Drop them", remove this for now, until the library can use it
       "Insert random value",
       "Insert fixed value"
     ]
@@ -325,8 +325,9 @@ export default {
       } else {
         this.editedItemDialog.variable.forEach((variable) => {
           const label = variable
+          const ci = this.getDepositorSetupInfo.confidenceInterval
           tempStats.push(
-              Object.assign({}, this.editedItemDialog, {variable}, {label})
+              Object.assign({}, this.editedItemDialog, {variable}, {label}, {ci})
           );
         })
       }
