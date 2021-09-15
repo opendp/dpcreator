@@ -8,6 +8,7 @@ BaseClass for Univariate statistics for OpenDP.
 - Implementing the "get_preprocessor" method acts as validation.
 -
 """
+from opendp.accuracy import laplacian_scale_to_accuracy
 from abc import ABCMeta, abstractmethod
 from django.core.exceptions import ValidationError
 from opendp.mod import OpenDPException
@@ -20,6 +21,7 @@ from opendp_apps.utils.extra_validators import \
      validate_float,
      validate_statistic,
      validate_epsilon_not_null,
+     validate_missing_val_handlers,
      validate_not_empty_or_none,
      validate_not_none,
      validate_not_negative,
@@ -43,7 +45,7 @@ class StatSpec(BasicErrCheckList):
                            max=validate_float,
                            categories=validate_not_empty_or_none,  # ?
                            #
-                           #missing_val_handling=
+                           missing_values_handling=validate_missing_val_handlers,
                            #impute_constant=validate_not_none, # more complex check
                            #fixed_value=
                            #
@@ -52,7 +54,7 @@ class StatSpec(BasicErrCheckList):
 
     def __init__(self, props: dict):
         """Set the internals using the props dict"""
-        self.var_name = props.get('var_name')
+        self.variable = props.get('variable')
         self.col_index = props.get('col_index')
         self.statistic = props.get('statistic')
         self.dataset_size = props.get('dataset_size')
@@ -63,7 +65,7 @@ class StatSpec(BasicErrCheckList):
         #
         self.accuracy = props.get('accuracy')
         #
-        self.missing_val_handling = props.get('missing_val_handling')
+        self.missing_values_handling = props.get('missing_values_handling')
         self.impute_constant = props.get('impute_constant')
         #self.missing_fixed_val = props.get('missing_fixed_val')
         #
@@ -75,16 +77,17 @@ class StatSpec(BasicErrCheckList):
         self.categories = self.variable_info.get('categories')
         self.var_type = self.variable_info.get('type')
 
+        self.preprocessor = None    # set this each time get_preprocessor is called--hopefully once
         self.value = None
 
-        self.run_additional_handling()
+        self.run_initial_handling()
         self.run_basic_validation()
 
 
     @abstractmethod
-    def run_additional_handling(self):
+    def run_initial_handling(self):
         """
-        This is a place for additional checking/transformations
+        This is a place for initial checking/transformations
         such as making sure values are floats
         Example:
         `self.floatify_int_values()`
@@ -111,10 +114,18 @@ class StatSpec(BasicErrCheckList):
 
     @abstractmethod
     def get_preprocessor(self):
-        """See "dp_mean_spec.py for an example of instantiation"""
+        """
+        See "dp_mean_spec.py for an example of instantiation
+        These should be the last two lines of the method
+
+        self.preprocessor = preprocessor
+        return preprocessor
+        """
         if self.has_error():
             return
         pass
+        # when instantiating, uncomment and use these last two lines
+        # self.preprocessor = preprocessor
         # return preprocessor
 
     @abstractmethod
@@ -123,6 +134,14 @@ class StatSpec(BasicErrCheckList):
         if self.has_error():
             return
         pass
+
+
+    def get_accuracy(self):
+        """Return the accuracy measure using Laplace and the confidence interval as alpha"""
+        if not self.preprocessor:
+            self.preprocessor = self.get_preprocessor()
+
+        return laplacian_scale_to_accuracy(self.preprocessor, self.ci)
 
 
     def get_bounds(self):
@@ -167,18 +186,17 @@ class StatSpec(BasicErrCheckList):
         assert isinstance(more_props_to_floatify, list), \
             '"more_props_to_floatify" must be a list, even and empty list'
 
-        props_to_floatify = ['epsilon', 'ci', 'min', 'max', 'impute_constant', ] \
+        props_to_floatify = ['epsilon', 'ci', 'min', 'max',] \
                             + more_props_to_floatify
 
         for prop_name in props_to_floatify:
-            prop_val = getattr(self, prop_name)
-            #
-            # if the property is an int, make it a float...
-            if isinstance(prop_val, int):
-                setattr(self, prop_name, prop_val + 0.0)
+            if not self.convert_to_float(prop_name):
+                return
 
     def run_basic_validation(self):
         """Evaluate the properties, make sure they are populated"""
+        if self.has_error():   # something may be wrong in "run_initial_handling()"
+            return
 
         # Always validate these properties, mostly using the self.prop_validators
         #
@@ -186,6 +204,8 @@ class StatSpec(BasicErrCheckList):
         self.validate_property('epsilon')
         self.validate_property('dataset_size')
         self.validate_property('col_index')
+        self.validate_property('missing_values_handling')
+
         if not self.var_type in pstatic.VALID_VAR_TYPES:
             self.add_err_msg(f'Invalid variable type: "{self.var_type}"')
 
@@ -224,7 +244,24 @@ class StatSpec(BasicErrCheckList):
 
         return True
 
-    def print_debug(self):
+    def convert_to_float(self, prop_name):
+        """Attempt to convert a value to a float"""
+        prop_val = getattr(self, prop_name)
+
+        try:
+            prop_val_float = float(prop_val)
+        except TypeError:
+            self.add_err_msg(f'Failed to convert "{prop_name}" to a float. (value: "{prop_val}")')
+            return False
+        except ValueError:
+            self.add_err_msg(f'Failed to convert "{prop_name}" to a float. (value: "{prop_val}")')
+            return False
+
+        setattr(self, prop_name, prop_val_float)
+
+        return True
+
+def print_debug(self):
         """show params"""
         for key, val in self.__dict__.items():
             print(f'{key}: {val}')

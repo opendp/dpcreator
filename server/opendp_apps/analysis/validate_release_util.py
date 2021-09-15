@@ -65,6 +65,87 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         for dp_stat in self.dp_statistics:
             stat_num += 1       # not used yet...
+            """
+            We're putting together lots of properties to pass to 
+            statistic specific classes such as DPMeanSpec.
+            
+            These classes take care of most error checking and validation.
+            
+            - Some sample input from the UI--e.g. contents of "dp_stat:
+                {
+                    "statistic": astatic.DP_MEAN,
+                    "variable": "EyeHeight",
+                    "epsilon": 1,
+                    "delta": 0,
+                    "error": "",
+                    "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
+                    "handle_as_fixed": False,
+                    "fixed_value": "5.0",
+                    "locked": False,
+                    "label": "EyeHeight"},
+            """
+            variable = dp_stat.get('variable')
+            statistic = dp_stat.get('statistic', 'shrug?')
+
+            # (1) Variable is not in the spec
+            #
+            if not variable:
+                user_msg = f'"variable" is missing from this DP Stat specification'
+                self.add_stat_error(var_name, statistic, user_msg)
+                continue  # to the next dp_stat specification
+
+            # (2) Is this a known statistic? If not stop here.
+            #
+            if not statistic in astatic.DP_STATS_CHOICES:  # also checked in the DPStatisticSerializer
+                user_msg = f'Statistic "{statistic}" is not supported'
+                self.add_stat_error(var_name, statistic, user_msg)
+                continue  # to the next dp_stat specification
+
+            # (2) Begin building the property dict
+            #
+            props = dp_stat         # start with what is in dp_stat--the UI input
+            props['impute_constant'] = dp_stat.get('fixed_value', None)   # one bit of renaming
+
+
+            # (3) Retrieve variable info which has min/max/categories, variable type, etc.
+            #
+            variable_info = self.analysis_plan.variable_info.get(var_name)
+            if not variable_info:
+                # Temp workaround!!! See Issue #300
+                # https://github.com/opendp/dpcreator/issues/300
+                variable_info = self.analysis_plan.variable_info.get(camel_to_snake(var_name))
+
+            if variable_info:
+                props['variable_info'] = variable_info
+            else:
+                self.add_stat_error(var_name, statistic, 'Variable info not found.')
+                continue # to the next dp_stat specification
+
+
+            # (4) Retrieve the column index
+            #
+            col_idx_info = self.analysis_plan.dataset.get_variable_index(var_name)
+            if col_idx_info.success:
+                props['col_index'] = col_idx_info.data
+            else:
+                self.add_stat_error(var_name, statistic, col_idx_info.message)
+                continue  # to the next dp_stat specification
+
+
+            # (5) Dataset size
+            #
+            dataset_size_info = self.analysis_plan.dataset.get_dataset_size()
+            if not dataset_size_info.success:
+                self.add_stat_error(var_name, statistic, dataset_size_info.message)
+                continue  # to the next dp_stat specification
+            else:
+                props['dataset_size'] = dataset_size_info.data
+
+
+
+            # -----------------------------------
+            # original looping code below
+            # -----------------------------------
             statistic = dp_stat['statistic']
             var_name = dp_stat['variable']  # User "variable", NOT "label"
             lower = upper = None

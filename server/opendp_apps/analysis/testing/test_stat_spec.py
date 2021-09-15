@@ -23,7 +23,8 @@ class StatSpecTest(TestCase):
                           col_index=1,
                           variable_info=dict(min=1, max=16.0, type=pstatic.VAR_TYPE_FLOAT),
                           statistic=astatic.DP_MEAN,
-                          impute_constant=8.0,
+                          missing_values_handling=astatic.MISSING_VAL_INSERT_FIXED,
+                          impute_constant="8.0",
                           dataset_size=1000,
                           epsilon=1.0,
                           ci=astatic.CI_95)
@@ -37,6 +38,12 @@ class StatSpecTest(TestCase):
         # dp_mean.print_debug()
 
         print('(2) dp_mean.is_valid()', dp_mean.is_valid())
+        print('(2a) dp_mean.is_valid()', dp_mean.is_valid())
+        #print(dp_mean.get_error_messages())
+        #self.assertTrue(dp_mean.is_valid())
+
+        #print('(3) accuracy', dp_mean.get_accuracy())
+
         if dp_mean.has_error():
             print(dp_mean.get_error_messages())
 

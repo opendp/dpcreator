@@ -3,7 +3,6 @@ Wrapper class for DP Mean functionality
 
 
 """
-from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp.meas import make_base_laplace
 from opendp.mod import binary_search, enable_features
 from opendp.trans import \
@@ -16,6 +15,9 @@ from opendp.trans import \
      make_split_dataframe)
 
 enable_features("floating-point")
+
+from opendp_apps.analysis.tools.stat_spec import StatSpec
+from opendp_apps.analysis import static_vals as astatic
 
 
 class DPMeanInfo(StatSpec):
@@ -40,10 +42,20 @@ class DPMeanInfo(StatSpec):
         return ['min', 'max', 'ci', 'impute_constant']
 
 
-    def run_additional_handling(self):
+    def run_initial_handling(self):
         """
         Make sure values are consistently floats
         """
+        if self.impute_constant is not None:
+            pass
+
+        # Use the "impute_value" for missing values, make sure it's a float!
+        #
+        if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
+            # Convert the impute value to a float!
+            if not self.convert_to_float('impute_constant'):
+                return
+
         self.floatify_int_values()
 
 
@@ -83,6 +95,10 @@ class DPMeanInfo(StatSpec):
         scale = binary_search(lambda s: self.check_scale(s, preprocessor, 1, self.epsilon),
                               bounds=(0.0, 1000.0))
         preprocessor = preprocessor >> make_base_laplace(scale)
+
+        #laplacian_scale_to_accuracy(self.preprocessor, self.ci)
+
+        self.preprocessor = preprocessor
         return preprocessor
 
 
@@ -118,7 +134,7 @@ class DPMeanInfo(StatSpec):
         dp_result = everything(data)
 
         print((f"Epsilon: {self.epsilon}"
-               f"\nColumn name: {self.var_name}"
+               f"\nColumn name: {self.variable}"
                f"\nColumn index: {self.col_index}"
                f"\nDP Mean: {dp_result}"
                f"\nActual Mean: {sleep_total/num_rows}" ))
