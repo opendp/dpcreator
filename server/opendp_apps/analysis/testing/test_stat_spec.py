@@ -21,7 +21,7 @@ class StatSpecTest(TestCase):
 
         spec_props = dict(var_name="hours_sleep",
                           col_index=1,
-                          variable_info=dict(min=1.0, max=16.0, type=pstatic.VAR_TYPE_FLOAT),
+                          variable_info=dict(min=1, max=16.0, type=pstatic.VAR_TYPE_FLOAT),
                           statistic=astatic.DP_MEAN,
                           impute_constant=8.0,
                           dataset_size=1000,

@@ -1,4 +1,8 @@
-import pandas as pd
+"""
+Wrapper class for DP Mean functionality
+
+
+"""
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp.meas import make_base_laplace
 from opendp.mod import binary_search, enable_features
@@ -35,6 +39,15 @@ class DPMeanInfo(StatSpec):
         """
         return ['min', 'max', 'ci', 'impute_constant']
 
+
+    def run_additional_handling(self):
+        """
+        Make sure values are consistently floats
+        """
+        self.floatify_int_values()
+
+
+
     def check_scale(self, scale, preprocessor, dataset_distance, epsilon):
         """
         Return T/F
@@ -62,13 +75,13 @@ class DPMeanInfo(StatSpec):
             # Impute missing values to 0 Vec<Float>
             make_impute_constant(self.impute_constant) >>
             # Clamp age values
-            make_clamp(self.bounds) >>
-            make_bounded_resize(self.dataset_size, self.bounds, self.impute_constant) >>
-            make_sized_bounded_mean(self.dataset_size, self.bounds)
+            make_clamp(self.get_bounds()) >>
+            make_bounded_resize(self.dataset_size, self.get_bounds(), self.impute_constant) >>
+            make_sized_bounded_mean(self.dataset_size, self.get_bounds())
         )
 
         scale = binary_search(lambda s: self.check_scale(s, preprocessor, 1, self.epsilon),
-                              bounds=(0.0, 1000.0))  #self.bounds)
+                              bounds=(0.0, 1000.0))
         preprocessor = preprocessor >> make_base_laplace(scale)
         return preprocessor
 
@@ -95,7 +108,7 @@ class DPMeanInfo(StatSpec):
             sleep_total += sleep
             outlines.append(f'{age}, {sleep}')
         data = '\n'.join(outlines)
-        print(data)
+        #print(data)
 
         parse_dataframe = make_split_dataframe(separator=",",
                                                col_names=[0, 1])
