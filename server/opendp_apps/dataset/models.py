@@ -109,9 +109,9 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
         return ok_resp(self.data_profile['dataset']['rowCount'])
 
-
-    def get_variable_index(self, var_name: str) -> BasicResponse:
-        """Retrieve the variable index from the data_profile
+    def get_variable_order(self, as_indices=False) -> BasicResponse:
+        """
+        Retrieve the variableOrder list from the data_profile
          Example data structure:
           {"dataset":{
               "rowCount":6610,
@@ -124,6 +124,44 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
             }
             etc
           }
+
+        :param as_indices, if True, return [0, 1, 2], etc.
+        """
+        if not self.data_profile:
+            return err_resp('Data profile not available')
+
+        if not 'dataset' in self.data_profile:
+            return err_resp('Dataset information not available in profile')
+
+        if not 'variableOrder' in self.data_profile['dataset']:
+            return err_resp('"variableOrder" information not available in profile (id:2')
+
+        variable_order = self.data_profile['dataset']['variableOrder']
+
+        if as_indices:
+            try:
+                return ok_resp([idx for idx, _var_name in variable_order])
+            except:
+                return err_resp('"variableOrder" information not in proper format: {variable_order}')
+
+        return ok_resp(variable_order)
+
+    def get_variable_index(self, var_name: str) -> BasicResponse:
+        """Retrieve the variable index from the data_profile for a specific variable name
+         Example data structure:
+          {"dataset":{
+              "rowCount":6610,
+              "variableCount":20,
+              "variableOrder":[
+                 [0, "ccode"],
+                 [1, "country"],
+                 [2, "cname" ],
+                ]
+            }
+            etc
+          }
+
+        :param var_name - variable name, e.g. "cname" would return 1
         """
         if not self.data_profile:
             return err_resp('Data profile not available')

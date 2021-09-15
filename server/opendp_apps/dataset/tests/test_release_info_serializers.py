@@ -18,9 +18,6 @@ from opendp_apps.analysis.serializers import ReleaseValidationSerializer
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
-from opendp_apps.utils.extra_validators import \
-    (VALIDATE_MSG_EPSILON,)
-
 
 
 class TestReleaseInfoSerializer(TestCase):
@@ -122,10 +119,22 @@ class TestReleaseInfoSerializer(TestCase):
         #print('stats_info.success', stats_info.success)
         self.assertTrue(stats_info.success)
 
-        expected_result = [{'variable': 'EyeHeight', 'statistic': astatic.DP_MEAN,
-                            'valid': True, 'message': None}]
+        expected_result = [{'variable': 'EyeHeight', 'statistic': 'mean', 'valid': True,
+                            'message': None,
+                            'accuracy': {
+                                'val': 1.6370121873967791,
+                                'message': 'Releasing mean for the variable EyeHeight. With at least probability 0.95 the output mean will differ from the true mean by at most 1.6370121873967791 units. Here the units are the same units the variable has in the dataset.'}}]
+
         #print('stats_info.data', stats_info.data)
-        self.assertEqual(expected_result, stats_info.data)
+        self.assertEqual(stats_info.data[0]['valid'], True)
+
+        # Were accuracy results included?
+        self.assertTrue('val' in stats_info.data[0]['accuracy'])
+        self.assertTrue('message' in stats_info.data[0]['accuracy'])
+
+        accuracy_msg = f'output {astatic.DP_MEAN} will differ from the true {astatic.DP_MEAN} by at'
+        self.assertTrue(stats_info.data[0]['accuracy']['message'].find(accuracy_msg) > -1)
+
 
     def test_15_api_validate_stats(self):
         """(15) Test a working stat via API"""
