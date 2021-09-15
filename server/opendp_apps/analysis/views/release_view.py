@@ -103,17 +103,22 @@ class ReleaseView(viewsets.ViewSet):
         #print('>> ReleaseView.create >>>', request.data)
         release_info_serializer = ReleaseValidationSerializer(data=request.data)
         if not release_info_serializer.is_valid():
-            raise Exception(f"Invalid fDPStatistics objects: {release_info_serializer.errors}")
+            print('release_info_serializer.errors', release_info_serializer.errors)
+            return Response(get_json_error('Field validation failed',
+                                           errors=release_info_serializer.errors),
+                            status=status.HTTP_200_OK)
+                            #status=status.HTTP_400_BAD_REQUEST)
+
 
         save_result = release_info_serializer.save(**dict(opendp_user=request.user))
-        print(save_result.success)
+        #print(save_result.success)
         if not save_result.success:
-            print(save_result.message)
+            #print(save_result.message)
 
             return Response(get_json_error(save_result.message),
                             status=status.HTTP_400_BAD_REQUEST)
 
-        print(save_result.data)
+        #print(save_result.data)
         return Response(get_json_success('validation results returned',
                                          data=save_result.data),
                         status=status.HTTP_200_OK)

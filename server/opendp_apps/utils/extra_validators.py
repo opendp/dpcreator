@@ -8,6 +8,7 @@ VALIDATE_MSG_EPSILON = 'As a rule of thumb, epsilon should not be less than 0.00
 VALIDATE_MSG_NOT_FLOAT = 'The value must be a float.'
 VALIDATE_MSG_NOT_INT = 'The value must be an integer.'
 VALIDATE_MSG_NOT_VALID_CI = 'Valid confidence interval values:'
+VALIDATE_MSG_MISSING_VAL_HANDLER = 'Valid missing value handlers:'
 VALIDATE_MSG_UNSUPPORTED_STATISTIC = 'Valid statistics:'
 
 def validate_statistic(value):
@@ -27,6 +28,14 @@ def validate_confidence_interval(value):
         user_msg = f'{VALIDATE_MSG_NOT_VALID_CI} {ci_choices_str}'
         raise ValidationError(user_msg)
 
+def validate_missing_val_handlers(value):
+    """Check that the missing val handler is correct"""
+    if not value in astatic.MISSING_VAL_HANDLING_TYPES:
+        choices_str = ', '.join(astatic.MISSING_VAL_HANDLING_TYPES)
+        user_msg = f'{VALIDATE_MSG_MISSING_VAL_HANDLER} {choices_str}'
+        raise ValidationError(user_msg)
+
+
 def validate_not_negative(value):
     """Valid values are non-negative numbers"""
     if value < 0.0:
@@ -39,6 +48,14 @@ def validate_int_greater_than_zero(value):
 
     if value < 1:
         raise ValidationError(VALIDATE_MSG_ONE_OR_GREATER)
+
+def validate_int_not_negative(value):
+    """Validate int greater >= 0"""
+    if not isinstance(value, int):
+        raise ValidationError(VALIDATE_MSG_NOT_INT)
+
+    if value < 0:
+        raise ValidationError(VALIDATE_MSG_ZERO_OR_GREATER)
 
 
 def validate_not_negative_or_none(value):
@@ -62,8 +79,15 @@ def validate_epsilon_or_none(value):
 
 def validate_not_empty_or_none(value):
 
-    if not value:
+    if value == 0:
+        pass
+    elif not value:
         raise ValidationError('The value cannot be empty.')
+
+def validate_not_none(value):
+
+    if value is None:
+        raise ValidationError('The value cannot be None.')
 
 def validate_epsilon_not_null(value):
     """

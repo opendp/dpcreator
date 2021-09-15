@@ -56,6 +56,8 @@ class DPStatisticSerializer(serializers.Serializer):
     label = serializers.CharField()
     locked = serializers.BooleanField()
     epsilon = serializers.FloatField()
+    delta = serializers.FloatField(required=False, default=0.0)
+    ci = serializers.FloatField(default=astatic.CI_95)
     variable = serializers.CharField()
 
     # e.g. ['mean', 'sum', 'count', 'histogram', 'quantile'] etc.
@@ -145,6 +147,8 @@ class ReleaseValidationSerializer(serializers.ModelSerializer):
         model = ReleaseInfo
         fields = ('dp_statistics', 'analysis_plan_id', )
 
+    # Temp workaround!!! See Issue #300
+    # https://github.com/opendp/dpcreator/issues/300
     def _camel_to_snake(self, name):
         """
         Front end is passing camelCase, but JSON in DB is using snake_case
@@ -210,7 +214,7 @@ class ReleaseValidationSerializer(serializers.ModelSerializer):
             # How should this be used?
             return err_resp(user_msg)   #dict(success=False, message=user_msg)
 
-        print('(validate_util.validation_info)', validate_util.validation_info)
+        #print('(validate_util.validation_info)', validate_util.validation_info)
         return ok_resp(validate_util.validation_info)
         #return validate_util.validation_info
 
