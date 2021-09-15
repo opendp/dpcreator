@@ -40,57 +40,74 @@ export const analystSteps = [
 ]
 
 export default {
-    // STEP_0100_UPLOADED
-    step_100: {
+    [STEP_0100_UPLOADED]: {
         workflowStatus: statusInformation.statuses.UPLOADED,
         wizardStepper: 0,
+        label: 'Dataset Uploaded',
         nextStep: STEP_0200_VALIDATED
     },
-    // STEP_0200_VALIDATED
-    step_200: {
+    [STEP_0200_VALIDATED]: {
         workflowStatus: statusInformation.statuses.IN_PROGRESS,
         wizardStepper: 1,
+        label: 'Dataset Validated',
         nextStep: STEP_0300_PROFILE_PROCESSING
     },
-    // STEP_0300_PROFILE_PROCESSING
-    step_300: {
+    [STEP_0300_PROFILE_PROCESSING]: {
         workflowStatus: statusInformation.statuses.IN_PROGRESS,
         wizardStepper: 1,
+        label: 'Profile Processing',
         nextStep: STEP_0400_PROFILING_COMPLETE
     },
-    // STEP_0400_PROFILING_COMPLETE
-    step_400: {
+    [STEP_0400_PROFILING_COMPLETE]: {
         workflowStatus: statusInformation.statuses.IN_PROGRESS,
         wizardStepper: 1,
+        label: 'Profiling Complete',
         nextStep: STEP_0500_VARIABLE_DEFAULTS_CONFIRMED
     },
-    // STEP_0500_VARIABLE_DEFAULTS_CONFIRMED
-    step_500: {
+    [STEP_0500_VARIABLE_DEFAULTS_CONFIRMED]: {
         workflowStatus: statusInformation.statuses.IN_PROGRESS,
         wizardStepper: 2,
+        label: 'Variable Defaults Confirmed',
         nextStep: STEP_0600_EPSILON_SET
     },
-    // STEP_0600_EPSILON_SET
-    step_600: {
+    [STEP_0600_EPSILON_SET]: {
         workflowStatus: statusInformation.statuses.IN_PROGRESS,
         wizardStepper: 3,
+        label: 'Epsilon Set',
         nextStep: STEP_0800_STATISTICS_CREATED
-
     },
-    // STEP_9100_VALIDATION_FAILED
-    step_9100: {
-        workflowStatus: statusInformation.statuses.ERROR,
+    [STEP_0700_VARIABLES_CONFIRMED]: {
+        label: 'Variables Confirmed'
     },
-    // STEP_9200_DATAVERSE_DOWNLOAD_FAILED
-    step_9200: {
-        workflowStatus: statusInformation.statuses.ERROR,
+    [STEP_0800_STATISTICS_CREATED]: {
+        label: 'Statistics Created'
     },
-    // STEP_9300_PROFILING_FAILED
-    step_9300: {
-        workflowStatus: statusInformation.statuses.ERROR,
+    [STEP_0900_STATISTICS_SUBMITTED]: {
+        label: 'Statistics Submitted'
     },
-    // STEP_9400_CREATE_RELEASE_FAILED
-    step_9400: {
+    [STEP_1000_RELEASE_COMPLETE]: {
+        label: 'Release Complete'
+    },
+    [STEP_1100_DV_RELEASE_DEPOSITED]: {
+        label: 'Dataverse Release Deposited'
+    },
+    [STEP_1200_PROCESS_COMPLETE]: {
+        label: 'Process Complete'
+    },
+    [STEP_9100_VALIDATION_FAILED]: {
         workflowStatus: statusInformation.statuses.ERROR,
+        label: 'Validation Failed'
+    },
+    [STEP_9200_DATAVERSE_DOWNLOAD_FAILED]: {
+        workflowStatus: statusInformation.statuses.ERROR,
+        label: 'Download Failed'
+    },
+    [STEP_9300_PROFILING_FAILED]: {
+        workflowStatus: statusInformation.statuses.ERROR,
+        label: 'Profiling Failed'
+    },
+    [STEP_9400_CREATE_RELEASE_FAILED]: {
+        workflowStatus: statusInformation.statuses.ERROR,
+        label: 'Create Release Failed'
     }
 }

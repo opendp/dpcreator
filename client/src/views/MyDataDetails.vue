@@ -3,7 +3,7 @@
     <v-container>
       <v-sheet rounded="lg">
         <v-container>
-          <h1 class="title-size-2">{{ datasetTitle }}</h1>
+          <h1 class="title-size-2">{{ datasetInfo.datasetSchemaInfo.name }}</h1>
           <StatusTag class="my-5" :status="status"/>
           <ColoredBorderAlert type="warning" v-if="$vuetify.breakpoint.xsOnly">
             <template v-slot:content>
@@ -139,6 +139,9 @@ import StatusTag from "../components/DesignSystem/StatusTag.vue";
 import Button from "../components/DesignSystem/Button.vue";
 import SupportBanner from "../components/SupportBanner.vue";
 import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
+import {mapGetters, mapState} from "vuex";
+import analysis from "@/api/analysis";
+import stepInformation from "@/data/stepInformation";
 
 const {
   IN_PROGRESS,
@@ -162,13 +165,13 @@ export default {
     Button,
     SupportBanner
   },
+
   methods: {
     handleButtonClick(action, item) {
       this[action](item);
     },
     continueWorkflow(item) {
-      //TODO: Implement Handler
-      alert("continue workflow " + item);
+      this.$router.push(`${NETWORK_CONSTANTS.WIZARD.PATH}`)
     },
     cancelExecution(item) {
       //TODO: Implement Handler
@@ -192,20 +195,14 @@ export default {
     }
   },
   computed: {
+
+
+    ...mapState('dataset', ['datasetInfo', 'analysisPlan']),
+    ...mapGetters('dataset', ['getDepositorSetupInfo']),
+    ...mapState('auth', ['user']),
+
     status: function () {
-      const urlParam = this.$router.history.current.params.id;
-      switch (urlParam) {
-        case "exampleInProgress":
-          return IN_PROGRESS;
-        case "exampleInExecution":
-          return IN_EXECUTION;
-        case "exampleError":
-          return ERROR;
-        case "exampleCompleted":
-          return COMPLETED;
-        default:
-          return COMPLETED;
-      }
+      return stepInformation[this.datasetInfo.status].workflowStatus
     },
     generalError: function () {
       return this.status === ERROR;

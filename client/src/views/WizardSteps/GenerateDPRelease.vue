@@ -15,7 +15,7 @@
       <p class="mb-2">
         <strong>Confirm the email to send notifications to:</strong>
       </p>
-      <p>{{ email }}*</p>
+      <p>{{ user.email }}*</p>
 
       <span class="d-block grey--text text--darken-2 mt-0 font-italic"
       >* If you would like to change your email address, you can edit it in
@@ -98,6 +98,8 @@ import ColoredBorderAlert from "../../components/DynamicHelpResources/ColoredBor
 import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
 import statusInformation from "../../data/statusInformation";
 import StatusTag from "../../components/DesignSystem/StatusTag.vue";
+import {mapState} from "vuex";
+import {STEP_0900_STATISTICS_SUBMITTED} from "@/data/stepInformation";
 
 const {IN_EXECUTION} = statusInformation.statuses;
 
@@ -115,7 +117,7 @@ export default {
         setTimeout(() => {
           this.areStatisticsSubmitted = false;
           //TODO: Implement the Handler of the response of the statistics submit
-          this.releaseLink = `${NETWORK_CONSTANTS.MY_DATA.PATH}/abcd1234`;
+          this.releaseLink = `${NETWORK_CONSTANTS.MY_DATA_DETAILS.PATH}`
           this.areStatisticsReceived = true;
         }, 3000);
       }
@@ -125,18 +127,26 @@ export default {
     handleFormSubmit: function () {
       if (this.$refs.form.validate()) {
         this.areStatisticsSubmitted = true;
-        //TODO: Implement Submit Statistics handler
+        //TODO: make call to Release API to submit statistics
+        const completedStepProp = {
+          userStep: STEP_0900_STATISTICS_SUBMITTED
+        }
+        const payload = {objectId: this.analysisPlan.objectId, props: completedStepProp}
+        this.$store.dispatch('dataset/updateAnalysisPlan', payload)
+
       }
     }
   },
   data: () => ({
     areStatisticsSubmitted: false,
-    //TODO: Change with the email of the current logged user
-    email: "danny-fy@gmail.com",
     areStatisticsReceived: false,
     releaseLink: "",
     NETWORK_CONSTANTS,
     IN_EXECUTION
-  })
+  }),
+  computed: {
+    ...mapState('auth', ['user']),
+    ...mapState('dataset', ['analysisPlan'])
+  }
 };
 </script>

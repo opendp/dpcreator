@@ -153,6 +153,11 @@ const actions = {
         if (variableInput.type === 'Numerical') {
             targetVar.min = Number(variableInput.additional_information.min)
             targetVar.max = Number(variableInput.additional_information.max)
+
+            //   targetVar.min = Number(0)
+
+            //    targetVar.max = Number(100)
+
         }
         if (variableInput.type === 'Categorical') {
             targetVar.categories = variableInput.additional_information.categories
@@ -289,6 +294,9 @@ const mutations = {
         state.profilerStatus = status
     },
     [SET_DATASET_INFO](state, datasetInfo) {
+        if (datasetInfo.depositorSetupInfo.defaultEpsilon === null) {
+            console.log("EPSILON NULL")
+        }
         state.datasetInfo = datasetInfo
     },
 };
