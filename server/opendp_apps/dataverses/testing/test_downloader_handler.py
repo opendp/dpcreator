@@ -90,6 +90,8 @@ class DownloadHandlerTests(TestCase):
         # ---------------------------
         profile_handler = profiler_tasks.run_profile_by_filefield(dfi.object_id)
         print('profile_handler.has_error()', profile_handler.has_error())
+        if profile_handler.has_error():
+            print(profile_handler.get_err_msg())
         self.assertTrue(profile_handler.has_error() is False)
 
         # data profile exists

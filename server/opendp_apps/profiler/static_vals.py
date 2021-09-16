@@ -17,3 +17,4 @@ VALID_VAR_TYPES = (VAR_TYPE_BOOLEAN,
                    VAR_TYPE_NUMERICAL,
                    VAR_TYPE_INTEGER,
                    VAR_TYPE_FLOAT)
+

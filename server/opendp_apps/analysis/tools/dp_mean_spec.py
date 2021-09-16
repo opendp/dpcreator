@@ -55,8 +55,8 @@ class DPMeanSpec(StatSpec):
             # Convert the impute value to a float!
             if not self.convert_to_float('impute_constant'):
                 return
-
         self.floatify_int_values()
+
 
     def check_scale(self, scale, preprocessor, dataset_distance, epsilon):
         """

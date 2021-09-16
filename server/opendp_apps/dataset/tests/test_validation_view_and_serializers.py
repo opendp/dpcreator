@@ -20,7 +20,7 @@ from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
 
 
-class TestReleaseInfoSerializer(TestCase):
+class TestValidationViewAndSerializers(TestCase):
     fixtures = ['test_dataset_data_001.json', ]
 
     def setUp(self):
@@ -80,6 +80,67 @@ class TestReleaseInfoSerializer(TestCase):
         # re-retrieve it...
         return DataSetInfo.objects.get(object_id=dataset_info.object_id)
 
+    def get_good_spec_05_08_10(self):
+        """Stat spec for multiple tests"""
+        stat_spec = {
+                        "statistic": astatic.DP_MEAN,
+                        "variable": "EyeHeight",
+                        "epsilon": 1,
+                        "delta": 0,
+                        "ci": astatic.CI_95,
+                        "error": "",
+                        "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
+                        "handle_as_fixed": False,
+                        "fixed_value": "5.0",
+                        "locked": False,
+                        "label": "EyeHeight"
+                    }
+
+        return stat_spec
+
+    def test_05_api_fail_not_logged_in(self):
+        """(5) Test API fail, not logged in"""
+        msgt(self.test_05_api_fail_not_logged_in.__doc__)
+
+        client = APIClient()
+        dataset_info = DataSetInfo.objects.get(id=4)
+        AnalysisPlanUtil.create_plan(dataset_info.object_id, self.user_obj)
+        analysis_plan = AnalysisPlan.objects.first()
+
+        # Send the dp_statistics for validation
+        #
+        request_plan = dict(analysis_plan_id=analysis_plan.object_id,
+                            dp_statistics=[self.get_good_spec_05_08_10()])
+
+        response = client.post('/api/validation/', data=request_plan, format='json')
+        #print('response.status_code', response.status_code)
+        #print('json', response.json())
+        self.assertEqual(response.status_code, 403)
+
+
+
+    def test_08_api_fail_wrong_user(self):
+        """(8) Test API fail, logged in as different user"""
+        msgt(self.test_08_api_fail_wrong_user.__doc__)
+
+        new_client = APIClient()
+        other_user_obj, _created = get_user_model().objects.get_or_create(username='test_user')
+        new_client.force_login(other_user_obj)
+
+        dataset_info = DataSetInfo.objects.get(id=4)
+        AnalysisPlanUtil.create_plan(dataset_info.object_id, self.user_obj)
+        analysis_plan = AnalysisPlan.objects.first()
+
+        # Send the dp_statistics for validation
+        #
+        request_plan = dict(analysis_plan_id=analysis_plan.object_id,
+                            dp_statistics=[self.get_good_spec_05_08_10()])
+
+        response = new_client.post('/api/validation/', data=request_plan, format='json')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(response.json()['success'])
+        self.assertEqual(response.json()['message'], astatic.ERR_MSG_NO_ANALYSIS_PLAN)
 
 
     def test_10_validate_stats(self):
@@ -90,21 +151,8 @@ class TestReleaseInfoSerializer(TestCase):
 
         # Send the dp_statistics for validation
         #
-        stat_spec =  { \
-                "statistic": astatic.DP_MEAN,
-                "variable": "EyeHeight",
-                "epsilon": 1,
-                "delta": 0,
-                "ci": astatic.CI_95,
-                "error": "",
-                "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
-                "handle_as_fixed": False,
-                "fixed_value": "5.0",
-                "locked": False,
-                "label": "EyeHeight"}
-
         request_plan = dict(analysis_plan_id=analysis_plan.object_id,
-                            dp_statistics=[stat_spec])
+                            dp_statistics=[self.get_good_spec_05_08_10()])
 
         # Check the basics
         #
@@ -160,7 +208,7 @@ class TestReleaseInfoSerializer(TestCase):
         request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
                             dp_statistics=[stat_spec])
 
-        response = self.client.post('/api/release/',
+        response = self.client.post('/api/validation/',
                                     json.dumps(request_plan),
                                     content_type='application/json')
 
@@ -238,7 +286,7 @@ class TestReleaseInfoSerializer(TestCase):
         request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
                             dp_statistics=[stat_spec])
 
-        response = self.client.post('/api/release/',
+        response = self.client.post('/api/validation/',
                                     json.dumps(request_plan),
                                     content_type='application/json')
 
@@ -335,7 +383,7 @@ class TestReleaseInfoSerializer(TestCase):
         request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
                             dp_statistics=[stat_spec])
 
-        response = self.client.post('/api/release/',
+        response = self.client.post('/api/validation/',
                                     json.dumps(request_plan),
                                     content_type='application/json')
 
@@ -435,7 +483,7 @@ class TestReleaseInfoSerializer(TestCase):
         self.assertTrue(valid)
         self.assertTrue(serializer.errors == {})
 
-        response = self.client.post('/api/release/',
+        response = self.client.post('/api/validation/',
                                     json.dumps(request_plan),
                                     content_type='application/json')
 
@@ -494,7 +542,7 @@ class TestReleaseInfoSerializer(TestCase):
 
 
     def test_55_api_bad_total_epsilon(self):
-        """(50) Fail: API, Bad total epsilon"""
+        """(55) Fail: API, Bad total epsilon"""
         msgt(self.test_55_api_bad_total_epsilon.__doc__)
 
         analysis_plan = self.retrieve_new_plan()
@@ -521,7 +569,7 @@ class TestReleaseInfoSerializer(TestCase):
         request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
                             dp_statistics=[stat_spec])
 
-        response = self.client.post('/api/release/',
+        response = self.client.post('/api/validation/',
                                     json.dumps(request_plan),
                                     content_type='application/json')
 
@@ -602,9 +650,9 @@ class TestReleaseInfoSerializer(TestCase):
         self.assertTrue(stats_valid.data[1]['valid'] is False)
         self.assertTrue(stats_valid.data[1]['message'].find('exceeds the max epsilon') > -1)
 
-    def test_65_bad_running_epsilon(self):
+    def test_65_api_bad_running_epsilon(self):
         """(65) Fail: API,  Total epsilon from dp_statistics > depositor_setup_info.epsilon"""
-        msgt(self.test_65_bad_running_epsilon.__doc__)
+        msgt(self.test_65_api_bad_running_epsilon.__doc__)
 
         analysis_plan = self.retrieve_new_plan()
 
@@ -621,7 +669,7 @@ class TestReleaseInfoSerializer(TestCase):
 
         request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
                             dp_statistics=stat_specs)
-        response = self.client.post('/api/release/',
+        response = self.client.post('/api/validation/',
                                     json.dumps(request_plan),
                                     content_type='application/json')
 
@@ -638,7 +686,7 @@ class TestReleaseInfoSerializer(TestCase):
         self.assertTrue(jresp['data'][1]['valid'] is False)
         self.assertTrue(jresp['data'][1]['message'].find('exceeds the max epsilon') > -1)
 
-    @skip
+    #@skip
     def test_70_show_add_file(self):
         """(70) Sample of attaching file to a DataSetInfo object"""
         msgt(self.test_70_show_add_file.__doc__)
@@ -660,6 +708,7 @@ class TestReleaseInfoSerializer(TestCase):
 
         # print(json.dumps(dataset_info_2.data_profile, indent=4))
         # print(json.dumps(dataset_info_2.profile_variables, indent=4))
+
 
 
 """
