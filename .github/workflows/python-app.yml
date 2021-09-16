@@ -31,5 +31,11 @@ jobs:
     #    flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
+        # Note tests are split out. Was running into incorrect state messages when
+        # run together--will need to troubleshoot. (Several apps have empty "tests.py files)
+        #
         cd server
-        python manage.py test #--exclude-tag=web-client
+        python manage.py test opendp_apps.analysis opendp_apps.communication opendp_apps.content_pages
+        python manage.py test opendp_apps.dataset
+        python manage.py test opendp_apps.dataverses opendp_apps.model_helpers
+        python manage.py test opendp_apps.profiler opendp_apps.terms_of_access opendp_apps.user
