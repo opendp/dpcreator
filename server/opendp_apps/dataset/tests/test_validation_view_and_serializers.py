@@ -43,8 +43,6 @@ class TestValidationViewAndSerializers(TestCase):
         self.analysis_plan = AnalysisPlan.objects.first()
         self.assertEqual(orig_plan.object_id, self.analysis_plan.object_id)
 
-        print(self.analysis_plan.object_id)
-
         self.general_stat_spec = {"statistic": astatic.DP_MEAN,
                 "variable": "EyeHeight",
                 "epsilon": 1,

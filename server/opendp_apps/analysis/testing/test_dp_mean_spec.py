@@ -96,59 +96,16 @@ class StatSpecTest(TestCase):
             print('\nUI info:', json.dumps(dp_mean.get_success_msg_dict()))
 
 
-    @skip
-    def test_15_dp_mean(self):
-        """(15) Test DP Mean Spec"""
-        msgt(self.test_15_dp_mean.__doc__)
-
-        spec_props = dict(var_name="hours_sleep",
-                          col_index=1,
-                          variable_info=dict(min=1, max=16.0, type=pstatic.VAR_TYPE_FLOAT),
-                          statistic=astatic.DP_MEAN,
-                          missing_values_handling=astatic.MISSING_VAL_INSERT_FIXED,
-                          impute_constant="8.0",
-                          dataset_size=1000,
-                          epsilon=1.0,
-                          ci=astatic.CI_95)
-
-        dp_mean = DPMeanSpec(spec_props)
-        print('(1) Setup dp_mean.has_error()', dp_mean.has_error())
-        if dp_mean.has_error():
-            print(dp_mean.get_error_messages())
-        self.assertFalse(dp_mean.has_error())
-
-        # dp_mean.print_debug()
-
-        print('(2) dp_mean.is_chain_valid()', dp_mean.is_chain_valid())
-        print('(2a) dp_mean.is_chain_valid()', dp_mean.is_chain_valid())
-        #print(dp_mean.get_error_messages())
-        #self.assertTrue(dp_mean.is_chain_valid())
-
-        #print('(3) accuracy', dp_mean.get_accuracy())
-
-        if dp_mean.has_error():
-            print(dp_mean.get_error_messages())
-
-        dp_mean.create_statistic()
-        #self.assertTrue(dp_mean.has_error())
-        #print('dp_mean.is_chain_valid()', dp_mean.is_chain_valid())
-        #print('dp_mean.has_error()', dp_mean.has_error())
-        #print(dp_mean.get_error_messages())
-
-    @skip
-    def test_20_get_variable_order(self):
-        """(20) Test get variable order"""
-        msgt(self.test_20_get_variable_order.__doc__)
+    def test_05_get_variable_order(self):
+        """(05) Test get variable order"""
+        msgt(self.test_05_get_variable_order.__doc__)
 
         analysis_plan = self.retrieve_new_plan()
 
         variable_indices_info = analysis_plan.dataset.get_variable_order(as_indices=True)
-        if variable_indices_info.success:
-            print('variable_indices_info.data', variable_indices_info.data)
-            variable_indices = variable_indices_info.data
-        else:
-            print('variable_indices_info.message', variable_indices_info.message)
-            self.add_err_msg(variable_indices_info.message)
+
+        self.assertTrue(variable_indices_info.success)
+        self.assertEqual(variable_indices_info.data, [x for x in range(20)])
 
 
     def test_10_valid_spec(self):
@@ -262,10 +219,10 @@ class StatSpecTest(TestCase):
 
 
 
-    @skip
-    def test_30_run_calculation(self):
-        """(30) Run DP mean calculation"""
-        msgt(self.test_30_run_calculation.__doc__)
+    #@skip
+    def test_40_run_dpmean_calculation(self):
+        """(40) Run DP mean calculation"""
+        msgt(self.test_40_run_dpmean_calculation.__doc__)
 
 
         spec_props = {'variable': 'EyeHeight',
@@ -284,25 +241,12 @@ class StatSpecTest(TestCase):
                       }
 
         dp_mean = DPMeanSpec(spec_props)
-        print('(1) Run initial check, before using the OpenDp library')
-        print('  - Error found?', dp_mean.has_error())
+        self.assertTrue(dp_mean.is_chain_valid())
         if dp_mean.has_error():
-            print('\n-- Errors --')
             print(dp_mean.get_error_messages())
-            print('\nUI info:', json.dumps(dp_mean.get_error_msg_dict()))
             return
+        #print('\nUI info:', json.dumps(dp_mean.get_success_msg_dict()))
 
-        print('(2) Use the OpenDP library to check validity')
-        print('  - Is valid?', dp_mean.is_chain_valid())
-        if dp_mean.has_error():
-            print('\n-- Errors --')
-            print(dp_mean.get_error_messages())
-            print('\nUI info:', json.dumps(dp_mean.get_error_msg_dict()))
-        else:
-            print('\n-- Looks good! --')
-            print('\nUI info:', json.dumps(dp_mean.get_success_msg_dict()))
-
-        return
         # ------------------------------------------------------
         # Run the actual mean
         # ------------------------------------------------------
@@ -312,7 +256,7 @@ class StatSpecTest(TestCase):
         # File object
         #
         eye_fatigue_filepath = join(TEST_DATA_DIR, 'Fatigue_data.tab')
-        print('eye_fatigue_filepath', eye_fatigue_filepath)
+        #print('eye_fatigue_filepath', eye_fatigue_filepath)
         self.assertTrue(isfile(eye_fatigue_filepath))
 
         file_obj = open(eye_fatigue_filepath, 'r')
@@ -320,6 +264,8 @@ class StatSpecTest(TestCase):
         # Call run_chain
         #
         dp_mean.run_chain(col_indexes, file_obj, sep_char="\t")
+
+
 
         print('Actual mean: -0.9503854412185792')
         '''
@@ -341,16 +287,29 @@ class StatSpecTest(TestCase):
         '''
 
 """
+# from ./dpcreator/server directory
+
+import os
 from raven_preprocess.preprocess_runner import PreprocessRunner
 
-run_info = PreprocessRunner.load_from_file(eye_fatigue_filepath)
-if not run_info.success:
-    print(run_info.err_msg)
-else:
-    runner = run_info.result_obj
+fnames =  ['PUMS5extract1000.csv', 'PUMS5extract10000.csv', 
+           'Fatigue_data.tab', 'gking-crisis.tab',
+           'teacher_climate_survey_lwd.csv', 'fearonLaitin.csv']
+for fname in fnames:
+    fpath = join(os.getcwd(), 'test_data', fname)
+    run_info = PreprocessRunner.load_from_file(fpath)
+    if not run_info.success:
+        print(run_info.err_msg)
+    else:
+        runner = run_info.result_obj
+        fname_base = fname.split('.')[0]
+        out_path = join(os.getcwd(), 'test_data', 
+                        'non_dp_debug_info', f'info_{fname_base}.json')
+        open(out_path, 'w').write(runner.get_final_json(indent=4))
+        print('file written: ', out_path)
 
     # show the JSON (string)
-    print(runner.get_final_json(indent=4)
+    print(runner.get_final_json(indent=4))
     
     metadata = runner.get_final_dict()
     print(metadata['variables']['EyeHeight']

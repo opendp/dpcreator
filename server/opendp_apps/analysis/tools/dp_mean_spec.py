@@ -14,6 +14,7 @@ from opendp.trans import \
      make_select_column,
      make_sized_bounded_mean,
      make_split_dataframe)
+from opendp.mod import OpenDPException
 
 enable_features("floating-point")
 
@@ -147,11 +148,13 @@ class DPMeanSpec(StatSpec):
         if self.has_error():
             return False
 
-        print('column_names', column_names)
+        if not isinstance(column_names, list):
+            self.add_err_msg('DPMeanSpec.run_chain(..): column_names must be a list. Found: (type({column_names}))')
+            return
 
         try:
             parse_dataframe = make_split_dataframe(separator=sep_char,
-                                               col_names=column_names)
+                                                   col_names=column_names)
 
             computation_chain = parse_dataframe >> self.preprocessor
 
