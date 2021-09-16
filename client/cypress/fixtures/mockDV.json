@@ -3,5 +3,7 @@
   "fileId": "4164587",
   "datasetPid": "doi:10.7910/DVN/PUXVDH",
   "token": "shoefly-dont-bother-m3",
-  "filePid": "doi:10.7910/DVN/PUXVDH"
+  "filePid": "doi:10.7910/DVN/PUXVDH",
+  "user": "dev_admin",
+  "password": "admin"
 }

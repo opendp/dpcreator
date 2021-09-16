@@ -46,8 +46,8 @@ Cypress.Commands.add('createMockDataset', (fixture) => {
         //    cy.get('[data-test="loginButton"]').click({multiple:true});
         cy.get('#account-buttons--placeholder .v-btn--is-elevated > .v-btn__content').click()
         cy.url().should('contain', 'log-in')
-        cy.get('[data-test="username"]').type('dev_admin');
-        cy.get('[data-test="password"]').type('admin');
+        cy.get('[data-test="username"]').type(mockForm['user']);
+        cy.get('[data-test="password"]').type(mockForm['password']);
         cy.get('[data-test="Log in"]').click();
         // first we will be routed to the Terms of Conditions page for the user
         cy.get('[data-test="confirmTermsCheckbox"]').click({force: true});
@@ -69,7 +69,20 @@ Cypress.Commands.add('storeExample', (email, password) => {
 
 
 })
+Cypress.Commands.add('goToConfirmVariables', () => {
+    // click on the start Process button on the welcome page,
+    // to navigate to the Validate Dataset step of the Wizard
+    cy.get('[data-test="Start Process"]').click();
+    cy.url().should('contain', 'wizard')
+    cy.get('[data-test="radioPrivateInformationYes"]').check({force: true})
+    cy.get('[data-test="notHarmButConfidential"]').check({force: true})
+    cy.get('[data-test="radioOnlyOneIndividualPerRowYes"]').check({force: true})
 
+    // click on continue to go to trigger the profiler and go to the Confirm Variables Page
+    cy.get('[data-test="wizardContinueButton"]').last().click();
+    cy.get('h1').should('contain', 'Confirm Variables')
+
+})
 
 //
 //

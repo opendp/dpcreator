@@ -19,9 +19,10 @@
             cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
                 ' Teacher Climate Survey ')
             cy.goToConfirmVariables()
-            cy.get('table').contains('td', 'subject').should('be.visible')
-            cy.get('table').contains('td', 'surveymode').should('be.visible')
-
+            cy.fixture('demoData.json').then((demoData) => {
+                cy.get('table').contains('td', demoData['variable1']).should('be.visible')
+                cy.get('table').contains('td', demoData['variable2']).should('be.visible')
+            })
 
         })
     })
