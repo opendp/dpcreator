@@ -30,7 +30,7 @@ export default {
         console.log(JSON.stringify(dpStatistics));
 
 
-        return session.post('/api/release/',
+        return session.post('/api/validation/',
                  {analysis_plan_id: analysisPlanId, dp_statistics: dpStatistics})
                  .then(resp => camelcaseKeys(resp.data, {deep: true}))
 
