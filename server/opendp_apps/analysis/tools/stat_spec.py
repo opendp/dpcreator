@@ -255,11 +255,13 @@ class StatSpec(BasicErrCheckList):
 
         if 'min' in self.additional_required_props() and \
                 'max' in self.additional_required_props():
-            if self.max < self.min:
-                #print('min', self.min, type(min))
-                #print('max', self.max, type(max))
+            print('checking min/max!')
+            print('min', self.min, type(self.min))
+            print('max', self.max, type(self.max))
+            if not self.max > self.min:
                 self.add_err_msg(astatic.ERR_MSG_INVALID_MIN_MAX)
                 return
+            print('looks okay!')
 
         # If this is numeric variable, check the impute constant
         #   (If impute constant isn't used, this check will simply exit)
