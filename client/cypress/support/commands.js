@@ -25,6 +25,21 @@ Cypress.Commands.add('vuex', () =>
         .its('app.$store')
 )
 
+Cypress.Commands.add('runDemo', (mockDVfile, demoDatafile) => {
+    cy.clearData()
+    cy.createMockDataset(mockDVfile)
+    cy.fixture(demoDatafile).then((demoData) => {
+        cy.url().should('contain', 'welcome')
+        cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
+            demoData['datasetName'])
+        cy.goToConfirmVariables()
+
+        cy.get('table').contains('td', demoData['variable1']).should('be.visible')
+        cy.get('table').contains('td', demoData['variable2']).should('be.visible')
+    })
+
+})
+
 
 Cypress.Commands.add('createMockDataset', (fixture) => {
     cy.fixture(fixture).then((mockForm) => {
