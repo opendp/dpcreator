@@ -73,8 +73,14 @@ class StatValidInfo:
 
 
     @staticmethod
-    def get_success_msg_dict_with_val(variable, statistic, message=None, value=None, accuracy=None):
-        return StatValidInfo(variable, statistic, True, message, value, accuracy_val=None, accuracy_msg=None).as_dict()
+    def get_success_msg_dict_with_val(variable, statistic, message=None, value=None,
+                                      accuracy_val=None, accuracy_msg=None):
+        """Return a success message, including the value--actually this shouldn't happen! Value should only be transmitted in a release!"""
+        assert False, ("Don't use StatValidInfo.get_success_msg_dict_with_val(...)."
+                       " The value should only be available via ReleaseInfo!!!")
+        return StatValidInfo(variable, statistic, True, message,
+                             value=value, accuracy_val=accuracy_val,
+                             accuracy_msg=accuracy_msg).as_dict()
 
 """
 from opendp_apps.analysis.stat_valid_info import StatValidInfo

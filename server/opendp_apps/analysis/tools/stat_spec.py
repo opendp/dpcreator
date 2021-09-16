@@ -130,16 +130,51 @@ class StatSpec(BasicErrCheckList):
         # self.preprocessor = preprocessor
         # return preprocessor
 
+
+
     @abstractmethod
-    def calculate_statistic(self, variabl_names, data):
-        """See "dp_mean_spec.py for an example of instantiation"""
+    def run_chain(self, columns: list, file_obj, sep_char=","):
+        """
+        Calculate the stats! See "dp_mean_spec.py" for an example of instantiation
+
+        :param columns. Examples: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
+                - In general using zero-based index of columns is preferred
+        :param file_obj - file like object to read data from
+        :param sep_char - separator from the object, default is "," for a .csv, etc
+
+        :return bool -  False: error messages are available through .get_err_msgs()
+                                or .get_error_msg_dict()
+                        True: results available through .value -- others params through
+                                .get_success_msg_dict()
+
+        Example:
+        # Note "\t" is for a tabular file
+        `dp_mean_spec.run_chain([0, 1, 2, 3], file_obj, sep_char="\t")`
+
+        """
         if self.has_error():
-            return
-        pass
+            return False
+        return True
+
 
     @abstractmethod
     def set_accuracy(self):
+        """Instantiate this for each subclass """
         pass
+        # Example from dp_mean_spec:
+        """
+        if self.has_error():
+            return
+            
+        if not self.preprocessor:
+            self.preprocessor = self.get_preprocessor()
+    
+        self.accuracy_val = laplacian_scale_to_accuracy(self.scale, self.ci)
+        self.accuracy_message = f"Releasing {self.statistic} for the variable {self.variable}. " \
+                                f"With at least probability {1 - self.ci} the output {self.statistic} " \
+                                f"will differ from the true mean by at most {self.accuracy_val} units. " \
+                                f"Here the units are the same units the variable has in the dataset."
+        """
 
     def get_bounds(self):
         """Return bounds based on the min/max values
@@ -148,7 +183,7 @@ class StatSpec(BasicErrCheckList):
         """
         return (self.min, self.max)
 
-    def is_valid(self):
+    def is_chain_valid(self):
         """Checking validity is accomplished by building the preprocessor"""
         if self.has_error():
             return False

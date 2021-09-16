@@ -83,7 +83,7 @@ class StatSpecTest(TestCase):
             return
 
         print('(2) Use the OpenDP library to check validity')
-        print('  - Is valid?', dp_mean.is_valid())
+        print('  - Is valid?', dp_mean.is_chain_valid())
         if dp_mean.has_error():
             print('\n-- Errors --')
             print(dp_mean.get_error_messages())
@@ -116,10 +116,10 @@ class StatSpecTest(TestCase):
 
         # dp_mean.print_debug()
 
-        print('(2) dp_mean.is_valid()', dp_mean.is_valid())
-        print('(2a) dp_mean.is_valid()', dp_mean.is_valid())
+        print('(2) dp_mean.is_chain_valid()', dp_mean.is_chain_valid())
+        print('(2a) dp_mean.is_chain_valid()', dp_mean.is_chain_valid())
         #print(dp_mean.get_error_messages())
-        #self.assertTrue(dp_mean.is_valid())
+        #self.assertTrue(dp_mean.is_chain_valid())
 
         #print('(3) accuracy', dp_mean.get_accuracy())
 
@@ -128,7 +128,7 @@ class StatSpecTest(TestCase):
 
         dp_mean.create_statistic()
         #self.assertTrue(dp_mean.has_error())
-        #print('dp_mean.is_valid()', dp_mean.is_valid())
+        #print('dp_mean.is_chain_valid()', dp_mean.is_chain_valid())
         #print('dp_mean.has_error()', dp_mean.has_error())
         #print(dp_mean.get_error_messages())
 
@@ -178,7 +178,7 @@ class StatSpecTest(TestCase):
             return
 
         print('(2) Use the OpenDP library to check validity')
-        print('  - Is valid?', dp_mean.is_valid())
+        print('  - Is valid?', dp_mean.is_chain_valid())
         if dp_mean.has_error():
             print('\n-- Errors --')
             print(dp_mean.get_error_messages())

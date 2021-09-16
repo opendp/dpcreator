@@ -178,7 +178,7 @@ class ValidateReleaseUtil(BasicErrCheck):
                 # Shouldn't reach here, unknown stats are captured up above
                 pass
 
-            if stat_spec.is_valid():
+            if stat_spec.is_chain_valid():
                 running_epsilon += stat_spec.epsilon
                 if running_epsilon > self.max_epsilon:
                     user_msg = (f'The running epsilon ({running_epsilon}) exceeds'
