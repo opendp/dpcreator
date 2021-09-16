@@ -32,4 +32,8 @@ jobs:
     - name: Test with pytest
       run: |
         cd server
-        python manage.py test #--exclude-tag=web-client
+        python manage.py test
+        # python manage.py test opendp_apps.analysis opendp_apps.communication opendp_apps.content_pages
+        # python manage.py test opendp_apps.dataset
+        # python manage.py test opendp_apps.dataverses opendp_apps.model_helpers
+        # python manage.py test opendp_apps.profiler opendp_apps.terms_of_access opendp_apps.user

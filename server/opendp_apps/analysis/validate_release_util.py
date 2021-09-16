@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from opendp.mod import OpenDPException
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.stat_valid_info import StatValidInfo
-from opendp_apps.analysis.tools.dp_mean import dp_mean
+#from opendp_apps.analysis.tools.dp_mean import dp_mean
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.utils.extra_validators import \
@@ -97,7 +97,8 @@ class ValidateReleaseUtil(BasicErrCheck):
                     "locked": False,
                     "label": "EyeHeight"},
             """
-            print('dp_stat', dp_stat)
+            # print('ValidateReleaseUtil. dp_stat input:', dp_stat)
+            variable_info = col_idx_info = dataset_size_info = stat_spec = None
             variable = dp_stat.get('variable')
             statistic = dp_stat.get('statistic', 'shrug?')
             epsilon = dp_stat.get('epsilon')
@@ -178,7 +179,9 @@ class ValidateReleaseUtil(BasicErrCheck):
                 # Shouldn't reach here, unknown stats are captured up above
                 pass
 
-            if stat_spec.is_valid():
+            assert stat_spec is not None, 'stat_spec should never be None here!'
+
+            if stat_spec.is_chain_valid():
                 running_epsilon += stat_spec.epsilon
                 if running_epsilon > self.max_epsilon:
                     user_msg = (f'The running epsilon ({running_epsilon}) exceeds'
@@ -187,8 +190,10 @@ class ValidateReleaseUtil(BasicErrCheck):
                 else:
                     self.validation_info.append(stat_spec.get_success_msg_dict())
             else:
+                # Validity failed! get error message!
+                #
                 self.validation_info.append(stat_spec.get_error_msg_dict())
-                stat_spec.print_debug()
+                #stat_spec.print_debug()
                 #print(stat_spec.props)
 
         # End of loop!

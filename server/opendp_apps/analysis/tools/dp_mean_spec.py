@@ -14,6 +14,7 @@ from opendp.trans import \
      make_select_column,
      make_sized_bounded_mean,
      make_split_dataframe)
+from opendp.mod import OpenDPException
 
 enable_features("floating-point")
 
@@ -34,13 +35,16 @@ class DPMeanSpec(StatSpec):
                       ci=CI_95.
                       impute_constant=1)
     """
+    def __init__(self, props: dict):
+        """Set the internals using the props dict"""
+        super().__init__(props)
 
     def additional_required_props(self):
         """
         Add a list of required properties
         example: ['min', 'max']
         """
-        return ['min', 'max', 'ci', 'impute_constant']
+        return ['min', 'max', 'ci',]    # 'impute_constant']
 
     def run_initial_handling(self):
         """
@@ -55,8 +59,19 @@ class DPMeanSpec(StatSpec):
             # Convert the impute value to a float!
             if not self.convert_to_float('impute_constant'):
                 return
-
         self.floatify_int_values()
+
+    def run_custom_validation(self):
+        """
+        This is a place for initial checking/transformations
+        such as making sure values are floats
+        Example:
+        self.check_numeric_impute_constant()
+        """
+        if self.has_error():
+            return
+
+        self.check_numeric_impute_constant()
 
     def check_scale(self, scale, preprocessor, dataset_distance, epsilon):
         """
@@ -77,9 +92,10 @@ class DPMeanSpec(StatSpec):
         if self.has_error():
             return
 
-        # We've already assembled it!
+        # Have we already already assembled it?
         #
         if self.preprocessor is not None:
+            # Yes!
             return self.preprocessor
 
         preprocessor = (
@@ -105,35 +121,74 @@ class DPMeanSpec(StatSpec):
 
     def set_accuracy(self):
         """Return the accuracy measure using Laplace and the confidence interval as alpha"""
+        if self.has_error():
+            return False
+
         if not self.preprocessor:
             self.preprocessor = self.get_preprocessor()
+
         self.accuracy_val = laplacian_scale_to_accuracy(self.scale, self.ci)
         self.accuracy_message = f"Releasing {self.statistic} for the variable {self.variable}. " \
                                 f"With at least probability {1-self.ci} the output {self.statistic} " \
                                 f"will differ from the true mean by at most {self.accuracy_val} units. " \
                                 f"Here the units are the same units the variable has in the dataset."
 
+        return True
+
+
     def run_chain(self, column_names, file_obj, sep_char=","):
-        # Column_names needs to be list of integers 0...n-1
-        # Read file
-        # Use make_split_dataframe to build df
-        # Select column (call it data)
-        # Call res = self.preprocessor(data)
-        print('column_names', column_names)
+        """
+        Calculate the stats! See "dp_mean_spec.py" for an example of instantiation
 
-        parse_dataframe = make_split_dataframe(separator=sep_char,
-                                               col_names=column_names)
+        :param columns. Examples: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
+                - In general using zero-based index of columns is preferred
+        :param file_obj - file like object to read data from
+        :param sep_char - separator from the object, default is "," for a .csv, etc
 
-        computation_chain = parse_dataframe >> self.preprocessor
+        :return bool -  False: error messages are available through .get_err_msgs()
+                                or .get_error_msg_dict()
+                        True: results available through .value -- others params through
+                                .get_success_msg_dict()
 
-        print('-' * 40)
-        dp_result = computation_chain(file_obj.read())
+        Example:
+        # Note "\t" is for a tabular file
+        `dp_mean_spec.run_chain([0, 1, 2, 3], file_obj, sep_char="\t")`
+        """
+        if not self.preprocessor:
+            assert False, 'Please call is_chain_valid() before using "run_chain()!'
 
-        self.value = dp_result
+        self.value = None
+
+        if self.has_error():
+            return False
+
+        if not isinstance(column_names, list):
+            self.add_err_msg('DPMeanSpec.run_chain(..): column_names must be a list. Found: (type({column_names}))')
+            return
+
+        try:
+            parse_dataframe = make_split_dataframe(separator=sep_char,
+                                                   col_names=column_names)
+
+            computation_chain = parse_dataframe >> self.preprocessor
+
+            self.value = computation_chain(file_obj.read())
+
+        except OpenDPException as ex_obj:
+            self.add_err_msg(f'{ex_obj.message} (OpenDPException)')
+            return False
+        except Exception as ex_obj:
+            if hasattr(ex_obj, 'message'):
+                self.add_err_msg(f'{ex_obj.message} (Exception)')
+            else:
+                self.add_err_msg(f'{ex_obj} (Exception)')
+            return False
 
         print((f"Epsilon: {self.epsilon}"
                f"\nColumn name: {self.variable}"
                f"\nColumn index: {self.col_index}"
                f"\nColumn index: {self.accuracy_val}"
                f"\nColumn index: {self.accuracy_message}"
-               f"\n\nDP Mean: {dp_result}" ))
+               f"\n\nDP Mean: {self.value}" ))
+
+        return True
