@@ -5,7 +5,13 @@ const snakecaseKeys = require('snakecase-keys');
 
 
 export default {
+    release(analysisPlanId) {
+        return session.post('/api/release/',
+            {analysis_plan_id: analysisPlanId})
+            .then(resp => camelcaseKeys(resp.data, {deep: true}))
 
+
+    },
     validate(analysisPlanId, dpStatistics) {
         // TODO: Update AddStatisticDialog so that it has separate Label/values to handle this
         dpStatistics.forEach((item) => {

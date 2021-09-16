@@ -21,6 +21,9 @@
                         "results": [dataset]
                     }
                 })
+                cy.fixture('analysisPlanStep700.json').then(analysisPlan => {
+                    cy.intercept('GET', '/api/analyze/' + analysisPlan.objectId + '/', {body: analysisPlan})
+                })
                 cy.visit('/my-data')
                 cy.get('tr').should('contain',
                     'Replication Data for: Eye-typing experiment')
@@ -54,6 +57,24 @@
                         cy.get('label').should('not.contain', varsFixture[key].name)
                     }
                 }
+            })
+        })
+        it('Validates Mean statistic with fixed missing values ', () => {
+            cy.on('uncaught:exception', (e, runnable) => {
+                console.log('error', e)
+                console.log('runnable', runnable)
+                return false
+            })
+            cy.fixture('variables').then((varsFixture) => {
+                // Create your statistic
+                cy.get('[data-test="Add Statistic"]').click({force: true})
+                cy.get('[data-test="Mean"]').click({force: true})
+                cy.get('[data-test="EyeHeight"]').click({force: true})
+                cy.get('[data-test="Insert fixed value"]').click({force: true})
+                cy.get('[data-test="Fixed value"]').type('10')
+                cy.get('[data-test="Create statistic"]').click({force: true})
+
+
             })
         })
 

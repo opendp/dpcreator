@@ -92,6 +92,7 @@
               v-model="variable.additional_information['min']"
               class="text-center py-0"
               :rules="[checkMin]"
+              :data-test="variable.label+':min'"
               v-on:click="currentRow=variable.index"
               v-on:change="saveUserInput(variable)"
           ></v-text-field>
@@ -100,6 +101,7 @@
               type="number"
               label="Add max"
               :rules="[checkMax]"
+              :data-test="variable.label+':max'"
               v-model="variable.additional_information['max']"
               class="text-center py-0"
               v-on:click="currentRow=variable.index"

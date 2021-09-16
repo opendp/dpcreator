@@ -225,11 +225,12 @@ export default {
       } else {
         for (let variable of this.editedItem.variable) {
           let label = variable
+          let ci = this.getDepositorSetupInfo.confidenceInterval
           if (!statsInformation.isDeltaStat(this.editedItem.statistic)) {
             this.editedItem.delta = ""
           }
           this.statistics.push(
-              Object.assign({}, this.editedItem, {variable}, {label})
+              Object.assign({}, this.editedItem, {variable}, {label}, {ci})
           );
         }
       }

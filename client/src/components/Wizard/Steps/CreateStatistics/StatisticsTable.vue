@@ -17,6 +17,9 @@
       <template v-slot:[`item.num`]="{ index }">
         <span class="index-td">{{ index + 1 }}</span>
       </template>
+      <template :data-test="'statistic'+index" v-slot:[`item.Statistic`]="{ item }">
+        <div data-test="statistic">{{ item.statistic }}</div>
+      </template>
       <template v-slot:[`item.epsilon`]="{ item }">
         <v-text-field
             v-model="item.epsilon"

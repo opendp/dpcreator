@@ -50,6 +50,7 @@
                 :key="variable + index"
                 :label="variable['label']"
                 :value="variable['label']"
+                :data-test="variable['label']"
                 on-icon="mdi-check"
             ></v-radio>
           </v-radio-group>
@@ -71,6 +72,7 @@
                 :key="handlingOption + '-' + index"
                 :label="handlingOption"
                 :value="handlingOption"
+                :data-test="handlingOption"
                 on-icon="mdi-check"
                 @click="() => updateFixedInputVisibility(handlingOption)"
             ></v-radio>
@@ -85,22 +87,23 @@
                 placeholder="E.g. Lorem ipsum"
                 background-color="soft_primary"
                 class="top-borders-radius width50"
+                data-test="Fixed value"
             ></v-text-field>
           </div>
         </div>
 
         <ColoredBorderAlert type="warning" v-if="validationError">
           <template v-slot:content>
-
-            <ul v-if="errorCount > 1">
-              <li v-if="item.message" v-for="item in validationErrorMsg">
-                {{ item.stat.statistic }} / {{ item.stat.variable }}: {{ item.message }}
-              </li>
-            </ul>
-            <div v-if="errorCount==1" v-for="item in validationErrorMsg">
-              {{ item.message }}
+            <div data-test="validation alertbox">
+              <ul v-if="errorCount > 1">
+                <li v-if="item.message" v-for="item in validationErrorMsg">
+                  {{ item.stat.statistic }} / {{ item.stat.variable }}: {{ item.message }}
+                </li>
+              </ul>
+              <div v-if="errorCount==1" v-for="item in validationErrorMsg">
+                {{ item.message }}
+              </div>
             </div>
-
           </template>
         </ColoredBorderAlert>
 
@@ -112,6 +115,7 @@
             classes="mr-2 px-5"
             :click="save"
             :disabled="isButtonDisabled"
+            data-test="Create statistic"
             label="Create statistic"
         />
 
@@ -121,6 +125,7 @@
             classes="px-5"
             :click="close"
             label="Close"
+            data-test="Close Dialog"
         />
       </v-card-actions>
 
@@ -245,16 +250,16 @@ export default {
       statistic: "",
       variable: [],
       epsilon: "",
-      delta: 0.0,
-      ci: 0.05,
+      delta: '0.0',
+      ci: null,
       error: "",
       missingValuesHandling: "",
       handleAsFixed: false,
-      fixedValue: "0",
+      fixedValue: 0,
       locked: false
     },
     missingValuesHandling: [
-      "Drop them",
+      // "Drop them", remove this for now, until the library can use it
       "Insert random value",
       "Insert fixed value"
     ]
@@ -325,8 +330,9 @@ export default {
       } else {
         this.editedItemDialog.variable.forEach((variable) => {
           const label = variable
+          const ci = this.getDepositorSetupInfo.confidenceInterval
           tempStats.push(
-              Object.assign({}, this.editedItemDialog, {variable}, {label})
+              Object.assign({}, this.editedItemDialog, {variable}, {label}, {ci})
           );
         })
       }
@@ -335,7 +341,6 @@ export default {
       return release.validate(this.analysisPlan.objectId, tempStats)
           .then((resp) => {
             console.log('validate response: ' + JSON.stringify(resp))
-            console.log('validate response: ' + JSON.stringify(resp.data))
             let valid = true
             resp.data.forEach((item, index) => {
               if (item.valid !== true) {
