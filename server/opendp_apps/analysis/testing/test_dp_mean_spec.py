@@ -63,11 +63,11 @@ class StatSpecTest(TestCase):
 
         spec_props = {'variable': 'EyeHeight',
                       'col_index': 19,
-                      'statistic': 'mean',
+                      'statistic': astatic.DP_MEAN,
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': 0.05,
+                      'ci': astatic.CI_95,
                       #'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'impute_constant': '0',
@@ -114,11 +114,11 @@ class StatSpecTest(TestCase):
 
         spec_props = {'variable': 'EyeHeight',
                       'col_index': 19,
-                      'statistic': 'mean',
+                      'statistic': astatic.DP_MEAN,
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': 0.05,
+                      'ci': astatic.CI_95,
                       #'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'impute_constant': '5',
@@ -150,24 +150,25 @@ class StatSpecTest(TestCase):
             print(f'> Valid dataset_size: {good_ds}')
             self.assertTrue(dp_mean.is_chain_valid())
 
-
+    @skip
     def test_20_bad_epsilon(self):
         """(20) Bad epsilon"""
         msgt(self.test_20_bad_epsilon.__doc__)
 
         spec_props = {'variable': 'EyeHeight',
                       'col_index': 19,
-                      'statistic': 'mean',
+                      'statistic': astatic.DP_MEAN,
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': 0.05,
+                      'ci': astatic.CI_95,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'impute_constant': '5',
                       'variable_info': {'min': -8,
                                         'max': 5,
                                         'type': 'Float', },
                       }
+
 
         for epsilon_val in [1.01, -0.01, 10, 'a', 'carrot', 'cake']:
             print(f'> Bad epsilon val: {epsilon_val}')
@@ -177,6 +178,7 @@ class StatSpecTest(TestCase):
             self.assertFalse(dp_mean.is_chain_valid())
             err_info = dp_mean.get_error_msg_dict()
             self.assertTrue(err_info['valid'] == False)
+            print(err_info['message'])
             self.assertTrue(err_info['message'].find(VALIDATE_MSG_EPSILON) > -1)
 
         print('     ---')
@@ -194,11 +196,11 @@ class StatSpecTest(TestCase):
 
         spec_props = {'variable': 'EyeHeight',
                       'col_index': 19,
-                      'statistic': 'mean',
+                      'statistic': astatic.DP_MEAN,
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': 0.05,
+                      'ci': astatic.CI_95,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'impute_constant': '5',
                       'variable_info': {'min': -8,
@@ -217,21 +219,68 @@ class StatSpecTest(TestCase):
             #print(dp_mean.is_chain_valid())
             self.assertFalse(dp_mean.is_chain_valid())
 
+    def test_40_test_impute(self):
+        """(40) Test impute validation"""
+        msgt(self.test_40_test_impute.__doc__)
+
+        spec_props = {'variable': 'EyeHeight',
+                      'col_index': 19,
+                      'statistic': astatic.DP_MEAN,
+                      'dataset_size': 183,
+                      'epsilon': 1.0,
+                      'delta': 0.0,
+                      'ci': astatic.CI_95,
+                      'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+                      'impute_constant': '5.0',
+                      'variable_info': {'min': -8,
+                                        'max': 5,
+                                        'type': 'Float', },
+                      }
+
+        dp_mean = DPMeanSpec(spec_props)
+        self.assertTrue(dp_mean.is_chain_valid())
+
+
+        bad_impute_info = [  (-10, astatic.ERR_IMPUTE_PHRASE_MIN)
+                           , (45, astatic.ERR_IMPUTE_PHRASE_MAX)
+                           , (5.2, astatic.ERR_IMPUTE_PHRASE_MAX)]
+
+        for bad_impute, stat_err_msg in bad_impute_info:
+            print(f'> bad impute: {bad_impute}')
+            new_props = spec_props.copy()
+            new_props['impute_constant'] = bad_impute
+            dp_mean2 = DPMeanSpec(new_props)
+
+            self.assertFalse(dp_mean2.is_chain_valid())
+            err_dict = dp_mean2.get_error_msg_dict()
+            print(f"  - {err_dict['message']}")
+            self.assertTrue(err_dict['message'].find(stat_err_msg) > -1)
+
+
+        good_impute_info = [-8, 5, '-8.0', '5.0000', -7, 0, '0.0']
+
+        for good_impute in good_impute_info:
+            print(f'> good impute: {good_impute}')
+            new_props = spec_props.copy()
+            new_props['impute_constant'] = good_impute
+            dp_mean = DPMeanSpec(new_props)
+            self.assertTrue(dp_mean.is_chain_valid())
+
 
 
     #@skip
-    def test_40_run_dpmean_calculation(self):
-        """(40) Run DP mean calculation"""
-        msgt(self.test_40_run_dpmean_calculation.__doc__)
+    def test_100_run_dpmean_calculation(self):
+        """(100) Run DP mean calculation"""
+        msgt(self.test_100_run_dpmean_calculation.__doc__)
 
 
         spec_props = {'variable': 'EyeHeight',
                       'col_index': 19,
-                      'statistic': 'mean',
+                      'statistic': astatic.DP_MEAN,
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': 0.05,
+                      'ci': astatic.CI_95,
                       #'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'impute_constant': '5',

@@ -35,6 +35,9 @@ class DPMeanSpec(StatSpec):
                       ci=CI_95.
                       impute_constant=1)
     """
+    def __init__(self, props: dict):
+        """Set the internals using the props dict"""
+        super().__init__(props)
 
     def additional_required_props(self):
         """
@@ -58,6 +61,17 @@ class DPMeanSpec(StatSpec):
                 return
         self.floatify_int_values()
 
+    def run_custom_validation(self):
+        """
+        This is a place for initial checking/transformations
+        such as making sure values are floats
+        Example:
+        self.check_numeric_impute_constant()
+        """
+        if self.has_error():
+            return
+
+        self.check_numeric_impute_constant()
 
     def check_scale(self, scale, preprocessor, dataset_distance, epsilon):
         """

@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.analysis.tools.dp_mean import dp_mean
+#from opendp_apps.analysis.tools.dp_mean import dp_mean
 from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 
@@ -112,7 +112,7 @@ class ComputationChainSerializer(serializers.Serializer):
             # Do some validation and append to stats_valid
             if statistic == 'mean':
                 try:
-                    preprocessor = dp_mean(index, lower, upper, n, impute_value, epsilon)
+                    #preprocessor = dp_mean(index, lower, upper, n, impute_value, epsilon)
                     results.append({'column': column, 'statistic': statistic, 'result': preprocessor(column)})
                 # TODO: add column index and statistic to result
                 except Exception as ex:

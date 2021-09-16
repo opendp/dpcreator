@@ -574,7 +574,6 @@ class TestValidationViewAndSerializers(TestCase):
         self.assertTrue(jresp['data'][1]['message'].find('exceeds the max epsilon') > -1)
 
 
-    @skip # something happening, perhaps with snake/camelcase
     def test_70_fail_impute_too_high(self):
         """(70) Fail: Impute higher than max"""
         msgt(self.test_70_fail_impute_too_high.__doc__)
@@ -610,7 +609,6 @@ class TestValidationViewAndSerializers(TestCase):
         self.assertEqual(stats_valid.data[0]['message'], user_msg2)
 
 
-    @skip # something happening, perhaps with snake/camelcase?
     def test_80_fail_impute_too_low(self):
         """(80) Fail: Impute lower than min"""
         msgt(self.test_80_fail_impute_too_low.__doc__)

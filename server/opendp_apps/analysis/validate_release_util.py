@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from opendp.mod import OpenDPException
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.stat_valid_info import StatValidInfo
-from opendp_apps.analysis.tools.dp_mean import dp_mean
+#from opendp_apps.analysis.tools.dp_mean import dp_mean
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.utils.extra_validators import \

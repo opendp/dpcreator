@@ -9,7 +9,7 @@ BaseClass for Univariate statistics for OpenDP.
 -
 """
 from opendp.accuracy import laplacian_scale_to_accuracy
-from abc import ABCMeta, abstractmethod
+import abc # import ABC, ABCMeta, abstractmethod
 from django.core.exceptions import ValidationError
 from opendp.mod import OpenDPException
 
@@ -32,8 +32,8 @@ from opendp_apps.utils.extra_validators import \
 from opendp_apps.analysis.stat_valid_info import StatValidInfo
 
 
-class StatSpec(BasicErrCheckList):
-    __metaclass__ = ABCMeta
+class StatSpec:
+    __metaclass__ = abc.ABCMeta
 
     prop_validators = dict(statistic=validate_statistic,
                            dataset_size=validate_int_greater_than_zero,
@@ -83,56 +83,104 @@ class StatSpec(BasicErrCheckList):
         self.value = None
         self.scale = None
 
-        self.run_initial_handling()
-        self.run_basic_validation()
+        # error handling
+        self.error_found = False
+        self.error_messages = []
+
+        self.run_initial_handling()     # customize, if types need converting, etc.
+        self.run_basic_validation()     # always the same
+        self.run_custom_validation()    # customize, if types need converting, etc.
 
 
-    @abstractmethod
-    def run_initial_handling(self):
-        """
-        This is a place for initial checking/transformations
-        such as making sure values are floats
-        Example:
-        `self.floatify_int_values()`
-        """
-        pass
-
-    @abstractmethod
+    @abc.abstractmethod
     def additional_required_props(self):
         """
         Add a list of required properties.
         For example, a DP Mean might be:
         `   return ['min', 'max', 'ci']`
         """
-        return []
+        raise NotImplementedError('additional_required_props')
 
-    @abstractmethod
-    def check_scale(self, scale, preprocessor, dataset_distance):
-        """To implement!"""
+    @abc.abstractmethod
+    def run_initial_handling(self):
+        """
+        This is a place for initial checking/transformations
+        such as making sure values are floats
+        Example:
+        `self.floatify_int_values()`
+
+        See "dp_mean_spec.py for an example of instantiation
+
+        Always start implementation with:
+        ```
         if self.has_error():
             return
-        pass
-        # return (preprocessor >> make_base_laplace(scale)).check(dataset_distance, self.epsilon)
 
-    @abstractmethod
+        """
+        raise NotImplementedError('run_initial_handling')
+
+    @abc.abstractmethod
+    def run_custom_validation(self):
+        """
+        This is a place for initial checking/transformations
+        such as making sure values are floats
+
+        See "dp_mean_spec.py for an example of instantiation
+
+        Always start implementation with:
+        ```
+        if self.has_error():
+            return False
+        ```
+
+        Or, if not implemented, simply use
+        ```
+        pass
+        ```
+        """
+        raise NotImplementedError('run_custom_validation')
+
+
+    @abc.abstractmethod
+    def check_scale(self, scale, preprocessor, dataset_distance):
+        """
+        See "dp_mean_spec.py for an example of instantiation
+
+        Always start implementation with:
+        ```
+        if self.has_error():
+            return False
+        ```
+
+        Or, if not implemented, simply use
+        ```
+        pass
+        ```
+        """
+        raise NotImplementedError('check_scale')
+
+
+
+    @abc.abstractmethod
     def get_preprocessor(self):
         """
         See "dp_mean_spec.py for an example of instantiation
-        These should be the last two lines of the method
 
+        Always start implementation with:
+        ```
+        if self.has_error():
+            return False
+        ```
+
+        These should be the last two lines of the method
+        ```
         self.preprocessor = preprocessor
         return preprocessor
+        ```
         """
-        if self.has_error():
-            return
-        pass
-        # when instantiating, uncomment and use these last two lines
-        # self.preprocessor = preprocessor
-        # return preprocessor
+        raise NotImplementedError('get_preprocessor')
 
-
-
-    @abstractmethod
+    @abc.abstractmethod
     def run_chain(self, columns: list, file_obj, sep_char=","):
         """
         Calculate the stats! See "dp_mean_spec.py" for an example of instantiation
@@ -151,30 +199,33 @@ class StatSpec(BasicErrCheckList):
         # Note "\t" is for a tabular file
         `dp_mean_spec.run_chain([0, 1, 2, 3], file_obj, sep_char="\t")`
 
-        """
+        Always start implementation with:
+        ```
         if self.has_error():
             return False
-        return True
+        ```
+        """
+        raise NotImplementedError('run_chain')
 
 
-    @abstractmethod
+
+    @abc.abstractmethod
     def set_accuracy(self):
-        """Instantiate this for each subclass """
-        pass
-        # Example from dp_mean_spec:
         """
+        See "dp_mean_spec.py for an example of instantiation
+
+        Always start implementation with:
+        ```
         if self.has_error():
-            return
-            
-        if not self.preprocessor:
-            self.preprocessor = self.get_preprocessor()
-    
-        self.accuracy_val = laplacian_scale_to_accuracy(self.scale, self.ci)
-        self.accuracy_message = f"Releasing {self.statistic} for the variable {self.variable}. " \
-                                f"With at least probability {1 - self.ci} the output {self.statistic} " \
-                                f"will differ from the true mean by at most {self.accuracy_val} units. " \
-                                f"Here the units are the same units the variable has in the dataset."
+            return False
+        ```
+
+        Or, if not implemented, simply use
+        ```
+        pass
+        ```
         """
+        raise NotImplementedError()
 
     def get_bounds(self):
         """Return bounds based on the min/max values
@@ -268,8 +319,8 @@ class StatSpec(BasicErrCheckList):
 
         # If this is numeric variable, check the impute constant
         #   (If impute constant isn't used, this check will simply exit)
-        if self.var_type in pstatic.NUMERIC_VAR_TYPES:
-            self.check_numeric_impute_constant()
+        #if self.var_type in pstatic.NUMERIC_VAR_TYPES:
+        #    self.check_numeric_impute_constant()
 
     def check_numeric_impute_constant(self):
         """
@@ -282,13 +333,13 @@ class StatSpec(BasicErrCheckList):
         if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
 
             if self.impute_constant < self.min:
-                user_msg = (f'The "fixed value" ({self.impute_constant}) cannot'
-                            f' be less than the "min" ({self.min})')
+                user_msg = (f'The "fixed value" ({self.impute_constant})'
+                            f' {astatic.ERR_IMPUTE_PHRASE_MIN} ({self.min})')
                 self.add_err_msg(user_msg)
                 return
             elif self.impute_constant > self.max:
-                user_msg = (f'The "fixed value" ({self.impute_constant}) cannot'
-                            f' be more than the "max" ({self.max})')
+                user_msg = (f'The "fixed value" ({self.impute_constant})'
+                            f' {astatic.ERR_IMPUTE_PHRASE_MAX} ({self.max})')
                 self.add_err_msg(user_msg)
                 return
 
@@ -355,3 +406,34 @@ class StatSpec(BasicErrCheckList):
         print(json.dumps(self.__dict__, indent=4))
         #for key, val in self.__dict__.items():
         #    print(f'{key}: {val}')
+
+    def has_error(self):
+        """Did an error occur?"""
+        return self.error_found
+
+    def get_error_messages(self):
+        """Return the error message if 'has_error' is True"""
+        assert self.has_error(), \
+            "Please check that '.has_error()' is True before using this method"
+
+        return self.error_messages
+
+    def get_err_msgs(self):
+        """Return the error message if 'has_error' is True"""
+        return self.get_error_messages()
+
+    def get_err_msgs_concat(self, sep_char=' '):
+        return f'{sep_char}'.join(self.get_error_messages())
+
+    def get_error_messages_concat(self, sep_char=' '):
+        return self.get_err_msgs_concat(sep_char)
+
+    def add_err_msg(self, err_msg):
+        """Add an error message"""
+        # print('add err:', err_msg)
+        self.error_found = True
+        self.error_messages.append(err_msg)
+
+    def add_error_message(self, err_msg):
+        """Add an error message -- same as "add_err_msg" """
+        self.add_err_msg(err_msg)

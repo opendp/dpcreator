@@ -13,7 +13,7 @@ class ReleaseView(viewsets.ViewSet):
 
     http_method_names = ['get', 'post', 'patch']
 
-    def update(self, request, object_id=None):
+    def create(self, request, object_id=None):
         # TODO: This maybe should be under the POST method but with a flag (validation=false actually runs the chain)
         computation_chain_serializer = ComputationChainSerializer(data=request.data)
         if not computation_chain_serializer.is_valid():
