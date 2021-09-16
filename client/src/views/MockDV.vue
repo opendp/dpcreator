@@ -22,21 +22,25 @@
                           v-model="site_url"
                           label="site_url"
                           required
+                          data-test="siteUrl"
             ></v-text-field>
             <v-text-field
                 v-model="token"
                 label="token"
                 required
+                data-test="token"
             ></v-text-field>
             <v-text-field
                 v-model="filePid"
                 label="filePid"
                 required
+                data-test="filePid"
             ></v-text-field>
             <v-text-field
                 v-model="datasetPid"
                 label="datasetPid"
                 required
+                data-test="datasetPid"
             ></v-text-field>
 
             <Button
@@ -51,6 +55,7 @@
                 type="submit"
                 :disabled="!validForm"
                 label="Post to OpenDP"
+
             />
 
           </v-form>

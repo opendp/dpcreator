@@ -7,7 +7,7 @@
                 return false
             })
             cy.clearData()
-            cy.createMockDataset()
+            cy.createMockDataset('mockDV.json')
             // click on the start Process button on the welcome page,
             // to navigate to the Validate Dataset step of the Wizard
             cy.get('[data-test="Start Process"]').click();
