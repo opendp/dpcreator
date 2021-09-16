@@ -255,13 +255,15 @@ class StatSpec(BasicErrCheckList):
 
         if 'min' in self.additional_required_props() and \
                 'max' in self.additional_required_props():
-            if not self.max > self.min:
+            if self.max < self.min:
                 #print('min', self.min, type(min))
                 #print('max', self.max, type(max))
                 self.add_err_msg(astatic.ERR_MSG_INVALID_MIN_MAX)
                 return
 
-        if self.var_type in []:
+        # If this is numeric variable, check the impute constant
+        #   (If impute constant isn't used, this check will simply exit)
+        if self.var_type in pstatic.NUMERIC_VAR_TYPES:
             self.check_numeric_impute_constant()
 
     def check_numeric_impute_constant(self):
@@ -269,15 +271,19 @@ class StatSpec(BasicErrCheckList):
         For the case of handing missing values with a constant
         Check that the fixed value/impute_constant is not outside the min/max range
         """
+        if self.has_error():
+            return
+
         if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
+
             if self.impute_constant < self.min:
                 user_msg = (f'The "fixed value" ({self.impute_constant}) cannot'
-                            f' be less than the "min" {self.min}')
+                            f' be less than the "min" ({self.min})')
                 self.add_err_msg(user_msg)
                 return
-            if self.impute_constant < self.min:
+            elif self.impute_constant > self.max:
                 user_msg = (f'The "fixed value" ({self.impute_constant}) cannot'
-                            f' be more than the "max" {self.max}')
+                            f' be more than the "max" ({self.max})')
                 self.add_err_msg(user_msg)
                 return
 

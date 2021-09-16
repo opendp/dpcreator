@@ -40,7 +40,7 @@ class DPMeanSpec(StatSpec):
         Add a list of required properties
         example: ['min', 'max']
         """
-        return ['min', 'max', 'ci', 'impute_constant']
+        return ['min', 'max', 'ci',]    # 'impute_constant']
 
     def run_initial_handling(self):
         """

@@ -302,6 +302,23 @@ class TestValidationViewAndSerializers(TestCase):
         self.assertEqual(expected_result, jresp['data'])
 
 
+    def get_spec_test_30_35_37_38_39(self):
+        """Spec for tests 30, 35, 37, 38, 39"""
+        stat_spec =  {
+                        "statistic": astatic.DP_MEAN,
+                        "variable": "TypingSpeed",
+                        "epsilon": 1,
+                        "delta": 0,
+                        "ci": astatic.CI_99,
+                        "error": "",
+                        "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
+                        "handle_as_fixed": False,
+                        "fixed_value": "5.0",
+                        "locked": False,
+                        "label": "EyeHeight"
+                    }
+        return stat_spec
+
     def test_30_fail_bad_min_max(self):
         """(30) Fail: Add bad min/max values"""
         msgt(self.test_30_fail_bad_min_max.__doc__)
@@ -317,18 +334,7 @@ class TestValidationViewAndSerializers(TestCase):
 
         # Send the dp_statistics for validation
         #
-        stat_spec =  { \
-                        "statistic": astatic.DP_MEAN,
-                        "variable": "TypingSpeed",
-                        "epsilon": 1,
-                        "delta": 0,
-                        "ci": astatic.CI_99,
-                        "error": "",
-                        "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
-                        "handle_as_fixed": False,
-                        "fixed_value": "5.0",
-                        "locked": False,
-                        "label": "EyeHeight"}
+        stat_spec = self.get_spec_test_30_35_37_38_39()
 
         request_plan = dict(analysis_plan_id=analysis_plan.object_id,
                             dp_statistics=[stat_spec])
@@ -368,17 +374,7 @@ class TestValidationViewAndSerializers(TestCase):
 
         # Send the dp_statistics for validation
         #
-        stat_spec = {"statistic": astatic.DP_MEAN,
-                    "variable": "TypingSpeed",
-                    "epsilon": 1,
-                    "delta": 0,
-                    "ci": astatic.CI_99,
-                    "error": "",
-                    "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
-                    "handle_as_fixed": False,
-                    "fixed_value": "5.0",
-                    "locked": False,
-                    "label": "EyeHeight"}
+        stat_spec = self.get_spec_test_30_35_37_38_39()
 
         request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
                             dp_statistics=[stat_spec])
@@ -396,6 +392,142 @@ class TestValidationViewAndSerializers(TestCase):
                             'message': astatic.ERR_MSG_INVALID_MIN_MAX}]
 
         self.assertEqual(expected_result, jresp['data'])
+
+
+
+    def test_37_fail_impute_too_high(self):
+        """(37) Fail: Impute higher than max"""
+        msgt(self.test_37_fail_impute_too_high.__doc__)
+
+        analysis_plan = self.retrieve_new_plan()
+
+        variable_info_mod = analysis_plan.variable_info
+        # invalid min/max
+        variable_info_mod['TypingSpeed']['min'] = -8
+        variable_info_mod['TypingSpeed']['max'] = 5
+        analysis_plan.variable_info = variable_info_mod
+        analysis_plan.save()
+
+        # Send the dp_statistics for validation
+        #
+        stat_spec = self.get_spec_test_30_35_37_38_39()
+        stat_spec["fixed_value"] = 40 # max is 5
+
+        request_plan = dict(analysis_plan_id=analysis_plan.object_id,
+                            dp_statistics=[stat_spec])
+
+        # Check the basics
+        #
+        serializer = ReleaseValidationSerializer(data=request_plan)
+        self.assertTrue(serializer.is_valid())
+        self.assertTrue(serializer.errors == {})
+
+        # Now run the validator
+        #
+        stats_valid = serializer.save(**dict(opendp_user=self.user_obj))
+        #print('stats_valid.success', stats_valid.success)
+        self.assertTrue(stats_valid.success)
+        self.assertFalse(stats_valid.data[0]['valid'])
+
+        user_msg = 'The "fixed value" (40.0) cannot be more than the "max" (5.0)'
+        self.assertEqual(stats_valid.data[0]['message'], user_msg)
+
+
+
+    def test_38_fail_impute_too_low(self):
+        """(38) Fail: Impute lower than min"""
+        msgt(self.test_38_fail_impute_too_low.__doc__)
+
+        analysis_plan = self.retrieve_new_plan()
+
+        variable_info_mod = analysis_plan.variable_info
+        # invalid min/max
+        variable_info_mod['TypingSpeed']['min'] = -8
+        variable_info_mod['TypingSpeed']['max'] = 5
+        analysis_plan.variable_info = variable_info_mod
+        analysis_plan.save()
+
+        # Send the dp_statistics for validation
+        #
+        stat_spec = self.get_spec_test_30_35_37_38_39()
+        stat_spec["fixed_value"] = -10 # min is -8
+
+        request_plan = dict(analysis_plan_id=analysis_plan.object_id,
+                            dp_statistics=[stat_spec])
+
+        # Check the basics
+        #
+        serializer = ReleaseValidationSerializer(data=request_plan)
+        self.assertTrue(serializer.is_valid())
+        self.assertTrue(serializer.errors == {})
+
+        # Now run the validator
+        #
+        stats_valid = serializer.save(**dict(opendp_user=self.user_obj))
+        # print('stats_valid.success', stats_valid.success)
+        self.assertTrue(stats_valid.success)
+        self.assertFalse(stats_valid.data[0]['valid'])
+        # print('stats_valid.data', stats_valid.data)
+
+        user_msg = 'The "fixed value" (-10.0) cannot be less than the "min" (-8.0)'
+        self.assertEqual(stats_valid.data[0]['message'], user_msg)
+
+
+    def test_39_ok_impute_equals_min(self):
+        """(39) Fail: Impute equals min"""
+        msgt(self.test_39_ok_impute_equals_min.__doc__)
+
+        analysis_plan = self.retrieve_new_plan()
+
+        variable_info_mod = analysis_plan.variable_info
+        # invalid min/max
+        variable_info_mod['TypingSpeed']['min'] = -8
+        variable_info_mod['TypingSpeed']['max'] = 5
+        analysis_plan.variable_info = variable_info_mod
+        analysis_plan.save()
+
+        # Send the dp_statistics for validation
+        #
+        stat_spec = self.get_spec_test_30_35_37_38_39()
+        stat_spec["fixed_value"] = -8
+
+        request_plan = dict(analysis_plan_id=analysis_plan.object_id,
+                            dp_statistics=[stat_spec])
+
+        # Check the basics
+        #
+        serializer = ReleaseValidationSerializer(data=request_plan)
+        self.assertTrue(serializer.is_valid())
+        self.assertTrue(serializer.errors == {})
+
+        # Now run the validator
+        #
+        stats_valid = serializer.save(**dict(opendp_user=self.user_obj))
+        print('stats_valid.success', stats_valid.success)
+        self.assertTrue(stats_valid.success)
+        self.assertTrue(stats_valid.data[0]['valid'])
+        self.assertTrue('accuracy' in stats_valid.data[0])
+
+        # ----------------------------------------------
+        # have impute == max
+        # ----------------------------------------------
+        stat_spec2 = self.get_spec_test_30_35_37_38_39()
+        stat_spec2["fixed_value"] = 5
+
+        request_plan2 = dict(analysis_plan_id=analysis_plan.object_id,
+                            dp_statistics=[stat_spec])
+
+        # Check the basics
+        #
+        serializer2 = ReleaseValidationSerializer(data=request_plan2)
+        self.assertTrue(serializer2.is_valid())
+
+        # Now run the validator
+        #
+        stats_valid2 = serializer.save(**dict(opendp_user=self.user_obj))
+        self.assertTrue(stats_valid2.success)
+        self.assertTrue(stats_valid2.data[0]['valid'])
+        self.assertTrue('accuracy' in stats_valid2.data[0])
 
 
     def test_40_fail_single_stat_bad_epsilon(self):
