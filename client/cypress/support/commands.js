@@ -31,6 +31,7 @@ Cypress.Commands.add('createMockDataset', (fixture) => {
         cy.visit('/mock-dv');
         cy.get('[data-test="siteUrl"]').clear().type(mockForm['siteUrl'])
         cy.get('[data-test="token"]').clear().type(mockForm['token'])
+        cy.get('[data-test="fileId"]').clear().type(mockForm['fileId'])
         cy.get('[data-test="filePid"]').clear().type(mockForm['filePid'])
         cy.get('[data-test="datasetPid"]').clear().type(mockForm['datasetPid'])
 

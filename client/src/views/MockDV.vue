@@ -37,6 +37,12 @@
                 data-test="filePid"
             ></v-text-field>
             <v-text-field
+                v-model="fileId"
+                label="fileId"
+                required
+                data-test="fileId"
+            ></v-text-field>
+            <v-text-field
                 v-model="datasetPid"
                 label="datasetPid"
                 required

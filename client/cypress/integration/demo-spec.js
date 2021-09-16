@@ -8,6 +8,7 @@
             })
         })
         it('uses the test Dataverse', () => {
+            cy.clearData()
             cy.createMockDataset('dataverseMockDV.json')
 
 
