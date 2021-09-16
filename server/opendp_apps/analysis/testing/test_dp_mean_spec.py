@@ -5,6 +5,8 @@ TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 from unittest import skip
 
 import json
+import decimal
+
 from django.contrib.auth import get_user_model
 from django.core.files import File
 from django.test.testcases import TestCase
@@ -21,7 +23,8 @@ from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.analysis import static_vals as astatic
 
 from opendp_apps.model_helpers.msg_util import msgt
-
+from opendp_apps.utils.extra_validators import *
+#    VALIDATE_MSG_ZERO_OR_GREATER, VALIDATE_MSG_EPSILON
 
 
 
@@ -148,6 +151,118 @@ class StatSpecTest(TestCase):
             self.add_err_msg(variable_indices_info.message)
 
 
+    def test_10_valid_spec(self):
+        """(10) Run DP Mean valid spec"""
+        msgt(self.test_10_valid_spec.__doc__)
+
+        spec_props = {'variable': 'EyeHeight',
+                      'col_index': 19,
+                      'statistic': 'mean',
+                      'dataset_size': 183,
+                      'epsilon': 1.0,
+                      'delta': 0.0,
+                      'ci': 0.05,
+                      #'accuracy': None,
+                      'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+                      'impute_constant': '5',
+                      'variable_info': {'min': -8,
+                                        'max': 5,
+                                        'type': 'Float',},
+                      }
+
+        dp_mean = DPMeanSpec(spec_props)
+        self.assertTrue(dp_mean.is_chain_valid())
+
+        for epsilon_val in [0.1, .25, .65, .431, 1.0]:
+            print(f'> Valid epsilon val: {epsilon_val}')
+            spec_props['epsilon'] = epsilon_val
+            dp_mean = DPMeanSpec(spec_props)
+            self.assertTrue(dp_mean.is_chain_valid())
+
+        print('   --------')
+        for ci_val in [x[0] for x in astatic.CI_CHOICES]:
+            print(f'> Valid ci val: {ci_val}')
+            spec_props['ci'] = ci_val
+            dp_mean = DPMeanSpec(spec_props)
+            self.assertTrue(dp_mean.is_chain_valid())
+
+        print('   --------')
+        for good_ds in [1, 2, 10, 100, 56**3,]:
+            spec_props['dataset_size'] = good_ds
+            dp_mean = DPMeanSpec(spec_props)
+            print(f'> Valid dataset_size: {good_ds}')
+            self.assertTrue(dp_mean.is_chain_valid())
+
+
+    def test_20_bad_epsilon(self):
+        """(20) Bad epsilon"""
+        msgt(self.test_20_bad_epsilon.__doc__)
+
+        spec_props = {'variable': 'EyeHeight',
+                      'col_index': 19,
+                      'statistic': 'mean',
+                      'dataset_size': 183,
+                      'epsilon': 1.0,
+                      'delta': 0.0,
+                      'ci': 0.05,
+                      'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+                      'impute_constant': '5',
+                      'variable_info': {'min': -8,
+                                        'max': 5,
+                                        'type': 'Float', },
+                      }
+
+        for epsilon_val in [1.01, -0.01, 10, 'a', 'carrot', 'cake']:
+            print(f'> Bad epsilon val: {epsilon_val}')
+            spec_props['epsilon'] = epsilon_val
+            dp_mean = DPMeanSpec(spec_props)
+
+            self.assertFalse(dp_mean.is_chain_valid())
+            err_info = dp_mean.get_error_msg_dict()
+            self.assertTrue(err_info['valid'] == False)
+            self.assertTrue(err_info['message'].find(VALIDATE_MSG_EPSILON) > -1)
+
+        print('     ---')
+
+        spec_props['epsilon'] = 1
+        for bad_ds in [-1, 0, 1.0, .03, 'brick', 'cookie']:
+            print(f'> Bad dataset_size: {bad_ds}')
+            spec_props['dataset_size'] = bad_ds
+            dp_mean = DPMeanSpec(spec_props)
+            self.assertFalse(dp_mean.is_chain_valid())
+
+    def test_30_bad_ci(self):
+        """(30) Bad ci vals"""
+        msgt(self.test_30_bad_ci.__doc__)
+
+        spec_props = {'variable': 'EyeHeight',
+                      'col_index': 19,
+                      'statistic': 'mean',
+                      'dataset_size': 183,
+                      'epsilon': 1.0,
+                      'delta': 0.0,
+                      'ci': 0.05,
+                      'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+                      'impute_constant': '5',
+                      'variable_info': {'min': -8,
+                                        'max': 5,
+                                        'type': 'Float', },
+                      }
+        def float_range(start, stop, step):
+            while start < stop:
+                yield float(start)
+                start += decimal.Decimal(step)
+
+        for ci_val in list(float_range(-1, 3, '0.1')) + ['alphabet', 'soup']:
+            #print(f'> Invalid ci val: {ci_val}')
+            spec_props['ci'] = ci_val
+            dp_mean = DPMeanSpec(spec_props)
+            #print(dp_mean.is_chain_valid())
+            self.assertFalse(dp_mean.is_chain_valid())
+
+
+
+    @skip
     def test_30_run_calculation(self):
         """(30) Run DP mean calculation"""
         msgt(self.test_30_run_calculation.__doc__)

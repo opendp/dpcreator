@@ -308,7 +308,7 @@ class StatSpec(BasicErrCheckList):
         try:
             validator(getattr(self, prop_name))
         except ValidationError as err_obj:
-            user_msg = f'{prop_name}:  {err_obj.message}'
+            user_msg = f'{err_obj.message} ({prop_name})'
             self.add_err_msg(user_msg)
             return False
 
