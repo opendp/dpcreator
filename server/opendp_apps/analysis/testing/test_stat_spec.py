@@ -162,7 +162,7 @@ class StatSpecTest(TestCase):
                       'ci': 0.05,
                       #'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'impute_constant': '45',
+                      'impute_constant': '5',
                       'variable_info': {'min': -8,
                                         'max': 5,
                                         'type': 'Float',},

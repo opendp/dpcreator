@@ -98,6 +98,7 @@ class ValidateReleaseUtil(BasicErrCheck):
                     "label": "EyeHeight"},
             """
             # print('ValidateReleaseUtil. dp_stat input:', dp_stat)
+            variable_info = col_idx_info = dataset_size_info = stat_spec = None
             variable = dp_stat.get('variable')
             statistic = dp_stat.get('statistic', 'shrug?')
             epsilon = dp_stat.get('epsilon')
@@ -178,6 +179,8 @@ class ValidateReleaseUtil(BasicErrCheck):
                 # Shouldn't reach here, unknown stats are captured up above
                 pass
 
+            assert stat_spec is not None, 'stat_spec should never be None here!'
+
             if stat_spec.is_chain_valid():
                 running_epsilon += stat_spec.epsilon
                 if running_epsilon > self.max_epsilon:
@@ -187,6 +190,8 @@ class ValidateReleaseUtil(BasicErrCheck):
                 else:
                     self.validation_info.append(stat_spec.get_success_msg_dict())
             else:
+                # Validity failed! get error message!
+                #
                 self.validation_info.append(stat_spec.get_error_msg_dict())
                 #stat_spec.print_debug()
                 #print(stat_spec.props)

@@ -252,16 +252,19 @@ class StatSpec(BasicErrCheckList):
         #
         if self.has_error():
             return
-
         if 'min' in self.additional_required_props() and \
                 'max' in self.additional_required_props():
-            print('checking min/max!')
-            print('min', self.min, type(self.min))
-            print('max', self.max, type(self.max))
-            if not self.max > self.min:
-                self.add_err_msg(astatic.ERR_MSG_INVALID_MIN_MAX)
+            # print('checking min/max!')
+            # print('min', self.min, type(self.min))
+            # print('max', self.max, type(self.max))
+            if self.max > self.min:
+                pass
+            else:
+                user_msg = f'{self.variable} The min ({self.min}) must be less than the max ({self.max})'
+                self.add_err_msg(user_msg)
+                #self.add_err_msg(astatic.ERR_MSG_INVALID_MIN_MAX)
                 return
-            print('looks okay!')
+            #print('looks okay!')
 
         # If this is numeric variable, check the impute constant
         #   (If impute constant isn't used, this check will simply exit)
@@ -348,6 +351,7 @@ class StatSpec(BasicErrCheckList):
     def print_debug(self):
         """show params"""
         print('-' * 40)
-        print(self.__dict__)
+        import json
+        print(json.dumps(self.__dict__, indent=4))
         #for key, val in self.__dict__.items():
         #    print(f'{key}: {val}')
