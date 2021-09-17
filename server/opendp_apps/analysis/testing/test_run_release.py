@@ -122,15 +122,14 @@ class TestRunRelease(TestCase):
 
         # Send the dp_statistics for validation
         #
-        dp_statistics = self.general_stat_specs
+        analysis_plan.dp_statistics = self.general_stat_specs
+        analysis_plan.save()
 
         # Check the basics
         #
-        release_util = ValidateReleaseUtil(self.user_obj,
-                                           analysis_plan.object_id,
-                                           dp_statistics)
-        # release_util.run_validation_process()
-        release_util.run_release_process()
+        release_util = ValidateReleaseUtil.compute_mode(\
+                               self.user_obj,
+                               analysis_plan.object_id)
 
         self.assertFalse(release_util.has_error())
 

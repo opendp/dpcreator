@@ -38,8 +38,13 @@ from opendp_apps.utils.camel_to_snake import camel_to_snake
 
 class ValidateReleaseUtil(BasicErrCheck):
 
-    def __init__(self, opendp_user: get_user_model(), analysis_plan_id: int, dp_statistics: list, release_run=False, **kwargs):
-        """Passing IDs instead of objects here makes it easier to run async via celery, etc."""
+    def __init__(self, opendp_user: get_user_model(), analysis_plan_id: int, dp_statistics: list=None, compute_mode=False, **kwargs):
+        """
+        In most cases, don't use this method directly.
+        To initialize, use:
+            - ValidateReleaseUtil.validate_mode(...)  # e.g. run validations only
+            - ValidateReleaseUtil.compute_mode(...)     # run the commputation chain
+        """
         self.opendp_user = opendp_user     # to be retrieved
 
         self.analysis_plan_id = analysis_plan_id
@@ -57,7 +62,27 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         self.opendp_version = pkg_resources.get_distribution('opendp').version
 
-        # self.run_validation_process()
+        self.compute_mode = compute_mode
+        if self.compute_mode is True:
+            self.run_release_process()
+        else:
+            self.run_validation_process()
+
+    @staticmethod
+    def validate_mode(opendp_user: get_user_model(), analysis_plan_id: int, dp_statistics: list=None):
+        """
+        Use this method to return a ValidateReleaseUtil validates the dp_statistics
+        """
+        return ValidateReleaseUtil(opendp_user, analysis_plan_id, dp_statistics)
+
+    @staticmethod
+    def compute_mode(opendp_user: get_user_model(), analysis_plan_id: int):
+        """
+        Use this method to return a ValidateReleaseUtil which runs the dp_statistics
+        """
+        return ValidateReleaseUtil(opendp_user, analysis_plan_id,
+                                   dp_statistics=None,
+                                   compute_mode=True)
 
 
     def add_stat_spec(self, stat_spec: StatSpec):
@@ -302,9 +327,19 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         # Check the dp_statistics spec
         #
-        if not self.dp_statistics:
+        if self.compute_mode:
+            # In compute mode, run the stats saved in the plan!
+            #
+            self.dp_statistics = self.analysis_plan.dp_statistics
+            if not self.dp_statistics:
+                user_msg = 'The AnalysisPlan does not contain "dp_statistics"'
+                self.add_err_msg(user_msg)
+                return False
+            #
+        elif not self.dp_statistics:
+            #
             user_msg = 'There are no statistics to validate'
-            self.add_err_msg(ap_info.message)
+            self.add_err_msg(user_msg)
             return False
 
         dataset_size_info = self.analysis_plan.dataset.get_dataset_size()

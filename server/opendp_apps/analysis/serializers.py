@@ -192,11 +192,7 @@ class ReleaseValidationSerializer(serializers.ModelSerializer):
         dp_statistics = self.validated_data['dp_statistics']
         # import json; print('dp_statistics', json.dumps(dp_statistics, indent=4))
 
-        #opendp_user = request.user  # is the user in "save(...)" ?
-
-
-        validate_util = ValidateReleaseUtil(opendp_user, analysis_plan_id, dp_statistics)
-        validate_util.run_validation_process()
+        validate_util = ValidateReleaseUtil.validate_mode(opendp_user, analysis_plan_id, dp_statistics)
 
         if validate_util.has_error():
             # This is a big error, check for it before evaluating individual statistics

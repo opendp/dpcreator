@@ -224,13 +224,10 @@ class TestValidationViewAndSerializers(TestCase):
         #print('stats_info.success', stats_info.success)
         self.assertTrue(stats_info.success)
 
-        #print('stats_info.data', stats_info.data)
-        expected_result = [ \
-                {'variable': 'EyeHeight', 'statistic': astatic.DP_SUM, 'valid': False,
-                  'message': 'Statistic "sum" will be supported soon!'}]
-
-        self.assertEqual(expected_result, stats_info.data)
-
+        self.assertEqual(stats_info.data[0]['valid'], False)
+        self.assertEqual(stats_info.data[0]['statistic'], astatic.DP_SUM)
+        self.assertEqual(stats_info.data[0]['variable'], 'EyeHeight')
+        self.assertEqual(stats_info.data[0]['message'], 'Statistic "sum" will be supported soon!')
 
     def test_25_api_fail_unsupported_stat(self):
         """(25) Fail: API, Test a known but unsupported statistic"""
@@ -256,11 +253,10 @@ class TestValidationViewAndSerializers(TestCase):
 
         self.assertTrue(jresp['success'])
 
-        expected_result = [ \
-                {'variable': 'EyeHeight', 'statistic': astatic.DP_SUM, 'valid': False,
-                  'message': 'Statistic "sum" will be supported soon!'}]
-
-        self.assertEqual(expected_result, jresp['data'])
+        self.assertEqual(jresp['data'][0]['valid'], False)
+        self.assertEqual(jresp['data'][0]['statistic'], astatic.DP_SUM)
+        self.assertEqual(jresp['data'][0]['variable'], 'EyeHeight')
+        self.assertEqual(jresp['data'][0]['message'], 'Statistic "sum" will be supported soon!')
 
 
     def test_30_fail_bad_min_max(self):
