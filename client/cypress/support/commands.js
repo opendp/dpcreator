@@ -32,10 +32,8 @@ Cypress.Commands.add('runDemo', (mockDVfile, demoDatafile) => {
         cy.url().should('contain', 'welcome')
         cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
             demoData['datasetName'])
-        cy.goToConfirmVariables()
+        cy.goToConfirmVariables(demoData)
 
-        cy.get('table').contains('td', demoData['variable1']).should('be.visible')
-        cy.get('table').contains('td', demoData['variable2']).should('be.visible')
     })
 
 })
@@ -84,7 +82,7 @@ Cypress.Commands.add('storeExample', (email, password) => {
 
 
 })
-Cypress.Commands.add('goToConfirmVariables', () => {
+Cypress.Commands.add('goToConfirmVariables', (demoData) => {
     // click on the start Process button on the welcome page,
     // to navigate to the Validate Dataset step of the Wizard
     cy.get('[data-test="Start Process"]').click();
@@ -96,6 +94,11 @@ Cypress.Commands.add('goToConfirmVariables', () => {
     // click on continue to go to trigger the profiler and go to the Confirm Variables Page
     cy.get('[data-test="wizardContinueButton"]').last().click();
     cy.get('h1').should('contain', 'Confirm Variables')
+    demoData.variables.forEach((item) => {
+        cy.get('table').contains('td', item.name).should('be.visible')
+        cy.get('table').contains('tr', item.name).should('contain', item.type)
+    })
+
 
 })
 

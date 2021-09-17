@@ -1,5 +1,15 @@
 {
   "datasetName": "Voter Validation Dataset",
-  "variable1": "V207",
-  "variable2": "V208"
+  "variables": [
+    {
+      "name": "V201",
+      "type": "Numerical",
+      "min": 0.0,
+      "max": 10.0
+    },
+    {
+      "name": "V208",
+      "type": "Boolean"
+    }
+  ]
 }
