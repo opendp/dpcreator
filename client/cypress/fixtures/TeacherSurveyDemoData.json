@@ -1,7 +1,7 @@
 {
   "datasetName": "Teacher Climate Survey",
-  "variables": [
-    {
+  "variables": {
+    "subject": {
       "name": "subject",
       "type": "Categorical",
       "categories": [
@@ -9,9 +9,9 @@
         "cat2"
       ]
     },
-    {
+    "surveymode": {
       "name": "surveymode",
       "type": "Boolean"
     }
-  ]
+  }
 }

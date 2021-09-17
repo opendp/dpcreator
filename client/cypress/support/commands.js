@@ -32,14 +32,14 @@ Cypress.Commands.add('runDemo', (mockDVfile, demoDatafile) => {
         cy.url().should('contain', 'welcome')
         cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
             demoData['datasetName'])
-        cy.goToConfirmVariables(demoData)
+        cy.goToConfirmVariables(demoData.variables)
         // try to find one numerical variable
         let numericVar = null
-        demoData.variables.forEach((item) => {
-            if (item.type == "Numerical") {
-                numericVar = item
+        for (const key in demoData.variables) {
+            if (demoData.variables[key].type == "Numerical") {
+                numericVar = demoData.variables[key]
             }
-        })
+        }
         if (numericVar !== null) {
             cy.testMean(numericVar)
         }
@@ -92,7 +92,7 @@ Cypress.Commands.add('storeExample', (email, password) => {
 
 
 })
-Cypress.Commands.add('goToConfirmVariables', (demoData) => {
+Cypress.Commands.add('goToConfirmVariables', (variableData) => {
     // click on the start Process button on the welcome page,
     // to navigate to the Validate Dataset step of the Wizard
     cy.get('[data-test="Start Process"]').click();
@@ -104,10 +104,11 @@ Cypress.Commands.add('goToConfirmVariables', (demoData) => {
     // click on continue to go to trigger the profiler and go to the Confirm Variables Page
     cy.get('[data-test="wizardContinueButton"]').last().click();
     cy.get('h1').should('contain', 'Confirm Variables')
-    demoData.variables.forEach((item) => {
-        cy.get('table').contains('td', item.name).should('be.visible')
-        cy.get('table').contains('tr', item.name).should('contain', item.type)
-    })
+    for (const key in variableData) {
+        const val = variableData[key]
+        cy.get('table').contains('td', val.name).should('be.visible')
+        cy.get('table').contains('tr', val.name).should('contain', val.type)
+    }
 
 
 })

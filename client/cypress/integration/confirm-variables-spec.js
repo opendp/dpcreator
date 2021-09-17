@@ -8,8 +8,9 @@
             })
             cy.clearData()
             cy.createMockDataset('mockDV.json')
-            cy.goToConfirmVariables()
             cy.fixture('variables').then((varsFixture) => {
+                cy.goToConfirmVariables(varsFixture)
+
                 for (const key in varsFixture) {
                     cy.get('table').contains('td', varsFixture[key].name).should('be.visible')
                     cy.get('table').contains('tr', varsFixture[key].name).should('contain', varsFixture[key].type)
