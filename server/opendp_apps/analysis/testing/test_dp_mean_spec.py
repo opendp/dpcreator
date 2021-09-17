@@ -70,7 +70,7 @@ class StatSpecTest(TestCase):
                       'ci': astatic.CI_95,
                       #'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'impute_constant': '0',
+                      'fixed_value': '0',
                       'variable_info': {'min': 0,
                                         'max': 100,
                                         'type': 'Float',},
@@ -121,7 +121,7 @@ class StatSpecTest(TestCase):
                       'ci': astatic.CI_95,
                       #'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'impute_constant': '5',
+                      'fixed_value': '5',
                       'variable_info': {'min': -8,
                                         'max': 5,
                                         'type': 'Float',},
@@ -163,7 +163,7 @@ class StatSpecTest(TestCase):
                       'delta': 0.0,
                       'ci': astatic.CI_95,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'impute_constant': '5',
+                      'fixed_value': '5',
                       'variable_info': {'min': -8,
                                         'max': 5,
                                         'type': 'Float', },
@@ -202,7 +202,7 @@ class StatSpecTest(TestCase):
                       'delta': 0.0,
                       'ci': astatic.CI_95,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'impute_constant': '5',
+                      'fixed_value': '5',
                       'variable_info': {'min': -8,
                                         'max': 5,
                                         'type': 'Float', },
@@ -231,7 +231,7 @@ class StatSpecTest(TestCase):
                       'delta': 0.0,
                       'ci': astatic.CI_95,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'impute_constant': '5.0',
+                      'fixed_value': '5.0',
                       'variable_info': {'min': -8,
                                         'max': 5,
                                         'type': 'Float', },
@@ -248,7 +248,7 @@ class StatSpecTest(TestCase):
         for bad_impute, stat_err_msg in bad_impute_info:
             print(f'> bad impute: {bad_impute}')
             new_props = spec_props.copy()
-            new_props['impute_constant'] = bad_impute
+            new_props['fixed_value'] = bad_impute
             dp_mean2 = DPMeanSpec(new_props)
 
             self.assertFalse(dp_mean2.is_chain_valid())
@@ -262,7 +262,7 @@ class StatSpecTest(TestCase):
         for good_impute in good_impute_info:
             print(f'> good impute: {good_impute}')
             new_props = spec_props.copy()
-            new_props['impute_constant'] = good_impute
+            new_props['fixed_value'] = good_impute
             dp_mean = DPMeanSpec(new_props)
             self.assertTrue(dp_mean.is_chain_valid())
 
@@ -283,7 +283,7 @@ class StatSpecTest(TestCase):
                       'ci': astatic.CI_95,
                       #'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'impute_constant': '5',
+                      'fixed_value': '5',
                       'variable_info': {'min': -8,
                                         'max': 5,
                                         'type': 'Float',},

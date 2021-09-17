@@ -40,7 +40,7 @@ class StatValidInfo:
         if self.accuracy_val or self.accuracy_msg:
             info['accuracy'] = {}
             if self.accuracy_val:
-                info['accuracy']['val'] = self.accuracy_val
+                info['accuracy']['value'] = self.accuracy_val
             if self.accuracy_msg:
                 info['accuracy']['message'] = self.accuracy_msg
 

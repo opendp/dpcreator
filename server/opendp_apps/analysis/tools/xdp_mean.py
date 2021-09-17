@@ -4,7 +4,7 @@ from opendp.meas import *
 enable_features("floating-point")
 
 
-def dp_mean(index, lower, upper, n, impute_constant, epsilon):
+def dp_mean(index, lower, upper, n, fixed_value, epsilon):
     """
     Interface to calculate a DP Mean of a column. Note that this does not
     read the data set, this must be done beforehand (see analysis.tests for
@@ -13,7 +13,7 @@ def dp_mean(index, lower, upper, n, impute_constant, epsilon):
     :param lower:
     :param upper:
     :param n:
-    :param impute_constant:
+    :param fixed_value:
     :param epsilon:
     :return:
     """
@@ -37,10 +37,10 @@ def dp_mean(index, lower, upper, n, impute_constant, epsilon):
         # Cast the column as Vec<Optional<Float>>
         make_cast(TIA=str, TOA=float) >>
         # Impute missing values to 0 Vec<Float>
-        make_impute_constant(impute_constant) >>
+        make_impute_constant(fixed_value) >>
         # Clamp age values
         make_clamp(bounds) >>
-        make_bounded_resize(n, bounds, impute_constant) >>
+        make_bounded_resize(n, bounds, fixed_value) >>
         make_sized_bounded_mean(n, bounds)
 
         #make_bounded_mean(lower, upper, n=n, T=float)

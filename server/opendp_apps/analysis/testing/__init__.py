@@ -3,4 +3,5 @@ docker-compose run server python manage.py test opendp_apps.analysis.testing.tes
 
 docker-compose run server python manage.py test opendp_apps.analysis.testing.test_dp_mean_spec.StatSpecTest.test_40_test_impute
 
+python manage.py test opendp_apps.analysis.testing.test_run_release
 """

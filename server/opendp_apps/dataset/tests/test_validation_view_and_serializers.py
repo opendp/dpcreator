@@ -18,6 +18,7 @@ from opendp_apps.analysis.serializers import ReleaseValidationSerializer
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
+from opendp_apps.utils.extra_validators import VALIDATE_MSG_EPSILON
 
 
 
@@ -160,14 +161,14 @@ class TestValidationViewAndSerializers(TestCase):
         expected_result = [{'variable': 'EyeHeight', 'statistic': 'mean', 'valid': True,
                             'message': None,
                             'accuracy': {
-                                'val': 1.6370121873967791,
+                                'value': 1.6370121873967791,
                                 'message': 'Releasing mean for the variable EyeHeight. With at least probability 0.95 the output mean will differ from the true mean by at most 1.6370121873967791 units. Here the units are the same units the variable has in the dataset.'}}]
 
         #print('stats_info.data', stats_info.data)
         self.assertEqual(stats_info.data[0]['valid'], True)
 
         # Were accuracy results included?
-        self.assertTrue('val' in stats_info.data[0]['accuracy'])
+        self.assertTrue('value' in stats_info.data[0]['accuracy'])
         self.assertTrue('message' in stats_info.data[0]['accuracy'])
 
         accuracy_msg = f'output {astatic.DP_MEAN} will differ from the true {astatic.DP_MEAN} by at'
@@ -223,13 +224,10 @@ class TestValidationViewAndSerializers(TestCase):
         #print('stats_info.success', stats_info.success)
         self.assertTrue(stats_info.success)
 
-        #print('stats_info.data', stats_info.data)
-        expected_result = [ \
-                {'variable': 'EyeHeight', 'statistic': astatic.DP_SUM, 'valid': False,
-                  'message': 'Statistic "sum" will be supported soon!'}]
-
-        self.assertEqual(expected_result, stats_info.data)
-
+        self.assertEqual(stats_info.data[0]['valid'], False)
+        self.assertEqual(stats_info.data[0]['statistic'], astatic.DP_SUM)
+        self.assertEqual(stats_info.data[0]['variable'], 'EyeHeight')
+        self.assertEqual(stats_info.data[0]['message'], 'Statistic "sum" will be supported soon!')
 
     def test_25_api_fail_unsupported_stat(self):
         """(25) Fail: API, Test a known but unsupported statistic"""
@@ -255,11 +253,10 @@ class TestValidationViewAndSerializers(TestCase):
 
         self.assertTrue(jresp['success'])
 
-        expected_result = [ \
-                {'variable': 'EyeHeight', 'statistic': astatic.DP_SUM, 'valid': False,
-                  'message': 'Statistic "sum" will be supported soon!'}]
-
-        self.assertEqual(expected_result, jresp['data'])
+        self.assertEqual(jresp['data'][0]['valid'], False)
+        self.assertEqual(jresp['data'][0]['statistic'], astatic.DP_SUM)
+        self.assertEqual(jresp['data'][0]['variable'], 'EyeHeight')
+        self.assertEqual(jresp['data'][0]['message'], 'Statistic "sum" will be supported soon!')
 
 
     def test_30_fail_bad_min_max(self):
@@ -375,9 +372,9 @@ class TestValidationViewAndSerializers(TestCase):
         #
         stats_valid = serializer.save(**dict(opendp_user=self.user_obj))
         self.assertTrue(stats_valid.success)
-
+        print('40!! stats_valid', stats_valid.data)
         self.assertEqual(stats_valid.data[0]['valid'], False)
-        self.assertTrue(stats_valid.data[0]['message'].find('exceeds max epsilon') > -1)
+        self.assertTrue(stats_valid.data[0]['message'].find(VALIDATE_MSG_EPSILON) > -1)
 
     def test_45_api_fail_single_stat_bad_epsilon(self):
         """(45) Fail: API, Single stat exceeds total epsilon"""
@@ -419,7 +416,7 @@ class TestValidationViewAndSerializers(TestCase):
         print('jresp', jresp)
 
         self.assertEqual(jresp['data'][0]['valid'], False)
-        self.assertTrue(jresp['data'][0]['message'].find('exceeds max epsilon') > -1)
+        self.assertTrue(jresp['data'][0]['message'].find(VALIDATE_MSG_EPSILON) > -1)
 
 
     def test_50_bad_total_epsilon(self):
@@ -614,8 +611,6 @@ class TestValidationViewAndSerializers(TestCase):
         msgt(self.test_80_fail_impute_too_low.__doc__)
 
         analysis_plan = self.analysis_plan
-
-        print('analysis_plan.variable_info', analysis_plan.variable_info)
 
         # invalid min/max
         analysis_plan.variable_info['EyeHeight']['min'] = -8

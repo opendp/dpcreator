@@ -33,7 +33,7 @@ class DPMeanSpec(StatSpec):
                       dataset_size=365,
                       epsilon=0.5,
                       ci=CI_95.
-                      impute_constant=1)
+                      fixed_value=1)
     """
     def __init__(self, props: dict):
         """Set the internals using the props dict"""
@@ -44,34 +44,34 @@ class DPMeanSpec(StatSpec):
         Add a list of required properties
         example: ['min', 'max']
         """
-        return ['min', 'max', 'ci',]    # 'impute_constant']
+        return ['min', 'max', 'ci',]    # 'fixed_value']
 
-    def run_initial_handling(self):
+    def run_01_initial_handling(self):
         """
         Make sure values are consistently floats
         """
-        if self.impute_constant is not None:
+        if self.fixed_value is not None:
             pass
 
         # Use the "impute_value" for missing values, make sure it's a float!
         #
         if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
             # Convert the impute value to a float!
-            if not self.convert_to_float('impute_constant'):
+            if not self.convert_to_float('fixed_value'):
                 return
         self.floatify_int_values()
 
-    def run_custom_validation(self):
+    def run_03_custom_validation(self):
         """
         This is a place for initial checking/transformations
         such as making sure values are floats
         Example:
-        self.check_numeric_impute_constant()
+        self.check_numeric_fixed_value()
         """
         if self.has_error():
             return
 
-        self.check_numeric_impute_constant()
+        self.check_numeric_fixed_value()
 
     def check_scale(self, scale, preprocessor, dataset_distance, epsilon):
         """
@@ -104,10 +104,10 @@ class DPMeanSpec(StatSpec):
             # Cast the column as Vec<Optional<Float>>
             make_cast(TIA=str, TOA=float) >>
             # Impute missing values to 0 Vec<Float>
-            make_impute_constant(self.impute_constant) >>
+            make_impute_constant(self.fixed_value) >>
             # Clamp age values
             make_clamp(self.get_bounds()) >>
-            make_bounded_resize(self.dataset_size, self.get_bounds(), self.impute_constant) >>
+            make_bounded_resize(self.dataset_size, self.get_bounds(), self.fixed_value) >>
             make_sized_bounded_mean(self.dataset_size, self.get_bounds())
         )
 

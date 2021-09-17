@@ -48,7 +48,7 @@ class StatSpec:
                            categories=validate_not_empty_or_none,  # ?
                            #
                            missing_values_handling=validate_missing_val_handlers,
-                           #impute_constant=validate_not_none, # more complex check
+                           #fixed_value=validate_not_none, # more complex check
                            #fixed_value=
                            #
                            accuracy=validate_not_negative)
@@ -68,7 +68,7 @@ class StatSpec:
         self.accuracy_message = None
         #
         self.missing_values_handling = props.get('missing_values_handling')
-        self.impute_constant = props.get('impute_constant')
+        self.fixed_value = props.get('fixed_value')
         #self.missing_fixed_val = props.get('missing_fixed_val')
         #
         # Note: min, max, categories are sent in via variable_info
@@ -87,9 +87,9 @@ class StatSpec:
         self.error_found = False
         self.error_messages = []
 
-        self.run_initial_handling()     # customize, if types need converting, etc.
-        self.run_basic_validation()     # always the same
-        self.run_custom_validation()    # customize, if types need converting, etc.
+        self.run_01_initial_handling()     # customize, if types need converting, etc.
+        self.run_02_basic_validation()     # always the same
+        self.run_03_custom_validation()    # customize, if types need converting, etc.
 
 
     @abc.abstractmethod
@@ -102,7 +102,7 @@ class StatSpec:
         raise NotImplementedError('additional_required_props')
 
     @abc.abstractmethod
-    def run_initial_handling(self):
+    def run_01_initial_handling(self):
         """
         This is a place for initial checking/transformations
         such as making sure values are floats
@@ -117,12 +117,12 @@ class StatSpec:
             return
 
         """
-        raise NotImplementedError('run_initial_handling')
+        raise NotImplementedError('run_01_initial_handling')
 
     @abc.abstractmethod
-    def run_custom_validation(self):
+    def run_03_custom_validation(self):
         """
-        This is a place for initial checking/transformations
+        This is a place for custom checking/transformations
         such as making sure values are floats
 
         See "dp_mean_spec.py for an example of instantiation
@@ -138,7 +138,7 @@ class StatSpec:
         pass
         ```
         """
-        raise NotImplementedError('run_custom_validation')
+        raise NotImplementedError('run_03_custom_validation')
 
 
     @abc.abstractmethod
@@ -276,9 +276,9 @@ class StatSpec:
             if not self.convert_to_float(prop_name):
                 return
 
-    def run_basic_validation(self):
+    def run_02_basic_validation(self):
         """Evaluate the properties, make sure they are populated"""
-        if self.has_error():   # something may be wrong in "run_initial_handling()"
+        if self.has_error():   # something may be wrong in "run_01_initial_handling()"
             return
 
         # Always validate these properties, mostly using the self.prop_validators
@@ -320,25 +320,25 @@ class StatSpec:
         # If this is numeric variable, check the impute constant
         #   (If impute constant isn't used, this check will simply exit)
         #if self.var_type in pstatic.NUMERIC_VAR_TYPES:
-        #    self.check_numeric_impute_constant()
+        #    self.check_numeric_fixed_value()
 
-    def check_numeric_impute_constant(self):
+    def check_numeric_fixed_value(self):
         """
         For the case of handing missing values with a constant
-        Check that the fixed value/impute_constant is not outside the min/max range
+        Check that the fixed value/fixed_value is not outside the min/max range
         """
         if self.has_error():
             return
 
         if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
 
-            if self.impute_constant < self.min:
-                user_msg = (f'The "fixed value" ({self.impute_constant})'
+            if self.fixed_value < self.min:
+                user_msg = (f'The "fixed value" ({self.fixed_value})'
                             f' {astatic.ERR_IMPUTE_PHRASE_MIN} ({self.min})')
                 self.add_err_msg(user_msg)
                 return
-            elif self.impute_constant > self.max:
-                user_msg = (f'The "fixed value" ({self.impute_constant})'
+            elif self.fixed_value > self.max:
+                user_msg = (f'The "fixed value" ({self.fixed_value})'
                             f' {astatic.ERR_IMPUTE_PHRASE_MAX} ({self.max})')
                 self.add_err_msg(user_msg)
                 return
@@ -397,7 +397,13 @@ class StatSpec:
         """Get invalid info dict"""
         return StatValidInfo.get_error_msg_dict(self.variable,
                                                 self.statistic,
-                                                self.get_err_msgs()[0])
+                                                self.get_single_err_msg())
+
+    def get_single_err_msg(self):
+        """Get the first message in the self.error_messages list"""
+        if self.has_error():
+            return self.get_err_msgs()[0]
+        return None
 
     def print_debug(self):
         """show params"""
@@ -406,6 +412,53 @@ class StatSpec:
         print(json.dumps(self.__dict__, indent=4))
         #for key, val in self.__dict__.items():
         #    print(f'{key}: {val}')
+
+
+    def get_release_dict(self):
+        """Final release info"""
+        assert not self.has_error(), \
+            'Do not call this method before checking that ".has_error()" is False'
+        assert self.value, \
+            'Only use this after "run_chain()" was completed successfully"'
+
+        final_info = {
+             "statistic": self.statistic,
+             "variable": self.variable,
+             "result":{
+                "value": self.value
+             },
+             "epsilon": self.epsilon,
+             "delta": self.delta,
+        }
+
+        # Min/Max
+        #
+        if 'min' in self.additional_required_props():
+            final_info['bounds'] = {'min': self.min, 'max': self.max}
+
+        # Categories
+        #
+        if 'categories' in self.additional_required_props():
+            final_info['categories'] = self.categories
+
+        # Missing values
+        #
+        final_info['missing_value_handling'] = {"type": self.missing_values_handling}
+        if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
+            final_info['missing_value_handling']['fixed_value'] = self.fixed_value
+
+        # Add accuracy
+        #
+        if self.accuracy_val or self.accuracy_msg:
+            final_info['confidence_interval'] = self.ci
+            final_info['accuracy'] = {}
+            if self.accuracy_val:
+                final_info['accuracy']['value'] = self.accuracy_val
+            if self.accuracy_message:
+                final_info['accuracy']['message'] = self.accuracy_message
+
+        return final_info
+
 
     def has_error(self):
         """Did an error occur?"""
