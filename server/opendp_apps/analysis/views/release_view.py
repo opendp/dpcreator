@@ -43,31 +43,7 @@ class ReleaseView(viewsets.ViewSet):
                     "success": true,
                     "message": "release worked!",
                     "data":
-                        [
-                          {
-                              "statistic": "mean",
-                              "variable": "EyeHeight",
-                              "result": {
-                                  "value": -1.171651194916809
-                              },
-                              "epsilon": 0.45,
-                              "delta": 0,
-                              "bounds": {
-                                  "min": -8.01,
-                                  "max": 5.0
-                              },
-                              "missing_value_handling": {
-                                  "type": "insert_fixed",
-                                  "impute_constant": 1.0
-                              },
-                              "confidence_interval": 0.05,
-                              "accuracy": {
-                                  "value": 0.4732784077797872,
-                                  "message": "Releasing mean for the variable EyeHeight. With at least probability 0.95 the output mean will differ from the true mean by at most 0.4732784077797872 units. Here the units are the same units the variable has in the dataset."
-                              }
-                          },
-                        ]
-            }
+                       (see: opendp_apps.release_info_formatter.get_release_data())
 
         """
         # Get the AnalysisPlan object_id
