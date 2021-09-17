@@ -29,30 +29,9 @@
             cy.get('[data-test="wizardContinueButton"]').last().click();
             cy.get('h1').should('contain', 'Confirm Variables')
 
-            // Enter min and max for EyeHeight so we can validate
-            cy.get('[data-test="EyeHeight:min"]').type('0')
-            cy.get('[data-test="EyeHeight:max"]').type('100')
+            const numericVar = {"name": "EyeHeight", min: "0", max: "100", fixedValue: "10"}
+            cy.testMean(numericVar)
 
-            // Continue to Set Epsilon Step
-            cy.get('[data-test="wizardContinueButton"]').last().click();
-            cy.get('[data-test="Larger Population - no"]').check({force: true})
-            cy.get('[data-test="Public Observations - yes"]').check({force: true})
-
-            // Continue to Create  Statistics Step
-            cy.get('[data-test="wizardContinueButton"]').last().click();
-
-            // Test Validating EyeHeight mean
-            cy.get('[data-test="Add Statistic"]').click({force: true});
-            cy.get('[data-test="Mean"]').click({force: true});
-            cy.get('[data-test="EyeHeight"]').click({force: true})
-            cy.get('[data-test="Insert fixed value"]').click({force: true})
-            cy.get('[data-test="Fixed value"]').type('10')
-            cy.get('[data-test="Create statistic"]').click({force: true})
-
-            // The statistic should have been created
-            // cy.get('[data-test="statistic"]').should('contain', 'Mean')
-            cy.get('tr').first().get('td').should('contain', 'Mean')
-            cy.get('table').contains('td', 'Mean').should('be.visible');
 
             // Try to create the same statistic again, it should display a duplicates validation error
             cy.get('[data-test="Add Statistic"]').click({force: true});

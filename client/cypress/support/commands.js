@@ -33,6 +33,16 @@ Cypress.Commands.add('runDemo', (mockDVfile, demoDatafile) => {
         cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
             demoData['datasetName'])
         cy.goToConfirmVariables(demoData)
+        // try to find one numerical variable
+        let numericVar = null
+        demoData.variables.forEach((item) => {
+            if (item.type == "Numerical") {
+                numericVar = item
+            }
+        })
+        if (numericVar !== null) {
+            cy.testMean(numericVar)
+        }
 
     })
 
@@ -99,6 +109,37 @@ Cypress.Commands.add('goToConfirmVariables', (demoData) => {
         cy.get('table').contains('tr', item.name).should('contain', item.type)
     })
 
+
+})
+
+Cypress.Commands.add('testMean', (numericVar) => {
+    const minDataTest = '[data-test="' + numericVar.name + ':min"]'
+    const maxDataTest = '[data-test="' + numericVar.name + ':max"]'
+    // Enter min and max for EyeHeight so we can validate
+    cy.get(minDataTest).type(numericVar.min)
+    cy.get(maxDataTest).type(numericVar.max)
+
+    // Continue to Set Epsilon Step
+    cy.get('[data-test="wizardContinueButton"]').last().click();
+    cy.get('[data-test="Larger Population - no"]').check({force: true})
+    cy.get('[data-test="Public Observations - yes"]').check({force: true})
+
+    // Continue to Create  Statistics Step
+    cy.get('[data-test="wizardContinueButton"]').last().click();
+
+    // Test Validating EyeHeight mean
+    cy.get('[data-test="Add Statistic"]').click({force: true});
+    cy.get('[data-test="Mean"]').click({force: true});
+    const varDataTest = '[data-test="' + numericVar.name + '"]'
+    cy.get(varDataTest).click({force: true})
+    cy.get('[data-test="Insert fixed value"]').click({force: true})
+    cy.get('[data-test="Fixed value"]').type(numericVar.fixedValue)
+    cy.get('[data-test="Create statistic"]').click({force: true})
+
+    // The statistic should have been created
+    // cy.get('[data-test="statistic"]').should('contain', 'Mean')
+    cy.get('tr').first().get('td').should('contain', 'Mean')
+    cy.get('table').contains('td', 'Mean').should('be.visible');
 
 })
 

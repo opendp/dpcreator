@@ -4,8 +4,9 @@
     {
       "name": "V201",
       "type": "Numerical",
-      "min": 0.0,
-      "max": 10.0
+      "min": "0.0",
+      "max": "10.0",
+      "fixedValue": "2.0"
     },
     {
       "name": "V208",
