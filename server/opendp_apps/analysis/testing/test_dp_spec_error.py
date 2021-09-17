@@ -10,6 +10,7 @@ from opendp_apps.model_helpers.msg_util import msgt
 
 
 class DPSpecErrorTest(TestCase):
+    """Some tests for the DPSpecError"""
 
     def setUp(self):
         """Some reusable info"""
@@ -37,6 +38,8 @@ class DPSpecErrorTest(TestCase):
 
         dp_spec = DPSpecError(min_spec_props)
         self.assertFalse(dp_spec.is_chain_valid())
+        self.assertTrue(dp_spec.has_error())
+
         print(dp_spec.get_error_msg_dict())
         self.assertEqual(dp_spec.get_error_msg_dict()['valid'], False)
 
@@ -48,15 +51,19 @@ class DPSpecErrorTest(TestCase):
         self.spec_props['error_message'] = 'This is an error combined with data'
         dp_spec = DPSpecError(self.spec_props)
         self.assertFalse(dp_spec.is_chain_valid())
+        self.assertTrue(dp_spec.has_error())
+
         print(dp_spec.get_error_msg_dict())
         self.assertEqual(dp_spec.get_error_msg_dict()['valid'], False)
 
+
     def test_30_fail_empty_props(self):
-        """(30) Test DPSpecError with empty {} -- needs at least an "error_message" """
+        """(30) Fail with empty constructor"""
+        #   Needs at least 'error_message':
+        #     `spec = DPSpecError(error_message="Something wrong")`
         msgt(self.test_30_fail_empty_props.__doc__)
 
         with self.assertRaises(AssertionError) as context:
-            spec_props = {}
-            DPSpecError(spec_props)
+            DPSpecError({})
 
-            self.assertEqual(str(context.exception) + 'a', DPSpecError.ERR_MSG_REQUIRED_PROPS)
+        self.assertEqual(str(context.exception), DPSpecError.ERR_MSG_REQUIRED_PROPS)
