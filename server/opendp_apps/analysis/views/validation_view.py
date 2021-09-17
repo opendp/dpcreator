@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from opendp_apps.utils.view_helper import get_json_error, get_json_success
 
 from opendp_apps.analysis.serializers import AnalysisPlanSerializer, \
-    ReleaseValidationSerializer, ComputationChainSerializer
+    ReleaseValidationSerializer
 
 
 class ValidationView(viewsets.ViewSet):
@@ -124,6 +124,3 @@ class ValidationView(viewsets.ViewSet):
         return Response(get_json_success('validation results returned',
                                          data=save_result.data),
                         status=status.HTTP_200_OK)
-
-        #print('stats_valid', stats_valid)
-        #return Response({'valid': stats_valid}, status=status.HTTP_201_CREATED)

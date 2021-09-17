@@ -134,6 +134,28 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         super(DepositorSetupInfo, self).save(*args, **kwargs)
 
 
+class ReleaseInfo(TimestampedModelWithUUID):
+    """
+    Release of differentially private result from an AnalysisPlan
+    """
+    dataset = models.ForeignKey('dataset.DataSetInfo',
+                                on_delete=models.PROTECT)
+
+    epsilon_used = models.FloatField(null=False,
+                                     blank=False,
+                                     validators=[validate_not_negative])
+    dp_release = models.JSONField()
+
+
+
+    #pdf_release
+
+    class Meta:
+        verbose_name = 'Release Information'
+        verbose_name_plural = 'Release Information'
+        ordering = ('dataset', '-created')
+
+
 class AnalysisPlan(TimestampedModelWithUUID):
     """
     Details of request for a differentially private release
@@ -170,6 +192,8 @@ class AnalysisPlan(TimestampedModelWithUUID):
     #custom_variables = models.JSONField(null=True)
     dp_statistics = models.JSONField(null=True)
 
+    release_info = models.ForeignKey(ReleaseInfo, on_delete=models.PROTECT, null=True, blank=True)
+
     def __str__(self):
         return f'{self.dataset} - {self.user_step}'
 
@@ -181,26 +205,4 @@ class AnalysisPlan(TimestampedModelWithUUID):
         super(AnalysisPlan, self).save(*args, **kwargs)
 
 
-class ReleaseInfo(TimestampedModelWithUUID):
-    """
-    Release of differentially private result from an AnalysisPlan
-    """
-    dataset = models.ForeignKey('dataset.DataSetInfo',
-                                on_delete=models.PROTECT)
-
-    # also gives analyst
-    analysis_plan = models.ForeignKey(AnalysisPlan,
-                                      on_delete=models.PROTECT)
-
-    epsilon_used = models.FloatField(null=False,
-                                     blank=False,
-                                     validators=[validate_not_negative])
-    dp_release = models.JSONField()
-
-    #pdf_release
-
-    class Meta:
-        verbose_name = 'Release Information'
-        verbose_name_plural = 'Release Information'
-        ordering = ('dataset', '-created')
 

@@ -31,6 +31,8 @@ MISSING_VAL_HANDLING_TYPES = [MISSING_VAL_DROP, MISSING_VAL_INSERT_RANDOM, MISSI
 # --------------------------------------
 # Error Messages
 # --------------------------------------
+ERR_MSG_ANALYSIS_PLAN_NOT_FOUND = 'The AnalysisPlan was not found.'
+
 ERR_MSG_DATASET_ID_REQUIRED = 'The DataSetInfo id is required.'
 ERR_MSG_ANALYSIS_ID_REQUIRED = 'The AnalysisPlan id is required.'
 
@@ -43,6 +45,8 @@ ERR_MSG_NO_ANALYSIS_PLAN = 'AnalysisPlan object not found for this object_id and
 ERR_MSG_FIELDS_NOT_UPDATEABLE = 'These fields are not updatable'
 
 ERR_MSG_BAD_TOTAL_EPSILON = 'The depositor setup info has an invalid epsilon value'
+ERR_MSG_BAD_TOTAL_DELTA = 'The depositor setup info has an invalid delta value'
+
 ERR_MSG_INVALID_MIN_MAX = 'The "max" must be greater than the "min"'
 
 ERR_IMPUTE_PHRASE_MIN = 'cannot be less than the "min"'

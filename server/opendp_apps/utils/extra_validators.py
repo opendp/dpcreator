@@ -38,6 +38,8 @@ def validate_missing_val_handlers(value):
 
 def validate_not_negative(value):
     """Valid values are non-negative numbers"""
+    validate_float(value)
+
     if value < 0.0:
         raise ValidationError(VALIDATE_MSG_ZERO_OR_GREATER)
 
@@ -107,6 +109,8 @@ def validate_float(value):
     try:
         float(value)
     except ValueError:
+        raise ValidationError(VALIDATE_MSG_NOT_FLOAT)
+    except TypeError:
         raise ValidationError(VALIDATE_MSG_NOT_FLOAT)
 
 """
