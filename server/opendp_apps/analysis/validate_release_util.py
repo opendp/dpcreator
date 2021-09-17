@@ -1,4 +1,16 @@
-"""Utility class utilized by DRF API endpoints"""
+"""
+- Build computation chain from user-created statistic specifications
+    - Validate computation
+    - Run computation
+- Flow:
+    - Given an AnalysisPlan object_id an opendp_user
+    - Retrieve the AnalysisPlan and make sure the opendp_user created it
+        - Retrieve the max epsilon from analysis_plan.dataset.depositor_setup_info.epsilon
+        - Retrieve the max delta from analysis_plan.dataset.depositor_setup_info.delta
+    - Iterate through the specs in the AnalysisPlan.dp_statistics
+        - Retrieve the variable type/min/max/categories from AnalysisPlan.variable_info
+        - Retrieve
+"""
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -10,7 +22,8 @@ from opendp_apps.analysis.stat_valid_info import StatValidInfo
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.utils.extra_validators import \
-    (validate_epsilon_not_null,)
+    (validate_epsilon_not_null,
+     validate_not_negative)
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 
@@ -29,9 +42,11 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.analysis_plan_id = analysis_plan_id
         self.analysis_plan = None       # to be retrieved
 
-        self.max_epsilon = None         # from DepositorSetupInfo
+        self.max_epsilon = None         # from analysis_plan.dataset.get_depositor_setup_info()
+        self.max_delta = None           # from analysis_plan.dataset.get_depositor_setup_info()
+        self.dataset_size = None        # from analysis_plan.dataset
 
-        self.dp_statistics = dp_statistics
+        self.dp_statistics = dp_statistics  # User defined
 
         self.validation_info = []      # list of StatValidInfo objects as dicts to return to UI
 
@@ -74,8 +89,6 @@ class ValidateReleaseUtil(BasicErrCheck):
             self.add_err_msg(variable_indices_info.message)
             return
 
-        # max_epsilon - set in run_preliminary_steps
-
         for dp_stat in self.dp_statistics:
             stat_num += 1       # not used yet...
             """
@@ -97,16 +110,11 @@ class ValidateReleaseUtil(BasicErrCheck):
                     "locked": False,
                     "label": "EyeHeight"},
             """
-            # print('ValidateReleaseUtil. dp_stat input:', dp_stat)
-            variable_info = col_idx_info = dataset_size_info = stat_spec = None
+            stat_spec = variable_info = col_idx_info = None
+
             variable = dp_stat.get('variable')
             statistic = dp_stat.get('statistic', 'shrug?')
             epsilon = dp_stat.get('epsilon')
-            # Does the epsilon exceed the max epsilon?
-            if epsilon > self.max_epsilon:
-                self.add_stat_error(variable, statistic,
-                                    f'{epsilon} exceeds max epsilon of {self.max_epsilon}')
-                continue  # to the next dp_stat specification
 
             # (1) Variable is not in the spec
             #
@@ -115,6 +123,13 @@ class ValidateReleaseUtil(BasicErrCheck):
                 self.add_stat_error(variable, statistic, user_msg)
                 continue  # to the next dp_stat specification
 
+            # Does the epsilon exceed the max epsilon?
+            if epsilon > self.max_epsilon:
+                self.add_stat_error(variable, statistic,
+                                    f'{epsilon} exceeds max epsilon of {self.max_epsilon}')
+                continue  # to the next dp_stat specification
+
+
             # (2) Is this a known statistic? If not stop here.
             #
             if not statistic in astatic.DP_STATS_CHOICES:  # also checked in the DPStatisticSerializer
@@ -122,11 +137,11 @@ class ValidateReleaseUtil(BasicErrCheck):
                 self.add_stat_error(variable, statistic, user_msg)
                 continue  # to the next dp_stat specification
 
-            # (2) Begin building the property dict
+            # (3) Begin building the property dict
             #
             props = dp_stat         # start with what is in dp_stat--the UI input
+            props['dataset_size'] = self.dataset_size   # add dataset size, retrieved earlier
             props['impute_constant'] = dp_stat.get('fixed_value', None)   # one bit of renaming
-
 
             # (3) Add variable_info which has min/max/categories, variable type, etc.
             #
@@ -152,16 +167,6 @@ class ValidateReleaseUtil(BasicErrCheck):
                 self.add_stat_error(variable, statistic, col_idx_info.message)
                 continue  # to the next dp_stat specification
 
-
-            # (5) Add the Dataset size
-            #   - Logic here to see if dataset size should be added
-            #
-            dataset_size_info = self.analysis_plan.dataset.get_dataset_size()
-            if not dataset_size_info.success:
-                self.add_stat_error(variable, statistic, dataset_size_info.message)
-                continue  # to the next dp_stat specification
-            else:
-                props['dataset_size'] = dataset_size_info.data
 
             # Okay, "props" are built! Let's see if they work!
             #
@@ -227,9 +232,19 @@ class ValidateReleaseUtil(BasicErrCheck):
             self.add_err_msg(ap_info.message)
             return False
 
+        dataset_size_info = self.analysis_plan.dataset.get_dataset_size()
+        if dataset_size_info.success:
+            self.dataset_size = dataset_size_info.data
+        else:
+            self.add_err_msg('Dataset size is not available')
+            return False
+
+
+
         # Make sure the total epsilon is valid
         #
         self.max_epsilon = self.analysis_plan.dataset.get_depositor_setup_info().epsilon
+        self.max_delta = self.analysis_plan.dataset.get_depositor_setup_info().delta
 
         try:
             validate_epsilon_not_null(self.max_epsilon)
@@ -237,6 +252,14 @@ class ValidateReleaseUtil(BasicErrCheck):
             user_msg = f'{astatic.ERR_MSG_BAD_TOTAL_EPSILON}: {self.max_epsilon}'
             self.add_err_msg(user_msg)
             return False
+
+        try:
+            validate_not_negative(self.max_delta)
+        except ValidationError as err_obj:
+            user_msg = f'{astatic.ERR_MSG_BAD_TOTAL_DELTA}: {self.max_delta}'
+            self.add_err_msg(user_msg)
+            return False
+
 
         return True
 
