@@ -112,7 +112,8 @@ class ValidateReleaseUtil(BasicErrCheck):
         #   - Fail on 1st error found
         for stat_spec in self.stat_spec_list:
             if stat_spec.has_error():
-                user_msg = (f'Validation error found for {stat_spec.statistic}:'
+                user_msg = (f'Validation error found for variable "{stat_spec.variable}"'
+                            f' and statistic "{stat_spec.statistic}":'
                             f' {stat_spec.get_single_err_msg()}')
                 self.add_err_msg(user_msg)
                 return

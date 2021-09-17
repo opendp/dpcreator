@@ -101,7 +101,7 @@ class TestRunRelease(TestCase):
         #
         if add_profile is True:
             profile_handler = profiler_tasks.run_profile_by_filefield(dataset_info.object_id)
-            print('profile_handler.has_error()', profile_handler.has_error())
+            # print('profile_handler.has_error()', profile_handler.has_error())
 
             # Shouldn't have errors
             if profile_handler.has_error():
@@ -148,14 +148,15 @@ class TestRunRelease(TestCase):
         self.assertTrue(float(release_list[1]['result']['value']))
 
 
-    def test_20_api_compute_stats(self):
-        """(20) Via API, run compute stats"""
-        msgt(self.test_20_api_compute_stats.__doc__)
+    def test_30_api_bad_stat(self):
+        """(30) Via API, run compute stats with error"""
+        msgt(self.test_30_api_bad_stat.__doc__)
 
         analysis_plan = self.analysis_plan
 
         # Send the dp_statistics for validation
         #
+        self.general_stat_specs[0]['epsilon'] = 1.2
         analysis_plan.dp_statistics = self.general_stat_specs
         analysis_plan.save()
 
@@ -165,19 +166,37 @@ class TestRunRelease(TestCase):
                                     content_type='application/json')
 
         jresp = response.json()
-        self.assertEqual(response.status_code, 201)
         print('jresp', jresp)
-        self.assertTrue(jresp['success'])
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(jresp['success'])
+        self.assertTrue(jresp['message'].find(VALIDATE_MSG_EPSILON) > -1)
 
-        release_list = jresp['data']['statistics']
 
-        self.assertEqual(release_list[0]['variable'], 'EyeHeight')
-        self.assertTrue('result' in release_list[0])
-        self.assertTrue('value' in release_list[0]['result'])
-        self.assertTrue(float(release_list[0]['result']['value']))
 
-        self.assertEqual(release_list[1]['variable'], 'TypingSpeed')
-        self.assertTrue('result' in release_list[1])
-        self.assertTrue('value' in release_list[1]['result'])
-        self.assertTrue(float(release_list[1]['result']['value']))
+    def test_40_api_bad_overall_epsilon(self):
+        """(30) Via API, run compute stats, bad overall epsilon"""
+        msgt(self.test_40_api_bad_overall_epsilon.__doc__)
+
+        analysis_plan = self.analysis_plan
+
+        # Send the dp_statistics for validation
+        #
+        analysis_plan.dp_statistics = self.general_stat_specs
+        analysis_plan.save()
+
+        # Put some bad data in!
+        setup_info = analysis_plan.dataset.get_depositor_setup_info()
+        setup_info.epsilon = None   # Shouldn't happen but what if it does!
+        setup_info.save()
+
+        params = dict(object_id=str(analysis_plan.object_id))
+        response = self.client.post('/api/release/',
+                                    json.dumps(params),
+                                    content_type='application/json')
+
+        jresp = response.json()
+        print('jresp', jresp)
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(jresp['success'])
+        self.assertTrue(jresp['message'].find(astatic.ERR_MSG_BAD_TOTAL_EPSILON) > -1)
 

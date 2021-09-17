@@ -110,6 +110,8 @@ def validate_float(value):
         float(value)
     except ValueError:
         raise ValidationError(VALIDATE_MSG_NOT_FLOAT)
+    except TypeError:
+        raise ValidationError(VALIDATE_MSG_NOT_FLOAT)
 
 """
 from opendp_apps.utils.extra_validators import *
