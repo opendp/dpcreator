@@ -28,6 +28,7 @@ from opendp_apps.utils.extra_validators import \
      validate_not_negative)
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
+from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
 
 # Temp workaround!!! See Issue #300
 # https://github.com/opendp/dpcreator/issues/300
@@ -80,10 +81,21 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         # Call run_chain
         #
+        filepath = self.analysis_plan.dataset.source_file.path
+        sep_char = get_data_file_separator(filepath)
+        print('sep_char', sep_char)
+
         for stat_spec in self.stat_spec_list:
-            file_info = self.analysis_plan.dataset.source_file
-            file_obj = open(file_info, 'r')
-            stat_spec.run_chain(col_indexes, file_obj, sep_char="\t")
+            if stat_spec.has_error():
+                print('error! stop process!')
+                print(stat_spec.get_error_messages())
+                del (self.release_stats)
+                break
+
+            file_handle = open(filepath, 'r')
+            stat_spec.run_chain(col_indexes, file_handle, sep_char=sep_char)
+            file_handle.close()
+
             if stat_spec.has_error():
                 print('error! stop process!')
                 print(stat_spec.get_error_messages())
@@ -92,7 +104,16 @@ class ValidateReleaseUtil(BasicErrCheck):
 
             self.release_stats.append(stat_spec.get_release_dict())
 
-        print('self.release_stats', self.release_stats)
+        import json
+        print('self.release_stats', json.dumps(self.release_stats, indent=4))
+
+    def get_release_stats(self):
+        """Return the release stats"""
+        assert self.has_error() is False, \
+            "Check that .has_error() is False before calling this method"
+
+        return self.release_stats
+
 
     def run_validation_process(self):
         """Run the validation"""

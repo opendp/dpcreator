@@ -448,8 +448,10 @@ class StatSpec:
             final_info['accuracy'] = {}
             if self.accuracy_val:
                 final_info['accuracy']['value'] = self.accuracy_val
-            if self.accuracy_msg:
-                final_info['accuracy']['message'] = self.accuracy_msg
+            if self.accuracy_message:
+                final_info['accuracy']['message'] = self.accuracy_message
+
+        return final_info
 
 
     def has_error(self):
