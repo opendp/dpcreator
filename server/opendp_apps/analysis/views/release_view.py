@@ -1,10 +1,12 @@
 from rest_framework import permissions, viewsets, status
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from opendp_apps.utils.view_helper import get_json_error, get_json_success
 
-from opendp_apps.analysis.models import AnalysisPlan
+from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
-from opendp_apps.analysis.serializers import AnalysisPlanObjectIdSerializer, AnalysisPlanSerializer
+from opendp_apps.analysis.serializers import AnalysisPlanObjectIdSerializer, AnalysisPlanSerializer, \
+    ReleaseValidationSerializer, ReleaseInfoSerializer
 
 
 class ReleaseView(viewsets.ViewSet):
@@ -19,6 +21,10 @@ class ReleaseView(viewsets.ViewSet):
         """
         return AnalysisPlan.objects.filter(analyst=self.request.user)
 
+    def retrieve(self, request, pk=None):
+        release_info = get_object_or_404(ReleaseInfo, object_id=pk)
+        serializer = ReleaseValidationSerializer(release_info)
+        return Response(data=serializer)
 
     def create(self, request, *args, **kwargs):
         """
@@ -77,6 +83,6 @@ class ReleaseView(viewsets.ViewSet):
 
         # It worked! Return the release!
         release_info_obj = validate_util.get_new_release_info_object()
-        return Response(get_json_success('Release created!',
-                                         data=release_info_obj.dp_release),
+        serializer = ReleaseInfoSerializer(release_info_obj)
+        return Response(data=serializer.data,
                         status=status.HTTP_201_CREATED)

@@ -200,3 +200,55 @@ class TestRunRelease(TestCase):
         self.assertFalse(jresp['success'])
         self.assertTrue(jresp['message'].find(astatic.ERR_MSG_BAD_TOTAL_EPSILON) > -1)
 
+
+    def test_50_success(self):
+        """(50) Via API, run compute stats with error"""
+        msgt(self.test_50_success.__doc__)
+
+        analysis_plan = self.analysis_plan
+
+        # Send the dp_statistics for validation
+        #
+        analysis_plan.dp_statistics = self.general_stat_specs
+        analysis_plan.save()
+
+        params = dict(object_id=str(analysis_plan.object_id))
+        response = self.client.post('/api/release/',
+                                    json.dumps(params),
+                                    content_type='application/json')
+
+        jresp = response.json()
+        print('jresp', jresp)
+        self.assertEqual(response.status_code, 201)
+        self.assertIsNotNone(jresp['dp_release'])
+        self.assertIsNotNone(jresp['object_id'])
+
+
+    def test_60_analysis_plan_has_release_info(self):
+        """(60) Via API, ensure that release_info is added as a field to AnalysisPlan"""
+        msgt(self.test_60_analysis_plan_has_release_info.__doc__)
+
+        analysis_plan = self.analysis_plan
+
+        # Send the dp_statistics for validation
+        #
+        analysis_plan.dp_statistics = self.general_stat_specs
+        analysis_plan.save()
+
+        params = dict(object_id=str(analysis_plan.object_id))
+        response = self.client.post('/api/release/',
+                                    json.dumps(params),
+                                    content_type='application/json')
+
+        jresp = response.json()
+        self.assertEqual(response.status_code, 201)
+        self.assertIsNotNone(jresp['dp_release'])
+        self.assertIsNotNone(jresp['object_id'])
+
+        response = self.client.get(f'/api/analyze/{analysis_plan.object_id}/')
+        analysis_plan_jresp = response.json()
+        # from pprint import pprint
+        # pprint(analysis_plan_jresp)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(analysis_plan_jresp['release_info'])
+
