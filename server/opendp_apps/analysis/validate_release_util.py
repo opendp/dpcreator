@@ -56,19 +56,12 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         self.opendp_version = pkg_resources.get_distribution('opendp').version
 
-        self.run_validation_process()
-
-        if release_run:
-            pass
-            # do some more stuff
-            # self.run_release()
-
+        # self.run_validation_process()
 
 
     def add_stat_spec(self, stat_spec: StatSpec):
         """Add a StatSpec subclass to a list"""
         self.stat_spec_list.append(stat_spec)
-
 
     def run_release_process(self):
         """Run the release process"""

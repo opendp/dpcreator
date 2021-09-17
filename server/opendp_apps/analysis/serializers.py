@@ -147,16 +147,6 @@ class ReleaseValidationSerializer(serializers.ModelSerializer):
         model = ReleaseInfo
         fields = ('dp_statistics', 'analysis_plan_id', )
 
-    # Temp workaround!!! See Issue #300
-    # https://github.com/opendp/dpcreator/issues/300
-    def _camel_to_snake(self, name):
-        """
-        Front end is passing camelCase, but JSON in DB is using snake_case
-        :param name:
-        :return:
-        """
-        return re.sub(r'(?<!^)(?=[A-Z])', '_', name).lower()
-
     def save(self, **kwargs):
         """
         Validate each release request and return any errors that arise.
@@ -206,6 +196,8 @@ class ReleaseValidationSerializer(serializers.ModelSerializer):
 
 
         validate_util = ValidateReleaseUtil(opendp_user, analysis_plan_id, dp_statistics)
+        validate_util.run_validation_process()
+
         if validate_util.has_error():
             # This is a big error, check for it before evaluating individual statistics
             #
