@@ -87,9 +87,9 @@ class StatSpec:
         self.error_found = False
         self.error_messages = []
 
-        self.run_initial_handling()     # customize, if types need converting, etc.
-        self.run_basic_validation()     # always the same
-        self.run_custom_validation()    # customize, if types need converting, etc.
+        self.run_01_initial_handling()     # customize, if types need converting, etc.
+        self.run_02_basic_validation()     # always the same
+        self.run_03_custom_validation()    # customize, if types need converting, etc.
 
 
     @abc.abstractmethod
@@ -102,7 +102,7 @@ class StatSpec:
         raise NotImplementedError('additional_required_props')
 
     @abc.abstractmethod
-    def run_initial_handling(self):
+    def run_01_initial_handling(self):
         """
         This is a place for initial checking/transformations
         such as making sure values are floats
@@ -117,12 +117,12 @@ class StatSpec:
             return
 
         """
-        raise NotImplementedError('run_initial_handling')
+        raise NotImplementedError('run_01_initial_handling')
 
     @abc.abstractmethod
-    def run_custom_validation(self):
+    def run_03_custom_validation(self):
         """
-        This is a place for initial checking/transformations
+        This is a place for custom checking/transformations
         such as making sure values are floats
 
         See "dp_mean_spec.py for an example of instantiation
@@ -138,7 +138,7 @@ class StatSpec:
         pass
         ```
         """
-        raise NotImplementedError('run_custom_validation')
+        raise NotImplementedError('run_03_custom_validation')
 
 
     @abc.abstractmethod
@@ -276,9 +276,9 @@ class StatSpec:
             if not self.convert_to_float(prop_name):
                 return
 
-    def run_basic_validation(self):
+    def run_02_basic_validation(self):
         """Evaluate the properties, make sure they are populated"""
-        if self.has_error():   # something may be wrong in "run_initial_handling()"
+        if self.has_error():   # something may be wrong in "run_01_initial_handling()"
             return
 
         # Always validate these properties, mostly using the self.prop_validators

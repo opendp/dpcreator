@@ -46,7 +46,7 @@ class DPMeanSpec(StatSpec):
         """
         return ['min', 'max', 'ci',]    # 'impute_constant']
 
-    def run_initial_handling(self):
+    def run_01_initial_handling(self):
         """
         Make sure values are consistently floats
         """
@@ -61,7 +61,7 @@ class DPMeanSpec(StatSpec):
                 return
         self.floatify_int_values()
 
-    def run_custom_validation(self):
+    def run_03_custom_validation(self):
         """
         This is a place for initial checking/transformations
         such as making sure values are floats

@@ -42,7 +42,7 @@ class DPSpecError(StatSpec):
         self.add_err_msg(props['error_message'])    # Sets `self.error_found = True`
 
 
-    def run_basic_validation(self):
+    def run_02_basic_validation(self):
         """Unusual override!!!"""
         pass
 
@@ -54,10 +54,10 @@ class DPSpecError(StatSpec):
     def additional_required_props(self):
         return []
 
-    def run_initial_handling(self):
+    def run_01_initial_handling(self):
         pass
 
-    def run_custom_validation(self):
+    def run_03_custom_validation(self):
         pass
 
     def check_scale(self, scale, preprocessor, dataset_distance):

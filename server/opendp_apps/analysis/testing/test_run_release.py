@@ -71,7 +71,7 @@ class TestRunRelease(TestCase):
                             "variable": "TypingSpeed",
                             "epsilon": .5,
                             "delta": 0,
-                            "ci": astatic.CI_95,
+                            "ci": astatic.CI_99,
                             "error": "",
                             "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
                             "handle_as_fixed": False,
