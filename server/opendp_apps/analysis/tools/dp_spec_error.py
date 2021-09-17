@@ -1,6 +1,21 @@
 """
 This has the required interface as StatSpec but is only used to hold
-a spec-level error -- nothing else works!
+a spec-level error when there isn't enough info for a minimal spec
+
+It simply holds an error message. If you also send data, it skips any validation.
+
+Minimal example: `spec = DPSpecError(error_message="Something wrong")`
+
+With other props:
+    props = {
+             "error_message": "Couldn't find variable_info",  # required!
+             "variable": "education_level",
+             "statistic": DP_MEAN,
+             "epsilon": 0.25,
+             #.... (as much as more info as desired) ...
+             }
+    spec = DPSpecError(props)     # skips all validation and sets `self.error_found = True`
+
 """
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis import static_vals as astatic
@@ -24,8 +39,7 @@ class DPSpecError(StatSpec):
 
         assert 'error_message' in props, self.ERR_MSG_REQUIRED_PROPS
 
-
-        self.add_err_msg(props['error_message'])
+        self.add_err_msg(props['error_message'])    # Sets `self.error_found = True`
 
 
     def run_basic_validation(self):

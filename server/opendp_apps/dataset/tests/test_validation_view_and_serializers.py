@@ -18,6 +18,7 @@ from opendp_apps.analysis.serializers import ReleaseValidationSerializer
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
+from opendp_apps.utils.extra_validators import VALIDATE_MSG_EPSILON
 
 
 
@@ -375,9 +376,9 @@ class TestValidationViewAndSerializers(TestCase):
         #
         stats_valid = serializer.save(**dict(opendp_user=self.user_obj))
         self.assertTrue(stats_valid.success)
-
+        print('40!! stats_valid', stats_valid.data)
         self.assertEqual(stats_valid.data[0]['valid'], False)
-        self.assertTrue(stats_valid.data[0]['message'].find('exceeds max epsilon') > -1)
+        self.assertTrue(stats_valid.data[0]['message'].find(VALIDATE_MSG_EPSILON) > -1)
 
     def test_45_api_fail_single_stat_bad_epsilon(self):
         """(45) Fail: API, Single stat exceeds total epsilon"""
@@ -419,7 +420,7 @@ class TestValidationViewAndSerializers(TestCase):
         print('jresp', jresp)
 
         self.assertEqual(jresp['data'][0]['valid'], False)
-        self.assertTrue(jresp['data'][0]['message'].find('exceeds max epsilon') > -1)
+        self.assertTrue(jresp['data'][0]['message'].find(VALIDATE_MSG_EPSILON) > -1)
 
 
     def test_50_bad_total_epsilon(self):
@@ -614,8 +615,6 @@ class TestValidationViewAndSerializers(TestCase):
         msgt(self.test_80_fail_impute_too_low.__doc__)
 
         analysis_plan = self.analysis_plan
-
-        print('analysis_plan.variable_info', analysis_plan.variable_info)
 
         # invalid min/max
         analysis_plan.variable_info['EyeHeight']['min'] = -8

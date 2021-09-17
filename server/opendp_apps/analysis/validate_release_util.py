@@ -21,6 +21,7 @@ from opendp_apps.analysis.stat_valid_info import StatValidInfo
 #from opendp_apps.analysis.tools.dp_mean import dp_mean
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
+from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
 from opendp_apps.utils.extra_validators import \
     (validate_epsilon_not_null,
      validate_not_negative)
@@ -48,7 +49,8 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         self.dp_statistics = dp_statistics  # User defined
 
-        self.validation_info = []      # list of StatValidInfo objects as dicts to return to UI
+        self.stat_spec_list = []      # list of StatSpec objects
+        self.validation_info = []     # list of StatValidInfo objects to send to UI
 
         self.run_validation_process()
 
@@ -66,28 +68,87 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.run_validation_process()
 
 
+    def add_stat_spec(self, stat_spec: StatSpec):
+        """Add a StatSpec subclass to a list"""
+        self.stat_spec_list.append(stat_spec)
+
     def run_validation_process(self):
         """Run the validation"""
         if not self.run_preliminary_steps():
             return
 
+        # Make sure the variable indices are available!
+        # Not needed in this step but required for computation
+        #
+        if self.get_variable_indices() is None:
+            # error already set
+            return
+
+        self.build_stat_specs()
+        if not self.stat_spec_list:
+            self.add_err_msg('No statistics were built!')
+            return
+
+        # Iterate through the stat specs and validate them!
+        #
+        running_epsilon = 0.0
+        for stat_spec in self.stat_spec_list:
+            # Check each stat_spec
+            if not stat_spec.is_chain_valid():
+                # Nope: invalid!
+                self.validation_info.append(stat_spec.get_error_msg_dict())
+            else:
+                # Looks good but check single stat epsilon and cumulative epsilon
+                #
+                running_epsilon += stat_spec.epsilon
+                if stat_spec.epsilon > self.max_epsilon:
+                    # Error one stat uses more than all the epsilon!
+                    #
+                    user_msg = (f'The epsilon ({stat_spec.epsilon}) exceeds'
+                                f' max epsilon ({self.max_epsilon})')
+                    stat_spec.add_err_msg(user_msg)
+                    self.validation_info.append(stat_spec.get_error_msg_dict())
+
+                elif  running_epsilon > self.max_epsilon:
+                    # Error: Too much epsilon used!
+                    #
+                    user_msg = (f'The running epsilon ({running_epsilon}) exceeds'
+                                f' the max epsilon ({self.max_epsilon})')
+                    stat_spec.add_err_msg(user_msg)
+                    self.validation_info.append(stat_spec.get_error_msg_dict())
+                else:
+                    # Looks good!
+                    self.validation_info.append(stat_spec.get_success_msg_dict())
+
+
+    def get_variable_indices(self):
+        """
+        Retrieve variable indices from the dataset profile
+        Needed for actual data calculation!
+
+        Returns variable_indices or None!
+        """
+        variable_indices_info = self.analysis_plan.dataset.get_variable_order(as_indices=True)
+        if variable_indices_info.success:
+            return variable_indices_info.data
+
+        self.add_err_msg(variable_indices_info.message)
+        return None
+
+
+    def build_stat_specs(self):
+        """
+        Build a list of StatSpec subclasses that can be used for
+        chain validation or running computations
+        """
         # Iterate through the stats!
         #
-        self.validation_info = []
+        self.stat_spec_list = []
         stat_num = 0
 
         # track total epsilon
         #
         running_epsilon = 0
-
-        # variable indices for actual data calculation
-        #
-        variable_indices_info = self.analysis_plan.dataset.get_variable_order(as_indices=True)
-        if variable_indices_info.success:
-            variable_indices = variable_indices_info.data
-        else:
-            self.add_err_msg(variable_indices_info.message)
-            return
 
         for dp_stat in self.dp_statistics:
             stat_num += 1       # not used yet...
@@ -110,38 +171,35 @@ class ValidateReleaseUtil(BasicErrCheck):
                     "locked": False,
                     "label": "EyeHeight"},
             """
-            stat_spec = variable_info = col_idx_info = None
+            # -------------------------------------
+            # (1) Begin building the property dict
+            # -------------------------------------
+            props = dp_stat         # start with what is in dp_stat--the UI input
+            props['dataset_size'] = self.dataset_size   # add dataset size
+            props['impute_constant'] = dp_stat.get('fixed_value') # one bit of renaming!
 
-            variable = dp_stat.get('variable')
-            statistic = dp_stat.get('statistic', 'shrug?')
-            epsilon = dp_stat.get('epsilon')
-
-            # (1) Variable is not in the spec
+            #  Some high-level error checks, before making the StatSpec
             #
-            if not variable:
-                user_msg = f'"variable" is missing from this DP Stat specification'
-                self.add_stat_error(variable, statistic, user_msg)
-                continue  # to the next dp_stat specification
+            variable = props.get('variable')
+            statistic = props.get('statistic', 'shrug?')
+            epsilon = props.get('epsilon')
 
-            # Does the epsilon exceed the max epsilon?
-            if epsilon > self.max_epsilon:
-                self.add_stat_error(variable, statistic,
-                                    f'{epsilon} exceeds max epsilon of {self.max_epsilon}')
+            # (1) Is variable defined?
+            #
+            if not props.get('variable'):
+                props['error_message'] = (f'"variable" is missing from this'
+                                          f'DP Stat specification.')
+                self.add_stat_spec(DPSpecError(props))
                 continue  # to the next dp_stat specification
-
 
             # (2) Is this a known statistic? If not stop here.
             #
-            if not statistic in astatic.DP_STATS_CHOICES:  # also checked in the DPStatisticSerializer
-                user_msg = f'Statistic "{statistic}" is not supported'
-                self.add_stat_error(variable, statistic, user_msg)
+            if not statistic in astatic.DP_STATS_CHOICES:
+                # also checked in the DPStatisticSerializer
+                props['error_message'] = f'Statistic "{statistic}" is not supported'
+                self.add_stat_spec(DPSpecError(props))
                 continue  # to the next dp_stat specification
 
-            # (3) Begin building the property dict
-            #
-            props = dp_stat         # start with what is in dp_stat--the UI input
-            props['dataset_size'] = self.dataset_size   # add dataset size, retrieved earlier
-            props['impute_constant'] = dp_stat.get('fixed_value', None)   # one bit of renaming
 
             # (3) Add variable_info which has min/max/categories, variable type, etc.
             #
@@ -154,9 +212,9 @@ class ValidateReleaseUtil(BasicErrCheck):
             if variable_info:
                 props['variable_info'] = variable_info
             else:
-                self.add_stat_error(variable, statistic, 'Variable info not found.')
-                continue # to the next dp_stat specification
-
+                props['error_message'] = 'Variable info not found.'
+                self.add_stat_spec(DPSpecError(props))
+                continue  # to the next dp_stat specification
 
             # (4) Retrieve the column index
             #
@@ -164,53 +222,28 @@ class ValidateReleaseUtil(BasicErrCheck):
             if col_idx_info.success:
                 props['col_index'] = col_idx_info.data
             else:
-                self.add_stat_error(variable, statistic, col_idx_info.message)
+                props['error_message'] = col_idx_info.message
+                self.add_stat_spec(DPSpecError(props))
                 continue  # to the next dp_stat specification
-
 
             # Okay, "props" are built! Let's see if they work!
             #
             if statistic == astatic.DP_MEAN:
-                stat_spec = DPMeanSpec(props)
-            elif statistic == astatic.DP_HISTOGRAM:
-                user_msg = f'"{statistic}" will be supported soon! (hist)'
-                self.add_stat_error(variable, statistic, user_msg)
+                self.add_stat_spec(DPMeanSpec(props))
+                continue
+            elif statistic == astatic.DP_COUNT:
+                props['error_message'] = (f'Statistic "{statistic}" will be'
+                                          f' supported soon!')
+                self.add_stat_spec(DPSpecError(props))
                 continue
             elif statistic in astatic.DP_STATS_CHOICES:
-                user_msg = f'Statistic "{statistic}" will be supported soon!'
-                self.add_stat_error(variable, statistic, user_msg)
+                props['error_message'] = (f'Statistic "{statistic}" will be supported'
+                                          f' soon!')
+                self.add_stat_spec(DPSpecError(props))
                 continue
             else:
                 # Shouldn't reach here, unknown stats are captured up above
                 pass
-
-            assert stat_spec is not None, 'stat_spec should never be None here!'
-
-            if stat_spec.is_chain_valid():
-                running_epsilon += stat_spec.epsilon
-                if running_epsilon > self.max_epsilon:
-                    user_msg = (f'The running epsilon ({running_epsilon}) exceeds'
-                                f' the max epsilon ({self.max_epsilon})')
-                    self.add_stat_error(variable, statistic, user_msg)
-                else:
-                    self.validation_info.append(stat_spec.get_success_msg_dict())
-            else:
-                # Validity failed! get error message!
-                #
-                self.validation_info.append(stat_spec.get_error_msg_dict())
-                #stat_spec.print_debug()
-                #print(stat_spec.props)
-
-        # End of loop!
-
-
-
-    def add_stat_error(self, var_name, statistic, user_msg):
-        """
-        Shortcut to add an error entry to self.validation_info
-        """
-        info = StatValidInfo.get_error_msg_dict(var_name, statistic, user_msg)
-        self.validation_info.append(info)
 
 
     def run_preliminary_steps(self):
@@ -239,16 +272,13 @@ class ValidateReleaseUtil(BasicErrCheck):
             self.add_err_msg('Dataset size is not available')
             return False
 
-
-
         # Make sure the total epsilon is valid
         #
         self.max_epsilon = self.analysis_plan.dataset.get_depositor_setup_info().epsilon
         self.max_delta = self.analysis_plan.dataset.get_depositor_setup_info().delta
 
-        try:
-            validate_epsilon_not_null(self.max_epsilon)
-        except ValidationError as err_obj:
+        epsilon_ok, _err_msg_or_None = self.is_epsilon_valid(self.max_epsilon)
+        if not epsilon_ok:
             user_msg = f'{astatic.ERR_MSG_BAD_TOTAL_EPSILON}: {self.max_epsilon}'
             self.add_err_msg(user_msg)
             return False
@@ -263,3 +293,11 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         return True
 
+    def is_epsilon_valid(self, val):
+        """Validate a val as epsilon"""
+        try:
+            validate_epsilon_not_null(val)
+        except ValidationError as err_obj:
+            return False, str(err_obj)
+
+        return True, None
