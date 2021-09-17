@@ -11,6 +11,7 @@
         - Retrieve the variable type/min/max/categories from AnalysisPlan.variable_info
         - Retrieve
 """
+import pkg_resources
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -51,6 +52,9 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         self.stat_spec_list = []      # list of StatSpec objects
         self.validation_info = []     # list of StatValidInfo objects to send to UI
+        self.release_stats = []
+
+        self.opendp_version = pkg_resources.get_distribution('opendp').version
 
         self.run_validation_process()
 
@@ -60,17 +64,42 @@ class ValidateReleaseUtil(BasicErrCheck):
             # self.run_release()
 
 
-    def run_release(self):
-        """Run the release process"""
-        if self.has_error():
-            return
-
-        self.run_validation_process()
-
 
     def add_stat_spec(self, stat_spec: StatSpec):
         """Add a StatSpec subclass to a list"""
         self.stat_spec_list.append(stat_spec)
+
+
+    def run_release_process(self):
+        """Run the release process"""
+        if self.has_error():
+            return
+
+        # Run it again!!!
+        self.run_validation_process()
+        if self.has_error():
+            return
+
+        self.release_stats = []
+        col_indexes = self.get_variable_indices()
+        if col_indexes is None: # error already set
+            return
+
+        # Call run_chain
+        #
+        for stat_spec in self.stat_spec_list:
+            file_info = self.analysis_plan.dataset.source_file
+            file_obj = open(file_info, 'r')
+            stat_spec.run_chain(col_indexes, file_obj, sep_char="\t")
+            if stat_spec.has_error():
+                print('error! stop process!')
+                print(stat_spec.get_error_messages())
+                del(self.release_stats)
+                return
+
+            self.release_stats.append(stat_spec.get_release_dict())
+
+        print('self.release_stats', self.release_stats)
 
     def run_validation_process(self):
         """Run the validation"""

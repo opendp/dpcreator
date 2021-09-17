@@ -407,6 +407,51 @@ class StatSpec:
         #for key, val in self.__dict__.items():
         #    print(f'{key}: {val}')
 
+
+    def get_release_dict(self):
+        """Final release info"""
+        assert not self.has_error(), \
+            'Do not call this method before checking that ".has_error()" is False'
+        assert self.value, \
+            'Only use this after "run_chain()" was completed successfully"'
+
+        final_info = {
+             "statistic": self.statistic,
+             "variable": self.variable,
+             "result":{
+                "value": self.value
+             },
+             "epsilon": self.epsilon,
+             "delta": self.delta,
+        }
+
+        # Min/Max
+        #
+        if 'min' in self.additional_required_props():
+            final_info['bounds'] = {'min': self.min, 'max': self.max}
+
+        # Categories
+        #
+        if 'categories' in self.additional_required_props():
+            final_info['categories'] = self.categories
+
+        # Missing values
+        #
+        final_info['missing_value_handling'] = {"type": self.missing_values_handling}
+        if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
+            final_info['missing_value_handling']['impute_constant'] = self.impute_constant
+
+        # Add accuracy
+        #
+        if self.accuracy_val or self.accuracy_msg:
+            final_info['confidence_interval'] = self.ci
+            final_info['accuracy'] = {}
+            if self.accuracy_val:
+                final_info['accuracy']['value'] = self.accuracy_val
+            if self.accuracy_msg:
+                final_info['accuracy']['message'] = self.accuracy_msg
+
+
     def has_error(self):
         """Did an error occur?"""
         return self.error_found
