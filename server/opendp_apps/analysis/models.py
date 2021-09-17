@@ -197,6 +197,8 @@ class ReleaseInfo(TimestampedModelWithUUID):
                                      validators=[validate_not_negative])
     dp_release = models.JSONField()
 
+
+
     #pdf_release
 
     class Meta:

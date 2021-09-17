@@ -124,6 +124,3 @@ class ValidationView(viewsets.ViewSet):
         return Response(get_json_success('validation results returned',
                                          data=save_result.data),
                         status=status.HTTP_200_OK)
-
-        #print('stats_valid', stats_valid)
-        #return Response({'valid': stats_valid}, status=status.HTTP_201_CREATED)

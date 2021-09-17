@@ -114,9 +114,9 @@ class TestRunRelease(TestCase):
 
 
 
-    def test_10_validate_stats(self):
-        """(10) Test a working stat"""
-        msgt(self.test_10_validate_stats.__doc__)
+    def test_10_compute_stats(self):
+        """(10) Run compute stats"""
+        msgt(self.test_10_compute_stats.__doc__)
 
         analysis_plan = self.analysis_plan
 
@@ -133,7 +133,9 @@ class TestRunRelease(TestCase):
 
         self.assertFalse(release_util.has_error())
 
-        release_list = release_util.get_release_stats()
+        release_info_object = release_util.get_new_release_info_object()
+        dp_release = release_info_object.dp_release
+        release_list = dp_release['statistics']
 
         self.assertEqual(release_list[0]['variable'], 'EyeHeight')
         self.assertTrue('result' in release_list[0])
@@ -146,50 +148,36 @@ class TestRunRelease(TestCase):
         self.assertTrue(float(release_list[1]['result']['value']))
 
 
-    @skip
-    def test_15_api_validate_stats(self):
-        """(15) Test a working stat via API"""
-        msgt(self.test_15_api_validate_stats.__doc__)
+    def test_20_api_compute_stats(self):
+        """(20) Via API, run compute stats"""
+        msgt(self.test_20_api_compute_stats.__doc__)
 
         analysis_plan = self.analysis_plan
 
         # Send the dp_statistics for validation
         #
-        stat_spec = self.general_stat_spec
+        analysis_plan.dp_statistics = self.general_stat_specs
+        analysis_plan.save()
 
-        request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
-                            dp_statistics=[stat_spec])
-
-        response = self.client.post('/api/validation/',
-                                    json.dumps(request_plan),
+        params = dict(object_id=str(analysis_plan.object_id))
+        response = self.client.post('/api/release/',
+                                    json.dumps(params),
                                     content_type='application/json')
 
         jresp = response.json()
-        self.assertEqual(response.status_code, 200)
-
+        self.assertEqual(response.status_code, 201)
+        print('jresp', jresp)
         self.assertTrue(jresp['success'])
 
+        release_list = jresp['data']['statistics']
 
-    @skip
-    def test_70_show_add_file(self):
-        """(70) Sample of attaching file to a DataSetInfo object"""
-        msgt(self.test_70_show_add_file.__doc__)
+        self.assertEqual(release_list[0]['variable'], 'EyeHeight')
+        self.assertTrue('result' in release_list[0])
+        self.assertTrue('value' in release_list[0]['result'])
+        self.assertTrue(float(release_list[0]['result']['value']))
 
-        analysis_plan = self.analysis_plan
-
-        dataset_info_1 = analysis_plan.dataset
-        dataset_info_1.data_profile = None
-        dataset_info_1.profile_variables = None
-        dataset_info_1.save()
-
-        dataset_info_updated = self.add_source_file(analysis_plan.dataset, 'Fatigue_data.tab', True)
-
-        self.assertTrue('variables' in dataset_info_updated.data_profile)
-        self.assertTrue('dataset' in dataset_info_updated.data_profile)
-
-        self.assertTrue('variables' in dataset_info_updated.profile_variables)
-        self.assertTrue('dataset' in dataset_info_updated.profile_variables)
-
-        # print(json.dumps(dataset_info_2.data_profile, indent=4))
-        # print(json.dumps(dataset_info_2.profile_variables, indent=4))
+        self.assertEqual(release_list[1]['variable'], 'TypingSpeed')
+        self.assertTrue('result' in release_list[1])
+        self.assertTrue('value' in release_list[1]['result'])
+        self.assertTrue(float(release_list[1]['result']['value']))
 

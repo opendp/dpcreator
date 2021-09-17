@@ -7,7 +7,6 @@ from django.contrib.auth import get_user_model
 
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis import static_vals as astatic
-#from opendp_apps.analysis.tools.dp_mean import dp_mean
 from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 
@@ -20,7 +19,7 @@ class AnalysisPlanObjectIdSerializer(serializers.Serializer):
         Check that the object_id belongs to an existing AnalysisPlan object
         """
         try:
-            plan = AnalysisPlan.objects.get(object_id=value)
+            _plan = AnalysisPlan.objects.get(object_id=value)
         except AnalysisPlan.DoesNotExist:
             raise serializers.ValidationError(astatic.ERR_MSG_NO_ANALYSIS_PLAN)
 
@@ -205,7 +204,6 @@ class ReleaseValidationSerializer(serializers.ModelSerializer):
         #print('(validate_util.validation_info)', validate_util.validation_info)
         return ok_resp(validate_util.validation_info)
         #return validate_util.validation_info
-
 
 
 """

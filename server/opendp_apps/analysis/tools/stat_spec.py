@@ -397,7 +397,13 @@ class StatSpec:
         """Get invalid info dict"""
         return StatValidInfo.get_error_msg_dict(self.variable,
                                                 self.statistic,
-                                                self.get_err_msgs()[0])
+                                                self.get_single_err_msg())
+
+    def get_single_err_msg(self):
+        """Get the first message in the self.error_messages list"""
+        if self.has_error():
+            return self.get_err_msgs()[0]
+        return None
 
     def print_debug(self):
         """show params"""

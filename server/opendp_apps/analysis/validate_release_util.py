@@ -11,6 +11,7 @@
         - Retrieve the variable type/min/max/categories from AnalysisPlan.variable_info
         - Retrieve
 """
+import json
 import pkg_resources
 
 from django.contrib.auth import get_user_model
@@ -18,8 +19,10 @@ from django.core.exceptions import ValidationError
 
 from opendp.mod import OpenDPException
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
+from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 from opendp_apps.analysis.stat_valid_info import StatValidInfo
 #from opendp_apps.analysis.tools.dp_mean import dp_mean
+from opendp_apps.analysis.models import ReleaseInfo
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
@@ -56,9 +59,11 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         self.dp_statistics = dp_statistics  # User defined
 
-        self.stat_spec_list = []      # list of StatSpec objects
-        self.validation_info = []     # list of StatValidInfo objects to send to UI
-        self.release_stats = []
+        self.stat_spec_list = []        # list of StatSpec objects
+        self.validation_info = []       # list of StatValidInfo objects to send to UI
+
+        self.release_stats = []         # compute mode: potential stat for a ReleaseInfo
+        self.release_info = None        # compute_mode: potential full ReleaseInfo object
 
         self.opendp_version = pkg_resources.get_distribution('opendp').version
 
@@ -94,43 +99,117 @@ class ValidateReleaseUtil(BasicErrCheck):
         if self.has_error():
             return
 
-        # Run it again!!!
+        # -----------------------------------
+        # Validate again!! Just in case!!
+        # -----------------------------------
         self.run_validation_process()
+
+        # Any general validation errors?
         if self.has_error():
             return
 
-        self.release_stats = []
-        col_indexes = self.get_variable_indices()
-        if col_indexes is None: # error already set
+        # Any stat specific validation errors?
+        #   - Fail on 1st error found
+        for stat_spec in self.stat_spec_list:
+            if stat_spec.has_error():
+                user_msg = (f'Validation error found for {stat_spec.statistic}:'
+                            f' {stat_spec.get_single_err_msg()}')
+                self.add_err_msg(user_msg)
+                return
+
+        # -----------------------------------
+        # Get the column indices--necessary for "run_chain(...)"
+        # -----------------------------------
+        col_indices = self.get_variable_indices()
+        if col_indices is None:
             return
 
-        # Call run_chain
-        #
+        # -----------------------------------
+        # Get the file/dataset pointer -- needs adjusting for blob/S3 type objects
+        # -----------------------------------
         filepath = self.analysis_plan.dataset.source_file.path
         sep_char = get_data_file_separator(filepath)
         print('sep_char', sep_char)
 
-        for stat_spec in self.stat_spec_list:
-            if stat_spec.has_error():
-                print('error! stop process!')
-                print(stat_spec.get_error_messages())
-                del (self.release_stats)
-                break
 
+        # -----------------------------------
+        # Iterate through the stats!
+        # -----------------------------------
+        self.release_stats = []
+        epsilon_used = 0.0
+        for stat_spec in self.stat_spec_list:
+
+            # Okay! -> run_chain(...)!
+            #
             file_handle = open(filepath, 'r')
-            stat_spec.run_chain(col_indexes, file_handle, sep_char=sep_char)
+            stat_spec.run_chain(col_indices, file_handle, sep_char=sep_char)
             file_handle.close()
 
-            if stat_spec.has_error():
-                print('error! stop process!')
-                print(stat_spec.get_error_messages())
+            # Any errors?
+            #
+            if not stat_spec.has_error():
+                # Looks good! Save the stat
+                self.release_stats.append(stat_spec.get_release_dict())
+                epsilon_used += stat_spec.epsilon
+            else:
+                user_msg = (f'Validation error found for {stat_spec.statistic}:'
+                            f' {stat_spec.get_single_err_msg()}')
+                self.add_err_msg(user_msg)
+                #
+                # Delete any previous stats
                 del(self.release_stats)
                 return
 
-            self.release_stats.append(stat_spec.get_release_dict())
+        # should never happen!
+        if not self.release_stats:
+            user_msg = ("ValidateReleaseUtil.run_release_process.'"
+                        "No release_stats! shouldn't see this error!")
+            self.add_err_msg(user_msg)
+            return
 
-        import json
-        print('self.release_stats', json.dumps(self.release_stats, indent=4))
+        # It worked! Save the Release!!
+        self.make_release_info(epsilon_used)
+
+
+    def make_release_info(self, epsilon_used: float):
+        """
+        Make a ReleaseInfo object!
+        """
+        assert epsilon_used > 0.0, "make_release_info/ Something's wrong! Epsilon should always be > 0"
+        self.release_info = None
+
+        formatted_release = self.get_final_release_data()
+        if self.has_error():
+            del(self.release_stats)
+            return
+
+        params = dict(dataset=self.analysis_plan.dataset,
+                      analysis_plan=self.analysis_plan,
+                      epsilon_used=epsilon_used,
+                      dp_release=formatted_release)
+
+        self.release_info = ReleaseInfo(**params)
+        self.release_info.save()
+
+        # print('ValidateReleaseUtil - self.release_stats', json.dumps(self.release_stats, indent=4))
+
+    def get_new_release_info_object(self):
+        assert self.has_error() is False, \
+            "Check that .has_error() is False before calling this method"
+
+        return self.release_info
+
+    def get_final_release_data(self):
+        """Build object to save in ReleaseInfo.dp_release"""
+        formatter = ReleaseInfoFormatter(self)
+
+        if formatter.has_error():
+            # shouldn't happen, but over time...
+            self.add_err_msg(formatter.get_err_msg)
+            return
+
+        return formatter.get_release_data()
+
 
     def get_release_stats(self):
         """Return the release stats"""

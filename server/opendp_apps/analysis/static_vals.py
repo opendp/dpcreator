@@ -31,6 +31,8 @@ MISSING_VAL_HANDLING_TYPES = [MISSING_VAL_DROP, MISSING_VAL_INSERT_RANDOM, MISSI
 # --------------------------------------
 # Error Messages
 # --------------------------------------
+ERR_MSG_ANALYSIS_PLAN_NOT_FOUND = 'The AnalysisPlan was not found.'
+
 ERR_MSG_DATASET_ID_REQUIRED = 'The DataSetInfo id is required.'
 ERR_MSG_ANALYSIS_ID_REQUIRED = 'The AnalysisPlan id is required.'
 
