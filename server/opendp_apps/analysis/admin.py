@@ -34,13 +34,12 @@ class ReleaseInfoAdmin(admin.ModelAdmin):
     save_on_top = True
     search_fields = ('dataset__name',)
     list_filter = ('dataset__source', 'dataset',)
-    list_display = ('analysis_plan',
-                    'dataset',
+    list_display = ('dataset',
                     'epsilon_used',
                     'updated',
                     'created',)
     readonly_fields = ('id',
-                       'dataset', 'analysis_plan',
+                       'dataset',
                        'dp_release', 'epsilon_used',
                        'created', 'updated',)
 

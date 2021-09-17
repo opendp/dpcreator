@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from opendp_apps.utils.view_helper import get_json_error, get_json_success
 
 from opendp_apps.analysis.serializers import AnalysisPlanSerializer, \
-    ReleaseValidationSerializer, ComputationChainSerializer
+    ReleaseValidationSerializer
 
 
 class ValidationView(viewsets.ViewSet):

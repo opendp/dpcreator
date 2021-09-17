@@ -185,12 +185,14 @@ class ValidateReleaseUtil(BasicErrCheck):
             return
 
         params = dict(dataset=self.analysis_plan.dataset,
-                      analysis_plan=self.analysis_plan,
                       epsilon_used=epsilon_used,
                       dp_release=formatted_release)
 
         self.release_info = ReleaseInfo(**params)
         self.release_info.save()
+
+        self.analysis_plan.release_info = self.release_info
+        self.analysis_plan.save()
 
         # print('ValidateReleaseUtil - self.release_stats', json.dumps(self.release_stats, indent=4))
 
