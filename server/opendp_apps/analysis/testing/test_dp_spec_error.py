@@ -23,7 +23,7 @@ class DPSpecErrorTest(TestCase):
                   'ci': astatic.CI_95,
                   #'accuracy': None,
                   'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                  'impute_constant': '45_000',
+                  'fixed_value': '45_000',
                   'variable_info': {'min': 14_000,
                                     'max': 2_500_000,
                                     'type': 'Float',},

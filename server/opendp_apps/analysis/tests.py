@@ -21,12 +21,12 @@ class TestDPMean(TestCase):
 
         col_names = ["A", "B", "C", "D", "E"]
         index = "E"
-        impute_constant = 0.
+        fixed_value = 0.
         lower = 0.
         upper = 10000.
         n = 1000
         epsilon = 1.
         preprocessor = make_split_dataframe(separator=",", col_names=col_names)
-        res = preprocessor >> dp_mean(index, lower, upper, n, impute_constant, epsilon=epsilon)
+        res = preprocessor >> dp_mean(index, lower, upper, n, fixed_value, epsilon=epsilon)
         dp_mean_value = res(data)
         self.assertEqual(type(dp_mean_value), float)

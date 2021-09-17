@@ -219,7 +219,6 @@ class ValidateReleaseUtil(BasicErrCheck):
             # -------------------------------------
             props = dp_stat         # start with what is in dp_stat--the UI input
             props['dataset_size'] = self.dataset_size   # add dataset size
-            props['impute_constant'] = dp_stat.get('fixed_value') # one bit of renaming!
 
             #  Some high-level error checks, before making the StatSpec
             #

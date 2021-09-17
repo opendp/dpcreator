@@ -48,7 +48,7 @@ class StatSpec:
                            categories=validate_not_empty_or_none,  # ?
                            #
                            missing_values_handling=validate_missing_val_handlers,
-                           #impute_constant=validate_not_none, # more complex check
+                           #fixed_value=validate_not_none, # more complex check
                            #fixed_value=
                            #
                            accuracy=validate_not_negative)
@@ -68,7 +68,7 @@ class StatSpec:
         self.accuracy_message = None
         #
         self.missing_values_handling = props.get('missing_values_handling')
-        self.impute_constant = props.get('impute_constant')
+        self.fixed_value = props.get('fixed_value')
         #self.missing_fixed_val = props.get('missing_fixed_val')
         #
         # Note: min, max, categories are sent in via variable_info
@@ -320,25 +320,25 @@ class StatSpec:
         # If this is numeric variable, check the impute constant
         #   (If impute constant isn't used, this check will simply exit)
         #if self.var_type in pstatic.NUMERIC_VAR_TYPES:
-        #    self.check_numeric_impute_constant()
+        #    self.check_numeric_fixed_value()
 
-    def check_numeric_impute_constant(self):
+    def check_numeric_fixed_value(self):
         """
         For the case of handing missing values with a constant
-        Check that the fixed value/impute_constant is not outside the min/max range
+        Check that the fixed value/fixed_value is not outside the min/max range
         """
         if self.has_error():
             return
 
         if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
 
-            if self.impute_constant < self.min:
-                user_msg = (f'The "fixed value" ({self.impute_constant})'
+            if self.fixed_value < self.min:
+                user_msg = (f'The "fixed value" ({self.fixed_value})'
                             f' {astatic.ERR_IMPUTE_PHRASE_MIN} ({self.min})')
                 self.add_err_msg(user_msg)
                 return
-            elif self.impute_constant > self.max:
-                user_msg = (f'The "fixed value" ({self.impute_constant})'
+            elif self.fixed_value > self.max:
+                user_msg = (f'The "fixed value" ({self.fixed_value})'
                             f' {astatic.ERR_IMPUTE_PHRASE_MAX} ({self.max})')
                 self.add_err_msg(user_msg)
                 return
@@ -439,7 +439,7 @@ class StatSpec:
         #
         final_info['missing_value_handling'] = {"type": self.missing_values_handling}
         if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
-            final_info['missing_value_handling']['impute_constant'] = self.impute_constant
+            final_info['missing_value_handling']['fixed_value'] = self.fixed_value
 
         # Add accuracy
         #
