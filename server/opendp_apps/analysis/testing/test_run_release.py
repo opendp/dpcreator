@@ -259,3 +259,9 @@ class TestRunRelease(TestCase):
         # pprint(analysis_plan_jresp)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(analysis_plan_jresp['release_info'])
+
+        histogram_results = list(filter(lambda x: x['statistic'] == 'histogram',
+                                        analysis_plan_jresp['release_info']['dp_release']['statistics']))
+        self.assertIsNotNone(histogram_results)
+        self.assertEqual(len(histogram_results), 1)
+        self.assertTrue(type(histogram_results[0]['result']), list)
