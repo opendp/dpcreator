@@ -100,6 +100,7 @@ import statusInformation from "../../data/statusInformation";
 import StatusTag from "../../components/DesignSystem/StatusTag.vue";
 import {mapState} from "vuex";
 import {STEP_0900_STATISTICS_SUBMITTED} from "@/data/stepInformation";
+import release from "@/api/release";
 
 const {IN_EXECUTION} = statusInformation.statuses;
 
@@ -114,12 +115,18 @@ export default {
   watch: {
     areStatisticsSubmitted: function (newareStatisticsSubmitted) {
       if (newareStatisticsSubmitted === true) {
+        this.areStatisticsReceived = true;
+        release.generateRelease(this.analysisPlan.objectId).then((resp) => {
+          this.releaseLink = `${NETWORK_CONSTANTS.MY_DATA_DETAILS.PATH}`
+          this.areStatisticsGenerated = true
+        })
+        /*
         setTimeout(() => {
           this.areStatisticsSubmitted = false;
           //TODO: Implement the Handler of the response of the statistics submit
           this.releaseLink = `${NETWORK_CONSTANTS.MY_DATA_DETAILS.PATH}`
           this.areStatisticsReceived = true;
-        }, 3000);
+        }, 3000);*/
       }
     }
   },
@@ -134,12 +141,14 @@ export default {
         const payload = {objectId: this.analysisPlan.objectId, props: completedStepProp}
         this.$store.dispatch('dataset/updateAnalysisPlan', payload)
 
+
       }
     }
   },
   data: () => ({
     areStatisticsSubmitted: false,
     areStatisticsReceived: false,
+    areStatisticsGenerated: false,
     releaseLink: "",
     NETWORK_CONSTANTS,
     IN_EXECUTION

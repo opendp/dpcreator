@@ -276,6 +276,17 @@ const actions = {
         chatSocket.onerror = function (e) {
             console.error('onerror: ' + e);
         };
+    },
+    generateRelease({commit, state}, {objectId, props}) {
+        // submit statistics openDP release().
+        // When statistics are generated, retrieve the analysisPlan
+        // that will contain the ReleaseInfo
+        return analysis.patchDepositorSetup(objectId, props)
+            .then(() => this.dispatch('dataset/setDatasetInfo', state.datasetInfo.objectId)
+                .catch((data) => {
+                    return Promise.reject(data)
+                }))
+
     }
 
 };

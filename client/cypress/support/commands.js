@@ -116,9 +116,9 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
 Cypress.Commands.add('testMean', (numericVar) => {
     const minDataTest = '[data-test="' + numericVar.name + ':min"]'
     const maxDataTest = '[data-test="' + numericVar.name + ':max"]'
-    // Enter min and max for EyeHeight so we can validate
-    cy.get(minDataTest).type(numericVar.min)
-    cy.get(maxDataTest).type(numericVar.max)
+    // Enter min and max for one numericVar so we can validate
+    cy.get(minDataTest).type(numericVar.min, {force: true})
+    cy.get(maxDataTest).type(numericVar.max, {force: true})
 
     // Continue to Set Epsilon Step
     cy.get('[data-test="wizardContinueButton"]').last().click();
@@ -135,7 +135,7 @@ Cypress.Commands.add('testMean', (numericVar) => {
     cy.get(varDataTest).click({force: true})
     cy.get('[data-test="Insert fixed value"]').click({force: true})
     cy.get('[data-test="Fixed value"]').type(numericVar.fixedValue)
-    cy.get('[data-test="Create statistic"]').click({force: true})
+    cy.get('[data-test="Create statistic"]').click()
 
     // The statistic should have been created
     // cy.get('[data-test="statistic"]').should('contain', 'Mean')

@@ -5,27 +5,21 @@ const snakecaseKeys = require('snakecase-keys');
 
 
 export default {
-    release(analysisPlanId) {
+    generateRelease(analysisPlanId) {
         return session.post('/api/release/',
-            {analysis_plan_id: analysisPlanId})
+            {object_id: analysisPlanId})
             .then(resp => camelcaseKeys(resp.data, {deep: true}))
-
+        /*
+               setTimeout(() => {
+                 this.areStatisticsSubmitted = false;
+                 //TODO: Implement the Handler of the response of the statistics submit
+                 this.releaseLink = `${NETWORK_CONSTANTS.MY_DATA_DETAILS.PATH}`
+                 this.areStatisticsReceived = true;
+               }, 3000);*/
 
     },
     validate(analysisPlanId, dpStatistics) {
-        // TODO: Update AddStatisticDialog so that it has separate Label/values to handle this
-        dpStatistics.forEach((item) => {
-            if (item['missingValuesHandling'] === 'Drop them') {
-                item['missingValuesHandling'] = 'drop'
-            }
-            if (item['missingValuesHandling'] === 'Insert random value') {
-                item['missingValuesHandling'] = 'insert_random'
-            }
-            if (item['missingValuesHandling'] === 'Insert fixed value') {
-                item['missingValuesHandling'] = 'insert_fixed'
-            }
-            item['statistic'] = item['statistic'].toLowerCase()
-        })
+
         dpStatistics = snakecaseKeys(dpStatistics, {deep: true})
         console.log(JSON.stringify(dpStatistics));
 
