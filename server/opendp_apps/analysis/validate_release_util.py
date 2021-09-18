@@ -23,6 +23,7 @@ from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 from opendp_apps.analysis.stat_valid_info import StatValidInfo
 #from opendp_apps.analysis.tools.dp_mean import dp_mean
 from opendp_apps.analysis.models import ReleaseInfo
+from opendp_apps.analysis.tools.dp_histogram_spec import DPHistogramSpec
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
@@ -379,6 +380,11 @@ class ValidateReleaseUtil(BasicErrCheck):
             #
             if statistic == astatic.DP_MEAN:
                 self.add_stat_spec(DPMeanSpec(props))
+                continue
+            elif statistic in astatic.DP_HISTOGRAM:
+                spec = DPHistogramSpec(props)
+                print("SPEC ERRORS: ", spec.error_messages)
+                self.add_stat_spec(spec)
                 continue
             elif statistic == astatic.DP_COUNT:
                 props['error_message'] = (f'Statistic "{statistic}" will be'

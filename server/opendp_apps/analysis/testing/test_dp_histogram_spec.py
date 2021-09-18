@@ -1,14 +1,12 @@
 from os.path import abspath, dirname, isdir, isfile, join
+
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
-
-from unittest import skip
 
 import json
 import decimal
 
 from django.contrib.auth import get_user_model
-from django.core.files import File
 from django.test.testcases import TestCase
 
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
@@ -16,25 +14,19 @@ from opendp_apps.analysis.models import AnalysisPlan
 from opendp_apps.dataset.models import DataSetInfo
 
 from unittest import skip
-from opendp_apps.analysis.tools.stat_spec import StatSpec
-from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
-
-from opendp_apps.profiler import static_vals as pstatic
-from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.analysis.tools.dp_histogram_spec import DPHistogramSpec
 
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.utils.extra_validators import *
-#    VALIDATE_MSG_ZERO_OR_GREATER, VALIDATE_MSG_EPSILON
 
 
-class DPMeanStatSpecTest(TestCase):
+class HistogramStatSpecTest(TestCase):
 
     fixtures = ['test_dataset_data_001.json', ]
 
     def setUp(self):
         """Make a user"""
         self.user_obj, _created = get_user_model().objects.get_or_create(username='dev_admin')
-
 
     def retrieve_new_plan(self):
         """Convenience method to create a new plan"""
@@ -54,44 +46,43 @@ class DPMeanStatSpecTest(TestCase):
 
         return analysis_plan
 
-    @skip
-    def test_10_debug_mean(self):
+    def test_10_debug(self):
         """(10) Test DP Mean Spec"""
-        msgt(self.test_10_debug_mean.__doc__)
+        msgt(self.test_10_debug.__doc__)
 
         spec_props = {'variable': 'EyeHeight',
                       'col_index': 19,
-                      'statistic': astatic.DP_MEAN,
+                      'statistic': astatic.DP_HISTOGRAM,
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
                       'ci': astatic.CI_95,
                       #'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'fixed_value': '0',
+                      'fixed_value': 0,
                       'variable_info': {'min': 0,
                                         'max': 100,
-                                        'type': 'Float',},
+                                        'type': 'Integer',},
                       }
 
-        dp_mean = DPMeanSpec(spec_props)
+        dp_hist = DPHistogramSpec(spec_props)
         print('(1) Run initial check, before using the OpenDp library')
-        print('  - Error found?', dp_mean.has_error())
-        if dp_mean.has_error():
+        print('  - Error found?', dp_hist.has_error())
+        if dp_hist.has_error():
             print('\n-- Errors --')
-            print(dp_mean.get_error_messages())
-            print('\nUI info:', json.dumps(dp_mean.get_error_msg_dict()))
+            print(dp_hist.get_error_messages())
+            print('\nUI info:', json.dumps(dp_hist.get_error_msg_dict()))
             return
 
         print('(2) Use the OpenDP library to check validity')
-        print('  - Is valid?', dp_mean.is_chain_valid())
-        if dp_mean.has_error():
+        print('  - Is valid?', dp_hist.is_chain_valid())
+        if dp_hist.has_error():
             print('\n-- Errors --')
-            print(dp_mean.get_error_messages())
-            print('\nUI info:', json.dumps(dp_mean.get_error_msg_dict()))
+            print(dp_hist.get_error_messages())
+            print('\nUI info:', json.dumps(dp_hist.get_error_msg_dict()))
         else:
             print('\n-- Looks good! --')
-            print('\nUI info:', json.dumps(dp_mean.get_success_msg_dict()))
+            print('\nUI info:', json.dumps(dp_hist.get_success_msg_dict()))
 
 
     def test_05_get_variable_order(self):
@@ -112,41 +103,41 @@ class DPMeanStatSpecTest(TestCase):
 
         spec_props = {'variable': 'EyeHeight',
                       'col_index': 19,
-                      'statistic': astatic.DP_MEAN,
+                      'statistic': astatic.DP_HISTOGRAM,
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
                       'ci': astatic.CI_95,
                       #'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'fixed_value': '5',
+                      'fixed_value': 5,
                       'variable_info': {'min': -8,
                                         'max': 5,
                                         'type': 'Float',},
                       }
 
-        dp_mean = DPMeanSpec(spec_props)
-        self.assertTrue(dp_mean.is_chain_valid())
+        dp_hist = DPHistogramSpec(spec_props)
+        self.assertTrue(dp_hist.is_chain_valid())
 
         for epsilon_val in [0.1, .25, .65, .431, 1.0]:
             print(f'> Valid epsilon val: {epsilon_val}')
             spec_props['epsilon'] = epsilon_val
-            dp_mean = DPMeanSpec(spec_props)
-            self.assertTrue(dp_mean.is_chain_valid())
+            dp_hist = DPHistogramSpec(spec_props)
+            self.assertTrue(dp_hist.is_chain_valid())
 
         print('   --------')
         for ci_val in [x[0] for x in astatic.CI_CHOICES]:
             print(f'> Valid ci val: {ci_val}')
             spec_props['ci'] = ci_val
-            dp_mean = DPMeanSpec(spec_props)
-            self.assertTrue(dp_mean.is_chain_valid())
+            dp_hist = DPHistogramSpec(spec_props)
+            self.assertTrue(dp_hist.is_chain_valid())
 
         print('   --------')
         for good_ds in [1, 2, 10, 100, 56**3,]:
             spec_props['dataset_size'] = good_ds
-            dp_mean = DPMeanSpec(spec_props)
+            dp_hist = DPHistogramSpec(spec_props)
             print(f'> Valid dataset_size: {good_ds}')
-            self.assertTrue(dp_mean.is_chain_valid())
+            self.assertTrue(dp_hist.is_chain_valid())
 
     @skip
     def test_20_bad_epsilon(self):
@@ -155,7 +146,7 @@ class DPMeanStatSpecTest(TestCase):
 
         spec_props = {'variable': 'EyeHeight',
                       'col_index': 19,
-                      'statistic': astatic.DP_MEAN,
+                      'statistic': astatic.DP_HISTOGRAM,
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
@@ -171,10 +162,10 @@ class DPMeanStatSpecTest(TestCase):
         for epsilon_val in [1.01, -0.01, 10, 'a', 'carrot', 'cake']:
             print(f'> Bad epsilon val: {epsilon_val}')
             spec_props['epsilon'] = epsilon_val
-            dp_mean = DPMeanSpec(spec_props)
+            dp_hist = DPHistogramSpec(spec_props)
 
-            self.assertFalse(dp_mean.is_chain_valid())
-            err_info = dp_mean.get_error_msg_dict()
+            self.assertFalse(dp_hist.is_chain_valid())
+            err_info = dp_hist.get_error_msg_dict()
             self.assertTrue(err_info['valid'] == False)
             print(err_info['message'])
             self.assertTrue(err_info['message'].find(VALIDATE_MSG_EPSILON) > -1)
@@ -185,8 +176,8 @@ class DPMeanStatSpecTest(TestCase):
         for bad_ds in [-1, 0, 1.0, .03, 'brick', 'cookie']:
             print(f'> Bad dataset_size: {bad_ds}')
             spec_props['dataset_size'] = bad_ds
-            dp_mean = DPMeanSpec(spec_props)
-            self.assertFalse(dp_mean.is_chain_valid())
+            dp_hist = DPHistogramSpec(spec_props)
+            self.assertFalse(dp_hist.is_chain_valid())
 
     def test_30_bad_ci(self):
         """(30) Bad ci vals"""
@@ -194,13 +185,13 @@ class DPMeanStatSpecTest(TestCase):
 
         spec_props = {'variable': 'EyeHeight',
                       'col_index': 19,
-                      'statistic': astatic.DP_MEAN,
+                      'statistic': astatic.DP_HISTOGRAM,
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
                       'ci': astatic.CI_95,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'fixed_value': '5',
+                      'fixed_value': 5,
                       'variable_info': {'min': -8,
                                         'max': 5,
                                         'type': 'Float', },
@@ -213,9 +204,9 @@ class DPMeanStatSpecTest(TestCase):
         for ci_val in list(float_range(-1, 3, '0.1')) + ['alphabet', 'soup']:
             #print(f'> Invalid ci val: {ci_val}')
             spec_props['ci'] = ci_val
-            dp_mean = DPMeanSpec(spec_props)
-            #print(dp_mean.is_chain_valid())
-            self.assertFalse(dp_mean.is_chain_valid())
+            dp_hist = DPHistogramSpec(spec_props)
+            #print(dp_hist.is_chain_valid())
+            self.assertTrue(dp_hist.is_chain_valid())
 
     def test_40_test_impute(self):
         """(40) Test impute validation"""
@@ -223,76 +214,74 @@ class DPMeanStatSpecTest(TestCase):
 
         spec_props = {'variable': 'EyeHeight',
                       'col_index': 19,
-                      'statistic': astatic.DP_MEAN,
+                      'statistic': astatic.DP_HISTOGRAM,
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
                       'ci': astatic.CI_95,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'fixed_value': '5.0',
+                      'fixed_value': 5,
                       'variable_info': {'min': -8,
                                         'max': 5,
                                         'type': 'Float', },
                       }
 
-        dp_mean = DPMeanSpec(spec_props)
-        self.assertTrue(dp_mean.is_chain_valid())
+        dp_hist = DPHistogramSpec(spec_props)
+        self.assertTrue(dp_hist.is_chain_valid())
 
 
-        bad_impute_info = [  (-10, astatic.ERR_IMPUTE_PHRASE_MIN)
-                           , (45, astatic.ERR_IMPUTE_PHRASE_MAX)
-                           , (5.2, astatic.ERR_IMPUTE_PHRASE_MAX)]
+        bad_impute_info = [(-10, astatic.ERR_IMPUTE_PHRASE_MIN)]
 
         for bad_impute, stat_err_msg in bad_impute_info:
             print(f'> bad impute: {bad_impute}')
             new_props = spec_props.copy()
             new_props['fixed_value'] = bad_impute
-            dp_mean2 = DPMeanSpec(new_props)
+            dp_hist2 = DPHistogramSpec(new_props)
 
-            self.assertFalse(dp_mean2.is_chain_valid())
-            err_dict = dp_mean2.get_error_msg_dict()
+            self.assertFalse(dp_hist2.is_chain_valid())
+            err_dict = dp_hist2.get_error_msg_dict()
             print(f"  - {err_dict['message']}")
             self.assertTrue(err_dict['message'].find(stat_err_msg) > -1)
 
-
-        good_impute_info = [-8, 5, '-8.0', '5.0000', -7, 0, '0.0']
+        good_impute_info = [-8, 5, '-8', '5', -7, 0, '0']
 
         for good_impute in good_impute_info:
             print(f'> good impute: {good_impute}')
             new_props = spec_props.copy()
             new_props['fixed_value'] = good_impute
-            dp_mean = DPMeanSpec(new_props)
-            self.assertTrue(dp_mean.is_chain_valid())
+            dp_hist = DPHistogramSpec(new_props)
+            self.assertTrue(dp_hist.is_chain_valid())
 
 
 
     #@skip
-    def test_100_run_dpmean_calculation(self):
+    def test_100_run_dphist_calculation(self):
         """(100) Run DP mean calculation"""
-        msgt(self.test_100_run_dpmean_calculation.__doc__)
+        msgt(self.test_100_run_dphist_calculation.__doc__)
 
 
         spec_props = {'variable': 'EyeHeight',
                       'col_index': 19,
-                      'statistic': astatic.DP_MEAN,
+                      'statistic': astatic.DP_HISTOGRAM,
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
                       'ci': astatic.CI_95,
                       #'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'fixed_value': '5',
+                      'fixed_value': 5,
                       'variable_info': {'min': -8,
                                         'max': 5,
                                         'type': 'Float',},
                       }
 
-        dp_mean = DPMeanSpec(spec_props)
-        self.assertTrue(dp_mean.is_chain_valid())
-        if dp_mean.has_error():
-            print(dp_mean.get_error_messages())
+        dp_hist = DPHistogramSpec(spec_props)
+        print(dp_hist.has_error(), dp_hist.error_messages)
+        self.assertTrue(dp_hist.is_chain_valid())
+        if dp_hist.has_error():
+            print(dp_hist.get_error_messages())
             return
-        #print('\nUI info:', json.dumps(dp_mean.get_success_msg_dict()))
+        #print('\nUI info:', json.dumps(dp_hist.get_success_msg_dict()))
 
         # ------------------------------------------------------
         # Run the actual mean
@@ -310,7 +299,7 @@ class DPMeanStatSpecTest(TestCase):
 
         # Call run_chain
         #
-        dp_mean.run_chain(col_indexes, file_obj, sep_char="\t")
+        dp_hist.run_chain(col_indexes, file_obj, sep_char="\t")
 
 
 

@@ -331,7 +331,6 @@ class StatSpec:
             return
 
         if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
-
             if self.fixed_value < self.min:
                 user_msg = (f'The "fixed value" ({self.fixed_value})'
                             f' {astatic.ERR_IMPUTE_PHRASE_MIN} ({self.min})')
@@ -342,7 +341,6 @@ class StatSpec:
                             f' {astatic.ERR_IMPUTE_PHRASE_MAX} ({self.max})')
                 self.add_err_msg(user_msg)
                 return
-
 
     def validate_property(self, prop_name: str, validator=None) -> bool:
         """Validate a property name using a validator"""
