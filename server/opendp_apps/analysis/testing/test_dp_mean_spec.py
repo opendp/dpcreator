@@ -209,12 +209,23 @@ class StatSpecTest(TestCase):
                 yield float(start)
                 start += decimal.Decimal(step)
 
-        for ci_val in list(float_range(-1, 3, '0.1')) + ['alphabet', 'soup']:
+        for ci_val in list(float_range(-1, 3, '0.08')):
             #print(f'> Invalid ci val: {ci_val}')
             spec_props['ci'] = ci_val
             dp_mean = DPMeanSpec(spec_props)
             #print(dp_mean.is_chain_valid())
             self.assertFalse(dp_mean.is_chain_valid())
+            self.assertTrue(dp_mean.get_single_err_msg().find(VALIDATE_MSG_NOT_VALID_CI) > -1)
+
+        for ci_val in ['alphabet', 'soup', 'c']:
+            #print(f'> Invalid ci val: {ci_val}')
+            spec_props['ci'] = ci_val
+            dp_mean = DPMeanSpec(spec_props)
+            #print(dp_mean.is_chain_valid())
+            self.assertFalse(dp_mean.is_chain_valid())
+            self.assertTrue(dp_mean.get_single_err_msg().find('Failed to convert "ci" to a float') > -1)
+
+
 
     def test_40_test_impute(self):
         """(40) Test impute validation"""

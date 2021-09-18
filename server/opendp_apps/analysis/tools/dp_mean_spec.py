@@ -118,7 +118,7 @@ class DPMeanSpec(StatSpec):
         self.scale = binary_search(lambda s: self.check_scale(s, preprocessor, 1, self.epsilon), bounds=(0.0, 1000.0))
         preprocessor = preprocessor >> make_base_laplace(self.scale)
 
-        # keep a point to preprocessor in case it's re-used
+        # keep a pointer to the preprocessor to re-use for .run_chain(...)
         self.preprocessor = preprocessor
 
         return preprocessor
@@ -132,17 +132,18 @@ class DPMeanSpec(StatSpec):
             self.preprocessor = self.get_preprocessor()
 
         self.accuracy_val = laplacian_scale_to_accuracy(self.scale, self.ci)
-        self.accuracy_message = f"Releasing {self.statistic} for the variable {self.variable}. " \
-                                f"With at least probability {1-self.ci} the output {self.statistic} " \
-                                f"will differ from the true mean by at most {self.accuracy_val} units. " \
-                                f"Here the units are the same units the variable has in the dataset."
 
+        self.accuracy_message = (f"Releasing {self.statistic} for the variable {self.variable}." 
+                                f" With at least probability {1-self.ci} the output {self.statistic}" 
+                                f" will differ from the true {self.statistic} by at"
+                                f" most {self.accuracy_val} units." 
+                                f" Here the units are the same units the variable has in the dataset.")
         return True
 
 
     def run_chain(self, column_names, file_obj, sep_char=","):
         """
-        Calculate the stats! See "dp_mean_spec.py" for an example of instantiation
+        Calculate the DP Mean!
 
         :param columns. Examples: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
                 - In general using zero-based index of columns is preferred

@@ -1,15 +1,11 @@
 """
-Wrapper class for DP Mean functionality
-
-
+Wrapper class for DP Count functionality
 """
-from opendp.accuracy import laplacian_scale_to_accuracy, gaussian_scale_to_accuracy
-from opendp.meas import make_base_laplace, make_base_geometric
+from opendp.accuracy import laplacian_scale_to_accuracy
+from opendp.meas import make_base_geometric
 from opendp.mod import binary_search, enable_features
 from opendp.trans import \
-    (make_bounded_resize,
-     make_cast,
-     make_clamp,
+    (make_cast,
      make_count,
      make_impute_constant,
      make_select_column,
@@ -111,19 +107,14 @@ class DPCountSpec(StatSpec):
             make_impute_constant(self.fixed_value) >>
             # Count!
             make_count(TIA=str)
-            # Clamp for count??
-            # make_clamp(self.get_bounds()) >>
         )
 
-        #noisy_count_from_dataframe = binary_search_chain(\
-        #    lambda s: preprocessor >> make_base_geometric(s), d_in=1, d_out=1.)
+        self.scale = binary_search(lambda s: self.check_scale(s, preprocessor, 1, self.epsilon),
+                                   bounds=(0.0, 1000.0))
 
-        #     return (preprocessor >> make_base_laplace(scale)).check(dataset_distance, epsilon)
-
-        self.scale = binary_search(lambda s: self.check_scale(s, preprocessor, 1, self.epsilon), bounds=(0.0, 1000.0))
         preprocessor = preprocessor >> make_base_geometric(self.scale)
 
-        # keep a point to preprocessor in case it's re-used
+        # keep a pointer to the preprocessor to re-use for .run_chain(...)
         self.preprocessor = preprocessor
 
         return preprocessor
@@ -136,19 +127,20 @@ class DPCountSpec(StatSpec):
         if not self.preprocessor:
             self.preprocessor = self.get_preprocessor()
 
-        # LaPlace or Gaussian?
         self.accuracy_val = laplacian_scale_to_accuracy(self.scale, self.ci)
-        self.accuracy_message = f"Releasing {self.statistic} for the variable {self.variable}. " \
-                                f"With at least probability {1-self.ci} the output {self.statistic} " \
-                                f"will differ from the true mean by at most {self.accuracy_val} units. " \
-                                f"Here the units are the same units the variable has in the dataset."
+
+        self.accuracy_message = (f"Releasing {self.statistic} for the variable {self.variable}." 
+                                f" With at least probability {1-self.ci} the output {self.statistic}" 
+                                f" will differ from the true {self.statistic} by at"
+                                f" most {self.accuracy_val} units." 
+                                f" Here the units are the same units the variable has in the dataset.")
 
         return True
 
 
     def run_chain(self, column_names, file_obj, sep_char=","):
         """
-        Calculate the stats! See "dp_mean_spec.py" for an example of instantiation
+        Calculate the DP Count!
 
         :param columns. Examples: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
                 - In general using zero-based index of columns is preferred
