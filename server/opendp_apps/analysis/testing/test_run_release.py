@@ -57,7 +57,7 @@ class TestRunRelease(TestCase):
         self.general_stat_specs = [\
                             {"statistic": astatic.DP_MEAN,
                               "variable": "EyeHeight",
-                              "epsilon": .45,
+                              "epsilon": .5,
                               "delta": 0,
                               "ci": astatic.CI_95,
                               "error": "",
@@ -67,11 +67,12 @@ class TestRunRelease(TestCase):
                               "locked": False,
                               "label": "EyeHeight"
                               },
-                           {"statistic": astatic.DP_MEAN,
+                           {
+                            "statistic": astatic.DP_COUNT, # astatic.DP_MEAN,
                             "variable": "TypingSpeed",
                             "epsilon": .5,
                             "delta": 0,
-                            "ci": astatic.CI_99,
+                            "ci": astatic.CI_95,
                             "error": "",
                             "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
                             "handle_as_fixed": False,
@@ -166,7 +167,7 @@ class TestRunRelease(TestCase):
                                     content_type='application/json')
 
         jresp = response.json()
-        print('jresp', jresp)
+        # print('jresp', jresp)
         self.assertEqual(response.status_code, 400)
         self.assertFalse(jresp['success'])
         self.assertTrue(jresp['message'].find(VALIDATE_MSG_EPSILON) > -1)
@@ -195,7 +196,7 @@ class TestRunRelease(TestCase):
                                     content_type='application/json')
 
         jresp = response.json()
-        print('jresp', jresp)
+        # print('jresp', jresp)
         self.assertEqual(response.status_code, 400)
         self.assertFalse(jresp['success'])
         self.assertTrue(jresp['message'].find(astatic.ERR_MSG_BAD_TOTAL_EPSILON) > -1)
@@ -218,7 +219,7 @@ class TestRunRelease(TestCase):
                                     content_type='application/json')
 
         jresp = response.json()
-        print('jresp', jresp)
+        # print('jresp', jresp)
         self.assertEqual(response.status_code, 201)
         self.assertIsNotNone(jresp['dp_release'])
         self.assertIsNotNone(jresp['object_id'])

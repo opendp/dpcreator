@@ -5,17 +5,16 @@ Convenience class for holding statistic validation information
 
 class StatValidInfo:
     """Class to hold the result of a single stat validation"""
-    def __init__(self, var_name, statistic, valid, message, value=None, accuracy_val=None, accuracy_msg=None):
+    def __init__(self, variable, statistic, valid, message, value=None, accuracy_val=None, accuracy_msg=None):
         """
         :param variable str
         :param statistic str
         :param valid bool
-        :param message str          (optional)
-        :param kwargs['value'] multiple value types     (optional)
-        :param kwargs['accuracy_val'] float             (optional)
-        :param kwargs['accuracy_msg'] str               (optional)
+        :param message str              (optional)
+        :param accuracy_val float       (optional)
+        :param accuracy_msg str         (optional)
         """
-        self.variable = var_name
+        self.variable = variable
         self.statistic = statistic
         self.valid = valid
         self.message = message
