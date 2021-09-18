@@ -1,7 +1,9 @@
 
+CI_90 = 0.10    # just to look at
 CI_95 = 0.05
 CI_99 = 0.01
 CI_CHOICES = (
+    (CI_90, '90% CI'),
     (CI_95, '95% CI'),
     (CI_99, '99% CI'),
 )
