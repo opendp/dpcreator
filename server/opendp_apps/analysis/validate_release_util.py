@@ -25,8 +25,9 @@ from opendp_apps.analysis.stat_valid_info import StatValidInfo
 from opendp_apps.analysis.models import ReleaseInfo
 from opendp_apps.analysis.tools.dp_histogram_spec import DPHistogramSpec
 from opendp_apps.analysis.tools.stat_spec import StatSpec
-from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
+from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
+from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
 from opendp_apps.utils.extra_validators import \
     (validate_epsilon_not_null,
      validate_not_negative)
@@ -131,8 +132,7 @@ class ValidateReleaseUtil(BasicErrCheck):
         # -----------------------------------
         filepath = self.analysis_plan.dataset.source_file.path
         sep_char = get_data_file_separator(filepath)
-        print('sep_char', sep_char)
-
+        #print('sep_char', sep_char)
 
         # -----------------------------------
         # Iterate through the stats!
@@ -387,9 +387,7 @@ class ValidateReleaseUtil(BasicErrCheck):
                 self.add_stat_spec(spec)
                 continue
             elif statistic == astatic.DP_COUNT:
-                props['error_message'] = (f'Statistic "{statistic}" will be'
-                                          f' supported soon!')
-                self.add_stat_spec(DPSpecError(props))
+                self.add_stat_spec(DPCountSpec(props))
                 continue
             elif statistic in astatic.DP_STATS_CHOICES:
                 props['error_message'] = (f'Statistic "{statistic}" will be supported'

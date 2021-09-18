@@ -143,7 +143,6 @@ class TestRunRelease(TestCase):
         release_util = ValidateReleaseUtil.compute_mode(
             self.user_obj,
             analysis_plan.object_id)
-        print("LINE 146: ", release_util.error_message, release_util.validation_info)
         self.assertFalse(release_util.has_error())
 
         release_info_object = release_util.get_new_release_info_object()
@@ -178,7 +177,7 @@ class TestRunRelease(TestCase):
                                     content_type='application/json')
 
         jresp = response.json()
-        print('jresp', jresp)
+        # print('jresp', jresp)
         self.assertEqual(response.status_code, 400)
         self.assertFalse(jresp['success'])
         self.assertTrue(jresp['message'].find(VALIDATE_MSG_EPSILON) > -1)
@@ -205,7 +204,7 @@ class TestRunRelease(TestCase):
                                     content_type='application/json')
 
         jresp = response.json()
-        print('jresp', jresp)
+        # print('jresp', jresp)
         self.assertEqual(response.status_code, 400)
         self.assertFalse(jresp['success'])
         self.assertTrue(jresp['message'].find(astatic.ERR_MSG_BAD_TOTAL_EPSILON) > -1)
@@ -227,7 +226,7 @@ class TestRunRelease(TestCase):
                                     content_type='application/json')
 
         jresp = response.json()
-        print('jresp', jresp)
+        # print('jresp', jresp)
         self.assertEqual(response.status_code, 201)
         self.assertIsNotNone(jresp['dp_release'])
         self.assertIsNotNone(jresp['object_id'])

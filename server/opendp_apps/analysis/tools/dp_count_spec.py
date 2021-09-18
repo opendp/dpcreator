@@ -1,18 +1,14 @@
 """
-Wrapper class for DP Mean functionality
-
-
+Wrapper class for DP Count functionality
 """
 from opendp.accuracy import laplacian_scale_to_accuracy
-from opendp.meas import make_base_laplace
+from opendp.meas import make_base_geometric
 from opendp.mod import binary_search, enable_features
 from opendp.trans import \
-    (make_bounded_resize,
-     make_cast,
-     make_clamp,
+    (make_cast,
+     make_count,
      make_impute_constant,
      make_select_column,
-     make_sized_bounded_mean,
      make_split_dataframe)
 from opendp.mod import OpenDPException
 
@@ -22,7 +18,7 @@ from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis import static_vals as astatic
 
 
-class DPMeanSpec(StatSpec):
+class DPCountSpec(StatSpec):
     """
     Initiate with dict of properties. Example of needed properties:
 
@@ -43,27 +39,25 @@ class DPMeanSpec(StatSpec):
         """
         Add a list of required properties
         example: ['min', 'max']
+        If no additional properties, return []
         """
-        return ['min', 'max', 'ci',]    # 'fixed_value']
+        return ['ci']
 
     def run_01_initial_handling(self):
         """
-        Make sure values are consistently floats
+        Missing value handling, if a fixed_value is given, make it string
         """
-        if not self.statistic == astatic.DP_MEAN:
+        if not self.statistic == astatic.DP_COUNT:
             self.add_err_msg(('This is the DP Mean handler'
                               ' but the "statistic" is "{self.statistic}"'))
 
-        if self.fixed_value is not None:
-            pass
 
         # Use the "impute_value" for missing values, make sure it's a float!
         #
         if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
             # Convert the impute value to a float!
-            if not self.convert_to_float('fixed_value'):
-                return
-        self.floatify_int_values()
+            self.fixed_value = str(self.fixed_value)
+
 
     def run_03_custom_validation(self):
         """
@@ -72,10 +66,11 @@ class DPMeanSpec(StatSpec):
         Example:
         self.check_numeric_fixed_value()
         """
+        # Custom validation not needed
+        pass
         if self.has_error():
             return
 
-        self.check_numeric_fixed_value()
 
     def check_scale(self, scale, preprocessor, dataset_distance, epsilon):
         """
@@ -89,7 +84,8 @@ class DPMeanSpec(StatSpec):
         if self.has_error():
             return
 
-        return (preprocessor >> make_base_laplace(scale)).check(dataset_distance, epsilon)
+        return (preprocessor >> make_base_geometric(scale)).check(dataset_distance, epsilon)
+
 
     def get_preprocessor(self):
         """To implement!"""
@@ -106,17 +102,17 @@ class DPMeanSpec(StatSpec):
             # Selects a column of df, Vec<str>
             make_select_column(key=self.col_index, TOA=str) >>
             # Cast the column as Vec<Optional<Float>>
-            make_cast(TIA=str, TOA=float) >>
-            # Impute missing values to 0 Vec<Float>
+            make_cast(TIA=str, TOA=str) >>
+            # Impute missing values
             make_impute_constant(self.fixed_value) >>
-            # Clamp age values
-            make_clamp(self.get_bounds()) >>
-            make_bounded_resize(self.dataset_size, self.get_bounds(), self.fixed_value) >>
-            make_sized_bounded_mean(self.dataset_size, self.get_bounds())
+            # Count!
+            make_count(TIA=str)
         )
 
-        self.scale = binary_search(lambda s: self.check_scale(s, preprocessor, 1, self.epsilon), bounds=(0.0, 1000.0))
-        preprocessor = preprocessor >> make_base_laplace(self.scale)
+        self.scale = binary_search(lambda s: self.check_scale(s, preprocessor, 1, self.epsilon),
+                                   bounds=(0.0, 1000.0))
+
+        preprocessor = preprocessor >> make_base_geometric(self.scale)
 
         # keep a pointer to the preprocessor to re-use for .run_chain(...)
         self.preprocessor = preprocessor
@@ -138,12 +134,13 @@ class DPMeanSpec(StatSpec):
                                 f" will differ from the true {self.statistic} by at"
                                 f" most {self.accuracy_val} units." 
                                 f" Here the units are the same units the variable has in the dataset.")
+
         return True
 
 
     def run_chain(self, column_names, file_obj, sep_char=","):
         """
-        Calculate the DP Mean!
+        Calculate the DP Count!
 
         :param columns. Examples: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
                 - In general using zero-based index of columns is preferred
@@ -194,6 +191,6 @@ class DPMeanSpec(StatSpec):
                f"\nColumn index: {self.col_index}"
                f"\nColumn accuracy_val: {self.accuracy_val}"
                f"\nColumn accuracy_message: {self.accuracy_message}"
-               f"\n\nDP Mean: {self.value}" ))
+               f"\n\nDP Count: {self.value}" ))
 
         return True

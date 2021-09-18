@@ -413,7 +413,7 @@ class TestValidationViewAndSerializers(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(jresp['success'])
 
-        print('jresp', jresp)
+        # print('jresp', jresp)
 
         self.assertEqual(jresp['data'][0]['valid'], False)
         self.assertTrue(jresp['data'][0]['message'].find(VALIDATE_MSG_EPSILON) > -1)

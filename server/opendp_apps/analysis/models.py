@@ -32,6 +32,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     """
     Confidence Interval choices
     """
+    CI_90 = astatic.CI_90
     CI_95 = astatic.CI_95
     CI_99 = astatic.CI_99
     CI_CHOICES = astatic.CI_CHOICES
