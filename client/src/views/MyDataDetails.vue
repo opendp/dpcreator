@@ -23,11 +23,27 @@
               {{ generalErrorSummary }}
             </template>
           </ColoredBorderAlert>
-          <ColoredBorderAlert type="warning" v-if="status === IN_EXECUTION">
-            <template v-slot:content>
-              If canceling, this action cannot be undone.
-            </template>
-          </ColoredBorderAlert>
+
+          <div class="mb-5" v-if="status === COMPLETED">
+            <p class="primary--text">DP Release Information:</p>
+            <v-expansion-panels multiple v-model="expandedPanels">
+              <v-expansion-panel data-test="DP Statistics Panel">
+                <v-expansion-panel-header>DP Statistics</v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <json-viewer :expand-depth="5" :expanded=true :value="analysisPlan.releaseInfo.dpRelease.statistics">
+                  </json-viewer>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+              <v-expansion-panel>
+                <v-expansion-panel-header>DP Library</v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <json-viewer :expand-depth="5" :expanded=true
+                               :value="analysisPlan.releaseInfo.dpRelease.differentiallyPrivateLibrary">
+                  </json-viewer>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-expansion-panels>
+          </div>
           <div class="mb-5" v-if="status === COMPLETED">
             <p class="primary--text">Download DP Release:</p>
             <Button
@@ -223,6 +239,7 @@ export default {
     statusInformation,
     actionsInformation,
     datasetTitle: "",
+    expandedPanels: [0, 1],
     generalErrorSummary: "Error summary: lorem ipsum dolor sit amet.",
     datasetDetails: [
       {

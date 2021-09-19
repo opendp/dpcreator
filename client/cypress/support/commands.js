@@ -131,7 +131,7 @@ Cypress.Commands.add('testMean', (numericVar) => {
         'createPlan'
     )
 
-    cy.wait('@createPlan') //
+    cy.wait('@createPlan', {timeout: 10000})
     // Test Validating EyeHeight mean
     cy.get('[data-test="Add Statistic"]').click({force: true});
     cy.get('[data-test="Mean"]').click({force: true});
@@ -155,7 +155,10 @@ Cypress.Commands.add('testMean', (numericVar) => {
     // Go to Details page
     cy.get('[data-test="View Data Details"]').click({force: true});
     cy.url().should('contain', 'my-data-details')
+    // The Release Details should be visible
     cy.get('[data-test="status tag"]').should('contain', 'Release completed')
+    cy.get('[data-test="DP Statistics Panel"]').click({force: true})
+    cy.get('[data-test="DP Statistics Panel"]').should('contain', 'statistic:"mean"')
 
 
 })

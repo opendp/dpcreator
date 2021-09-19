@@ -131,12 +131,15 @@ export default {
         const completedStepProp = {userStep: completedStep}
         // Update the user step on the DepositorSetup or the Analysis Plan, depending
         // where we are in the Wizard
+        console.log("COMPLETED STEP" + completedStep)
         if (depositorSteps.includes(completedStep)) {
+          console.log("CALLING UPDATE")
           const payload = {objectId: this.getDepositorSetupInfo.objectId, props: completedStepProp}
           this.$store.dispatch('dataset/updateDepositorSetupInfo', payload).then(() => {
             // if the step that has just been completed is  STEP_0600_EPSILON_SET, then update the depositorsetupInfo
             // with epsilon and delta, and create the AnalysisPlan before continuing on to the
             // Create Statistics wizard step
+            console.log("RETURNED FROM UPDATE")
             if (completedStep === STEP_0600_EPSILON_SET) {
               console.log("WIZARD - EPSILON SET")
               this.$store.dispatch('dataset/updateDepositorSetupInfo', payload)
