@@ -138,9 +138,14 @@ export default {
             // with epsilon and delta, and create the AnalysisPlan before continuing on to the
             // Create Statistics wizard step
             if (completedStep === STEP_0600_EPSILON_SET) {
+              console.log("WIZARD - EPSILON SET")
               this.$store.dispatch('dataset/updateDepositorSetupInfo', payload)
                   .then(() => {
+                    console.log("UPDATED STEP, now creating Plan")
                     this.$store.dispatch('dataset/createAnalysisPlan', this.datasetInfo.objectId)
+                        .then(() => {
+                          'plan created'
+                        })
                   })
             }
           })
@@ -152,6 +157,7 @@ export default {
 
       }
       if (val == 3) {
+        console.log("INITIALIZE FORM")
         this.$refs.createStatComponent.initializeForm();
       }
 

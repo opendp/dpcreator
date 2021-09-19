@@ -127,7 +127,11 @@ Cypress.Commands.add('testMean', (numericVar) => {
 
     // Continue to Create  Statistics Step
     cy.get('[data-test="wizardContinueButton"]').last().click();
+    cy.intercept('POST', '/api/analyze/**',).as(
+        'createPlan'
+    )
 
+    cy.wait('@createPlan') //
     // Test Validating EyeHeight mean
     cy.get('[data-test="Add Statistic"]').click({force: true});
     cy.get('[data-test="Mean"]').click({force: true});
@@ -135,12 +139,24 @@ Cypress.Commands.add('testMean', (numericVar) => {
     cy.get(varDataTest).click({force: true})
     cy.get('[data-test="Insert fixed value"]').click({force: true})
     cy.get('[data-test="Fixed value"]').type(numericVar.fixedValue)
-    cy.get('[data-test="Create statistic"]').click()
+    cy.get('[data-test="Create statistic"]').click({force: true})
 
     // The statistic should have been created
     // cy.get('[data-test="statistic"]').should('contain', 'Mean')
     cy.get('tr').first().get('td').should('contain', 'Mean')
     cy.get('table').contains('td', 'Mean').should('be.visible');
+
+    // Click Continue to go to Generate DP Release Step
+    cy.get('[data-test="wizardContinueButton"]').last().click();
+
+    // Submit Statistic
+    cy.get('[data-test="Submit statistics"]').click({force: true});
+
+    // Go to Details page
+    cy.get('[data-test="View Data Details"]').click({force: true});
+    cy.url().should('contain', 'my-data-details')
+    cy.get('[data-test="status tag"]').should('contain', 'Release completed')
+
 
 })
 
