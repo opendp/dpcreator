@@ -10,6 +10,8 @@ import {
     SET_ANALYSIS_PLAN
 } from './types';
 import dataverse from "@/api/dataverse";
+import {STEP_0900_STATISTICS_SUBMITTED, STEP_1000_RELEASE_COMPLETE} from "@/data/stepInformation";
+import release from "@/api/release";
 
 const initialState = {
     datasetList: null,
@@ -277,15 +279,18 @@ const actions = {
             console.error('onerror: ' + e);
         };
     },
-    generateRelease({commit, state}, {objectId, props}) {
+    generateRelease({commit, state}, objectId) {
         // submit statistics openDP release().
-        // When statistics are generated, retrieve the analysisPlan
+        // When statistics are generated,
+        // update the userStep and retrieve the analysisPlan
         // that will contain the ReleaseInfo
-        return analysis.patchDepositorSetup(objectId, props)
-            .then(() => this.dispatch('dataset/setDatasetInfo', state.datasetInfo.objectId)
-                .catch((data) => {
-                    return Promise.reject(data)
-                }))
+        return release.generateRelease(objectId)
+            .then(() => {
+                const completedStepProp = {userStep: STEP_1000_RELEASE_COMPLETE}
+                const payload = {objectId: state.analysisPlan.objectId, props: completedStepProp}
+                this.dispatch('dataset/updateAnalysisPlan', payload)
+
+            })
 
     }
 

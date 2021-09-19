@@ -8,14 +8,11 @@ export default {
     generateRelease(analysisPlanId) {
         return session.post('/api/release/',
             {object_id: analysisPlanId})
-            .then(resp => camelcaseKeys(resp.data, {deep: true}))
-        /*
-               setTimeout(() => {
-                 this.areStatisticsSubmitted = false;
-                 //TODO: Implement the Handler of the response of the statistics submit
-                 this.releaseLink = `${NETWORK_CONSTANTS.MY_DATA_DETAILS.PATH}`
-                 this.areStatisticsReceived = true;
-               }, 3000);*/
+            .then(resp => {
+                camelcaseKeys(resp.data, {deep: true})
+                console.log("generate release API, received response: " + JSON.stringify(resp))
+            })
+
 
     },
     validate(analysisPlanId, dpStatistics) {

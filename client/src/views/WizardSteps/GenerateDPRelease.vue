@@ -100,7 +100,7 @@ import statusInformation from "../../data/statusInformation";
 import StatusTag from "../../components/DesignSystem/StatusTag.vue";
 import {mapState} from "vuex";
 import {STEP_0900_STATISTICS_SUBMITTED} from "@/data/stepInformation";
-import release from "@/api/release";
+
 
 const {IN_EXECUTION} = statusInformation.statuses;
 
@@ -116,7 +116,8 @@ export default {
     areStatisticsSubmitted: function (newareStatisticsSubmitted) {
       if (newareStatisticsSubmitted === true) {
         this.areStatisticsReceived = true;
-        release.generateRelease(this.analysisPlan.objectId).then((resp) => {
+        this.$store.dispatch('dataset/generateRelease', this.analysisPlan.objectId).then((resp) => {
+          console.log("store generateRelease(), resp: " + resp)
           this.releaseLink = `${NETWORK_CONSTANTS.MY_DATA_DETAILS.PATH}`
           this.areStatisticsGenerated = true
         })
