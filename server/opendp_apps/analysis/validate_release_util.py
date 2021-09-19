@@ -26,7 +26,7 @@ from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 from opendp_apps.analysis.stat_valid_info import StatValidInfo
 #from opendp_apps.analysis.tools.dp_mean import dp_mean
-from opendp_apps.analysis.models import ReleaseInfo
+from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
@@ -215,8 +215,8 @@ class ValidateReleaseUtil(BasicErrCheck):
         # (5) Attach the ReleaseInfo to the AnalysisPlan, AnalysisPlan.release_info
         #
         self.analysis_plan.release_info = self.release_info
+        self.analysis_plan.user_step = AnalysisPlan.AnalystSteps.STEP_1200_PROCESS_COMPLETE
         self.analysis_plan.save()
-
         # print('ValidateReleaseUtil - self.release_stats', json.dumps(self.release_stats, indent=4))
 
     def get_new_release_info_object(self):
