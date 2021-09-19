@@ -2,9 +2,10 @@
 Given a ValidateReleaseUtil object that has computed stat,
 build the release dict!
 """
+import json
 from datetime import datetime as dt
 
-from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.analysis.models import ReleaseInfo
 from opendp_apps.dataset.dataset_formatter import DataSetFormatter
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 
@@ -52,11 +53,16 @@ class ReleaseInfoFormatter(BasicErrCheck):
                        + tz_str
         return readable_str
 
-    def get_release_data(self):
+    def get_release_data(self, as_json=False):
         """Return the formatted release"""
         assert not self.has_error(), \
             "Make sure `.has_error() if False` before calling .get_release_data()"
+
+        if as_json is True:
+            return json.dumps(self.release_dict, indent=4)
+
         return self.release_dict
+
 
 
     def build_release_data(self):
@@ -88,3 +94,28 @@ class ReleaseInfoFormatter(BasicErrCheck):
             "statistics": self.release_util.get_release_stats()
         }
 
+        # Error check! Make sure it's serializable as JSON and encodable as bytes!!
+        try:
+            release_json = json.dumps(self.release_dict)
+            release_json.encode()
+        except TypeError as err_obj:
+            user_msg = 'Failed to convert the Release informaation into JSON. ({err_obj})'
+            self.add_err_msg(user_msg)
+
+    @staticmethod
+    def get_json_filename(release_info_obj: ReleaseInfo) -> str:
+        """
+        Format the filename to save to the ReleaseInfo.dp_release_json_file field
+        """
+        assert release_info_obj.object_id, \
+            "Make sure the ReleaseInfo is saved and has an \"object_id\" before calling this method"
+        return f'release-{release_info_obj.object_id}.json'
+
+    @staticmethod
+    def get_pdf_filename(release_info_obj: ReleaseInfo) -> str:
+        """
+        Format the filename to save to the ReleaseInfo.dp_release_pdf_file field
+        """
+        assert release_info_obj.object_id, \
+            "Make sure the ReleaseInfo is saved and has an \"object_id\" before calling this method"
+        return f'release-{release_info_obj.object_id}.pdf'

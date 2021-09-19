@@ -15,7 +15,7 @@ class ReleaseInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ReleaseInfo
-        exclude = ('id', 'dataset')
+        exclude = ('id', 'dataset', 'dp_release_json_file', 'dp_release_pdf_file')
 
 
 class AnalysisPlanObjectIdSerializer(serializers.Serializer):

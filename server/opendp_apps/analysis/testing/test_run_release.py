@@ -21,6 +21,7 @@ from opendp_apps.dataset.dataset_formatter import DataSetFormatter
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
 from opendp_apps.utils.extra_validators import VALIDATE_MSG_EPSILON
+from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 
 
 class TestRunRelease(TestCase):
@@ -229,6 +230,12 @@ class TestRunRelease(TestCase):
         self.assertIsNotNone(jresp['dp_release'])
         self.assertIsNotNone(jresp['object_id'])
 
+        updated_plan = AnalysisPlan.objects.get(object_id=analysis_plan.object_id)
+        json_filename = ReleaseInfoFormatter.get_json_filename(updated_plan.release_info)
+
+        self.assertTrue(updated_plan.release_info.dp_release_json_file.name.endswith(json_filename))
+        self.assertTrue(updated_plan.release_info.dp_release_json_file.size >= 2600)
+
 
     def test_60_analysis_plan_has_release_info(self):
         """(60) Via API, ensure that release_info is added as a field to AnalysisPlan"""
@@ -260,6 +267,12 @@ class TestRunRelease(TestCase):
         self.assertIn('dp_release', analysis_plan_jresp['release_info'])
 
         self.assertIn('dataset', analysis_plan_jresp['release_info']['dp_release'])
+
+        updated_plan = AnalysisPlan.objects.get(object_id=self.analysis_plan.object_id)
+        json_filename = ReleaseInfoFormatter.get_json_filename(updated_plan.release_info)
+
+        self.assertTrue(updated_plan.release_info.dp_release_json_file.name.endswith(json_filename))
+        self.assertTrue(updated_plan.release_info.dp_release_json_file.size >= 2600)
 
         # Uncomment next line to show the AnalysisPlan output
         #   with attached ReleaseInfo object
@@ -313,7 +326,6 @@ class TestRunRelease(TestCase):
         self.assertEqual(ds_info['file_information']['name'], "Fatigue_data.tab")
         self.assertIsNone(ds_info['file_information']['identifier'])
         self.assertEqual(ds_info['file_information']['fileFormat'], "text/tab-separated-values")
-
 
 
     def test_80_dataset_formatter_crisis_file(self):
