@@ -32,6 +32,18 @@ class DataSetFormatter(BasicErrCheck):
             self.add_err_msg('Unknown dataset type: {self.dataset.source}')
             return 
 
+    def get_formatted_info(self, as_json=False):
+        """
+        Return the formatted data
+        """
+        assert self.has_error() is False,\
+            "Do not call this method before checking if \".has_error()\" is False"
+
+        if as_json:
+            return json.dumps(self.formatted_info, indent=4)
+
+        return self.formatted_info
+
     def format_user_upload(self):
         """Format UserUpload dataset"""
         if self.has_error():
@@ -157,7 +169,7 @@ class DataSetFormatter(BasicErrCheck):
         if not 'text' in self.dataset.dataset_schema_info['citation'][0]:
             return err_resp('"[\'citation\'][0][\'text\']" not found in ".dataset_schema_info"')
 
-        return ok_resp(self.dataset.dataset_schema_info['citation'][0]['text]'])
+        return ok_resp(self.dataset.dataset_schema_info['citation'][0]['text'])
 
 
     def get_file_info(self):

@@ -68,11 +68,11 @@ class ReleaseInfoFormatter(BasicErrCheck):
             self.add_err_msg(ds_formatter.get_err_msg())
             return
         else:
-            dataset_dict = ds_formatter.formatted_info
+            dataset_dict = ds_formatter.get_formatted_info()
 
         self.release_dict = {
             "name": str(self.release_util.analysis_plan),
-            "release_url": '(not available, should be url within DP Creator)',
+            "release_url": None,    # to do...
             "created": {
                 "iso": current_dt.isoformat(),
                 "human_readable": self.get_readable_datetime(current_dt)
