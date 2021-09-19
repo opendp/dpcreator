@@ -26,3 +26,10 @@ WORKDIR /code/server
 # -------------------------------------
 COPY scripts_startup/azure_start_01.sh /usr/bin/azure_start_01.sh
 RUN chmod u+x /usr/bin/azure_start_01.sh
+
+# -------------------------------------
+# Install TinyTex and dependencies
+# (Used for rendering PDFs)
+# -------------------------------------
+RUN wget -qO- "https://yihui.org/tinytex/install-bin-unix.sh" | sh
+RUN tlmgr install lastpage
