@@ -10,7 +10,11 @@ import {
     SET_ANALYSIS_PLAN
 } from './types';
 import dataverse from "@/api/dataverse";
-import {STEP_0900_STATISTICS_SUBMITTED, STEP_1000_RELEASE_COMPLETE} from "@/data/stepInformation";
+import {
+    STEP_0900_STATISTICS_SUBMITTED,
+    STEP_1000_RELEASE_COMPLETE,
+    STEP_1200_PROCESS_COMPLETE
+} from "@/data/stepInformation";
 import release from "@/api/release";
 
 const initialState = {
@@ -30,6 +34,19 @@ const getters = {
     getDepositorSetupInfo: state => {
         if (state.datasetInfo) {
             return state.datasetInfo.depositorSetupInfo
+        } else {
+            return null
+        }
+    },
+    // The latest userStep may be in the dataset or analysisPlan,
+    // depending on the current state of the workflow
+    userStep: state => {
+        if (state.analysisPlan !== null) {
+            return state.analysisPlan.userStep
+        } else if (state.datasetInfo.depositorSetupInfo !== null) {
+            return state.datasetInfo.depositorSetupInfo.userStep
+        } else if (state.datasetInfo !== null) {
+            return state.datasetInfo.status
         } else {
             return null
         }
@@ -286,9 +303,18 @@ const actions = {
         // that will contain the ReleaseInfo
         return release.generateRelease(objectId)
             .then(() => {
-                const completedStepProp = {userStep: STEP_1000_RELEASE_COMPLETE}
+                // Will generateRelease return when the calc is done, or only
+                // after the DV is deposited?
+                // For now, assuming that the entire process is complete
+                // const completedStepProp = {userStep: STEP_1000_RELEASE_COMPLETE}
+
+                // Timeout handler to simulate a longer running process
+                //     setTimeout(() => {
+                const completedStepProp = {userStep: STEP_1200_PROCESS_COMPLETE}
                 const payload = {objectId: state.analysisPlan.objectId, props: completedStepProp}
                 this.dispatch('dataset/updateAnalysisPlan', payload)
+                //  }, 5000);
+
 
             })
 

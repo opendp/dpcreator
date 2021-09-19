@@ -140,7 +140,6 @@ import Button from "../components/DesignSystem/Button.vue";
 import SupportBanner from "../components/SupportBanner.vue";
 import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
 import {mapGetters, mapState} from "vuex";
-import analysis from "@/api/analysis";
 import stepInformation from "@/data/stepInformation";
 
 const {
@@ -200,11 +199,11 @@ export default {
 
 
     ...mapState('dataset', ['datasetInfo', 'analysisPlan']),
-    ...mapGetters('dataset', ['getDepositorSetupInfo']),
+    ...mapGetters('dataset', ['getDepositorSetupInfo', 'userStep']),
     ...mapState('auth', ['user']),
 
     status: function () {
-      return stepInformation[this.datasetInfo.status].workflowStatus
+      return stepInformation[this.userStep].workflowStatus
     },
     generalError: function () {
       return this.status === ERROR;
@@ -223,7 +222,7 @@ export default {
     CANCEL_EXECUTION,
     statusInformation,
     actionsInformation,
-    datasetTitle: "California Demographic Dataset",
+    datasetTitle: "",
     generalErrorSummary: "Error summary: lorem ipsum dolor sit amet.",
     datasetDetails: [
       {
