@@ -208,7 +208,7 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         if formatter.has_error():
             # shouldn't happen, but over time...
-            self.add_err_msg(formatter.get_err_msg)
+            self.add_err_msg(formatter.get_err_msg())
             return
 
         return formatter.get_release_data()

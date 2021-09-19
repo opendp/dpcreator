@@ -132,21 +132,24 @@ class TestRunRelease(TestCase):
                                self.user_obj,
                                analysis_plan.object_id)
 
+        #if release_util.has_error():
+        #    print(release_util.get_err_msg())
         self.assertFalse(release_util.has_error())
 
         release_info_object = release_util.get_new_release_info_object()
         dp_release = release_info_object.dp_release
-        release_list = dp_release['statistics']
 
-        self.assertEqual(release_list[0]['variable'], 'EyeHeight')
-        self.assertTrue('result' in release_list[0])
-        self.assertTrue('value' in release_list[0]['result'])
-        self.assertTrue(float(release_list[0]['result']['value']))
+        stats_list = dp_release['statistics']
 
-        self.assertEqual(release_list[1]['variable'], 'TypingSpeed')
-        self.assertTrue('result' in release_list[1])
-        self.assertTrue('value' in release_list[1]['result'])
-        self.assertTrue(float(release_list[1]['result']['value']))
+        self.assertEqual(stats_list[0]['variable'], 'EyeHeight')
+        self.assertTrue('result' in stats_list[0])
+        self.assertTrue('value' in stats_list[0]['result'])
+        self.assertTrue(float(stats_list[0]['result']['value']))
+
+        self.assertEqual(stats_list[1]['variable'], 'TypingSpeed')
+        self.assertTrue('result' in stats_list[1])
+        self.assertTrue('value' in stats_list[1]['result'])
+        self.assertTrue(float(stats_list[1]['result']['value']))
 
 
     def test_30_api_bad_stat(self):
@@ -214,6 +217,7 @@ class TestRunRelease(TestCase):
         analysis_plan.save()
 
         params = dict(object_id=str(analysis_plan.object_id))
+
         response = self.client.post('/api/release/',
                                     json.dumps(params),
                                     content_type='application/json')
