@@ -32,4 +32,4 @@ RUN chmod u+x /usr/bin/azure_start_01.sh
 # (Used for rendering PDFs)
 # -------------------------------------
 RUN wget -qO- "https://yihui.org/tinytex/install-bin-unix.sh" | sh
-RUN tlmgr install lastpage
+RUN /root/.TinyTeX/bin/x86_64-linux/tlmgr install lastpage
