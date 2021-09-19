@@ -248,8 +248,12 @@ class TestRunRelease(TestCase):
 
         response = self.client.get(f'/api/analyze/{analysis_plan.object_id}/')
         analysis_plan_jresp = response.json()
-        # from pprint import pprint
-        # pprint(analysis_plan_jresp)
+
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(analysis_plan_jresp['release_info'])
+
+        # Uncomment next line to show the AnalysisPlan output
+        #   with attached ReleaseInfo object
+        # print(json.dumps(analysis_plan_jresp, indent=4))
+
 

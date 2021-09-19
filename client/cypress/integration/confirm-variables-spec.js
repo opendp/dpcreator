@@ -1,6 +1,6 @@
 {
     describe('Confirm Variables Page', () => {
-        it('displays the variables correctlys', () => {
+        it('displays the variables correctly', () => {
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
                 console.log('runnable', runnable)
