@@ -1,0 +1,9 @@
+{
+  "siteUrl": "http://127.0.0.1:8000/dv-mock-api",
+  "fileId": "4164587",
+  "datasetPid": "doi:10.7910/DVN/PUXVDH",
+  "token": "shoefly-dont-bother-m3",
+  "filePid": "doi:10.7910/DVN/PUXVDH",
+  "user": "dev_admin",
+  "password": "admin"
+}

@@ -238,6 +238,8 @@ export default {
     radioOnlyOneIndividualPerRow: "",
     suitableDatasetDialogIsOpen: false,
     optionToUnset: "",
+    defaultEpsilon: null,
+    defaultDDelta: null,
     privacyTypes: {
       PUBLIC: "public",
       NOT_HARM: "notHarmButConfidential",
@@ -283,7 +285,11 @@ export default {
           radioDependOnPrivateInformation: this.radioDependOnPrivateInformation,
           radioBestDescribes: this.radioBestDescribes,
           radioOnlyOneIndividualPerRow: this.radioOnlyOneIndividualPerRow,
-        }
+        },
+        defaultEpsilon: this.defaultEpsilon,
+        defaultDelta: this.defaultDDelta,
+        epsilon: this.defaultEpsilon,
+        delta: this.defaultDDelta
       }
       const payload = {objectId: this.getDepositorSetupInfo.objectId, props: userInput}
       this.$store.dispatch('dataset/updateDepositorSetupInfo',
@@ -303,34 +309,25 @@ export default {
       or the University if disclosed: (ε=.05, δ=10-7=0.0000001)
      */
     updateEpsilonDelta(option) {
-      let epsilon = null
-      let delta = null
+
       // Set epsilon for the three valid privacyTypes.
       // The other types will require the user to go back and change their
       // answer, so in that case set the values to null.
       if (option === this.privacyTypes.NOT_HARM) {
-        epsilon = 1
-        delta = 0.00001
+        this.defaultEpsilon = 1
+        this.defaultDDelta = 0.00001
       } else if (option === this.privacyTypes.COULD_HARM) {
-        epsilon = .25
-        delta = 0.000001
+        this.defaultEpsilon = .25
+        this.defaultDDelta = 0.000001
       } else if (option === this.privacyTypes.LIKELY_HARM) {
-        epsilon = .05
-        delta = .0000001
+        this.defaultEpsilon = .05
+        this.defaultDDelta = .0000001
       }
-      let props = {
-        defaultEpsilon: epsilon,
-        defaultDelta: delta,
-      }
-      const payload = {objectId: this.getDepositorSetupInfo.objectId, props: props}
-      return this.$store.dispatch('dataset/updateDepositorSetupInfo',
-          payload)
+      this.saveUserInput()
     },
     handleRadioBestDescribes: function (option) {
       console.log('updating epsilon/delta for radioBestDescribes = ' + option)
-      this.updateEpsilonDelta(option).then(() => {
-        this.saveUserInput()
-      })
+      this.updateEpsilonDelta(option)
     },
     handleInvalidDataset: function (invalidOption) {
       this.optionToUnset = invalidOption;
