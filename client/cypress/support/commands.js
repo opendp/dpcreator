@@ -163,7 +163,10 @@ Cypress.Commands.add('testMean', (numericVar) => {
     cy.get('[data-test="status tag"]').should('contain', 'Release completed')
     cy.get('[data-test="DP Statistics Panel"]').click({force: true})
     cy.get('[data-test="DP Statistics Panel"]').should('contain', 'statistic:"mean"')
-
+    // The statistic description should be visible
+    cy.get('[data-test="DP Statistics Panel"]').should('contain', 'statistic:"mean"')
+    const snippet = 'A differentially private'
+    cy.get('[data-test="statistic description"]').should('contain', snippet)
 
 })
 

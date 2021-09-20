@@ -26,6 +26,13 @@
 
           <div class="mb-5" v-if="status === COMPLETED">
             <p class="primary--text">DP Release Information:</p>
+            <div v-for="statistic in analysisPlan.releaseInfo.dpRelease.statistics">
+
+              <div data-test="statistic description" v-html="statistic.description.html"></div>
+
+            </div>
+          </div>
+          <div class="mb-5" v-if="status === COMPLETED">
             <v-expansion-panels multiple v-model="expandedPanels">
               <v-expansion-panel data-test="DP Statistics Panel">
                 <v-expansion-panel-header>DP Statistics</v-expansion-panel-header>
