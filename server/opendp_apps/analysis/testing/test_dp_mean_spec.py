@@ -322,6 +322,10 @@ class StatSpecTest(TestCase):
         #
         dp_mean.run_chain(col_indexes, file_obj, sep_char="\t")
 
+        final_dict = dp_mean.get_release_dict()
+        self.assertIn('description', final_dict)
+        self.assertIn('text', final_dict['description'])
+        self.assertIn('html', final_dict['description'])
 
 
         print('Actual mean: -0.9503854412185792')

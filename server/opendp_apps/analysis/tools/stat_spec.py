@@ -423,7 +423,13 @@ class StatSpec:
         #for key, val in self.__dict__.items():
         #    print(f'{key}: {val}')
 
-    def get_description_html(self, as_table=False):
+    def get_short_description_text(self):
+        """Get description in plain text"""
+        template_name = 'analysis/dp_stat_general_description.txt'
+        return self.get_short_description_html(template_name)
+
+
+    def get_short_description_html(self, template_name=None):
         """
         Create an HTML description using a ReleaseInfo object
         """
@@ -434,15 +440,14 @@ class StatSpec:
             'MISSING_VAL_INSERT_RANDOM': astatic.MISSING_VAL_INSERT_RANDOM
         }
 
-        if as_table is True:
-            html_desc = render_to_string('analysis/dp_stat_general_description_tbl.html',
-                                         info_dict)
-        else:
-            html_desc = render_to_string('analysis/dp_stat_general_description.html',
-                                         info_dict)
+        if not template_name:
+            template_name = 'analysis/dp_stat_general_description.html'
+            # template_name = 'analysis/dp_stat_general_description_tbl.html'
 
-        print(html_desc)
-        return html_desc
+        desc = render_to_string(template_name, info_dict)
+
+        # print(desc)
+        return desc
 
 
     def get_release_dict(self):
@@ -488,7 +493,8 @@ class StatSpec:
             if self.accuracy_message:
                 final_info['accuracy']['message'] = self.accuracy_message
 
-        final_info['description'] = dict(html=self.get_description_html())
+        final_info['description'] = dict(html=self.get_short_description_html(),
+                                         text=self.get_short_description_text())
 
         return final_info
 

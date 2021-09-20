@@ -174,7 +174,12 @@ class DPCountStatSpecTest(TestCase):
         # Actual count 10_000
         self.assertTrue(dp_count.value > 9_980) # should be well within range
 
-        # print(json.dumps(dp_count.get_release_dict(), indent=4))
+        final_dict = dp_count.get_release_dict()
+        self.assertIn('description', final_dict)
+        self.assertIn('text', final_dict['description'])
+        self.assertIn('html', final_dict['description'])
+
+        #print(json.dumps(dp_count.get_release_dict(), indent=4))
         return
         # Call run_chain "num_runs" times
         #
