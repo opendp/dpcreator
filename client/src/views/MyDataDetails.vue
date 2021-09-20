@@ -23,11 +23,27 @@
               {{ generalErrorSummary }}
             </template>
           </ColoredBorderAlert>
-          <ColoredBorderAlert type="warning" v-if="status === IN_EXECUTION">
-            <template v-slot:content>
-              If canceling, this action cannot be undone.
-            </template>
-          </ColoredBorderAlert>
+
+          <div class="mb-5" v-if="status === COMPLETED">
+            <p class="primary--text">DP Release Information:</p>
+            <v-expansion-panels multiple v-model="expandedPanels">
+              <v-expansion-panel data-test="DP Statistics Panel">
+                <v-expansion-panel-header>DP Statistics</v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <json-viewer :expand-depth="5" :expanded=true :value="analysisPlan.releaseInfo.dpRelease.statistics">
+                  </json-viewer>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+              <v-expansion-panel>
+                <v-expansion-panel-header>DP Library</v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <json-viewer :expand-depth="5" :expanded=true
+                               :value="analysisPlan.releaseInfo.dpRelease.differentiallyPrivateLibrary">
+                  </json-viewer>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-expansion-panels>
+          </div>
           <div class="mb-5" v-if="status === COMPLETED">
             <p class="primary--text">Download DP Release:</p>
             <Button
@@ -140,7 +156,6 @@ import Button from "../components/DesignSystem/Button.vue";
 import SupportBanner from "../components/SupportBanner.vue";
 import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
 import {mapGetters, mapState} from "vuex";
-import analysis from "@/api/analysis";
 import stepInformation from "@/data/stepInformation";
 
 const {
@@ -200,11 +215,11 @@ export default {
 
 
     ...mapState('dataset', ['datasetInfo', 'analysisPlan']),
-    ...mapGetters('dataset', ['getDepositorSetupInfo']),
+    ...mapGetters('dataset', ['getDepositorSetupInfo', 'userStep']),
     ...mapState('auth', ['user']),
 
     status: function () {
-      return stepInformation[this.datasetInfo.status].workflowStatus
+      return stepInformation[this.userStep].workflowStatus
     },
     generalError: function () {
       return this.status === ERROR;
@@ -223,7 +238,8 @@ export default {
     CANCEL_EXECUTION,
     statusInformation,
     actionsInformation,
-    datasetTitle: "California Demographic Dataset",
+    datasetTitle: "",
+    expandedPanels: [0, 1],
     generalErrorSummary: "Error summary: lorem ipsum dolor sit amet.",
     datasetDetails: [
       {
