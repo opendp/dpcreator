@@ -488,8 +488,7 @@ class StatSpec:
             if self.accuracy_message:
                 final_info['accuracy']['message'] = self.accuracy_message
 
-        final_info['description'] = dict(html=self.get_description_html(),
-                                         html_table=self.get_description_html(as_table=True))
+        final_info['description'] = dict(html=self.get_description_html())
 
         return final_info
 
