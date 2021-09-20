@@ -5,6 +5,8 @@ build the release dict!
 import json
 from datetime import datetime as dt
 
+from django.template.loader import render_to_string
+
 from opendp_apps.analysis.models import ReleaseInfo
 from opendp_apps.dataset.dataset_formatter import DataSetFormatter
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
@@ -119,3 +121,21 @@ class ReleaseInfoFormatter(BasicErrCheck):
         assert release_info_obj.object_id, \
             "Make sure the ReleaseInfo is saved and has an \"object_id\" before calling this method"
         return f'release-{release_info_obj.object_id}.pdf'
+
+    @staticmethod
+    def create_release_description_html(release_info_obj: ReleaseInfo=None) -> str:
+        """
+        Create an HTML description using a ReleaseInfo object
+        """
+        html_desc = render_to_string('analysis/release_description.html',
+                                     {'dp_statistics': release_info_obj.dp_statistics}) #release_info_obj})
+        return html_desc
+
+"""
+python manage.py shell
+
+from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
+
+some_html = ReleaseInfoFormatter.create_release_description_html()
+print(some_html)
+"""

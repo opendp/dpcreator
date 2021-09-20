@@ -1,0 +1,43 @@
+
+<table>
+    <tr>
+        <th>Statistic</th>
+        <td>Differentially private <b>{{ stat.statistic|title }}</b> for variable <b>{{ stat.variable}}</b></td>
+    </tr>
+    <tr>
+        <th>Result</th>
+        <td>{{ stat.value}}</td>
+    </tr>
+    {% if stat.accuracy_val %}
+    <tr>
+        <th>Accuracy</th>
+        <td>{{ stat.accuracy_val}}</td>
+    </tr>
+    <tr>
+        <th>Accuracy Message</th>
+        <td>There is a probability of {{ stat.get_ci_text }} that the output count will differ from the true count by at most {{ stat.accuracy_val}} units. Here the units are the same units the variable has in the dataset.</td>
+    </tr>
+    {% endif %}
+    <tr>
+        <th>Epsilon</th>
+        <td>{{ stat.epsilon}}</td>
+    </tr>
+    {% if stat.use_min_max and stat.min and stat.max %}
+    <tr>
+        <th>Bounding Min / Max</th>
+        <td>{{ stat.min }} / {{ stat.max }}</td>
+    </tr>
+    {% endif %}
+    <tr>
+        <th>Missing value handling</th>
+        <td>{% if stat.missing_values_handling == MISSING_VAL_INSERT_FIXED %}
+                    Insert fixed value using "{{ stat.fixed_value }}".
+                {% elif stat.missing_values_handling == MISSING_VAL_INSERT_RANDOM %}
+                    Insert random values.
+                {% else %}
+                    {{ stat.missing_values_handling }}
+                {% endif %}</td>
+    </tr>
+</table>
+
+
