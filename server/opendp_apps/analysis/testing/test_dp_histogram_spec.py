@@ -1,4 +1,4 @@
-from os.path import abspath, dirname, isdir, isfile, join
+from os.path import abspath, dirname, isfile, join
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
@@ -21,7 +21,6 @@ from opendp_apps.utils.extra_validators import *
 
 
 class HistogramStatSpecTest(TestCase):
-
     fixtures = ['test_dataset_data_001.json', ]
 
     def setUp(self):
@@ -57,12 +56,12 @@ class HistogramStatSpecTest(TestCase):
                       'epsilon': 1.0,
                       'delta': 0.0,
                       'ci': astatic.CI_95,
-                      #'accuracy': None,
+                      # 'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': 0,
                       'variable_info': {'min': 0,
                                         'max': 100,
-                                        'type': 'Integer',},
+                                        'type': 'Integer', },
                       }
 
         dp_hist = DPHistogramSpec(spec_props)
@@ -84,6 +83,46 @@ class HistogramStatSpecTest(TestCase):
             print('\n-- Looks good! --')
             print('\nUI info:', json.dumps(dp_hist.get_success_msg_dict()))
 
+    def test_15_categorial_variables(self):
+        """(15) Test DP Mean Spec with categorial variables"""
+        msgt(self.test_15_categorial_variables.__doc__)
+
+        spec_props = {
+                'variable': 'Subject',
+                'statistic': astatic.DP_HISTOGRAM,
+                'dataset_size': 183,
+                'epsilon': 1.0,
+                'delta': 0.0,
+                'ci': astatic.CI_95,
+                'col_index': 0,
+                'fixed_value': 1,
+                'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+                'variable_info': {
+                    'min': 0,
+                    'max': 1E5,
+                    'categories': ['mh', 'ac', 'jm', 'cw', 'bh2'],
+                    'type': 'Categorical'
+                }
+            }
+
+        dp_hist = DPHistogramSpec(spec_props)
+        print('(1) Run initial check, before using the OpenDp library')
+        print('  - Error found?', dp_hist.has_error())
+        if dp_hist.has_error():
+            print('\n-- Errors --')
+            print(dp_hist.get_error_messages())
+            print('\nUI info:', json.dumps(dp_hist.get_error_msg_dict()))
+            return
+
+        print('(2) Use the OpenDP library to check validity')
+        print('  - Is valid?', dp_hist.is_chain_valid())
+        if dp_hist.has_error():
+            print('\n-- Errors --')
+            print(dp_hist.get_error_messages())
+            print('\nUI info:', json.dumps(dp_hist.get_error_msg_dict()))
+        else:
+            print('\n-- Looks good! --')
+            print('\nUI info:', json.dumps(dp_hist.get_success_msg_dict()))
 
     def test_05_get_variable_order(self):
         """(05) Test get variable order"""
@@ -96,7 +135,6 @@ class HistogramStatSpecTest(TestCase):
         self.assertTrue(variable_indices_info.success)
         self.assertEqual(variable_indices_info.data, [x for x in range(20)])
 
-
     def test_10_valid_spec(self):
         """(10) Run DP Mean valid spec"""
         msgt(self.test_10_valid_spec.__doc__)
@@ -108,12 +146,12 @@ class HistogramStatSpecTest(TestCase):
                       'epsilon': 1.0,
                       'delta': 0.0,
                       'ci': astatic.CI_95,
-                      #'accuracy': None,
+                      # 'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': 5,
                       'variable_info': {'min': -8,
                                         'max': 5,
-                                        'type': 'Float',},
+                                        'type': 'Float', },
                       }
 
         dp_hist = DPHistogramSpec(spec_props)
@@ -133,7 +171,7 @@ class HistogramStatSpecTest(TestCase):
             self.assertTrue(dp_hist.is_chain_valid())
 
         print('   --------')
-        for good_ds in [1, 2, 10, 100, 56**3,]:
+        for good_ds in [1, 2, 10, 100, 56 ** 3, ]:
             spec_props['dataset_size'] = good_ds
             dp_hist = DPHistogramSpec(spec_props)
             print(f'> Valid dataset_size: {good_ds}')
@@ -157,7 +195,6 @@ class HistogramStatSpecTest(TestCase):
                                         'max': 5,
                                         'type': 'Float', },
                       }
-
 
         for epsilon_val in [1.01, -0.01, 10, 'a', 'carrot', 'cake']:
             print(f'> Bad epsilon val: {epsilon_val}')
@@ -196,16 +233,17 @@ class HistogramStatSpecTest(TestCase):
                                         'max': 5,
                                         'type': 'Float', },
                       }
+
         def float_range(start, stop, step):
             while start < stop:
                 yield float(start)
                 start += decimal.Decimal(step)
 
         for ci_val in list(float_range(-1, 3, '0.1')) + ['alphabet', 'soup']:
-            #print(f'> Invalid ci val: {ci_val}')
+            # print(f'> Invalid ci val: {ci_val}')
             spec_props['ci'] = ci_val
             dp_hist = DPHistogramSpec(spec_props)
-            #print(dp_hist.is_chain_valid())
+            # print(dp_hist.is_chain_valid())
             self.assertTrue(dp_hist.is_chain_valid())
 
     def test_40_test_impute(self):
@@ -229,7 +267,6 @@ class HistogramStatSpecTest(TestCase):
         dp_hist = DPHistogramSpec(spec_props)
         self.assertTrue(dp_hist.is_chain_valid())
 
-
         bad_impute_info = [(-10, astatic.ERR_IMPUTE_PHRASE_MIN)]
 
         for bad_impute, stat_err_msg in bad_impute_info:
@@ -252,13 +289,10 @@ class HistogramStatSpecTest(TestCase):
             dp_hist = DPHistogramSpec(new_props)
             self.assertTrue(dp_hist.is_chain_valid())
 
-
-
-    #@skip
+    # @skip
     def test_100_run_dphist_calculation(self):
         """(100) Run DP mean calculation"""
         msgt(self.test_100_run_dphist_calculation.__doc__)
-
 
         spec_props = {'variable': 'EyeHeight',
                       'col_index': 19,
@@ -267,12 +301,12 @@ class HistogramStatSpecTest(TestCase):
                       'epsilon': 1.0,
                       'delta': 0.0,
                       'ci': astatic.CI_95,
-                      #'accuracy': None,
+                      # 'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': 5,
                       'variable_info': {'min': -8,
                                         'max': 5,
-                                        'type': 'Float',},
+                                        'type': 'Float', },
                       }
 
         dp_hist = DPHistogramSpec(spec_props)
@@ -281,18 +315,18 @@ class HistogramStatSpecTest(TestCase):
         if dp_hist.has_error():
             print(dp_hist.get_error_messages())
             return
-        #print('\nUI info:', json.dumps(dp_hist.get_success_msg_dict()))
+        # print('\nUI info:', json.dumps(dp_hist.get_success_msg_dict()))
 
         # ------------------------------------------------------
         # Run the actual mean
         # ------------------------------------------------------
         # Column indexes - We know this data has 20 columns
-        col_indexes = [idx for idx in range(0,20)]
+        col_indexes = [idx for idx in range(0, 20)]
 
         # File object
         #
         eye_fatigue_filepath = join(TEST_DATA_DIR, 'Fatigue_data.tab')
-        #print('eye_fatigue_filepath', eye_fatigue_filepath)
+        # print('eye_fatigue_filepath', eye_fatigue_filepath)
         self.assertTrue(isfile(eye_fatigue_filepath))
 
         file_obj = open(eye_fatigue_filepath, 'r')
@@ -300,8 +334,6 @@ class HistogramStatSpecTest(TestCase):
         # Call run_chain
         #
         dp_hist.run_chain(col_indexes, file_obj, sep_char="\t")
-
-
 
         print('Actual mean: -0.9503854412185792')
         '''
@@ -321,6 +353,74 @@ class HistogramStatSpecTest(TestCase):
                    -0.641054302
                ],
         '''
+
+    def test_105_run_dphist_calculation_categorical(self):
+        """(105) Run DP mean calculation with labels"""
+        msgt(self.test_105_run_dphist_calculation_categorical.__doc__)
+
+        spec_props = {
+            'variable': 'Subject',
+            'statistic': astatic.DP_HISTOGRAM,
+            'dataset_size': 183,
+            'epsilon': 1.0,
+            'delta': 0.0,
+            'ci': astatic.CI_95,
+            'col_index': 0,
+            'fixed_value': 1,
+            'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+            'variable_info': {
+                'min': 0,
+                'max': 1E5,
+                'categories': ['mh', 'ac', 'jm', 'cw', 'bh2'],
+                'type': 'Categorical'
+            }
+        }
+
+        dp_hist = DPHistogramSpec(spec_props)
+        print(dp_hist.has_error(), dp_hist.error_messages)
+        self.assertTrue(dp_hist.is_chain_valid())
+        if dp_hist.has_error():
+            print(dp_hist.get_error_messages())
+            return
+        # print('\nUI info:', json.dumps(dp_hist.get_success_msg_dict()))
+
+        # ------------------------------------------------------
+        # Run the actual mean
+        # ------------------------------------------------------
+        # Column indexes - We know this data has 20 columns
+        col_indexes = [idx for idx in range(0, 20)]
+
+        # File object
+        #
+        eye_fatigue_filepath = join(TEST_DATA_DIR, 'Fatigue_data.tab')
+        # print('eye_fatigue_filepath', eye_fatigue_filepath)
+        self.assertTrue(isfile(eye_fatigue_filepath))
+
+        file_obj = open(eye_fatigue_filepath, 'r')
+
+        # Call run_chain
+        #
+        dp_hist.run_chain(col_indexes, file_obj, sep_char="\t")
+
+        print('Actual mean: -0.9503854412185792')
+        '''
+           Some actual stats:
+               "invalidCount": 0,
+               "validCount": 183,
+               "uniqueCount": 183,
+               "median": -0.851190845,
+               "mean": -0.9503854412185792,
+               "max": 4.846733074,
+               "min": -7.953123756,
+               "mode": [
+                   -0.453860599,
+                   2.120359194,
+                   3.045188197,
+                   2.803143496,
+                   -0.641054302
+               ],
+        '''
+
 
 """
 # from ./dpcreator/server directory
