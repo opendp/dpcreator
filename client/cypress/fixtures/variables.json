@@ -1,134 +1,135 @@
 {
+  "trial": {
+    "max": null,
+    "min": null,
+    "name": "Trial",
+    "type": "Numerical",
+    "label": ""
+  },
+  "session": {
+    "name": "Session",
+    "type": "Boolean",
+    "label": ""
+  },
   "subject": {
     "name": "Subject",
-    "label": "",
     "type": "Categorical",
+    "label": "",
     "categories": null
   },
   "language": {
     "name": "Language",
-    "label": "",
-    "type": "Boolean"
+    "type": "Boolean",
+    "label": ""
   },
-  "session": {
-    "name": "Session",
-    "label": "",
-    "type": "Boolean"
+  "eyeHeight": {
+    "max": null,
+    "min": null,
+    "name": "EyeHeight",
+    "type": "Numerical",
+    "label": ""
+  },
+  "typingSpeed": {
+    "max": null,
+    "min": null,
+    "name": "TypingSpeed",
+    "type": "Numerical",
+    "label": ""
+  },
+  "blinkDuration": {
+    "max": null,
+    "min": null,
+    "name": "BlinkDuration",
+    "type": "Numerical",
+    "label": ""
+  },
+  "blinkInterval": {
+    "max": null,
+    "min": null,
+    "name": "BlinkInterval",
+    "type": "Numerical",
+    "label": ""
+  },
+  "blinkFrequency": {
+    "max": null,
+    "min": null,
+    "name": "BlinkFrequency",
+    "type": "Numerical",
+    "label": ""
+  },
+  "correctedError": {
+    "max": null,
+    "min": null,
+    "name": "CorrectedError",
+    "type": "Numerical",
+    "label": ""
+  },
+  "saccadeDuration": {
+    "max": null,
+    "min": null,
+    "name": "SaccadeDuration",
+    "type": "Numerical",
+    "label": ""
+  },
+  "saccadeVelocity": {
+    "max": null,
+    "min": null,
+    "name": "SaccadeVelocity",
+    "type": "Numerical",
+    "label": ""
+  },
+  "blinkBurstRatio": {
+    "max": null,
+    "min": null,
+    "name": "BlinkBurstRatio",
+    "type": "Numerical",
+    "label": ""
+  },
+  "saccadeAmplitude": {
+    "max": null,
+    "min": null,
+    "name": "SaccadeAmplitude",
+    "type": "Numerical",
+    "label": ""
+  },
+  "saccadePeakVelocity": {
+    "max": null,
+    "min": null,
+    "name": "SaccadePeakVelocity",
+    "type": "Numerical",
+    "label": ""
+  },
+  "readTextEventsRatio": {
+    "max": null,
+    "min": null,
+    "name": "ReadTextEventsRatio",
+    "type": "Numerical",
+    "label": ""
+  },
+  "uncorrectedErrorRate": {
+    "max": null,
+    "min": null,
+    "name": "UncorrectedErrorRate",
+    "type": "Numerical",
+    "label": ""
+  },
+  "baselinePupilDiameter": {
+    "max": null,
+    "min": null,
+    "name": "BaselinePupilDiameter",
+    "type": "Numerical",
+    "label": ""
   },
   "objectiveTaskDifficulty": {
     "name": "ObjectiveTaskDifficulty",
-    "label": "",
-    "type": "Boolean"
-  },
-  "trial": {
-    "name": "Trial",
-    "label": "",
-    "type": "Categorical",
-    "categories": null
-  },
-  "typingSpeed": {
-    "name": "TypingSpeed",
-    "label": "",
-    "type": "Numerical",
-    "min": null,
-    "max": null
-  },
-  "correctedError": {
-    "name": "CorrectedError",
-    "label": "",
-    "type": "Numerical",
-    "min": null,
-    "max": null
-  },
-  "readTextEventsRatio": {
-    "name": "ReadTextEventsRatio",
-    "label": "",
-    "type": "Numerical",
-    "min": null,
-    "max": null
+    "type": "Boolean",
+    "label": ""
   },
   "attendedButNotSelectedRate": {
+    "max": null,
+    "min": null,
     "name": "AttendedButNotSelectedRate",
-    "label": "",
     "type": "Numerical",
-    "min": null,
-    "max": null
-  },
-  "uncorrectedErrorRate": {
-    "name": "UncorrectedErrorRate",
-    "label": "",
-    "type": "Numerical",
-    "min": null,
-    "max": null
-  },
-  "baselinePupilDiameter": {
-    "name": "BaselinePupilDiameter",
-    "label": "",
-    "type": "Numerical",
-    "min": null,
-    "max": null
-  },
-  "blinkFrequency": {
-    "name": "BlinkFrequency",
-    "label": "",
-    "type": "Numerical",
-    "min": null,
-    "max": null
-  },
-  "blinkDuration": {
-    "name": "BlinkDuration",
-    "label": "",
-    "type": "Numerical",
-    "min": null,
-    "max": null
-  },
-  "blinkInterval": {
-    "name": "BlinkInterval",
-    "label": "",
-    "type": "Numerical",
-    "min": null,
-    "max": null
-  },
-  "blinkBurstRatio": {
-    "name": "BlinkBurstRatio",
-    "label": "",
-    "type": "Numerical",
-    "min": null,
-    "max": null
-  },
-  "saccadeAmplitude": {
-    "name": "SaccadeAmplitude",
-    "label": "",
-    "type": "Numerical",
-    "min": null,
-    "max": null
-  },
-  "saccadeDuration": {
-    "name": "SaccadeDuration",
-    "label": "",
-    "type": "Numerical",
-    "min": null,
-    "max": null
-  },
-  "saccadeVelocity": {
-    "name": "SaccadeVelocity",
-    "label": "",
-    "type": "Numerical",
-    "min": null,
-    "max": null
-  },
-  "saccadePeakVelocity": {
-    "name": "SaccadePeakVelocity",
-    "label": "",
-    "type": "Numerical",
-    "min": null,
-    "max": null
-  },
-  "eyeHeight": {
-    "name": "EyeHeight",
-    "label": "",
-    "type": "Numerical",
-    "min": null,
-    "max": null
+    "label": ""
   }
 }

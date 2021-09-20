@@ -125,10 +125,8 @@ class ProfileFormatter:
             if orig_var_info['binary'] is True:
                 var_type = pstatic.VAR_TYPE_BOOLEAN
             elif orig_var_info['numchar'] == 'numeric':
-                if orig_var_info['interval'] == 'continuous':
-                    var_type = pstatic.VAR_TYPE_NUMERICAL
-                else:
-                    var_type = pstatic.VAR_TYPE_CATEGORICAL
+                var_type = pstatic.VAR_TYPE_NUMERICAL
+                # if orig_var_info['interval'] == 'continuous': # currently unused
             else:
                 var_type = pstatic.VAR_TYPE_CATEGORICAL
 
