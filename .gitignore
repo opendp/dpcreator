@@ -162,3 +162,4 @@ dev_notes/rp_scratch.py
 dpcreator_volume/
 client/cypress/videos/
 server/static_deploy/
+server/release-files/*

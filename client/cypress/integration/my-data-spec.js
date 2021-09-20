@@ -8,7 +8,7 @@
                 return false
             })
             cy.clearData()
-            cy.createMockDataset()
+            cy.createMockDataset('mockDV.json')
             cy.visit('/my-data')
 
             cy.get('tr').should('contain',

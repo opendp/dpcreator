@@ -13,7 +13,7 @@
         </h2>
       </v-card-title>
       <v-card-text class="text--primary">
-        This will delete statistic "{{ editedItem.statistic }}" for variable "{{ editedItem.label }}".
+        This will delete statistic "{{ editedItem.label }}" for variable "{{ editedItem.variable }}".
       </v-card-text>
       <v-card-actions>
         <Button color="primary" :click="() => $emit('confirm')" label="OK"/>

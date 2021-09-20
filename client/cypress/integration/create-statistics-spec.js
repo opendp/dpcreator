@@ -59,24 +59,6 @@
                 }
             })
         })
-        it('Validates Mean statistic with fixed missing values ', () => {
-            cy.on('uncaught:exception', (e, runnable) => {
-                console.log('error', e)
-                console.log('runnable', runnable)
-                return false
-            })
-            cy.fixture('variables').then((varsFixture) => {
-                // Create your statistic
-                cy.get('[data-test="Add Statistic"]').click({force: true})
-                cy.get('[data-test="Mean"]').click({force: true})
-                cy.get('[data-test="EyeHeight"]').click({force: true})
-                cy.get('[data-test="Insert fixed value"]').click({force: true})
-                cy.get('[data-test="Fixed value"]').type('10')
-                cy.get('[data-test="Create statistic"]').click({force: true})
-
-
-            })
-        })
 
     })
 }

@@ -18,7 +18,7 @@
         <span class="index-td">{{ index + 1 }}</span>
       </template>
       <template :data-test="'statistic'+index" v-slot:[`item.Statistic`]="{ item }">
-        <div data-test="statistic">{{ item.statistic }}</div>
+        <div data-test="statistic">{{ item.statistic.label }}</div>
       </template>
       <template v-slot:[`item.epsilon`]="{ item }">
         <v-text-field
@@ -124,8 +124,8 @@ export default {
   data: () => ({
     headers: [
       {value: "num"},
-      {text: "Statistic", value: "statistic"},
-      {text: "Variable", value: "label"},
+      {text: "Statistic", value: "label"},
+      {text: "Variable", value: "variable"},
       {text: "Epsilon", value: "epsilon"},
       {text: "Delta", value: "delta"},
       {text: "Error", value: "error"},
