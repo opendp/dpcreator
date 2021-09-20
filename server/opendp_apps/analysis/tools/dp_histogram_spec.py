@@ -32,7 +32,7 @@ class DPHistogramSpec(StatSpec):
         Add a list of required properties
         example: ['min', 'max']
         """
-        return []
+        return ['min', 'max']
 
     def run_01_initial_handling(self):
         """

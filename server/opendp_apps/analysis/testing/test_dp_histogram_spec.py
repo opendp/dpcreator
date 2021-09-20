@@ -335,24 +335,7 @@ class HistogramStatSpecTest(TestCase):
         #
         dp_hist.run_chain(col_indexes, file_obj, sep_char="\t")
 
-        print('Actual mean: -0.9503854412185792')
-        '''
-           Some actual stats:
-               "invalidCount": 0,
-               "validCount": 183,
-               "uniqueCount": 183,
-               "median": -0.851190845,
-               "mean": -0.9503854412185792,
-               "max": 4.846733074,
-               "min": -7.953123756,
-               "mode": [
-                   -0.453860599,
-                   2.120359194,
-                   3.045188197,
-                   2.803143496,
-                   -0.641054302
-               ],
-        '''
+
 
     def test_105_run_dphist_calculation_categorical(self):
         """(105) Run DP mean calculation with labels"""
@@ -360,13 +343,13 @@ class HistogramStatSpecTest(TestCase):
 
         spec_props = {
             'variable': 'Subject',
+            'col_index': 0,
             'statistic': astatic.DP_HISTOGRAM,
             'dataset_size': 183,
             'epsilon': 1.0,
             'delta': 0.0,
             'ci': astatic.CI_95,
-            'col_index': 0,
-            'fixed_value': 1,
+            'fixed_value': "1",
             'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
             'variable_info': {
                 'min': 0,
@@ -402,51 +385,3 @@ class HistogramStatSpecTest(TestCase):
         #
         dp_hist.run_chain(col_indexes, file_obj, sep_char="\t")
 
-        print('Actual mean: -0.9503854412185792')
-        '''
-           Some actual stats:
-               "invalidCount": 0,
-               "validCount": 183,
-               "uniqueCount": 183,
-               "median": -0.851190845,
-               "mean": -0.9503854412185792,
-               "max": 4.846733074,
-               "min": -7.953123756,
-               "mode": [
-                   -0.453860599,
-                   2.120359194,
-                   3.045188197,
-                   2.803143496,
-                   -0.641054302
-               ],
-        '''
-
-
-"""
-# from ./dpcreator/server directory
-
-import os
-from raven_preprocess.preprocess_runner import PreprocessRunner
-
-fnames =  ['PUMS5extract1000.csv', 'PUMS5extract10000.csv', 
-           'Fatigue_data.tab', 'gking-crisis.tab',
-           'teacher_climate_survey_lwd.csv', 'fearonLaitin.csv']
-for fname in fnames:
-    fpath = join(os.getcwd(), 'test_data', fname)
-    run_info = PreprocessRunner.load_from_file(fpath)
-    if not run_info.success:
-        print(run_info.err_msg)
-    else:
-        runner = run_info.result_obj
-        fname_base = fname.split('.')[0]
-        out_path = join(os.getcwd(), 'test_data', 
-                        'non_dp_debug_info', f'info_{fname_base}.json')
-        open(out_path, 'w').write(runner.get_final_json(indent=4))
-        print('file written: ', out_path)
-
-    # show the JSON (string)
-    print(runner.get_final_json(indent=4))
-    
-    metadata = runner.get_final_dict()
-    print(metadata['variables']['EyeHeight']
-"""
