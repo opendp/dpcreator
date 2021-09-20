@@ -78,7 +78,7 @@ class ReleaseInfoFormatter(BasicErrCheck):
 
         self.release_dict = {
             "name": str(self.release_util.analysis_plan),
-            "release_url": None,    # to do...
+            "release_url": None,    # via with https://github.com/opendp/dpcreator/issues/34
             "created": {
                 "iso": current_dt.isoformat(),
                 "human_readable": self.get_readable_datetime(current_dt)
