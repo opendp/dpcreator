@@ -5,7 +5,10 @@ import store from './store'
 import axios from 'axios'
 import GSignInButton from 'vue-google-signin-button'
 import vuetify from "./plugins/vuetify";
+import JsonViewer from 'vue-json-viewer'
 
+
+Vue.use(JsonViewer)
 Vue.config.productionTip = false;
 Vue.use(GSignInButton)
 axios.defaults.xsrfHeaderName = 'X-CSRFToken';
