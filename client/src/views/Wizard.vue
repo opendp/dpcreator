@@ -138,16 +138,6 @@ export default {
             // with epsilon and delta, and create the AnalysisPlan before continuing on to the
             // Create Statistics wizard step
             if (completedStep === STEP_0600_EPSILON_SET) {
-              console.log("SETTING EPSILON & DELTA")
-              // Save the epsilon and delta,
-              // so the DepositorSetupInfo is completed
-              // before creating an AnalysisPlan
-              let props = {
-                epsilon: this.getDepositorSetupInfo.defaultEpsilon,
-                delta: this.getDepositorSetupInfo.defaultDelta,
-                confidenceInterval: .01
-              }
-              const payload = {objectId: this.getDepositorSetupInfo.objectId, props: props}
               this.$store.dispatch('dataset/updateDepositorSetupInfo', payload)
                   .then(() => {
                     this.$store.dispatch('dataset/createAnalysisPlan', this.datasetInfo.objectId)

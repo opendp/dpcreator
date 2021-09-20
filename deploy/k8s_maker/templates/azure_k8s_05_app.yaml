@@ -12,6 +12,7 @@ data:
   STATIC_ROOT: "/dpcreator_volume/static/dist"
   STATIC_URL: "/static/dist/"
   UPLOADED_FILE_STORAGE_ROOT: "/dpcreator_user_data"
+  RELEASE_FILE_STORAGE_ROOT: "/dpcreator_release_data"
   #
   # Should match the NGINX_MAX_UPLOAD_SIZE
   # ref: https://docs.djangoproject.com/en/3.2/ref/settings/#std:setting-DATA_UPLOAD_MAX_MEMORY_SIZE

@@ -17,9 +17,11 @@ from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.serializers import ReleaseValidationSerializer
 from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
 from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dataset.dataset_formatter import DataSetFormatter
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
 from opendp_apps.utils.extra_validators import VALIDATE_MSG_EPSILON
+from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 
 
 class TestRunRelease(TestCase):
@@ -147,17 +149,18 @@ class TestRunRelease(TestCase):
 
         release_info_object = release_util.get_new_release_info_object()
         dp_release = release_info_object.dp_release
-        release_list = dp_release['statistics']
 
-        self.assertEqual(release_list[0]['variable'], 'EyeHeight')
-        self.assertTrue('result' in release_list[0])
-        self.assertTrue('value' in release_list[0]['result'])
-        self.assertTrue(float(release_list[0]['result']['value']))
+        stats_list = dp_release['statistics']
 
-        self.assertEqual(release_list[1]['variable'], 'TypingSpeed')
-        self.assertTrue('result' in release_list[1])
-        self.assertTrue('value' in release_list[1]['result'])
-        self.assertTrue(float(release_list[1]['result']['value']))
+        self.assertEqual(stats_list[0]['variable'], 'EyeHeight')
+        self.assertTrue('result' in stats_list[0])
+        self.assertTrue('value' in stats_list[0]['result'])
+        self.assertTrue(float(stats_list[0]['result']['value']))
+
+        self.assertEqual(stats_list[1]['variable'], 'TypingSpeed')
+        self.assertTrue('result' in stats_list[1])
+        self.assertTrue('value' in stats_list[1]['result'])
+        self.assertTrue(float(stats_list[1]['result']['value']))
 
     def test_30_api_bad_stat(self):
         """(30) Via API, run compute stats with error"""
@@ -221,6 +224,7 @@ class TestRunRelease(TestCase):
         analysis_plan.save()
 
         params = dict(object_id=str(analysis_plan.object_id))
+
         response = self.client.post('/api/release/',
                                     json.dumps(params),
                                     content_type='application/json')
@@ -230,6 +234,13 @@ class TestRunRelease(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertIsNotNone(jresp['dp_release'])
         self.assertIsNotNone(jresp['object_id'])
+
+        updated_plan = AnalysisPlan.objects.get(object_id=analysis_plan.object_id)
+        json_filename = ReleaseInfoFormatter.get_json_filename(updated_plan.release_info)
+
+        self.assertTrue(updated_plan.release_info.dp_release_json_file.name.endswith(json_filename))
+        self.assertTrue(updated_plan.release_info.dp_release_json_file.size >= 2600)
+
 
     def test_60_analysis_plan_has_release_info(self):
         """(60) Via API, ensure that release_info is added as a field to AnalysisPlan"""
@@ -254,8 +265,7 @@ class TestRunRelease(TestCase):
 
         response = self.client.get(f'/api/analyze/{analysis_plan.object_id}/')
         analysis_plan_jresp = response.json()
-        # from pprint import pprint
-        # pprint(analysis_plan_jresp)
+
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(analysis_plan_jresp['release_info'])
 
@@ -264,3 +274,117 @@ class TestRunRelease(TestCase):
         self.assertIsNotNone(histogram_results)
         self.assertEqual(len(histogram_results), 1)
         self.assertTrue(type(histogram_results[0]['result']), list)
+        self.assertIn('dp_release', analysis_plan_jresp['release_info'])
+
+        self.assertIn('dataset', analysis_plan_jresp['release_info']['dp_release'])
+
+        updated_plan = AnalysisPlan.objects.get(object_id=self.analysis_plan.object_id)
+        json_filename = ReleaseInfoFormatter.get_json_filename(updated_plan.release_info)
+
+        self.assertTrue(updated_plan.release_info.dp_release_json_file.name.endswith(json_filename))
+        self.assertTrue(updated_plan.release_info.dp_release_json_file.size >= 2600)
+
+        # Uncomment next line to show the AnalysisPlan output
+        #   with attached ReleaseInfo object
+        # print(json.dumps(analysis_plan_jresp, indent=4))
+
+    def test_70_dataset_formatter_eye_fatigue_file(self):
+        """(70) Test the DataSetFormatter -- dataset info formatted for inclusion in ReleaseInfo.dp_release"""
+        msgt(self.test_70_dataset_formatter_eye_fatigue_file.__doc__)
+        """
+        Expected result:
+        {
+            "type": "dataverse",
+            "name": "Replication Data for: Eye-typing experiment",
+            "citation": null,
+            "doi": "doi:10.7910/DVN/PUXVDH",
+            "identifier": null,
+            "release_deposit_info": {
+                "deposited": false
+            },
+            "installation": {
+                "name": "Mock Local Dataverse",
+                "url": "http://127.0.0.1:8000/dv-mock-api"
+            },
+            "file_information": {
+                "name": "Fatigue_data.tab",
+                "identifier": null,
+                "fileFormat": "text/tab-separated-values"
+            }
+        }
+        """
+        formatter = DataSetFormatter(self.analysis_plan.dataset)
+        if formatter.has_error():
+            print(formatter.get_err_msg())
+
+        self.assertFalse(formatter.has_error())
+        ds_info = formatter.get_formatted_info()
+
+        # print(json.dumps(ds_info, indent=4))
+
+        self.assertEqual(ds_info['type'], "dataverse")
+        self.assertEqual(ds_info['name'], "Replication Data for: Eye-typing experiment")
+        self.assertIsNone(ds_info['citation'])
+
+        self.assertEqual(ds_info['doi'], "doi:10.7910/DVN/PUXVDH")
+        self.assertIsNone(ds_info['identifier'])
+        self.assertFalse(ds_info['release_deposit_info']['deposited'])
+
+        self.assertEqual(ds_info['installation']['name'], 'Mock Local Dataverse')
+        self.assertEqual(ds_info['installation']['url'], 'http://127.0.0.1:8000/dv-mock-api')
+
+        self.assertEqual(ds_info['file_information']['name'], "Fatigue_data.tab")
+        self.assertIsNone(ds_info['file_information']['identifier'])
+        self.assertEqual(ds_info['file_information']['fileFormat'], "text/tab-separated-values")
+
+
+    def test_80_dataset_formatter_crisis_file(self):
+        """(80) Test the DataSetFormatter -- dataset info formatted for inclusion in ReleaseInfo.dp_release"""
+        msgt(self.test_80_dataset_formatter_crisis_file.__doc__)
+        """
+        Expected result:
+        {
+            "type": "dataverse",
+            "name": "crisis.tab",
+            "citation": "Epstein, Lee, Daniel E Ho, Gary King, and Jeffrey A Segal. 2005. The Supreme Court During Crisis: How War Affects only Non-War Cases. New York University Law Review 80: 1\u2013116: \n<a href=\"http://j.mp/kh2NV8\" target=\"_blank\" rel=\"nofollow\">Link to article</a>. DASH",
+            "doi": "doi:10.7910/DVN/OLD7MB",
+            "identifier": null,
+            "release_deposit_info": {
+                "deposited": false
+            },
+            "installation": {
+                "name": "Harvard Dataverse",
+                "url": "https://dataverse.harvard.edu"
+            },
+            "file_information": {
+                "name": "crisis.tab",
+                "identifier": "https://doi.org/10.7910/DVN/OLD7MB/ZI4N3J",
+                "fileFormat": "text/tab-separated-values"
+            }
+        }
+        """
+
+        dataset_info = DataSetInfo.objects.get(id=3)
+
+        formatter = DataSetFormatter(dataset_info)
+        if formatter.has_error():
+            print(formatter.get_err_msg())
+
+        self.assertFalse(formatter.has_error())
+        ds_info = formatter.get_formatted_info()
+        # print(json.dumps(ds_info, indent=4))
+
+        self.assertEqual(ds_info['type'], "dataverse")
+        self.assertEqual(ds_info['name'], "crisis.tab")
+        self.assertTrue(ds_info['citation'].startswith("Epstein, Lee"))
+
+        self.assertEqual(ds_info['doi'], "doi:10.7910/DVN/OLD7MB")
+        self.assertIsNone(ds_info['identifier'])
+        self.assertFalse(ds_info['release_deposit_info']['deposited'])
+
+        self.assertEqual(ds_info['installation']['name'], 'Harvard Dataverse')
+        self.assertEqual(ds_info['installation']['url'], 'https://dataverse.harvard.edu')
+
+        self.assertEqual(ds_info['file_information']['name'], "crisis.tab",)
+        self.assertEqual(ds_info['file_information']['identifier'], "https://doi.org/10.7910/DVN/OLD7MB/ZI4N3J")
+        self.assertEqual(ds_info['file_information']['fileFormat'], "text/tab-separated-values")

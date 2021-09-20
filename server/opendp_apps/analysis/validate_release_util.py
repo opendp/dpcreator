@@ -12,22 +12,26 @@
         - Retrieve
 """
 import json
+from io import BytesIO
 import pkg_resources
+import tempfile
 
+from django.core.files.base import ContentFile
+from django.core.files import File
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
 from opendp.mod import OpenDPException
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
+from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 from opendp_apps.analysis.stat_valid_info import StatValidInfo
-#from opendp_apps.analysis.tools.dp_mean import dp_mean
-from opendp_apps.analysis.models import ReleaseInfo
-from opendp_apps.analysis.tools.dp_histogram_spec import DPHistogramSpec
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
-from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
+from opendp_apps.analysis.tools.dp_histogram_spec import DPHistogramSpec
+from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
+
 from opendp_apps.utils.extra_validators import \
     (validate_epsilon_not_null,
      validate_not_negative)
@@ -180,11 +184,20 @@ class ValidateReleaseUtil(BasicErrCheck):
         assert epsilon_used > 0.0, "make_release_info/ Something's wrong! Epsilon should always be > 0"
         self.release_info = None
 
+        # (1) Format the release JSON as a Python dict as well as JSON string
+        #
         formatted_release = self.get_final_release_data()
         if self.has_error():
             del(self.release_stats)
             return
 
+        formatted_release_json_str = self.get_final_release_data(as_json=True)
+        if self.has_error():
+            del(self.release_stats)
+            return
+
+        # (3) Save the ReleaseInfo object
+        #
         params = dict(dataset=self.analysis_plan.dataset,
                       epsilon_used=epsilon_used,
                       dp_release=formatted_release)
@@ -192,9 +205,19 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.release_info = ReleaseInfo(**params)
         self.release_info.save()
 
-        self.analysis_plan.release_info = self.release_info
-        self.analysis_plan.save()
+        # (4) Save Release JSON string to a file on field ReleaseInfo.dp_release_json
+        #
+        json_filename = ReleaseInfoFormatter.get_json_filename(self.release_info)
 
+        django_file = ContentFile(formatted_release_json_str.encode())
+        self.release_info.dp_release_json_file.save(json_filename, django_file)
+        self.release_info.save()
+
+        # (5) Attach the ReleaseInfo to the AnalysisPlan, AnalysisPlan.release_info
+        #
+        self.analysis_plan.release_info = self.release_info
+        self.analysis_plan.user_step = AnalysisPlan.AnalystSteps.STEP_1200_PROCESS_COMPLETE
+        self.analysis_plan.save()
         # print('ValidateReleaseUtil - self.release_stats', json.dumps(self.release_stats, indent=4))
 
     def get_new_release_info_object(self):
@@ -203,16 +226,18 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         return self.release_info
 
-    def get_final_release_data(self):
+
+    def get_final_release_data(self, as_json=False):
         """Build object to save in ReleaseInfo.dp_release"""
         formatter = ReleaseInfoFormatter(self)
 
         if formatter.has_error():
             # shouldn't happen, but over time...
-            self.add_err_msg(formatter.get_err_msg)
+            self.add_err_msg(formatter.get_err_msg())
             return
 
-        return formatter.get_release_data()
+
+        return formatter.get_release_data(as_json=as_json)
 
 
     def get_release_stats(self):
@@ -304,11 +329,11 @@ class ValidateReleaseUtil(BasicErrCheck):
         for dp_stat in self.dp_statistics:
             stat_num += 1       # not used yet...
             """
-            We're putting together lots of properties to pass to 
+            We're putting together lots of properties to pass to
             statistic specific classes such as DPMeanSpec.
-            
+
             These classes take care of most error checking and validation.
-            
+
             - Some sample input from the UI--e.g. contents of "dp_stat:
                 {
                     "statistic": astatic.DP_MEAN,

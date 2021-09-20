@@ -27,11 +27,11 @@
                 class="rounded-pill mr-2"
                 v-for="(statistic, index) in singleVariableStatistics"
                 :key="statistic + '-' + index"
-                :label="statistic"
-                :value="statistic"
+                :label="statistic.label"
+                :value="statistic.value"
                 on-icon="mdi-check"
                 @click="() => updateSelectedStatistic(statistic)"
-                :data-test="statistic"
+                :data-test="statistic.label"
             ></v-radio>
           </v-radio-group>
         </div>
@@ -70,9 +70,9 @@
                 class="rounded-pill mr-2"
                 v-for="(handlingOption, index) in missingValuesHandling"
                 :key="handlingOption + '-' + index"
-                :label="handlingOption"
-                :value="handlingOption"
-                :data-test="handlingOption"
+                :label="handlingOption.label"
+                :value="handlingOption.value"
+                :data-test="handlingOption.label"
                 on-icon="mdi-check"
                 @click="() => updateFixedInputVisibility(handlingOption)"
             ></v-radio>
@@ -195,6 +195,9 @@ export default {
   name: "AddStatisticDialog",
   components: {Button, ColoredBorderAlert},
   props: ["formTitle", "dialog", "editedIndex", "editedItem", "variableInfo", "statistics"],
+  created() {
+    console.log('created, ' + JSON.stringify(this.analysisPlan))
+  },
   computed: {
     ...mapState('dataset', ['analysisPlan', "datasetInfo"]),
     ...mapGetters('dataset', ['getDepositorSetupInfo']),
@@ -213,6 +216,7 @@ export default {
       return (
           !this.editedItemDialog.statistic ||
           !this.editedItemDialog.variable ||
+          !this.analysisPlan ||
           !this.editedItemDialog.missingValuesHandling
       );
     },
@@ -227,8 +231,10 @@ export default {
         if (displayVar.label === '') {
           displayVar.label = displayVar.name
         }
-        if ((this.selectedStatistic !== 'Mean') ||
-            (this.selectedStatistic === 'Mean' && this.variableInfo[key].type === 'Numerical')) {
+
+        if ((this.selectedStatistic == null) ||
+            (this.selectedStatistic.label !== 'Mean') ||
+            (this.selectedStatistic.label === 'Mean' && this.variableInfo[key].type === 'Numerical')) {
           displayVars.push(displayVar)
         }
 
@@ -239,15 +245,24 @@ export default {
   watch: {
     editedItem: function (newEditedItem) {
       this.editedItemDialog = Object.assign({}, newEditedItem);
+    },
+    analysisPlan: function (newVal) {
+      console.log("new analysisPlan: " + newVal)
     }
   },
   data: () => ({
-    singleVariableStatistics: ["Mean", "Histogram", "Quantile"],
+    singleVariableStatistics: [
+      {value: "mean", label: "Mean"},
+      {value: "histogram", label: "Histogram"},
+      {value: "quantile", label: "Quantile"},
+      {value: "count", label: "Count"}
+    ],
     selectedStatistic: null,
     validationError: false,
     validationErrorMsg: null,
     editedItemDialog: {
       statistic: "",
+      label: "",
       variable: [],
       epsilon: "",
       delta: '0.0',
@@ -260,20 +275,27 @@ export default {
     },
     missingValuesHandling: [
       // "Drop them", remove this for now, until the library can use it
-      "Insert random value",
-      "Insert fixed value"
+      {value: "insert_random", label: "Insert random value"},
+      {value: "insert_fixed", label: "Insert fixed value"}
     ]
   }),
   methods: {
     save() {
-      this.validate().then((valid) => {
-        if (valid) {
-          this.validationError = false
-          this.$emit("saveConfirmed", this.editedItemDialog)
-        } else {
-          this.validationError = true
-        }
-      })
+      try {
+        this.editedItemDialog.label = this.selectedStatistic.label
+        this.validate().then((valid) => {
+          if (valid) {
+            this.validationError = false
+            this.$emit("saveConfirmed", this.editedItemDialog)
+          } else {
+            this.validationError = true
+          }
+        })
+      } catch (err) {
+        this.validationError = true
+        console.error(err)
+        this.validationErrorMsg = [{"valid": false, "message": err}]
+      }
     },
     validate() {
       if (this.checkForDuplicates()) {
@@ -372,7 +394,7 @@ export default {
     },
     updateFixedInputVisibility(handlingOption) {
       this.editedItemDialog.handleAsFixed =
-          handlingOption === "Insert fixed value";
+          handlingOption.label === "Insert fixed value";
     }
   }
 };

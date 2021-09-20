@@ -220,17 +220,15 @@ export default {
     save(editedItemFromDialog) {
       this.editedItem = Object.assign({}, editedItemFromDialog);
       if (this.isEditionMode) {
-        const label = this.editedItem.variable
-        Object.assign(this.statistics[this.editedIndex], this.editedItem, {label});
+         Object.assign(this.statistics[this.editedIndex], this.editedItem);
       } else {
         for (let variable of this.editedItem.variable) {
-          let label = variable
           let ci = this.getDepositorSetupInfo.confidenceInterval
           if (!statsInformation.isDeltaStat(this.editedItem.statistic)) {
             this.editedItem.delta = ""
           }
           this.statistics.push(
-              Object.assign({}, this.editedItem, {variable}, {label}, {ci})
+              Object.assign({}, this.editedItem, {variable}, {ci})
           );
         }
       }
