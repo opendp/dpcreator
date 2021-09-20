@@ -304,6 +304,7 @@ class DataverseFileInfo(DataSetInfo):
         return info
 
 
+
 class UploadFileInfo(DataSetInfo):
     """
     Refers to a file uploaded independently of DV

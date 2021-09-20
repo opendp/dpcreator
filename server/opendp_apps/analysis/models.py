@@ -147,7 +147,15 @@ class ReleaseInfo(TimestampedModelWithUUID):
                                      validators=[validate_not_negative])
     dp_release = models.JSONField()
 
+    dp_release_json_file = models.FileField( \
+                                   # storage=settings.RELEASE_FILE_STORAGE_ROOT,
+                                   upload_to='release-files/%Y/%m/%d/',
+                                   blank=True, null=True)
 
+    dp_release_pdf_file = models.FileField(
+                                   # storage=settings.RELEASE_FILE_STORAGE_ROOT,
+                                   upload_to='release-files/%Y/%m/%d/',
+                                   blank=True, null=True)
 
     #pdf_release
 
