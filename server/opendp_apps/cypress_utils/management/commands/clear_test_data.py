@@ -19,9 +19,9 @@ class Command(BaseCommand):
             return
 
         models_to_clear = [('terms_of_access', ['TermsOfAccessLog']),
-                           ('analysis', ['ReleaseInfo', 'AnalysisPlan']),
-                           ('dataset', ['UploadFileInfo', 'DataverseFileInfo', 'DataSetInfo']),
+                           ('analysis', ['AnalysisPlan']),
                            ('analysis', ['ReleaseInfo', 'DepositorSetupInfo']),
+                           ('dataset', ['UploadFileInfo', 'DataverseFileInfo', 'DataSetInfo']),
                            ('dataverses', ['DataverseHandoff']),
                            ('user', ['DataverseUser'])
                            ]

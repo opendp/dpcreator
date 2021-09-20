@@ -77,21 +77,27 @@ export default {
         nextStep: STEP_0800_STATISTICS_CREATED
     },
     [STEP_0700_VARIABLES_CONFIRMED]: {
+        workflowStatus: statusInformation.statuses.IN_PROGRESS,
         label: 'Variables Confirmed'
     },
     [STEP_0800_STATISTICS_CREATED]: {
+        workflowStatus: statusInformation.statuses.IN_PROGRESS,
         label: 'Statistics Created'
     },
     [STEP_0900_STATISTICS_SUBMITTED]: {
+        workflowStatus: statusInformation.statuses.IN_EXECUTION,
         label: 'Statistics Submitted'
     },
     [STEP_1000_RELEASE_COMPLETE]: {
+        workflowStatus: statusInformation.statuses.IN_EXECUTION,
         label: 'Release Complete'
     },
     [STEP_1100_DV_RELEASE_DEPOSITED]: {
+        workflowStatus: statusInformation.statuses.IN_EXECUTION,
         label: 'Dataverse Release Deposited'
     },
     [STEP_1200_PROCESS_COMPLETE]: {
+        workflowStatus: statusInformation.statuses.COMPLETED,
         label: 'Process Complete'
     },
     [STEP_9100_VALIDATION_FAILED]: {

@@ -114,12 +114,16 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
 })
 
 Cypress.Commands.add('testMean', (numericVar) => {
+    cy.intercept('PATCH', '/api/deposit/**',).as(
+        'patchDeposit'
+    )
+
     const minDataTest = '[data-test="' + numericVar.name + ':min"]'
     const maxDataTest = '[data-test="' + numericVar.name + ':max"]'
     // Enter min and max for one numericVar so we can validate
     cy.get(minDataTest).type(numericVar.min, {force: true})
     cy.get(maxDataTest).type(numericVar.max, {force: true})
-
+    cy.wait('@patchDeposit', {timeout: 5000})
     // Continue to Set Epsilon Step
     cy.get('[data-test="wizardContinueButton"]').last().click();
     cy.get('[data-test="Larger Population - no"]').check({force: true})
@@ -127,7 +131,11 @@ Cypress.Commands.add('testMean', (numericVar) => {
 
     // Continue to Create  Statistics Step
     cy.get('[data-test="wizardContinueButton"]').last().click();
+    cy.intercept('POST', '/api/analyze/**',).as(
+        'createPlan'
+    )
 
+    cy.wait('@createPlan', {timeout: 10000})
     // Test Validating EyeHeight mean
     cy.get('[data-test="Add Statistic"]').click({force: true});
     cy.get('[data-test="Mean"]').click({force: true});
@@ -135,12 +143,27 @@ Cypress.Commands.add('testMean', (numericVar) => {
     cy.get(varDataTest).click({force: true})
     cy.get('[data-test="Insert fixed value"]').click({force: true})
     cy.get('[data-test="Fixed value"]').type(numericVar.fixedValue)
-    cy.get('[data-test="Create statistic"]').click()
+    cy.get('[data-test="Create statistic"]').click({force: true})
 
     // The statistic should have been created
     // cy.get('[data-test="statistic"]').should('contain', 'Mean')
     cy.get('tr').first().get('td').should('contain', 'Mean')
     cy.get('table').contains('td', 'Mean').should('be.visible');
+
+    // Click Continue to go to Generate DP Release Step
+    cy.get('[data-test="wizardContinueButton"]').last().click();
+
+    // Submit Statistic
+    cy.get('[data-test="Submit statistics"]').click({force: true});
+
+    // Go to Details page
+    cy.get('[data-test="View Data Details"]').click({force: true});
+    cy.url().should('contain', 'my-data-details')
+    // The Release Details should be visible
+    cy.get('[data-test="status tag"]').should('contain', 'Release completed')
+    cy.get('[data-test="DP Statistics Panel"]').click({force: true})
+    cy.get('[data-test="DP Statistics Panel"]').should('contain', 'statistic:"mean"')
+
 
 })
 
