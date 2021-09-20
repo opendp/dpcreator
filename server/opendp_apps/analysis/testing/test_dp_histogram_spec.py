@@ -49,8 +49,8 @@ class HistogramStatSpecTest(TestCase):
         """(10) Test DP Mean Spec"""
         msgt(self.test_10_debug.__doc__)
 
-        spec_props = {'variable': 'EyeHeight',
-                      'col_index': 19,
+        spec_props = {'variable': 'Subject',
+                      'col_index': 0,
                       'statistic': astatic.DP_HISTOGRAM,
                       'dataset_size': 183,
                       'epsilon': 1.0,
@@ -61,6 +61,9 @@ class HistogramStatSpecTest(TestCase):
                       'fixed_value': 0,
                       'variable_info': {'min': 0,
                                         'max': 100,
+                                        'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"', '"cw"',
+                                                       '"jp"', '"rh"', '"aq"', '"ph"', '"le"', '"mn"', '"ls2"', '"no"',
+                                                       '"af"'],
                                         'type': 'Integer', },
                       }
 
@@ -100,7 +103,8 @@ class HistogramStatSpecTest(TestCase):
                 'variable_info': {
                     'min': 0,
                     'max': 1E5,
-                    'categories': ['mh', 'ac', 'jm', 'cw', 'bh2'],
+                    'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"', '"cw"',
+                                   '"jp"', '"rh"', '"aq"', '"ph"', '"le"', '"mn"', '"ls2"', '"no"', '"af"'],
                     'type': 'Categorical'
                 }
             }
@@ -139,8 +143,8 @@ class HistogramStatSpecTest(TestCase):
         """(10) Run DP Mean valid spec"""
         msgt(self.test_10_valid_spec.__doc__)
 
-        spec_props = {'variable': 'EyeHeight',
-                      'col_index': 19,
+        spec_props = {'variable': 'Subject',
+                      'col_index': 0,
                       'statistic': astatic.DP_HISTOGRAM,
                       'dataset_size': 183,
                       'epsilon': 1.0,
@@ -151,6 +155,9 @@ class HistogramStatSpecTest(TestCase):
                       'fixed_value': 5,
                       'variable_info': {'min': -8,
                                         'max': 5,
+                                        'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"', '"cw"',
+                                                       '"jp"', '"rh"', '"aq"', '"ph"', '"le"', '"mn"', '"ls2"', '"no"',
+                                                       '"af"'],
                                         'type': 'Float', },
                       }
 
@@ -182,8 +189,8 @@ class HistogramStatSpecTest(TestCase):
         """(20) Bad epsilon"""
         msgt(self.test_20_bad_epsilon.__doc__)
 
-        spec_props = {'variable': 'EyeHeight',
-                      'col_index': 19,
+        spec_props = {'variable': 'Subject',
+                      'col_index': 0,
                       'statistic': astatic.DP_HISTOGRAM,
                       'dataset_size': 183,
                       'epsilon': 1.0,
@@ -193,6 +200,9 @@ class HistogramStatSpecTest(TestCase):
                       'fixed_value': '5',
                       'variable_info': {'min': -8,
                                         'max': 5,
+                                        'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"', '"cw"',
+                                                       '"jp"', '"rh"', '"aq"', '"ph"', '"le"', '"mn"', '"ls2"', '"no"',
+                                                       '"af"'],
                                         'type': 'Float', },
                       }
 
@@ -220,8 +230,8 @@ class HistogramStatSpecTest(TestCase):
         """(30) Bad ci vals"""
         msgt(self.test_30_bad_ci.__doc__)
 
-        spec_props = {'variable': 'EyeHeight',
-                      'col_index': 19,
+        spec_props = {'variable': 'Subject',
+                      'col_index': 0,
                       'statistic': astatic.DP_HISTOGRAM,
                       'dataset_size': 183,
                       'epsilon': 1.0,
@@ -231,6 +241,9 @@ class HistogramStatSpecTest(TestCase):
                       'fixed_value': 5,
                       'variable_info': {'min': -8,
                                         'max': 5,
+                                        'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"', '"cw"',
+                                                       '"jp"', '"rh"', '"aq"', '"ph"', '"le"', '"mn"', '"ls2"', '"no"',
+                                                       '"af"'],
                                         'type': 'Float', },
                       }
 
@@ -250,8 +263,8 @@ class HistogramStatSpecTest(TestCase):
         """(40) Test impute validation"""
         msgt(self.test_40_test_impute.__doc__)
 
-        spec_props = {'variable': 'EyeHeight',
-                      'col_index': 19,
+        spec_props = {'variable': 'Subject',
+                      'col_index': 0,
                       'statistic': astatic.DP_HISTOGRAM,
                       'dataset_size': 183,
                       'epsilon': 1.0,
@@ -261,6 +274,9 @@ class HistogramStatSpecTest(TestCase):
                       'fixed_value': 5,
                       'variable_info': {'min': -8,
                                         'max': 5,
+                                        'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"', '"cw"',
+                                                       '"jp"', '"rh"', '"aq"', '"ph"', '"le"', '"mn"', '"ls2"', '"no"',
+                                                       '"af"'],
                                         'type': 'Float', },
                       }
 
@@ -294,8 +310,8 @@ class HistogramStatSpecTest(TestCase):
         """(100) Run DP mean calculation"""
         msgt(self.test_100_run_dphist_calculation.__doc__)
 
-        spec_props = {'variable': 'EyeHeight',
-                      'col_index': 19,
+        spec_props = {'variable': 'Subject',
+                      'col_index': 0,
                       'statistic': astatic.DP_HISTOGRAM,
                       'dataset_size': 183,
                       'epsilon': 1.0,
@@ -306,7 +322,10 @@ class HistogramStatSpecTest(TestCase):
                       'fixed_value': 5,
                       'variable_info': {'min': -8,
                                         'max': 5,
-                                        'type': 'Float', },
+                                        'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"', '"cw"',
+                                                       '"jp"', '"rh"', '"aq"', '"ph"', '"le"', '"mn"', '"ls2"', '"no"',
+                                                       '"af"'],
+                                        'type': 'Integer', },
                       }
 
         dp_hist = DPHistogramSpec(spec_props)
@@ -335,8 +354,6 @@ class HistogramStatSpecTest(TestCase):
         #
         dp_hist.run_chain(col_indexes, file_obj, sep_char="\t")
 
-
-
     def test_105_run_dphist_calculation_categorical(self):
         """(105) Run DP mean calculation with labels"""
         msgt(self.test_105_run_dphist_calculation_categorical.__doc__)
@@ -349,21 +366,22 @@ class HistogramStatSpecTest(TestCase):
             'epsilon': 1.0,
             'delta': 0.0,
             'ci': astatic.CI_95,
-            'fixed_value': "1",
+            'fixed_value': 1,
             'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
             'variable_info': {
                 'min': 0,
                 'max': 1E5,
-                'categories': ['mh', 'ac', 'jm', 'cw', 'bh2'],
+                'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"', '"cw"', '"jp"', '"rh"', '"aq"',
+                               '"ph"', '"le"', '"mn"', '"ls2"', '"no"', '"af"'],
                 'type': 'Categorical'
             }
         }
 
         dp_hist = DPHistogramSpec(spec_props)
-        print(dp_hist.has_error(), dp_hist.error_messages)
+        print(f"DPHistogramSpec valid? {dp_hist.has_error()}. get_error_msg_dict: {dp_hist.get_error_msg_dict()}")
         self.assertTrue(dp_hist.is_chain_valid())
         if dp_hist.has_error():
-            print(dp_hist.get_error_messages())
+            print(f"get_error_messages(): {dp_hist.get_error_messages()}")
             return
         # print('\nUI info:', json.dumps(dp_hist.get_success_msg_dict()))
 
@@ -384,4 +402,5 @@ class HistogramStatSpecTest(TestCase):
         # Call run_chain
         #
         dp_hist.run_chain(col_indexes, file_obj, sep_char="\t")
+        print(dp_hist.statistic)
 

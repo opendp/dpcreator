@@ -83,26 +83,30 @@ class DPHistogramSpec(StatSpec):
             # Yes!
             return self.preprocessor
 
-        preprocessor = (
-            # Convert data into Vec<Vec<String>>
-                # Selects a column of df, Vec<str>
-                make_select_column(key=self.col_index, TOA=str) >>
-                # Cast the column as Vec<Int>
-                make_cast(TIA=str, TOA=int) >>
-                # Impute missing values to 0
-                make_impute_constant(0) >>
-                make_count_by_categories(categories=list(range(1, 20)), MO=L1Distance[float]) # >>
-            # make_base_geometric(scale=1., bounds=(0,201), D="VectorDomain<AllDomain<i32>>")
-        )
+        try:
+            preprocessor = (
+                # Convert data into Vec<Vec<String>>
+                    # Selects a column of df, Vec<str>
+                    make_select_column(key=self.col_index, TOA=str) >>
+                    # Cast the column as Vec<Int>
+                    # make_cast(TIA=str, TOA=str) >>
+                    # Impute missing values to 0
+                    # make_impute_constant(self.fixed_value) >>
+                    make_count_by_categories(categories=self.categories, MO=L1Distance[float])
+                # make_base_geometric(scale=1., bounds=(0,201), D="VectorDomain<AllDomain<i32>>")
+            )
 
-        # self.scale = binary_search(lambda s: self.check_scale(s, preprocessor, 1, self.epsilon), bounds=(0, 1000))
+            # self.scale = binary_search(lambda s: self.check_scale(s, preprocessor, 1, self.epsilon), bounds=(0, 1000))
 
-        # preprocessor = preprocessor >> make_base_geometric(scale=1., D=VectorDomain[AllDomain[int]])
+            # preprocessor = preprocessor >> make_base_geometric(scale=1., D=VectorDomain[AllDomain[int]])
 
-        # keep a point to preprocessor in case it's re-used
-        self.preprocessor = preprocessor
+            # keep a point to preprocessor in case it's re-used
+            self.preprocessor = preprocessor
+            return preprocessor
 
-        return preprocessor
+        except OpenDPException as ex:
+            self.add_err_msg(ex.message)
+
 
     def set_accuracy(self):
         """Return the accuracy measure using Laplace and the confidence interval as alpha"""
