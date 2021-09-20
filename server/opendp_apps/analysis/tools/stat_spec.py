@@ -11,6 +11,8 @@ BaseClass for Univariate statistics for OpenDP.
 from opendp.accuracy import laplacian_scale_to_accuracy
 import abc # import ABC, ABCMeta, abstractmethod
 from django.core.exceptions import ValidationError
+from django.template.loader import render_to_string
+
 from opendp.mod import OpenDPException
 
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheckList
@@ -91,6 +93,14 @@ class StatSpec:
         self.run_02_basic_validation()     # always the same
         self.run_03_custom_validation()    # customize, if types need converting, etc.
 
+
+    def get_ci_text(self):
+        """Return the ci as text. e.g. .05 is returned as 95%"""
+        if not self.ci:
+            return None
+
+        ci_num = (1-self.ci) * 100
+        return f'{ci_num}%'
 
     @abc.abstractmethod
     def additional_required_props(self):
@@ -413,6 +423,27 @@ class StatSpec:
         #for key, val in self.__dict__.items():
         #    print(f'{key}: {val}')
 
+    def get_description_html(self, as_table=False):
+        """
+        Create an HTML description using a ReleaseInfo object
+        """
+        info_dict = {
+            'stat': self,
+            'use_min_max': 'min' in self.additional_required_props(),
+            'MISSING_VAL_INSERT_FIXED': astatic.MISSING_VAL_INSERT_FIXED,
+            'MISSING_VAL_INSERT_RANDOM': astatic.MISSING_VAL_INSERT_RANDOM
+        }
+
+        if as_table is True:
+            html_desc = render_to_string('analysis/dp_stat_general_description_tbl.html',
+                                         info_dict)
+        else:
+            html_desc = render_to_string('analysis/dp_stat_general_description.html',
+                                         info_dict)
+
+        print(html_desc)
+        return html_desc
+
 
     def get_release_dict(self):
         """Final release info"""
@@ -456,6 +487,9 @@ class StatSpec:
                 final_info['accuracy']['value'] = self.accuracy_val
             if self.accuracy_message:
                 final_info['accuracy']['message'] = self.accuracy_message
+
+        final_info['description'] = dict(html=self.get_description_html(),
+                                         html_table=self.get_description_html(as_table=True))
 
         return final_info
 
