@@ -114,12 +114,16 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
 })
 
 Cypress.Commands.add('testMean', (numericVar) => {
+    cy.intercept('PATCH', '/api/deposit/**',).as(
+        'patchDeposit'
+    )
+
     const minDataTest = '[data-test="' + numericVar.name + ':min"]'
     const maxDataTest = '[data-test="' + numericVar.name + ':max"]'
     // Enter min and max for one numericVar so we can validate
     cy.get(minDataTest).type(numericVar.min, {force: true})
     cy.get(maxDataTest).type(numericVar.max, {force: true})
-
+    cy.wait('@patchDeposit', {timeout: 5000})
     // Continue to Set Epsilon Step
     cy.get('[data-test="wizardContinueButton"]').last().click();
     cy.get('[data-test="Larger Population - no"]').check({force: true})

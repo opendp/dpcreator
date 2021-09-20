@@ -123,47 +123,9 @@ export default {
   },
   watch: {
     stepperPosition: function (val, oldVal) {
-      // if the new val is more than one step ahead of the oldVal, that means that val is being initialized because
-      // the user has come from the 'Continue Workflow' button on the my data page.  So we don't need to go to the
-      // next step.
-      if (val - oldVal === 1) {
-        const completedStep = stepInformation[this.getDepositorSetupInfo.userStep].nextStep
-        const completedStepProp = {userStep: completedStep}
-        // Update the user step on the DepositorSetup or the Analysis Plan, depending
-        // where we are in the Wizard
-        console.log("COMPLETED STEP" + completedStep)
-        if (depositorSteps.includes(completedStep)) {
-          console.log("CALLING UPDATE")
-          const payload = {objectId: this.getDepositorSetupInfo.objectId, props: completedStepProp}
-          this.$store.dispatch('dataset/updateDepositorSetupInfo', payload).then(() => {
-            // if the step that has just been completed is  STEP_0600_EPSILON_SET, then update the depositorsetupInfo
-            // with epsilon and delta, and create the AnalysisPlan before continuing on to the
-            // Create Statistics wizard step
-            console.log("RETURNED FROM UPDATE")
-            if (completedStep === STEP_0600_EPSILON_SET) {
-              console.log("WIZARD - EPSILON SET")
-              this.$store.dispatch('dataset/updateDepositorSetupInfo', payload)
-                  .then(() => {
-                    console.log("UPDATED STEP, now creating Plan")
-                    this.$store.dispatch('dataset/createAnalysisPlan', this.datasetInfo.objectId)
-                        .then(() => {
-                          'plan created'
-                        })
-                  })
-            }
-          })
-
-        } else {
-          const payload = {objectId: this.analysisPlan.objectId, props: completedStepProp}
-          this.$store.dispatch('dataset/updateAnalysisPlan', payload)
-        }
-
-      }
       if (val == 3) {
-        console.log("INITIALIZE FORM")
         this.$refs.createStatComponent.initializeForm();
       }
-
       this.checkProfileData(val)
     }
   },
