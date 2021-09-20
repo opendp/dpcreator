@@ -60,7 +60,7 @@ class TestRunRelease(TestCase):
             {
                 "statistic": astatic.DP_MEAN,
                 "variable": "EyeHeight",
-                "epsilon": .45,
+                "epsilon": .25,
                 "delta": 0,
                 "ci": astatic.CI_95,
                 "error": "",
@@ -68,12 +68,17 @@ class TestRunRelease(TestCase):
                 "handle_as_fixed": False,
                 "fixed_value": "1",
                 "locked": False,
-                "label": "EyeHeight"
+                "label": "EyeHeight",
+                "variable_info": {
+                    "min": 0,
+                    "max": 100,
+                    "type": "Float"
+                }
             },
             {
                 "statistic": astatic.DP_MEAN,
                 "variable": "TypingSpeed",
-                "epsilon": .5,
+                "epsilon": .25,
                 "delta": 0,
                 "ci": astatic.CI_99,
                 "error": "",
@@ -81,21 +86,31 @@ class TestRunRelease(TestCase):
                 "handle_as_fixed": False,
                 "fixed_value": "9",
                 "locked": False,
-                "label": "TypingSpeed"
+                "label": "TypingSpeed",
+                "variable_info": {
+                    "min": 0,
+                    "max": 100,
+                    "type": "Float"
+                }
             },
             {
-                "statistic": astatic.DP_HISTOGRAM,
-                "variable": "TypingSpeed",
-                "epsilon": .05,
-                "delta": 0,
-                "ci": astatic.CI_99,
-                "error": "",
-                "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
-                "handle_as_fixed": False,
-                "fixed_value": 3,
-                "locked": False,
-                "label": "TypingSpeed"
-            }
+                'variable': 'Subject',
+                'col_index': 0,
+                'statistic': astatic.DP_HISTOGRAM,
+                'dataset_size': 183,
+                'epsilon': 0.5,
+                'delta': 0.0,
+                'ci': astatic.CI_95,
+                'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+                'fixed_value': 5,
+                'variable_info': {
+                    'min': 0,
+                    'max': 5,
+                    'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"', '"cw"',
+                                   '"jp"', '"rh"', '"aq"', '"ph"', '"le"', '"mn"', '"ls2"', '"no"', '"af"'],
+                    'type': 'Float'
+                }
+             }
         ]
 
     def add_source_file(self, dataset_info: DataSetInfo, filename: str, add_profile: bool = False) -> DataSetInfo:

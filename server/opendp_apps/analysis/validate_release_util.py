@@ -285,7 +285,7 @@ class ValidateReleaseUtil(BasicErrCheck):
                     stat_spec.add_err_msg(user_msg)
                     self.validation_info.append(stat_spec.get_error_msg_dict())
 
-                elif  running_epsilon > self.max_epsilon:
+                elif running_epsilon > self.max_epsilon:
                     # Error: Too much epsilon used!
                     #
                     user_msg = (f'The running epsilon ({running_epsilon}) exceeds'
@@ -408,7 +408,6 @@ class ValidateReleaseUtil(BasicErrCheck):
                 continue
             elif statistic in astatic.DP_HISTOGRAM:
                 spec = DPHistogramSpec(props)
-                print("SPEC ERRORS: ", spec.error_messages)
                 self.add_stat_spec(spec)
                 continue
             elif statistic == astatic.DP_COUNT:
