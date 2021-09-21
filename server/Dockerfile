@@ -33,3 +33,14 @@ RUN chmod u+x /usr/bin/azure_start_01.sh
 # -------------------------------------
 RUN wget -qO- "https://yihui.org/tinytex/install-bin-unix.sh" | sh
 RUN /root/.TinyTeX/bin/x86_64-linux/tlmgr install lastpage
+
+# -------------------------------------
+# Install TexLiv and dependencies
+# (Used for rendering PDFs)
+# Unlikely to use this due to
+# installation time
+# -------------------------------------
+# RUN apt install texlive
+# RUN tlmgr init-usertree && tlmgr install lastpage
+
+

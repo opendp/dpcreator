@@ -31,6 +31,7 @@ from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
+from opendp_apps.results.tools.render_release import RenderRelease
 from opendp_apps.utils.extra_validators import \
     (validate_epsilon_not_null,
      validate_not_negative)
@@ -93,7 +94,6 @@ class ValidateReleaseUtil(BasicErrCheck):
         return ValidateReleaseUtil(opendp_user, analysis_plan_id,
                                    dp_statistics=None,
                                    compute_mode=True)
-
 
     def add_stat_spec(self, stat_spec: StatSpec):
         """Add a StatSpec subclass to a list"""
@@ -175,7 +175,6 @@ class ValidateReleaseUtil(BasicErrCheck):
         # It worked! Save the Release!!
         self.make_release_info(epsilon_used)
 
-
     def make_release_info(self, epsilon_used: float):
         """
         Make a ReleaseInfo object!
@@ -210,6 +209,12 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         django_file = ContentFile(formatted_release_json_str.encode())
         self.release_info.dp_release_json_file.save(json_filename, django_file)
+
+        pdf_filename = ReleaseInfoFormatter.get_pdf_filename(self.release_info)
+        render_release = RenderRelease(self.release_info)
+        render_release.save_latex(pdf_filename)
+        django_pdf_file = ContentFile(render_release.read_latex().encode())
+        self.release_info.dp_release_pdf_file.save(pdf_filename, django_pdf_file)
         self.release_info.save()
 
         # (5) Attach the ReleaseInfo to the AnalysisPlan, AnalysisPlan.release_info
@@ -225,7 +230,6 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         return self.release_info
 
-
     def get_final_release_data(self, as_json=False):
         """Build object to save in ReleaseInfo.dp_release"""
         formatter = ReleaseInfoFormatter(self)
@@ -235,9 +239,7 @@ class ValidateReleaseUtil(BasicErrCheck):
             self.add_err_msg(formatter.get_err_msg())
             return
 
-
         return formatter.get_release_data(as_json=as_json)
-
 
     def get_release_stats(self):
         """Return the release stats"""
@@ -245,7 +247,6 @@ class ValidateReleaseUtil(BasicErrCheck):
             "Check that .has_error() is False before calling this method"
 
         return self.release_stats
-
 
     def run_validation_process(self):
         """Run the validation"""
