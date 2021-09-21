@@ -171,7 +171,7 @@ spec:
               value: /dpcreator_volume/private/user_uploaded_data
             - name: RELEASE_FILE_STORAGE_ROOT
               value: /dpcreator_volume/public/release_files
-             - name: DJANGO_SETTINGS_MODULE
+            - name: DJANGO_SETTINGS_MODULE
               value: opendp_project.settings.azure_test_01
             # ----------------------------------------------------
             - name: ALLOWED_HOSTS
