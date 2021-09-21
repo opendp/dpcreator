@@ -201,7 +201,7 @@ spec:
             - name: DJANGO_SETTINGS_MODULE
               value: opendp_project.settings.azure_test_01
             - name: ALLOWED_HOSTS
-              value: "52.191.30.153,dev.dpcreator.org,127.0.0.1,0.0.0.0"
+              value: "40.85.170.176,dev.dpcreator.org,127.0.0.1,0.0.0.0"
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
@@ -250,7 +250,7 @@ spec:
             - name: DJANGO_SETTINGS_MODULE
               value: opendp_project.settings.azure_test_01
             - name: ALLOWED_HOSTS
-              value: "52.191.30.153,dev.dpcreator.org,127.0.0.1,0.0.0.0"
+              value: "40.85.170.176,dev.dpcreator.org,127.0.0.1,0.0.0.0"
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
@@ -285,7 +285,7 @@ metadata:
 spec:
   type: LoadBalancer
   # IP mapped to dpcreator.2ravens.org
-  loadBalancerIP: 52.191.30.153
+  loadBalancerIP: 40.85.170.176
   selector:
     app: dpcreator
     tier: app
