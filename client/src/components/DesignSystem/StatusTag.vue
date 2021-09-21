@@ -1,5 +1,5 @@
 <template>
-  <v-chip :class="statusClasses" label :small="$vuetify.breakpoint.smAndDown">
+  <v-chip data-test="status tag" :class="statusClasses" label :small="$vuetify.breakpoint.smAndDown">
     {{ statusInformation[status].label }}
   </v-chip>
 </template>

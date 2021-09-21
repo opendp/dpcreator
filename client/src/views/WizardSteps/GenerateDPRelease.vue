@@ -27,6 +27,7 @@
           type="submit"
           classes="mt-5"
           label="Submit statistics"
+          data-test="Submit statistics"
       />
     </v-form>
     <v-overlay :value="areStatisticsSubmitted">
@@ -57,8 +58,8 @@
           </p>
           <p>
             Your statistics are now on
-            <StatusTag :status="IN_EXECUTION"/>
-            status, you can check the remaining time to complete in the
+            <StatusTag :status="status"/>
+            status, you can view more details in the
             <router-link
                 :to="releaseLink"
                 class="font-weight-bold text-decoration-none"
@@ -78,6 +79,7 @@
               classes="mr-2 px-5"
               :click="() => $router.push(releaseLink)"
               label="View Data Details"
+              data-test="View Data Details"
           />
           <Button
               color="primary"
@@ -98,9 +100,9 @@ import ColoredBorderAlert from "../../components/DynamicHelpResources/ColoredBor
 import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
 import statusInformation from "../../data/statusInformation";
 import StatusTag from "../../components/DesignSystem/StatusTag.vue";
-import {mapState} from "vuex";
-import {STEP_0900_STATISTICS_SUBMITTED} from "@/data/stepInformation";
-import release from "@/api/release";
+import {mapState, mapGetters} from "vuex";
+import stepInformation, {STEP_0900_STATISTICS_SUBMITTED} from "@/data/stepInformation";
+
 
 const {IN_EXECUTION} = statusInformation.statuses;
 
@@ -116,17 +118,10 @@ export default {
     areStatisticsSubmitted: function (newareStatisticsSubmitted) {
       if (newareStatisticsSubmitted === true) {
         this.areStatisticsReceived = true;
-        release.generateRelease(this.analysisPlan.objectId).then((resp) => {
-          this.releaseLink = `${NETWORK_CONSTANTS.MY_DATA_DETAILS.PATH}`
+        this.$store.dispatch('dataset/generateRelease', this.analysisPlan.objectId).then((resp) => {
+          console.log("store generateRelease(), resp: " + resp)
           this.areStatisticsGenerated = true
         })
-        /*
-        setTimeout(() => {
-          this.areStatisticsSubmitted = false;
-          //TODO: Implement the Handler of the response of the statistics submit
-          this.releaseLink = `${NETWORK_CONSTANTS.MY_DATA_DETAILS.PATH}`
-          this.areStatisticsReceived = true;
-        }, 3000);*/
       }
     }
   },
@@ -149,13 +144,21 @@ export default {
     areStatisticsSubmitted: false,
     areStatisticsReceived: false,
     areStatisticsGenerated: false,
-    releaseLink: "",
+
     NETWORK_CONSTANTS,
     IN_EXECUTION
   }),
   computed: {
     ...mapState('auth', ['user']),
-    ...mapState('dataset', ['analysisPlan'])
+    ...mapState('dataset', ['analysisPlan']),
+    ...mapGetters('dataset', ['userStep']),
+    status: function () {
+      return stepInformation[this.userStep].workflowStatus
+    },
+    releaseLink: function () {
+      return `${NETWORK_CONSTANTS.MY_DATA_DETAILS.PATH}`
+
+    }
   }
 };
 </script>
