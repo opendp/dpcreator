@@ -30,6 +30,6 @@ def make_k8s_template(specs, output_prefix=''):
 
 if __name__ == '__main__':
     # make_k8s_template()
-    #make_k8s_template(specs_01.specs_01)
+    make_k8s_template(specs_01.specs_01)
     make_k8s_template(specs_01.specs_01_test, output_prefix='test_')
 

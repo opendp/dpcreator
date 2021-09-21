@@ -1,6 +1,8 @@
 
 
 
+# dev.dpcreator.org
+#
 specs_01 = dict(bird='song',
                 # tag used for dpcreator app and nginx
                 dpcreator_app_container="ghcr.io/opendp/dpcreator/app",
@@ -9,11 +11,13 @@ specs_01 = dict(bird='song',
                 #
                 DEFAULT_FROM_EMAIL='info@opendp.org',
                 # Make these two the same!!!
-                ALLOWED_HOSTS="52.191.30.153,dev.dpcreator.org,127.0.0.1,0.0.0.0",
-                loadBalancerIP="52.191.30.153",
+                ALLOWED_HOSTS="40.85.170.176,dev.dpcreator.org,127.0.0.1,0.0.0.0",
+                loadBalancerIP="40.85.170.176",
                 #
                 )
 
+# test.dpcreator.org
+#
 specs_01_test = dict(bird='song',
                 # tag used for dpcreator app and nginx
                 dpcreator_app_container="ghcr.io/opendp/dpcreator/app",
