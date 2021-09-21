@@ -44,6 +44,10 @@ Deployment currently requires the building of two Docker images:
     #   - For more information, see README-TEXT.md at the top of the project directory
     #
     node ./build_locale/CreateLocaleJson.js
+    # If this fails, try this--then run `CreateLocaleJson.js` again:
+    # rm -rf node_modules
+    # npm install
+    # npm update
     
     #
     # Build the Vue app
@@ -63,8 +67,8 @@ Deployment currently requires the building of two Docker images:
     docker push ghcr.io/opendp/dpcreator/app:YYYY-MMDD   
    
     # Example:
-    # docker build -t ghcr.io/opendp/dpcreator/app:2021-0910 .
-    # docker push ghcr.io/opendp/dpcreator/app:2021-0910  
+    # docker build -t ghcr.io/opendp/dpcreator/app:2021-0921 .
+    # docker push ghcr.io/opendp/dpcreator/app:2021-0921  
     ```
 
 ### (B) DPCreator nginx
@@ -82,8 +86,8 @@ Deployment currently requires the building of two Docker images:
     docker push ghcr.io/opendp/dpcreator/nginx:YYYY-MMDD
   
     # Example:
-    # docker build -t ghcr.io/opendp/dpcreator/nginx:2021-0910 .
-    # docker push ghcr.io/opendp/dpcreator/nginx:2021-0910
+    # docker build -t ghcr.io/opendp/dpcreator/nginx:2021-0921 .
+    # docker push ghcr.io/opendp/dpcreator/nginx:2021-0921
 
     ```
 
