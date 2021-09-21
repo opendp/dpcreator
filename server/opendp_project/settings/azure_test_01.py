@@ -27,6 +27,7 @@ STATICFILES_DIRS = [
     #os.path.join(BASE_DIR, 'static')
     os.path.join(BASE_DIR, 'static', 'dist')
 ]
+
 """
 Settings for running cypress tests
 DANGER: This Cypress settings file introduces an API endpoint that deletes nearly all data.
