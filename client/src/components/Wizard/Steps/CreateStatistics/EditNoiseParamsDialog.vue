@@ -60,7 +60,7 @@
         <div
             class="soft_primary grey--text text--darken-2 top-borders-radius width50 pl-3 mb-5 borderBottom"
         >
-          <span class="d-inline-block width50">Confidence level</span>
+          <span class="d-inline-block width50">Significance level</span>
           <v-autocomplete
               v-model="editConfidenceInterval"
               :items="confidenceLevelOptions"
