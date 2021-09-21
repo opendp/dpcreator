@@ -146,7 +146,7 @@ spec:
         # (1) Nginx frontend: Separate requests to static files vs. Django app
         # -------------------------------------------------
         - name: dpcreator-nginx
-          image: ghcr.io/opendp/dpcreator/nginx:2021-0910
+          image: ghcr.io/opendp/dpcreator/nginx:2021-0921
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -175,7 +175,7 @@ spec:
         # (3) Core application: Django + bundled static files
         # -------------------------------------------------
         - name: dpcreator-app
-          image: ghcr.io/opendp/dpcreator/app:2021-0910
+          image: ghcr.io/opendp/dpcreator/app:2021-0921
           imagePullPolicy: Always
           command: [ "azure_start_01.sh" ]
           #command: [ "/bin/sh" ]
@@ -226,7 +226,7 @@ spec:
         # (4) Celery Queue - same image/settings as except for "command"
         # -------------------------------------------------
         - name: celery-worker
-          image: ghcr.io/opendp/dpcreator/app:2021-0910
+          image: ghcr.io/opendp/dpcreator/app:2021-0921
           imagePullPolicy: Always
           command: ['celery', '-A', 'opendp_project', 'worker', '-l', 'info', '-n', 'worker_dpcreator']
           ports:
