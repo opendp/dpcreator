@@ -97,13 +97,15 @@ class ReleaseValidationSerializer(serializers.ModelSerializer):
     The purpose of this serializer is to validate individual statistic specifications--with
     each specification described by the DPStatisticSerializer
     """
-    dp_statistics = serializers.ListField(child=DPStatisticSerializer())
-    analysis_plan_id = serializers.UUIDField()
+    dp_statistics = serializers.ListField(child=DPStatisticSerializer(), allow_null=True)
+    analysis_plan_id = serializers.UUIDField(allow_null=True)
+    dp_release_pdf_file = serializers.FileField(required=False, read_only=True)
+    dp_release_json_file = serializers.FileField(required=False, read_only=True)
 
     class Meta:
         model = ReleaseInfo
-        fields = ('dp_statistics', 'analysis_plan_id', )
-        # read_only_fields = ('dp_release', )
+        fields = ('dp_statistics', 'analysis_plan_id', 'dp_release', 'dp_release_pdf_file', 'dp_release_json_file', )
+        read_only_fields = ('dp_release', 'dp_release_pdf_file', 'dp_release_json_file', )
 
     def save(self, **kwargs):
         """

@@ -123,6 +123,15 @@ class ReleaseInfoFormatter(BasicErrCheck):
         return f'release-{release_info_obj.object_id}.pdf'
 
     @staticmethod
+    def get_tex_filename(release_info_obj: ReleaseInfo) -> str:
+        """
+        Format the filename to save to the ReleaseInfo.dp_release_pdf_file field
+        """
+        assert release_info_obj.object_id, \
+            "Make sure the ReleaseInfo is saved and has an \"object_id\" before calling this method"
+        return f'release-{release_info_obj.object_id}.tex'
+
+    @staticmethod
     def create_release_description_html(release_info_obj: ReleaseInfo=None) -> str:
         """
         Create an HTML description using a ReleaseInfo object

@@ -13,7 +13,7 @@ class ReleaseView(viewsets.ViewSet):
 
     analysis_plan = AnalysisPlanSerializer()
     permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ['post']    # 'patch']
+    http_method_names = ['post', 'get']    # 'patch']
 
     def get_queryset(self):
         """
@@ -24,7 +24,7 @@ class ReleaseView(viewsets.ViewSet):
     def retrieve(self, request, pk=None):
         release_info = get_object_or_404(ReleaseInfo, object_id=pk)
         serializer = ReleaseValidationSerializer(release_info)
-        return Response(data=serializer)
+        return Response(data=serializer.data)
 
     def create(self, request, *args, **kwargs):
         """

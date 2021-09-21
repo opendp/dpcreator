@@ -210,7 +210,7 @@ class ValidateReleaseUtil(BasicErrCheck):
         django_file = ContentFile(formatted_release_json_str.encode())
         self.release_info.dp_release_json_file.save(json_filename, django_file)
 
-        pdf_filename = ReleaseInfoFormatter.get_pdf_filename(self.release_info)
+        pdf_filename = ReleaseInfoFormatter.get_tex_filename(self.release_info)
         render_release = RenderRelease(self.release_info)
         render_release.save_latex(pdf_filename)
         django_pdf_file = ContentFile(render_release.read_latex().encode())
