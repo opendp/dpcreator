@@ -15,12 +15,12 @@ DP Creator is under development and we expect to have a test version, connected 
 
 The application is designed to be deployed using [kubernetes](https://kubernetes.io/) and the development environment is available through [Docker Compose](https://docs.docker.com/compose/).
 
-Several screenshots of DP Creator appear below:
+Several screenshots of DP Creator appear below (click for a larger image):
 
-[<img src="doc_images/dpcreator_home.png" alt="DP Creator home" height="140">](doc_images/dpcreator_home.png)
-[<img src="doc_images/dpcreator_02_questions.png" alt="DP Creator home" height="140">](doc_images/dpcreator_02_questions.png)
-[<img src="doc_images/dpcreator_03_set.png" alt="DP Creator home" height="140">](doc_images/dpcreator_03_set.png)
-[<img src="doc_images/dpcreator_04.create.png" alt="DP Creator home" height="140">](doc_images/dpcreator_04.create.png)
+[<img src="doc_images/dpcreator_home.png" alt="DP Creator home" height="140">](doc_images/dpcreator_home.png)&nbsp;
+[<img src="doc_images/dpcreator_02_questions.png" alt="DP Creator home" height="130">](doc_images/dpcreator_02_questions.png)&nbsp;
+[<img src="doc_images/dpcreator_03_set.png" alt="DP Creator home" height="130">](doc_images/dpcreator_03_set.png)&nbsp;
+[<img src="doc_images/dpcreator_04.create.png" alt="DP Creator home" height="130">](doc_images/dpcreator_04.create.png)
 
 
 ## Contact / Getting Help
