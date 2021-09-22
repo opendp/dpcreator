@@ -106,6 +106,7 @@
             </a
             >
           </div>
+          <!-- TODO - replace with dynamic data
           <div class="pt-5 pb-10">
             <div v-for="(detail, index) in datasetDetails" :key="index">
               <v-row class="py-3">
@@ -135,7 +136,7 @@
               <v-divider class="hidden-xs-only"/>
             </div>
           </div>
-
+  -->
           <Button
               v-for="(action, index) in statusInformation[
               status
