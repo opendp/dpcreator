@@ -11,7 +11,7 @@ DP Creator is part of the larger [OpenDP Project](https://opendp.org), a communi
 
 ## Status
 
-DP Creator is under development and we expect to have a test version, connected to a example Dataverse installation publicly available this fall.
+DP Creator is under development and we expect to have a test version, connected to a example Dataverse installation publicly available this fall. Please see the [OpenDP project Roadmap](https://opendp.org/roadmap) for more details.
 
 The application is designed to be deployed using [kubernetes](https://kubernetes.io/) and the development environment is available through [Docker Compose](https://docs.docker.com/compose/).
 
