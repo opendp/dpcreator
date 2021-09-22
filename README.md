@@ -28,7 +28,7 @@ Several screenshots of DP Creator appear below (click for a larger image):
 If you would like to learn more or want to submit feedback, please reach out! Here are some ways to contact us:
 
 * Ask questions on our [discussions forum](https://github.com/opendp/opendp/discussions)
-  * This forum is used for all of the OpenDP projects, including the [OpenDP library](https://github.com/opendp/opendp and DP Creator. 
+  * This forum is used for all of the OpenDP projects, including the [OpenDP library](https://github.com/opendp/opendp) and DP Creator. 
 * Open issues on our [issue tracker](https://github.com/opendp/dpcreator/issues)
 * Send general queries to [info@opendp.org](mailto:info@opendp.org?subject=DP%20Creator)
 * Reach us on Twitter at [@opendp_org](https://twitter.com/opendp_org)
