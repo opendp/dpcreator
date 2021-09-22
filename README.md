@@ -8,7 +8,8 @@ DP Creator is a web application which guides users in the creation of [different
 
 DP Creator is part of the larger [OpenDP Project](https://opendp.org), a community effort to build trustworthy, open source software tools for analysis of private data. 
 
-<img src="doc_images/dpcreator_home.png" alt="DP Creator home" height="100">
+<img src="doc_images/dpcreator_home.png" alt="DP Creator home" height="140">
+<img src="doc_images/dpcreator_02_questions.png" alt="DP Creator home" height="140"><img src="doc_images/dpcreator_03_set.png" alt="DP Creator home" height="140"><img src="doc_images/dpcreator_04.create.png" alt="DP Creator home" height="140">
 
 ## Status
 
