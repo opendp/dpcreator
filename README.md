@@ -17,10 +17,10 @@ The application is designed to be deployed using [kubernetes](https://kubernetes
 
 Several screenshots of DP Creator appear below (click for a larger image):
 
-[<img src="doc_images/dpcreator_home.png" alt="DP Creator home" height="140">](doc_images/dpcreator_home.png)&nbsp;
-[<img src="doc_images/dpcreator_02_questions.png" alt="DP Creator home" height="130">](doc_images/dpcreator_02_questions.png)&nbsp;
-[<img src="doc_images/dpcreator_03_set.png" alt="DP Creator home" height="130">](doc_images/dpcreator_03_set.png)&nbsp;
-[<img src="doc_images/dpcreator_04.create.png" alt="DP Creator home" height="130">](doc_images/dpcreator_04.create.png)
+[<img src="doc_images/dpcreator_home.png" alt="DP Creator home" height="120">](doc_images/dpcreator_home.png)&nbsp;
+[<img src="doc_images/dpcreator_02_questions.png" alt="DP Creator home" height="110">](doc_images/dpcreator_02_questions.png)&nbsp;
+[<img src="doc_images/dpcreator_03_set.png" alt="DP Creator home" height="110">](doc_images/dpcreator_03_set.png)&nbsp;
+[<img src="doc_images/dpcreator_04.create.png" alt="DP Creator home" height="110">](doc_images/dpcreator_04.create.png)
 
 
 ## Contact / Getting Help
