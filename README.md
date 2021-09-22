@@ -8,14 +8,20 @@ DP Creator is a web application which guides users in the creation of [different
 
 DP Creator is part of the larger [OpenDP Project](https://opendp.org), a community effort to build trustworthy, open source software tools for analysis of private data. 
 
-<img src="doc_images/dpcreator_home.png" alt="DP Creator home" height="140">
-<img src="doc_images/dpcreator_02_questions.png" alt="DP Creator home" height="140"><img src="doc_images/dpcreator_03_set.png" alt="DP Creator home" height="140"><img src="doc_images/dpcreator_04.create.png" alt="DP Creator home" height="140">
 
 ## Status
 
 DP Creator is under development and we expect to have a test version, connected to a example Dataverse installation publicly available this fall.
 
 The application is designed to be deployed using [kubernetes](https://kubernetes.io/) and the development environment is available through [Docker Compose](https://docs.docker.com/compose/).
+
+Several screenshots of DP Creator appear below:
+
+[<img src="doc_images/dpcreator_home.png" alt="DP Creator home" height="140">](doc_images/dpcreator_home.png)
+[<img src="doc_images/dpcreator_02_questions.png" alt="DP Creator home" height="140">](doc_images/dpcreator_02_questions.png)
+[<img src="doc_images/dpcreator_03_set.png" alt="DP Creator home" height="140">](doc_images/dpcreator_03_set.png)
+[<img src="doc_images/dpcreator_04.create.png" alt="DP Creator home" height="140">](doc_images/dpcreator_04.create.png)
+
 
 ## Contact / Getting Help
 
