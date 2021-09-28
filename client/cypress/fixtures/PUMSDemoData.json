@@ -1,5 +1,5 @@
 {
-  "datasetName": "2000 PUMS 5-Percent",
+  "datasetName": "Demo PUMS 5-Percent",
   "variables": {
     "age": {
       "name": "age",
