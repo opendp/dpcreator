@@ -189,7 +189,7 @@ import Button from "../../../DesignSystem/Button.vue";
 import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
 import release from "@/api/release";
 import {mapState, mapGetters} from "vuex";
-import statsInformation from "@/data/statsInformation";
+import createStatsUtils from "@/shared/createStatsUtils";
 
 export default {
   name: "AddStatisticDialog",
@@ -358,8 +358,8 @@ export default {
           );
         })
       }
-      statsInformation.redistributeValue(this.getDepositorSetupInfo.epsilon, 'epsilon', tempStats)
-      statsInformation.redistributeValue(this.getDepositorSetupInfo.delta, 'delta', tempStats)
+      createStatsUtils.redistributeValue(this.getDepositorSetupInfo.epsilon, 'epsilon', tempStats)
+      createStatsUtils.redistributeValue(this.getDepositorSetupInfo.delta, 'delta', tempStats)
       return release.validate(this.analysisPlan.objectId, tempStats)
           .then((resp) => {
             console.log('validate response: ' + JSON.stringify(resp))

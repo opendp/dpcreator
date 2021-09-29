@@ -115,7 +115,7 @@
 import Button from "../../../DesignSystem/Button.vue";
 import QuestionIconTooltip from "../../../DynamicHelpResources/QuestionIconTooltip.vue";
 import Decimal from "decimal.js";
-import statsInformation from "@/data/statsInformation";
+import createStatsUtils from "@/shared/createStatsUtils";
 
 export default {
   components: {QuestionIconTooltip, Button},
@@ -136,12 +136,12 @@ export default {
   computed:
       {
         deltaDisabled(item) {
-          return !(item.locked && statsInformation.isDeltaStat(item.statistic))
+          return !(item.locked && createStatsUtils.isDeltaStat(item.statistic))
         }
       },
   methods: {
     isDeltaStat(item) {
-      return statsInformation.isDeltaStat(item.statistic)
+      return createStatsUtils.isDeltaStat(item.statistic)
     },
 
     validateEpsilon(value) {
@@ -161,7 +161,7 @@ export default {
       if (this.currentItem !== null) {
         let lockedDelta = new Decimal('0.0');
         this.statistics.forEach(function (item) {
-          if (item.locked && statsInformation.isDeltaStat(item.statistic)) {
+          if (item.locked && createStatsUtils.isDeltaStat(item.statistic)) {
             lockedDelta = lockedDelta.plus(item.delta)
           }
         })
