@@ -101,8 +101,12 @@ export default {
           // create the AnalysisPlan before continuing on to the
           // Create Statistics wizard step
           if (completedStep === STEP_0600_EPSILON_SET) {
+            console.log("600 EPSILON SET")
             this.$store.dispatch('dataset/createAnalysisPlan', this.datasetInfo.objectId)
-                .then(() => this.emitStepEvent())
+                .then(() => {
+                  console.log("ANALYSIS CREATED")
+                  this.emitStepEvent()
+                })
           } else {
             this.emitStepEvent()
           }
