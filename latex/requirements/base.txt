@@ -1,1 +1,4 @@
+matplotlib
+numpy
+pylatex
 web.py
