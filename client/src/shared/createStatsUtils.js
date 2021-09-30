@@ -16,35 +16,6 @@ export default {
         })
         return useDelta
     },
-    validateRelease: function (analysisPlanId, tempStats) {
-        release.validate(analysisPlanId, tempStats)
-            .then((resp) => {
-                let accuracyList = []
-                let returnObj = {}
-                console.log('validate response: ' + JSON.stringify(resp))
-                let valid = true
-                resp.data.forEach((item, index) => {
-                    accuracyList.push(item.accuracy)
-
-                    if (item.valid !== true) {
-                        item.stat = tempStats[index]
-                        valid = false;
-                    }
-                })
-                if (valid) {
-
-                    returnObj = {valid: valid, accuracyList: accuracyList}
-                } else {
-                    returnObj = {valid: false, validationErrorMsg: resp.data}
-                }
-
-                return returnObj
-            })
-            .catch((error) => {
-                this.validationErrorMsg = [{"valid": false, "message": error}]
-                return {valid: false, accuracyList: acc}
-            })
-    },
     statisticUsesValue(valName, statistic) {
         return valName === 'epsilon' || (valName == 'delta' && deltaStats.includes(statistic))
     },
