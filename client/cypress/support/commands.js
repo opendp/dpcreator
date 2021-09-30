@@ -95,6 +95,9 @@ Cypress.Commands.add('storeExample', (email, password) => {
 Cypress.Commands.add('goToConfirmVariables', (variableData) => {
     // click on the start Process button on the welcome page,
     // to navigate to the Validate Dataset step of the Wizard
+    cy.intercept('GET', '/api/dataset-info/**',).as(
+        'datasetInfo'
+    )
     cy.get('[data-test="Start Process"]').click();
     cy.url().should('contain', 'wizard')
     cy.get('[data-test="radioPrivateInformationYes"]').check({force: true})
@@ -103,6 +106,7 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
 
     // click on continue to go to trigger the profiler and go to the Confirm Variables Page
     cy.get('[data-test="wizardContinueButton"]').last().click();
+    cy.wait('@datasetInfo')
     cy.get('h1').should('contain', 'Confirm Variables')
     for (const key in variableData) {
         const val = variableData[key]
@@ -117,26 +121,40 @@ Cypress.Commands.add('testMean', (numericVar) => {
     cy.intercept('PATCH', '/api/deposit/**',).as(
         'patchDeposit'
     )
-
+    cy.intercept('GET', '/api/dataset-info/**',).as(
+        'datasetInfo'
+    )
     const minDataTest = '[data-test="' + numericVar.name + ':min"]'
     const maxDataTest = '[data-test="' + numericVar.name + ':max"]'
     // Enter min and max for one numericVar so we can validate
+    cy.get(minDataTest).should('be.visible')
+    cy.get(maxDataTest).should('be.visible')
     cy.get(minDataTest).type(numericVar.min, {force: true})
     cy.get(maxDataTest).type(numericVar.max, {force: true})
     cy.wait('@patchDeposit', {timeout: 5000})
+
     // Continue to Set Epsilon Step
     cy.get('[data-test="wizardContinueButton"]').last().click();
+    cy.wait('@datasetInfo', {timeout: 5000})
+
+    cy.get('h1').should('contain', 'Set epsilon value').should('be.visible')
     cy.get('[data-test="Larger Population - no"]').check({force: true})
+    //  cy.get('[data-test="Public Observations - yes"]').should('be.visible')
     cy.get('[data-test="Public Observations - yes"]').check({force: true})
+    cy.get('[data-test="wizardContinueButton"]').should('be.enabled')
+
 
     // Continue to Create  Statistics Step
     cy.get('[data-test="wizardContinueButton"]').last().click();
+    cy.wait('@datasetInfo', {timeout: 5000})
+
     // On the statistics page,
     cy.get('h1').should('contain', 'Create the statistics').should('be.visible')
     cy.get('[data-test="wizardContinueButton"]').should('be.enabled')
 
 
     // Test Validating EyeHeight mean
+    cy.get('[data-test="Add Statistic"]').should('be.visible')
     cy.get('[data-test="Add Statistic"]').click({force: true});
     cy.get('[data-test="Mean"]').click({force: true});
     const varDataTest = '[data-test="' + numericVar.name + '"]'
