@@ -213,12 +213,14 @@ export default {
       return count
     },
     isButtonDisabled: function () {
-      return (
+      const returnVal = (
           !this.editedItemDialog.statistic ||
           !this.editedItemDialog.variable ||
           !this.analysisPlan ||
           !this.editedItemDialog.missingValuesHandling
       );
+      console.log("ADD STAT BUTTN " + returnVal)
+      return returnVal
     },
     isMultiple: function () {
       return this.editedIndex === -1;
@@ -360,23 +362,13 @@ export default {
       }
       createStatsUtils.redistributeValue(this.getDepositorSetupInfo.epsilon, 'epsilon', tempStats)
       createStatsUtils.redistributeValue(this.getDepositorSetupInfo.delta, 'delta', tempStats)
-      return release.validate(this.analysisPlan.objectId, tempStats)
-          .then((resp) => {
-            console.log('validate response: ' + JSON.stringify(resp))
-            let valid = true
-            resp.data.forEach((item, index) => {
-              if (item.valid !== true) {
-                item.stat = tempStats[index]
-                valid = false;
-              }
-            })
-            this.validationErrorMsg = resp.data
-            return valid
+      return createStatsUtils.releaseValidation(this.analysisPlan.objectId, tempStats)
+          .then((validateResults) => {
+            this.validationErrorMsg = validateResults.data
+            return validateResults.valid
           })
-          .catch((error) => {
-            this.validationErrorMsg = [{"valid": false, "message": error}]
-            return false
-          })
+
+
     },
 
     close() {

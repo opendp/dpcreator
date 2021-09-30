@@ -103,4 +103,28 @@ export default {
         }
 
     },
+
+    // Returns Promise json object:
+    // valid: true/false
+    // data: Array of individual validation flags, accuracy, error messages for each statistic
+    releaseValidation(analysisPlanId, tempStats) {
+        let returnObj = {valid: true, data: null}
+        return release.validate(analysisPlanId, tempStats)
+            .then((resp) => {
+                console.log('releaseValidation, validate response: ' + JSON.stringify(resp))
+                returnObj.data = resp.data
+                resp.data.forEach((item, index) => {
+                    if (item.valid !== true) {
+                        returnObj.valid = false;
+                    }
+                })
+                return returnObj
+            })
+            .catch((error) => {
+                returnObj.valid = false
+                returnObj.data = [{"valid": false, "message": error}]
+                return returnObj
+            })
+    }
+
 }
