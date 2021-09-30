@@ -2,3 +2,4 @@ matplotlib
 numpy
 pylatex
 web.py
+azure-storage-blob

@@ -81,6 +81,8 @@ services:
       - server
   latex:
     build: "./latex"
+    env_file:
+      - latex/.env
     command: python /code/latex/app.py 1234
     volumes:
       - .:/code

@@ -3,6 +3,7 @@ import os
 
 import web
 
+from blob_client import upload
 from pdf_renderer import PDFRenderer
 
 urls = (
@@ -39,8 +40,8 @@ class hello:
         }
         :return:
         """
-        local_output_dir = 'output'
-        azure_root = 'dp_creator_pdfs'
+        local_path = 'output'
+        container_name = 'output'
 
         data = json.loads(web.data())
         stats = data.get('statistics', {})
@@ -49,10 +50,12 @@ class hello:
         if stats == {} and hists == {}:
             raise web.badrequest({'error': 'One of \'statistics\' and \'histograms\' must be given'})
 
-        base_filename = os.path.join(local_output_dir, data.get('base_filename'))
+        base_filename = data.get('base_filename')
+        local_file_name = base_filename + '.pdf'
         pdf_renderer = PDFRenderer(stats, hists)
-        pdf_renderer.save_pdf(base_filename)
-        return {'key': os.path.join(azure_root, base_filename + '.pdf'), 'object_id': object_id}
+        pdf_renderer.save_pdf(os.path.join(local_path, base_filename))
+        upload(local_path, local_file_name, container_name)
+        return {'key': os.path.join(container_name, base_filename + '.pdf'), 'object_id': object_id}
 
 
 if __name__ == "__main__":

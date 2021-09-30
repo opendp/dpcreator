@@ -19,7 +19,6 @@ class PDFRenderer(object):
         """
         self.doc = Document('output')
         self.statistics = statistics
-        print(self.statistics)
         self.histograms = histograms
         self.figure_size = (figure_width, 3 * len(histograms))
         self.fill_document()
