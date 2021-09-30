@@ -47,6 +47,12 @@
           NA
         </div>
       </template>
+      <template v-slot:[`item.error`]="{ item }">
+        <div v-if="item.accuracy">
+          {{ item.accuracy.value }}
+        </div>
+
+      </template>
       <template v-slot:[`item.actions`]="{ item }">
         <div class="d-flex justify-space-between">
           <v-tooltip bottom max-width="220px">

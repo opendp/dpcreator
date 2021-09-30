@@ -355,8 +355,7 @@ export default {
         this.editedItemDialog.variable.forEach((variable) => {
           const label = variable
           const ci = this.getDepositorSetupInfo.confidenceInterval
-          tempStats.push(
-              Object.assign({}, this.editedItemDialog, {variable}, {label}, {ci})
+          tempStats.push(Object.assign({}, this.editedItemDialog, {variable}, {label}, {ci})
           );
         })
       }

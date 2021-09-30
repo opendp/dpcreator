@@ -204,7 +204,16 @@ export default {
       this.epsilon = epsilon;
       this.delta = delta;
       this.confidenceInterval = confidenceInterval;
-      createStatsUtils.redistributeValues()
+      createStatsUtils.redistributeValues(this.statistics, this.delta, this.epsilon, this.getDepositorSetupInfo.defaultDelta)
+      // update stats with the accuracy values
+      // (we don't have to check validation because that was done in the Dialog)
+      createStatsUtils.releaseValidation(this.analysisPlan.objectId, this.statistics)
+          .then((validateResults) => {
+            for (let i = 0; i < this.statistics.length; i++) {
+              this.statistics[i].accuracy = validateResults.data[i].accuracy
+            }
+          })
+
       this.saveUserInput()
     },
     // Label may not be set for all variables, so use name as the label if needed
@@ -231,8 +240,20 @@ export default {
         }
       }
       createStatsUtils.redistributeValues(this.statistics, this.delta, this.epsilon, this.getDepositorSetupInfo.defaultDelta)
-      this.saveUserInput()
-      this.close()
+      // update stats with the accuracy values
+      // (we don't have to check validation because that was done in the Dialog)
+      console.log("SAVING INPUT: " + JSON.stringify(this.statistics))
+      createStatsUtils.releaseValidation(this.analysisPlan.objectId, this.statistics)
+          .then((validateResults) => {
+            for (let i = 0; i < this.statistics.length; i++) {
+              console.log('assigning accuracy: ' + JSON.stringify(validateResults.data[i].accuracy))
+              const accuracy = validateResults.data[i].accuracy
+              Object.assign(this.statistics[i], {accuracy})
+            }
+            this.saveUserInput()
+            this.close()
+          })
+
 
     },
     saveUserInput() {

@@ -52,26 +52,28 @@ export default {
             }
         });
         const remaining = new Decimal(totalValue).minus(lockedValue)
+        let valueShare = new Decimal('0')
         if (unlockedCount > 0) {
-            const valueShare = remaining.div(unlockedCount)
-            // Assign value shares and convert everything back from Decimal to Number
-            // before saving
-            statistics.forEach((item) => {
-                if (this.statisticUsesValue(property, item.statistic)) {
-                    if (!item.locked) {
-                        item[property] = valueShare.toNumber()
-                    } else {
-                        if (typeof (item[property]) == Decimal) {
-                            item[property] = item[property].toNumber()
-                        }
-                    }
-
-                } else {
-                    item[property] = 0
-                }
-            })
-
+            valueShare = remaining.div(unlockedCount)
         }
+
+        // Assign value shares and convert everything back from Decimal to Number
+        // before saving
+        statistics.forEach((item) => {
+            if (this.statisticUsesValue(property, item.statistic)) {
+                if (!item.locked) {
+                    item[property] = valueShare.toNumber()
+                } else {
+                    if (typeof (item[property]) == Decimal) {
+                        item[property] = item[property].toNumber()
+                    }
+                }
+
+            } else {
+                item[property] = 0
+            }
+        })
+
 
     },
 
