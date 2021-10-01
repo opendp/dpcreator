@@ -76,3 +76,16 @@ services:
       - ./client:/e2e
     environment:
       WAIT_HOSTS: server:8000
+  latex:
+    build: "./latex"
+    env_file:
+      - latex/.env
+    command: python /code/latex/app.py 1234
+    volumes:
+      - .:/code
+    ports:
+      - "1234:1234"
+    depends_on:
+      - db
+      - redis
+      - server
