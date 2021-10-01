@@ -52,10 +52,10 @@ class PDFRenderer(object):
             return
         fig = plt.figure(tight_layout=True, figsize=self.figure_size)
         gs = gridspec.GridSpec(len(self.histograms), 2)
-        for i, (name, hist_dict) in enumerate(self.histograms.items()):
+        for i, hist_dict in enumerate(self.histograms):
             ax = fig.add_subplot(gs[i, :])
             ax.bar(x=hist_dict['data'], height=hist_dict['height'])
-            ax.set_xlabel(name)
+            ax.set_xlabel(hist_dict['name'])
         with self.doc.create(Section('DP Histograms')):
             with self.doc.create(Figure(position='htbp')) as plot:
                 plot.add_plot()

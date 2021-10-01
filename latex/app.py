@@ -7,12 +7,15 @@ from blob_client import upload
 from pdf_renderer import PDFRenderer
 
 urls = (
-    '/', 'hello'
+    '/', 'LatexApplication'
 )
 app = web.application(urls, globals())
 
 
-class hello:
+class LatexApplication:
+
+    save_to_azure = os.getenv('SAVE_TO_AZURE')
+
     def GET(self, name):
         if not name:
             name = 'World'
@@ -54,8 +57,12 @@ class hello:
         local_file_name = base_filename + '.pdf'
         pdf_renderer = PDFRenderer(stats, hists)
         pdf_renderer.save_pdf(os.path.join(local_path, base_filename))
-        upload(local_path, local_file_name, container_name)
-        return {'key': os.path.join(container_name, base_filename + '.pdf'), 'object_id': object_id}
+        if self.save_to_azure:
+            upload(local_path, local_file_name, container_name)
+        return json.dumps({
+            "key": os.path.join(container_name, base_filename + '.pdf'),
+            "object_id": object_id
+        })
 
 
 if __name__ == "__main__":
