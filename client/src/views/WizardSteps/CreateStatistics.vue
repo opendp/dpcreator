@@ -154,7 +154,8 @@ export default {
       missingValuesHandling: "",
       handleAsFixed: false,
       fixedValue: "0",
-      locked: false
+      locked: false,
+      accuracy: {value: 0, message: 'not calculated'}
     },
     defaultItem: {
       statistic: "",
@@ -164,7 +165,8 @@ export default {
       missingValuesHandling: "",
       handleAsFixed: false,
       fixedValue: "0",
-      locked: false
+      locked: false,
+      accuracy: {value: 0, message: 'not calculated'}
     }
   }),
   methods: {
@@ -240,21 +242,29 @@ export default {
         }
       }
       createStatsUtils.redistributeValues(this.statistics, this.delta, this.epsilon, this.getDepositorSetupInfo.defaultDelta)
-      // update stats with the accuracy values
+      this.setAccuracyAndSaveUserInput()
+      this.close()
+
+
+    },
+    setAccuracyAndSaveUserInput() {
+      // if there are statistics, update them with the accuracy values
       // (we don't have to check validation because that was done in the Dialog)
-      console.log("SAVING INPUT: " + JSON.stringify(this.statistics))
-      createStatsUtils.releaseValidation(this.analysisPlan.objectId, this.statistics)
-          .then((validateResults) => {
-            for (let i = 0; i < this.statistics.length; i++) {
-              console.log('assigning accuracy: ' + JSON.stringify(validateResults.data[i].accuracy))
-              const accuracy = validateResults.data[i].accuracy
-              Object.assign(this.statistics[i], {accuracy})
-            }
-            this.saveUserInput()
-            this.close()
-          })
-
-
+      if (this.statistics.length > 0) {
+        createStatsUtils.releaseValidation(this.analysisPlan.objectId, this.statistics)
+            .then((validateResults) => {
+              for (let i = 0; i < this.statistics.length; i++) {
+                const accuracy = validateResults.data[i].accuracy
+                this.statistics[i].accuracy.value = accuracy.value
+                this.statistics[i].accuracy.message = accuracy.message
+                // this assigment below didn't work!  Can't change the object reference, need to change the values
+                //  this.statistics[i] = Object.assign({}, this.statistics[i], { accuracy })
+              }
+              this.saveUserInput()
+            })
+      } else {
+        this.saveUserInput()
+      }
     },
     saveUserInput() {
       // convert statistics back from Decimal to Number
@@ -276,12 +286,12 @@ export default {
     },
 
     editEpsilon(item) {
-      this.redistributeValue(this.epsilon, 'epsilon')
-      this.saveUserInput()
+      createStatsUtils.redistributeValue(this.epsilon, 'epsilon', this.statistics)
+      this.setAccuracyAndSaveUserInput()
     },
     editDelta(item) {
-      this.redistributeValue(this.delta, 'delta')
-      this.saveUserInput()
+      createStatsUtils.redistributeValue(this.delta, 'delta', this.statistics)
+      this.setAccuracyAndSaveUserInput()
     },
     editItem(item) {
 
@@ -300,7 +310,7 @@ export default {
     deleteItemConfirm() {
       this.statistics.splice(this.editedIndex, 1);
       createStatsUtils.redistributeValues()
-      this.saveUserInput()
+      this.setAccuracyAndSaveUserInput()
       this.closeDelete();
     },
     close() {

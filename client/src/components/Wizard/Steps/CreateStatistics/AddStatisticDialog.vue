@@ -195,9 +195,7 @@ export default {
   name: "AddStatisticDialog",
   components: {Button, ColoredBorderAlert},
   props: ["formTitle", "dialog", "editedIndex", "editedItem", "variableInfo", "statistics"],
-  created() {
-    console.log('created, ' + JSON.stringify(this.analysisPlan))
-  },
+
   computed: {
     ...mapState('dataset', ['analysisPlan', "datasetInfo"]),
     ...mapGetters('dataset', ['getDepositorSetupInfo']),
@@ -219,7 +217,6 @@ export default {
           !this.analysisPlan ||
           !this.editedItemDialog.missingValuesHandling
       );
-      console.log("ADD STAT BUTTN " + returnVal)
       return returnVal
     },
     isMultiple: function () {
@@ -248,9 +245,7 @@ export default {
     editedItem: function (newEditedItem) {
       this.editedItemDialog = Object.assign({}, newEditedItem);
     },
-    analysisPlan: function (newVal) {
-      console.log("new analysisPlan: " + newVal)
-    }
+
   },
   data: () => ({
     singleVariableStatistics: [
@@ -273,7 +268,8 @@ export default {
       missingValuesHandling: "",
       handleAsFixed: false,
       fixedValue: 0,
-      locked: false
+      locked: false,
+      accuracy: {value: null, message: null}
     },
     missingValuesHandling: [
       // "Drop them", remove this for now, until the library can use it
@@ -295,7 +291,6 @@ export default {
         })
       } catch (err) {
         this.validationError = true
-        console.error(err)
         this.validationErrorMsg = [{"valid": false, "message": err}]
       }
     },
