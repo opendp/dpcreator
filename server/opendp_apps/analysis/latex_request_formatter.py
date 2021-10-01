@@ -8,9 +8,8 @@ class LatexRequestFormatter(object):
         self.release = release
 
     def format(self):
-        statistics = dict((x['statistic'], x['result']['value'],) for x in self.release.dp_release['statistics'])
         return {
-            'statistics': statistics,
+            'statistics': self.release.dp_release['statistics'],
             'histograms': self.release.dp_release['histograms'],
             'object_id': str(self.release.object_id),
             'base_filename': '-'.join(['release', str(self.release.object_id)])

@@ -49,14 +49,16 @@ class LatexApplication:
         data = json.loads(web.data())
         stats = data.get('statistics', {})
         hists = data.get('histograms', {})
-        object_id = data.get('object_id')
         if stats == {} and hists == {}:
             raise web.badrequest({'error': 'One of \'statistics\' and \'histograms\' must be given'})
-
+        object_id = data.get('object_id')
         base_filename = data.get('base_filename')
+        if not object_id or not base_filename:
+            raise web.badrequest({'error': 'Both \'object_id\' and \'base_filename\' must be given'})
+
         local_file_name = base_filename + '.pdf'
         pdf_renderer = PDFRenderer(stats, hists)
-        pdf_renderer.save_pdf(os.path.join(local_path, base_filename))
+        # pdf_renderer.save_pdf(os.path.join(local_path, base_filename))
         if self.save_to_azure:
             upload(local_path, local_file_name, container_name)
         return json.dumps({

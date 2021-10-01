@@ -12,7 +12,7 @@ matplotlib.use('Agg')  # Not to use X server.
 
 class PDFRenderer(object):
 
-    def __init__(self, statistics: dict, histograms: dict, figure_width=8):
+    def __init__(self, statistics: List, histograms: List, figure_width=8):
         """
         :param statistics: List of tuples (name, value)
         :param histograms: List of tuples (name, list[int])
@@ -42,8 +42,8 @@ class PDFRenderer(object):
             table1.add_hline()
             table1.add_row((MultiColumn(2, align='|c|', data='Summary'),))
             table1.add_hline()
-            for stat, value in self.statistics.items():
-                table1.add_row((stat, value))
+            for stat in self.statistics:
+                table1.add_row((stat['statistic'], stat['result']['value']))
                 table1.add_hline()
             self.doc.append(table1)
 
