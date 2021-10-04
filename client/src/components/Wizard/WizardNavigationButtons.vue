@@ -75,7 +75,7 @@ import stepInformation, {depositorSteps, STEP_0600_EPSILON_SET} from "@/data/ste
 export default {
   components: {Button, GoBackDialog},
   name: "WizardNavigationButtons",
-  props: ["steps", "stepperPosition"],
+  props: ["steps", "stepperPosition", "nextStep"],
 
   methods: {
     handleContinue: function () {
@@ -96,25 +96,13 @@ export default {
       // where we are in the Wizard
       if (depositorSteps.includes(completedStep)) {
         const payload = {objectId: this.getDepositorSetupInfo.objectId, props: completedStepProp}
-        this.$store.dispatch('dataset/updateDepositorSetupInfo', payload).then(() => {
-          // if the step that has just been completed is  STEP_0600_EPSILON_SET, then
-          // create the AnalysisPlan before continuing on to the
-          // Create Statistics wizard step
-          if (completedStep === STEP_0600_EPSILON_SET) {
-            console.log("600 EPSILON SET")
-            this.$store.dispatch('dataset/createAnalysisPlan', this.datasetInfo.objectId)
-                .then(() => {
-                  console.log("ANALYSIS CREATED")
-                  this.emitStepEvent()
-                })
-          } else {
-            this.emitStepEvent()
-          }
-        })
+        this.$store.dispatch('dataset/updateDepositorSetupInfo', payload)
+        this.emitStepEvent()
 
       } else {
         const payload = {objectId: this.analysisPlan.objectId, props: completedStepProp}
-        this.$store.dispatch('dataset/updateAnalysisPlan', payload).then(() => this.emitStepEvent())
+        this.$store.dispatch('dataset/updateAnalysisPlan', payload)
+        this.emitStepEvent()
       }
 
     },
