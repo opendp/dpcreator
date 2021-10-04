@@ -28,7 +28,7 @@ class DPCountSpec(StatSpec):
                       statistic=DP_MEAN,
                       dataset_size=365,
                       epsilon=0.5,
-                      ci=CI_95.
+                      ci=CI_95_ALPHA.
                       fixed_value=1)
     """
     def __init__(self, props: dict):
@@ -41,7 +41,7 @@ class DPCountSpec(StatSpec):
         example: ['min', 'max']
         If no additional properties, return []
         """
-        return ['ci']
+        return ['ci_alpha']
 
     def run_01_initial_handling(self):
         """
@@ -127,10 +127,10 @@ class DPCountSpec(StatSpec):
         if not self.preprocessor:
             self.preprocessor = self.get_preprocessor()
 
-        self.accuracy_val = laplacian_scale_to_accuracy(self.scale, self.ci)
+        self.accuracy_val = laplacian_scale_to_accuracy(self.scale, self.ci_alpha)
 
         self.accuracy_message = (f"Releasing {self.statistic} for the variable {self.variable}." 
-                                f" With at least probability {1-self.ci} the output {self.statistic}" 
+                                f" With at least probability {self.get_ci_text()} the output {self.statistic}" 
                                 f" will differ from the true {self.statistic} by at"
                                 f" most {self.accuracy_val} units." 
                                 f" Here the units are the same units the variable has in the dataset.")

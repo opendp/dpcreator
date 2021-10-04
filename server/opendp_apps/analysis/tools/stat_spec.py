@@ -21,7 +21,7 @@ from opendp_apps.analysis.stat_valid_info import StatValidInfo
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.utils.extra_validators import \
-    (validate_confidence_interval,
+    (validate_confidence_interval_alpha,
      validate_float,
      validate_statistic,
      validate_epsilon_not_null,
@@ -43,7 +43,7 @@ class StatSpec:
                            #
                            epsilon=validate_epsilon_not_null,
                            delta=validate_not_negative,  # add something more!
-                           ci=validate_confidence_interval,
+                           ci_alpha=validate_confidence_interval_alpha,
                            #
                            min=validate_float,
                            max=validate_float,
@@ -64,7 +64,9 @@ class StatSpec:
         #
         self.epsilon = props.get('epsilon')
         self.delta = props.get('delta')
-        self.ci = props.get('ci')
+        self.ci_alpha = props.get('ci')   # This is actually alpha. needs an update from the frontend!
+        #self.ci = to do
+
         #
         self.accuracy_val = None
         self.accuracy_message = None
@@ -94,12 +96,19 @@ class StatSpec:
         self.run_03_custom_validation()    # customize, if types need converting, etc.
 
 
-    def get_ci_text(self):
-        """Return the ci as text. e.g. .05 is returned as 95%"""
-        if not self.ci:
+    def get_ci_number(self):
+        """Return the ci number based on ci_alpha"""
+        if not self.ci_alpha:
             return None
 
-        ci_num = (1-self.ci) * 100
+        return 1.00 - self.ci_alpha
+
+    def get_ci_text(self):
+        """Return the ci as text. e.g. .05 is returned as 95%"""
+        if not self.ci_alpha:
+            return None
+
+        ci_num = self.get_ci_number() * 100
         return f'{ci_num}%'
 
     @abc.abstractmethod
@@ -279,7 +288,7 @@ class StatSpec:
         assert isinstance(more_props_to_floatify, list), \
             '"more_props_to_floatify" must be a list, even and empty list'
 
-        props_to_floatify = ['epsilon', 'ci', 'min', 'max',] \
+        props_to_floatify = ['epsilon', 'ci_alpha', 'min', 'max',] \
                             + more_props_to_floatify
 
         for prop_name in props_to_floatify:
@@ -486,7 +495,8 @@ class StatSpec:
         # Add accuracy
         #
         if self.accuracy_val or self.accuracy_msg:
-            final_info['confidence_interval'] = self.ci
+            final_info['confidence_interval'] = self.get_ci_number()
+            final_info['confidence_interval_alpha'] = self.ci_alpha
             final_info['accuracy'] = {}
             if self.accuracy_val:
                 final_info['accuracy']['value'] = self.accuracy_val

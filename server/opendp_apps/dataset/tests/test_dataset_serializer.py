@@ -66,7 +66,7 @@ class TestDataSetSerializer(BaseEndpointTest):
                                                 'epsilon': None,
                                                 'default_delta': 0.0,
                                                 'delta': 0.0,
-                                                'confidence_interval': DepositorSetupInfo.CI_95,
+                                                'confidence_interval': DepositorSetupInfo.CI_95_ALPHA,
                                                 'is_complete': False,
                                                 'user_step': 'step_100',
                                                 'variable_info': None})

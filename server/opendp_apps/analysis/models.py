@@ -32,9 +32,9 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     """
     Confidence Interval choices
     """
-    CI_90 = astatic.CI_90
-    CI_95 = astatic.CI_95
-    CI_99 = astatic.CI_99
+    CI_90_ALPHA = astatic.CI_90_ALPHA
+    CI_95_ALPHA = astatic.CI_95_ALPHA
+    CI_99_ALPHA = astatic.CI_99_ALPHA
     CI_CHOICES = astatic.CI_CHOICES
 
     """
@@ -96,7 +96,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
 
     confidence_interval = models.FloatField(\
                             choices=CI_CHOICES,
-                            default=CI_95,
+                            default=CI_95_ALPHA,
                             help_text=('Used for OpenDP operations, starts as the "default_delta"'
                                        ' value but may be overridden by the user.'))
 

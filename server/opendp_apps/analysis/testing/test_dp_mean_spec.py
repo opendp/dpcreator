@@ -64,7 +64,7 @@ class StatSpecTest(TestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95,
+                      'ci': astatic.CI_95_ALPHA,
                       #'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '0',
@@ -115,7 +115,7 @@ class StatSpecTest(TestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95,
+                      'ci': astatic.CI_95_ALPHA,
                       #'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '5',
@@ -158,7 +158,7 @@ class StatSpecTest(TestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95,
+                      'ci': astatic.CI_95_ALPHA,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '5',
                       'variable_info': {'min': -8,
@@ -197,7 +197,7 @@ class StatSpecTest(TestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95,
+                      'ci': astatic.CI_95_ALPHA,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '5',
                       'variable_info': {'min': -8,
@@ -215,7 +215,7 @@ class StatSpecTest(TestCase):
             dp_mean = DPMeanSpec(spec_props)
             #print(dp_mean.is_chain_valid())
             self.assertFalse(dp_mean.is_chain_valid())
-            self.assertTrue(dp_mean.get_single_err_msg().find(VALIDATE_MSG_NOT_VALID_CI) > -1)
+            self.assertTrue(dp_mean.get_single_err_msg().find(VALIDATE_MSG_NOT_VALID_CI_ALPHA) > -1)
 
         for ci_val in ['alphabet', 'soup', 'c']:
             #print(f'> Invalid ci val: {ci_val}')
@@ -223,7 +223,7 @@ class StatSpecTest(TestCase):
             dp_mean = DPMeanSpec(spec_props)
             #print(dp_mean.is_chain_valid())
             self.assertFalse(dp_mean.is_chain_valid())
-            self.assertTrue(dp_mean.get_single_err_msg().find('Failed to convert "ci" to a float') > -1)
+            self.assertTrue(dp_mean.get_single_err_msg().find('Failed to convert "ci_alpha" to a float') > -1)
 
 
 
@@ -237,7 +237,7 @@ class StatSpecTest(TestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95,
+                      'ci': astatic.CI_95_ALPHA,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '5.0',
                       'variable_info': {'min': -8,
@@ -288,7 +288,7 @@ class StatSpecTest(TestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95,
+                      'ci': astatic.CI_95_ALPHA,
                       #'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '5',

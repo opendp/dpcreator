@@ -7,7 +7,7 @@ VALIDATE_MSG_ONE_OR_GREATER = 'The value must be a number, 1 or greater.'
 VALIDATE_MSG_EPSILON = 'As a rule of thumb, epsilon should not be less than 0.001 nor greater than 1.'
 VALIDATE_MSG_NOT_FLOAT = 'The value must be a float.'
 VALIDATE_MSG_NOT_INT = 'The value must be an integer.'
-VALIDATE_MSG_NOT_VALID_CI = 'Valid confidence interval values:'
+VALIDATE_MSG_NOT_VALID_CI_ALPHA = 'Valid confidence interval alpha values:'
 VALIDATE_MSG_MISSING_VAL_HANDLER = 'Valid missing value handlers:'
 VALIDATE_MSG_UNSUPPORTED_STATISTIC = 'Valid statistics:'
 
@@ -18,14 +18,14 @@ def validate_statistic(value):
         user_msg = f'{VALIDATE_MSG_UNSUPPORTED_STATISTIC} {ci_choices_str}'
         raise ValidationError(user_msg)
 
-def validate_confidence_interval(value):
-    """Validate a valid CI"""
+def validate_confidence_interval_alpha(value):
+    """Validate a valid CI alpha value"""
     validate_float(value)
     #
     ci_choices = [x[0] for x in astatic.CI_CHOICES]
     if not value in ci_choices:
         ci_choices_str = ', '.join([str(x) for x in ci_choices])
-        user_msg = f'{VALIDATE_MSG_NOT_VALID_CI} {ci_choices_str}'
+        user_msg = f'{VALIDATE_MSG_NOT_VALID_CI_ALPHA} {ci_choices_str}'
         raise ValidationError(user_msg)
 
 def validate_missing_val_handlers(value):

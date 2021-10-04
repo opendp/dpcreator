@@ -33,7 +33,7 @@ class TestDepositorInfo(BaseEndpointTest):
                                       'epsilon': 0.9,
                                       'default_delta': DepositorSetupInfo.DELTA_0,
                                       'delta': DepositorSetupInfo.DELTA_10_NEG_6,
-                                      'confidence_interval': DepositorSetupInfo.CI_99})
+                                      'confidence_interval': DepositorSetupInfo.CI_99_ALPHA})
         print('(10 resp)', response.json())
         self.assertEqual(response.status_code, 200)
         response = response.json()
@@ -52,7 +52,7 @@ class TestDepositorInfo(BaseEndpointTest):
                           'epsilon': 0.9,
                           'default_delta': DepositorSetupInfo.DELTA_0,
                           'delta': DepositorSetupInfo.DELTA_10_NEG_6,
-                          'confidence_interval': DepositorSetupInfo.CI_99,
+                          'confidence_interval': DepositorSetupInfo.CI_99_ALPHA,
                           'variable_info': None})
 
 
