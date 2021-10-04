@@ -150,9 +150,7 @@
         "
       >
         <span class="font-weight-bold title-size-2 d-flex"
-        ><v-icon color="primary" left>mdi-play</v-icon> Does your dataset
-          contain only one individual per row?</span
-        >
+        ><v-icon color="primary" left>mdi-play</v-icon> Does each individual appear in only one row?</span>
         <v-radio-group
             :disabled="radioOnlyOneIndividualPerRowShouldBeDisabled"
             v-model="radioOnlyOneIndividualPerRow"
