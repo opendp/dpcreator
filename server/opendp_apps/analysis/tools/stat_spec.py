@@ -10,8 +10,11 @@ BaseClass for Univariate statistics for OpenDP.
 """
 from opendp.accuracy import laplacian_scale_to_accuracy
 import abc # import ABC, ABCMeta, abstractmethod
+from collections import OrderedDict
+
 from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
+
 
 from opendp.mod import OpenDPException
 
@@ -466,20 +469,20 @@ class StatSpec:
         assert self.value, \
             'Only use this after "run_chain()" was completed successfully"'
 
-        final_info = {
-             "statistic": self.statistic,
-             "variable": self.variable,
-             "result":{
-                "value": self.value
-             },
-             "epsilon": self.epsilon,
-             "delta": self.delta,
-        }
+        final_info = OrderedDict({
+                         "statistic": self.statistic,
+                         "variable": self.variable,
+                         "result":{
+                            "value": self.value
+                         },
+                         "epsilon": self.epsilon,
+                         "delta": self.delta,
+                    })
 
         # Min/Max
         #
         if 'min' in self.additional_required_props():
-            final_info['bounds'] = {'min': self.min, 'max': self.max}
+            final_info['bounds'] = OrderedDict({'min': self.min, 'max': self.max})
 
         # Categories
         #
@@ -488,7 +491,7 @@ class StatSpec:
 
         # Missing values
         #
-        final_info['missing_value_handling'] = {"type": self.missing_values_handling}
+        final_info['missing_value_handling'] = OrderedDict({"type": self.missing_values_handling})
         if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
             final_info['missing_value_handling']['fixed_value'] = self.fixed_value
 
@@ -497,14 +500,15 @@ class StatSpec:
         if self.accuracy_val or self.accuracy_msg:
             final_info['confidence_interval'] = self.get_ci_number()
             final_info['confidence_interval_alpha'] = self.ci_alpha
-            final_info['accuracy'] = {}
+            final_info['accuracy'] = OrderedDict()
             if self.accuracy_val:
                 final_info['accuracy']['value'] = self.accuracy_val
             if self.accuracy_message:
                 final_info['accuracy']['message'] = self.accuracy_message
 
-        final_info['description'] = dict(html=self.get_short_description_html(),
-                                         text=self.get_short_description_text())
+        final_info['description'] = OrderedDict()
+        final_info['description']['html'] = self.get_short_description_html()
+        final_info['description']['text'] = self.get_short_description_text()
 
         return final_info
 

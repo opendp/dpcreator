@@ -114,6 +114,19 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         else:
             return f'{self.object_id} - {self.user_step}'
 
+    def get_dataset_info(self):
+        """
+        Access a DataSetInfo object, either dataversefileinfo or uploadfileinfo
+        # Workaround for https://github.com/opendp/dpcreator/issues/257
+        """
+        if hasattr(self, 'dataversefileinfo'):
+            return self.dataversefileinfo
+        elif hasattr(self, 'uploadfileinfo'):
+            return self.uploadfileinfo
+
+        raise AttributeError('DepositorSetupInfo does not have access to a DataSetInfo instance')
+
+
     def set_user_step(self, new_step:DepositorSteps) -> bool:
         """Set a new user step. Does *not* save the object."""
         assert isinstance(new_step, DepositorSetupInfo.DepositorSteps), \
@@ -205,6 +218,17 @@ class AnalysisPlan(TimestampedModelWithUUID):
 
     def __str__(self):
         return f'{self.dataset} - {self.user_step}'
+
+    def is_editable(self) -> bool:
+        """
+        Allow editing if the user step is either:'
+          STEP_0700_VARIABLES_CONFIRMED or
+          STEP_0800_STATISTICS_CREATED
+        """
+        editable_steps = [self.AnalystSteps.STEP_0700_VARIABLES_CONFIRMED,
+                          self.AnalystSteps.STEP_0800_STATISTICS_CREATED]
+        return self.user_step in editable_steps
+
 
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the user_step
