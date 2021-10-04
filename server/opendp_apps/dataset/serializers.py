@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
+from rest_framework_extensions.serializers import PartialUpdateSerializerMixin
 from rest_polymorphic.serializers import PolymorphicSerializer
 
 from opendp_apps.analysis.models import DepositorSetupInfo
@@ -10,7 +11,6 @@ from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.basic_response import BasicResponse, ok_resp, err_resp
 from opendp_apps.user.models import OpenDPUser
 from opendp_apps.analysis.serializers import AnalysisPlanSerializer
-
 
 
 class DatasetObjectIdSerializer(serializers.Serializer):
@@ -46,7 +46,6 @@ class DatasetObjectIdSerializer(serializers.Serializer):
 
         return self.validated_data.get('object_id')
 
-
     def get_dataset_info_with_user_check(self, user: get_user_model()) -> BasicResponse:
         """Get the related DataSetInfo object and check that the user matches the creator"""
         assert self.is_valid(), "Do not call this method before checking \".is_valid()\""
@@ -74,7 +73,7 @@ class DataSetInfoSerializer(serializers.ModelSerializer):
         read_only_fields = ['object_id', 'id', 'created', 'updated']
 
 
-class DepositorSetupInfoSerializer(serializers.ModelSerializer):
+class DepositorSetupInfoSerializer(serializers.ModelSerializer, PartialUpdateSerializerMixin):
     """Serializer for the DepositorSetupInfo"""
     class Meta:
         model = DepositorSetupInfo

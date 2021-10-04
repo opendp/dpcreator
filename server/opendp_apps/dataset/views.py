@@ -26,6 +26,7 @@ class DataSetInfoViewSet(BaseModelViewSet):
 }
 """
 
+
 class DepositorSetupViewSet(BaseModelViewSet):
     queryset = DepositorSetupInfo.objects.all()
     serializer_class = DepositorSetupInfoSerializer

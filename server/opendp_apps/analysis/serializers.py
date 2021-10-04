@@ -1,9 +1,7 @@
-import re
-import pandas as pd
-
 from rest_framework import serializers
 from rest_framework.relations import PrimaryKeyRelatedField
 from django.contrib.auth import get_user_model
+from rest_framework_extensions.serializers import PartialUpdateSerializerMixin
 
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis import static_vals as astatic
@@ -40,7 +38,7 @@ class AnalysisPlanObjectIdSerializer(serializers.Serializer):
         return self.validated_data.get('object_id')
 
 
-class AnalysisPlanSerializer(serializers.ModelSerializer):
+class AnalysisPlanSerializer(serializers.ModelSerializer, PartialUpdateSerializerMixin):
     analyst = serializers.SlugRelatedField(slug_field='object_id', read_only=True)
     dataset = serializers.SlugRelatedField(slug_field='object_id', read_only=True)
     release_info = ReleaseInfoSerializer(read_only=True)

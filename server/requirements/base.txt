@@ -11,6 +11,7 @@ django-allauth==0.44.0
 djangorestframework==3.12.2
 django-rest-polymorphic==0.1.9
 django-cors-headers==3.6.0
+drf-extensions==0.7.1
 idna==2.10
 lxml==4.6.3
 opendp==0.2.1
