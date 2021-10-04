@@ -88,7 +88,7 @@ class DPCountSpec(StatSpec):
 
 
     def get_preprocessor(self):
-        """To implement!"""
+        """DP Count preprocessor"""
         if self.has_error():
             return
 

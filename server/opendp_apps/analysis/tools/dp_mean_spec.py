@@ -92,7 +92,7 @@ class DPMeanSpec(StatSpec):
         return (preprocessor >> make_base_laplace(scale)).check(dataset_distance, epsilon)
 
     def get_preprocessor(self):
-        """To implement!"""
+        """DP Mean preprocessor for floats"""
         if self.has_error():
             return
 
@@ -189,11 +189,11 @@ class DPMeanSpec(StatSpec):
                 self.add_err_msg(f'{ex_obj} (Exception)')
             return False
 
-        print((f"Epsilon: {self.epsilon}"
-               f"\nColumn name: {self.variable}"
-               f"\nColumn index: {self.col_index}"
-               f"\nColumn accuracy_val: {self.accuracy_val}"
-               f"\nColumn accuracy_message: {self.accuracy_message}"
-               f"\n\nDP Mean: {self.value}" ))
+        #print((f"Epsilon: {self.epsilon}"
+        #       f"\nColumn name: {self.variable}"
+        #       f"\nColumn index: {self.col_index}"
+        #       f"\nColumn accuracy_val: {self.accuracy_val}"
+        #       f"\nColumn accuracy_message: {self.accuracy_message}"
+        #       f"\n\nDP Mean: {self.value}" ))
 
         return True

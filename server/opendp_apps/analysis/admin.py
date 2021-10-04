@@ -12,7 +12,7 @@ class DepositorSetupInfoAdmin(admin.ModelAdmin):
                     'epsilon',
                     'updated',
                     'created',)
-    readonly_fields = ('id', 'is_complete', 'created', 'updated',)
+    readonly_fields = ('id', 'object_id', 'is_complete', 'created', 'updated',)
 
 
 class AnalysisPlanAdmin(admin.ModelAdmin):
@@ -27,7 +27,7 @@ class AnalysisPlanAdmin(admin.ModelAdmin):
                     #'epsilon',
                     'updated',
                     'created',)
-    readonly_fields = ('id', 'is_complete', 'created', 'updated',)
+    readonly_fields = ('id', 'object_id', 'is_complete', 'created', 'updated',)
 
 
 class ReleaseInfoAdmin(admin.ModelAdmin):
@@ -39,6 +39,7 @@ class ReleaseInfoAdmin(admin.ModelAdmin):
                     'updated',
                     'created',)
     readonly_fields = ('id',
+                       'object_id',
                        'dataset',
                        'dp_release', 'epsilon_used',
                        'created', 'updated',)
