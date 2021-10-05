@@ -67,7 +67,7 @@ class StatSpec:
         self.ci = props.get('ci')
         #
         self.accuracy_val = None
-        self.accuracy_message = None
+        self.accuracy_msg = None
         #
         self.missing_values_handling = props.get('missing_values_handling')
         self.fixed_value = props.get('fixed_value')
@@ -334,7 +334,7 @@ class StatSpec:
 
     def check_numeric_fixed_value(self):
         """
-        For the case of handing missing values with a constant
+        For the case of handling missing values with a constant
         Check that the fixed value/fixed_value is not outside the min/max range
         """
         if self.has_error():
@@ -390,6 +390,24 @@ class StatSpec:
 
         return True
 
+    def convert_to_int(self, prop_name):
+        """Attempt to convert a value to an integer"""
+        prop_val = getattr(self, prop_name)
+
+        try:
+            prop_val_float = int(prop_val)
+        except TypeError:
+            self.add_err_msg(f'Failed to convert "{prop_name}" to an integer. (value: "{prop_val}")')
+            return False
+        except ValueError:
+            self.add_err_msg(f'Failed to convert "{prop_name}" to a integer. (value: "{prop_val}")')
+            return False
+
+        setattr(self, prop_name, prop_val_float)
+
+        return True
+
+
 
     def get_success_msg_dict(self):
         """Get success info"""
@@ -399,7 +417,7 @@ class StatSpec:
         # Need to add accuracy...
         return StatValidInfo.get_success_msg_dict(self.variable, self.statistic,
                                                   accuracy_val=self.accuracy_val,
-                                                  accuracy_msg=self.accuracy_message)
+                                                  accuracy_msg=self.accuracy_msg)
 
     def get_error_msg_dict(self):
         """Get invalid info dict"""
@@ -488,8 +506,8 @@ class StatSpec:
             final_info['accuracy'] = {}
             if self.accuracy_val:
                 final_info['accuracy']['value'] = self.accuracy_val
-            if self.accuracy_message:
-                final_info['accuracy']['message'] = self.accuracy_message
+            if self.accuracy_msg:
+                final_info['accuracy']['message'] = self.accuracy_msg
 
         final_info['description'] = dict(html=self.get_short_description_html(),
                                          text=self.get_short_description_text())

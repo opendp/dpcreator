@@ -24,7 +24,6 @@ class DPHistogramSpec(StatSpec):
     def __init__(self, props: dict):
         """Set the internals using the props dict"""
         # TODO: Generates an error when this isn't initialized somewhere
-        self.accuracy_msg = ""
         super().__init__(props)
 
     def additional_required_props(self):
@@ -38,12 +37,17 @@ class DPHistogramSpec(StatSpec):
         """
         """
         if self.fixed_value is not None:
-            self.fixed_value = int(self.fixed_value)
+            # attempt conversion to int
+            if not self.convert_to_int('fixed_value'):
+                return
+
         # TODO: These default values are allowing the tests to pass,
         #  but we need to process cases where min and max are referring to counts of a
         #  categorical variable.
-        self.min = int(self.min) if self.min else 0.0
-        self.max = int(self.max) if self.max else 10.0
+        if not self.convert_to_int('min'):
+            self.min =  0.0
+        if not self.convert_to_int('max'):
+            self.max = 10.0
 
     def run_03_custom_validation(self):
         """
@@ -76,7 +80,6 @@ class DPHistogramSpec(StatSpec):
         Set up and return computation chain
         :return:
         """
-
         if self.has_error():
             return
 
@@ -103,7 +106,7 @@ class DPHistogramSpec(StatSpec):
 
             # preprocessor = preprocessor >> make_base_geometric(scale=1., D=VectorDomain[AllDomain[int]])
 
-            # keep a point to preprocessor in case it's re-used
+            # keep a pointer to the preprocessor in case it's re-used
             self.preprocessor = preprocessor
             return preprocessor
 
@@ -120,7 +123,7 @@ class DPHistogramSpec(StatSpec):
             self.preprocessor = self.get_preprocessor()
 
         self.accuracy_val = None
-        self.accuracy_message = ""
+        self.accuracy_msg = ""
 
         return True
 
@@ -176,7 +179,7 @@ class DPHistogramSpec(StatSpec):
                f"\nColumn name: {self.variable}"
                f"\nColumn index: {self.col_index}"
                f"\nAccuracy value: {self.accuracy_val}"
-               f"\nAccuracy message: {self.accuracy_message}"
+               f"\nAccuracy message: {self.accuracy_msg}"
                f"\n\nDP Histogram: {self.value}" ))
 
         return True

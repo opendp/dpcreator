@@ -184,48 +184,6 @@ class HistogramStatSpecTest(TestCase):
             print(f'> Valid dataset_size: {good_ds}')
             self.assertTrue(dp_hist.is_chain_valid())
 
-    @skip
-    def test_20_bad_epsilon(self):
-        """(20) Bad epsilon"""
-        msgt(self.test_20_bad_epsilon.__doc__)
-
-        spec_props = {'variable': 'Subject',
-                      'col_index': 0,
-                      'statistic': astatic.DP_HISTOGRAM,
-                      'dataset_size': 183,
-                      'epsilon': 1.0,
-                      'delta': 0.0,
-                      'ci': astatic.CI_95,
-                      'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'fixed_value': '5',
-                      'variable_info': {'min': -8,
-                                        'max': 5,
-                                        'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"', '"cw"',
-                                                       '"jp"', '"rh"', '"aq"', '"ph"', '"le"', '"mn"', '"ls2"', '"no"',
-                                                       '"af"'],
-                                        'type': 'Float', },
-                      }
-
-        for epsilon_val in [1.01, -0.01, 10, 'a', 'carrot', 'cake']:
-            print(f'> Bad epsilon val: {epsilon_val}')
-            spec_props['epsilon'] = epsilon_val
-            dp_hist = DPHistogramSpec(spec_props)
-
-            self.assertFalse(dp_hist.is_chain_valid())
-            err_info = dp_hist.get_error_msg_dict()
-            self.assertTrue(err_info['valid'] == False)
-            print(err_info['message'])
-            self.assertTrue(err_info['message'].find(VALIDATE_MSG_EPSILON) > -1)
-
-        print('     ---')
-
-        spec_props['epsilon'] = 1
-        for bad_ds in [-1, 0, 1.0, .03, 'brick', 'cookie']:
-            print(f'> Bad dataset_size: {bad_ds}')
-            spec_props['dataset_size'] = bad_ds
-            dp_hist = DPHistogramSpec(spec_props)
-            self.assertFalse(dp_hist.is_chain_valid())
-
     def test_30_bad_ci(self):
         """(30) Bad ci vals"""
         msgt(self.test_30_bad_ci.__doc__)
@@ -322,9 +280,9 @@ class HistogramStatSpecTest(TestCase):
                       'fixed_value': 5,
                       'variable_info': {'min': -8,
                                         'max': 5,
-                                        'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"', '"cw"',
-                                                       '"jp"', '"rh"', '"aq"', '"ph"', '"le"', '"mn"', '"ls2"', '"no"',
-                                                       '"af"'],
+                                        'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"',
+                                                       '"cw"', '"jp"', '"rh"', '"aq"', '"ph"', '"le"', '"mn"',
+                                                       '"ls2"', '"no"', '"af"'],
                                         'type': 'Integer', },
                       }
 
