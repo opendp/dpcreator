@@ -17,7 +17,7 @@
             cy.url().should('contain', 'wizard')
             cy.request('/api/dataset-info/').then((data) => {
                 // save the original copy of the object
-                const datasetInfo = camelcaseKeys(data.body.results[0], {deep: true});
+                const datasetInfo = data.body.results[0] 
                 //   console.log('returned depositorSetupInfo' + JSON.stringify(datasetInfo.depositorSetupInfo))
                 const depositorSetupId = datasetInfo.depositor_setup_info.object_id
                 // update the user step
