@@ -152,7 +152,7 @@ class StatSpec:
 
 
     @abc.abstractmethod
-    def check_scale(self, scale, preprocessor, dataset_distance):
+    def check_scale(self, scale, preprocessor):
         """
         See "dp_mean_spec.py for an example of instantiation
 

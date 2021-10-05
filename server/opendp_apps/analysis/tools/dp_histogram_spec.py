@@ -1,11 +1,12 @@
 from opendp.trans import *
 from opendp.meas import *
-from opendp.core import *
+from opendp.mod import enable_features, binary_search_param, OpenDPException
 from opendp.typing import *
 
-enable_features("floating-point")
-
 from opendp_apps.analysis.tools.stat_spec import StatSpec
+
+enable_features("contrib")
+enable_features("floating-point")
 
 
 class DPHistogramSpec(StatSpec):
@@ -67,19 +68,17 @@ class DPHistogramSpec(StatSpec):
 
         self.check_numeric_fixed_value()
 
-    def check_scale(self, scale, preprocessor, dataset_distance, epsilon):
+    def check_scale(self, scale, preprocessor):
         """
         Return T/F
         :param scale:
         :param preprocessor:
-        :param dataset_distance:
-        # :param epsilon:
         :return:
         """
         if self.has_error():
             return
 
-        return (preprocessor >> make_base_geometric(scale)).check(dataset_distance, epsilon)
+        return preprocessor >> make_base_geometric(scale, D=VectorDomain[AllDomain[int]])
 
     def get_preprocessor(self):
         """
@@ -97,20 +96,13 @@ class DPHistogramSpec(StatSpec):
 
         try:
             preprocessor = (
-                # Convert data into Vec<Vec<String>>
-                    # Selects a column of df, Vec<str>
-                    make_select_column(key=self.col_index, TOA=str) >>
-                    # Cast the column as Vec<Int>
-                    # make_cast(TIA=str, TOA=str) >>
-                    # Impute missing values to 0
-                    # make_impute_constant(self.fixed_value) >>
-                    make_count_by_categories(categories=self.categories, MO=L1Distance[float])
-                # make_base_geometric(scale=1., bounds=(0,201), D="VectorDomain<AllDomain<i32>>")
+                make_select_column(key=self.col_index, TOA=str) >>
+                make_count_by_categories(categories=self.categories, MO=L1Distance[int], TIA=str)
             )
 
-            # self.scale = binary_search(lambda s: self.check_scale(s, preprocessor, 1, self.epsilon), bounds=(0, 1000))
-
-            # preprocessor = preprocessor >> make_base_geometric(scale=1., D=VectorDomain[AllDomain[int]])
+            self.scale = binary_search_param(
+                lambda s: self.check_scale(s, preprocessor), d_in=1, d_out=self.epsilon)
+            preprocessor = preprocessor >> make_base_geometric(scale=self.scale, D=VectorDomain[AllDomain[int]])
 
             # keep a pointer to the preprocessor in case it's re-used
             self.preprocessor = preprocessor
