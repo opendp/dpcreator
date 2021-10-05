@@ -189,15 +189,13 @@ import Button from "../../../DesignSystem/Button.vue";
 import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
 import release from "@/api/release";
 import {mapState, mapGetters} from "vuex";
-import statsInformation from "@/data/statsInformation";
+import createStatsUtils from "@/shared/createStatsUtils";
 
 export default {
   name: "AddStatisticDialog",
   components: {Button, ColoredBorderAlert},
   props: ["formTitle", "dialog", "editedIndex", "editedItem", "variableInfo", "statistics"],
-  created() {
-    console.log('created, ' + JSON.stringify(this.analysisPlan))
-  },
+
   computed: {
     ...mapState('dataset', ['analysisPlan', "datasetInfo"]),
     ...mapGetters('dataset', ['getDepositorSetupInfo']),
@@ -213,12 +211,13 @@ export default {
       return count
     },
     isButtonDisabled: function () {
-      return (
+      const returnVal = (
           !this.editedItemDialog.statistic ||
           !this.editedItemDialog.variable ||
           !this.analysisPlan ||
           !this.editedItemDialog.missingValuesHandling
       );
+      return returnVal
     },
     isMultiple: function () {
       return this.editedIndex === -1;
@@ -246,9 +245,7 @@ export default {
     editedItem: function (newEditedItem) {
       this.editedItemDialog = Object.assign({}, newEditedItem);
     },
-    analysisPlan: function (newVal) {
-      console.log("new analysisPlan: " + newVal)
-    }
+
   },
   data: () => ({
     singleVariableStatistics: [
@@ -271,7 +268,8 @@ export default {
       missingValuesHandling: "",
       handleAsFixed: false,
       fixedValue: 0,
-      locked: false
+      locked: false,
+      accuracy: {value: null, message: null}
     },
     missingValuesHandling: [
       // "Drop them", remove this for now, until the library can use it
@@ -293,7 +291,6 @@ export default {
         })
       } catch (err) {
         this.validationError = true
-        console.error(err)
         this.validationErrorMsg = [{"valid": false, "message": err}]
       }
     },
@@ -353,30 +350,19 @@ export default {
         this.editedItemDialog.variable.forEach((variable) => {
           const label = variable
           const ci = this.getDepositorSetupInfo.confidenceInterval
-          tempStats.push(
-              Object.assign({}, this.editedItemDialog, {variable}, {label}, {ci})
+          tempStats.push(Object.assign({}, this.editedItemDialog, {variable}, {label}, {ci})
           );
         })
       }
-      statsInformation.redistributeValue(this.getDepositorSetupInfo.epsilon, 'epsilon', tempStats)
-      statsInformation.redistributeValue(this.getDepositorSetupInfo.delta, 'delta', tempStats)
-      return release.validate(this.analysisPlan.objectId, tempStats)
-          .then((resp) => {
-            console.log('validate response: ' + JSON.stringify(resp))
-            let valid = true
-            resp.data.forEach((item, index) => {
-              if (item.valid !== true) {
-                item.stat = tempStats[index]
-                valid = false;
-              }
-            })
-            this.validationErrorMsg = resp.data
-            return valid
+      createStatsUtils.redistributeValue(this.getDepositorSetupInfo.epsilon, 'epsilon', tempStats)
+      createStatsUtils.redistributeValue(this.getDepositorSetupInfo.delta, 'delta', tempStats)
+      return createStatsUtils.releaseValidation(this.analysisPlan.objectId, tempStats)
+          .then((validateResults) => {
+            this.validationErrorMsg = validateResults.data
+            return validateResults.valid
           })
-          .catch((error) => {
-            this.validationErrorMsg = [{"valid": false, "message": error}]
-            return false
-          })
+
+
     },
 
     close() {

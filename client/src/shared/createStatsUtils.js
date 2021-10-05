@@ -1,4 +1,5 @@
 import Decimal from 'decimal.js';
+import release from "@/api/release";
 
 export const deltaStats = ['Histogram']
 export default {
@@ -15,7 +16,6 @@ export default {
         })
         return useDelta
     },
-
     statisticUsesValue(valName, statistic) {
         return valName === 'epsilon' || (valName == 'delta' && deltaStats.includes(statistic))
     },
@@ -52,26 +52,52 @@ export default {
             }
         });
         const remaining = new Decimal(totalValue).minus(lockedValue)
+        let valueShare = new Decimal('0')
         if (unlockedCount > 0) {
-            const valueShare = remaining.div(unlockedCount)
-            // Assign value shares and convert everything back from Decimal to Number
-            // before saving
-            statistics.forEach((item) => {
-                if (this.statisticUsesValue(property, item.statistic)) {
-                    if (!item.locked) {
-                        item[property] = valueShare.toNumber()
-                    } else {
-                        if (typeof (item[property]) == Decimal) {
-                            item[property] = item[property].toNumber()
-                        }
-                    }
-
-                } else {
-                    item[property] = 0
-                }
-            })
-
+            valueShare = remaining.div(unlockedCount)
         }
 
+        // Assign value shares and convert everything back from Decimal to Number
+        // before saving
+        statistics.forEach((item) => {
+            if (this.statisticUsesValue(property, item.statistic)) {
+                if (!item.locked) {
+                    item[property] = valueShare.toNumber()
+                } else {
+                    if (typeof (item[property]) == Decimal) {
+                        item[property] = item[property].toNumber()
+                    }
+                }
+
+            } else {
+                item[property] = 0
+            }
+        })
+
+
     },
+
+    // Returns Promise json object:
+    // valid: true/false
+    // data: Array of individual validation flags, accuracy, error messages for each statistic
+    releaseValidation(analysisPlanId, tempStats) {
+        let returnObj = {valid: true, data: null}
+        return release.validate(analysisPlanId, tempStats)
+            .then((resp) => {
+           //     console.log('releaseValidation, validate response: ' + JSON.stringify(resp))
+                returnObj.data = resp.data
+                resp.data.forEach((item, index) => {
+                    if (item.valid !== true) {
+                        returnObj.valid = false;
+                    }
+                })
+                return returnObj
+            })
+            .catch((error) => {
+                returnObj.valid = false
+                returnObj.data = [{"valid": false, "message": error}]
+                return returnObj
+            })
+    }
+
 }
