@@ -7,8 +7,8 @@ RUN apt-get update && apt-get install -y \
 # -------------------------------------
 # Copy over the requirements and run them
 # -------------------------------------
-RUN mkdir -p /code/latex
-WORKDIR /code/latex
+RUN mkdir -p /code/latex_service
+WORKDIR /code/latex_service
 COPY ./requirements/ ./requirements
 RUN pip install --no-cache-dir -r requirements/dev.txt
 
@@ -16,5 +16,5 @@ RUN pip install --no-cache-dir -r requirements/dev.txt
 # Copy over the rest of the repository
 # -------------------------------------
 WORKDIR /code
-COPY . /code/latex
-WORKDIR /code/latex
+COPY . /code/latex_service
+WORKDIR /code/latex_service

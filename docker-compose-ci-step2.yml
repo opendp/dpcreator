@@ -77,10 +77,10 @@ services:
     environment:
       WAIT_HOSTS: server:8000
   latex:
-    build: "./latex"
+    build: "./latex_service"
     env_file:
-      - latex/.env
-    command: python /code/latex/app.py 1234
+      - latex_service/.env
+    command: python /code/latex_service/app.py 1234
     volumes:
       - .:/code
     ports:

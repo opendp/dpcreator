@@ -58,7 +58,7 @@ class LatexApplication:
 
         local_file_name = base_filename + '.pdf'
         pdf_renderer = PDFRenderer(stats, hists)
-        # pdf_renderer.save_pdf(os.path.join(local_path, base_filename))
+        pdf_renderer.save_pdf(os.path.join(local_path, base_filename))
         if self.save_to_azure:
             upload(local_path, local_file_name, container_name)
         return json.dumps({
