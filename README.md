@@ -1,110 +1,38 @@
+# DP Creator
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![integration tests](https://github.com/opendp/dpcreator/actions/workflows/cypress.yml/badge.svg)
 ![python server side tests](https://github.com/opendp/dpcreator/actions/workflows/python-app.yml/badge.svg)
 
-****
-# The OpenDP Web Application
+DP Creator is a web application which guides users in the creation of [differentially private statistics](https://opendp.org/about#whatisdifferentialprivacy). Using the [OpenDP library](https://github.com/opendp/opendp) at its core, DP Creator has been designed to work with data repositories, with initial integration beginning with [Dataverse](https://dataverse.org/), an open source research data repository. 
 
-## Building with Docker Compose
-1. Clone the repo and `cd` into the directory.
+DP Creator is part of the larger [OpenDP Project](https://opendp.org), a community effort to build trustworthy, open source software tools for analysis of private data. 
 
-    `git clone https://github.com/opendifferentialprivacy/opendp-ux.git && cd opendp-ux`
 
-2. Tell Docker to turn on the webserver and database: 
+## Status
 
-    `docker-compose up`
-   
-   If major configuration changes have been made (new dependencies, etc.) then the containers will need to be rebuilt:
-   
-   `docker-compose up --build`
+DP Creator is under development and we expect to have a test version, connected to a example Dataverse installation publicly available this fall. Please see the [OpenDP project Roadmap](https://opendp.org/roadmap) for more details.
 
-1. All subsequent commands should be run from the `server` directory
-   
-   `cd server`
+The application is designed to be deployed using [kubernetes](https://kubernetes.io/) and the development environment is available through [Docker Compose](https://docs.docker.com/compose/).
 
-3. The first time you run (or anytime schema changes have been made) 
-you need to run migrate manually:
+Several screenshots of DP Creator appear below (click for a larger image):
 
-    `docker-compose run server ./migrate.sh`
+[<img src="doc_images/dpcreator_home.png" alt="DP Creator home" height="120">](doc_images/dpcreator_home.png)&nbsp;
+[<img src="doc_images/dpcreator_02_questions.png" alt="DP Creator home" height="110">](doc_images/dpcreator_02_questions.png)&nbsp;
+[<img src="doc_images/dpcreator_03_set.png" alt="DP Creator home" height="110">](doc_images/dpcreator_03_set.png)&nbsp;
+[<img src="doc_images/dpcreator_04.create.png" alt="DP Creator home" height="110">](doc_images/dpcreator_04.create.png)
 
-    (In general, any command can be run by adding "docker-compose run server" to the beginning, 
-such as:
 
-    `docker-compose run server python manage.py shell`
-    
-which will drop you into the Django shell on the Docker container.)
+## Contact / Getting Help
 
-## Running without Containers (not recommended)
+If you would like to learn more or want to submit feedback, please reach out! Here are some ways to contact us:
 
-1. Clone the repo and `cd` into the directory. `git clone https://github.com/opendifferentialprivacy/opendp-ux.git && cd opendp-ux`
-1. Create virtual environment: `python3 -m venv venv`
-1. Activate virtual environment: `. venv/bin/activate`
-2. Install requirements: `pip install -r requirements.txt`
-3. Ensure latest version of npm: `npm install -g npm@latest`
-4. Install Vue.js project dependencies: `cd opendp-ux/client && npm install`
-5. Run the Vue.js dev server: `cd opendp-ux/client && npm run serve`
-   - build for production: `npm run build`
-6. `cd server/` 
-7. First time, run migrations: `python manage.py migrate` 
-8. Run Django dev server: `python manage.py runserver`
-9. Open `http://127.0.0.1:8000/` in your browser.
+* Ask questions on our [discussions forum](https://github.com/opendp/opendp/discussions)
+  * This forum is used for all of the OpenDP projects, including the [OpenDP library](https://github.com/opendp/opendp) and DP Creator. 
+* Open issues on our [issue tracker](https://github.com/opendp/dpcreator/issues)
+* Send general queries to [info@opendp.org](mailto:info@opendp.org?subject=DP%20Creator)
+* Reach us on Twitter at [@opendp_org](https://twitter.com/opendp_org)
 
-## Accessing the API
+## Contributing
 
-1. Follow steps 1-5 under Running, above
-2. Open `http://127.0.0.1:8000/api/` in your browser.
-
-## Accessing the API via command-line
-1. Access your command-line terminal
-2. Issue a HTTP command for the API area of interest. This example uses curl to issue the HTTP command. Note that the port you specify should match the port in the output of step 5 under Running, above
-```
-curl http://127.0.0.1:8000/api/
-curl http://127.0.0.1:8000/api/users/
-```
-
-## Generating code diagrams
-1. Create a Python virtualenv to set up your environment `python3 -m venv venv`
-2. Install PyDotPlus
-`pip install pydotplus`
-3. Install Django Extensions
-`pip install django-extensions`
-4. Configure your Django project to use Django Extensions in settings.py under `server/opendp-projects/`
-```
-INSTALLED_APPS = (
-	...
-	'django_extensions',
-	...
-)
-```
-5. Invoke Django manager with graph models option, from the server/ subdirectory
-`python manage.py graph_models -a -o opendpapp_models.png`
-6. Use a browser or viewer to view the created png file, found in the `server/` subdirectory
-
-(This is based on an [existing project](https://github.com/EugeneDae/django-vue-cli-webpack-demo) by EugeneDae. See his project for original documentation.)
-
-## Generating code diagrams
-
-1. Create a Python virtualenv to set up your environment `python3 -m venv venv`
-2. Install PyDotPlus
-`pip install pydotplus`
-3. Install Django Extensions
-`pip install django-extensions`
-4. Configure your Django project to use Django Extensions in settings.py under `server/opendp-projects/`
-```
-INSTALLED_APPS = (
-	...
-	'django_extensions',
-	...
-)
-```
-5. Invoke Django manager with graph models option, from the server/ subdirectory
-`python manage.py graph_models -a -o opendpapp_models.png`
-6. Use a browser or viewer to view the created png file, found in the `server/` subdirectory
-
-(This is based on an [existing project](https://github.com/EugeneDae/django-vue-cli-webpack-demo) by EugeneDae. See his project for original documentation.)
-
-## Communication
-
-- You are very welcome to join us on [GitHub Discussions](https://github.com/opendp/opendp/discussions)!
-- Please use [GitHub Issues](https://github.com/opendp/dpcreator/issues) for bug reports and feature requests.
-- For other requests, including security issues, please contact us at [info@opendp.org](mailto:info@opendp.org).
+DP Creator is a community effort, and we welcome your contributions to its development! Our current technology stack/development environment includes [Vue.js](https://vuejs.org/), [Python](https://www.python.org/), and [Docker](https://www.docker.com/). If you'd like to participate, please reach out using the contact information above.

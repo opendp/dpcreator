@@ -101,6 +101,7 @@ class DataSetFormatter(BasicErrCheck):
 
             'release_deposit_info': {
                   "deposited": False,
+                  # if True, add: "release_url": "some-url"
                   # update with https://github.com/opendp/dpcreator/issues/34
                   # "release_urls": {
                       #    "release_json": "http://dataverse.edu/some.json",

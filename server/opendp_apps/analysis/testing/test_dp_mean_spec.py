@@ -320,26 +320,14 @@ class DPMeanStatSpecTest(TestCase):
         #
         dp_mean.run_chain(col_indexes, file_obj, sep_char="\t")
 
+        final_dict = dp_mean.get_release_dict()
+        self.assertIn('description', final_dict)
+        self.assertIn('text', final_dict['description'])
+        self.assertIn('html', final_dict['description'])
 
 
         print('Actual mean: -0.9503854412185792')
-        '''
-           Some actual stats:
-               "invalidCount": 0,
-               "validCount": 183,
-               "uniqueCount": 183,
-               "median": -0.851190845,
-               "mean": -0.9503854412185792,
-               "max": 4.846733074,
-               "min": -7.953123756,
-               "mode": [
-                   -0.453860599,
-                   2.120359194,
-                   3.045188197,
-                   2.803143496,
-                   -0.641054302
-               ],
-        '''
+
 
 """
 # from ./dpcreator/server directory

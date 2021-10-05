@@ -28,6 +28,7 @@
             <p class="grey--text text--darken-2" v-html="$t('home.service2 text')"></p>
           </template>
         </LinearBox>
+        <!-- TODO: uncomment this when we have appropriate text for 'home.service3 text'
         <LinearBox
             :class="{
             'mb-6': $vuetify.breakpoint.xsOnly,
@@ -39,6 +40,7 @@
             <p class="grey--text text--darken-2" v-html="$t('home.service3 text')"></p>
           </template>
         </LinearBox>
+        -->
         <LinearBox
             :class="{
             'mb-6': $vuetify.breakpoint.xsOnly,

@@ -131,11 +131,11 @@ Cypress.Commands.add('testMean', (numericVar) => {
 
     // Continue to Create  Statistics Step
     cy.get('[data-test="wizardContinueButton"]').last().click();
-    cy.intercept('POST', '/api/analyze/**',).as(
-        'createPlan'
-    )
+    // On the statistics page,
+    cy.get('h1').should('contain', 'Create the statistics').should('be.visible')
+    cy.get('[data-test="wizardContinueButton"]').should('be.enabled')
 
-    cy.wait('@createPlan', {timeout: 10000})
+
     // Test Validating EyeHeight mean
     cy.get('[data-test="Add Statistic"]').click({force: true});
     cy.get('[data-test="Mean"]').click({force: true});
@@ -163,19 +163,9 @@ Cypress.Commands.add('testMean', (numericVar) => {
     cy.get('[data-test="status tag"]').should('contain', 'Release completed')
     cy.get('[data-test="DP Statistics Panel"]').click({force: true})
     cy.get('[data-test="DP Statistics Panel"]').should('contain', 'statistic:"mean"')
-
+    // The statistic description should be visible
+    cy.get('[data-test="DP Statistics Panel"]').should('contain', 'statistic:"mean"')
+    const snippet = 'A differentially private'
+    cy.get('[data-test="statistic description"]').should('contain', snippet)
 
 })
-
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })

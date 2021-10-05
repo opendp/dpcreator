@@ -13,7 +13,9 @@ def are_cypress_settings_in_place():
     # (1) Settings module must be named 'opendp_project.settings.cypress_tests'
     #
     settings_name = os.environ.get('DJANGO_SETTINGS_MODULE')
-    if settings_name != 'opendp_project.settings.cypress_settings':
+    allowed_settings_for_del = ['opendp_project.settings.azure_test_01',
+                                'opendp_project.settings.cypress_settings']
+    if settings_name not in allowed_settings_for_del:
         print('are_cypress_settings_in_place? No, settings_name does not match')
         return False
 
