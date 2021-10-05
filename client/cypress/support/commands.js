@@ -141,7 +141,6 @@ Cypress.Commands.add('testMean', (numericVar) => {
     cy.get('[data-test="Larger Population - no"]').check({force: true})
     //  cy.get('[data-test="Public Observations - yes"]').should('be.visible')
     cy.get('[data-test="Public Observations - yes"]').check({force: true})
-    cy.get('[data-test="wizardContinueButton"]').should('be.enabled')
 
 
     // Continue to Create  Statistics Step
@@ -150,7 +149,6 @@ Cypress.Commands.add('testMean', (numericVar) => {
 
     // On the statistics page,
     cy.get('h1').should('contain', 'Create the statistics').should('be.visible')
-    cy.get('[data-test="wizardContinueButton"]').should('be.enabled')
 
 
     // Test Validating EyeHeight mean
