@@ -44,10 +44,16 @@ class DPHistogramSpec(StatSpec):
         # TODO: These default values are allowing the tests to pass,
         #  but we need to process cases where min and max are referring to counts of a
         #  categorical variable.
-        if not self.convert_to_int('min'):
+        if not self.min:
             self.min =  0.0
-        if not self.convert_to_int('max'):
+        elif self.convert_to_int('min') is False:
+            return
+
+        if not self.max:
             self.max = 10.0
+        elif self.convert_to_int('max') is False:
+            return
+
 
     def run_03_custom_validation(self):
         """

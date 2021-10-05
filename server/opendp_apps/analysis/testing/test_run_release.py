@@ -160,6 +160,8 @@ class TestRunRelease(TestCase):
         release_util = ValidateReleaseUtil.compute_mode(
             self.user_obj,
             analysis_plan.object_id)
+        if release_util.has_error():
+            print('release_util:', release_util.get_err_msg())
         self.assertFalse(release_util.has_error())
 
         release_info_object = release_util.get_new_release_info_object()
