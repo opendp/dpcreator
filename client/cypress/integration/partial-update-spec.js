@@ -1,4 +1,4 @@
-import camelcaseKeys from "camelcase-keys";
+
 
 {
     describe('Multiple Partial Updates', () => {
@@ -19,7 +19,7 @@ import camelcaseKeys from "camelcase-keys";
                 // save the original copy of the object
                 const datasetInfo = camelcaseKeys(data.body.results[0], {deep: true});
                 //   console.log('returned depositorSetupInfo' + JSON.stringify(datasetInfo.depositorSetupInfo))
-                const depositorSetupId = datasetInfo.depositorSetupInfo.objectId
+                const depositorSetupId = datasetInfo.depositor_setup_info.object_id
                 // update the user step
                 // update something else - epsilon
                 // check the state of the object in Vuex, it should have the correct userStep && epsilon
