@@ -1,0 +1,83 @@
+version: "3.8"
+
+services:
+  # ---------------------------------
+  # Redis: used for async celery tasks
+  # ---------------------------------
+  redis:
+    image: redis
+    command: redis-server --requirepass password
+    expose:
+      - 6379
+  # ---------------------------------
+  # Postgres Database
+  # ---------------------------------
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - DB_HOST=localhost
+    ports:
+      - "5432:5432"
+  # ---------------------------------
+  # Client side (Vue.js)
+  #  - Built from "client/Dockerfile"
+  # ---------------------------------
+  # TODO: Load data every time
+  client:
+    build: "./client"
+    environment:
+      - DEV_MODE=true
+    command: ./run_client.sh
+    volumes:
+      - .:/code
+      - /code/client/node_modules
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+  # ---------------------------------
+  # Server side (Django)
+  #  - Built from "server/Dockerfile"
+  # ---------------------------------
+  server:
+    build: "./server"
+    # For production we will need to set
+    # these variables to point to a standalone instance
+    environment:
+      - DJANGO_SETTINGS_MODULE=opendp_project.settings.cypress_settings
+    env_file:
+      - .env
+    command: sh -c "python manage.py show_debug_params && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - client
+      - db
+
+
+  # ---------------------------------
+  # Celery Task Queue
+  # - Used for profiling, other longer
+  #   running tasks
+  # ---------------------------------
+  celery-queue:
+    build: "./server"
+    environment:
+      - DJANGO_SETTINGS_MODULE=opendp_project.settings.development
+    env_file:
+      - .env
+    command: celery -A opendp_project worker -l info -n worker_dpcreator
+    #  command: celery -A opendp_project worker -l INFO
+    volumes:
+      - .:/code
+    ports:
+      - "8070:8070"
+    depends_on:
+      - db
+      - redis
+      - server
