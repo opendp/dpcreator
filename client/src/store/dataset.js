@@ -7,10 +7,12 @@ import {
     SET_DATASET_INFO,
     SET_PROFILER_MSG,
     SET_PROFILER_STATUS,
-    SET_ANALYSIS_PLAN
+    SET_ANALYSIS_PLAN,
+    SET_DEPOSITOR_SETUP, SET_UPDATING, REMOVE_UPDATING
 } from './types';
 import dataverse from "@/api/dataverse";
 import {
+    STEP_0400_PROFILING_COMPLETE, STEP_0600_EPSILON_SET,
     STEP_0900_STATISTICS_SUBMITTED,
     STEP_1000_RELEASE_COMPLETE,
     STEP_1200_PROCESS_COMPLETE
@@ -22,7 +24,9 @@ const initialState = {
     datasetInfo: null,
     profilerStatus: null,
     profilerMsg: null,
-    analysisPlan: null
+    analysisPlan: null,
+    updating: [], // array of depositorIds that are currently being updated
+    locked: false
 };
 const getters = {
     getDatasetList: state => {
@@ -143,18 +147,49 @@ const actions = {
                 commit(SET_DATASET_LIST, resp.data.results)
             })
     },
-    setDatasetInfo({commit}, objectId) {
+    setDatasetInfo({commit, state}, objectId) {
+        /*
+        setTimeout(() => {
+            if (state.datasetInfo == null || state.datasetInfo.depositorSetupInfo == null
+                || !state.updating.includes()[state.datasetInfo.depositorSetupInfo.objectId]) {
+                dataset.getDatasetInfo(objectId)
+                    .then((resp) => {
+                        commit(SET_DATASET_INFO, resp.data)
+                    })
+            }
+        }, 1000);
+
+         */
         return dataset.getDatasetInfo(objectId)
             .then((resp) => {
                 commit(SET_DATASET_INFO, resp.data)
             })
     },
     updateDepositorSetupInfo({commit, state}, {objectId, props}) {
-        return analysis.patchDepositorSetup(objectId, props)
-            .then(() => this.dispatch('dataset/setDatasetInfo', state.datasetInfo.objectId)
-                .catch((data) => {
-                    return Promise.reject(data)
-                }))
+        console.log("begin step: " + state.datasetInfo.depositorSetupInfo.userStep)
+        console.log("props: " + JSON.stringify(props))
+        if (props.hasOwnProperty('userStep')) {
+            console.log('new step: ' + props.userStep)
+        }
+        analysis.patchDepositorSetup(objectId, props)
+            .then((resp) => {
+                dataset.getDatasetInfo(state.datasetInfo.objectId)
+                    .then((resp) => {
+                        commit(SET_DATASET_INFO, resp.data)
+                    }).then(() => {
+
+                    if (props.hasOwnProperty('userStep')
+                        && props.userStep === STEP_0600_EPSILON_SET) {
+                        this.dispatch('dataset/createAnalysisPlan', state.datasetInfo.objectId)
+                    }
+
+                })
+
+            })
+            .catch((data) => {
+                commit(REMOVE_UPDATING, objectId)
+                return Promise.reject(data)
+            })
 
     },
     /**
@@ -165,6 +200,7 @@ const actions = {
      */
     updateVariableInfo({commit, state}, variableInput) {
         //  Get a local copy of variableInfo, for editing
+        console.log('variableInput: ' + JSON.stringify(variableInput))
         let variableInfo = JSON.parse(JSON.stringify(state.datasetInfo.depositorSetupInfo.variableInfo))
         let targetVar = variableInfo[variableInput.key]
         targetVar.name = variableInput.name
@@ -276,10 +312,12 @@ const actions = {
                     const profileData = JSON.parse(wsMsg.data.profileStr)
                     const profileStr = JSON.stringify(profileData.variables, null, 2);
                     console.log(typeof wsMsg.data);
-                    console.log('>>DATA<< ws_msg.data: ' + profileStr);
 
                     // update depositorSetupInfo with variableInfo contained in the message
-                    const props = {variable_info: profileData.variables}
+                    const props = {
+                        variableInfo: profileData.variables,
+                        userStep: STEP_0400_PROFILING_COMPLETE
+                    }
                     const payload = {objectId: state.datasetInfo.depositorSetupInfo.objectId, props: props}
                     this.dispatch('dataset/updateDepositorSetupInfo', payload)
                     return (wsMsg.userMessage)
@@ -323,6 +361,20 @@ const actions = {
 };
 
 const mutations = {
+    [SET_UPDATING](state, objectId) {
+        state.updating.push(objectId)
+    },
+    [REMOVE_UPDATING](state, objectId) {
+        const index = state.updating.indexOf(objectId);
+        if (index > -1) {
+            state.updating.splice(index, 1);
+        }
+    },
+    [SET_DEPOSITOR_SETUP](state, depositorSetupInfo) {
+        state.datasetInfo.depositorSetupInfo = depositorSetupInfo
+        state.datasetInfo.status = state.datasetInfo.depositorSetupInfo.userStep
+        state.datasetInfo.userStep = state.datasetInfo.depositorSetupInfo.userStep
+    },
     [SET_ANALYSIS_PLAN](state, analysisPlan) {
         state.analysisPlan = analysisPlan
     },
@@ -336,9 +388,6 @@ const mutations = {
         state.profilerStatus = status
     },
     [SET_DATASET_INFO](state, datasetInfo) {
-        if (datasetInfo.depositorSetupInfo.defaultEpsilon === null) {
-            console.log("EPSILON NULL")
-        }
         state.datasetInfo = datasetInfo
     },
 };

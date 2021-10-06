@@ -15,7 +15,8 @@ export default {
     patchDepositorSetup(objectId, props) {
         const snakeProps = snakecaseKeys(props, {deep: true})
         return session.patch('/api/deposit/' + objectId + '/',
-            snakeProps).catch((error) => console.log('error'))
+            snakeProps).then(resp => camelcaseKeys(resp.data, {deep: true}))
+            .catch((error) => console.log('error'))
     },
     createAnalysisPlan(datasetId) {
         return session.post('/api/analyze/',
