@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import status
@@ -91,7 +92,7 @@ class AnalysisPlanViewSet(BaseModelViewSet):
                 fields_to_update.append(field)
         if problem_fields:
             problem_field_list = ', '.join([str(f) for f in problem_fields])
-            user_msg =  f'{astatic.ERR_MSG_FIELDS_NOT_UPDATEABLE}: {problem_field_list}'
+            user_msg = f'{astatic.ERR_MSG_FIELDS_NOT_UPDATEABLE}: {problem_field_list}'
             return Response(get_json_error(user_msg),
                             status=status.HTTP_400_BAD_REQUEST)
 
