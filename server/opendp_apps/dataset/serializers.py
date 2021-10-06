@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from rest_framework_extensions.serializers import PartialUpdateSerializerMixin
 from rest_polymorphic.serializers import PolymorphicSerializer
 
 from opendp_apps.analysis.models import DepositorSetupInfo
@@ -73,7 +72,7 @@ class DataSetInfoSerializer(serializers.ModelSerializer):
         read_only_fields = ['object_id', 'id', 'created', 'updated']
 
 
-class DepositorSetupInfoSerializer(serializers.ModelSerializer, PartialUpdateSerializerMixin):
+class DepositorSetupInfoSerializer(serializers.ModelSerializer):
     """Serializer for the DepositorSetupInfo"""
     class Meta:
         model = DepositorSetupInfo

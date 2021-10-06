@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import permissions, status
 from rest_framework.response import Response
 
@@ -39,6 +40,7 @@ class DepositorSetupViewSet(BaseModelViewSet):
         """
         return self.queryset.filter(creator=self.request.user)
 
+    @transaction.atomic()
     def partial_update(self, request, *args, **kwargs):
         acceptable_fields = ['user_step',
                              'dataset_questions', 'epsilon_questions',

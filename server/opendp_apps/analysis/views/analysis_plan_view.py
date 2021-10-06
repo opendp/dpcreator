@@ -79,7 +79,6 @@ class AnalysisPlanViewSet(BaseModelViewSet):
         return Response(get_json_error(plan_util.message),
                         status=plan_util.data)
 
-    @transaction.atomic()
     def partial_update(self, request, *args, **kwargs):
         """Make updates to the AnalysisPlan object"""
         print('>>> partial_update: ', request.data)
