@@ -89,9 +89,8 @@ import EditNoiseParamsConfirmationDialog
   from "../../components/Wizard/Steps/CreateStatistics/EditNoiseParamsConfirmation.vue";
 import NoiseParams from "../../components/Wizard/Steps/CreateStatistics/NoiseParams.vue";
 import StatisticsTable from "../../components/Wizard/Steps/CreateStatistics/StatisticsTable.vue";
-import statsInformation from "@/data/statsInformation";
-import release from "@/api/release";
 import {mapGetters, mapState} from "vuex";
+import createStatsUtils from "@/shared/createStatsUtils";
 
 export default {
   name: "CreateStatistics",
@@ -155,7 +154,8 @@ export default {
       missingValuesHandling: "",
       handleAsFixed: false,
       fixedValue: "0",
-      locked: false
+      locked: false,
+      accuracy: {value: 0, message: 'not calculated'}
     },
     defaultItem: {
       statistic: "",
@@ -165,7 +165,8 @@ export default {
       missingValuesHandling: "",
       handleAsFixed: false,
       fixedValue: "0",
-      locked: false
+      locked: false,
+      accuracy: {value: 0, message: 'not calculated'}
     }
   }),
   methods: {
@@ -187,7 +188,7 @@ export default {
         this.confidenceInterval = this.getDepositorSetupInfo.confidenceInterval
       }
 
-      if (!statsInformation.statisticsUseDelta(this.statistics)) {
+      if (!createStatsUtils.statisticsUseDelta(this.statistics)) {
         this.delta = 0
       } else if (this.getDepositorSetupInfo.delta == null) {
         this.delta = this.getDepositorSetupInfo.defaultDelta
@@ -205,8 +206,16 @@ export default {
       this.epsilon = epsilon;
       this.delta = delta;
       this.confidenceInterval = confidenceInterval;
-      this.redistributeValues()
- //     statsInformation.redistributeValues(this.statistics,this.epsilon,this.delta, this.getDepositorSetupInfo.defaultDelta)
+      createStatsUtils.redistributeValues(this.statistics, this.delta, this.epsilon, this.getDepositorSetupInfo.defaultDelta)
+      // update stats with the accuracy values
+      // (we don't have to check validation because that was done in the Dialog)
+      createStatsUtils.releaseValidation(this.analysisPlan.objectId, this.statistics)
+          .then((validateResults) => {
+            for (let i = 0; i < this.statistics.length; i++) {
+              this.statistics[i].accuracy = validateResults.data[i].accuracy
+            }
+          })
+
       this.saveUserInput()
     },
     // Label may not be set for all variables, so use name as the label if needed
@@ -224,7 +233,7 @@ export default {
       } else {
         for (let variable of this.editedItem.variable) {
           let ci = this.getDepositorSetupInfo.confidenceInterval
-          if (!statsInformation.isDeltaStat(this.editedItem.statistic)) {
+          if (!createStatsUtils.isDeltaStat(this.editedItem.statistic)) {
             this.editedItem.delta = ""
           }
           this.statistics.push(
@@ -232,60 +241,30 @@ export default {
           );
         }
       }
-      this.redistributeValues()
-      this.saveUserInput()
+      createStatsUtils.redistributeValues(this.statistics, this.delta, this.epsilon, this.getDepositorSetupInfo.defaultDelta)
+      this.setAccuracyAndSaveUserInput()
       this.close()
 
+
     },
-    redistributeValues() {
-      if (this.statistics) {
-        if (statsInformation.statisticsUseDelta(this.statistics) && this.delta == 0) {
-          this.delta = this.getDepositorSetupInfo.defaultDelta
-        }
-        if (!statsInformation.statisticsUseDelta(this.statistics)) {
-          this.delta = 0
-        }
-        this.redistributeValue(this.epsilon, 'epsilon')
-        this.redistributeValue(this.delta, 'delta')
-      }
-    },
-    redistributeValue(totalValue, property) {
-      // for all statistics that use this value -
-      // if locked == false, update so that the unlocked value
-      // is shared equally among them.
-      let lockedValue = new Decimal('0.0');
-      let lockedCount = new Decimal('0');
-      let unlockedCount = new Decimal('0')
-      this.statistics.forEach((item) => {
-        if (statsInformation.statisticUsesValue(property, item.statistic)) {
-          if (item.locked) {
-            lockedValue = lockedValue.plus(item[property])
-            lockedCount = lockedCount.plus(1);
-          } else {
-            unlockedCount = unlockedCount.plus(1)
-          }
-        }
-      });
-      const remaining = new Decimal(totalValue).minus(lockedValue)
-      if (unlockedCount > 0) {
-        const valueShare = remaining.div(unlockedCount)
-        // Assign value shares and convert everything back from Decimal to Number
-        // before saving
-        this.statistics.forEach((item) => {
-          if (statsInformation.statisticUsesValue(property, item.statistic)) {
-            if (!item.locked) {
-              item[property] = valueShare.toNumber()
-            } else {
-              if (typeof (item[property]) == Decimal) {
-                item[property] = item[property].toNumber()
+    setAccuracyAndSaveUserInput() {
+      // if there are statistics, update them with the accuracy values
+      // (we don't have to check validation because that was done in the Dialog)
+      if (this.statistics.length > 0) {
+        createStatsUtils.releaseValidation(this.analysisPlan.objectId, this.statistics)
+            .then((validateResults) => {
+              for (let i = 0; i < this.statistics.length; i++) {
+                const accuracy = validateResults.data[i].accuracy
+                this.statistics[i].accuracy.value = accuracy.value
+                this.statistics[i].accuracy.message = accuracy.message
+                // this assigment below didn't work!  Can't change the object reference, need to change the values
+                //  this.statistics[i] = Object.assign({}, this.statistics[i], { accuracy })
               }
-            }
-
-          }
-        })
-
+              this.saveUserInput()
+            })
+      } else {
+        this.saveUserInput()
       }
-
     },
     saveUserInput() {
       // convert statistics back from Decimal to Number
@@ -307,12 +286,12 @@ export default {
     },
 
     editEpsilon(item) {
-      this.redistributeValue(this.epsilon, 'epsilon')
-      this.saveUserInput()
+      createStatsUtils.redistributeValue(this.epsilon, 'epsilon', this.statistics)
+      this.setAccuracyAndSaveUserInput()
     },
     editDelta(item) {
-      this.redistributeValue(this.delta, 'delta')
-      this.saveUserInput()
+      createStatsUtils.redistributeValue(this.delta, 'delta', this.statistics)
+      this.setAccuracyAndSaveUserInput()
     },
     editItem(item) {
 
@@ -330,8 +309,8 @@ export default {
     },
     deleteItemConfirm() {
       this.statistics.splice(this.editedIndex, 1);
-      this.redistributeValues()
-      this.saveUserInput()
+      createStatsUtils.redistributeValues()
+      this.setAccuracyAndSaveUserInput()
       this.closeDelete();
     },
     close() {
