@@ -130,6 +130,7 @@ Cypress.Commands.add('testMean', (numericVar) => {
     cy.get(minDataTest).should('be.visible')
     cy.get(maxDataTest).should('be.visible')
     cy.get(minDataTest).type(numericVar.min, {force: true})
+    cy.wait(500)
     cy.get(maxDataTest).type(numericVar.max, {force: true})
     cy.wait('@patchDeposit', {timeout: 5000})
 
@@ -165,7 +166,8 @@ Cypress.Commands.add('testMean', (numericVar) => {
     // cy.get('[data-test="statistic"]').should('contain', 'Mean')
     cy.get('tr').first().get('td').should('contain', 'Mean')
     cy.get('table').contains('td', 'Mean').should('be.visible');
-
+    // Mean should contain correct accuracy value
+    cy.get('table').contains('td', numericVar.accuracy).should('be.visible')
     // Click Continue to go to Generate DP Release Step
     cy.get('[data-test="wizardContinueButton"]').last().click();
 
