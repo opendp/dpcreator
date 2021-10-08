@@ -8,14 +8,14 @@ import {
     SET_PROFILER_MSG,
     SET_PROFILER_STATUS,
     SET_ANALYSIS_PLAN,
-    SET_DEPOSITOR_SETUP, SET_UPDATING, REMOVE_UPDATING
+    SET_DEPOSITOR_SETUP,
 } from './types';
 import dataverse from "@/api/dataverse";
-import {
+import stepInformation, {
+    depositorSteps,
     STEP_0400_PROFILING_COMPLETE, STEP_0600_EPSILON_SET,
-    STEP_0900_STATISTICS_SUBMITTED,
-    STEP_1000_RELEASE_COMPLETE,
-    STEP_1200_PROCESS_COMPLETE
+
+    STEP_1200_PROCESS_COMPLETE, wizardNextSteps, wizardUserSteps
 } from "@/data/stepInformation";
 import release from "@/api/release";
 
@@ -24,9 +24,7 @@ const initialState = {
     datasetInfo: null,
     profilerStatus: null,
     profilerMsg: null,
-    analysisPlan: null,
-    updating: [], // array of depositorIds that are currently being updated
-    locked: false
+    analysisPlan: null
 };
 const getters = {
     getDatasetList: state => {
@@ -115,6 +113,37 @@ const getters = {
 
 };
 const actions = {
+    updateUserStep({commit, state, getters}, stepperPosition) {
+        const nextStep = wizardNextSteps[stepperPosition]
+        // This update happens when the user clicks "Continue" in the Wizard navigation.
+        // We only update the userStep if this is the first time the user is completing this step.
+        // We test to see if this is the first time by comparing the current userStep to the step
+        // that will be completed by continuing in the wizard.
+        // If the current userStep is earlier in the order, then it needs to be updated.
+        //  (This test is necessary because the user can go back to previous steps in the wizard)
+        /*
+        console.log('stepperPosition: '+ stepperPosition)
+        console.log('nextStep: '+ nextStep)
+        console.log('nextStep index: '+ wizardUserSteps.indexOf(nextStep))
+        console.log('userStep: ' + getters.userStep )
+        console.log('userStep index: '+wizardUserSteps.indexOf(getters.userStep))
+        */
+
+        if (wizardUserSteps.indexOf(getters.userStep) < wizardUserSteps.indexOf(nextStep)) {
+            const completedStepProp = {userStep: nextStep}
+            // Update the user step on the DepositorSetup or the Analysis Plan, depending
+            // where we are in the Wizard
+            if (depositorSteps.includes(nextStep)) {
+                const payload = {objectId: getters.getDepositorSetupInfo.objectId, props: completedStepProp}
+                this.dispatch('dataset/updateDepositorSetupInfo', payload)
+
+            } else {
+                const payload = {objectId: state.analysisPlan.objectId, props: completedStepProp}
+                this.dispatch('dataset/updateAnalysisPlan', payload)
+
+            }
+        }
+    },
     createAnalysisPlan({commit, state}, datasetId) {
         return analysis.createAnalysisPlan(datasetId)
             .then((resp) => {
@@ -148,18 +177,6 @@ const actions = {
             })
     },
     setDatasetInfo({commit, state}, objectId) {
-        /*
-        setTimeout(() => {
-            if (state.datasetInfo == null || state.datasetInfo.depositorSetupInfo == null
-                || !state.updating.includes()[state.datasetInfo.depositorSetupInfo.objectId]) {
-                dataset.getDatasetInfo(objectId)
-                    .then((resp) => {
-                        commit(SET_DATASET_INFO, resp.data)
-                    })
-            }
-        }, 1000);
-
-         */
         return dataset.getDatasetInfo(objectId)
             .then((resp) => {
                 commit(SET_DATASET_INFO, resp.data)
@@ -361,15 +378,6 @@ const actions = {
 };
 
 const mutations = {
-    [SET_UPDATING](state, objectId) {
-        state.updating.push(objectId)
-    },
-    [REMOVE_UPDATING](state, objectId) {
-        const index = state.updating.indexOf(objectId);
-        if (index > -1) {
-            state.updating.splice(index, 1);
-        }
-    },
     [SET_DEPOSITOR_SETUP](state, depositorSetupInfo) {
         state.datasetInfo.depositorSetupInfo = depositorSetupInfo
         state.datasetInfo.status = state.datasetInfo.depositorSetupInfo.userStep
