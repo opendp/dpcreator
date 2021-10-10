@@ -8,7 +8,7 @@ import {
     SET_PROFILER_MSG,
     SET_PROFILER_STATUS,
     SET_ANALYSIS_PLAN,
-    SET_DEPOSITOR_SETUP,
+    SET_MYDATA_LIST
 } from './types';
 import dataverse from "@/api/dataverse";
 import stepInformation, {
@@ -24,7 +24,8 @@ const initialState = {
     datasetInfo: null,
     profilerStatus: null,
     profilerMsg: null,
-    analysisPlan: null
+    analysisPlan: null,
+    myDataList: null,
 };
 const getters = {
     getDatasetList: state => {
@@ -43,38 +44,11 @@ const getters = {
     // The latest userStep may be in the dataset or analysisPlan,
     // depending on the current state of the workflow
     userStep: state => {
-        if (state.analysisPlan !== null) {
-            return state.analysisPlan.userStep
-        } else if (state.datasetInfo.depositorSetupInfo !== null) {
-            return state.datasetInfo.depositorSetupInfo.userStep
-        } else if (state.datasetInfo !== null) {
-            return state.datasetInfo.status
-        } else {
-            return null
-        }
+        return getUserStep(state.datasetInfo, state.analysisPlan)
     },
-    // List of items for the MyData table, which flattens the nested AnalysisPlan array.
-    // If a Dataset contains multiple AnalysisPlan objects,
-    // create an item in the list for each AnalysisPlan.
+
     getMyDataList: state => {
-        let myData = []
-        if (state.datasetList) {
-            state.datasetList.forEach(dataset => {
-                let myDataElem = {}
-                if (dataset.analysisPlans && dataset.analysisPlans.length > 0) {
-                    myDataElem.datasetInfo = dataset
-                    dataset.analysisPlans.forEach(analysisPlan => {
-                        myDataElem.analysisPlan = analysisPlan
-                        myData.push(myDataElem)
-                    })
-                } else {
-                    myDataElem.datasetInfo = dataset
-                    myDataElem.analysisPlan = null;
-                    myData.push(myDataElem)
-                }
-            })
-        }
-        return myData
+        return state.myDataList
     },
     getUpdatedTime: state => {
         if (state.analysisPlan) {
@@ -174,6 +148,7 @@ const actions = {
         return dataset.getUserDatasets()
             .then((resp) => {
                 commit(SET_DATASET_LIST, resp.data.results)
+                commit(SET_MYDATA_LIST, resp.data.results)
             })
     },
     setDatasetInfo({commit, state}, objectId) {
@@ -378,10 +353,29 @@ const actions = {
 };
 
 const mutations = {
-    [SET_DEPOSITOR_SETUP](state, depositorSetupInfo) {
-        state.datasetInfo.depositorSetupInfo = depositorSetupInfo
-        state.datasetInfo.status = state.datasetInfo.depositorSetupInfo.userStep
-        state.datasetInfo.userStep = state.datasetInfo.depositorSetupInfo.userStep
+    // List of items for the MyData table, which flattens the nested AnalysisPlan array.
+    // If a Dataset contains multiple AnalysisPlan objects,
+    // create an item in the list for each AnalysisPlan.
+    [SET_MYDATA_LIST](state, dataList) {
+        let myData = []
+        dataList.forEach(dataset => {
+            let myDataElem = {}
+            if (dataset.analysisPlans && dataset.analysisPlans.length > 0) {
+                myDataElem.datasetInfo = dataset
+                dataset.analysisPlans.forEach(analysisPlan => {
+                    myDataElem.analysisPlan = analysisPlan
+                    myDataElem.userStep = getUserStep(dataset, analysisPlan)
+                    myData.push(myDataElem)
+                })
+            } else {
+                myDataElem.datasetInfo = dataset
+                myDataElem.analysisPlan = null;
+                myDataElem.userStep = getUserStep(dataset, null)
+                myData.push(myDataElem)
+            }
+        })
+        state.myDataList = myData
+
     },
     [SET_ANALYSIS_PLAN](state, analysisPlan) {
         state.analysisPlan = analysisPlan
@@ -400,10 +394,23 @@ const mutations = {
     },
 };
 
+function getUserStep(datasetInfo, analysisPlan) {
+    console.log('in getUserStep, datasetInfo ' + datasetInfo)
+    if (analysisPlan !== null) {
+        return analysisPlan.userStep
+    } else if (datasetInfo.depositorSetupInfo !== null) {
+        return datasetInfo.depositorSetupInfo.userStep
+    } else if (datasetInfo !== null) {
+        return datasetInfo.status
+    } else {
+        return null
+    }
+}
+
 export default {
-  namespaced: true,
-  state: initialState,
-  getters,
-  actions,
-  mutations,
+    namespaced: true,
+    state: initialState,
+    getters,
+    actions,
+    mutations,
 };
