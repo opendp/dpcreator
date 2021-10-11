@@ -135,5 +135,13 @@ export default {
     [STEP_9400_CREATE_RELEASE_FAILED]: {
         workflowStatus: statusInformation.statuses.ERROR,
         label: 'Create Release Failed'
+    },
+    [STEP_9500_RELEASE_CREATION_FAILED]: {
+        workflowStatus: statusInformation.statuses.ERROR,
+        label: 'Create Release Failed'
+    },
+    [STEP_9600_RELEASE_DEPOSIT_FAILED]: {
+        workflowStatus: statusInformation.statuses.ERROR,
+        label: 'Release Deposit Failed'
     }
 }

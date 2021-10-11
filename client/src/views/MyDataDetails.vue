@@ -261,7 +261,7 @@ export default {
         {
           label: "Last state in Workflow",
           tooltip: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-          value: this.status
+          value: stepInformation[this.userStep].label
         },
         {
           label: "Citation",
@@ -278,7 +278,7 @@ export default {
       return this.status === ERROR;
     },
     permissionsError: function () {
-      return this.status === IN_PROGRESS;
+      return false;
     }
   },
   data: () => ({
