@@ -106,18 +106,17 @@
             </a
             >
           </div>
-          <!-- TODO - replace with dynamic data
-          <div class="pt-5 pb-10">
-            <div v-for="(detail, index) in datasetDetails" :key="index">
-              <v-row class="py-3">
-                <v-col
-                    cols="12"
-                    sm="4"
-                    class="grey--text text--darken-2 d-flex"
-                    :class="{
+           <div class="pt-5 pb-10">
+             <div v-for="(detail, index) in datasetDetails" :key="index">
+               <v-row class="py-3">
+                 <v-col
+                     cols="12"
+                     sm="4"
+                     class="grey--text text--darken-2 d-flex"
+                     :class="{
                     'py-0': $vuetify.breakpoint.xsOnly
                   }"
-                >
+                 >
                   <span>
                     {{ detail.label }}
                   </span>
@@ -136,7 +135,7 @@
               <v-divider class="hidden-xs-only"/>
             </div>
           </div>
-  -->
+
           <Button
               v-for="(action, index) in statusInformation[
               status
@@ -238,9 +237,40 @@ export default {
 
 
     ...mapState('dataset', ['datasetInfo', 'analysisPlan']),
-    ...mapGetters('dataset', ['getDepositorSetupInfo', 'userStep']),
+    ...mapGetters('dataset', ['getDepositorSetupInfo', 'userStep', "getTimeRemaining"]),
     ...mapState('auth', ['user']),
+    datasetDetails: function () {
 
+      let datasetDetails = [
+        {
+          label: "DV Installation",
+          tooltip: "The Dataverse Installation where dataset originated",
+          value: this.datasetInfo.installationName
+        },
+
+        {
+          label: "Remaining time to complete release",
+          tooltip: "3 Days from start of the process",
+          value: this.getTimeRemaining
+        },
+        {
+          label: "DV File ID / DOI",
+          tooltip: "Persistent Identifier",
+          value: this.datasetInfo.fileDoi
+        },
+        {
+          label: "Last state in Workflow",
+          tooltip: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+          value: this.status
+        },
+        {
+          label: "Citation",
+          tooltip: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+          value: this.datasetInfo.datasetDoi + ' | ' + this.datasetInfo.datasetSchemaInfo.name + ' | ' + this.datasetInfo.fileSchemaInfo.name
+        },
+      ]
+      return datasetDetails;
+    },
     status: function () {
       return stepInformation[this.userStep].workflowStatus
     },
@@ -264,40 +294,7 @@ export default {
     datasetTitle: "",
     expandedPanels: [0, 1],
     generalErrorSummary: "Error summary: lorem ipsum dolor sit amet.",
-    datasetDetails: [
-      {
-        label: "DV Installation",
-        tooltip: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        value: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-      },
-      {
-        label: "Remaining time to complete release",
-        tooltip: "Lorem ipsum dolor sit amet.",
-        value: "13h"
-      },
-      {
-        label: "DV File ID / DOI",
-        tooltip: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        value: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-      },
-      {
-        label: "Last state in Workflow",
-        tooltip: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        value: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-      },
-      {
-        label: "Citation",
-        tooltip: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        value: "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-      },
-      {
-        label: "Email address to send notification",
-        tooltip: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        value: "example@gmail.com"
-      }
-      //TODO: The objects above are just examples
-      //Here we should use the mounted function of Vue to fill these objects with the real data from the actual dataset
-    ],
+
     NETWORK_CONSTANTS
   })
 };
