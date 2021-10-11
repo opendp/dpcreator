@@ -52,10 +52,9 @@ const getters = {
     },
     getUpdatedTime: state => {
         if (state.analysisPlan) {
-            return state.analysisPlan.updated
+             return new Date(state.analysisPlan.updated).toLocaleString()
         } else if (state.datasetInfo.depositorSetupInfo) {
-            let d = new Date(state.datasetInfo.depositorSetupInfo.updated)
-            return d.toLocaleString()
+            return new Date(state.datasetInfo.depositorSetupInfo.updated).toLocaleString()
         } else {
             return 'not found'
         }
@@ -64,45 +63,25 @@ const getters = {
         return state.datasetInfo.created
     },
     getTimeRemaining: state => {
-        const millisInDay = 1000 * 60 * 60 * 24
-        const millisInHour = 1000 * 60 * 60
-        const millisInMin = 1000 * 60
-        const createdDate = new Date(state.datasetInfo.created)
-        // console.log('createdDate: '+createdDate)
-        const expirationDate = createdDate.getTime() + (3 * millisInDay)
-
-        const diffTime = expirationDate - (new Date().getTime())
-        // console.log('exp date '+new Date(expirationDate))
-
-        if (diffTime < 0) {
-            return ('Time has expired')
-        } else {
-            const diffDays = Math.floor(diffTime / (millisInDay))
-            const diffHours = Math.floor((diffTime - (diffDays * millisInDay)) / millisInHour)
-            const diffMin = Math.floor((diffTime - (diffDays * millisInDay + diffHours * millisInHour)) / millisInMin)
-            return '' + diffDays + 'd ' + diffHours + 'h ' + diffMin + 'min'
-        }
-
+        return getTimeRemaining(state.datasetInfo.created)
     }
 
 };
 const actions = {
+    /**
+     *   This method is called when the user clicks "Continue" in the Wizard navigation.
+     *   We only update the userStep if this is the first time the user is completing this step.
+     *   We test to see if this is the first time by comparing the current userStep to the step
+     *   that will be completed by continuing in the wizard.
+     *   If the current userStep is earlier in the order, then it needs to be updated.
+     *     (This test is necessary because the user can go back to previous steps in the wizard)
+     * @param commit
+     * @param state
+     * @param getters
+     * @param stepperPosition - the current wizard step that the user is on (0-4)
+     */
     updateUserStep({commit, state, getters}, stepperPosition) {
         const nextStep = wizardNextSteps[stepperPosition]
-        // This update happens when the user clicks "Continue" in the Wizard navigation.
-        // We only update the userStep if this is the first time the user is completing this step.
-        // We test to see if this is the first time by comparing the current userStep to the step
-        // that will be completed by continuing in the wizard.
-        // If the current userStep is earlier in the order, then it needs to be updated.
-        //  (This test is necessary because the user can go back to previous steps in the wizard)
-        /*
-        console.log('stepperPosition: '+ stepperPosition)
-        console.log('nextStep: '+ nextStep)
-        console.log('nextStep index: '+ wizardUserSteps.indexOf(nextStep))
-        console.log('userStep: ' + getters.userStep )
-        console.log('userStep index: '+wizardUserSteps.indexOf(getters.userStep))
-        */
-
         if (wizardUserSteps.indexOf(getters.userStep) < wizardUserSteps.indexOf(nextStep)) {
             const completedStepProp = {userStep: nextStep}
             // Update the user step on the DepositorSetup or the Analysis Plan, depending
@@ -365,12 +344,14 @@ const mutations = {
                 dataset.analysisPlans.forEach(analysisPlan => {
                     myDataElem.analysisPlan = analysisPlan
                     myDataElem.userStep = getUserStep(dataset, analysisPlan)
+                    myDataElem.timeRemaining = getTimeRemaining(dataset.created)
                     myData.push(myDataElem)
                 })
             } else {
                 myDataElem.datasetInfo = dataset
                 myDataElem.analysisPlan = null;
                 myDataElem.userStep = getUserStep(dataset, null)
+                myDataElem.timeRemaining = getTimeRemaining(dataset.created)
                 myData.push(myDataElem)
             }
         })
@@ -393,17 +374,44 @@ const mutations = {
         state.datasetInfo = datasetInfo
     },
 };
+// Functions that are used for Vuex state and also
+// for individual items in the My Data table
 
+/**
+ * Get the userStep from the analysisPlan or the
+ * depositorSetupInfo, depending on where we are
+ * in the workflow
+ * @param datasetInfo
+ * @param analysisPlan
+ * @returns {null|(function(*): null)|string}
+ */
 function getUserStep(datasetInfo, analysisPlan) {
     console.log('in getUserStep, datasetInfo ' + datasetInfo)
     if (analysisPlan !== null) {
         return analysisPlan.userStep
     } else if (datasetInfo.depositorSetupInfo !== null) {
         return datasetInfo.depositorSetupInfo.userStep
-    } else if (datasetInfo !== null) {
-        return datasetInfo.status
     } else {
         return null
+    }
+}
+
+function getTimeRemaining(created) {
+    const millisInDay = 1000 * 60 * 60 * 24
+    const millisInHour = 1000 * 60 * 60
+    const millisInMin = 1000 * 60
+    const createdDate = new Date(created)
+    const expirationDate = createdDate.getTime() + (3 * millisInDay)
+
+    const diffTime = expirationDate - (new Date().getTime())
+
+    if (diffTime < 0) {
+        return ('Time has expired')
+    } else {
+        const diffDays = Math.floor(diffTime / (millisInDay))
+        const diffHours = Math.floor((diffTime - (diffDays * millisInDay)) / millisInHour)
+        const diffMin = Math.floor((diffTime - (diffDays * millisInDay + diffHours * millisInHour)) / millisInMin)
+        return '' + diffDays + 'd ' + diffHours + 'h ' + diffMin + 'min'
     }
 }
 

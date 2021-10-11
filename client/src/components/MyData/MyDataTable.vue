@@ -28,15 +28,18 @@
         <span class="index-td hidden-xs-only grey--text">{{ index + 1 }}</span>
       </template>
       <template v-slot:[`item.status`]="{ item }">
-        <StatusTag :status="stepInformation[item.userStep].workflowStatus"/>
+        <StatusTag :status="getWorkflowStatus(item)"/>
       </template>
-      <template v-slot:[`item.remainingTime`]="{ item }">
-        <span
-            :class="{
-            'error_status__color--text': item.datasetInfo.remainingTime === 'Expired'
+      <template v-slot:[`item.timeRemaining`]="{ item }">
+        <span v-if="getWorkflowStatus(item) !== 'completed'"
+              :class="{
+            'error_status__color--text': item.timeRemaining === 'Expired'
           }"
-        >{{ item.remainingTime }}</span
+        >{{ item.timeRemaining }}</span
         >
+        <div v-if="getWorkflowStatus(item) == 'completed'">
+          NA
+        </div>
       </template>
       <template v-slot:[`item.options`]="{ item }">
         <Button
@@ -217,7 +220,7 @@ export default {
         {value: "num"},
         {text: "Dataset", value: "datasetInfo.name"},
         {text: "Status", value: "status"},
-        //  {text: "Remaining time to complete release", value: "remainingTime"},
+        {text: "Remaining time to complete release", value: "timeRemaining"},
         {text: "Options", value: "options", align: "end"}
       ],
       statusInformation,
@@ -239,7 +242,9 @@ export default {
     continueWorkflow(item) {
       this.goToPage(item, `${NETWORK_CONSTANTS.WIZARD.PATH}`)
     },
-
+    getWorkflowStatus(item) {
+      return stepInformation[item.userStep].workflowStatus
+    },
     goToPage(item, path) {
       this.$store.dispatch('dataset/setDatasetInfo', item.datasetInfo.objectId)
           .then(() => {

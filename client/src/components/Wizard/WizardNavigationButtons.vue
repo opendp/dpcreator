@@ -69,8 +69,7 @@
 <script>
 import Button from "../DesignSystem/Button.vue";
 import GoBackDialog from "./GoBackDialog.vue";
-import {mapState, mapGetters} from "vuex";
-import stepInformation, {depositorSteps, STEP_0600_EPSILON_SET} from "@/data/stepInformation";
+import {mapGetters} from "vuex";
 
 export default {
   components: {Button, GoBackDialog},
