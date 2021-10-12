@@ -6,7 +6,8 @@
       "type": "Numerical",
       "min": "0.0",
       "max": "10.0",
-      "fixedValue": "2.0"
+      "fixedValue": "2.0",
+      "accuracy": "0.0014422738517808759"
     },
     "V208": {
       "name": "V208",

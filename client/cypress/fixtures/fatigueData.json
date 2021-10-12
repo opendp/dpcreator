@@ -7,7 +7,8 @@
       "type": "Numerical",
       "min": "0.0",
       "max": "100.0",
-      "fixedValue": "10"
+      "fixedValue": "10",
+      "accuracy": "1.6370121873967791"
     }
   }
 }
