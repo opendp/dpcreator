@@ -39,6 +39,7 @@
             <router-link
                 class="router-link d-inline-flex align-center"
                 :to="item.link"
+                :data-test="item.title"
             >
               <v-icon left>{{ item.icon }}</v-icon>
               {{ item.title }}
