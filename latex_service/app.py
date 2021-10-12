@@ -15,6 +15,8 @@ app = web.application(urls, globals())
 class LatexApplication:
 
     save_to_azure = os.getenv('SAVE_TO_AZURE')
+    local_path = os.getenv('LATEX_SERVICE_OUTPUT_DIRECTORY', 'output')
+    container_name = os.getenv('LATEX_SERVICE_AZURE_CONTAINER', 'output')
 
     def GET(self, name):
         if not name:
@@ -43,10 +45,10 @@ class LatexApplication:
         }
         :return:
         """
-        local_path = 'output'
-        container_name = 'output'
-
-        data = json.loads(web.data())
+        try:
+            data = json.loads(web.data())
+        except json.JSONDecodeError as ex:
+            raise web.badrequest({'error': f'JSON error: {ex.msg}'})
         stats = data.get('statistics', {})
         hists = data.get('histograms', {})
         if stats == {} and hists == {}:
@@ -58,11 +60,11 @@ class LatexApplication:
 
         local_file_name = base_filename + '.pdf'
         pdf_renderer = PDFRenderer(stats, hists)
-        pdf_renderer.save_pdf(os.path.join(local_path, base_filename))
+        pdf_renderer.save_pdf(os.path.join(self.local_path, base_filename))
         if self.save_to_azure:
-            upload(local_path, local_file_name, container_name)
+            upload(self.local_path, local_file_name, self.container_name)
         return json.dumps({
-            "key": os.path.join(container_name, base_filename + '.pdf'),
+            "key": os.path.join(self.container_name, base_filename + '.pdf'),
             "object_id": object_id
         })
 
