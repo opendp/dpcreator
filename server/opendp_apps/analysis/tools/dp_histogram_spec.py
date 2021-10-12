@@ -120,16 +120,19 @@ class DPHistogramSpec(StatSpec):
         if not self.preprocessor:
             self.preprocessor = self.get_preprocessor()
 
-        self.accuracy_val = None
-        self.accuracy_msg = ""
-
+        self.accuracy_val = None  # Future: self.geometric_scale_to_accuracy()
+        self.accuracy_msg = (f"Releasing a {self.statistic} for the variable {self.variable}."
+                             f" With at least probability {1-self.ci} the output {self.statistic}"
+                             f" will differ from the true {self.statistic} by at"
+                             f" most {self.accuracy_val} units."
+                             f" Here the units are the same units the variable has in the dataset.")
         return True
 
     def run_chain(self, column_names, file_obj, sep_char=","):
         """
         Calculate the stats! See "dp_mean_spec.py" for an example of instantiation
 
-        :param columns. Examples: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
+        :param columns, Example: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
                 - In general using zero-based index of columns is preferred
         :param file_obj - file like object to read data from
         :param sep_char - separator from the object, default is "," for a .csv, etc
