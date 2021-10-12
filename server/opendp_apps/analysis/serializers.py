@@ -1,6 +1,3 @@
-import re
-import pandas as pd
-
 from rest_framework import serializers
 from rest_framework.relations import PrimaryKeyRelatedField
 from django.contrib.auth import get_user_model

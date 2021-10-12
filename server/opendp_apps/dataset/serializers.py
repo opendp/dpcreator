@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework.serializers import raise_errors_on_nested_writes
+from rest_framework.utils import model_meta
 
 from rest_polymorphic.serializers import PolymorphicSerializer
 
@@ -10,7 +12,6 @@ from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.basic_response import BasicResponse, ok_resp, err_resp
 from opendp_apps.user.models import OpenDPUser
 from opendp_apps.analysis.serializers import AnalysisPlanSerializer
-
 
 
 class DatasetObjectIdSerializer(serializers.Serializer):
@@ -46,7 +47,6 @@ class DatasetObjectIdSerializer(serializers.Serializer):
 
         return self.validated_data.get('object_id')
 
-
     def get_dataset_info_with_user_check(self, user: get_user_model()) -> BasicResponse:
         """Get the related DataSetInfo object and check that the user matches the creator"""
         assert self.is_valid(), "Do not call this method before checking \".is_valid()\""
@@ -80,6 +80,35 @@ class DepositorSetupInfoSerializer(serializers.ModelSerializer):
         model = DepositorSetupInfo
         fields = '__all__'
         read_only_fields = ['object_id', 'id', 'created', 'updated']
+
+    def update(self, instance, validated_data):
+        """
+        Override default update method to counteract race conditions.
+        (See https://github.com/encode/django-rest-framework/issues/5897)
+        :param instance:
+        :param validated_data:
+        :return:
+        """
+        raise_errors_on_nested_writes('update', self, validated_data)
+        info = model_meta.get_field_info(instance)
+        update_fields = []
+
+        for attr, value in validated_data.items():
+            update_fields.append(attr)
+            if attr in info.relations and info.relations[attr].to_many:
+                field = getattr(instance, attr)
+                field.set(value)
+            else:
+                setattr(instance, attr, value)
+        # This ensures that `is_complete` gets added to update_fields or else the process cannot proceed
+        # from the frontend
+        if instance.variable_info and instance.epsilon \
+                and instance.user_step == instance.DepositorSteps.STEP_0600_EPSILON_SET:
+            instance.is_complete = True
+            update_fields.append('is_complete')
+        instance.save(update_fields=update_fields)
+
+        return instance
 
 
 class DataverseFileInfoSerializer(DataSetInfoSerializer):
