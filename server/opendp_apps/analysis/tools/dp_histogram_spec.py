@@ -121,11 +121,8 @@ class DPHistogramSpec(StatSpec):
             self.preprocessor = self.get_preprocessor()
 
         self.accuracy_val = None  # Future: self.geometric_scale_to_accuracy()
-        self.accuracy_msg = (f"Releasing a {self.statistic} for the variable {self.variable}."
-                             f" With at least probability {1-self.ci} the output {self.statistic}"
-                             f" will differ from the true {self.statistic} by at"
-                             f" most {self.accuracy_val} units."
-                             f" Here the units are the same units the variable has in the dataset.")
+        self.accuracy_msg = None
+
         return True
 
     def run_chain(self, column_names, file_obj, sep_char=","):
