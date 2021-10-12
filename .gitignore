@@ -11,6 +11,16 @@ server/static/dist/
 Pipfile
 Pipfile.lock
 *.ddi
+*/production
+*/out
+*.tab
+*.tex
+*.pdf
+*.json
+*.aux
+*.fdb_latexmk
+*cypress*
+*.fls
 
 
 # Byte-compiled / optimized / DLL files
