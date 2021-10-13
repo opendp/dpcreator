@@ -6,7 +6,8 @@
       "type": "Numerical",
       "min": "0.0",
       "max": "100.0",
-      "fixedValue": "45"
+      "fixedValue": "45",
+      "accuracy": "0.029957332877164806"
     },
     "married": {
       "name": "married",

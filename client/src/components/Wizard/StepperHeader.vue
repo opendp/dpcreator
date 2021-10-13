@@ -3,6 +3,7 @@
     <template v-for="(step, i) in steps">
       <v-stepper-step
           :editable="isEditable(i)"
+          :data-test="'step' + i"
           :key="i + '-v1'"
           :complete="isStepCompleted(i)"
           :step="i"

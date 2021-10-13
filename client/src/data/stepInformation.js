@@ -39,49 +39,69 @@ export const analystSteps = [
     STEP_1200_PROCESS_COMPLETE
 ]
 
+// All userSteps that can occur within the wizard stepper.
+// Some steps share a stepper position.
+export const wizardUserSteps = [
+    STEP_0100_UPLOADED,
+    STEP_0200_VALIDATED,
+    STEP_0300_PROFILE_PROCESSING,
+    STEP_0400_PROFILING_COMPLETE,
+    STEP_0500_VARIABLE_DEFAULTS_CONFIRMED,
+    STEP_0600_EPSILON_SET,
+    STEP_0700_VARIABLES_CONFIRMED,
+    STEP_0800_STATISTICS_CREATED,
+    STEP_0900_STATISTICS_SUBMITTED
+]
+// Maps Wizard StepperPosition (the index of this array)
+// to the userStep to be assigned when the wizard step is completed.
+export const wizardNextSteps = [
+    STEP_0200_VALIDATED,  //stepperPos 0
+    STEP_0500_VARIABLE_DEFAULTS_CONFIRMED,//stepperPos 1
+    STEP_0600_EPSILON_SET, //stepperPos 2
+    STEP_0800_STATISTICS_CREATED, //stepperPos 3
+    STEP_0900_STATISTICS_SUBMITTED //stepperPos 4
+]
+
+
 export default {
     [STEP_0100_UPLOADED]: {
         workflowStatus: statusInformation.statuses.UPLOADED,
         wizardStepper: 0,
-        label: 'Dataset Uploaded',
-        nextStep: STEP_0200_VALIDATED
+        label: 'Dataset Uploaded'
     },
     [STEP_0200_VALIDATED]: {
         workflowStatus: statusInformation.statuses.IN_PROGRESS,
         wizardStepper: 1,
-        label: 'Dataset Validated',
-        nextStep: STEP_0300_PROFILE_PROCESSING
+        label: 'Dataset Validated'
     },
     [STEP_0300_PROFILE_PROCESSING]: {
         workflowStatus: statusInformation.statuses.IN_PROGRESS,
         wizardStepper: 1,
-        label: 'Profile Processing',
-        nextStep: STEP_0400_PROFILING_COMPLETE
+        label: 'Profile Processing'
     },
     [STEP_0400_PROFILING_COMPLETE]: {
         workflowStatus: statusInformation.statuses.IN_PROGRESS,
         wizardStepper: 1,
         label: 'Profiling Complete',
-        nextStep: STEP_0500_VARIABLE_DEFAULTS_CONFIRMED
     },
     [STEP_0500_VARIABLE_DEFAULTS_CONFIRMED]: {
         workflowStatus: statusInformation.statuses.IN_PROGRESS,
         wizardStepper: 2,
         label: 'Variable Defaults Confirmed',
-        nextStep: STEP_0600_EPSILON_SET
     },
     [STEP_0600_EPSILON_SET]: {
         workflowStatus: statusInformation.statuses.IN_PROGRESS,
         wizardStepper: 3,
         label: 'Epsilon Set',
-        nextStep: STEP_0800_STATISTICS_CREATED
     },
     [STEP_0700_VARIABLES_CONFIRMED]: {
         workflowStatus: statusInformation.statuses.IN_PROGRESS,
+        wizardStepper: 3,
         label: 'Variables Confirmed'
     },
     [STEP_0800_STATISTICS_CREATED]: {
         workflowStatus: statusInformation.statuses.IN_PROGRESS,
+        wizardStepper: 4,
         label: 'Statistics Created'
     },
     [STEP_0900_STATISTICS_SUBMITTED]: {
@@ -115,5 +135,13 @@ export default {
     [STEP_9400_CREATE_RELEASE_FAILED]: {
         workflowStatus: statusInformation.statuses.ERROR,
         label: 'Create Release Failed'
+    },
+    [STEP_9500_RELEASE_CREATION_FAILED]: {
+        workflowStatus: statusInformation.statuses.ERROR,
+        label: 'Create Release Failed'
+    },
+    [STEP_9600_RELEASE_DEPOSIT_FAILED]: {
+        workflowStatus: statusInformation.statuses.ERROR,
+        label: 'Release Deposit Failed'
     }
 }

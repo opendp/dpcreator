@@ -28,20 +28,23 @@
         <span class="index-td hidden-xs-only grey--text">{{ index + 1 }}</span>
       </template>
       <template v-slot:[`item.status`]="{ item }">
-        <StatusTag :status="stepInformation[item.datasetInfo.status].workflowStatus"/>
+        <StatusTag :status="getWorkflowStatus(item)"/>
       </template>
-      <template v-slot:[`item.remainingTime`]="{ item }">
-        <span
-            :class="{
-            'error_status__color--text': item.datasetInfo.remainingTime === 'Expired'
+      <template v-slot:[`item.timeRemaining`]="{ item }">
+        <span v-if="getWorkflowStatus(item) !== 'completed'"
+              :class="{
+            'error_status__color--text': item.timeRemaining === 'Expired'
           }"
-        >{{ item.remainingTime }}</span
+        >{{ item.timeRemaining }}</span
         >
+        <div v-if="getWorkflowStatus(item) == 'completed'">
+          NA
+        </div>
       </template>
       <template v-slot:[`item.options`]="{ item }">
         <Button
             :data-test="action"
-            v-for="(action, index) in statusInformation[stepInformation[item.datasetInfo.status].workflowStatus]
+            v-for="(action, index) in statusInformation[stepInformation[item.userStep].workflowStatus]
             .availableActions"
             :key="action + '-' + index"
             small
@@ -69,7 +72,7 @@
             'flex-column align-center': $vuetify.breakpoint.xsOnly
           }"
         >
-          <div class="d-inline">
+          <div v-if="props.pagination.itemsLength > 5" class="d-inline">
             Showing
             <v-select
                 v-model="computedItemsPerPage"
@@ -81,7 +84,7 @@
             ></v-select>
             <span>of {{ props.pagination.itemsLength }}</span>
           </div>
-          <div class="d-inline">
+          <div v-if="pageCount > 1" class="d-inline">
             <v-pagination
                 v-model="page"
                 :length="pageCount"
@@ -216,8 +219,8 @@ export default {
       headers: [
         {value: "num"},
         {text: "Dataset", value: "datasetInfo.name"},
-        {text: "Status", value: "datasetInfostatus"},
-        //  {text: "Remaining time to complete release", value: "remainingTime"},
+        {text: "Status", value: "status"},
+        {text: "Remaining time to complete release", value: "timeRemaining"},
         {text: "Options", value: "options", align: "end"}
       ],
       statusInformation,
@@ -239,18 +242,9 @@ export default {
     continueWorkflow(item) {
       this.goToPage(item, `${NETWORK_CONSTANTS.WIZARD.PATH}`)
     },
-    /*
-      this.$store.dispatch('dataset/setDatasetInfo', item.datasetInfo.objectId)
-          .then(() => {
-            if (item.analysisPlan) {
-              this.$store.dispatch('dataset/setAnalysisPlan', item.analysisPlan.objectId).then(() => {
-                this.$router.push(`${NETWORK_CONSTANTS.WIZARD.PATH}`)
-              })
-            } else {
-              this.$router.push(`${NETWORK_CONSTANTS.WIZARD.PATH}`)
-            }
-          })
-    },*/
+    getWorkflowStatus(item) {
+      return stepInformation[item.userStep].workflowStatus
+    },
     goToPage(item, path) {
       this.$store.dispatch('dataset/setDatasetInfo', item.datasetInfo.objectId)
           .then(() => {

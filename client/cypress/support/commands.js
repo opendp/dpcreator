@@ -116,7 +116,6 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
 
 
 })
-
 Cypress.Commands.add('testMean', (numericVar) => {
     cy.intercept('PATCH', '/api/deposit/**',).as(
         'patchDeposit'
@@ -130,6 +129,7 @@ Cypress.Commands.add('testMean', (numericVar) => {
     cy.get(minDataTest).should('be.visible')
     cy.get(maxDataTest).should('be.visible')
     cy.get(minDataTest).type(numericVar.min, {force: true})
+    cy.wait(500)
     cy.get(maxDataTest).type(numericVar.max, {force: true})
     cy.wait('@patchDeposit', {timeout: 5000})
 
@@ -165,7 +165,8 @@ Cypress.Commands.add('testMean', (numericVar) => {
     // cy.get('[data-test="statistic"]').should('contain', 'Mean')
     cy.get('tr').first().get('td').should('contain', 'Mean')
     cy.get('table').contains('td', 'Mean').should('be.visible');
-
+    // Mean should contain correct accuracy value
+    cy.get('table').contains('td', numericVar.accuracy).should('be.visible')
     // Click Continue to go to Generate DP Release Step
     cy.get('[data-test="wizardContinueButton"]').last().click();
 
@@ -185,3 +186,27 @@ Cypress.Commands.add('testMean', (numericVar) => {
     cy.get('[data-test="statistic description"]').should('contain', snippet)
 
 })
+Cypress.Commands.add('setupStatisticsPage', (datasetFixture, analysisFixture) => {
+    cy.fixture(datasetFixture).then(dataset => {
+        dataset.created = '' + new Date()
+        dataset.depositorSetupInfo.updated = dataset.created
+        cy.intercept('GET', '/api/dataset-info/' + dataset.objectId + '/', {body: dataset})
+        cy.intercept('GET', '/api/dataset-info/', {
+            body: {
+                "count": 1,
+                "next": null,
+                "previous": null,
+                "results": [dataset]
+            }
+        })
+        cy.fixture(analysisFixture).then(analysisPlan => {
+            cy.intercept('GET', '/api/analyze/' + analysisPlan.objectId + '/', {body: analysisPlan})
+        })
+        cy.get('[data-test="My Data"]').click({force: true})
+        cy.get('tr').should('contain',
+            'Replication Data for: Eye-typing experiment')
+        cy.get('[data-test="continueWorkflow"]').click({force: true})
+    })
+})
+
+
