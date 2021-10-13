@@ -83,6 +83,7 @@ class DPHistogramSpec(StatSpec):
     def get_preprocessor(self):
         """
         Set up and return computation chain
+        Note: Exceptions are caught via "is_chain_valid()"
         :return:
         """
         if self.has_error():
@@ -94,31 +95,24 @@ class DPHistogramSpec(StatSpec):
             # Yes!
             return self.preprocessor
 
-        try:
-            preprocessor = (
-                make_select_column(key=self.col_index, TOA=str) >>
-                make_count_by_categories(categories=self.categories, MO=L1Distance[int], TIA=str)
-            )
+        preprocessor = (
+            make_select_column(key=self.col_index, TOA=str) >>
+            make_count_by_categories(categories=self.categories, MO=L1Distance[int], TIA=str)
+        )
 
-            self.scale = binary_search_param(
-                lambda s: self.check_scale(s, preprocessor), d_in=1, d_out=self.epsilon)
-            preprocessor = preprocessor >> make_base_geometric(scale=self.scale, D=VectorDomain[AllDomain[int]])
+        self.scale = binary_search_param(
+            lambda s: self.check_scale(s, preprocessor), d_in=1, d_out=self.epsilon)
+        preprocessor = preprocessor >> make_base_geometric(scale=self.scale, D=VectorDomain[AllDomain[int]])
 
-            # keep a pointer to the preprocessor in case it's re-used
-            self.preprocessor = preprocessor
-            return preprocessor
-
-        except Exception as ex:
-            self.add_err_msg(ex)
+        # keep a pointer to the preprocessor in case it's re-used
+        self.preprocessor = preprocessor
+        return preprocessor
 
 
     def set_accuracy(self):
         """Return the accuracy measure using Laplace and the confidence interval as alpha"""
         if self.has_error():
             return False
-
-        if not self.preprocessor:
-            self.preprocessor = self.get_preprocessor()
 
         self.accuracy_val = None  # Future: self.geometric_scale_to_accuracy()
         self.accuracy_msg = None

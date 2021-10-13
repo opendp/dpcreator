@@ -239,6 +239,8 @@ class HistogramStatSpecTest(TestCase):
                       }
 
         dp_hist = DPHistogramSpec(spec_props)
+        if not dp_hist.is_chain_valid():
+            print(dp_hist.get_error_messages())
         self.assertTrue(dp_hist.is_chain_valid())
 
         bad_impute_info = [(-10, astatic.ERR_IMPUTE_PHRASE_MIN)]
@@ -288,10 +290,9 @@ class HistogramStatSpecTest(TestCase):
 
         dp_hist = DPHistogramSpec(spec_props)
         print(dp_hist.has_error(), dp_hist.error_messages)
-        self.assertTrue(dp_hist.is_chain_valid())
         if dp_hist.has_error():
             print(dp_hist.get_error_messages())
-            return
+        self.assertTrue(dp_hist.is_chain_valid())
         # print('\nUI info:', json.dumps(dp_hist.get_success_msg_dict()))
 
         # ------------------------------------------------------
@@ -337,10 +338,9 @@ class HistogramStatSpecTest(TestCase):
 
         dp_hist = DPHistogramSpec(spec_props)
         print(f"DPHistogramSpec valid? {dp_hist.has_error()}. get_error_msg_dict: {dp_hist.get_error_msg_dict()}")
-        self.assertTrue(dp_hist.is_chain_valid())
         if dp_hist.has_error():
             print(f"get_error_messages(): {dp_hist.get_error_messages()}")
-            return
+        self.assertTrue(dp_hist.is_chain_valid())
         # print('\nUI info:', json.dumps(dp_hist.get_success_msg_dict()))
 
         # ------------------------------------------------------

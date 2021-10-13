@@ -92,9 +92,9 @@ class DPMeanSpec(StatSpec):
         return (preprocessor >> make_base_laplace(scale)).check(dataset_distance, epsilon)
 
     def get_preprocessor(self):
-        """To implement!"""
+        """Preprocessor for DP Mean (float)"""
         if self.has_error():
-            return
+            return None
 
         # Have we already already assembled it?
         #

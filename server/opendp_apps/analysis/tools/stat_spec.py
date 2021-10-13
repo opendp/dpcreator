@@ -263,6 +263,10 @@ class StatSpec:
                 self.add_err_msg(f'{ex_obj} (Exception)')
             return False
 
+        # Important, even if an exception wasn't thrown, an error may have been found
+        if self.has_error():
+            return False
+
         return True
 
     def floatify_int_values(self, more_props_to_floatify=[]):
@@ -538,7 +542,8 @@ class StatSpec:
 
     def add_err_msg(self, err_msg):
         """Add an error message"""
-        # print('add err:', err_msg)
+        # print('add_err_msg. type', type(err_msg))
+
         self.error_found = True
         self.error_messages.append(err_msg)
 
