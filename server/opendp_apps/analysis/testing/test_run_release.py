@@ -53,36 +53,65 @@ class TestRunRelease(TestCase):
         self.analysis_plan.variable_info['TypingSpeed']['min'] = 3
         self.analysis_plan.variable_info['TypingSpeed']['max'] = 30
 
-        #analysis_plan.variable_info = variable_info_mod
+        # analysis_plan.variable_info = variable_info_mod
         self.analysis_plan.save()
 
-        self.general_stat_specs = [\
-                            {"statistic": astatic.DP_MEAN,
-                              "variable": "EyeHeight",
-                              "epsilon": .5,
-                              "delta": 0,
-                              "ci": astatic.CI_95,
-                              "error": "",
-                              "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
-                              "handle_as_fixed": False,
-                              "fixed_value": "1",
-                              "locked": False,
-                              "label": "EyeHeight"
-                              },
-                           {
-                            "statistic": astatic.DP_COUNT, # astatic.DP_MEAN,
-                            "variable": "TypingSpeed",
-                            "epsilon": .5,
-                            "delta": 0,
-                            "ci": astatic.CI_95,
-                            "error": "",
-                            "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
-                            "handle_as_fixed": False,
-                            "fixed_value": "9",
-                            "locked": False,
-                            "label": "TypingSpeed"
-                            }
-                         ]
+        self.general_stat_specs = [
+            {
+                "statistic": astatic.DP_MEAN,
+                "variable": "EyeHeight",
+                "epsilon": .25,
+                "delta": 0,
+                "ci": astatic.CI_95,
+                "error": "",
+                "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
+                "handle_as_fixed": False,
+                "fixed_value": "1",
+                "locked": False,
+                "label": "EyeHeight",
+                "variable_info": {
+                    "min": 0,
+                    "max": 100,
+                    "type": "Float"
+                }
+            },
+            {
+                "statistic": astatic.DP_MEAN,
+                "variable": "TypingSpeed",
+                "epsilon": .25,
+                "delta": 0,
+                "ci": astatic.CI_99,
+                "error": "",
+                "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
+                "handle_as_fixed": False,
+                "fixed_value": "9",
+                "locked": False,
+                "label": "TypingSpeed",
+                "variable_info": {
+                    "min": 0,
+                    "max": 100,
+                    "type": "Float"
+                }
+            },
+            {
+                'variable': 'Subject',
+                'col_index': 0,
+                'statistic': astatic.DP_HISTOGRAM,
+                'dataset_size': 183,
+                'epsilon': 0.5,
+                'delta': 0.0,
+                'ci': astatic.CI_95,
+                'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+                'fixed_value': 5,
+                'variable_info': {
+                    'min': 0,
+                    'max': 5,
+                    'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"', '"cw"',
+                                   '"jp"', '"rh"', '"aq"', '"ph"', '"le"', '"mn"', '"ls2"', '"no"', '"af"'],
+                    'type': 'Float'
+                }
+             }
+        ]
 
     def add_source_file(self, dataset_info: DataSetInfo, filename: str, add_profile: bool = False) -> DataSetInfo:
         """Add a source file -- example...
@@ -115,8 +144,6 @@ class TestRunRelease(TestCase):
         # re-retrieve it...
         return DataSetInfo.objects.get(object_id=dataset_info.object_id)
 
-
-
     def test_10_compute_stats(self):
         """(10) Run compute stats"""
         msgt(self.test_10_compute_stats.__doc__)
@@ -130,12 +157,11 @@ class TestRunRelease(TestCase):
 
         # Check the basics
         #
-        release_util = ValidateReleaseUtil.compute_mode(\
-                               self.user_obj,
-                               analysis_plan.object_id)
-
-        #if release_util.has_error():
-        #    print(release_util.get_err_msg())
+        release_util = ValidateReleaseUtil.compute_mode(
+            self.user_obj,
+            analysis_plan.object_id)
+        if release_util.has_error():
+            print('release_util:', release_util.get_err_msg())
         self.assertFalse(release_util.has_error())
 
         release_info_object = release_util.get_new_release_info_object()
@@ -152,7 +178,6 @@ class TestRunRelease(TestCase):
         self.assertTrue('result' in stats_list[1])
         self.assertTrue('value' in stats_list[1]['result'])
         self.assertTrue(float(stats_list[1]['result']['value']))
-
 
     def test_30_api_bad_stat(self):
         """(30) Via API, run compute stats with error"""
@@ -177,8 +202,6 @@ class TestRunRelease(TestCase):
         self.assertFalse(jresp['success'])
         self.assertTrue(jresp['message'].find(VALIDATE_MSG_EPSILON) > -1)
 
-
-
     def test_40_api_bad_overall_epsilon(self):
         """(30) Via API, run compute stats, bad overall epsilon"""
         msgt(self.test_40_api_bad_overall_epsilon.__doc__)
@@ -192,7 +215,7 @@ class TestRunRelease(TestCase):
 
         # Put some bad data in!
         setup_info = analysis_plan.dataset.get_depositor_setup_info()
-        setup_info.epsilon = None   # Shouldn't happen but what if it does!
+        setup_info.epsilon = None  # Shouldn't happen but what if it does!
         setup_info.save()
 
         params = dict(object_id=str(analysis_plan.object_id))
@@ -205,7 +228,6 @@ class TestRunRelease(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertFalse(jresp['success'])
         self.assertTrue(jresp['message'].find(astatic.ERR_MSG_BAD_TOTAL_EPSILON) > -1)
-
 
     def test_50_success(self):
         """(50) Via API, run compute stats with error"""
@@ -264,6 +286,11 @@ class TestRunRelease(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(analysis_plan_jresp['release_info'])
 
+        histogram_results = list(filter(lambda x: x['statistic'] == 'histogram',
+                                        analysis_plan_jresp['release_info']['dp_release']['statistics']))
+        self.assertIsNotNone(histogram_results)
+        self.assertEqual(len(histogram_results), 1)
+        self.assertTrue(type(histogram_results[0]['result']), list)
         self.assertIn('dp_release', analysis_plan_jresp['release_info'])
 
         self.assertIn('dataset', analysis_plan_jresp['release_info']['dp_release'])

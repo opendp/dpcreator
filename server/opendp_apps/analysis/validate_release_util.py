@@ -23,14 +23,15 @@ from django.core.exceptions import ValidationError
 
 from opendp.mod import OpenDPException
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
+from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 from opendp_apps.analysis.stat_valid_info import StatValidInfo
-#from opendp_apps.analysis.tools.dp_mean import dp_mean
-from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
-from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
+from opendp_apps.analysis.tools.dp_histogram_spec import DPHistogramSpec
+from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
+
 from opendp_apps.utils.extra_validators import \
     (validate_epsilon_not_null,
      validate_not_negative)
@@ -284,7 +285,7 @@ class ValidateReleaseUtil(BasicErrCheck):
                     stat_spec.add_err_msg(user_msg)
                     self.validation_info.append(stat_spec.get_error_msg_dict())
 
-                elif  running_epsilon > self.max_epsilon:
+                elif running_epsilon > self.max_epsilon:
                     # Error: Too much epsilon used!
                     #
                     user_msg = (f'The running epsilon ({running_epsilon}) exceeds'
@@ -328,11 +329,11 @@ class ValidateReleaseUtil(BasicErrCheck):
         for dp_stat in self.dp_statistics:
             stat_num += 1       # not used yet...
             """
-            We're putting together lots of properties to pass to 
+            We're putting together lots of properties to pass to
             statistic specific classes such as DPMeanSpec.
-            
+
             These classes take care of most error checking and validation.
-            
+
             - Some sample input from the UI--e.g. contents of "dp_stat:
                 {
                     "statistic": astatic.DP_MEAN,
@@ -404,6 +405,10 @@ class ValidateReleaseUtil(BasicErrCheck):
             #
             if statistic == astatic.DP_MEAN:
                 self.add_stat_spec(DPMeanSpec(props))
+                continue
+            elif statistic in astatic.DP_HISTOGRAM:
+                spec = DPHistogramSpec(props)
+                self.add_stat_spec(spec)
                 continue
             elif statistic == astatic.DP_COUNT:
                 self.add_stat_spec(DPCountSpec(props))
