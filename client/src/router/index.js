@@ -136,7 +136,11 @@ router.beforeEach((to, from, next) => {
       && store.state.auth.token == null) {
     sessionStorage.setItem('redirectPath', to.path);
     next({name: NETWORK_CONSTANTS.LOGIN.NAME})
-  } else next()
+  } else if (to.name === NETWORK_CONSTANTS.LOGIN.NAME && store.state.auth.token !== null) {
+    next({name: NETWORK_CONSTANTS.MY_DATA.NAME})
+  } else {
+    next()
+  }
 })
 router.afterEach(() => {
   window.scrollTo(0, 0);
