@@ -1,7 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
-
+import store from "../store/index"
 import NETWORK_CONSTANTS from "./NETWORK_CONSTANTS";
 
 const {
@@ -32,18 +32,27 @@ const routes = [
     path: `${WIZARD.PATH}/`,
     name: WIZARD.NAME,
     // dynamic segments start with a colon
-    component: () => import("../views/Wizard.vue")
+    component: () => import("../views/Wizard.vue"),
+    meta: {
+      requiresAuth: true
+    }
   },
 
   {
     path: MY_DATA.PATH,
     name: MY_DATA.NAME,
-    component: () => import("../views/MyData.vue")
+    component: () => import("../views/MyData.vue"),
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: `${MY_DATA_DETAILS.PATH}`,
     name: "MyDataDetails",
-    component: () => import("../views/MyDataDetails.vue")
+    component: () => import("../views/MyDataDetails.vue"),
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: SIGN_UP.PATH,
@@ -68,7 +77,10 @@ const routes = [
   {
     path: WELCOME.PATH,
     name: WELCOME.NAME,
-    component: () => import("../views/Welcome.vue")
+    component: () => import("../views/Welcome.vue"),
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: TERMS_AND_CONDITIONS.PATH,
@@ -83,7 +95,10 @@ const routes = [
   {
     path: MY_PROFILE.PATH,
     name: MY_PROFILE.NAME,
-    component: () => import("../views/MyProfile.vue")
+    component: () => import("../views/MyProfile.vue"),
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: MOCK_DV.PATH,
@@ -116,6 +131,11 @@ const router = new VueRouter({
   }
 });
 
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)
+      && store.state.auth.token == null) next({name: NETWORK_CONSTANTS.LOGIN.NAME})
+  else next()
+})
 router.afterEach(() => {
   window.scrollTo(0, 0);
 });
