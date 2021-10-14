@@ -1,10 +1,10 @@
-from os.path import abspath, dirname, isdir, isfile, join
+import json
+
+from os.path import abspath, dirname, isfile, join
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
-from unittest import skip
 
-import json
 from django.contrib.auth import get_user_model
 from django.core.files import File
 from django.test.testcases import TestCase
@@ -14,14 +14,13 @@ from rest_framework.test import APIClient
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.models import AnalysisPlan
 from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.analysis.serializers import ReleaseValidationSerializer
 from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
+from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.dataset.dataset_formatter import DataSetFormatter
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
 from opendp_apps.utils.extra_validators import VALIDATE_MSG_EPSILON
-from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 
 
 class TestRunRelease(TestCase):
