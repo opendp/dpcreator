@@ -13,7 +13,7 @@ MAINTAINER OpenDP https://github.com/opendp
 LABEL organization="OpenDP" \
       version="0.1-alpha" \
       release-date="2022-10-14" \
-      description="Base image with Python 3.9 and LaTeX for the DP Creator LaTeX service"
+      description="Base image with Python 3.9 and Tex Live for the DP Creator LaTeX service"
 
 
 ENV PYTHONUNBUFFERED=1
