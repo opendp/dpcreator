@@ -34,7 +34,8 @@ const routes = [
     // dynamic segments start with a colon
     component: () => import("../views/Wizard.vue"),
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiresDataset: true
     }
   },
 
@@ -43,7 +44,7 @@ const routes = [
     name: MY_DATA.NAME,
     component: () => import("../views/MyData.vue"),
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
     }
   },
   {
@@ -51,7 +52,8 @@ const routes = [
     name: "MyDataDetails",
     component: () => import("../views/MyDataDetails.vue"),
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiresDataset: true
     }
   },
   {
@@ -132,13 +134,21 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
+  console.log('dataset is null? ' + (store.state.dataset.datasetInfo == null))
+  console.log('to = ' + to.name)
+  console.log('requires dataset = ' + to.matched.some(record => record.meta.requiresDataset))
   if (to.matched.some(record => record.meta.requiresAuth)
       && store.state.auth.token == null) {
     sessionStorage.setItem('redirectPath', to.path);
     next({name: NETWORK_CONSTANTS.LOGIN.NAME})
   } else if (to.name === NETWORK_CONSTANTS.LOGIN.NAME && store.state.auth.token !== null) {
     next({name: NETWORK_CONSTANTS.MY_DATA.NAME})
+  } else if (to.matched.some(record => record.meta.requiresDataset
+      && store.state.dataset.datasetInfo == null)) {
+    console.log('setting next to my data')
+    next({name: NETWORK_CONSTANTS.MY_DATA.NAME})
   } else {
+    console.log('going to default next')
     next()
   }
 })
