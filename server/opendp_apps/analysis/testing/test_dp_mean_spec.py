@@ -24,9 +24,7 @@ from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.utils.extra_validators import *
 
 
-
-
-class StatSpecTest(TestCase):
+class DPMeanStatSpecTest(TestCase):
 
     fixtures = ['test_dataset_data_001.json', ]
 

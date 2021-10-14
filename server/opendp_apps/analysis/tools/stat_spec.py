@@ -8,15 +8,12 @@ BaseClass for Univariate statistics for OpenDP.
 - Implementing the "get_preprocessor" method acts as validation.
 -
 """
-from opendp.accuracy import laplacian_scale_to_accuracy
-import abc # import ABC, ABCMeta, abstractmethod
+import abc
+
 from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
 
 from opendp.mod import OpenDPException
-
-from opendp_apps.model_helpers.basic_err_check import BasicErrCheckList
-from opendp_apps.analysis.stat_valid_info import StatValidInfo
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.profiler import static_vals as pstatic
@@ -27,7 +24,6 @@ from opendp_apps.utils.extra_validators import \
      validate_epsilon_not_null,
      validate_missing_val_handlers,
      validate_not_empty_or_none,
-     validate_not_none,
      validate_not_negative,
      validate_int_greater_than_zero,
      validate_int_not_negative)
@@ -50,8 +46,8 @@ class StatSpec:
                            categories=validate_not_empty_or_none,  # ?
                            #
                            missing_values_handling=validate_missing_val_handlers,
-                           #fixed_value=validate_not_none, # more complex check
-                           #fixed_value=
+                           # fixed_value=validate_not_none, # more complex check
+                           # fixed_value=
                            #
                            accuracy=validate_not_negative)
 
@@ -67,21 +63,21 @@ class StatSpec:
         self.ci = props.get('ci')
         #
         self.accuracy_val = None
-        self.accuracy_message = None
+        self.accuracy_msg = None
         #
         self.missing_values_handling = props.get('missing_values_handling')
         self.fixed_value = props.get('fixed_value')
-        #self.missing_fixed_val = props.get('missing_fixed_val')
+        # self.missing_fixed_val = props.get('missing_fixed_val')
         #
         # Note: min, max, categories are sent in via variable_info
-        self.variable_info = props.get('variable_info', {}) # derive the min/max if needed
+        self.variable_info = props.get('variable_info', {})  # derive the min/max if needed
         self.min = self.variable_info.get('min')
         self.max = self.variable_info.get('max')
 
         self.categories = self.variable_info.get('categories')
         self.var_type = self.variable_info.get('type')
 
-        self.preprocessor = None    # set this each time get_preprocessor is called--hopefully once
+        self.preprocessor = None  # set this each time get_preprocessor is called--hopefully once
         self.value = None
         self.scale = None
 
@@ -89,17 +85,16 @@ class StatSpec:
         self.error_found = False
         self.error_messages = []
 
-        self.run_01_initial_handling()     # customize, if types need converting, etc.
-        self.run_02_basic_validation()     # always the same
-        self.run_03_custom_validation()    # customize, if types need converting, etc.
-
+        self.run_01_initial_handling()  # customize, if types need converting, etc.
+        self.run_02_basic_validation()  # always the same
+        self.run_03_custom_validation()  # customize, if types need converting, etc.
 
     def get_ci_text(self):
         """Return the ci as text. e.g. .05 is returned as 95%"""
         if not self.ci:
             return None
 
-        ci_num = (1-self.ci) * 100
+        ci_num = (1 - self.ci) * 100
         return f'{ci_num}%'
 
     @abc.abstractmethod
@@ -150,9 +145,8 @@ class StatSpec:
         """
         raise NotImplementedError('run_03_custom_validation')
 
-
     @abc.abstractmethod
-    def check_scale(self, scale, preprocessor, dataset_distance):
+    def check_scale(self, scale, preprocessor):
         """
         See "dp_mean_spec.py for an example of instantiation
 
@@ -168,8 +162,6 @@ class StatSpec:
         ```
         """
         raise NotImplementedError('check_scale')
-
-
 
     @abc.abstractmethod
     def get_preprocessor(self):
@@ -195,7 +187,7 @@ class StatSpec:
         """
         Calculate the stats! See "dp_mean_spec.py" for an example of instantiation
 
-        :param columns. Examples: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
+        :param columns - for example [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
                 - In general using zero-based index of columns is preferred
         :param file_obj - file like object to read data from
         :param sep_char - separator from the object, default is "," for a .csv, etc
@@ -216,8 +208,6 @@ class StatSpec:
         ```
         """
         raise NotImplementedError('run_chain')
-
-
 
     @abc.abstractmethod
     def set_accuracy(self):
@@ -263,6 +253,10 @@ class StatSpec:
                 self.add_err_msg(f'{ex_obj} (Exception)')
             return False
 
+        # Important, even if an exception wasn't thrown, an error may have been found
+        if self.has_error():
+            return False
+
         return True
 
     def floatify_int_values(self, more_props_to_floatify=[]):
@@ -279,7 +273,7 @@ class StatSpec:
         assert isinstance(more_props_to_floatify, list), \
             '"more_props_to_floatify" must be a list, even and empty list'
 
-        props_to_floatify = ['epsilon', 'ci', 'min', 'max',] \
+        props_to_floatify = ['epsilon', 'ci', 'min', 'max', ] \
                             + more_props_to_floatify
 
         for prop_name in props_to_floatify:
@@ -288,7 +282,7 @@ class StatSpec:
 
     def run_02_basic_validation(self):
         """Evaluate the properties, make sure they are populated"""
-        if self.has_error():   # something may be wrong in "run_01_initial_handling()"
+        if self.has_error():  # something may be wrong in "run_01_initial_handling()"
             return
 
         # Always validate these properties, mostly using the self.prop_validators
@@ -323,25 +317,24 @@ class StatSpec:
             else:
                 user_msg = f'{self.variable} The min ({self.min}) must be less than the max ({self.max})'
                 self.add_err_msg(user_msg)
-                #self.add_err_msg(astatic.ERR_MSG_INVALID_MIN_MAX)
+                # self.add_err_msg(astatic.ERR_MSG_INVALID_MIN_MAX)
                 return
-            #print('looks okay!')
+            # print('looks okay!')
 
         # If this is numeric variable, check the impute constant
         #   (If impute constant isn't used, this check will simply exit)
-        #if self.var_type in pstatic.NUMERIC_VAR_TYPES:
+        # if self.var_type in pstatic.NUMERIC_VAR_TYPES:
         #    self.check_numeric_fixed_value()
 
     def check_numeric_fixed_value(self):
         """
-        For the case of handing missing values with a constant
+        For the case of handling missing values with a constant
         Check that the fixed value/fixed_value is not outside the min/max range
         """
         if self.has_error():
             return
 
         if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
-
             if self.fixed_value < self.min:
                 user_msg = (f'The "fixed value" ({self.fixed_value})'
                             f' {astatic.ERR_IMPUTE_PHRASE_MIN} ({self.min})')
@@ -352,7 +345,6 @@ class StatSpec:
                             f' {astatic.ERR_IMPUTE_PHRASE_MAX} ({self.max})')
                 self.add_err_msg(user_msg)
                 return
-
 
     def validate_property(self, prop_name: str, validator=None) -> bool:
         """Validate a property name using a validator"""
@@ -392,6 +384,22 @@ class StatSpec:
 
         return True
 
+    def convert_to_int(self, prop_name):
+        """Attempt to convert a value to an integer"""
+        prop_val = getattr(self, prop_name)
+
+        try:
+            prop_val_float = int(prop_val)
+        except TypeError:
+            self.add_err_msg(f'Failed to convert "{prop_name}" to an integer. (value: "{prop_val}")')
+            return False
+        except ValueError:
+            self.add_err_msg(f'Failed to convert "{prop_name}" to a integer. (value: "{prop_val}")')
+            return False
+
+        setattr(self, prop_name, prop_val_float)
+
+        return True
 
     def get_success_msg_dict(self):
         """Get success info"""
@@ -401,7 +409,7 @@ class StatSpec:
         # Need to add accuracy...
         return StatValidInfo.get_success_msg_dict(self.variable, self.statistic,
                                                   accuracy_val=self.accuracy_val,
-                                                  accuracy_msg=self.accuracy_message)
+                                                  accuracy_msg=self.accuracy_msg)
 
     def get_error_msg_dict(self):
         """Get invalid info dict"""
@@ -420,14 +428,13 @@ class StatSpec:
         print('-' * 40)
         import json
         print(json.dumps(self.__dict__, indent=4))
-        #for key, val in self.__dict__.items():
+        # for key, val in self.__dict__.items():
         #    print(f'{key}: {val}')
 
     def get_short_description_text(self):
         """Get description in plain text"""
         template_name = 'analysis/dp_stat_general_description.txt'
         return self.get_short_description_html(template_name)
-
 
     def get_short_description_html(self, template_name=None):
         """
@@ -449,7 +456,6 @@ class StatSpec:
         # print(desc)
         return desc
 
-
     def get_release_dict(self):
         """Final release info"""
         assert not self.has_error(), \
@@ -458,13 +464,13 @@ class StatSpec:
             'Only use this after "run_chain()" was completed successfully"'
 
         final_info = {
-             "statistic": self.statistic,
-             "variable": self.variable,
-             "result":{
+            "statistic": self.statistic,
+            "variable": self.variable,
+            "result": {
                 "value": self.value
-             },
-             "epsilon": self.epsilon,
-             "delta": self.delta,
+            },
+            "epsilon": self.epsilon,
+            "delta": self.delta,
         }
 
         # Min/Max
@@ -490,14 +496,13 @@ class StatSpec:
             final_info['accuracy'] = {}
             if self.accuracy_val:
                 final_info['accuracy']['value'] = self.accuracy_val
-            if self.accuracy_message:
-                final_info['accuracy']['message'] = self.accuracy_message
+            if self.accuracy_msg:
+                final_info['accuracy']['message'] = self.accuracy_msg
 
         final_info['description'] = dict(html=self.get_short_description_html(),
                                          text=self.get_short_description_text())
 
         return final_info
-
 
     def has_error(self):
         """Did an error occur?"""
@@ -522,7 +527,8 @@ class StatSpec:
 
     def add_err_msg(self, err_msg):
         """Add an error message"""
-        # print('add err:', err_msg)
+        # print('add_err_msg. type', type(err_msg))
+
         self.error_found = True
         self.error_messages.append(err_msg)
 
