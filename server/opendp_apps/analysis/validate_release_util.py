@@ -31,6 +31,7 @@ from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
 from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
 from opendp_apps.analysis.tools.dp_histogram_spec import DPHistogramSpec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
+from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
 
 from opendp_apps.utils.extra_validators import \
     (validate_epsilon_not_null,
@@ -403,21 +404,27 @@ class ValidateReleaseUtil(BasicErrCheck):
 
             # Okay, "props" are built! Let's see if they work!
             #
-            if statistic == astatic.DP_MEAN:
-                self.add_stat_spec(DPMeanSpec(props))
-                continue
-            elif statistic in astatic.DP_HISTOGRAM:
-                spec = DPHistogramSpec(props)
-                self.add_stat_spec(spec)
-                continue
-            elif statistic == astatic.DP_COUNT:
+            if statistic == astatic.DP_COUNT:
+                # DP Count!
                 self.add_stat_spec(DPCountSpec(props))
-                continue
+
+            elif statistic in astatic.DP_HISTOGRAM:
+                # DP Histogram!
+                self.add_stat_spec(DPHistogramSpec(props))
+
+            elif statistic == astatic.DP_MEAN:
+                # DP Mean!
+                self.add_stat_spec(DPMeanSpec(props))
+
+            elif statistic == astatic.DP_SUM:
+                # DP Mean!
+                self.add_stat_spec(DPSumSpec(props))
+
             elif statistic in astatic.DP_STATS_CHOICES:
+                # Stat not yet available or an error
                 props['error_message'] = (f'Statistic "{statistic}" will be supported'
                                           f' soon!')
                 self.add_stat_spec(DPSpecError(props))
-                continue
             else:
                 # Shouldn't reach here, unknown stats are captured up above
                 pass

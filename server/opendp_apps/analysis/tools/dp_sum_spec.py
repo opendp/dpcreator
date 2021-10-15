@@ -47,6 +47,8 @@ class DPSumSpec(StatSpec):
         if not self.statistic == astatic.DP_SUM:
             self.add_err_msg(('This is the DP Sum handler'
                               ' but the "statistic" is "{self.statistic}"'))
+            # stop here!
+            return
 
         if self.fixed_value is not None:
             pass
@@ -77,7 +79,7 @@ class DPSumSpec(StatSpec):
         :param scale:
         :param preprocessor:
         :param dataset_distance:
-        # :param epsilon:
+        :param epsilon:
         :return:
         """
         if self.has_error():
@@ -95,6 +97,9 @@ class DPSumSpec(StatSpec):
         if self.preprocessor is not None:
             # Yes!
             return self.preprocessor
+
+        # Build the preprocessor!
+        #
         preprocessor = (
                 make_select_column(self.col_index, TOA=str) >>
                 make_cast(TIA=str, TOA=float) >>
@@ -178,11 +183,12 @@ class DPSumSpec(StatSpec):
                 self.add_err_msg(f'{ex_obj} (Exception)')
             return False
 
-        print((f"Epsilon: {self.epsilon}"
-               f"\nColumn name: {self.variable}"
-               f"\nColumn index: {self.col_index}"
-               f"\nColumn accuracy_val: {self.accuracy_val}"
-               f"\nColumn accuracy_message: {self.accuracy_msg}"
-               f"\n\nDP Sum: {self.value}" ))
+        if False:
+            print((f"Epsilon: {self.epsilon}"
+                   f"\nColumn name: {self.variable}"
+                   f"\nColumn index: {self.col_index}"
+                   f"\nColumn accuracy_val: {self.accuracy_val}"
+                   f"\nColumn accuracy_message: {self.accuracy_msg}"
+                   f"\n\nDP Sum: {self.value}" ))
 
         return True
