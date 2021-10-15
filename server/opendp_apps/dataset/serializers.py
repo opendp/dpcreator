@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.serializers import raise_errors_on_nested_writes
@@ -105,6 +107,7 @@ class DepositorSetupInfoSerializer(serializers.ModelSerializer):
         if instance.variable_info and instance.epsilon \
                 and instance.user_step == instance.DepositorSteps.STEP_0600_EPSILON_SET:
             instance.is_complete = True
+            instance.updated = datetime.now()
             update_fields.append('is_complete')
         instance.save(update_fields=update_fields)
 
