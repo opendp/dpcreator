@@ -1,0 +1,22 @@
+# -----------------------------------------------------
+# This Dockerfile is used to create an image providing
+#  - Python 3.9
+#  - The Tex Live system (https://www.tug.org/texlive/)
+#
+# It is built up on by subsequent images such as
+#   the DP Creator LaTeX service
+# -----------------------------------------------------
+FROM python:3.9
+
+MAINTAINER OpenDP https://github.com/opendp
+
+LABEL organization="OpenDP" \
+      version="0.1-alpha" \
+      release-date="2022-10-14" \
+      description="Base image with Python 3.9 and Tex Live for the DP Creator LaTeX service"
+
+
+ENV PYTHONUNBUFFERED=1
+
+RUN apt-get update && \
+    apt-get install -y texlive-full
