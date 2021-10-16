@@ -69,7 +69,8 @@ export default {
   },
   computed: {
     ...mapState('auth', ['currentTerms', 'user']),
-    ...mapGetters('auth', ['isTermsAccepted'])
+    ...mapGetters('auth', ['isTermsAccepted']),
+    ...mapState('dataverse', ['handoffId']),
   },
   data: () => ({
     loading: true,
@@ -82,7 +83,13 @@ export default {
         user: this.user.objectId,
         termsOfAccess: this.currentTerms.objectId
       })
-      this.$router.push(NETWORK_CONSTANTS.WELCOME.PATH)
+      // If we are signing terms as part of a login redirect,
+      //  Go back to redirect page, or go to default page
+      const defaultPage = this.handoffId == null ? NETWORK_CONSTANTS.MY_DATA.PATH : NETWORK_CONSTANTS.WELCOME.PATH
+      this.$router.replace(sessionStorage.getItem('redirectPath') || defaultPage);
+      //Cleanup redirectPath
+      sessionStorage.removeItem('redirectPath');
+
     }
   }
 };

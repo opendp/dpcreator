@@ -10,7 +10,9 @@
             cy.clearData()
             cy.login('dev_admin', 'admin')
             cy.setupStatisticsPage('datasetInfoStep600.json', 'analysisPlanStep700.json')
+
         })
+        afterEach(() => cy.logout())
 
         it('Goes to the correct wizard step', () => {
             cy.on('uncaught:exception', (e, runnable) => {
@@ -38,7 +40,9 @@
                         cy.get('label').should('not.contain', varsFixture[key].name)
                     }
                 }
+                cy.get('[data-test="Add Statistic Close"]').click({force: true})
             })
+
         })
 
     })

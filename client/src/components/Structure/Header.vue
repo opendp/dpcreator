@@ -48,6 +48,7 @@
           </span>
           <span class="ml-8 red--text text--accent-4">
             <router-link
+                data-test="Logout Link"
                 class="router-link d-inline-flex align-center"
                 :to="NETWORK_CONSTANTS.HOME.PATH"
                 v-on:click.native="logoutHandler()"
@@ -195,6 +196,7 @@ export default {
   methods: {
     logoutHandler() {
       this.$store.dispatch('auth/logout')
+      this.$store.dispatch('dataset/clearDatasetStorage')
       this.$router.push(NETWORK_CONSTANTS.HOME.PATH);
     }
   }
