@@ -129,10 +129,10 @@ class DPCountSpec(StatSpec):
 
         self.accuracy_val = laplacian_scale_to_accuracy(self.scale, self.ci_alpha)
 
-        self.accuracy_message = (f"Releasing {self.statistic} for the variable {self.variable}." 
-                                f" With at least probability {self.get_ci_text()} the output {self.statistic}" 
+        self.accuracy_message = (f"Releasing {self.statistic} for the variable {self.variable}."
+                                f" With at least probability {self.get_ci_text()} the output {self.statistic}"
                                 f" will differ from the true {self.statistic} by at"
-                                f" most {self.accuracy_val} units." 
+                                f" most {self.accuracy_val} units."
                                 f" Here the units are the same units the variable has in the dataset.")
 
         return True
@@ -190,7 +190,7 @@ class DPCountSpec(StatSpec):
                f"\nColumn name: {self.variable}"
                f"\nColumn index: {self.col_index}"
                f"\nColumn accuracy_val: {self.accuracy_val}"
-               f"\nColumn accuracy_message: {self.accuracy_message}"
+               f"\nColumn accuracy_message: {self.accuracy_msg}"
                f"\n\nDP Count: {self.value}" ))
 
         return True

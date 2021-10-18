@@ -9,27 +9,10 @@
             })
             cy.clearData()
             cy.login('dev_admin', 'admin')
-            cy.fixture('datasetInfoStep600.json').then(dataset => {
-                dataset.created = '' + new Date()
-                dataset.depositorSetupInfo.updated = dataset.created
-                cy.intercept('GET', '/api/dataset-info/' + dataset.objectId + '/', {body: dataset})
-                cy.intercept('GET', '/api/dataset-info/', {
-                    body: {
-                        "count": 1,
-                        "next": null,
-                        "previous": null,
-                        "results": [dataset]
-                    }
-                })
-                cy.fixture('analysisPlanStep700.json').then(analysisPlan => {
-                    cy.intercept('GET', '/api/analyze/' + analysisPlan.objectId + '/', {body: analysisPlan})
-                })
-                cy.visit('/my-data')
-                cy.get('tr').should('contain',
-                    'Replication Data for: Eye-typing experiment')
-                cy.get('[data-test="continueWorkflow"]').click({force: true})
-            })
+            cy.setupStatisticsPage('datasetInfoStep600.json', 'analysisPlanStep700.json')
+
         })
+        afterEach(() => cy.logout())
 
         it('Goes to the correct wizard step', () => {
             cy.on('uncaught:exception', (e, runnable) => {
@@ -57,7 +40,9 @@
                         cy.get('label').should('not.contain', varsFixture[key].name)
                     }
                 }
+                cy.get('[data-test="Add Statistic Close"]').click({force: true})
             })
+
         })
 
     })

@@ -81,6 +81,7 @@ export default {
   created() {
     this.$store.dispatch('auth/fetchUser')
     this.$store.dispatch('dataset/setDatasetList')
+    this.$store.dispatch('dataverse/setHandoffId', null)
   },
   computed: {
     ...mapGetters('auth', ['isAuthenticated']),

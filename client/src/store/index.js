@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import createLogger from 'vuex/dist/logger';
+import createPersistedState from 'vuex-persistedstate';
 
 import auth from './auth';
 import password from './password';
@@ -20,5 +21,5 @@ export default new Vuex.Store({
     dataset
   },
   strict: debug,
-  plugins: debug ? [createLogger()] : [],
+  plugins: debug ? [createLogger(), createPersistedState({storage: window.sessionStorage})] : [createPersistedState({storage: window.sessionStorage})],
 });

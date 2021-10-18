@@ -8,14 +8,14 @@ import {
     SET_PROFILER_MSG,
     SET_PROFILER_STATUS,
     SET_ANALYSIS_PLAN,
-    SET_DEPOSITOR_SETUP, SET_UPDATING, REMOVE_UPDATING
+    SET_MYDATA_LIST
 } from './types';
 import dataverse from "@/api/dataverse";
-import {
+import stepInformation, {
+    depositorSteps,
     STEP_0400_PROFILING_COMPLETE, STEP_0600_EPSILON_SET,
-    STEP_0900_STATISTICS_SUBMITTED,
-    STEP_1000_RELEASE_COMPLETE,
-    STEP_1200_PROCESS_COMPLETE
+
+    STEP_1200_PROCESS_COMPLETE, wizardNextSteps, wizardUserSteps
 } from "@/data/stepInformation";
 import release from "@/api/release";
 
@@ -25,8 +25,7 @@ const initialState = {
     profilerStatus: null,
     profilerMsg: null,
     analysisPlan: null,
-    updating: [], // array of depositorIds that are currently being updated
-    locked: false
+    myDataList: null,
 };
 const getters = {
     getDatasetList: state => {
@@ -45,45 +44,17 @@ const getters = {
     // The latest userStep may be in the dataset or analysisPlan,
     // depending on the current state of the workflow
     userStep: state => {
-        if (state.analysisPlan !== null) {
-            return state.analysisPlan.userStep
-        } else if (state.datasetInfo.depositorSetupInfo !== null) {
-            return state.datasetInfo.depositorSetupInfo.userStep
-        } else if (state.datasetInfo !== null) {
-            return state.datasetInfo.status
-        } else {
-            return null
-        }
+        return getUserStep(state.datasetInfo, state.analysisPlan)
     },
-    // List of items for the MyData table, which flattens the nested AnalysisPlan array.
-    // If a Dataset contains multiple AnalysisPlan objects,
-    // create an item in the list for each AnalysisPlan.
+
     getMyDataList: state => {
-        let myData = []
-        if (state.datasetList) {
-            state.datasetList.forEach(dataset => {
-                let myDataElem = {}
-                if (dataset.analysisPlans && dataset.analysisPlans.length > 0) {
-                    myDataElem.datasetInfo = dataset
-                    dataset.analysisPlans.forEach(analysisPlan => {
-                        myDataElem.analysisPlan = analysisPlan
-                        myData.push(myDataElem)
-                    })
-                } else {
-                    myDataElem.datasetInfo = dataset
-                    myDataElem.analysisPlan = null;
-                    myData.push(myDataElem)
-                }
-            })
-        }
-        return myData
+        return state.myDataList
     },
     getUpdatedTime: state => {
         if (state.analysisPlan) {
-            return state.analysisPlan.updated
+             return new Date(state.analysisPlan.updated).toLocaleString()
         } else if (state.datasetInfo.depositorSetupInfo) {
-            let d = new Date(state.datasetInfo.depositorSetupInfo.updated)
-            return d.toLocaleString()
+            return new Date(state.datasetInfo.depositorSetupInfo.updated).toLocaleString()
         } else {
             return 'not found'
         }
@@ -92,29 +63,53 @@ const getters = {
         return state.datasetInfo.created
     },
     getTimeRemaining: state => {
-        const millisInDay = 1000 * 60 * 60 * 24
-        const millisInHour = 1000 * 60 * 60
-        const millisInMin = 1000 * 60
-        const createdDate = new Date(state.datasetInfo.created)
-        // console.log('createdDate: '+createdDate)
-        const expirationDate = createdDate.getTime() + (3 * millisInDay)
-
-        const diffTime = expirationDate - (new Date().getTime())
-        // console.log('exp date '+new Date(expirationDate))
-
-        if (diffTime < 0) {
-            return ('Time has expired')
-        } else {
-            const diffDays = Math.floor(diffTime / (millisInDay))
-            const diffHours = Math.floor((diffTime - (diffDays * millisInDay)) / millisInHour)
-            const diffMin = Math.floor((diffTime - (diffDays * millisInDay + diffHours * millisInHour)) / millisInMin)
-            return '' + diffDays + 'd ' + diffHours + 'h ' + diffMin + 'min'
-        }
-
+        return getTimeRemaining(state.datasetInfo.created)
     }
 
 };
 const actions = {
+    /**
+     * Called when user logs out
+     * @param commit
+     * @param state
+     */
+    clearDatasetStorage({commit, state}) {
+        commit('SET_ANALYSIS_PLAN', null)
+        commit('SET_DATASET_LIST', null)
+        commit('SET_DATASET_INFO', null)
+        commit('SET_PROFILER_MSG', null)
+        commit('SET_PROFILER_STATUS', null)
+        commit('SET_MYDATA_LIST', null)
+    },
+    /**
+     *   This method is called when the user clicks "Continue" in the Wizard navigation.
+     *   We only update the userStep if this is the first time the user is completing this step.
+     *   We test to see if this is the first time by comparing the current userStep to the step
+     *   that will be completed by continuing in the wizard.
+     *   If the current userStep is earlier in the order, then it needs to be updated.
+     *     (This test is necessary because the user can go back to previous steps in the wizard)
+     * @param commit
+     * @param state
+     * @param getters
+     * @param stepperPosition - the current wizard step that the user is on (0-4)
+     */
+    updateUserStep({commit, state, getters}, stepperPosition) {
+        const nextStep = wizardNextSteps[stepperPosition]
+        if (wizardUserSteps.indexOf(getters.userStep) < wizardUserSteps.indexOf(nextStep)) {
+            const completedStepProp = {userStep: nextStep}
+            // Update the user step on the DepositorSetup or the Analysis Plan, depending
+            // where we are in the Wizard
+            if (depositorSteps.includes(nextStep)) {
+                const payload = {objectId: getters.getDepositorSetupInfo.objectId, props: completedStepProp}
+                this.dispatch('dataset/updateDepositorSetupInfo', payload)
+
+            } else {
+                const payload = {objectId: state.analysisPlan.objectId, props: completedStepProp}
+                this.dispatch('dataset/updateAnalysisPlan', payload)
+
+            }
+        }
+    },
     createAnalysisPlan({commit, state}, datasetId) {
         return analysis.createAnalysisPlan(datasetId)
             .then((resp) => {
@@ -145,29 +140,17 @@ const actions = {
         return dataset.getUserDatasets()
             .then((resp) => {
                 commit(SET_DATASET_LIST, resp.data.results)
+                commit(SET_MYDATA_LIST, resp.data.results)
             })
     },
     setDatasetInfo({commit, state}, objectId) {
-        /*
-        setTimeout(() => {
-            if (state.datasetInfo == null || state.datasetInfo.depositorSetupInfo == null
-                || !state.updating.includes()[state.datasetInfo.depositorSetupInfo.objectId]) {
-                dataset.getDatasetInfo(objectId)
-                    .then((resp) => {
-                        commit(SET_DATASET_INFO, resp.data)
-                    })
-            }
-        }, 1000);
-
-         */
         return dataset.getDatasetInfo(objectId)
             .then((resp) => {
                 commit(SET_DATASET_INFO, resp.data)
             })
     },
     updateDepositorSetupInfo({commit, state}, {objectId, props}) {
-        console.log("begin step: " + state.datasetInfo.depositorSetupInfo.userStep)
-        console.log("props: " + JSON.stringify(props))
+        //  console.log("props: " + JSON.stringify(props))
         if (props.hasOwnProperty('userStep')) {
             console.log('new step: ' + props.userStep)
         }
@@ -361,19 +344,34 @@ const actions = {
 };
 
 const mutations = {
-    [SET_UPDATING](state, objectId) {
-        state.updating.push(objectId)
-    },
-    [REMOVE_UPDATING](state, objectId) {
-        const index = state.updating.indexOf(objectId);
-        if (index > -1) {
-            state.updating.splice(index, 1);
+    // List of items for the MyData table, which flattens the nested AnalysisPlan array.
+    // If a Dataset contains multiple AnalysisPlan objects,
+    // create an item in the list for each AnalysisPlan.
+    [SET_MYDATA_LIST](state, dataList) {
+        let myData = []
+        if (dataList == null) {
+            state.myDataList = null
+        } else {
+            dataList.forEach(dataset => {
+                let myDataElem = {}
+                if (dataset.analysisPlans && dataset.analysisPlans.length > 0) {
+                    myDataElem.datasetInfo = dataset
+                    dataset.analysisPlans.forEach(analysisPlan => {
+                        myDataElem.analysisPlan = analysisPlan
+                        myDataElem.userStep = getUserStep(dataset, analysisPlan)
+                        myDataElem.timeRemaining = getTimeRemaining(dataset.created)
+                        myData.push(myDataElem)
+                    })
+                } else {
+                    myDataElem.datasetInfo = dataset
+                    myDataElem.analysisPlan = null;
+                    myDataElem.userStep = getUserStep(dataset, null)
+                    myDataElem.timeRemaining = getTimeRemaining(dataset.created)
+                    myData.push(myDataElem)
+                }
+            })
+            state.myDataList = myData
         }
-    },
-    [SET_DEPOSITOR_SETUP](state, depositorSetupInfo) {
-        state.datasetInfo.depositorSetupInfo = depositorSetupInfo
-        state.datasetInfo.status = state.datasetInfo.depositorSetupInfo.userStep
-        state.datasetInfo.userStep = state.datasetInfo.depositorSetupInfo.userStep
     },
     [SET_ANALYSIS_PLAN](state, analysisPlan) {
         state.analysisPlan = analysisPlan
@@ -391,11 +389,50 @@ const mutations = {
         state.datasetInfo = datasetInfo
     },
 };
+// Functions that are used for Vuex state and also
+// for individual items in the My Data table
+
+/**
+ * Get the userStep from the analysisPlan or the
+ * depositorSetupInfo, depending on where we are
+ * in the workflow
+ * @param datasetInfo
+ * @param analysisPlan
+ * @returns {null|(function(*): null)|string}
+ */
+function getUserStep(datasetInfo, analysisPlan) {
+    if (analysisPlan !== null) {
+        return analysisPlan.userStep
+    } else if (datasetInfo.depositorSetupInfo !== null) {
+        return datasetInfo.depositorSetupInfo.userStep
+    } else {
+        return null
+    }
+}
+
+function getTimeRemaining(created) {
+    const millisInDay = 1000 * 60 * 60 * 24
+    const millisInHour = 1000 * 60 * 60
+    const millisInMin = 1000 * 60
+    const createdDate = new Date(created)
+    const expirationDate = createdDate.getTime() + (3 * millisInDay)
+
+    const diffTime = expirationDate - (new Date().getTime())
+
+    if (diffTime < 0) {
+        return ('Time has expired')
+    } else {
+        const diffDays = Math.floor(diffTime / (millisInDay))
+        const diffHours = Math.floor((diffTime - (diffDays * millisInDay)) / millisInHour)
+        const diffMin = Math.floor((diffTime - (diffDays * millisInDay + diffHours * millisInHour)) / millisInMin)
+        return '' + diffDays + 'd ' + diffHours + 'h ' + diffMin + 'min'
+    }
+}
 
 export default {
-  namespaced: true,
-  state: initialState,
-  getters,
-  actions,
-  mutations,
+    namespaced: true,
+    state: initialState,
+    getters,
+    actions,
+    mutations,
 };

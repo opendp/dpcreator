@@ -206,7 +206,7 @@ class TestValidationViewAndSerializers(TestCase):
         # Send the dp_statistics for validation
         #
         stat_spec =  self.general_stat_spec
-        stat_spec['statistic'] = astatic.DP_SUM
+        stat_spec['statistic'] = astatic.DP_QUANTILE
 
         request_plan = dict(analysis_plan_id=analysis_plan.object_id,
                             dp_statistics=[stat_spec])
@@ -225,9 +225,9 @@ class TestValidationViewAndSerializers(TestCase):
         self.assertTrue(stats_info.success)
 
         self.assertEqual(stats_info.data[0]['valid'], False)
-        self.assertEqual(stats_info.data[0]['statistic'], astatic.DP_SUM)
+        self.assertEqual(stats_info.data[0]['statistic'], astatic.DP_QUANTILE)
         self.assertEqual(stats_info.data[0]['variable'], 'EyeHeight')
-        self.assertEqual(stats_info.data[0]['message'], 'Statistic "sum" will be supported soon!')
+        self.assertEqual(stats_info.data[0]['message'], f'Statistic "{astatic.DP_QUANTILE}" will be supported soon!')
 
     def test_25_api_fail_unsupported_stat(self):
         """(25) Fail: API, Test a known but unsupported statistic"""
@@ -238,7 +238,7 @@ class TestValidationViewAndSerializers(TestCase):
         # Send the dp_statistics for validation
         #
         stat_spec =  self.general_stat_spec
-        stat_spec['statistic'] = astatic.DP_SUM
+        stat_spec['statistic'] = astatic.DP_QUANTILE
 
 
         request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
@@ -254,9 +254,9 @@ class TestValidationViewAndSerializers(TestCase):
         self.assertTrue(jresp['success'])
 
         self.assertEqual(jresp['data'][0]['valid'], False)
-        self.assertEqual(jresp['data'][0]['statistic'], astatic.DP_SUM)
+        self.assertEqual(jresp['data'][0]['statistic'], astatic.DP_QUANTILE)
         self.assertEqual(jresp['data'][0]['variable'], 'EyeHeight')
-        self.assertEqual(jresp['data'][0]['message'], 'Statistic "sum" will be supported soon!')
+        self.assertEqual(jresp['data'][0]['message'], f'Statistic "{astatic.DP_QUANTILE}" will be supported soon!')
 
 
     def test_30_fail_bad_min_max(self):

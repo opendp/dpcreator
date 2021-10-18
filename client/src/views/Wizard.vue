@@ -72,7 +72,7 @@ import GenerateDPRelease from "./WizardSteps/GenerateDPRelease.vue";
 import StepperHeader from "../components/Wizard/StepperHeader.vue";
 import WizardNavigationButtons from "../components/Wizard/WizardNavigationButtons.vue";
 import ValidateDataset from "./WizardSteps/ValidateDataset.vue";
-import stepInformation, {depositorSteps, STEP_0600_EPSILON_SET} from "@/data/stepInformation";
+import stepInformation from "@/data/stepInformation";
 
 
 import {mapState, mapGetters} from "vuex";
@@ -89,9 +89,7 @@ export default {
     ValidateDataset
   },
   created() {
-
           this.initStepperPosition()
-
           this.loading = false
 
 
@@ -104,7 +102,9 @@ export default {
     // Set the current Wizard stepper position based on the
     // depositorSetup userStep
     initStepperPosition: function () {
-      this.stepperPosition = stepInformation[this.getDepositorSetupInfo.userStep].wizardStepper
+      if (this.datasetInfo && this.getDepositorSetupInfo) {
+        this.stepperPosition = stepInformation[this.userStep].wizardStepper
+      }
     },
     // If we are on the Confirm Variables step, and the DepositorSetup variables
     // are not set, then run the Profiler
@@ -118,7 +118,7 @@ export default {
   },
   computed: {
     ...mapState('dataset', ['datasetInfo', 'analysisPlan']),
-    ...mapGetters('dataset', ['getDepositorSetupInfo']),
+    ...mapGetters('dataset', ['getDepositorSetupInfo', 'userStep']),
     ...mapState('auth', ['user']),
   },
   watch: {

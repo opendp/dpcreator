@@ -69,13 +69,12 @@
 <script>
 import Button from "../DesignSystem/Button.vue";
 import GoBackDialog from "./GoBackDialog.vue";
-import {mapState, mapGetters} from "vuex";
-import stepInformation, {depositorSteps, STEP_0600_EPSILON_SET} from "@/data/stepInformation";
+import {mapGetters} from "vuex";
 
 export default {
   components: {Button, GoBackDialog},
   name: "WizardNavigationButtons",
-  props: ["steps", "stepperPosition", "nextStep"],
+  props: ["steps", "stepperPosition"],
 
   methods: {
     handleContinue: function () {
@@ -90,20 +89,9 @@ export default {
       this.$emit("update:stepperPosition", this.stepperPosition + 1)
     },
     updateUserStep() {
-      const completedStep = stepInformation[this.getDepositorSetupInfo.userStep].nextStep
-      const completedStepProp = {userStep: completedStep}
-      // Update the user step on the DepositorSetup or the Analysis Plan, depending
-      // where we are in the Wizard
-      if (depositorSteps.includes(completedStep)) {
-        const payload = {objectId: this.getDepositorSetupInfo.objectId, props: completedStepProp}
-        this.$store.dispatch('dataset/updateDepositorSetupInfo', payload)
-        this.emitStepEvent()
+      this.$store.dispatch('dataset/updateUserStep', this.stepperPosition)
+      this.emitStepEvent()
 
-      } else {
-        const payload = {objectId: this.analysisPlan.objectId, props: completedStepProp}
-        this.$store.dispatch('dataset/updateAnalysisPlan', payload)
-        this.emitStepEvent()
-      }
 
     },
 
@@ -111,14 +99,13 @@ export default {
   },
   data: () => ({
     LAST_STEP_INDEX: 4,
-    lastSavedAt: "00:00",
-    remainingTime: "2d 14h 36min",
+    lastSavedAt: "",
+    remainingTime: "",
     dialogGoBack: false
   }),
 
   computed: {
-    ...mapState('dataset', ['datasetInfo', 'analysisPlan']),
-    ...mapGetters('dataset', ['getDepositorSetupInfo', 'getUpdatedTime', 'getTimeRemaining']),
+    ...mapGetters('dataset', ['getUpdatedTime', 'getTimeRemaining']),
 
     isContinueDisabled: function () {
       return !this.steps[this.stepperPosition].completed;

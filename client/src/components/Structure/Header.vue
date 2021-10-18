@@ -1,5 +1,6 @@
 <template>
   <div>
+
     <v-app-bar
         class="pt-5"
         app
@@ -39,6 +40,7 @@
             <router-link
                 class="router-link d-inline-flex align-center"
                 :to="item.link"
+                :data-test="item.title"
             >
               <v-icon left>{{ item.icon }}</v-icon>
               {{ item.title }}
@@ -46,8 +48,9 @@
           </span>
           <span class="ml-8 red--text text--accent-4">
             <router-link
+                data-test="Logout Link"
                 class="router-link d-inline-flex align-center"
-                to="/?logout=true"
+                :to="NETWORK_CONSTANTS.HOME.PATH"
                 v-on:click.native="logoutHandler()"
             >
               <v-icon color="red accent-4" left>mdi-logout</v-icon>
@@ -102,7 +105,7 @@
           </v-list-item-icon>
           <v-list-item-content>
             <v-list-item-title
-                @click="$router.push('/logout')"
+                @click="logoutHandler()"
                 class="red--text text--accent-4"
             >Logout
             </v-list-item-title
@@ -192,10 +195,9 @@ export default {
   }),
   methods: {
     logoutHandler() {
-      console.log('calling logoutHandler')
-      this.isLoggedUser = undefined;
-      localStorage.removeItem("isLoggedUser");
-      this.$router.go();
+      this.$store.dispatch('auth/logout')
+      this.$store.dispatch('dataset/clearDatasetStorage')
+      this.$router.push(NETWORK_CONSTANTS.HOME.PATH);
     }
   }
 };

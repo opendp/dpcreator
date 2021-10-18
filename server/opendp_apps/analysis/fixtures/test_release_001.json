@@ -1,0 +1,1209 @@
+[
+  {
+    "model": "dataverses.registereddataverse",
+    "pk": 1,
+    "fields": {
+      "created": "2020-11-09T17:55:43.854Z",
+      "updated": "2020-11-09T17:55:53.111Z",
+      "object_id": "58fd79dc-8541-4aa1-a7c2-85a5b443efa1",
+      "name": "Harvard Dataverse",
+      "dataverse_url": "https://dataverse.harvard.edu",
+      "active": true,
+      "notes": "Harvard Dataverse"
+    }
+  },
+  {
+    "model": "dataverses.registereddataverse",
+    "pk": 2,
+    "fields": {
+      "created": "2020-11-09T17:56:12.419Z",
+      "updated": "2020-11-09T17:56:12.419Z",
+      "object_id": "2281c623-a06f-498a-8efc-23ebb0c25de1",
+      "name": "Mock Local Dataverse",
+      "dataverse_url": "http://127.0.0.1:8000/dv-mock-api",
+      "active": true,
+      "notes": "For testing"
+    }
+  },
+  {
+    "model": "dataverses.registereddataverse",
+    "pk": 3,
+    "fields": {
+      "created": "2021-07-12T18:56:37.011Z",
+      "updated": "2021-07-12T18:56:59.730Z",
+      "object_id": "b16d47b3-c1c7-403e-9b66-e32d49aa7a5f",
+      "name": "Test Dataverse EC2",
+      "dataverse_url": "http://ec2-18-232-125-211.compute-1.amazonaws.com",
+      "active": true,
+      "notes": "Test Dataverse. Created on 7/12/2021"
+    }
+  },
+  {
+    "model": "user.opendpuser",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$216000$1EQw2pz9XhKe$/+RU9pGCrSieWq4R7D1Reiy323YxPH0CYXyAjqVJoIo=",
+      "last_login": "2021-08-19T21:44:39.328Z",
+      "is_superuser": true,
+      "username": "dev_admin",
+      "first_name": "Dev",
+      "last_name": "Administrator",
+      "email": "opendp_admin@some.edu",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2021-03-23T17:19:13.044Z",
+      "object_id": "b579c31c-5ffa-411f-8830-31466d4cb641",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "user.opendpuser",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$216000$EW0prp9GKN4z$84pyr2rf6HaKMQ+JNkxna49SSGuGQUjsSGBp6dMLl+0=",
+      "last_login": "2021-03-30T16:09:20.134Z",
+      "is_superuser": true,
+      "username": "test_user",
+      "first_name": "Bent",
+      "last_name": "Martini",
+      "email": "r@r.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2021-03-29T14:40:56.258Z",
+      "object_id": "16a65359-87bf-4f04-b48a-8ebf46112acf",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "user.dataverseuser",
+    "pk": 1,
+    "fields": {
+      "created": "2020-11-09T17:55:43.854Z",
+      "updated": "2020-11-09T17:55:43.854Z",
+      "object_id": "6c4986b1-e90d-48a2-98d5-3a37da1fd331",
+      "user": 2,
+      "dv_installation": 1,
+      "persistent_id": "persistent_id1",
+      "email": "dv_user@mock.edu",
+      "first_name": "Fname",
+      "last_name": "Lname",
+      "dv_general_token": "",
+      "dv_sensitive_token": "",
+      "dv_token_update": null
+    }
+  },
+  {
+    "model": "user.dataverseuser",
+    "pk": 2,
+    "fields": {
+      "created": "2021-03-23T17:22:50.853Z",
+      "updated": "2021-08-19T21:44:39.427Z",
+      "object_id": "ed0bfb7e-c68a-42e0-b510-62ab3062ee40",
+      "user": 1,
+      "dv_installation": 2,
+      "persistent_id": "https://fed.some-it.some.edu/idp/shibboleth|92459eabc12ec34@some.edu",
+      "email": "mock_user@some.edu",
+      "first_name": "Mock",
+      "last_name": "User",
+      "dv_general_token": "shoefly-dont-bother-m3",
+      "dv_sensitive_token": "shoefly-dont-bother-m3",
+      "dv_token_update": null
+    }
+  },
+  {
+    "model": "user.dataverseuser",
+    "pk": 3,
+    "fields": {
+      "created": "2021-07-19T19:16:46.524Z",
+      "updated": "2021-07-20T15:12:42.323Z",
+      "object_id": "1d8d55c0-5e24-4feb-a607-31b1edf27f80",
+      "user": 1,
+      "dv_installation": 1,
+      "persistent_id": "https://fed.huit.harvard.edu/idp/shibboleth|0e459e6d562ec7e5@harvard.edu",
+      "email": "raman_prasad@harvard.edu",
+      "first_name": "Raman",
+      "last_name": "Prasad",
+      "dv_general_token": "some-old-token",
+      "dv_sensitive_token": "",
+      "dv_token_update": "2021-07-20T15:12:40Z"
+    }
+  },
+  {
+    "model": "dataset.datasetinfo",
+    "pk": 1,
+    "fields": {
+      "polymorphic_ctype": 22,
+      "created": "2021-03-23T17:22:50.889Z",
+      "updated": "2021-03-30T20:39:14.177Z",
+      "object_id": "9255c067-e435-43bd-8af1-33a6987ffc9b",
+      "name": "Fatigue_data.tab",
+      "creator": 1,
+      "source": "dataverse",
+      "data_profile": "",
+      "profile_variables": null,
+      "source_file": ""
+    }
+  },
+  {
+    "model": "dataset.datasetinfo",
+    "pk": 3,
+    "fields": {
+      "polymorphic_ctype": 22,
+      "created": "2021-07-19T19:16:46.535Z",
+      "updated": "2021-07-20T15:43:36.220Z",
+      "object_id": "af0d01d4-073c-46fa-a2ff-829193828b82",
+      "name": "crisis.tab",
+      "creator": 1,
+      "source": "dataverse",
+      "data_profile": null,
+      "profile_variables": null,
+      "source_file": ""
+    }
+  },
+  {
+    "model": "dataset.datasetinfo",
+    "pk": 4,
+    "fields": {
+      "polymorphic_ctype": 22,
+      "created": "2021-08-19T21:44:39.493Z",
+      "updated": "2021-08-19T21:44:55.437Z",
+      "object_id": "7ee982f8-1f38-4cd4-9776-43b21d6e3ea5",
+      "name": "Replication Data for: Eye-typing experiment",
+      "creator": 1,
+      "source": "dataverse",
+      "data_profile": {
+        "self": {
+          "created_at": "2021-09-13 22:37:20",
+          "description": "TwoRavens metadata generated by https://github.com/TwoRavens/raven-metadata-service"
+        },
+        "$schema": "https://github.com/TwoRavens/raven-metadata-service/schema/jsonschema/1-2-0.json#",
+        "dataset": {
+          "rowCount": 183,
+          "variableCount": 20,
+          "variableOrder": [
+            [
+              0,
+              "Subject"
+            ],
+            [
+              1,
+              "Language"
+            ],
+            [
+              2,
+              "Session"
+            ],
+            [
+              3,
+              "ObjectiveTaskDifficulty"
+            ],
+            [
+              4,
+              "Trial"
+            ],
+            [
+              5,
+              "TypingSpeed"
+            ],
+            [
+              6,
+              "CorrectedError"
+            ],
+            [
+              7,
+              "ReadTextEventsRatio"
+            ],
+            [
+              8,
+              "AttendedButNotSelectedRate"
+            ],
+            [
+              9,
+              "UncorrectedErrorRate"
+            ],
+            [
+              10,
+              "BaselinePupilDiameter"
+            ],
+            [
+              11,
+              "BlinkFrequency"
+            ],
+            [
+              12,
+              "BlinkDuration"
+            ],
+            [
+              13,
+              "BlinkInterval"
+            ],
+            [
+              14,
+              "BlinkBurstRatio"
+            ],
+            [
+              15,
+              "SaccadeAmplitude"
+            ],
+            [
+              16,
+              "SaccadeDuration"
+            ],
+            [
+              17,
+              "SaccadeVelocity"
+            ],
+            [
+              18,
+              "SaccadePeakVelocity"
+            ],
+            [
+              19,
+              "EyeHeight"
+            ]
+          ]
+        },
+        "variables": {
+          "Trial": {
+            "binary": false,
+            "nature": "ordinal",
+            "numchar": "numeric",
+            "interval": "discrete",
+            "description": "",
+            "variableName": "Trial"
+          },
+          "Session": {
+            "binary": true,
+            "nature": "ordinal",
+            "numchar": "numeric",
+            "interval": "discrete",
+            "description": "",
+            "variableName": "Session"
+          },
+          "Subject": {
+            "binary": false,
+            "nature": "nominal",
+            "numchar": "character",
+            "interval": "discrete",
+            "description": "",
+            "variableName": "Subject"
+          },
+          "Language": {
+            "binary": true,
+            "nature": "nominal",
+            "numchar": "character",
+            "interval": "discrete",
+            "description": "",
+            "variableName": "Language"
+          },
+          "EyeHeight": {
+            "binary": false,
+            "nature": "ratio",
+            "numchar": "numeric",
+            "interval": "continuous",
+            "description": "",
+            "variableName": "EyeHeight"
+          },
+          "TypingSpeed": {
+            "binary": false,
+            "nature": "ratio",
+            "numchar": "numeric",
+            "interval": "continuous",
+            "description": "",
+            "variableName": "TypingSpeed"
+          },
+          "BlinkDuration": {
+            "binary": false,
+            "nature": "percent",
+            "numchar": "numeric",
+            "interval": "continuous",
+            "description": "",
+            "variableName": "BlinkDuration"
+          },
+          "BlinkInterval": {
+            "binary": false,
+            "nature": "ratio",
+            "numchar": "numeric",
+            "interval": "continuous",
+            "description": "",
+            "variableName": "BlinkInterval"
+          },
+          "BlinkFrequency": {
+            "binary": false,
+            "nature": "ratio",
+            "numchar": "numeric",
+            "interval": "continuous",
+            "description": "",
+            "variableName": "BlinkFrequency"
+          },
+          "CorrectedError": {
+            "binary": false,
+            "nature": "percent",
+            "numchar": "numeric",
+            "interval": "continuous",
+            "description": "",
+            "variableName": "CorrectedError"
+          },
+          "BlinkBurstRatio": {
+            "binary": false,
+            "nature": "ratio",
+            "numchar": "numeric",
+            "interval": "continuous",
+            "description": "",
+            "variableName": "BlinkBurstRatio"
+          },
+          "SaccadeDuration": {
+            "binary": false,
+            "nature": "ratio",
+            "numchar": "numeric",
+            "interval": "continuous",
+            "description": "",
+            "variableName": "SaccadeDuration"
+          },
+          "SaccadeVelocity": {
+            "binary": false,
+            "nature": "ratio",
+            "numchar": "numeric",
+            "interval": "continuous",
+            "description": "",
+            "variableName": "SaccadeVelocity"
+          },
+          "SaccadeAmplitude": {
+            "binary": false,
+            "nature": "ratio",
+            "numchar": "numeric",
+            "interval": "continuous",
+            "description": "",
+            "variableName": "SaccadeAmplitude"
+          },
+          "ReadTextEventsRatio": {
+            "binary": false,
+            "nature": "percent",
+            "numchar": "numeric",
+            "interval": "continuous",
+            "description": "",
+            "variableName": "ReadTextEventsRatio"
+          },
+          "SaccadePeakVelocity": {
+            "binary": false,
+            "nature": "ratio",
+            "numchar": "numeric",
+            "interval": "continuous",
+            "description": "",
+            "variableName": "SaccadePeakVelocity"
+          },
+          "UncorrectedErrorRate": {
+            "binary": false,
+            "nature": "percent",
+            "numchar": "numeric",
+            "interval": "continuous",
+            "description": "",
+            "variableName": "UncorrectedErrorRate"
+          },
+          "BaselinePupilDiameter": {
+            "binary": false,
+            "nature": "ratio",
+            "numchar": "numeric",
+            "interval": "continuous",
+            "description": "",
+            "variableName": "BaselinePupilDiameter"
+          },
+          "ObjectiveTaskDifficulty": {
+            "binary": true,
+            "nature": "nominal",
+            "numchar": "character",
+            "interval": "discrete",
+            "description": "",
+            "variableName": "ObjectiveTaskDifficulty"
+          },
+          "AttendedButNotSelectedRate": {
+            "binary": false,
+            "nature": "ratio",
+            "numchar": "numeric",
+            "interval": "continuous",
+            "description": "",
+            "variableName": "AttendedButNotSelectedRate"
+          }
+        }
+      },
+      "profile_variables": {
+        "dataset": {
+          "rowCount": 183,
+          "variableCount": 20,
+          "variableOrder": [
+            [
+              0,
+              "Subject"
+            ],
+            [
+              1,
+              "Language"
+            ],
+            [
+              2,
+              "Session"
+            ],
+            [
+              3,
+              "ObjectiveTaskDifficulty"
+            ],
+            [
+              4,
+              "Trial"
+            ],
+            [
+              5,
+              "TypingSpeed"
+            ],
+            [
+              6,
+              "CorrectedError"
+            ],
+            [
+              7,
+              "ReadTextEventsRatio"
+            ],
+            [
+              8,
+              "AttendedButNotSelectedRate"
+            ],
+            [
+              9,
+              "UncorrectedErrorRate"
+            ],
+            [
+              10,
+              "BaselinePupilDiameter"
+            ],
+            [
+              11,
+              "BlinkFrequency"
+            ],
+            [
+              12,
+              "BlinkDuration"
+            ],
+            [
+              13,
+              "BlinkInterval"
+            ],
+            [
+              14,
+              "BlinkBurstRatio"
+            ],
+            [
+              15,
+              "SaccadeAmplitude"
+            ],
+            [
+              16,
+              "SaccadeDuration"
+            ],
+            [
+              17,
+              "SaccadeVelocity"
+            ],
+            [
+              18,
+              "SaccadePeakVelocity"
+            ],
+            [
+              19,
+              "EyeHeight"
+            ]
+          ]
+        },
+        "variables": {
+          "Trial": {
+            "name": "Trial",
+            "type": "Categorical",
+            "label": "",
+            "categories": null
+          },
+          "Session": {
+            "name": "Session",
+            "type": "Boolean",
+            "label": ""
+          },
+          "Subject": {
+            "name": "Subject",
+            "type": "Categorical",
+            "label": "",
+            "categories": null
+          },
+          "Language": {
+            "name": "Language",
+            "type": "Boolean",
+            "label": ""
+          },
+          "EyeHeight": {
+            "max": null,
+            "min": null,
+            "name": "EyeHeight",
+            "type": "Numerical",
+            "label": ""
+          },
+          "TypingSpeed": {
+            "max": null,
+            "min": null,
+            "name": "TypingSpeed",
+            "type": "Numerical",
+            "label": ""
+          },
+          "BlinkDuration": {
+            "max": null,
+            "min": null,
+            "name": "BlinkDuration",
+            "type": "Numerical",
+            "label": ""
+          },
+          "BlinkInterval": {
+            "max": null,
+            "min": null,
+            "name": "BlinkInterval",
+            "type": "Numerical",
+            "label": ""
+          },
+          "BlinkFrequency": {
+            "max": null,
+            "min": null,
+            "name": "BlinkFrequency",
+            "type": "Numerical",
+            "label": ""
+          },
+          "CorrectedError": {
+            "max": null,
+            "min": null,
+            "name": "CorrectedError",
+            "type": "Numerical",
+            "label": ""
+          },
+          "BlinkBurstRatio": {
+            "max": null,
+            "min": null,
+            "name": "BlinkBurstRatio",
+            "type": "Numerical",
+            "label": ""
+          },
+          "SaccadeDuration": {
+            "max": null,
+            "min": null,
+            "name": "SaccadeDuration",
+            "type": "Numerical",
+            "label": ""
+          },
+          "SaccadeVelocity": {
+            "max": null,
+            "min": null,
+            "name": "SaccadeVelocity",
+            "type": "Numerical",
+            "label": ""
+          },
+          "SaccadeAmplitude": {
+            "max": null,
+            "min": null,
+            "name": "SaccadeAmplitude",
+            "type": "Numerical",
+            "label": ""
+          },
+          "ReadTextEventsRatio": {
+            "max": null,
+            "min": null,
+            "name": "ReadTextEventsRatio",
+            "type": "Numerical",
+            "label": ""
+          },
+          "SaccadePeakVelocity": {
+            "max": null,
+            "min": null,
+            "name": "SaccadePeakVelocity",
+            "type": "Numerical",
+            "label": ""
+          },
+          "UncorrectedErrorRate": {
+            "max": null,
+            "min": null,
+            "name": "UncorrectedErrorRate",
+            "type": "Numerical",
+            "label": ""
+          },
+          "BaselinePupilDiameter": {
+            "max": null,
+            "min": null,
+            "name": "BaselinePupilDiameter",
+            "type": "Numerical",
+            "label": ""
+          },
+          "ObjectiveTaskDifficulty": {
+            "name": "ObjectiveTaskDifficulty",
+            "type": "Boolean",
+            "label": ""
+          },
+          "AttendedButNotSelectedRate": {
+            "max": null,
+            "min": null,
+            "name": "AttendedButNotSelectedRate",
+            "type": "Numerical",
+            "label": ""
+          }
+        }
+      },
+      "source_file": "source-file/2021/08/19/Fatigue_data.tab"
+    }
+  },
+  {
+    "model": "dataset.dataversefileinfo",
+    "pk": 3,
+    "fields": {
+      "dv_installation": 1,
+      "dataverse_file_id": 101649,
+      "dataset_doi": "doi:10.7910/DVN/OLD7MB",
+      "file_doi": "",
+      "dataset_schema_info": {
+        "@id": "https://doi.org/10.7910/DVN/OLD7MB",
+        "name": "Replication data for: The Supreme Court During Crisis: How War Affects Only Nonwar Cases",
+        "@type": "Dataset",
+        "author": [
+          {
+            "name": "Epstein, Lee",
+            "affiliation": "Northwestern University"
+          },
+          {
+            "name": "Ho, Daniel E.",
+            "affiliation": "Yale Law School; Harvard University"
+          },
+          {
+            "name": "King, Gary",
+            "affiliation": "Harvard University"
+          },
+          {
+            "name": "Segal, Jeffrey A.",
+            "affiliation": "SUNY at Stony Brook"
+          }
+        ],
+        "creator": [
+          {
+            "name": "Epstein, Lee",
+            "affiliation": "Northwestern University"
+          },
+          {
+            "name": "Ho, Daniel E.",
+            "affiliation": "Yale Law School; Harvard University"
+          },
+          {
+            "name": "King, Gary",
+            "affiliation": "Harvard University"
+          },
+          {
+            "name": "Segal, Jeffrey A.",
+            "affiliation": "SUNY at Stony Brook"
+          }
+        ],
+        "license": {
+          "@type": "Dataset"
+        },
+        "version": "4",
+        "@context": "http://schema.org",
+        "citation": [
+          {
+            "@id": "http://nrs.harvard.edu/urn-3:HUL.InstRepos:4214882",
+            "text": "Epstein, Lee, Daniel E Ho, Gary King, and Jeffrey A Segal. 2005. The Supreme Court During Crisis: How War Affects only Non-War Cases. New York University Law Review 80: 1–116: \n<a href=\"http://j.mp/kh2NV8\" target=\"_blank\" rel=\"nofollow\">Link to article</a>. DASH",
+            "@type": "CreativeWork",
+            "identifier": "http://nrs.harvard.edu/urn-3:HUL.InstRepos:4214882"
+          }
+        ],
+        "keywords": [
+          "Social Sciences"
+        ],
+        "provider": {
+          "name": "Harvard Dataverse",
+          "@type": "Organization"
+        },
+        "publisher": {
+          "name": "Harvard Dataverse",
+          "@type": "Organization"
+        },
+        "identifier": "https://doi.org/10.7910/DVN/OLD7MB",
+        "description": [
+          "Does the U.S. Supreme Court curtail rights and liberties when the nation's security is under threat? In hundreds of articles and books, and with renewed fervor since September 11, 2001, members of the legal community have warred over this question. Yet, not a single large-scale, quantitative study exists on the subject. Using the best data available on the causes and outcomes of every civil rights and liberties case decided by the Supreme Court over the past six decades and employing methods cho sen and tuned especially for this problem, our analyses demonstrate that when crises threaten the nation's security, the justices are substantially more likely to curtail rights and liberties than when peace prevails. Yet paradoxically, and in contradiction to virtually every theory of crisis jurisprudence, war appears to affect only cases that are unrelated to the war. For these cases, the effect of war and other international crises is so substantial, persistent, and consistent that it may surprise even those commentators who long have argued that the Court rallies around the flag in times of crisis. On the other hand, we find no evidence that cases most directly related to the war are affected.   We attempt to explain this seemingly paradoxical evidence with one unifying conjecture: Instead of balancing rights and security in high stakes cases directly related to the war, the Justices retreat to ensuring the institutional checks of the democratic branches. Since rights-oriented and process-oriented dimensions seem to operate in different domains and at different times, and often suggest different outcomes, the predictive factors that work for cases unrelated to the war fa il for cases related to the war. If this conjecture is correct, federal judges should consider giving less weight to legal principles outside of wartime but established during wartime, and attorneys should see it as their responsibility to distinguish cases along these lines.   The related paper and software we used: Daniel Ho, Kosuke Imai, Gary King, and Elizabeth Stuart, \"Matching as Nonparametric Preprocessing for Improving Parametric Causal Inference, (Article: PDF | Abstract: HTML | Software: MatchIt).  There is also a greatly abbreviated version of the paper written for an undergraduate audience: Epstein, Lee; Daniel E. Ho; Gary King; and Jeffrey A. Segal, \"The Effect of War on the Supreme Court,\" in Samuel Kernell and Steven S. Smith, eds. (3rd ed). Principles and Practice in American Politics: Classic and Contemporary Readings. Washington, D.C.: Congressional Quarterly Press, 2006 (Article: PDF).  See also: International Conflict; Casual Inference"
+        ],
+        "dateModified": "2016-11-17",
+        "distribution": [
+          {
+            "@id": "https://doi.org/10.7910/DVN/OLD7MB/PZPDJF",
+            "name": "Crisis.PDF",
+            "@type": "DataDownload",
+            "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/101646",
+            "fileFormat": "application/pdf",
+            "identifier": "https://doi.org/10.7910/DVN/OLD7MB/PZPDJF",
+            "contentSize": 677112,
+            "description": "Article related to this study: The Supreme Court During Crisis: How War Affects Only Nonwar Cases"
+          },
+          {
+            "@id": "https://doi.org/10.7910/DVN/OLD7MB/AKUMWO",
+            "name": "Crisis.R",
+            "@type": "DataDownload",
+            "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/101645",
+            "fileFormat": "text/plain; charset=US-ASCII",
+            "identifier": "https://doi.org/10.7910/DVN/OLD7MB/AKUMWO",
+            "contentSize": 10887,
+            "description": "Analysis file for R 1.9.0 http://www.r-project.org/)with MatchIt Version 0.1-8 (http://gking.harvard.edu/matchit/)"
+          },
+          {
+            "@id": "https://doi.org/10.7910/DVN/OLD7MB/ZI4N3J",
+            "name": "crisis.tab",
+            "@type": "DataDownload",
+            "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/101649",
+            "fileFormat": "text/tab-separated-values",
+            "identifier": "https://doi.org/10.7910/DVN/OLD7MB/ZI4N3J",
+            "contentSize": 173322,
+            "description": "Data file for this study"
+          },
+          {
+            "@id": "https://doi.org/10.7910/DVN/OLD7MB/7KF7JF",
+            "name": "Crisis.txt",
+            "@type": "DataDownload",
+            "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/101647",
+            "fileFormat": "text/plain; charset=US-ASCII",
+            "identifier": "https://doi.org/10.7910/DVN/OLD7MB/7KF7JF",
+            "contentSize": 261058,
+            "description": "Data file for this study in original  text format"
+          },
+          {
+            "@id": "https://doi.org/10.7910/DVN/OLD7MB/WVA80N",
+            "name": "crisis.zip",
+            "@type": "DataDownload",
+            "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/601184",
+            "fileFormat": "application/zip",
+            "identifier": "https://doi.org/10.7910/DVN/OLD7MB/WVA80N",
+            "contentSize": 568684,
+            "description": "Zip file containing data for this study"
+          },
+          {
+            "@id": "https://doi.org/10.7910/DVN/OLD7MB/A7M2YP",
+            "name": "fns.R",
+            "@type": "DataDownload",
+            "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/101644",
+            "fileFormat": "text/plain; charset=US-ASCII",
+            "identifier": "https://doi.org/10.7910/DVN/OLD7MB/A7M2YP",
+            "contentSize": 15042,
+            "description": "Functions used in Crisis.R"
+          },
+          {
+            "@id": "https://doi.org/10.7910/DVN/OLD7MB/ZHHFTQ",
+            "name": "ReadME",
+            "@type": "DataDownload",
+            "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/101648",
+            "fileFormat": "text/plain; charset=US-ASCII",
+            "identifier": "https://doi.org/10.7910/DVN/OLD7MB/ZHHFTQ",
+            "contentSize": 476,
+            "description": "Detailed information on the data and documentation files"
+          }
+        ],
+        "datePublished": "2009-04-16",
+        "includedInDataCatalog": {
+          "url": "https://dataverse.harvard.edu",
+          "name": "Harvard Dataverse",
+          "@type": "DataCatalog"
+        }
+      },
+      "file_schema_info": {
+        "@id": "https://doi.org/10.7910/DVN/OLD7MB/ZI4N3J",
+        "name": "crisis.tab",
+        "@type": "DataDownload",
+        "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/101649",
+        "fileFormat": "text/tab-separated-values",
+        "identifier": "https://doi.org/10.7910/DVN/OLD7MB/ZI4N3J",
+        "contentSize": 173322,
+        "description": "Data file for this study"
+      },
+      "depositor_setup_info": 3
+    }
+  },
+  {
+    "model": "dataset.dataversefileinfo",
+    "pk": 1,
+    "fields": {
+      "dv_installation": 1,
+      "dataverse_file_id": 4164587,
+      "dataset_doi": "doi:10.7910/DVN/PUXVDH",
+      "file_doi": "",
+      "dataset_schema_info": null,
+      "file_schema_info": null,
+      "depositor_setup_info": 1
+    }
+  },
+  {
+    "model": "dataset.dataversefileinfo",
+    "pk": 4,
+    "fields": {
+      "dv_installation": 2,
+      "dataverse_file_id": 4164587,
+      "dataset_doi": "doi:10.7910/DVN/PUXVDH",
+      "file_doi": "doi:10.7910/DVN/PUXVDH",
+      "dataset_schema_info": {
+        "@id": "https://doi.org/10.7910/DVN/PUXVDH",
+        "name": "Replication Data for: Eye-typing experiment",
+        "@type": "Dataset",
+        "author": [
+          {
+            "name": "Bafna, Tanya",
+            "affiliation": "Danmarks Tekniske Universitet"
+          }
+        ],
+        "creator": [
+          {
+            "name": "Bafna, Tanya",
+            "affiliation": "Danmarks Tekniske Universitet"
+          }
+        ],
+        "license": {
+          "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+          "text": "CC0",
+          "@type": "Dataset"
+        },
+        "version": "1",
+        "@context": "http://schema.org",
+        "keywords": [
+          "Engineering",
+          "Medicine, Health and Life Sciences",
+          "eye-tracking, eye-typing, mental fatigue"
+        ],
+        "provider": {
+          "name": "Harvard Dataverse",
+          "@type": "Organization"
+        },
+        "publisher": {
+          "name": "Harvard Dataverse",
+          "@type": "Organization"
+        },
+        "identifier": "https://doi.org/10.7910/DVN/PUXVDH",
+        "description": [
+          "The data consists of performance and eye-tracking features obtained during an eye-typing experiment conducted over 4 days, 2 sessions on each day, with 18 participants."
+        ],
+        "dateModified": "2020-11-04",
+        "distribution": [
+          {
+            "name": "Fatigue_data.tab",
+            "@type": "DataDownload",
+            "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/4164587",
+            "fileFormat": "text/tab-separated-values",
+            "contentSize": 36399,
+            "description": "Fatigue level (taken from trials 1,5 and 10 on each day) and eye-tracking and performance data from trials that correlate to the corresponding fatigue level. (For all sessions where the correlation between left and right pupil size was greater or equal to 0.75)"
+          },
+          {
+            "name": "Fatigue_difference_consecutive_subjScore.tab",
+            "@type": "DataDownload",
+            "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/4164586",
+            "fileFormat": "text/tab-separated-values",
+            "contentSize": 2795,
+            "description": "Difference between intermediate fatigue level (obtained after session 1) and initial fatigue level (obtained before experiment) and between  terminal fatigue level (obtained after session 2) and intermediate fatigue level (obtained after session 1) "
+          },
+          {
+            "name": "Fatigue_difference_terminal_initial_subjScore.tab",
+            "@type": "DataDownload",
+            "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/4164589",
+            "fileFormat": "text/tab-separated-values",
+            "contentSize": 2712,
+            "description": "Difference between  terminal fatigue level (obtained after session 2) and initial fatigue level (obtained before experiment)"
+          },
+          {
+            "name": "PerceivedEffort_data.tab",
+            "@type": "DataDownload",
+            "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/4164588",
+            "fileFormat": "text/tab-separated-values",
+            "contentSize": 123290,
+            "description": "Eye-tracking and performance data for every trial, and the perceived effort for every trial (For all sessions where the correlation between left and right pupil size was greater or equal to 0.75)"
+          },
+          {
+            "name": "PerceivedEffort_subjScore.tab",
+            "@type": "DataDownload",
+            "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/4164590",
+            "fileFormat": "text/tab-separated-values",
+            "contentSize": 17053,
+            "description": "Perceived effort for every trial "
+          }
+        ],
+        "datePublished": "2020-11-04",
+        "includedInDataCatalog": {
+          "url": "https://dataverse.harvard.edu",
+          "name": "Harvard Dataverse",
+          "@type": "DataCatalog"
+        }
+      },
+      "file_schema_info": {
+        "name": "Fatigue_data.tab",
+        "@type": "DataDownload",
+        "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/4164587",
+        "fileFormat": "text/tab-separated-values",
+        "contentSize": 36399,
+        "description": "Fatigue level (taken from trials 1,5 and 10 on each day) and eye-tracking and performance data from trials that correlate to the corresponding fatigue level. (For all sessions where the correlation between left and right pupil size was greater or equal to 0.75)"
+      },
+      "depositor_setup_info": 4
+    }
+  },
+  {
+    "model": "analysis.depositorsetupinfo",
+    "pk": 1,
+    "fields": {
+      "created": "2021-03-23T17:22:50.889Z",
+      "updated": "2021-03-30T20:39:14.177Z",
+      "object_id": "9255c067-e435-43bd-8af1-33a6987ffc9b",
+      "creator": 1,
+      "is_complete": false,
+      "user_step": "step_100",
+      "epsilon": null,
+      "dataset_questions": null,
+      "variable_info": null
+    }
+  },
+  {
+    "model": "analysis.depositorsetupinfo",
+    "pk": 3,
+    "fields": {
+      "created": "2021-07-19T19:16:46.533Z",
+      "updated": "2021-07-19T19:16:46.533Z",
+      "object_id": "f454732a-ac44-40c8-a2c3-baaa9f4756a9",
+      "creator": 1,
+      "is_complete": false,
+      "user_step": "step_100",
+      "epsilon": null,
+      "dataset_questions": null,
+      "variable_info": null
+    }
+  },
+  {
+    "model": "analysis.depositorsetupinfo",
+    "pk": 4,
+    "fields": {
+      "created": "2021-08-19T21:44:39.488Z",
+      "updated": "2021-08-19T21:47:38.551Z",
+      "object_id": "4d5be3e0-34d0-4bdc-be79-10f27f19e293",
+      "creator": 1,
+      "is_complete": true,
+      "user_step": "step_600",
+      "epsilon": 1.0,
+      "dataset_questions": {
+        "radio_best_describes": "notHarmButConfidential",
+        "radio_only_one_individual_per_row": "yes",
+        "radio_depend_on_private_information": "yes"
+      },
+      "variable_info": {
+        "trial": {
+          "name": "Trial",
+          "type": "Categorical",
+          "label": "",
+          "categories": null
+        },
+        "session": {
+          "name": "Session",
+          "type": "Boolean",
+          "label": ""
+        },
+        "subject": {
+          "name": "Subject",
+          "type": "Categorical",
+          "label": "",
+          "categories": null
+        },
+        "language": {
+          "name": "Language",
+          "type": "Boolean",
+          "label": ""
+        },
+        "eye_height": {
+          "max": 100.0,
+          "min": 0.0,
+          "name": "EyeHeight",
+          "type": "Numerical",
+          "label": ""
+        },
+        "typing_speed": {
+          "max": null,
+          "min": null,
+          "name": "TypingSpeed",
+          "type": "Numerical",
+          "label": ""
+        },
+        "blink_duration": {
+          "max": null,
+          "min": null,
+          "name": "BlinkDuration",
+          "type": "Numerical",
+          "label": ""
+        },
+        "blink_interval": {
+          "max": null,
+          "min": null,
+          "name": "BlinkInterval",
+          "type": "Numerical",
+          "label": ""
+        },
+        "blink_frequency": {
+          "max": null,
+          "min": null,
+          "name": "BlinkFrequency",
+          "type": "Numerical",
+          "label": ""
+        },
+        "corrected_error": {
+          "max": null,
+          "min": null,
+          "name": "CorrectedError",
+          "type": "Numerical",
+          "label": ""
+        },
+        "saccade_duration": {
+          "max": null,
+          "min": null,
+          "name": "SaccadeDuration",
+          "type": "Numerical",
+          "label": ""
+        },
+        "saccade_velocity": {
+          "max": null,
+          "min": null,
+          "name": "SaccadeVelocity",
+          "type": "Numerical",
+          "label": ""
+        },
+        "blink_burst_ratio": {
+          "max": null,
+          "min": null,
+          "name": "BlinkBurstRatio",
+          "type": "Numerical",
+          "label": ""
+        },
+        "saccade_amplitude": {
+          "max": null,
+          "min": null,
+          "name": "SaccadeAmplitude",
+          "type": "Numerical",
+          "label": ""
+        },
+        "saccade_peak_velocity": {
+          "max": null,
+          "min": null,
+          "name": "SaccadePeakVelocity",
+          "type": "Numerical",
+          "label": ""
+        },
+        "read_text_events_ratio": {
+          "max": null,
+          "min": null,
+          "name": "ReadTextEventsRatio",
+          "type": "Numerical",
+          "label": ""
+        },
+        "uncorrected_error_rate": {
+          "max": null,
+          "min": null,
+          "name": "UncorrectedErrorRate",
+          "type": "Numerical",
+          "label": ""
+        },
+        "baseline_pupil_diameter": {
+          "max": null,
+          "min": null,
+          "name": "BaselinePupilDiameter",
+          "type": "Numerical",
+          "label": ""
+        },
+        "objective_task_difficulty": {
+          "name": "ObjectiveTaskDifficulty",
+          "type": "Boolean",
+          "label": ""
+        },
+        "attended_but_not_selected_rate": {
+          "max": null,
+          "min": null,
+          "name": "AttendedButNotSelectedRate",
+          "type": "Numerical",
+          "label": ""
+        }
+      }
+    }
+  },
+  {
+    "model": "analysis.releaseinfo",
+    "pk": 1,
+    "fields": {
+      "created": "2021-07-19T19:16:46.533Z",
+      "updated": "2021-07-19T19:16:46.533Z",
+      "object_id": "9ef82fe9-e305-44d2-b91c-264177aedd08",
+      "dataset": 1,
+      "epsilon_used": 1.0,
+      "dp_release": {
+        "name": "Replication Data for: Eye-typing experiment - step_800",
+        "created": {
+          "iso": "2021-10-01T19:28:43.878954",
+          "human_readable": "October 01, 2021 at 19:28:43:878954"
+        },
+        "dataset": {
+          "doi": "doi:10.7910/DVN/PUXVDH",
+          "name": "Replication Data for: Eye-typing experiment",
+          "type": "dataverse",
+          "citation": null,
+          "identifier": null,
+          "installation": {
+            "url": "http://127.0.0.1:8000/dv-mock-api",
+            "name": "Mock Local Dataverse"
+          },
+          "file_information": {
+            "name": "Fatigue_data.tab",
+            "fileFormat": "text/tab-separated-values",
+            "identifier": null
+          },
+          "release_deposit_info": {
+            "deposited": false
+          }
+        },
+        "statistics": [
+          {
+            "delta": 0,
+            "bounds": {
+              "max": 100.0,
+              "min": 0.0
+            },
+            "result": {
+              "value": 0.3684799824191177
+            },
+            "epsilon": 1.0,
+            "accuracy": {
+              "value": 1.6370121873967791,
+              "message": "Releasing mean for the variable EyeHeight. With at least probability 0.95 the output mean will differ from the true mean by at most 1.6370121873967791 units. Here the units are the same units the variable has in the dataset."
+            },
+            "variable": "EyeHeight",
+            "statistic": "mean",
+            "description": {
+              "html": "A differentially private <b>Mean</b> for variable\n<b>EyeHeight</b> was calculated with the result <b>0.3684799824191177</b>. There is a\n probability of <b>95.0%</b> that the output count will differ from the true count by at most\n <b>1.6370121873967791</b> units. Here the units are the same units the variable has in the dataset.",
+              "text": "A differentially private Mean for variable EyeHeight was calculated with the result\n0.3684799824191177. There is a probability of 95.0% that the output count will\ndiffer from the true count by at most 1.6370121873967791 units. Here the units are the same units the variable has\nin the dataset."
+            },
+            "confidence_interval": 0.05,
+            "missing_value_handling": {
+              "type": "insert_fixed",
+              "fixed_value": 0.0
+            }
+          }
+        ],
+        "histograms": [
+          {
+            "name": "test",
+            "data": [1,2,3,4,5],
+            "height": [1,2,3,4,5]
+          }
+        ],
+        "application": "DP Creator",
+        "release_url": null,
+        "application_url": "https://github.com/opendp/dpcreator",
+        "differentially_private_library": {
+          "url": "https://github.com/opendp/opendp",
+          "name": "OpenDP",
+          "version": "0.2.1"
+        }
+      }
+    }
+  }
+]

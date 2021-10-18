@@ -1,58 +1,18 @@
-from os.path import abspath, dirname, isdir, isfile, join
+from os.path import abspath, dirname, isfile, join
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
-from unittest import skip
-
-import json
-import decimal
-
-from django.contrib.auth import get_user_model
-from django.test.testcases import TestCase
-
-from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
-from opendp_apps.analysis.models import AnalysisPlan
-from opendp_apps.dataset.models import DataSetInfo
-
-from unittest import skip
+from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
 from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
-
-from opendp_apps.profiler import static_vals as pstatic
-from opendp_apps.analysis import static_vals as astatic
-
 from opendp_apps.model_helpers.msg_util import msgt
+from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.utils.extra_validators import *
 
 
-#    VALIDATE_MSG_ZERO_OR_GREATER, VALIDATE_MSG_EPSILON
+class DPCountStatSpecTest(StatSpecTestCase):
 
-
-class DPCountStatSpecTest(TestCase):
     fixtures = ['test_dataset_data_001.json', ]
-
-    def setUp(self):
-        """Make a user"""
-        self.user_obj, _created = get_user_model().objects.get_or_create(username='dev_admin')
-
-    def retrieve_new_plan(self):
-        """Convenience method to create a new plan"""
-
-        # Create a plan
-        #
-        dataset_info = DataSetInfo.objects.get(id=4)
-
-        plan_info = AnalysisPlanUtil.create_plan(dataset_info.object_id, self.user_obj)
-        self.assertTrue(plan_info.success)
-        orig_plan = plan_info.data
-
-        # Retrieve it
-        #
-        analysis_plan = AnalysisPlan.objects.first()
-        self.assertEqual(orig_plan.object_id, analysis_plan.object_id)
-
-        return analysis_plan
-
 
     def test_10_count_valid_spec(self):
         """(10) Run DP Count valid spec, float column"""
@@ -104,23 +64,6 @@ class DPCountStatSpecTest(TestCase):
 
         # Actual count 184
         self.assertTrue(dp_count.value > 170) # should be well within range
-
-        return
-        # Call run_chain
-        #
-        count_vals = []
-        for x in range(100):
-            print(f'\n>> Run {x+1}')
-            file_obj = open(eye_fatigue_filepath, 'r')
-            dp_count.run_chain(col_indexes, file_obj, sep_char="\t")
-            file_obj.close()
-            count_vals.append(dp_count.value)
-
-        count_vals.sort()
-        print('count_vals', count_vals)
-
-        print('Actual count: 183')
-
 
     def test_20_count_valid_spec(self):
         """(20) Run DP Count valid spec, string column"""
@@ -178,21 +121,3 @@ class DPCountStatSpecTest(TestCase):
         self.assertIn('description', final_dict)
         self.assertIn('text', final_dict['description'])
         self.assertIn('html', final_dict['description'])
-
-        #print(json.dumps(dp_count.get_release_dict(), indent=4))
-        return
-        # Call run_chain "num_runs" times
-        #
-        num_runs = 100
-        count_vals = []
-        for x in range(num_runs):
-            print(f'\n>> Run {x+1}')
-            file_obj = open(pums_extract_10_000, 'r')
-            dp_count.run_chain(col_indexes, file_obj, sep_char=",")
-            file_obj.close()
-            count_vals.append(dp_count.value)
-
-        count_vals.sort()
-        print('count_vals', count_vals)
-        print('Actual count: 10,000')
-

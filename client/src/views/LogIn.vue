@@ -118,13 +118,16 @@ export default {
             this.processLogin();
           })
     },
-    routeToNextPage() {
+    routeToNextPage(defaultPath) {
       Promise.all([
         this.$store.dispatch('auth/fetchCurrentTerms'),
         this.$store.dispatch('auth/fetchTermsLog')
       ]).then(() => {
         if (this.isTermsAccepted) {
-          this.$router.push(NETWORK_CONSTANTS.WELCOME.PATH)
+          // Go back to redirect page, or default page
+          this.$router.replace(sessionStorage.getItem('redirectPath') || defaultPath);
+          //Cleanup redirectPath
+          sessionStorage.removeItem('redirectPath');
         } else {
           this.$router.push(NETWORK_CONSTANTS.TERMS_AND_CONDITIONS.PATH)
         }
@@ -139,7 +142,7 @@ export default {
                     this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
                         .catch(({data}) => console.log("error: " + data))
                         .then(() => {
-                          this.routeToNextPage()
+                          this.routeToNextPage(NETWORK_CONSTANTS.WELCOME.PATH)
                         })
 
                   })
@@ -151,7 +154,7 @@ export default {
       } else {
         this.$store.dispatch('auth/fetchUser')
             .then(() => {
-              this.routeToNextPage()
+              this.routeToNextPage(NETWORK_CONSTANTS.MY_DATA.PATH)
             })
 
       }
