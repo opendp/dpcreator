@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 
 from opendp_apps.dataverses.models import DataverseHandoff
 from opendp_apps.dataverses.serializers import DataverseUserSerializer
+from opendp_apps.user.models import DataverseUser
 
 
 class TestDataverseUserSerializer(TestCase):
@@ -32,3 +33,10 @@ class TestDataverseUserSerializer(TestCase):
         dataverse_user = serializer.save()
         # Ensure token from DataverseHandoff makes it onto the new DataverseUser
         self.assertEquals(dataverse_user.dv_general_token, DataverseHandoff.objects.first().apiGeneralToken)
+
+    def test_update(self):
+        dataverse_user = DataverseUser.objects.first()
+        original_updated = dataverse_user.updated
+        serializer = DataverseUserSerializer()
+        updated_instance = serializer.update(dataverse_user, validated_data={'user': dataverse_user.user.object_id})
+        self.assertNotEqual(original_updated, updated_instance.updated)
