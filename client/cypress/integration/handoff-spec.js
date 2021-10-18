@@ -40,6 +40,7 @@
             cy.url().should('contain', 'welcome')
             cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
                 ' doi:10.7910/DVN/PUXVDH | Replication Data for: Eye-typing experiment | Fatigue_data.tab ')
+            cy.logout()
         }),
             it('Correctly displays locked file message', () => {
                 cy.on('uncaught:exception', (e, runnable) => {
@@ -48,6 +49,7 @@
                     // for now, always return false to allow the test to pass
                     return false
                 })
+
                 cy.visit('/mock-dv');
                 cy.get('#postOpenDP > .v-btn__content').click();
                 cy.url().should('contains', '/?id=');

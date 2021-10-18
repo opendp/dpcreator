@@ -26,7 +26,6 @@
 
                     return false
                 })
-                cy.login('dev_admin', 'admin')
                 cy.clearData()
                 cy.visit('/mock-dv')
                 cy.get('#postOpenDP > .v-btn__content').click();

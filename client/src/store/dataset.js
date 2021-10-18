@@ -69,6 +69,19 @@ const getters = {
 };
 const actions = {
     /**
+     * Called when user logs out
+     * @param commit
+     * @param state
+     */
+    clearDatasetStorage({commit, state}) {
+        commit('SET_ANALYSIS_PLAN', null)
+        commit('SET_DATASET_LIST', null)
+        commit('SET_DATASET_INFO', null)
+        commit('SET_PROFILER_MSG', null)
+        commit('SET_PROFILER_STATUS', null)
+        commit('SET_MYDATA_LIST', null)
+    },
+    /**
      *   This method is called when the user clicks "Continue" in the Wizard navigation.
      *   We only update the userStep if this is the first time the user is completing this step.
      *   We test to see if this is the first time by comparing the current userStep to the step
@@ -137,8 +150,7 @@ const actions = {
             })
     },
     updateDepositorSetupInfo({commit, state}, {objectId, props}) {
-        console.log("begin step: " + state.datasetInfo.depositorSetupInfo.userStep)
-        console.log("props: " + JSON.stringify(props))
+        //  console.log("props: " + JSON.stringify(props))
         if (props.hasOwnProperty('userStep')) {
             console.log('new step: ' + props.userStep)
         }
@@ -337,26 +349,29 @@ const mutations = {
     // create an item in the list for each AnalysisPlan.
     [SET_MYDATA_LIST](state, dataList) {
         let myData = []
-        dataList.forEach(dataset => {
-            let myDataElem = {}
-            if (dataset.analysisPlans && dataset.analysisPlans.length > 0) {
-                myDataElem.datasetInfo = dataset
-                dataset.analysisPlans.forEach(analysisPlan => {
-                    myDataElem.analysisPlan = analysisPlan
-                    myDataElem.userStep = getUserStep(dataset, analysisPlan)
+        if (dataList == null) {
+            state.myDataList = null
+        } else {
+            dataList.forEach(dataset => {
+                let myDataElem = {}
+                if (dataset.analysisPlans && dataset.analysisPlans.length > 0) {
+                    myDataElem.datasetInfo = dataset
+                    dataset.analysisPlans.forEach(analysisPlan => {
+                        myDataElem.analysisPlan = analysisPlan
+                        myDataElem.userStep = getUserStep(dataset, analysisPlan)
+                        myDataElem.timeRemaining = getTimeRemaining(dataset.created)
+                        myData.push(myDataElem)
+                    })
+                } else {
+                    myDataElem.datasetInfo = dataset
+                    myDataElem.analysisPlan = null;
+                    myDataElem.userStep = getUserStep(dataset, null)
                     myDataElem.timeRemaining = getTimeRemaining(dataset.created)
                     myData.push(myDataElem)
-                })
-            } else {
-                myDataElem.datasetInfo = dataset
-                myDataElem.analysisPlan = null;
-                myDataElem.userStep = getUserStep(dataset, null)
-                myDataElem.timeRemaining = getTimeRemaining(dataset.created)
-                myData.push(myDataElem)
-            }
-        })
-        state.myDataList = myData
-
+                }
+            })
+            state.myDataList = myData
+        }
     },
     [SET_ANALYSIS_PLAN](state, analysisPlan) {
         state.analysisPlan = analysisPlan
@@ -386,7 +401,6 @@ const mutations = {
  * @returns {null|(function(*): null)|string}
  */
 function getUserStep(datasetInfo, analysisPlan) {
-    console.log('in getUserStep, datasetInfo ' + datasetInfo)
     if (analysisPlan !== null) {
         return analysisPlan.userStep
     } else if (datasetInfo.depositorSetupInfo !== null) {

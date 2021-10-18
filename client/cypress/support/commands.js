@@ -14,10 +14,24 @@ Cypress.Commands.add('loginAPI', (username, password) => {
     })
 })
 Cypress.Commands.add('clearData', () => {
+    cy.intercept('POST', 'rest-auth/login').as('login')
+    cy.intercept('POST', 'rest-auth/logout').as('logout')
     cy.login('dev_admin', 'admin')
+    cy.wait('@login')
     cy.request('/cypress-tests/clear-test-data/')
+        .then(() => cy.get('[data-test="Logout Link"]').click())
+    cy.wait('@logout')
+})
 
-
+Cypress.Commands.add('logout', () => {
+    if (sessionStorage.getItem('vuex') !== null) {
+        const sessionObj = JSON.parse(sessionStorage.getItem('vuex'))
+        if (sessionObj.auth.user !== null) {
+            cy.intercept('POST', 'rest-auth/logout').as('logout')
+            cy.get('[data-test="Logout Link"]').click()
+            cy.wait('@logout')
+        }
+    }
 })
 
 Cypress.Commands.add('vuex', () =>

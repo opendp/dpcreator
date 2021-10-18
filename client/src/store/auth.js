@@ -141,6 +141,8 @@ const mutations = {
     state.authenticating = false;
     state.error = false;
     state.user = null;
+    state.currentTerms = null,
+        state.termsOfAccessLog = null
   },
   [SET_TOKEN](state, token) {
     if (!isProduction) localStorage.setItem(TOKEN_STORAGE_KEY, token);
