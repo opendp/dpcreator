@@ -5,7 +5,7 @@
       @click:outside="close"
   >
     <v-card elevation="2" class="px-10 py-12 add-statistic-dialog">
-      <v-icon style="position: absolute; right: 40px" @click="close"
+      <v-icon data-test="Add Statistic Close" style="position: absolute; right: 40px" @click="close"
       >mdi-close
       </v-icon
       >

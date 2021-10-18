@@ -202,9 +202,7 @@ export default {
     Button,
     SupportBanner
   },
-  created() {
-    console.log("my data details!")
-  },
+
   methods: {
     handleButtonClick(action, item) {
       this[action](item);
