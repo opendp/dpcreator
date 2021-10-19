@@ -349,7 +349,7 @@ export default {
       } else {
         this.editedItemDialog.variable.forEach((variable) => {
           const label = variable
-          const ci = this.getDepositorSetupInfo.confidenceInterval
+          const ci = this.getDepositorSetupInfo.confidenceLevel
           tempStats.push(Object.assign({}, this.editedItemDialog, {variable}, {label}, {ci})
           );
         })

@@ -60,9 +60,9 @@
         <div
             class="soft_primary grey--text text--darken-2 top-borders-radius width50 pl-3 mb-5 borderBottom"
         >
-          <span class="d-inline-block width50">Significance level</span>
+          <span class="d-inline-block width50">Confidence Level</span>
           <v-autocomplete
-              v-model="editConfidenceInterval"
+              v-model="editConfidenceLevel"
               :items="confidenceLevelOptions"
               class="d-inline-block confidenceLevel pl-5 pt-2 font-weight-bold width50 text-right"
               placeholder="Select..."
@@ -139,16 +139,16 @@ export default {
     return {
       editEpsilon: this.epsilon,
       editDelta: this.delta,
-      editConfidenceInterval: this.confidenceInterval,
-      confidenceLevelOptions: [.01, .05]
+      editConfidenceLevel: this.confidenceLevel,
+      confidenceLevelOptions: [.99, .95]
     };
   },
-  props: ["dialogEditNoiseParams", "epsilon", "delta", "confidenceInterval"],
+  props: ["dialogEditNoiseParams", "epsilon", "delta", "confidenceLevel"],
   methods: {
     handleCancelEditNoiseParamsDialog() {
       this.editEpsilon = this.epsilon;
       this.editDelta = this.delta;
-      this.editConfidenceInterval = this.confidenceInterval;
+      this.editConfidenceLevel = this.confidenceLevel;
       this.$emit("update:dialogEditNoiseParams", false);
     },
     handleSaveEditNoiseParamsDialog() {
@@ -156,7 +156,7 @@ export default {
           "noiseParamsUpdated",
           this.editEpsilon,
           this.editDelta,
-          this.editConfidenceInterval
+          this.editConfidenceLevel
       );
       this.$emit("update:dialogEditNoiseParams", false);
     }
