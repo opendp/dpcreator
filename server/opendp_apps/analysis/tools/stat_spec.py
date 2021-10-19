@@ -8,17 +8,19 @@ BaseClass for Univariate statistics for OpenDP.
 - Implementing the "get_preprocessor" method acts as validation.
 -
 """
-import abc
+import abc # import ABC, ABCMeta, abstractmethod
+from collections import OrderedDict
 
 from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
+
 
 from opendp.mod import OpenDPException
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.utils.extra_validators import \
-    (validate_confidence_interval,
+    (validate_confidence_interval_alpha,
      validate_float,
      validate_statistic,
      validate_epsilon_not_null,
@@ -39,7 +41,7 @@ class StatSpec:
                            #
                            epsilon=validate_epsilon_not_null,
                            delta=validate_not_negative,  # add something more!
-                           ci=validate_confidence_interval,
+                           ci_alpha=validate_confidence_interval_alpha,
                            #
                            min=validate_float,
                            max=validate_float,
@@ -60,7 +62,9 @@ class StatSpec:
         #
         self.epsilon = props.get('epsilon')
         self.delta = props.get('delta')
-        self.ci = props.get('ci')
+        self.ci_alpha = props.get('ci')   # This is actually alpha. needs an update from the frontend!
+        #self.ci = to do
+
         #
         self.accuracy_val = None
         self.accuracy_msg = None
@@ -89,12 +93,20 @@ class StatSpec:
         self.run_02_basic_validation()  # always the same
         self.run_03_custom_validation()  # customize, if types need converting, etc.
 
-    def get_ci_text(self):
-        """Return the ci as text. e.g. .05 is returned as 95%"""
-        if not self.ci:
+    def get_ci_number(self):
+        """Return the ci number based on ci_alpha"""
+        if not self.ci_alpha:
             return None
 
-        ci_num = (1 - self.ci) * 100
+        return 1.00 - self.ci_alpha
+
+    def get_ci_text(self):
+        """Return the ci as text. e.g. .05 is returned as 95%"""
+        if not self.ci_alpha:
+            return None
+
+        ci_num = self.get_ci_number() * 100
+
         return f'{ci_num}%'
 
     @abc.abstractmethod
@@ -273,7 +285,7 @@ class StatSpec:
         assert isinstance(more_props_to_floatify, list), \
             '"more_props_to_floatify" must be a list, even and empty list'
 
-        props_to_floatify = ['epsilon', 'ci', 'min', 'max', ] \
+        props_to_floatify = ['epsilon', 'ci_alpha', 'min', 'max',] \
                             + more_props_to_floatify
 
         for prop_name in props_to_floatify:
@@ -463,20 +475,20 @@ class StatSpec:
         assert self.value, \
             'Only use this after "run_chain()" was completed successfully"'
 
-        final_info = {
-            "statistic": self.statistic,
-            "variable": self.variable,
-            "result": {
-                "value": self.value
-            },
-            "epsilon": self.epsilon,
-            "delta": self.delta,
-        }
+        final_info = OrderedDict({
+                         "statistic": self.statistic,
+                         "variable": self.variable,
+                         "result":{
+                            "value": self.value
+                         },
+                         "epsilon": self.epsilon,
+                         "delta": self.delta,
+                    })
 
         # Min/Max
         #
         if 'min' in self.additional_required_props():
-            final_info['bounds'] = {'min': self.min, 'max': self.max}
+            final_info['bounds'] = OrderedDict({'min': self.min, 'max': self.max})
 
         # Categories
         #
@@ -485,22 +497,24 @@ class StatSpec:
 
         # Missing values
         #
-        final_info['missing_value_handling'] = {"type": self.missing_values_handling}
+        final_info['missing_value_handling'] = OrderedDict({"type": self.missing_values_handling})
         if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
             final_info['missing_value_handling']['fixed_value'] = self.fixed_value
 
         # Add accuracy
         #
         if self.accuracy_val or self.accuracy_msg:
-            final_info['confidence_interval'] = self.ci
-            final_info['accuracy'] = {}
+            final_info['confidence_interval'] = self.get_ci_number()
+            final_info['confidence_interval_alpha'] = self.ci_alpha
+            final_info['accuracy'] = OrderedDict()
             if self.accuracy_val:
                 final_info['accuracy']['value'] = self.accuracy_val
             if self.accuracy_msg:
                 final_info['accuracy']['message'] = self.accuracy_msg
 
-        final_info['description'] = dict(html=self.get_short_description_html(),
-                                         text=self.get_short_description_text())
+        final_info['description'] = OrderedDict()
+        final_info['description']['html'] = self.get_short_description_html()
+        final_info['description']['text'] = self.get_short_description_text()
 
         return final_info
 

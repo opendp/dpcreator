@@ -32,9 +32,9 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     """
     Confidence Interval choices
     """
-    CI_90 = astatic.CI_90
-    CI_95 = astatic.CI_95
-    CI_99 = astatic.CI_99
+    CI_90_ALPHA = astatic.CI_90_ALPHA
+    CI_95_ALPHA = astatic.CI_95_ALPHA
+    CI_99_ALPHA = astatic.CI_99_ALPHA
     CI_CHOICES = astatic.CI_CHOICES
 
     """
@@ -96,7 +96,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
 
     confidence_interval = models.FloatField(\
                             choices=CI_CHOICES,
-                            default=CI_95,
+                            default=CI_95_ALPHA,
                             help_text=('Used for OpenDP operations, starts as the "default_delta"'
                                        ' value but may be overridden by the user.'))
 
@@ -113,6 +113,19 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
             return f'{self.uploadfileinfo} - {self.user_step}'
         else:
             return f'{self.object_id} - {self.user_step}'
+
+    def get_dataset_info(self):
+        """
+        Access a DataSetInfo object, either dataversefileinfo or uploadfileinfo
+        # Workaround for https://github.com/opendp/dpcreator/issues/257
+        """
+        if hasattr(self, 'dataversefileinfo'):
+            return self.dataversefileinfo
+        elif hasattr(self, 'uploadfileinfo'):
+            return self.uploadfileinfo
+
+        raise AttributeError('DepositorSetupInfo does not have access to a DataSetInfo instance')
+
 
     def set_user_step(self, new_step:DepositorSteps) -> bool:
         """Set a new user step. Does *not* save the object."""
@@ -205,6 +218,17 @@ class AnalysisPlan(TimestampedModelWithUUID):
 
     def __str__(self):
         return f'{self.dataset} - {self.user_step}'
+
+    def is_editable(self) -> bool:
+        """
+        Allow editing if the user step is either:'
+          STEP_0700_VARIABLES_CONFIRMED or
+          STEP_0800_STATISTICS_CREATED
+        """
+        editable_steps = [self.AnalystSteps.STEP_0700_VARIABLES_CONFIRMED,
+                          self.AnalystSteps.STEP_0800_STATISTICS_CREATED]
+        return self.user_step in editable_steps
+
 
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the user_step

@@ -32,7 +32,7 @@ class DPMeanSpec(StatSpec):
                       statistic=DP_MEAN,
                       dataset_size=365,
                       epsilon=0.5,
-                      ci=CI_95.
+                      ci=CI_95_ALPHA.
                       fixed_value=1)
     """
     def __init__(self, props: dict):
@@ -44,7 +44,7 @@ class DPMeanSpec(StatSpec):
         Add a list of required properties
         example: ['min', 'max']
         """
-        return ['min', 'max', 'ci',]    # 'fixed_value']
+        return ['min', 'max', 'ci_alpha',]    # 'fixed_value']
 
     def run_01_initial_handling(self):
         """
@@ -131,13 +131,13 @@ class DPMeanSpec(StatSpec):
         if not self.preprocessor:
             self.preprocessor = self.get_preprocessor()
 
-        self.accuracy_val = laplacian_scale_to_accuracy(self.scale, self.ci)
+        self.accuracy_val = laplacian_scale_to_accuracy(self.scale, self.ci_alpha)
 
-        self.accuracy_msg = (f"Releasing {self.statistic} for the variable {self.variable}." 
-                                f" With at least probability {1-self.ci} the output {self.statistic}" 
-                                f" will differ from the true {self.statistic} by at"
-                                f" most {self.accuracy_val} units." 
-                                f" Here the units are the same units the variable has in the dataset.")
+        self.accuracy_msg = (f"Releasing {self.statistic} for the variable {self.variable}."
+                             f" With at least probability {self.get_ci_text()} the output {self.statistic}"
+                             f" will differ from the true {self.statistic} by at"
+                             f" most {self.accuracy_val} units."
+                             f" Here the units are the same units the variable has in the dataset.")
         return True
 
 
@@ -189,11 +189,11 @@ class DPMeanSpec(StatSpec):
                 self.add_err_msg(f'{ex_obj} (Exception)')
             return False
 
-        print((f"Epsilon: {self.epsilon}"
-               f"\nColumn name: {self.variable}"
-               f"\nColumn index: {self.col_index}"
-               f"\nColumn accuracy_val: {self.accuracy_val}"
-               f"\nColumn accuracy_message: {self.accuracy_msg}"
-               f"\n\nDP Mean: {self.value}" ))
+        #print((f"Epsilon: {self.epsilon}"
+        #       f"\nColumn name: {self.variable}"
+        #       f"\nColumn index: {self.col_index}"
+        #       f"\nColumn accuracy_val: {self.accuracy_val}"
+        #       f"\nColumn accuracy_message: {self.accuracy_message}"
+        #       f"\n\nDP Mean: {self.value}" ))
 
         return True

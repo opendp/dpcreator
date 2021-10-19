@@ -48,7 +48,7 @@ class TestValidationViewAndSerializers(TestCase):
                 "variable": "EyeHeight",
                 "epsilon": 1,
                 "delta": 0,
-                "ci": astatic.CI_95,
+                "ci": astatic.CI_95_ALPHA,
                 "error": "",
                 "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
                 "handle_as_fixed": False,
@@ -164,7 +164,7 @@ class TestValidationViewAndSerializers(TestCase):
                                 'value': 1.6370121873967791,
                                 'message': 'Releasing mean for the variable EyeHeight. With at least probability 0.95 the output mean will differ from the true mean by at most 1.6370121873967791 units. Here the units are the same units the variable has in the dataset.'}}]
 
-        #print('stats_info.data', stats_info.data)
+        # print('stats_info.data', stats_info.data)
         self.assertEqual(stats_info.data[0]['valid'], True)
 
         # Were accuracy results included?
@@ -626,7 +626,7 @@ class TestValidationViewAndSerializers(TestCase):
                      "variable": "EyeHeight",
                      "epsilon": 1,
                      "delta": 0,
-                     "ci": astatic.CI_95,
+                     "ci": astatic.CI_95_ALPHA,
                      "error": "",
                      "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
                      "handle_as_fixed": False,

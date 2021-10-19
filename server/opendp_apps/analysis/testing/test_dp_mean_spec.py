@@ -28,7 +28,7 @@ class DPMeanStatSpecTest(StatSpecTestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95,
+                      'ci': astatic.CI_95_ALPHA,
                       #'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '0',
@@ -79,7 +79,7 @@ class DPMeanStatSpecTest(StatSpecTestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95,
+                      'ci': astatic.CI_95_ALPHA,
                       #'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '5',
@@ -122,7 +122,7 @@ class DPMeanStatSpecTest(StatSpecTestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95,
+                      'ci': astatic.CI_95_ALPHA,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '5',
                       'variable_info': {'min': -8,
@@ -161,7 +161,7 @@ class DPMeanStatSpecTest(StatSpecTestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95,
+                      'ci': astatic.CI_95_ALPHA,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '5',
                       'variable_info': {'min': -8,
@@ -179,7 +179,7 @@ class DPMeanStatSpecTest(StatSpecTestCase):
             dp_mean = DPMeanSpec(spec_props)
             #print(dp_mean.is_chain_valid())
             self.assertFalse(dp_mean.is_chain_valid())
-            self.assertTrue(dp_mean.get_single_err_msg().find(VALIDATE_MSG_NOT_VALID_CI) > -1)
+            self.assertTrue(dp_mean.get_single_err_msg().find(VALIDATE_MSG_NOT_VALID_CI_ALPHA) > -1)
 
         for ci_val in ['alphabet', 'soup', 'c']:
             #print(f'> Invalid ci val: {ci_val}')
@@ -187,7 +187,7 @@ class DPMeanStatSpecTest(StatSpecTestCase):
             dp_mean = DPMeanSpec(spec_props)
             #print(dp_mean.is_chain_valid())
             self.assertFalse(dp_mean.is_chain_valid())
-            self.assertTrue(dp_mean.get_single_err_msg().find('Failed to convert "ci" to a float') > -1)
+            self.assertTrue(dp_mean.get_single_err_msg().find('Failed to convert "ci_alpha" to a float') > -1)
 
 
 
@@ -201,7 +201,7 @@ class DPMeanStatSpecTest(StatSpecTestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95,
+                      'ci': astatic.CI_95_ALPHA,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '5.0',
                       'variable_info': {'min': -8,
@@ -252,7 +252,7 @@ class DPMeanStatSpecTest(StatSpecTestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95,
+                      'ci': astatic.CI_95_ALPHA,
                       #'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '5',
@@ -294,6 +294,67 @@ class DPMeanStatSpecTest(StatSpecTestCase):
 
         print('Actual mean: -0.9503854412185792')
 
+
+
+    def test_110_run_dpmean_calculation(self):
+        """(110) Run another DP mean calculation"""
+        msgt(self.test_110_run_dpmean_calculation.__doc__)
+
+        spec_props = {'variable': 'income',
+                      'col_index': 6,
+                      'statistic': astatic.DP_MEAN,
+                      'dataset_size': 10000,
+                      'epsilon': 0.6,
+                      'delta': 0.0,
+                      'ci': astatic.CI_99_ALPHA,
+                      'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+                      'fixed_value': '31000',
+                      'variable_info': {'min': 0,
+                                        'max': 650000,
+                                        'type': 'Float',},
+                      }
+
+        dp_mean = DPMeanSpec(spec_props)
+        print('Is this spec valid?', dp_mean.is_chain_valid())
+        if dp_mean.has_error():
+            print(dp_mean.get_error_messages())
+            print(dp_mean.get_error_msg_dict())
+            return
+        self.assertTrue(dp_mean.is_chain_valid())
+
+        # ------------------------------------------------------
+        # Run the actual mean
+        # ------------------------------------------------------
+        # Column indexes - We know this data has 11 columns
+        col_indexes = [idx for idx in range(0, 11)]
+
+        # File object
+        #
+        pums_filepath = join(TEST_DATA_DIR, 'PUMS5extract10000.csv')
+        self.assertTrue(isfile(pums_filepath))
+
+        file_like_obj = open(pums_filepath, 'r')
+
+        # Call run_chain
+        #
+        dp_mean.run_chain(col_indexes, file_like_obj)
+        if dp_mean.has_error():
+            print(dp_mean.get_error_messages())
+            return
+
+        final_dict = dp_mean.get_release_dict()
+
+        json_str = json.dumps(final_dict, indent=4)
+        print(json_str)
+
+        print('-- actual vals --')
+        print(('mean: 30,943.4566'
+               '\nmin: -10,000.0'
+               '\nmax: 713,000.0'))
+
+        self.assertIn('description', final_dict)
+        self.assertIn('text', final_dict['description'])
+        self.assertIn('html', final_dict['description'])
 
 """
 # from ./dpcreator/server directory
