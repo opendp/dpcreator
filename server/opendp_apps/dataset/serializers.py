@@ -102,13 +102,7 @@ class DepositorSetupInfoSerializer(serializers.ModelSerializer):
                 field.set(value)
             else:
                 setattr(instance, attr, value)
-        # This ensures that `is_complete` gets added to update_fields or else the process cannot proceed
-        # from the frontend
-        if instance.variable_info and instance.epsilon \
-                and instance.user_step == instance.DepositorSteps.STEP_0600_EPSILON_SET:
-            instance.is_complete = True
-            instance.updated = datetime.now()
-            update_fields.append('is_complete')
+
         instance.save(update_fields=update_fields)
 
         return instance

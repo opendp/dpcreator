@@ -25,3 +25,19 @@ class TestDepositorSerializer(TestCase):
         serializer = DepositorSetupInfoSerializer()
         updated_instance = serializer.update(instance, validated_data={'is_complete': True})
         self.assertNotEqual(original_updated, updated_instance.updated)
+
+    def test_is_complete_field(self):
+        """
+        Update instance of DepositorSetupInfo and ensure is_complete field is updated
+        """
+        msgt(self.test_is_complete_field.__doc__.strip())
+        # Get current instance and store "is_complete" field
+        instance = DepositorSetupInfo.objects.filter(is_complete=False).first()
+        original_is_complete = instance.is_complete
+        self.assertFalse(original_is_complete)
+        # Use serializer to update user_step field and make sure "is_complete" changes
+        serializer = DepositorSetupInfoSerializer()
+        updated_instance = serializer.update(instance, validated_data={'variable_info': {'test': 'something'},
+                                                                       'epsilon': 1.0,
+                                                                       'user_step': 'step_600'})
+        self.assertTrue(updated_instance.is_complete)

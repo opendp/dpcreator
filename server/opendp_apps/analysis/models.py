@@ -1,11 +1,12 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
+
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
 from opendp_apps.utils.extra_validators import \
     (validate_not_negative,
-     validate_not_negative_or_none,
      validate_epsilon_or_none)
 
 
@@ -139,12 +140,17 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
         #       depending on the data
         #
+        # This ensures that `is_complete` gets added to update_fields or else the process cannot proceed
+        # from the frontend
         if self.variable_info and self.epsilon \
             and self.user_step == self.DepositorSteps.STEP_0600_EPSILON_SET:
             self.is_complete = True
         else:
             self.is_complete = False
-
+        # Specifically for this model, we are overriding the update method with an explicit list of
+        # update_fields, so we need to set the updated field manually.
+        # All other models will be updated without this step due to the auto_now option from the parent class.
+        self.updated = timezone.now()
         super(DepositorSetupInfo, self).save(*args, **kwargs)
 
 
