@@ -171,7 +171,7 @@ class TestValidationViewAndSerializers(TestCase):
         self.assertTrue('value' in stats_info.data[0]['accuracy'])
         self.assertTrue('message' in stats_info.data[0]['accuracy'])
 
-        accuracy_msg = f'output {astatic.DP_MEAN} will differ from the true {astatic.DP_MEAN} by at'
+        accuracy_msg = f'DP {astatic.DP_MEAN.title()} will differ from the true {astatic.DP_MEAN.title()} by at'
         self.assertTrue(stats_info.data[0]['accuracy']['message'].find(accuracy_msg) > -1)
 
 

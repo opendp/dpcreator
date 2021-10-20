@@ -462,6 +462,23 @@ class StatSpec:
         # print(desc)
         return desc
 
+
+    def get_accuracy_text(self, template_name=None):
+        """
+        Create an HTML description using a ReleaseInfo object
+        """
+        info_dict = {
+            'stat': self,
+        }
+
+        if not template_name:
+            template_name = 'analysis/dp_stat_accuracy_default.txt'
+
+        desc = render_to_string(template_name, info_dict)
+
+        # print(desc)
+        return desc
+
     def get_release_dict(self) -> OrderedDict:
         """Final release info"""
         assert not self.has_error(), \

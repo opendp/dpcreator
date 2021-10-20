@@ -133,11 +133,16 @@ class DPMeanSpec(StatSpec):
 
         self.accuracy_val = laplacian_scale_to_accuracy(self.scale, self.get_confidence_level_alpha())
 
+        # Note `self.accuracy_val` must bet set before using `self.get_accuracy_text()
+        #
+        self.accuracy_msg = self.get_accuracy_text()
+        """
         self.accuracy_msg = (f"Releasing {self.statistic} for the variable {self.variable}."
                              f" With at least probability {self.get_cl_text()} the output {self.statistic}"
                              f" will differ from the true {self.statistic} by at"
                              f" most {self.accuracy_val} units."
                              f" Here the units are the same units the variable has in the dataset.")
+        """
         return True
 
 

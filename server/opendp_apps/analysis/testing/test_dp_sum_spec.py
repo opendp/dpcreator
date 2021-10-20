@@ -62,6 +62,10 @@ class DPSumStatSpecTest(StatSpecTestCase):
         # Actual sum -173.920535743
         self.assertTrue(dp_sum.value > -200) # should be well within range
 
+        # import json
+        # print(json.dumps(dp_sum.get_release_dict(), indent=4))
+
+
     def test_20_sum_valid_spec(self):
         """(20) Run DP Sum valid spec, string column"""
         msgt(self.test_20_sum_valid_spec.__doc__)
