@@ -1,12 +1,27 @@
+# ---------------------------------
+# Confidence level static values
+# ---------------------------------
+CL_90 = 0.90    # just to look at
+CL_95 = 0.95
+CL_99 = 0.99
 
-CI_90_ALPHA = 0.10    # just to look at
-CI_95_ALPHA = 0.05
-CI_99_ALPHA = 0.01
-CI_CHOICES = (
-    (CI_90_ALPHA, '90% CI'),
-    (CI_95_ALPHA, '95% CI'),
-    (CI_99_ALPHA, '99% CI'),
+CL_90test_30_bad_confidence_levels = 1 - CL_90
+CL_95_ALPHA = 1 - CL_95
+CL_99_ALPHA = 1 - CL_99
+
+CL_CHOICES = (
+    (CL_90, '90% CL'),
+    (CL_95, '95% CL'),
+    (CL_99, '99% CL'),
 )
+
+# --------------------------------------
+# Often-used Delta values
+# --------------------------------------
+DELTA_0 = 0.0
+DELTA_10_NEG_5 = 10.0 ** -5
+DELTA_10_NEG_6 = 10.0 ** -6
+DELTA_10_NEG_7 = 10.0 ** -7
 
 # --------------------------------------
 # Statistic Types
@@ -17,10 +32,6 @@ DP_COUNT = 'count'
 DP_HISTOGRAM = 'histogram'
 DP_QUANTILE = 'quantile'
 DP_STATS_CHOICES = [DP_MEAN, DP_SUM, DP_COUNT, DP_HISTOGRAM, DP_QUANTILE]
-
-DP_STAT_NEED_MIN_MAX = {DP_MEAN: True,
-                        DP_HISTOGRAM: False}
-
 
 # --------------------------------------
 # Missing value handling
