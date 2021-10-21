@@ -140,7 +140,10 @@ export default {
       editEpsilon: this.epsilon,
       editDelta: this.delta,
       editConfidenceLevel: this.confidenceLevel,
-      confidenceLevelOptions: [.99, .95]
+      confidenceLevelOptions: [
+        {text: "99%", value: .99},
+        {text: "95%", value: .95},
+        {text: "90%", value: .90},]
     };
   },
   props: ["dialogEditNoiseParams", "epsilon", "delta", "confidenceLevel"],

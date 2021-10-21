@@ -263,7 +263,6 @@ export default {
       variable: [],
       epsilon: "",
       delta: '0.0',
-      ci: null,
       error: "",
       missingValuesHandling: "",
       handleAsFixed: false,
@@ -349,8 +348,8 @@ export default {
       } else {
         this.editedItemDialog.variable.forEach((variable) => {
           const label = variable
-          const ci = this.getDepositorSetupInfo.confidenceLevel
-          tempStats.push(Object.assign({}, this.editedItemDialog, {variable}, {label}, {ci})
+          const cl = this.getDepositorSetupInfo.confidenceLevel
+          tempStats.push(Object.assign({}, this.editedItemDialog, {variable}, {label}, {cl})
           );
         })
       }

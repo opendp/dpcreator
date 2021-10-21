@@ -232,12 +232,13 @@ export default {
          Object.assign(this.statistics[this.editedIndex], this.editedItem);
       } else {
         for (let variable of this.editedItem.variable) {
-          let ci = this.getDepositorSetupInfo.confidenceLevel
+          console.log("saving cl: " + this.getDepositorSetupInfo.confidenceLevel)
+          let cl = this.getDepositorSetupInfo.confidenceLevel
           if (!createStatsUtils.isDeltaStat(this.editedItem.statistic)) {
             this.editedItem.delta = ""
           }
           this.statistics.push(
-              Object.assign({}, this.editedItem, {variable}, {ci})
+              Object.assign({}, this.editedItem, {variable}, {cl})
           );
         }
       }
