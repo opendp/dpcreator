@@ -125,7 +125,11 @@ class DPSumSpec(StatSpec):
         if not self.preprocessor:
             self.preprocessor = self.get_preprocessor()
 
-        self.accuracy_val = laplacian_scale_to_accuracy(self.scale, self.get_confidence_level_alpha())
+        cl_alpha = self.get_confidence_level_alpha()
+        if cl_alpha is None:
+            # Error already saved
+            return False
+        self.accuracy_val = laplacian_scale_to_accuracy(self.scale, cl_alpha)
 
         # Note `self.accuracy_val` must bet set before using `self.get_accuracy_text()
         #

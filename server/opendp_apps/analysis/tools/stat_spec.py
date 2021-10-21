@@ -10,6 +10,7 @@ BaseClass for Univariate statistics for OpenDP.
 """
 import abc # import ABC, ABCMeta, abstractmethod
 from collections import OrderedDict
+import decimal
 
 from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
@@ -530,11 +531,23 @@ class StatSpec:
         return final_info
 
     def get_confidence_level_alpha(self) -> float:
-        """Get the confidence level (CL) alpha. e.g. if CL coefficient is .99, return .01"""
+        """Get the confidence level (CL) alpha. e.g. if CL coefficient is .99, return .01
+        Assumes that `self.cl` has passed through the validator: `validate_confidence_level`
+        """
         if not self.cl:
+            user_msg = 'Attempted to calculate confidence level (CL) alpha when CL was not set. ("{self.cl}")'
+            self.add_err_msg(user_msg)
             return None
 
-        return 1 - self.cl
+        try:
+            dec_alpha = decimal.Decimal(1 - self.cl).quantize(decimal.Decimal('.01'),
+                                                              rounding=decimal.ROUND_DOWN)
+        except TypeError as ex_obj:
+            user_msg = 'Failed to calculate confidence level (CL) alpha using CL of "{self.cl}" ({ex_obj})'
+            self.add_err_msg(user_msg)
+            return None
+
+        return float(dec_alpha)
 
     def has_error(self) -> bool:
         """Did an error occur?"""
