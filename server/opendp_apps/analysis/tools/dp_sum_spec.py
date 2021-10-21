@@ -26,7 +26,7 @@ class DPSumSpec(StatSpec):
                       statistic=DP_SUM,
                       dataset_size=365,
                       epsilon=0.5,
-                      ci=CI_95.
+                      cl=CL_95.
                       fixed_value=1)
     """
     def __init__(self, props: dict):
@@ -38,7 +38,7 @@ class DPSumSpec(StatSpec):
         Add a list of required properties
         example: ['min', 'max']
         """
-        return ['min', 'max', 'ci_alpha',]    # 'fixed_value']
+        return ['min', 'max', 'cl',]    # 'fixed_value']
 
     def run_01_initial_handling(self):
         """
@@ -125,13 +125,12 @@ class DPSumSpec(StatSpec):
         if not self.preprocessor:
             self.preprocessor = self.get_preprocessor()
 
-        self.accuracy_val = laplacian_scale_to_accuracy(self.scale, self.ci_alpha)
+        self.accuracy_val = laplacian_scale_to_accuracy(self.scale, self.get_confidence_level_alpha())
 
-        self.accuracy_msg = (f"Releasing {self.statistic} for the variable {self.variable}."
-                             f" With at least probability {self.get_ci_text()} the output {self.statistic}"
-                             f" will differ from the true {self.statistic} by at"
-                             f" most {self.accuracy_val} units."
-                             f" Here the units are the same units the variable has in the dataset.")
+        # Note `self.accuracy_val` must bet set before using `self.get_accuracy_text()
+        #
+        self.accuracy_msg = self.get_accuracy_text()
+
         return True
 
 

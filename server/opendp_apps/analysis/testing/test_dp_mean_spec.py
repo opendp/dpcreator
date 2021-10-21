@@ -28,7 +28,7 @@ class DPMeanStatSpecTest(StatSpecTestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95_ALPHA,
+                      'cl': astatic.CL_95,
                       #'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '0',
@@ -79,7 +79,7 @@ class DPMeanStatSpecTest(StatSpecTestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95_ALPHA,
+                      'cl': astatic.CL_95,
                       #'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '5',
@@ -98,9 +98,9 @@ class DPMeanStatSpecTest(StatSpecTestCase):
             self.assertTrue(dp_mean.is_chain_valid())
 
         print('   --------')
-        for ci_val in [x[0] for x in astatic.CI_CHOICES]:
-            print(f'> Valid ci val: {ci_val}')
-            spec_props['ci'] = ci_val
+        for cl_val in [x[0] for x in astatic.CL_CHOICES]:
+            print(f'> Valid CL val: {cl_val}')
+            spec_props['cl'] = cl_val
             dp_mean = DPMeanSpec(spec_props)
             self.assertTrue(dp_mean.is_chain_valid())
 
@@ -122,7 +122,7 @@ class DPMeanStatSpecTest(StatSpecTestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95_ALPHA,
+                      'cl': astatic.CL_95,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '5',
                       'variable_info': {'min': -8,
@@ -151,9 +151,9 @@ class DPMeanStatSpecTest(StatSpecTestCase):
             dp_mean = DPMeanSpec(spec_props)
             self.assertFalse(dp_mean.is_chain_valid())
 
-    def test_30_bad_ci(self):
-        """(30) Bad ci vals"""
-        msgt(self.test_30_bad_ci.__doc__)
+    def test_30_bad_confidence_levels(self):
+        """(30) Bad confidence level vals"""
+        msgt(self.test_30_bad_confidence_levels.__doc__)
 
         spec_props = {'variable': 'EyeHeight',
                       'col_index': 19,
@@ -161,7 +161,7 @@ class DPMeanStatSpecTest(StatSpecTestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95_ALPHA,
+                      'cl': astatic.CL_95,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '5',
                       'variable_info': {'min': -8,
@@ -173,21 +173,21 @@ class DPMeanStatSpecTest(StatSpecTestCase):
                 yield float(start)
                 start += decimal.Decimal(step)
 
-        for ci_val in list(float_range(-1, 3, '0.08')):
+        for cl_val in list(float_range(-1, 3, '0.08')):
             #print(f'> Invalid ci val: {ci_val}')
-            spec_props['ci'] = ci_val
+            spec_props['cl'] = cl_val
             dp_mean = DPMeanSpec(spec_props)
             #print(dp_mean.is_chain_valid())
             self.assertFalse(dp_mean.is_chain_valid())
-            self.assertTrue(dp_mean.get_single_err_msg().find(VALIDATE_MSG_NOT_VALID_CI_ALPHA) > -1)
+            self.assertTrue(dp_mean.get_single_err_msg().find(VALIDATE_MSG_NOT_VALID_CL_VALUE) > -1)
 
-        for ci_val in ['alphabet', 'soup', 'c']:
+        for cl_val in ['alphabet', 'soup', 'c']:
             #print(f'> Invalid ci val: {ci_val}')
-            spec_props['ci'] = ci_val
+            spec_props['cl'] = cl_val
             dp_mean = DPMeanSpec(spec_props)
             #print(dp_mean.is_chain_valid())
             self.assertFalse(dp_mean.is_chain_valid())
-            self.assertTrue(dp_mean.get_single_err_msg().find('Failed to convert "ci_alpha" to a float') > -1)
+            self.assertTrue(dp_mean.get_single_err_msg().find('Failed to convert "cl" to a float') > -1)
 
 
 
@@ -201,7 +201,7 @@ class DPMeanStatSpecTest(StatSpecTestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95_ALPHA,
+                      'cl': astatic.CL_95,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '5.0',
                       'variable_info': {'min': -8,
@@ -252,7 +252,7 @@ class DPMeanStatSpecTest(StatSpecTestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95_ALPHA,
+                      'cl': astatic.CL_95,
                       #'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '5',
@@ -306,7 +306,7 @@ class DPMeanStatSpecTest(StatSpecTestCase):
                       'dataset_size': 10000,
                       'epsilon': 0.6,
                       'delta': 0.0,
-                      'ci': astatic.CI_99_ALPHA,
+                      'cl': astatic.CL_99,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '31000',
                       'variable_info': {'min': 0,

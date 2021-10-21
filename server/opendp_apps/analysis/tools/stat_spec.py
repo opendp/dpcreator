@@ -20,7 +20,7 @@ from opendp.mod import OpenDPException
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.utils.extra_validators import \
-    (validate_confidence_interval_alpha,
+    (validate_confidence_level,
      validate_float,
      validate_statistic,
      validate_epsilon_not_null,
@@ -41,7 +41,7 @@ class StatSpec:
                            #
                            epsilon=validate_epsilon_not_null,
                            delta=validate_not_negative,  # add something more!
-                           ci_alpha=validate_confidence_interval_alpha,
+                           cl=validate_confidence_level,
                            #
                            min=validate_float,
                            max=validate_float,
@@ -62,8 +62,8 @@ class StatSpec:
         #
         self.epsilon = props.get('epsilon')
         self.delta = props.get('delta')
-        self.ci_alpha = props.get('ci')   # This is actually alpha. needs an update from the frontend!
-        #self.ci = to do
+
+        self.cl = props.get('cl')      # confidence level coefficient (e.g. .95, .99, etc)
 
         #
         self.accuracy_val = None
@@ -93,28 +93,22 @@ class StatSpec:
         self.run_02_basic_validation()  # always the same
         self.run_03_custom_validation()  # customize, if types need converting, etc.
 
-    def get_ci_number(self):
-        """Return the ci number based on ci_alpha"""
-        if not self.ci_alpha:
-            return None
 
-        return 1.00 - self.ci_alpha
-
-    def get_ci_text(self):
+    def get_cl_text(self):
         """Return the ci as text. e.g. .05 is returned as 95%"""
-        if not self.ci_alpha:
+        if not self.cl:
             return None
 
-        ci_num = self.get_ci_number() * 100
+        cl_fmt = self.cl * 100
 
-        return f'{ci_num}%'
+        return f'{cl_fmt}%'
 
     @abc.abstractmethod
     def additional_required_props(self):
         """
         Add a list of required properties.
         For example, a DP Mean might be:
-        `   return ['min', 'max', 'ci']`
+        `   return ['min', 'max', 'cl']`
         """
         raise NotImplementedError('additional_required_props')
 
@@ -285,7 +279,7 @@ class StatSpec:
         assert isinstance(more_props_to_floatify, list), \
             '"more_props_to_floatify" must be a list, even and empty list'
 
-        props_to_floatify = ['epsilon', 'ci_alpha', 'min', 'max',] \
+        props_to_floatify = ['epsilon', 'cl', 'min', 'max',] \
                             + more_props_to_floatify
 
         for prop_name in props_to_floatify:
@@ -468,7 +462,24 @@ class StatSpec:
         # print(desc)
         return desc
 
-    def get_release_dict(self):
+
+    def get_accuracy_text(self, template_name=None):
+        """
+        Create an HTML description using a ReleaseInfo object
+        """
+        info_dict = {
+            'stat': self,
+        }
+
+        if not template_name:
+            template_name = 'analysis/dp_stat_accuracy_default.txt'
+
+        desc = render_to_string(template_name, info_dict)
+
+        # print(desc)
+        return desc
+
+    def get_release_dict(self) -> OrderedDict:
         """Final release info"""
         assert not self.has_error(), \
             'Do not call this method before checking that ".has_error()" is False'
@@ -504,8 +515,8 @@ class StatSpec:
         # Add accuracy
         #
         if self.accuracy_val or self.accuracy_msg:
-            final_info['confidence_interval'] = self.get_ci_number()
-            final_info['confidence_interval_alpha'] = self.ci_alpha
+            final_info['confidence_level'] = self.cl
+            final_info['confidence_level_alpha'] = self.get_confidence_level_alpha()
             final_info['accuracy'] = OrderedDict()
             if self.accuracy_val:
                 final_info['accuracy']['value'] = self.accuracy_val
@@ -518,34 +529,41 @@ class StatSpec:
 
         return final_info
 
-    def has_error(self):
+    def get_confidence_level_alpha(self) -> float:
+        """Get the confidence level (CL) alpha. e.g. if CL coefficient is .99, return .01"""
+        if not self.cl:
+            return None
+
+        return 1 - self.cl
+
+    def has_error(self) -> bool:
         """Did an error occur?"""
         return self.error_found
 
-    def get_error_messages(self):
+    def get_error_messages(self) -> list:
         """Return the error message if 'has_error' is True"""
         assert self.has_error(), \
             "Please check that '.has_error()' is True before using this method"
 
         return self.error_messages
 
-    def get_err_msgs(self):
+    def get_err_msgs(self) -> list:
         """Return the error message if 'has_error' is True"""
         return self.get_error_messages()
 
-    def get_err_msgs_concat(self, sep_char=' '):
+    def get_err_msgs_concat(self, sep_char=' ') -> str:
         return f'{sep_char}'.join(self.get_error_messages())
 
-    def get_error_messages_concat(self, sep_char=' '):
+    def get_error_messages_concat(self, sep_char=' ') -> str:
         return self.get_err_msgs_concat(sep_char)
 
-    def add_err_msg(self, err_msg):
+    def add_err_msg(self, err_msg: str):
         """Add an error message"""
         # print('add_err_msg. type', type(err_msg))
 
         self.error_found = True
         self.error_messages.append(err_msg)
 
-    def add_error_message(self, err_msg):
+    def add_error_message(self, err_msg: str):
         """Add an error message -- same as "add_err_msg" """
         self.add_err_msg(err_msg)
