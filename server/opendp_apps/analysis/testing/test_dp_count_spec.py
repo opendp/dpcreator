@@ -110,6 +110,8 @@ class DPCountStatSpecTest(StatSpecTestCase):
 
         self.assertFalse(dp_count.has_error())
 
+        import json
+        print(json.dumps(dp_count.get_release_dict(), indent=4))
         # val from local machine: 2.9957322850627124
         self.assertTrue(dp_count.accuracy_val > 2.995)
         self.assertTrue(dp_count.accuracy_val < 2.996)
