@@ -128,6 +128,7 @@
 <script>
 import Button from "../../../DesignSystem/Button.vue";
 import AdditionalInformationAlert from "../../../DynamicHelpResources/AdditionalInformationAlert";
+import {confLevelOptions} from "@/shared/createStatsUtils";
 
 export default {
   name: "EditNoiseParamsDialog",
@@ -140,10 +141,7 @@ export default {
       editEpsilon: this.epsilon,
       editDelta: this.delta,
       editConfidenceLevel: this.confidenceLevel,
-      confidenceLevelOptions: [
-        {text: "99%", value: .99},
-        {text: "95%", value: .95},
-        {text: "90%", value: .90},]
+      confidenceLevelOptions: confLevelOptions
     };
   },
   props: ["dialogEditNoiseParams", "epsilon", "delta", "confidenceLevel"],
@@ -155,6 +153,8 @@ export default {
       this.$emit("update:dialogEditNoiseParams", false);
     },
     handleSaveEditNoiseParamsDialog() {
+      //  console.log("saving noise params, cl: " + JSON.stringify(this.editConfidenceLevel))
+      //  console.log("saving noise params, epsilon: " + this.epsilon+ ","+ this.editEpsilon)
       this.$emit(
           "noiseParamsUpdated",
           this.editEpsilon,

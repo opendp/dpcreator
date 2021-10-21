@@ -182,6 +182,7 @@ export default {
       } else {
         this.epsilon = this.getDepositorSetupInfo.epsilon
       }
+    //  console.log("initialize form, epsilon = "+ this.epsilon)
       if (this.getDepositorSetupInfo.confidenceLevel == null) {
         this.confidenceLevel = .99
       } else {
@@ -199,6 +200,7 @@ export default {
     },
 
     handleOpenEditNoiseParamsDialog() {
+      //   console.log("opening dialog, epsilon = " + this.epsilon)
       this.dialogEditNoiseParamsConfirmation = false;
       this.dialogEditNoiseParams = true;
     },
@@ -206,6 +208,9 @@ export default {
       this.epsilon = epsilon;
       this.delta = delta;
       this.confidenceLevel = confidenceLevel;
+      this.statistics.forEach((dpStat) => {
+        dpStat.cl = confidenceLevel
+      })
       createStatsUtils.redistributeValues(this.statistics, this.delta, this.epsilon, this.getDepositorSetupInfo.defaultDelta)
       // update stats with the accuracy values
       // (we don't have to check validation because that was done in the Dialog)
