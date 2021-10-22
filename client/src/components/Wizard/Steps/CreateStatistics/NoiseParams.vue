@@ -35,9 +35,9 @@
         <div
             class="borderBottom soft_primary grey--text text--darken-2 pa-3 top-borders-radius noise-params d-flex justify-space-between"
         >
-          <span>Significance Level</span>
+          <span>Confidence Level</span>
           <span>
-            {{ confidenceInterval }}
+            {{ confidencePercent }}
             <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
           </span>
         </div><span>&nbsp;</span>
@@ -60,7 +60,17 @@
 <script>
 export default {
   name: "NoiseParams",
-  props: ["epsilon", "delta", "confidenceInterval"],
+  props: ["epsilon", "delta", "confidenceLevel"],
+  computed: {
+    confidencePercent: function () {
+      const percent = Number(this.confidenceLevel).toLocaleString(undefined, {
+        style: 'percent',
+        minimumFractionDigits: 0
+      });
+      return percent
+    }
+
+  },
   methods: {
     emitEditEvent: function () {
       this.$emit("editNoiseParams");

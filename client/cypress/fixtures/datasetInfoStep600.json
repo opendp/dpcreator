@@ -163,7 +163,7 @@
         "epsilon": 1,
         "defaultDelta": 0.00001,
         "delta": 0.00001,
-        "confidenceInterval": 0.01,
+        "confidenceLevel": 0.99,
         "creator": 1
     },
     "datasetSchemaInfo": {

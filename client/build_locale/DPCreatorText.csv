@@ -258,5 +258,5 @@ more information,delta text,"<p>Delta (&delta;) is a second privacy-loss paramet
 
 <p>This parameter  controls the probability that a privacy breach event would happen, and hence should be kept
 very small (e.g., one in a billion).</p>  ",
-more information,confidence title,What is a confidence interval?,
+more information,confidence title,What is a confidence level?,
 more information,confidence text,CI is ,

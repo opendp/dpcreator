@@ -3,7 +3,7 @@ import requests_mock
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
-from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.dataverses.testing.test_endpoints import BaseEndpointTest
 from opendp_apps.model_helpers.msg_util import msgt
 
@@ -66,7 +66,7 @@ class TestDataSetSerializer(BaseEndpointTest):
                                                 'epsilon': None,
                                                 'default_delta': 0.0,
                                                 'delta': 0.0,
-                                                'confidence_interval': DepositorSetupInfo.CI_95_ALPHA,
+                                                'confidence_level': astatic.CL_95,
                                                 'is_complete': False,
                                                 'user_step': 'step_100',
                                                 'variable_info': None})

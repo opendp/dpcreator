@@ -3,6 +3,7 @@ import requests_mock
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
+from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.dataverses.testing.test_endpoints import BaseEndpointTest
 from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.utils.extra_validators import \
@@ -31,9 +32,9 @@ class TestDepositorInfo(BaseEndpointTest):
                                              kwargs={'object_id': "9255c067-e435-43bd-8af1-33a6987ffc9b"}),
                                      {'default_epsilon': 1.0,
                                       'epsilon': 0.9,
-                                      'default_delta': DepositorSetupInfo.DELTA_0,
-                                      'delta': DepositorSetupInfo.DELTA_10_NEG_6,
-                                      'confidence_interval': DepositorSetupInfo.CI_99_ALPHA})
+                                      'default_delta': astatic.DELTA_0,
+                                      'delta': astatic.DELTA_10_NEG_6,
+                                      'confidence_level': astatic.CL_99})
         print('(10 resp)', response.json())
         self.assertEqual(response.status_code, 200)
         response = response.json()
@@ -50,9 +51,9 @@ class TestDepositorInfo(BaseEndpointTest):
                           'user_step': 'step_100',
                           'default_epsilon': 1.0,
                           'epsilon': 0.9,
-                          'default_delta': DepositorSetupInfo.DELTA_0,
-                          'delta': DepositorSetupInfo.DELTA_10_NEG_6,
-                          'confidence_interval': DepositorSetupInfo.CI_99_ALPHA,
+                          'default_delta': astatic.DELTA_0,
+                          'delta': astatic.DELTA_10_NEG_6,
+                          'confidence_level': astatic.CL_99,
                           'variable_info': None})
 
 
@@ -78,7 +79,7 @@ class TestDepositorInfo(BaseEndpointTest):
         self.set_mock_requests(req_mocker)
         response = self.client.patch(reverse("deposit-detail",
                                              kwargs={'object_id': "9255c067-e435-43bd-8af1-33a6987ffc9b"}),
-                                     {'confidence_interval': 0.48,
+                                     {'confidence_level': 0.48,
                                       'default_epsilon': -2,
                                       'epsilon': 0.001,
                                       'default_delta': -0.1,
@@ -87,7 +88,7 @@ class TestDepositorInfo(BaseEndpointTest):
         self.assertEqual(response.status_code, 400)
         print(f"get response: {response.json()}")
 
-        expected_msg = {'confidence_interval': ['"0.48" is not a valid choice.'],
+        expected_msg = {'confidence_level': ['"0.48" is not a valid choice.'],
                         'default_delta': [VALIDATE_MSG_ZERO_OR_GREATER],
                         'delta': [VALIDATE_MSG_ZERO_OR_GREATER],
                         'default_epsilon': [VALIDATE_MSG_EPSILON],

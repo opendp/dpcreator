@@ -16,27 +16,25 @@ export default {
 
     },
     validate(analysisPlanId, dpStatistics) {
-
-        dpStatistics = snakecaseKeys(dpStatistics, {deep: true})
-        console.log(JSON.stringify(dpStatistics));
-
-
-        return session.post('/api/validation/',
-                 {analysis_plan_id: analysisPlanId, dp_statistics: dpStatistics})
-                 .then(resp => camelcaseKeys(resp.data, {deep: true}))
+        if (dpStatistics && dpStatistics.length > 0) {
+            dpStatistics = snakecaseKeys(dpStatistics, {deep: true})
+            console.log(JSON.stringify(dpStatistics));
 
 
-        // Return an object with valid:true for each statistic, to mimic the API
-        /*    let resp = {}
+            return session.post('/api/validation/',
+                {analysis_plan_id: analysisPlanId, dp_statistics: dpStatistics})
+                .then(resp => camelcaseKeys(resp.data, {deep: true}))
+
+        } else {
+            // If the statistics array is empty, don't call the API, just return an empty array
+            let resp = {}
             resp['valid'] = []
-            dpStatistics.forEach((item) => {
-                resp['valid'].push({"valid": true})
-            })
             const myPromise = new Promise((resolve, reject) => {
                 resolve(resp);
             });
             return myPromise
-            */
+        }
+
 
     },
 
