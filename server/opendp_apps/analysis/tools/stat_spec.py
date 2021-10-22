@@ -535,7 +535,7 @@ class StatSpec:
         Assumes that `self.cl` has passed through the validator: `validate_confidence_level`
         """
         if not self.cl:
-            user_msg = 'Attempted to calculate confidence level (CL) alpha when CL was not set. ("{self.cl}")'
+            user_msg = f'{astatic.ERR_MSG_CL_ALPHA_CL_NOT_SET} ("{self.cl}")'
             self.add_err_msg(user_msg)
             return None
 
@@ -543,7 +543,17 @@ class StatSpec:
             dec_alpha = decimal.Decimal(1 - self.cl).quantize(decimal.Decimal('.01'),
                                                               rounding=decimal.ROUND_DOWN)
         except TypeError as ex_obj:
-            user_msg = 'Failed to calculate confidence level (CL) alpha using CL of "{self.cl}" ({ex_obj})'
+            user_msg = f'{astatic.ERR_MSG_CL_ALPHA_CL_NOT_NUMERIC} "{self.cl}" ({ex_obj})'
+            self.add_err_msg(user_msg)
+            return None
+
+        if dec_alpha > 1:
+            user_msg = f'{astatic.ERR_MSG_CL_ALPHA_CL_GREATER_THAN_1} ("{dec_alpha}")'
+            self.add_err_msg(user_msg)
+            return None
+
+        if dec_alpha < 0:
+            user_msg = f'{astatic.ERR_MSG_CL_ALPHA_CL_LESS_THAN_0} ("{dec_alpha}")'
             self.add_err_msg(user_msg)
             return None
 

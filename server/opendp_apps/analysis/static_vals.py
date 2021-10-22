@@ -5,9 +5,9 @@ CL_90 = 0.90    # just to look at
 CL_95 = 0.95
 CL_99 = 0.99
 
-CL_90test_30_bad_confidence_levels = 1 - CL_90
-CL_95_ALPHA = 1 - CL_95
-CL_99_ALPHA = 1 - CL_99
+CL_90test_30_bad_confidence_levels = 0.10
+CL_95_ALPHA = 0.05
+CL_99_ALPHA = 0.01
 
 CL_CHOICES = (
     (CL_90, '90% CL'),
@@ -64,3 +64,9 @@ ERR_MSG_INVALID_MIN_MAX = 'The "max" must be greater than the "min"'
 
 ERR_IMPUTE_PHRASE_MIN = 'cannot be less than the "min"'
 ERR_IMPUTE_PHRASE_MAX = 'cannot be more than the "max"'
+
+ERR_MSG_CL_ALPHA_CL_NOT_SET = 'Attempted to calculate confidence level (CL) alpha when CL was not set'
+ERR_MSG_CL_ALPHA_CL_NOT_NUMERIC = 'Failed to calculate confidence level (CL) alpha using CL of'
+ERR_MSG_CL_ALPHA_CL_GREATER_THAN_1 = 'Failed to calculate confidence level (CL) alpha. Value was greater than 1'
+ERR_MSG_CL_ALPHA_CL_LESS_THAN_0 = 'Failed to calculate confidence level (CL) alpha. Value was less than 0'
+
