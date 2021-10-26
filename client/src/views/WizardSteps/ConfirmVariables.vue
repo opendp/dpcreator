@@ -61,6 +61,35 @@
             v-on:change="saveUserInput(item)"
         ></v-text-field>
       </template>
+      <template v-slot:[`item.type`]="{ item }">
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+
+            <!--
+                     <ColoredBorderAlert type="warning"
+                                         v-if="item.showMessage && item.type == 'Numerical' && item.additional_information.min !== null">
+                     <template v-slot:content>
+                         Changing the type of the variable will clear the additional information column.
+                        </template>
+                      </ColoredBorderAlert>
+                      -->
+
+            <v-select
+                v-model="item.type"
+                :items="['Numerical', 'Categorical', 'Boolean']"
+                standard
+                hide-selected
+                class="d-inline-block select"
+                dense
+
+                v-on:change="saveUserInput(item)"
+            ></v-select>
+
+          </template>
+          <span>Tooltip</span>
+        </v-tooltip>
+      </template>
+
       <template v-slot:[`item.additional_information`]="{ item: variable }">
         <div v-if="variable.type === 'Categorical'">
           <v-combobox
@@ -203,6 +232,14 @@ export default {
     ...mapState('auth', ['error', 'user']),
     ...mapState('dataset', ['datasetInfo']),
     ...mapGetters('dataset', ['getDepositorSetupInfo']),
+    showMessage: function () {
+      if (this.currentRow !== null) {
+        return this.variables[this.currentRow].additional_information.max !== null
+            && this.variables[this.currentRow].type == 'Numerical'
+      } else {
+        return false;
+      }
+    }
   },
   created: function () {
     if (this.datasetInfo.depositorSetupInfo.variableInfo !== null) {
