@@ -25,7 +25,7 @@ class HistogramStatSpecTest(StatSpecTestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95_ALPHA,
+                      'cl': astatic.CL_95,
                       # 'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': 0,
@@ -66,7 +66,7 @@ class HistogramStatSpecTest(StatSpecTestCase):
                 'dataset_size': 183,
                 'epsilon': 1.0,
                 'delta': 0.0,
-                'ci': astatic.CI_95_ALPHA,
+                'cl': astatic.CL_95,
                 'col_index': 0,
                 'fixed_value': 1,
                 'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
@@ -119,7 +119,7 @@ class HistogramStatSpecTest(StatSpecTestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95_ALPHA,
+                      'cl': astatic.CL_95,
                       # 'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': 5,
@@ -141,9 +141,9 @@ class HistogramStatSpecTest(StatSpecTestCase):
             self.assertTrue(dp_hist.is_chain_valid())
 
         print('   --------')
-        for ci_val in [x[0] for x in astatic.CI_CHOICES]:
-            print(f'> Valid ci val: {ci_val}')
-            spec_props['ci'] = ci_val
+        for cl_val in [x[0] for x in astatic.CL_CHOICES]:
+            print(f'> Valid cl val: {cl_val}')
+            spec_props['cl'] = cl_val
             dp_hist = DPHistogramSpec(spec_props)
             self.assertTrue(dp_hist.is_chain_valid())
 
@@ -154,9 +154,9 @@ class HistogramStatSpecTest(StatSpecTestCase):
             print(f'> Valid dataset_size: {good_ds}')
             self.assertTrue(dp_hist.is_chain_valid())
 
-    def test_30_bad_ci(self):
-        """(30) Bad ci vals"""
-        msgt(self.test_30_bad_ci.__doc__)
+    def test_30_bad_confidence_levels(self):
+        """(30) Bad confidence level values"""
+        msgt(self.test_30_bad_confidence_levels.__doc__)
 
         spec_props = {'variable': 'Subject',
                       'col_index': 0,
@@ -164,7 +164,7 @@ class HistogramStatSpecTest(StatSpecTestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95_ALPHA,
+                      'cl': astatic.CL_95,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': 5,
                       'variable_info': {'min': -8,
@@ -180,9 +180,9 @@ class HistogramStatSpecTest(StatSpecTestCase):
                 yield float(start)
                 start += decimal.Decimal(step)
 
-        for ci_val in list(float_range(-1, 3, '0.1')) + ['alphabet', 'soup']:
+        for cl_val in list(float_range(-1, 3, '0.1')) + ['alphabet', 'soup']:
             # print(f'> Invalid ci val: {ci_val}')
-            spec_props['ci'] = ci_val
+            spec_props['cl'] = cl_val
             dp_hist = DPHistogramSpec(spec_props)
             # print(dp_hist.is_chain_valid())
             self.assertTrue(dp_hist.is_chain_valid())
@@ -197,7 +197,7 @@ class HistogramStatSpecTest(StatSpecTestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95_ALPHA,
+                      'cl': astatic.CL_95,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': 5,
                       'variable_info': {'min': -8,
@@ -246,7 +246,7 @@ class HistogramStatSpecTest(StatSpecTestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95_ALPHA,
+                      'cl': astatic.CL_95,
                       # 'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': 5,
@@ -294,7 +294,7 @@ class HistogramStatSpecTest(StatSpecTestCase):
             'dataset_size': 183,
             'epsilon': 1.0,
             'delta': 0.0,
-            'ci': astatic.CI_95_ALPHA,
+            'cl': astatic.CL_95,
             'fixed_value': 1,
             'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
             'variable_info': {

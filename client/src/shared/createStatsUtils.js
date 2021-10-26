@@ -2,6 +2,17 @@ import Decimal from 'decimal.js';
 import release from "@/api/release";
 
 export const deltaStats = ['Histogram']
+export const CL_99 = "99"
+export const CL_95 = "95"
+export const CL_90 = "90"
+
+export const confLevelOptions = [
+    {text: "99%", value: .99},
+    {text: "95%", value: .95},
+    {text: "90%", value: .90}
+]
+
+
 export default {
     statisticsUseDelta: function (statistics)
         // Only a subset of statistics use delta.
@@ -23,7 +34,7 @@ export default {
         return deltaStats.includes(statistic)
     },
     redistributeValues(statistics, delta, epsilon, defaultDelta) {
-        if (statistics) {
+        if (statistics && statistics.length > 0) {
             if (this.statisticsUseDelta(statistics) && delta == 0) {
                 delta = defaultDelta
             }

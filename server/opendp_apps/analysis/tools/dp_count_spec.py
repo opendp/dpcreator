@@ -28,7 +28,7 @@ class DPCountSpec(StatSpec):
                       statistic=DP_MEAN,
                       dataset_size=365,
                       epsilon=0.5,
-                      ci=CI_95_ALPHA.
+                      cl=CL_95,
                       fixed_value=1)
     """
     def __init__(self, props: dict):
@@ -41,7 +41,7 @@ class DPCountSpec(StatSpec):
         example: ['min', 'max']
         If no additional properties, return []
         """
-        return ['ci_alpha']
+        return ['cl']
 
     def run_01_initial_handling(self):
         """
@@ -120,20 +120,22 @@ class DPCountSpec(StatSpec):
         return preprocessor
 
     def set_accuracy(self):
-        """Return the accuracy measure using Laplace and the confidence interval as alpha"""
+        """Return the accuracy measure using Laplace and the confidence level alpha"""
         if self.has_error():
             return False
 
         if not self.preprocessor:
             self.preprocessor = self.get_preprocessor()
 
-        self.accuracy_val = laplacian_scale_to_accuracy(self.scale, self.ci_alpha)
+        cl_alpha = self.get_confidence_level_alpha()
+        if cl_alpha is None:
+            # Error already saved
+            return False
+        self.accuracy_val = laplacian_scale_to_accuracy(self.scale, cl_alpha)
 
-        self.accuracy_msg = (f"Releasing {self.statistic} for the variable {self.variable}."
-                             f" With at least probability {self.get_ci_text()} the output {self.statistic}"
-                             f" will differ from the true {self.statistic} by at"
-                             f" most {self.accuracy_val} units."
-                             f" Here the units are the same units the variable has in the dataset.")
+        # Note `self.accuracy_val` must bet set before using `self.get_accuracy_text()
+        #
+        self.accuracy_msg = self.get_accuracy_text()
 
         return True
 

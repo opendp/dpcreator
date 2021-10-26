@@ -30,21 +30,6 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         STEP_9300_PROFILING_FAILED = 'error_9300', 'Error 3: Profiling Failed'
         STEP_9400_CREATE_RELEASE_FAILED = 'error_9400', 'Error 4: Create Release Failed'
 
-    """
-    Confidence Interval choices
-    """
-    CI_90_ALPHA = astatic.CI_90_ALPHA
-    CI_95_ALPHA = astatic.CI_95_ALPHA
-    CI_99_ALPHA = astatic.CI_99_ALPHA
-    CI_CHOICES = astatic.CI_CHOICES
-
-    """
-    Often used Delta values
-    """
-    DELTA_0 = 0.0
-    DELTA_10_NEG_5 = 10.0**-5
-    DELTA_10_NEG_6 = 10.0**-6
-    DELTA_10_NEG_7 = 10.0**-7
 
     # User who initially added/uploaded data
     creator = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -84,22 +69,22 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     #
     default_delta = models.FloatField(null=True,
                                       blank=True,
-                                      default=DELTA_0,
+                                      default=astatic.DELTA_0,
                                       help_text='Default based on answers to epsilon_questions.',
                                       validators=[validate_not_negative])
 
     delta = models.FloatField(null=True,
                               blank=True,
-                              default=DELTA_0,
+                              default=astatic.DELTA_0,
                               help_text=('Used for OpenDP operations, starts as the "default_delta"'
                                          ' value but may be overridden by the user.'),
                               validators=[validate_not_negative])
 
-    confidence_interval = models.FloatField(\
-                            choices=CI_CHOICES,
-                            default=CI_95_ALPHA,
-                            help_text=('Used for OpenDP operations, starts as the "default_delta"'
-                                       ' value but may be overridden by the user.'))
+    confidence_level = models.FloatField(\
+                              choices=astatic.CL_CHOICES,
+                              default=astatic.CL_95,
+                              help_text=('Used for OpenDP operations, starts as the "default_delta"'
+                                         ' value but may be overridden by the user.'))
 
 
     class Meta:

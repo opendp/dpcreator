@@ -24,7 +24,7 @@ class DPCountStatSpecTest(StatSpecTestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_99_ALPHA,
+                      'cl': astatic.CL_99,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '182',
                       'variable_info': {'min': -8,
@@ -75,7 +75,7 @@ class DPCountStatSpecTest(StatSpecTestCase):
                       'dataset_size': 10_000,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95_ALPHA,
+                      'cl': astatic.CL_95,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '44',
                       'variable_info': {'min': 18,
@@ -110,6 +110,8 @@ class DPCountStatSpecTest(StatSpecTestCase):
 
         self.assertFalse(dp_count.has_error())
 
+        import json
+        print(json.dumps(dp_count.get_release_dict(), indent=4))
         # val from local machine: 2.9957322850627124
         self.assertTrue(dp_count.accuracy_val > 2.995)
         self.assertTrue(dp_count.accuracy_val < 2.996)

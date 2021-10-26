@@ -19,7 +19,7 @@ class DPHistogramSpec(StatSpec):
                       statistic=DP_HISTOGRAM,
                       dataset_size=365,
                       epsilon=0.5,
-                      ci=CI_95.
+                      cl=CL_95,
                       fixed_value=1)
     """
     def __init__(self, props: dict):

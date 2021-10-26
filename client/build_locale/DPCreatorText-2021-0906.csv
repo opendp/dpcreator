@@ -66,11 +66,11 @@ generate DP,generate status,"(Include a summary of the statistics being requeste
 more information,title,DP Creator Concepts,
 more information,epsilon title,More Information on Epsilon,
 more information,delta title,More Information on Delta,
-more information,confidence title,More Information on Significance Level,
+more information,confidence title,More Information on Confidence Level,
 more information,epsilon text,More information epsilon text,
 more information,delta text,More information delta text,
 more information,differential privacy title,Differential Privacy,
 more information,differential privacy text,Explanatory text for differential privacy,
 more information,registered dataverses title,Registered Dataverses,
 more information,registered dataverses text,Here is a list of Registered dataverses
-more information,confidence text,More information significance text,ç
+more information,confidence text,More information confidence level text,

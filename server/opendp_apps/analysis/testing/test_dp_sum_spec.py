@@ -24,7 +24,7 @@ class DPSumStatSpecTest(StatSpecTestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_99_ALPHA,
+                      'cl': astatic.CL_95,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '0',
                       'variable_info': {'min': -8,
@@ -60,7 +60,11 @@ class DPSumStatSpecTest(StatSpecTestCase):
         self.assertFalse(dp_sum.has_error())
 
         # Actual sum -173.920535743
-        self.assertTrue(dp_sum.value > -200) # should be well within range
+        self.assertTrue(dp_sum.value > -250) # should be well within range
+
+        # import json
+        # print(json.dumps(dp_sum.get_release_dict(), indent=4))
+
 
     def test_20_sum_valid_spec(self):
         """(20) Run DP Sum valid spec, string column"""
@@ -72,7 +76,7 @@ class DPSumStatSpecTest(StatSpecTestCase):
                       'dataset_size': 10_000,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95_ALPHA,
+                      'cl': astatic.CL_95,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '44',
                       'variable_info': {'min': 18,
