@@ -62,32 +62,31 @@
         ></v-text-field>
       </template>
       <template v-slot:[`item.type`]="{ item }">
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-
-            <!--
-                     <ColoredBorderAlert type="warning"
-                                         v-if="item.showMessage && item.type == 'Numerical' && item.additional_information.min !== null">
-                     <template v-slot:content>
-                         Changing the type of the variable will clear the additional information column.
-                        </template>
-                      </ColoredBorderAlert>
-                      -->
-
             <v-select
+                v-if="showToolTip(item)"
                 v-model="item.type"
                 :items="['Numerical', 'Categorical', 'Boolean']"
                 standard
+                v-tooltip="'Changing type will clear additional info.'"
                 hide-selected
                 class="d-inline-block select"
+                v-on:click="currentRow=item.index"
+                v-on:hover="currentRow=item.index"
                 dense
-
                 v-on:change="saveUserInput(item)"
             ></v-select>
-
-          </template>
-          <span>Tooltip</span>
-        </v-tooltip>
+        <v-select
+            v-else
+            v-model="item.type"
+            :items="['Numerical', 'Categorical', 'Boolean']"
+            standard
+            hide-selected
+            class="d-inline-block select"
+            v-on:click="currentRow=item.index"
+            v-on:hover="currentRow=item.index"
+            dense
+            v-on:change="saveUserInput(item)"
+        ></v-select>
       </template>
 
       <template v-slot:[`item.additional_information`]="{ item: variable }">
@@ -122,6 +121,7 @@
               class="text-center py-0"
               :rules="[checkMin]"
               :data-test="variable.label+':min'"
+
               v-on:click="currentRow=variable.index"
               v-on:change="saveUserInput(variable)"
           ></v-text-field>
@@ -280,6 +280,10 @@ export default {
         }
       }
       return true
+    },
+    showToolTip(item) {
+      console.log('isNumeric ' + item.type)
+      return item.type == 'Numerical' && (item.additional_information.max !== null || item.additional_information.min !== null)
     },
     isValidRow(variable) {
       let minmaxValid = true
