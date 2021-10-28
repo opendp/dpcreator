@@ -338,14 +338,6 @@ export default {
     ...mapState('auth', ['error', 'user']),
     ...mapState('dataset', ['datasetInfo']),
     ...mapGetters('dataset', ['getDepositorSetupInfo']),
-    showMessage: function () {
-      if (this.currentRow !== null) {
-        return this.variables[this.currentRow].additional_information.max !== null
-            && this.variables[this.currentRow].type == 'Numerical'
-      } else {
-        return false;
-      }
-    }
   },
   created: function () {
     if (this.datasetInfo.depositorSetupInfo.variableInfo !== null) {
