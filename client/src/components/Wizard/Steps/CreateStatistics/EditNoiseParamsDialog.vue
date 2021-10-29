@@ -35,9 +35,10 @@
             class="borderBottom soft_primary grey--text text--darken-2 pa-3 my-5 top-borders-radius noise-params d-flex justify-space-between width50"
         >
           <span>Epsilon (&epsilon;)</span>
-          <input
+          <v-text-field
               class="text-right font-weight-bold"
               type="number"
+              data-test="editEpsilonInput"
               v-model="editEpsilon"
           />
         </div>
@@ -48,7 +49,7 @@
             class="borderBottom soft_primary grey--text text--darken-2 pa-3 my-5 top-borders-radius noise-params d-flex justify-space-between width50"
         >
           <span>Delta (x)</span>
-          <input
+          <v-text-field
               class="text-right font-weight-bold"
               type="number"
               v-model="editDelta"
@@ -92,6 +93,7 @@
             outlined
             classes="px-5"
             :click="handleCancelEditNoiseParamsDialog"
+            data-test="editParamsCancel"
             label="Cancel"
         />
       </v-card-actions>
@@ -145,6 +147,18 @@ export default {
     };
   },
   props: ["dialogEditNoiseParams", "epsilon", "delta", "confidenceLevel"],
+  // There is a l
+  watch: {
+    editEpsilon: function (newEpsilon, oldEpsilon) {
+      console.log("EDIT EPSILON: newEditEpsilon: " + newEpsilon + ", oldEditEpsilon: " + oldEpsilon)
+      //  this.editEpsilon = newEpsilon
+    },
+    epsilon: function (newEpsilon, oldEpsilon) {
+      this.editEpsilon = newEpsilon
+      console.log("EPSILON: newEpsilon: " + newEpsilon + ", oldEpsilon: " + oldEpsilon)
+      //  this.editEpsilon = newEpsilon
+    },
+  },
   methods: {
     handleCancelEditNoiseParamsDialog() {
       this.editEpsilon = this.epsilon;
@@ -153,8 +167,6 @@ export default {
       this.$emit("update:dialogEditNoiseParams", false);
     },
     handleSaveEditNoiseParamsDialog() {
-      //  console.log("saving noise params, cl: " + JSON.stringify(this.editConfidenceLevel))
-      //  console.log("saving noise params, epsilon: " + this.epsilon+ ","+ this.editEpsilon)
       this.$emit(
           "noiseParamsUpdated",
           this.editEpsilon,

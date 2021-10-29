@@ -165,6 +165,12 @@ Cypress.Commands.add('testMean', (numericVar) => {
 
     // On the statistics page,
     cy.get('h1').should('contain', 'Create the statistics').should('be.visible')
+    cy.get('[data-test="editConfidenceIcon"]').click({force: true});
+    cy.get('h2').should('contain', 'Are you sure you want to proceed?').should('be.visible')
+    cy.get('[data-test="confirmButton"]').click({force: true});
+
+    cy.get('[data-test="editEpsilonInput"]').should('have.value', 1)
+    cy.get('[data-test="editParamsCancel"]').click({force: true});
 
 
     // Test Validating EyeHeight mean
