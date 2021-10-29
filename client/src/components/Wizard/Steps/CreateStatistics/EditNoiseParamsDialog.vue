@@ -147,16 +147,18 @@ export default {
     };
   },
   props: ["dialogEditNoiseParams", "epsilon", "delta", "confidenceLevel"],
-  // There is a l
+  // Sometimes the properties are updated
+  // after the data has been initialized. (Because the component is created on the first navigation to the Wizard)
+  // To handle this add a watch for updated property values)
   watch: {
-    editEpsilon: function (newEpsilon, oldEpsilon) {
-      console.log("EDIT EPSILON: newEditEpsilon: " + newEpsilon + ", oldEditEpsilon: " + oldEpsilon)
-      //  this.editEpsilon = newEpsilon
+    epsilon: function (newVal) {
+      this.editEpsilon = newVal
     },
-    epsilon: function (newEpsilon, oldEpsilon) {
-      this.editEpsilon = newEpsilon
-      console.log("EPSILON: newEpsilon: " + newEpsilon + ", oldEpsilon: " + oldEpsilon)
-      //  this.editEpsilon = newEpsilon
+    delta: function (newVal) {
+      this.editDelta = newVal
+    },
+    confidenceLevel: function (newVal) {
+      this.editConfidenceLevel = newVal
     },
   },
   methods: {

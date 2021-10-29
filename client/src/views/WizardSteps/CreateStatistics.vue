@@ -120,21 +120,10 @@ export default {
       return this.editedIndex > -1;
     }
   },
-  created() {
-    this.initializeForm()
-  },
   watch: {
     statistics: function (newStatisticsArray) {
       this.$emit("stepCompleted", 3, newStatisticsArray.length !== 0);
     },
-    stepperPosition: function (val, oldVal) {
-      // If the wizard has landed on the CreateStatistics Step,
-      // initialize the form with data from Vuex store
-      if (val === 3) {
-        this.initializeForm()
-      }
-    }
-
   },
   data: () => ({
     epsilon: null,
@@ -171,6 +160,7 @@ export default {
   }),
   methods: {
     initializeForm() {
+      console.log('begin initialize form')
       if (this.analysisPlan !== null && this.analysisPlan.dpStatistics !== null) {
         // make a deep copy of the Vuex state so it can be edited locally
         this.statistics = JSON.parse(JSON.stringify(this.analysisPlan.dpStatistics))
@@ -182,7 +172,7 @@ export default {
       } else {
         this.epsilon = this.getDepositorSetupInfo.epsilon
       }
-    //  console.log("initialize form, epsilon = "+ this.epsilon)
+      console.log("initialize form, epsilon = " + this.epsilon)
       if (this.getDepositorSetupInfo.confidenceLevel == null) {
         this.confidenceLevel = .99
       } else {
@@ -196,11 +186,10 @@ export default {
       } else {
         this.delta = this.getDepositorSetupInfo.delta
       }
-
+      console.log('end initialize form')
     },
 
     handleOpenEditNoiseParamsDialog() {
-      //   console.log("opening dialog, epsilon = " + this.epsilon)
       this.dialogEditNoiseParamsConfirmation = false;
       this.dialogEditNoiseParams = true;
     },

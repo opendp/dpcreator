@@ -286,6 +286,9 @@ export default {
         },
         defaultEpsilon: this.defaultEpsilon,
         defaultDelta: this.defaultDDelta,
+        // Have to set the actual epsilon, not just the default
+        // in order to complete the depositor setup (which happens before
+        // the Create Statistics page.)
         epsilon: this.defaultEpsilon,
         delta: this.defaultDDelta
       }
