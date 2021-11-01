@@ -118,10 +118,19 @@
 import Button from "../components/DesignSystem/Button.vue";
 import EventSuccessAlert from "../components/Home/EventSuccessAlert.vue";
 import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
+import {mapState} from "vuex";
 
 export default {
   name: "MyProfile",
   components: {Button, EventSuccessAlert},
+  computed: {
+    ...mapState('auth', ['user']),
+  },
+  created: function () {
+    console.log("My Profile CREATED")
+    this.username = this.user.username
+    this.email = this.user.email
+  },
   methods: {
     confirmNewPasswordRules() {
       return (
