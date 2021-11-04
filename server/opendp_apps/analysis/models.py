@@ -128,7 +128,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         # This ensures that `is_complete` gets added to update_fields or else the process cannot proceed
         # from the frontend
         if self.variable_info and self.epsilon \
-            and self.user_step == self.DepositorSteps.STEP_0600_EPSILON_SET:
+                and self.user_step == self.DepositorSteps.STEP_0600_EPSILON_SET:
             self.is_complete = True
         else:
             self.is_complete = False

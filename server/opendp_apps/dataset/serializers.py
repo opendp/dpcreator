@@ -1,6 +1,5 @@
-from datetime import datetime
-
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.serializers import raise_errors_on_nested_writes
 from rest_framework.utils import model_meta
@@ -102,7 +101,19 @@ class DepositorSetupInfoSerializer(serializers.ModelSerializer):
                 field.set(value)
             else:
                 setattr(instance, attr, value)
+        # if instance.variable_info and instance.epsilon \
+        #         and instance.user_step == instance.DepositorSteps.STEP_0600_EPSILON_SET:
+        #     instance.is_complete = True
+        # else:
+        #     instance.is_complete = False
 
+        # This needs to be added to tell the save method to update the value.
+        update_fields.append('is_complete')
+
+        # Specifically for this model, we are overriding the update method with an explicit list of
+        # update_fields, so we need to set the updated field manually.
+        # All other models will be updated without this step due to the auto_now option from the parent class.
+        instance.updated = timezone.now()
         instance.save(update_fields=update_fields)
 
         return instance
