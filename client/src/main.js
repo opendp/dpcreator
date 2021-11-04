@@ -6,8 +6,9 @@ import axios from 'axios'
 import GSignInButton from 'vue-google-signin-button'
 import vuetify from "./plugins/vuetify";
 import JsonViewer from 'vue-json-viewer'
+import VTooltip from 'v-tooltip'
 
-
+Vue.use(VTooltip)
 Vue.use(JsonViewer)
 Vue.config.productionTip = false;
 Vue.use(GSignInButton)
