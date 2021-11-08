@@ -2,16 +2,33 @@ import session from './session';
 const camelcaseKeys = require('camelcase-keys');
 
 export default {
-  login(username, password) {
-    return session.post('/rest-auth/login/', {username, password})
-        .then(data => camelcaseKeys(data, {deep: true}))
-        .catch(function (data) {
-          if (data.response) {
-            if (data.response.status == 400) {
-              return Promise.reject(data.response.data);
-            }
-          } else if (data.request) {
-            // The request was made but no response was received
+    changePassword(old_password, new_password1, new_password2) {
+        session.post('/rest-auth/password/change/', {new_password1, new_password2, old_password})
+            .catch(function (data) {
+                if (data.response) {
+                    if (data.response.status == 400) {
+                        return Promise.reject(data.response.data);
+                    }
+                } else if (data.request) {
+                    // The request was made but no response was received
+                    console.log('no response' + data.request);
+                } else {
+                    // Something happened in setting up the request that triggered an Error
+                    console.log('Error', data.message);
+                }
+
+            })
+    },
+    login(username, password) {
+        return session.post('/rest-auth/login/', {username, password})
+            .then(data => camelcaseKeys(data, {deep: true}))
+            .catch(function (data) {
+                if (data.response) {
+                    if (data.response.status == 400) {
+                        return Promise.reject(data.response.data);
+                    }
+                } else if (data.request) {
+                    // The request was made but no response was received
             console.log('no response' + data.request);
           } else {
             // Something happened in setting up the request that triggered an Error

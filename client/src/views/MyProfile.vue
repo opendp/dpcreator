@@ -119,6 +119,7 @@ import Button from "../components/DesignSystem/Button.vue";
 import EventSuccessAlert from "../components/Home/EventSuccessAlert.vue";
 import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
 import {mapState} from "vuex";
+import auth from '../api/auth';
 
 export default {
   name: "MyProfile",
@@ -127,7 +128,6 @@ export default {
     ...mapState('auth', ['user']),
   },
   created: function () {
-    console.log("My Profile CREATED")
     this.username = this.user.username
     this.email = this.user.email
   },
@@ -144,10 +144,15 @@ export default {
       this.$router.go();
     },
     handleChangePassword() {
-      //TODO: Implement Change Password Handler
-      alert("change password form submitted!");
-      this.$router.push(`${NETWORK_CONSTANTS.MY_PROFILE.PATH}?saved=true`);
-      this.$router.go();
+      auth.changePassword(this.password, this.newPassword, this.confirmNewPassword)
+          .then(() => {
+                this.password = "",
+                    this.newPassword = "",
+                    this.confirmNewPassword = "",
+                    this.$router.push(`${NETWORK_CONSTANTS.MY_PROFILE.PATH}?saved=true`);
+              }
+          )
+
     }
   },
 
