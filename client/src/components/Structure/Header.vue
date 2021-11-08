@@ -197,7 +197,9 @@ export default {
     logoutHandler() {
       this.$store.dispatch('auth/logout')
       this.$store.dispatch('dataset/clearDatasetStorage')
-      this.$router.push(NETWORK_CONSTANTS.HOME.PATH);
+      if (this.$router.currentRoute.path != NETWORK_CONSTANTS.HOME.PATH) {
+        this.$router.push(NETWORK_CONSTANTS.HOME.PATH);
+      }
     }
   }
 };

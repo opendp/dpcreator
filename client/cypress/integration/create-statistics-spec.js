@@ -13,7 +13,21 @@
 
         })
         afterEach(() => cy.logout())
+        it('Populates Edit Noise Param Dialog', () => {
+            cy.on('uncaught:exception', (e, runnable) => {
+                console.log('error', e)
+                console.log('runnable', runnable)
+                return false
+            })
+            cy.get('h1').should('contain', 'Create the statistics')
+            cy.get('[data-test="editConfidenceIcon"]').click({force: true});
+            cy.get('h2').should('contain', 'Are you sure you want to proceed?').should('be.visible')
+            cy.get('[data-test="confirmButton"]').click({force: true});
 
+            cy.get('[data-test="editEpsilonInput"]').should('have.value', 1)
+            cy.get('[data-test="editParamsCancel"]').click({force: true});
+
+        })
         it('Goes to the correct wizard step', () => {
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)

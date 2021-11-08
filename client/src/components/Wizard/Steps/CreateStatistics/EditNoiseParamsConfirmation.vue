@@ -22,6 +22,7 @@
         <Button
             color="primary"
             classes="mr-2 px-5"
+            data-test="confirmButton"
             :click="() => $emit('confirm')"
             label="Yes"
         />
