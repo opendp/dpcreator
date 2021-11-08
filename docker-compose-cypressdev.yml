@@ -46,6 +46,10 @@ services:
     build: "./server"
     # For production we will need to set
     # these variables to point to a standalone instance
+    #
+    # !Note: "opendp_project.settings.cypress_settings" below should never be used for actual deployment.
+    #        They include an administrative API endpoint which can "clear" the database.
+    #
     environment:
       - DJANGO_SETTINGS_MODULE=opendp_project.settings.cypress_settings
     env_file:
