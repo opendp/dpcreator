@@ -4,10 +4,12 @@ import json
 from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.db.models.loading import get_model
 from django.conf import settings
 from django_cryptography.fields import encrypt
 
 from polymorphic.models import PolymorphicModel
+
 
 from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.dataverses.models import RegisteredDataverse
@@ -229,6 +231,10 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         except json.JSONDecodeError:
             return None
 
+    def is_dataverse_dataset(self):
+        """Shortcut to check if it's a Dataverse dataset"""
+        return self.source == DataSetInfo.SourceChoices.Dataverse
+
 
 class DataverseFileInfo(DataSetInfo):
     """
@@ -303,6 +309,14 @@ class DataverseFileInfo(DataSetInfo):
 
         return info
 
+    def get_dataverse_user(self):
+        """Convenience method to retrieve the Dataverse User associated with this dataset"""
+
+        dv_user_model = get_model('user', 'DataverseUser')
+        try:
+            return dv_user_model.get(user=self.creator, dv_installation=self.dv_installation)
+        except dv_user_model.DoesNotExist:
+            return None
 
 
 class UploadFileInfo(DataSetInfo):

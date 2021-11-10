@@ -70,3 +70,7 @@ ERR_MSG_CL_ALPHA_CL_NOT_NUMERIC = 'Failed to calculate confidence level (CL) alp
 ERR_MSG_CL_ALPHA_CL_GREATER_THAN_1 = 'Failed to calculate confidence level (CL) alpha. Value was greater than 1'
 ERR_MSG_CL_ALPHA_CL_LESS_THAN_0 = 'Failed to calculate confidence level (CL) alpha. Value was less than 0'
 
+ERR_MSG_DEPOSIT_NO_JSON_FILE = 'A JSON file is not avilable for deposit.'
+ERR_MSG_DEPOSIT_NO_PDF_FILE = 'A PDF file is not avilable for deposit.'
+ERR_MSG_DEPOSIT_NOT_DATAVERSE = 'Deposit functionality is not available for a non-Dataverse file'
+ERR_MSG_DEPOSIT_NO_DV_USER = 'The Datavese user could not be for this release.'

@@ -161,12 +161,23 @@ class ReleaseInfo(TimestampedModelWithUUID):
                                    upload_to='release-files/%Y/%m/%d/',
                                    blank=True, null=True)
 
+    dataverse_deposit_complete = models.BooleanField(default=False,
+                                                     help_text='Only applies to Dataverse datasets')
     #pdf_release
 
     class Meta:
         verbose_name = 'Release Information'
         verbose_name_plural = 'Release Information'
         ordering = ('dataset', '-created')
+
+
+    def save(self, *args, **kwargs):
+        """Error check the dataverse_deposit_complete flag"""
+        if not self.dataset.is_dataverse_dataset(): # can never be True
+            self.dataverse_deposit_complete = False
+
+        super(ReleaseInfo, self).save(*args, **kwargs)
+
 
 
 class AnalysisPlan(TimestampedModelWithUUID):
