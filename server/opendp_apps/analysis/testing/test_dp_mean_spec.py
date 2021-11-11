@@ -380,32 +380,3 @@ class DPMeanStatSpecTest(StatSpecTestCase):
         self.assertIn('description', final_dict)
         self.assertIn('text', final_dict['description'])
         self.assertIn('html', final_dict['description'])
-
-"""
-# from ./dpcreator/server directory
-
-import os
-from raven_preprocess.preprocess_runner import PreprocessRunner
-
-fnames =  ['PUMS5extract1000.csv', 'PUMS5extract10000.csv', 
-           'Fatigue_data.tab', 'gking-crisis.tab',
-           'teacher_climate_survey_lwd.csv', 'fearonLaitin.csv']
-for fname in fnames:
-    fpath = join(os.getcwd(), 'test_data', fname)
-    run_info = PreprocessRunner.load_from_file(fpath)
-    if not run_info.success:
-        print(run_info.err_msg)
-    else:
-        runner = run_info.result_obj
-        fname_base = fname.split('.')[0]
-        out_path = join(os.getcwd(), 'test_data', 
-                        'non_dp_debug_info', f'info_{fname_base}.json')
-        open(out_path, 'w').write(runner.get_final_json(indent=4))
-        print('file written: ', out_path)
-
-    # show the JSON (string)
-    print(runner.get_final_json(indent=4))
-    
-    metadata = runner.get_final_dict()
-    print(metadata['variables']['EyeHeight']
-"""

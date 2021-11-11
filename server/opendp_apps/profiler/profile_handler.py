@@ -6,7 +6,6 @@ import pandas as pd
 
 from django.conf import settings
 
-from raven_preprocess.preprocess_runner import PreprocessRunner
 
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
@@ -14,6 +13,7 @@ from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.dataset import static_vals as dstatic
+from opendp_apps.profiler.preprocess_runner import PreprocessRunner
 from opendp_apps.profiler.profile_formatter import ProfileFormatter
 from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
 

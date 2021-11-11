@@ -1,6 +1,6 @@
 """
 Convenience methods to format the output of the PreprocessRunner
-    (e.g. from raven_preprocess.preprocess_runner import PreprocessRunner)
+    (e.g. from .preprocess_runner import PreprocessRunner)
 
 """
 from collections import OrderedDict
