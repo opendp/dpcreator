@@ -45,4 +45,5 @@ class DatasetLevelInfo(object):
             self.error_messages.append(" This is an empty dataframe with no variables")
             return
 
+        self.final_output[DATASET_ROW_CNT] = self.rows_count
         self.final_output[DATASET_VARIABLE_CNT] = self.variables_count
