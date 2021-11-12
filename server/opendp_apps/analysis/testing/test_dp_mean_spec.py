@@ -2,14 +2,12 @@ import json
 import decimal
 
 from os.path import abspath, dirname, isfile, join
-from unittest import skip
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
 from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
-from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.utils.extra_validators import *
 
