@@ -41,8 +41,6 @@ class DataverseUser(TimestampedModelWithUUID):
     last_name = models.CharField(max_length=255, blank=True)
 
     dv_general_token = encrypt(models.CharField(max_length=255, blank=True))
-    dv_sensitive_token = encrypt(models.CharField(max_length=255, blank=True))
-    dv_token_update = models.DateTimeField(null=True)
 
     class Meta:
         verbose_name = 'Dataverse User'

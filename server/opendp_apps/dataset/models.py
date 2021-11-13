@@ -3,9 +3,9 @@ import json
 
 from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db import models
-from django.db.models.loading import get_model
+from django.apps import apps
 from django.conf import settings
+from django.db import models
 from django_cryptography.fields import encrypt
 
 from polymorphic.models import PolymorphicModel
@@ -312,7 +312,7 @@ class DataverseFileInfo(DataSetInfo):
     def get_dataverse_user(self):
         """Convenience method to retrieve the Dataverse User associated with this dataset"""
 
-        dv_user_model = get_model('user', 'DataverseUser')
+        dv_user_model = apps.get_model(app_label='user', model_name='DataverseUser')
         try:
             return dv_user_model.get(user=self.creator, dv_installation=self.dv_installation)
         except dv_user_model.DoesNotExist:

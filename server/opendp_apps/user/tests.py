@@ -25,9 +25,7 @@ class TestUserSerializer(TestCase):
             'email': 'test@test.com',
             'first_name': 'test',
             'last_name': 'test',
-            'dv_general_token': '1234',
-            'dv_sensitive_token': '1234',
-            'dv_token_update': '1234'
+            'dv_general_token': '1234'
         }
         user = OpenDPUserSerializer(data=data)
         is_valid = user.is_valid()
