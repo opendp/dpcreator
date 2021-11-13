@@ -71,4 +71,17 @@ class DataverseDepositUtil(BasicErrCheck):
         if self.has_error():
             return
 
+
+
         # https://guides.dataverse.org/en/latest/developers/aux-file-support.html
+        """
+        export API_TOKEN=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+        export FILENAME='auxfile.txt'
+        export FILE_ID='12345'
+        export FORMAT_TAG='dpJson'
+        export FORMAT_VERSION='v1'
+        export TYPE='DP'
+        export SERVER_URL=https://demo.dataverse.org
+        
+        curl -H X-Dataverse-key:$API_TOKEN -X POST -F "file=@$FILENAME" -F 'origin=myApp' -F 'isPublic=true' -F "type=$TYPE" "$SERVER_URL/api/access/datafile/$FILE_ID/auxiliary/$FORMAT_TAG/$FORMAT_VERSION"
+        """
