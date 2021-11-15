@@ -7,7 +7,7 @@
                 return false
             })
             cy.clearData()
-            cy.createMockDataset('mockDV.json')
+            cy.createMockDataset('EyeDemoMockDV.json')
             cy.fixture('variables').then((varsFixture) => {
                 cy.goToConfirmVariables(varsFixture)
 
