@@ -1,0 +1,32 @@
+import pandas as pd
+
+from os.path import abspath, dirname, join
+
+from django.test import TestCase
+
+from opendp_apps.profiler.variable_info import VariableInfoHandler
+
+CURRENT_DIR = dirname(abspath(__file__))
+TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
+
+
+class TestVariableInfoHandler(TestCase):
+    maxDiff = None
+
+    def setUp(self) -> None:
+        self.df = pd.read_csv(join(TEST_DATA_DIR, 'Fatigue_data.tab'), delimiter='\t')
+
+    def test_run_profile_process(self):
+        variable_info_handler = VariableInfoHandler(self.df)
+        profile = variable_info_handler.run_profile_process()
+        self.assertEqual(profile['rowCount'], 183)
+        self.assertEqual(profile['variableCount'], 24)
+        self.assertEqual(len(profile['variableOrder']), 24)
+        self.assertEqual(len(profile['variables']), 24)
+        last_variable = profile['variables'][-1]
+        self.assertDictEqual(last_variable['lrPupilCorrelation'], {'label': '',
+                                                                   'max': 0.987012535,
+                                                                   'min': 0.768410701,
+                                                                   'name': 'lrPupilCorrelation',
+                                                                   'type': 'float64'
+                                                                   })
