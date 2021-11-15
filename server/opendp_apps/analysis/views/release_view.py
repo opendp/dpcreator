@@ -71,7 +71,11 @@ class ReleaseView(viewsets.ViewSet):
         #
         analysis_plan_id = serializer.get_object_id()
 
-        validate_util = ValidateReleaseUtil.compute_mode(request.user, analysis_plan_id)
+        # For longer releases, Async this!!
+        # Async: the validate_util process!
+        validate_util = ValidateReleaseUtil.compute_mode(request.user,
+                                                         analysis_plan_id,
+                                                         run_dataverse_deposit=True)
         if validate_util.has_error():
             # This is a big error, check for it before evaluating individual statistics
             #

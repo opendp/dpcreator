@@ -218,8 +218,10 @@ class ValidateReleaseUtil(BasicErrCheck):
         if deposit_util.has_error():
             self.add_err_msg(deposit_util.get_err_msg())
             return
-
-        print('ValidateReleaseUtil: Deposit complete!')
+        else:
+            self.analysis_plan.user_step = AnalysisPlan.AnalystSteps.STEP_1200_PROCESS_COMPLETE
+            self.analysis_plan.save()
+            print('ValidateReleaseUtil: Deposit complete!')
 
 
 
@@ -262,7 +264,7 @@ class ValidateReleaseUtil(BasicErrCheck):
         # (5) Attach the ReleaseInfo to the AnalysisPlan, AnalysisPlan.release_info
         #
         self.analysis_plan.release_info = self.release_info
-        self.analysis_plan.user_step = AnalysisPlan.AnalystSteps.STEP_1200_PROCESS_COMPLETE
+        self.analysis_plan.user_step = AnalysisPlan.AnalystSteps.STEP_1000_RELEASE_COMPLETE
         self.analysis_plan.save()
         # print('ValidateReleaseUtil - self.release_stats', json.dumps(self.release_stats, indent=4))
 

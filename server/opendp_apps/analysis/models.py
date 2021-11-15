@@ -221,7 +221,11 @@ class AnalysisPlan(TimestampedModelWithUUID):
     #custom_variables = models.JSONField(null=True)
     dp_statistics = models.JSONField(null=True)
 
-    release_info = models.ForeignKey(ReleaseInfo, on_delete=models.PROTECT, null=True, blank=True)
+    release_info = models.ForeignKey(ReleaseInfo,
+                                     on_delete=models.SET_NULL,
+                                     # on_delete=models.PROTECT,
+                                     null=True,
+                                     blank=True)
 
     def __str__(self):
         return f'{self.dataset} - {self.user_step}'
@@ -242,6 +246,11 @@ class AnalysisPlan(TimestampedModelWithUUID):
         #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
         #       depending on the data
         #
+        if self.user_step == self.AnalystSteps.STEP_1200_PROCESS_COMPLETE:
+            self.is_complete = True
+        else:
+            self.is_complete = False
+
         super(AnalysisPlan, self).save(*args, **kwargs)
 
 

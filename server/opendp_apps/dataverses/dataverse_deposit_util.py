@@ -109,6 +109,8 @@ class DataverseDepositUtil(BasicErrCheck):
 
         format_version = 'v1'   # hardcoded for now..
 
+        num_deposits = 0
+        expected_num_deposits = 0
         for file_info in file_info_list:
 
             dv_url = (f'{self.dv_dataset.dv_installation.dataverse_url}'
@@ -125,6 +127,10 @@ class DataverseDepositUtil(BasicErrCheck):
             # Assuming actual filepath for initial pass;
             #   For azure/s3 update: https://github.com/jschneier/django-storages/tree/master/storages/backends
             file_field = file_info["file_field"]
+            if not file_field:
+                # file not available to deposit!
+                continue
+            expected_num_deposits += 1
 
             files = {'file': open(file_field.path, 'rb')}
 
@@ -143,6 +149,10 @@ class DataverseDepositUtil(BasicErrCheck):
             if response.status_code == status.HTTP_200_OK:
                 file_info["complete_field"] = True
                 self.release_info.save()
+                num_deposits += 1
             else:
                 self.add_err_msg(dv_static.ERR_MSG_JSON_DEPOSIT_FAILED)
 
+        if num_deposits == 0:
+            self.add_err_msg((f'No files were deposited. (Expected: '
+                              f'{expected_num_deposits} deposit(s)'))

@@ -13,6 +13,14 @@ from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadHandler
 
 
+def build_test_data():
+    """
+    Semi-manual run here to create a ReleaseInfo object and
+    DataverseUser based on an existing dummy DataverseFileInfo object
+    """
+    df = DataverseFileInfo.objects(pk=)
+
+
 def test_dv_depositor(release_id):
     """Test profiler with file"""
 
