@@ -157,9 +157,11 @@ class TestRunRelease(TestCase):
 
         # Check the basics
         #
-        release_util = ValidateReleaseUtil.compute_mode(
+        release_util = ValidateReleaseUtil.compute_mode(\
             self.user_obj,
-            analysis_plan.object_id)
+            analysis_plan.object_id,
+            run_dataverse_deposit=False)
+
         if release_util.has_error():
             print('release_util:', release_util.get_err_msg())
         self.assertFalse(release_util.has_error())

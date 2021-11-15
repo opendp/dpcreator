@@ -50,3 +50,17 @@ DV_LAST_NAME = 'lastName'
 # ----------------------------------
 KEY_DP_USER_ID = 'user_id' # OpenDPUser.object_id
 KEY_DV_HANDOFF_ID = 'dataverse_handoff_id'  # DataverseHandoff.object_id
+
+DV_DEPOSIT_TYPE_DP_JSON = 'dpJSON'
+DV_DEPOSIT_TYPE_DP_PDF = 'dpPDF'
+
+# ----------------------------------
+# Error messages
+# ----------------------------------
+ERR_MSG_DEPOSIT_NO_DV_DATASET_INFO = 'This is not a Dataverse dataset'
+
+ERR_MSG_JSON_DEPOSIT_ALREADY_COMPLETE = 'JSON deposit already complete'
+ERR_MSG_PDF_DEPOSIT_ALREADY_COMPLETE = 'PDF deposit already complete'
+
+ERR_MSG_JSON_DEPOSIT_FAILED = 'JSON deposit failed'
+ERR_MSG_PDF_DEPOSIT_FAILED = 'PDF deposit failed'

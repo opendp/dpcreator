@@ -320,6 +320,11 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
 
+# ------------------------------------------------------
+# Application name for deposit use
+# ------------------------------------------------------
+DP_CREATOR_APP_NAME = os.environ.get('DP_CREATOR_APP_NAME', 'DP Creator (test)')
+
 # ---------------------------
 # Cookies
 # ---------------------------

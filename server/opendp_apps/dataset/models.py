@@ -235,6 +235,22 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         """Shortcut to check if it's a Dataverse dataset"""
         return self.source == DataSetInfo.SourceChoices.Dataverse
 
+    def get_dataverse_user(self):
+        """
+        Check if this is a Dataverse dataset, if so return the DataverseUser
+        """
+        if self.is_dataverse_dataset():
+            return self.dataversefileinfo.get_dataverse_user()
+        return None
+
+    def get_dataverse_file_info(self):
+        """
+        Check if this is a Dataverse dataset, if so return the DataverseFileInfo
+        """
+        if self.is_dataverse_dataset():
+            return self.dataversefileinfo
+        return None
+
 
 class DataverseFileInfo(DataSetInfo):
     """
@@ -314,7 +330,7 @@ class DataverseFileInfo(DataSetInfo):
 
         dv_user_model = apps.get_model(app_label='user', model_name='DataverseUser')
         try:
-            return dv_user_model.get(user=self.creator, dv_installation=self.dv_installation)
+            return dv_user_model.objects.get(user=self.creator, dv_installation=self.dv_installation)
         except dv_user_model.DoesNotExist:
             return None
 

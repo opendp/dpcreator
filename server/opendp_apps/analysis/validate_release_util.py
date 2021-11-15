@@ -25,6 +25,7 @@ from opendp.mod import OpenDPException
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
+from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
 from opendp_apps.analysis.stat_valid_info import StatValidInfo
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
@@ -60,11 +61,15 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.analysis_plan_id = analysis_plan_id
         self.analysis_plan = None       # to be retrieved
 
+        self.dp_statistics = dp_statistics  # User defined
+        self.compute_mode = compute_mode
+
+        self.run_dataverse_deposit = kwargs.get('run_dataverse_deposit', False)
+
         self.max_epsilon = None         # from analysis_plan.dataset.get_depositor_setup_info()
         self.max_delta = None           # from analysis_plan.dataset.get_depositor_setup_info()
         self.dataset_size = None        # from analysis_plan.dataset
 
-        self.dp_statistics = dp_statistics  # User defined
 
         self.stat_spec_list = []        # list of StatSpec objects
         self.validation_info = []       # list of StatValidInfo objects to send to UI
@@ -74,7 +79,6 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         self.opendp_version = pkg_resources.get_distribution('opendp').version
 
-        self.compute_mode = compute_mode
         if self.compute_mode is True:
             self.run_release_process()
         else:
@@ -88,13 +92,16 @@ class ValidateReleaseUtil(BasicErrCheck):
         return ValidateReleaseUtil(opendp_user, analysis_plan_id, dp_statistics)
 
     @staticmethod
-    def compute_mode(opendp_user: get_user_model(), analysis_plan_id: int):
+    def compute_mode(opendp_user: get_user_model(), analysis_plan_id: int,
+                     run_dataverse_deposit: bool=False):
         """
         Use this method to return a ValidateReleaseUtil which runs the dp_statistics
         """
-        return ValidateReleaseUtil(opendp_user, analysis_plan_id,
+        return ValidateReleaseUtil(opendp_user,
+                                   analysis_plan_id,
                                    dp_statistics=None,
-                                   compute_mode=True)
+                                   compute_mode=True,
+                                   **dict(run_dataverse_deposit=run_dataverse_deposit))
 
 
     def add_stat_spec(self, stat_spec: StatSpec):
@@ -102,7 +109,15 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.stat_spec_list.append(stat_spec)
 
     def run_release_process(self):
-        """Run the release process"""
+        """
+        Run the release process which includes:
+        - validation of the analysis plan
+        - running the computation chain for each statistic
+        - create a ReleaseInfo object
+            - create/add a JSON file
+            - create/add a PDF file
+        - deposit the files to Dataverse (if appropriate)
+        """
         if self.has_error():
             return
 
@@ -177,6 +192,36 @@ class ValidateReleaseUtil(BasicErrCheck):
         # It worked! Save the Release!!
         self.make_release_info(epsilon_used)
 
+        # Deposit release files in Dataverse
+        #
+        self.deposit_to_dataverse()
+
+    def deposit_to_dataverse(self):
+        """
+        Using the ReleaseInfo object, deposit any release files to Dataverse
+        """
+        if not self.analysis_plan.dataset.is_dataverse_dataset():
+            # Not needed for this ReleaseInfo
+            return
+
+        if not self.run_dataverse_deposit:
+            return
+
+        if self.has_error():
+            return
+
+        if not self.release_info:
+            # Shouldn't happen!
+            self.add_err_msg('ReleaseInfo not available for Dataverse deposit')
+
+        deposit_util = DataverseDepositUtil(self.release_info)
+        if deposit_util.has_error():
+            self.add_err_msg(deposit_util.get_err_msg())
+            return
+
+        print('ValidateReleaseUtil: Deposit complete!')
+
+
 
     def make_release_info(self, epsilon_used: float):
         """
@@ -190,12 +235,12 @@ class ValidateReleaseUtil(BasicErrCheck):
         formatted_release = self.get_final_release_data()
         if self.has_error():
             del(self.release_stats)
-            return
+            return False
 
         formatted_release_json_str = self.get_final_release_data(as_json=True)
         if self.has_error():
             del(self.release_stats)
-            return
+            return False
 
         # (3) Save the ReleaseInfo object
         #
@@ -220,6 +265,9 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.analysis_plan.user_step = AnalysisPlan.AnalystSteps.STEP_1200_PROCESS_COMPLETE
         self.analysis_plan.save()
         # print('ValidateReleaseUtil - self.release_stats', json.dumps(self.release_stats, indent=4))
+
+        return True
+
 
     def get_new_release_info_object(self):
         assert self.has_error() is False, \

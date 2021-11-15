@@ -51,3 +51,5 @@ ROOT_URLCONF = 'opendp_project.urls_cypress'
 
 # (3) ALLOW_CYPRESS_ENDPOINT value is set
 ALLOW_CYPRESS_ENDPOINT = 'cypress-in-ci-endpoint'
+
+DP_CREATOR_APP_NAME = os.environ.get('DP_CREATOR_APP_NAME', 'DP Creator (demo)')
