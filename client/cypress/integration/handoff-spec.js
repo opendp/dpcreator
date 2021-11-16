@@ -24,11 +24,7 @@
             cy.url().should('contains', '/?id=');
             cy.scrollTo("bottom");
             cy.get('[data-test="termsOfServiceCheckbox"]').click({force: true});
-            // This get (below) is more readable, but it causes a cypress error saying that the element
-            // is detachached from the DOM.  Need to investigate further, but in the meantime, use the less
-            // readable get string.
-            //    cy.get('[data-test="loginButton"]').click({multiple:true});
-            cy.get('#account-buttons--placeholder .v-btn--is-elevated > .v-btn__content').click()
+            cy.get('[data-test="loginButton"]').click({force: true, multiple: true});
             cy.url().should('contain', 'log-in')
             cy.get('[data-test="username"]').type('dev_admin');
             cy.get('[data-test="password"]').type('admin');
