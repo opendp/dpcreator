@@ -10,6 +10,11 @@
             :class="{ 'px-10': $vuetify.breakpoint.xsOnly }"
         >
           <h1 class="title-size-1">Log in</h1>
+          <ColoredBorderAlert type="error" v-if="errorMessage!==null">
+            <template v-slot:content>
+              {{ errorMessage.non_field_errors[0] }}
+            </template>
+          </ColoredBorderAlert>
           <v-form data-test="login form" v-model="validLoginForm">
             <v-text-field
                 data-test="username"
@@ -95,10 +100,11 @@ import SocialLoginSeparator from "../components/Accounts/SocialLoginSeparator.vu
 import Button from "../components/DesignSystem/Button.vue";
 import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
 import {mapState, mapGetters} from 'vuex';
+import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
 
 export default {
   name: "MyData",
-  components: {SocialLoginButton, SocialLoginSeparator, Button},
+  components: {SocialLoginButton, SocialLoginSeparator, Button, ColoredBorderAlert},
   computed: {
     ...mapState('auth', ['error', 'user']),
     ...mapGetters('auth', ['isTermsAccepted']),
@@ -110,6 +116,9 @@ export default {
       this.$store.dispatch('auth/login', this.inputs)
           .then(() => {
             this.processLogin();
+          })
+          .catch((data) => {
+            this.errorMessage = data
           })
     },
     handleGoogle(access_token) {
@@ -140,7 +149,7 @@ export default {
               this.$store.dispatch('dataverse/updateDataverseUser', this.user.objectId, this.handoffId)
                   .then((dvUserObjectId) => {
                     this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
-                        .catch(({data}) => console.log("error: " + data))
+                        .catch(({data}) => this.errorMessage = data)
                         .then(() => {
                           this.routeToNextPage(NETWORK_CONSTANTS.WELCOME.PATH)
                         })
@@ -163,6 +172,7 @@ export default {
   data: () => ({
     validLoginForm: false,
     showPassword: false,
+    errorMessage: null,
     inputs: {
       username: '',
       password: '',
