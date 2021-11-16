@@ -2,6 +2,9 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 
+from rest_framework import status
+
+from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
@@ -183,6 +186,51 @@ class ReleaseInfo(TimestampedModelWithUUID):
 
         super(ReleaseInfo, self).save(*args, **kwargs)
 
+
+class AuxiliaryFileDepositRecord(TimestampedModelWithUUID):
+    """Used to record the depositing of ReleaseInfo files to Dataverse as Auxiliary Files"""
+    name = models.CharField(max_length=255, blank=True, help_text='auto-filled on save')
+    release_info = models.ForeignKey(ReleaseInfo, on_delete=models.CASCADE)
+
+    deposit_success = models.BooleanField(default=False)
+    dv_auxiliary_type = models.CharField(max_length=100, choices=dv_static.DV_DEPOSIT_CHOICES)
+    dv_auxiliary_version = models.CharField(max_length=50, default='v1', help_text='e.g. "v1", "v2", etc')
+
+    http_status_code = models.IntegerField(help_text='HTTP code', default=-1)
+    http_resp_text = models.TextField(blank=True)
+    http_resp_json = models.JSONField(null=True, blank=True)
+
+    user_msg_text = models.TextField(blank=True, help_text='text version')
+    user_msg_html = models.TextField(blank=True, help_text='HTML version')
+
+    dv_download_url = models.URLField(blank=True)
+
+    def __str__(self):
+        if self.name:
+            return self.name
+        else:
+            return AuxiliaryFileDepositRecord.format_name(self)
+
+    def save(self, *args, **kwargs):
+        self.name = AuxiliaryFileDepositRecord.format_name(self)
+
+        if self.http_status_code in (status.HTTP_200_OK, status.HTTP_201_CREATED):
+            self.deposit_success = True
+        else:
+            self.deposit_success = False
+            self.dv_download_url = ''
+
+        super(AuxiliaryFileDepositRecord, self).save(*args, **kwargs)
+
+
+    @staticmethod
+    def format_name(deposit_rec) -> str:
+        """
+        Name formatting for the AuxiliaryFileDepositRecord
+
+        :param deposit_rec AuxiliaryFileDepositRecord
+        """
+        return f'{deposit_rec.release_info} - {deposit_rec.dv_auxiliary_version} ({deposit_rec.dv_auxiliary_type})'
 
 
 class AnalysisPlan(TimestampedModelWithUUID):

@@ -214,14 +214,17 @@ class ValidateReleaseUtil(BasicErrCheck):
             # Shouldn't happen!
             self.add_err_msg('ReleaseInfo not available for Dataverse deposit')
 
+        self.analysis_plan.user_step = AnalysisPlan.AnalystSteps.STEP_1200_PROCESS_COMPLETE
+        self.analysis_plan.save()
+        print('ValidateReleaseUtil: Deposit complete!')
+
+        # If the ReleaseInfo object was crated and deposit fails,
+        # the error for the deposit will be sent to the user
+        #
         deposit_util = DataverseDepositUtil(self.release_info)
         if deposit_util.has_error():
-            self.add_err_msg(deposit_util.get_err_msg())
+            #self.add_err_msg(deposit_util.get_err_msg())
             return
-        else:
-            self.analysis_plan.user_step = AnalysisPlan.AnalystSteps.STEP_1200_PROCESS_COMPLETE
-            self.analysis_plan.save()
-            print('ValidateReleaseUtil: Deposit complete!')
 
 
 

@@ -76,7 +76,7 @@ class ReleaseView(viewsets.ViewSet):
         validate_util = ValidateReleaseUtil.compute_mode(request.user,
                                                          analysis_plan_id,
                                                          run_dataverse_deposit=False)
-                                                         #run_dataverse_deposit=False)
+                                                         #run_dataverse_deposit=True)
         if validate_util.has_error():
             # This is a big error, check for it before evaluating individual statistics
             #
