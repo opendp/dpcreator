@@ -12,7 +12,8 @@ from opendp_project.views import BaseModelViewSet
 class TermsOfAccessViewSet(BaseModelViewSet):
     queryset = TermsOfAccess.objects.all().order_by('-created')
     serializer_class = TermsOfAccessSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
+    http_method_names = ['get']
 
 
 class TermsOfAccessAgreementViewSet(BaseModelViewSet):
