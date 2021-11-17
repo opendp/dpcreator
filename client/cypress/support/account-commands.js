@@ -1,5 +1,5 @@
 Cypress.Commands.add('createAccount', (username, email, password) => {
-    cy.url().should('contain', 'sign-up')
+    cy.visit('/sign-up')
 
     cy.get('h2').should('contain', '1/2. Check and accept Terms of Use:').should('be.visible')
     cy.get('[data-test="signupTermsCheckbox"]').click({force: true});

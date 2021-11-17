@@ -18,6 +18,7 @@
             cy.scrollTo("bottom");
             cy.get('[data-test="termsOfServiceCheckbox"]').click({force: true});
             cy.get('[data-test="createAccountButton"]').click({force: true, multiple: true});
+            cy.url().should('contain', 'sign-up')
             cy.createAccount(username, email, password)
             // We have turned off email confirmation for Cypress, so we should be able
             // to log in now with the new account.
@@ -25,7 +26,7 @@
             cy.get('[data-test="username"]').type(username);
             cy.get('[data-test="password"]').type(password);
             cy.get('[data-test="Log in"]').click();
-            cy.url().should('contains', 'my-data')
+            cy.url().should('contains', 'welcome')
             cy.get('[data-test="My Profile"]').click();
             cy.url().should('contains', 'my-profile')
             cy.get('[data-test="username"]').should('have.value', username)

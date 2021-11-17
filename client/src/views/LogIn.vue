@@ -139,7 +139,7 @@ export default {
             userId: this.user.objectId,
             termsOfAccessId: this.currentTerms.objectId
           })
-          this.routeToNextPage(NETWORK_CONSTANTS.MY_DATA.PATH)
+          this.routeToNextPage(defaultPath)
         } else if (this.isCurrentTermsAccepted) {
           // Go back to redirect page, or default page
           this.$router.replace(sessionStorage.getItem('redirectPath') || defaultPath);
