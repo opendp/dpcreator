@@ -199,6 +199,7 @@ class AuxiliaryFileDepositRecord(TimestampedModelWithUUID):
     http_status_code = models.IntegerField(help_text='HTTP code', default=-1)
     http_resp_text = models.TextField(blank=True)
     http_resp_json = models.JSONField(null=True, blank=True)
+    dv_err_msg = models.CharField(max_length=255, blank=True)
 
     user_msg_text = models.TextField(blank=True, help_text='text version')
     user_msg_html = models.TextField(blank=True, help_text='HTML version')
@@ -218,7 +219,6 @@ class AuxiliaryFileDepositRecord(TimestampedModelWithUUID):
             self.deposit_success = True
         else:
             self.deposit_success = False
-            self.dv_download_url = ''
 
         super(AuxiliaryFileDepositRecord, self).save(*args, **kwargs)
 

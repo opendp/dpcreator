@@ -145,10 +145,15 @@ class DataverseDepositUtil(BasicErrCheck):
             files = {'file': open(file_field.path, 'rb')}
 
             print('dv_url', dv_deposit_url)
-            response = requests.post(dv_deposit_url,
-                                     headers=headers,
-                                     data=payload,
-                                     files=files)
+            try:
+                response = requests.post(dv_deposit_url,
+                                         headers=headers,
+                                         data=payload,
+                                         files=files)
+            except Exception as err_obj:
+                print('deposit failed', dv_deposit_url)
+                print(err_obj)
+                return
 
             # debug start
             print('status_code: ', response.status_code)
@@ -175,10 +180,20 @@ class DataverseDepositUtil(BasicErrCheck):
                 num_deposits += 1
             else:
                 # Deposit failed
-                #
-                deposit_record.user_msg = dv_static.ERR_MSG_JSON_DEPOSIT_FAILED
+                try:
+                    # Check for a DV deposit error message:
+                    # {"status":"ERROR","message":"File not found based on id 29."}
+                    #
+                    deposit_record.http_resp_json = response.json()
+                    if 'status' in deposit_record.http_resp_json and \
+                        deposit_record.http_resp_json['status'] == 'ERROR' and \
+                        'message' in deposit_record.http_resp_json:
+
+                        deposit_record.dv_err_msg = deposit_record.http_resp_json['message']
+                    self.add_err_msg(dv_static.ERR_MSG_JSON_DEPOSIT_FAILED)
+                except:
+                    self.add_err_msg(dv_static.ERR_MSG_JSON_DEPOSIT_FAILED)
                 deposit_record.save()
-                self.add_err_msg(dv_static.ERR_MSG_JSON_DEPOSIT_FAILED)
 
             # Format user messages
             #  - deposit_record needs to be saved before this is set--saving sets the "deposit_success" field

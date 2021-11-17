@@ -64,5 +64,5 @@ ERR_MSG_DEPOSIT_NO_DV_DATASET_INFO = 'This is not a Dataverse dataset'
 ERR_MSG_JSON_DEPOSIT_ALREADY_COMPLETE = 'JSON deposit already complete'
 ERR_MSG_PDF_DEPOSIT_ALREADY_COMPLETE = 'PDF deposit already complete'
 
-ERR_MSG_JSON_DEPOSIT_FAILED = 'JSON deposit failed'
-ERR_MSG_PDF_DEPOSIT_FAILED = 'PDF deposit failed'
+ERR_MSG_JSON_DEPOSIT_FAILED = 'JSON deposit to Dataverse failed.'
+ERR_MSG_PDF_DEPOSIT_FAILED = 'PDF deposit to Dataverse failed.'

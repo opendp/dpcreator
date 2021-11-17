@@ -1,5 +1,7 @@
 {% if deposit.deposit_success %}{% spaceless %}
-The {{dv_auxiliary_type}} release file, version {{dv_auxiliary_version}}, has been deposited to Dataverse as an auxiliary file. It may be accessed through: {{ dv_download_url }}{% endspaceless %}
+The {{ deposit.dv_auxiliary_type}} release file, version {{ deposit.dv_auxiliary_version }}, has been deposited to Dataverse as an auxiliary file. It may be accessed through: {{ deposit.dv_download_url }}{% endspaceless %}
 {% else %}{% spaceless %}
-Error. The {{dv_auxiliary_type}} release file was not deposited to Dataverse.{% endspaceless %}
+Error. The {{ deposit.dv_auxiliary_type}} release file was not deposited to Dataverse.
+{% if deposit.dv_err_msg %}(Dataverse message: {{ deposit.dv_err_msg}}){% endif %}
+{% endspaceless %}
 {% endif %}
