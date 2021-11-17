@@ -32,6 +32,8 @@ class AnalysisPlanAdmin(admin.ModelAdmin):
 
 class AuxiliaryFileDepositRecordInline(admin.TabularInline):
     model = AuxiliaryFileDepositRecord
+    extra = 0
+
 
 class ReleaseInfoAdmin(admin.ModelAdmin):
     inlines = (AuxiliaryFileDepositRecordInline,)
@@ -46,6 +48,7 @@ class ReleaseInfoAdmin(admin.ModelAdmin):
                        'object_id',
                        'dataset',
                        'dp_release', 'epsilon_used',
+                       'dataverse_deposit_info_json',
                        'created', 'updated',)
 
 
@@ -61,6 +64,7 @@ class AuxiliaryFileDepositRecordAdmin(admin.ModelAdmin):
     readonly_fields = ('id',
                        'object_id',
                        'release_info',
+                       'json_string_html',
                        'created', 'updated',)
 
 

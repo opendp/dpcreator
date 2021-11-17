@@ -1,6 +1,10 @@
+from collections import OrderedDict
+import json
+
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 
 from rest_framework import status
 
@@ -164,6 +168,10 @@ class ReleaseInfo(TimestampedModelWithUUID):
                                    upload_to='release-files/%Y/%m/%d/',
                                    blank=True, null=True)
 
+    dataverse_deposit_info = models.JSONField(blank=True,
+                                              null=True,
+                                              help_text='Only applies to Dataverse files')
+
     dv_json_deposit_complete = models.BooleanField(\
                                 default=False,
                                 help_text='Only applies to Dataverse datasets')
@@ -180,11 +188,19 @@ class ReleaseInfo(TimestampedModelWithUUID):
 
     def save(self, *args, **kwargs):
         """Error check the dataverse_deposit_complete flag"""
-        if not self.dataset.is_dataverse_dataset(): # can never be True
-            self.dv_json_deposit_complete = False
-            self.dv_pdf_deposit_complete = False
+        #if not self.dataset.is_dataverse_dataset(): # can never be True
+        #    self.dv_json_deposit_complete = False
+        #    self.dv_pdf_deposit_complete = False
+        #    self.dataverse_deposit_info = None
 
         super(ReleaseInfo, self).save(*args, **kwargs)
+
+    @mark_safe
+    def dataverse_deposit_info_json(self):
+        """Return JSON string"""
+        if self.dataverse_deposit_info:
+            return '<pre>' + json.dumps(self.dataverse_deposit_info, indent=4) + '</pre>'
+        return ''
 
 
 class AuxiliaryFileDepositRecord(TimestampedModelWithUUID):
@@ -210,7 +226,8 @@ class AuxiliaryFileDepositRecord(TimestampedModelWithUUID):
         if self.name:
             return self.name
         else:
-            return AuxiliaryFileDepositRecord.format_name(self)
+            return f'{self.release_info} - {self.dv_auxiliary_version} ({self.dv_auxiliary_type})'
+            #return AuxiliaryFileDepositRecord.format_name(self)
 
     def save(self, *args, **kwargs):
         self.name = AuxiliaryFileDepositRecord.format_name(self)
@@ -221,6 +238,41 @@ class AuxiliaryFileDepositRecord(TimestampedModelWithUUID):
             self.deposit_success = False
 
         super(AuxiliaryFileDepositRecord, self).save(*args, **kwargs)
+
+    def as_dict(self):
+        """Return in dict format for API Use"""
+        info_dict = OrderedDict({
+            'name': self.name,
+            'object_id': str(self.object_id),
+            'deposit_success': self.deposit_success,
+            'dv_download_url': self.dv_download_url,
+
+            'dv_auxiliary_type': self.dv_auxiliary_type,
+            'dv_auxiliary_version': self.dv_auxiliary_version,
+
+            'http_status_code': self.http_status_code,
+            'http_resp_text': self.http_resp_text,
+            'http_resp_json': self.http_resp_json,
+            'dv_err_msg': self.dv_err_msg,
+
+            'user_msg_text': self.user_msg_text,
+            'user_msg_html': self.user_msg_html,
+
+
+            'created': self.created.isoformat(),
+            'updated': self.updated.isoformat(),
+        })
+
+        return info_dict
+
+    def as_json_string(self, indent=4):
+        """Return JSON string"""
+        return json.dumps(self.as_dict(), indent=indent)
+
+    @mark_safe
+    def json_string_html(self):
+        """Return JSON string"""
+        return '<pre>' + self.as_json_string() + '</pre>'
 
 
     @staticmethod

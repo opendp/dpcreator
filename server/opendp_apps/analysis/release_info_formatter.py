@@ -2,8 +2,9 @@
 Given a ValidateReleaseUtil object that has computed stat,
 build the release dict!
 """
-import json
+from collections import OrderedDict
 from datetime import datetime as dt
+import json
 
 from django.template.loader import render_to_string
 
@@ -78,9 +79,9 @@ class ReleaseInfoFormatter(BasicErrCheck):
         else:
             dataset_dict = ds_formatter.get_formatted_info()
 
-        self.release_dict = {
+        self.release_dict = OrderedDict({
             "name": str(self.release_util.analysis_plan),
-            "release_url": None,    # via with https://github.com/opendp/dpcreator/issues/34
+            # "release_url": None,    # via with https://github.com/opendp/dpcreator/issues/34
             "created": {
                 "iso": current_dt.isoformat(),
                 "human_readable": self.get_readable_datetime(current_dt)
@@ -88,13 +89,13 @@ class ReleaseInfoFormatter(BasicErrCheck):
             "application": "DP Creator",
             "application_url": "https://github.com/opendp/dpcreator",
             "differentially_private_library": {
-                "name": "OpenDP",
+                "name": "OpenDPz",
                 "url": "https://github.com/opendp/opendp",
                 "version": self.release_util.opendp_version,
             },
             "dataset": dataset_dict,
             "statistics": self.release_util.get_release_stats()
-        }
+        })
 
         # Error check! Make sure it's serializable as JSON and encodable as bytes!!
         try:
@@ -103,6 +104,7 @@ class ReleaseInfoFormatter(BasicErrCheck):
         except TypeError as err_obj:
             user_msg = 'Failed to convert the Release informaation into JSON. ({err_obj})'
             self.add_err_msg(user_msg)
+
 
     @staticmethod
     def get_json_filename(release_info_obj: ReleaseInfo) -> str:

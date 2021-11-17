@@ -1,7 +1,7 @@
 """
 Utility for depositing Dataverse auxiliary files related to a ReleaseInfo object
 """
-
+from collections import OrderedDict
 from os.path import basename
 import requests
 from rest_framework import status
@@ -34,6 +34,7 @@ class DataverseDepositUtil(BasicErrCheck):
 
         self.run_basic_check()
         self.deposit_files()
+        self.update_release_info()
 
     def run_basic_check(self):
         """Make sure the correct data is available and the release can be deposited"""
@@ -60,8 +61,6 @@ class DataverseDepositUtil(BasicErrCheck):
             self.add_err_msg(astatic.ERR_MSG_DEPOSIT_NO_DV_USER)
             return
 
-
-
         # Is the JSON release file available?
         #
         if not self.release_info.dp_release_json_file:
@@ -70,19 +69,29 @@ class DataverseDepositUtil(BasicErrCheck):
 
         # Has the JSON release file already been deposited?
         #
-        if self.release_info.dv_json_deposit_complete:
+        qparams = dict(release_info=self.release_info,
+                       dv_auxiliary_type=dv_static.DV_DEPOSIT_TYPE_DP_JSON)
+        json_rec1 = AuxiliaryFileDepositRecord.objects.filter(**qparams).first()
+        if json_rec1 is not None:
             self.add_err_msg(dv_static.ERR_MSG_JSON_DEPOSIT_ALREADY_COMPLETE)
             return
 
+        """
         # Is the PDF release file available?
         #
-        #if not self.release_info.dp_release_pdf_file:
-        #    self.add_err_msg(astatic.ERR_MSG_DEPOSIT_NO_PDF_FILE)
-        #    return
+        if not self.release_info.dp_release_pdf_file:
+            self.add_err_msg(astatic.ERR_MSG_DEPOSIT_NO_PDF_FILE)
+            return
+        """
 
-        #if self.release_info.dv_pdf_deposit_complete:
-        #    self.add_err_msg(dv_static.ERR_MSG_PDF_DEPOSIT_ALREADY_COMPLETE)
-        #    return
+        # Has the PDF release file already been deposited?
+        #
+        qparams = dict(release_info=self.release_info,
+                       dv_auxiliary_type=dv_static.DV_DEPOSIT_TYPE_DP_PDF)
+        json_rec2 = AuxiliaryFileDepositRecord.objects.filter(**qparams).first()
+        if json_rec2 is not None:
+            self.add_err_msg(dv_static.ERR_MSG_PDF_DEPOSIT_ALREADY_COMPLETE)
+            return
 
     def deposit_files(self):
         """
@@ -99,12 +108,10 @@ class DataverseDepositUtil(BasicErrCheck):
             {
                 'dv_deposit_type': dv_static.DV_DEPOSIT_TYPE_DP_JSON,
                 'file_field': self.release_info.dp_release_json_file,
-                'complete_field': self.release_info.dv_json_deposit_complete
             },
             {
                 'dv_deposit_type': dv_static.DV_DEPOSIT_TYPE_DP_PDF,
                 'file_field': self.release_info.dp_release_pdf_file,
-                'complete_field': self.release_info.dv_pdf_deposit_complete
             }
         ]
 
@@ -150,10 +157,20 @@ class DataverseDepositUtil(BasicErrCheck):
                                          headers=headers,
                                          data=payload,
                                          files=files)
-            except Exception as err_obj:
+            except requests.exceptions.ConnectionError as ex_obj:
+                deposit_record.http_status_code = -99
+                user_msg = (f'Failed to connect to Dataverse at server'
+                            f' {self.dv_dataset.dv_installation.dataverse_url}')
+                deposit_record.dv_err_msg = user_msg
+                deposit_record.save()
+                continue
+            except Exception as ex_obj:
                 print('deposit failed', dv_deposit_url)
-                print(err_obj)
-                return
+                print(ex_obj)
+                deposit_record.http_status_code = -99
+                deposit_record.dv_err_msg = f'Error connecting to Dataverse: {ex_obj}'
+                deposit_record.save()
+                continue
 
             # debug start
             print('status_code: ', response.status_code)
@@ -174,9 +191,6 @@ class DataverseDepositUtil(BasicErrCheck):
                 # Successful deposit!
                 deposit_record.http_resp_json = response.json()
                 deposit_record.save()
-
-                file_info["complete_field"] = True
-                self.release_info.save()
                 num_deposits += 1
             else:
                 # Deposit failed
@@ -192,6 +206,7 @@ class DataverseDepositUtil(BasicErrCheck):
                         deposit_record.dv_err_msg = deposit_record.http_resp_json['message']
                     self.add_err_msg(dv_static.ERR_MSG_JSON_DEPOSIT_FAILED)
                 except:
+                    # could not convert response to JSON
                     self.add_err_msg(dv_static.ERR_MSG_JSON_DEPOSIT_FAILED)
                 deposit_record.save()
 
@@ -209,3 +224,44 @@ class DataverseDepositUtil(BasicErrCheck):
         if num_deposits == 0:
             self.add_err_msg((f'No files were deposited. (Expected: '
                               f'{expected_num_deposits} deposit(s)'))
+
+    def update_release_info(self):
+        """
+        On the ReleaseInfo object, update the "dataverse_deposit_info" field
+        """
+        if self.has_error():
+            return
+
+        dv_has_deposit = False
+
+        # Get the latest JSON record--assumes there are no records earlier than a success record!
+        #
+        json_rec = AuxiliaryFileDepositRecord.objects.filter(\
+                        release_info=self.release_info, dv_auxiliary_type=dv_static.DV_DEPOSIT_TYPE_DP_JSON,
+                    ).order_by('-created').first()
+        if json_rec:
+            json_rec = json_rec.as_dict()
+
+        # Get the latest PDF record--assumes there are no records earlier than a success record!
+        #
+        pdf_rec = AuxiliaryFileDepositRecord.objects.filter(\
+                        release_info=self.release_info, dv_auxiliary_type=dv_static.DV_DEPOSIT_TYPE_DP_PDF,
+                    ).order_by('-created').first()
+        if pdf_rec:
+            pdf_rec = pdf_rec.as_dict()
+            self.release_info.dv_pdf_deposit_complete = True
+
+        if json_rec or pdf_rec:
+            dv_has_deposit = True
+            self.release_info.dv_json_deposit_complete = True
+
+        deposit_info_dict = OrderedDict({\
+            "deposited": dv_has_deposit,
+            'json_deposit_record': json_rec,
+            'pdf_deposit_record':  pdf_rec,
+        })
+
+        self.release_info.dataverse_deposit_info = deposit_info_dict
+
+        print('>>> deposit_info_dict', deposit_info_dict)
+        self.release_info.save()

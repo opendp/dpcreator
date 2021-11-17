@@ -18,7 +18,7 @@ def build_test_data():
     Semi-manual run here to create a ReleaseInfo object and
     DataverseUser based on an existing dummy DataverseFileInfo object
     """
-    df = DataverseFileInfo.objects(pk=)
+    df = DataverseFileInfo.objects(pk=some_pk)
 
 
 def test_dv_depositor(release_id):
@@ -98,7 +98,12 @@ def run_deposit_api():
     print('status_code: ', response.status_code)
     print('response.text', response.text)
     print('-' * 40)
-    print('response json', response.json())
+    try:
+        print('response json', response.json())
+    except Exception as ex_obj:
+        print('ex_obj', ex_obj)
+        print('could not convert to JSON')
+
 
 
 
