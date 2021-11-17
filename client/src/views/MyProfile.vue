@@ -15,6 +15,7 @@
           <v-form @submit.prevent="handleEditAccountInformation">
             <v-text-field
                 v-model="username"
+                data-test="username"
                 label="Username"
                 required
             ></v-text-field>
@@ -138,10 +139,8 @@ export default {
       );
     },
     handleEditAccountInformation() {
-      //TODO: Implement Edit Account Information Handler
-      alert("edit account information form submitted!");
+      this.$store.dispatch('auth/changeUsername', this.username)
       this.$router.push(`${NETWORK_CONSTANTS.MY_PROFILE.PATH}?saved=true`);
-      this.$router.go();
     },
     handleChangePassword() {
       auth.changePassword(this.password, this.newPassword, this.confirmNewPassword)
