@@ -61,9 +61,9 @@ const getters = {
 
 const actions = {
   changeUsername({commit, state}, newUsername) {
-    const newUser = null;
+    let newUser = null;
     console.log('current user: ' + JSON.stringify(state.user))
-    Object.assign(newUser, state.user)
+    newUser = Object.assign({}, state.user)
     newUser.username = newUsername
     auth.updateAccountDetails(newUser)
         .then((data) => {

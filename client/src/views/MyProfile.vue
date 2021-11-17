@@ -19,13 +19,18 @@
                 label="Username"
                 required
             ></v-text-field>
+            <!-- For now, don't allow editing of the email, because it would require a new endpoint
+            and another email verification
             <v-text-field
                 v-model="email"
                 label="Email"
                 required
                 :rules="emailRules"
                 type="email"
-            ></v-text-field>
+            ></v-text-field> -->
+            <div class="mt-5 mb-10">
+              {{ email }}
+            </div>
             <div class="mt-5 mb-10">
               <Button
                   type="submit"
