@@ -194,12 +194,16 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         # Deposit release files in Dataverse
         #
-        self.deposit_to_dataverse()
+        if not self.has_error():
+            self.deposit_to_dataverse()
 
     def deposit_to_dataverse(self):
         """
         Using the ReleaseInfo object, deposit any release files to Dataverse
         """
+        if self.has_error():
+            return
+
         if not self.analysis_plan.dataset.is_dataverse_dataset():
             # Not needed for this ReleaseInfo
             return
@@ -207,8 +211,6 @@ class ValidateReleaseUtil(BasicErrCheck):
         if not self.run_dataverse_deposit:
             return
 
-        if self.has_error():
-            return
 
         if not self.release_info:
             # Shouldn't happen!
@@ -223,6 +225,7 @@ class ValidateReleaseUtil(BasicErrCheck):
         #
         deposit_util = DataverseDepositUtil(self.release_info)
         if deposit_util.has_error():
+            print('deposit failed (ok in tests)')
             #self.add_err_msg(deposit_util.get_err_msg())
             return
 

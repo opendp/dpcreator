@@ -174,7 +174,7 @@ class DataverseDepositUtil(BasicErrCheck):
 
             # debug start
             print('status_code: ', response.status_code)
-            print('response.text', response.text)
+            # print('response.text', response.text)
             print('-' * 40)
             if response.status_code == status.HTTP_200_OK:
                 print('response json', response.json())

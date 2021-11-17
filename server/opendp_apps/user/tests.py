@@ -76,7 +76,7 @@ class TestUserSerializer(TestCase):
 
         # Delete OpenDPUser objects and their related DataverseUser object based on the "opendp_user_ids"
         (del_cnt, del_details) = opendp_user_model.objects.filter(id__in=opendp_user_ids).delete()
-        print(del_cnt, del_details)
+
         self.assertEqual(del_cnt, 2)
         self.assertEqual(del_details, {'user.DataverseUser': 1, 'user.OpenDPUser': 1})
 

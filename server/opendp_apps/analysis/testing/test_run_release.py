@@ -12,7 +12,7 @@ from django.test.testcases import TestCase
 from rest_framework.test import APIClient
 
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
-from opendp_apps.analysis.models import AnalysisPlan
+from opendp_apps.analysis.models import AnalysisPlan, AuxiliaryFileDepositRecord
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
 from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
@@ -260,6 +260,15 @@ class TestRunRelease(TestCase):
         self.assertTrue(updated_plan.release_info.dp_release_json_file.name.endswith(json_filename))
         self.assertTrue(updated_plan.release_info.dp_release_json_file.size >= 2600)
 
+        self.assertTrue(updated_plan.release_info.dv_json_deposit_complete is False)
+        self.assertTrue(updated_plan.release_info.dv_pdf_deposit_complete is False)
+
+        self.assertTrue(AuxiliaryFileDepositRecord.objects.filter(release_info=updated_plan.release_info).count() > 0)
+        for dep_rec in AuxiliaryFileDepositRecord.objects.filter(release_info=updated_plan.release_info):
+            self.assertTrue(dep_rec.deposit_success is False)
+            self.assertTrue(dep_rec.http_status_code == 403 or\
+                            dep_rec.http_status_code < 0)
+
 
     def test_60_analysis_plan_has_release_info(self):
         """(60) Via API, ensure that release_info is added as a field to AnalysisPlan"""
@@ -303,6 +312,12 @@ class TestRunRelease(TestCase):
         self.assertTrue(updated_plan.release_info.dp_release_json_file.name.endswith(json_filename))
         self.assertTrue(updated_plan.release_info.dp_release_json_file.size >= 2600)
 
+        self.assertTrue(AuxiliaryFileDepositRecord.objects.filter(release_info=updated_plan.release_info).count() > 0)
+        for dep_rec in AuxiliaryFileDepositRecord.objects.filter(release_info=updated_plan.release_info):
+            self.assertTrue(dep_rec.deposit_success is False)
+            self.assertTrue(dep_rec.http_status_code == 403 or\
+                            dep_rec.http_status_code < 0)
+
         # Uncomment next line to show the AnalysisPlan output
         #   with attached ReleaseInfo object
         # print(json.dumps(analysis_plan_jresp, indent=4))
@@ -318,9 +333,6 @@ class TestRunRelease(TestCase):
             "citation": null,
             "doi": "doi:10.7910/DVN/PUXVDH",
             "identifier": null,
-            "release_deposit_info": {
-                "deposited": false
-            },
             "installation": {
                 "name": "Mock Local Dataverse",
                 "url": "http://127.0.0.1:8000/dv-mock-api"
@@ -339,15 +351,12 @@ class TestRunRelease(TestCase):
         self.assertFalse(formatter.has_error())
         ds_info = formatter.get_formatted_info()
 
-        # print(json.dumps(ds_info, indent=4))
-
         self.assertEqual(ds_info['type'], "dataverse")
         self.assertEqual(ds_info['name'], "Replication Data for: Eye-typing experiment")
         self.assertIsNone(ds_info['citation'])
 
         self.assertEqual(ds_info['doi'], "doi:10.7910/DVN/PUXVDH")
         self.assertIsNone(ds_info['identifier'])
-        self.assertFalse(ds_info['release_deposit_info']['deposited'])
 
         self.assertEqual(ds_info['installation']['name'], 'Mock Local Dataverse')
         self.assertEqual(ds_info['installation']['url'], 'http://127.0.0.1:8000/dv-mock-api')
@@ -399,7 +408,6 @@ class TestRunRelease(TestCase):
 
         self.assertEqual(ds_info['doi'], "doi:10.7910/DVN/OLD7MB")
         self.assertIsNone(ds_info['identifier'])
-        self.assertFalse(ds_info['release_deposit_info']['deposited'])
 
         self.assertEqual(ds_info['installation']['name'], 'Harvard Dataverse')
         self.assertEqual(ds_info['installation']['url'], 'https://dataverse.harvard.edu')
