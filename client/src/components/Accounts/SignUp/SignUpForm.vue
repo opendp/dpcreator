@@ -13,6 +13,11 @@
             class="pl-0"
             :class="{ 'ml-5': $vuetify.breakpoint.xsOnly }"
         >
+          <ColoredBorderAlert type="error" v-if="errorMessage!==null">
+            <template v-slot:content>
+              {{ errorMessage }}
+            </template>
+          </ColoredBorderAlert>
           <v-form
               v-model="validSignUpForm"
               ref="signUpForm"
@@ -20,12 +25,14 @@
           >
             <v-text-field
                 v-model="username"
+                data-test="username"
                 label="Username"
                 :rules="usernameRules"
                 required
             ></v-text-field>
             <v-text-field
                 v-model="email"
+                data-test="email"
                 label="Email"
                 required
                 :rules="emailRules"
@@ -33,6 +40,7 @@
             ></v-text-field>
             <v-text-field
                 v-model="password"
+                data-test="password"
                 :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                 :type="showPassword ? 'text' : 'password'"
                 name="input-10-1"
@@ -51,6 +59,7 @@
             >
             <v-text-field
                 v-model="confirmPassword"
+                data-test="confirmPassword"
                 :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
                 :type="showConfirmPassword ? 'text' : 'password'"
                 :rules="[confirmPasswordVerification, ...confirmPasswordRules]"
@@ -60,6 +69,7 @@
                 @click:append="showConfirmPassword = !showConfirmPassword"
             ></v-text-field>
             <Button
+                data-test="submit"
                 classes="mt-5"
                 color="primary"
                 :class="{
@@ -134,11 +144,6 @@ export default {
         this.$store.dispatch('signup/createAccount', inputs)
             .then((resp) => {
               const openDPUserId = resp.data[0]
-              // now that we have a user object,
-              // save user's acceptance of terms of use (step 1 of sign up)
-              if (!this.isTermsAccepted) {
-                this.$store.dispatch('auth/acceptTerms', openDPUserId)
-              }
               if (this.handoffId) {
                 this.$store.dispatch('dataverse/updateDataverseUser', openDPUserId, this.handoffId)
                     .then((dvUserObjectId) => {
@@ -153,7 +158,9 @@ export default {
                       this.errorMessage = data
                     });
               }
-            })
+            }).catch((error) => {
+          this.errorMessage = error
+        })
         this.$router.push(`${NETWORK_CONSTANTS.SIGN_UP.PATH}/confirmation`);
       }
     },

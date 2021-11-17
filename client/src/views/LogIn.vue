@@ -106,8 +106,8 @@ export default {
   name: "MyData",
   components: {SocialLoginButton, SocialLoginSeparator, Button, ColoredBorderAlert},
   computed: {
-    ...mapState('auth', ['error', 'user']),
-    ...mapGetters('auth', ['isTermsAccepted']),
+    ...mapState('auth', ['error', 'user', 'currentTerms']),
+    ...mapGetters('auth', ['isTermsAccepted', 'isCurrentTermsAccepted']),
     ...mapState('dataverse', ['handoffId']),
   },
   methods: {
@@ -132,7 +132,15 @@ export default {
         this.$store.dispatch('auth/fetchCurrentTerms'),
         this.$store.dispatch('auth/fetchTermsLog')
       ]).then(() => {
-        if (this.isTermsAccepted) {
+        // If no terms have been accepted, this means it is the first time logging in,
+        // and terms were accepted at the time of account creation.  So set the terms as accepted
+        if (!this.isTermsAccepted) {
+          this.$store.dispatch('auth/acceptTerms', {
+            userId: this.user.objectId,
+            termsOfAccessId: this.currentTerms.objectId
+          })
+          this.routeToNextPage(NETWORK_CONSTANTS.MY_DATA.PATH)
+        } else if (this.isCurrentTermsAccepted) {
           // Go back to redirect page, or default page
           this.$router.replace(sessionStorage.getItem('redirectPath') || defaultPath);
           //Cleanup redirectPath
@@ -143,9 +151,9 @@ export default {
       })
     },
     processLogin() {
-      if (this.handoffId) {
-        this.$store.dispatch('auth/fetchUser')
-            .then((data) => {
+      this.$store.dispatch('auth/fetchUser')
+          .then((data) => {
+            if (this.handoffId) {
               this.$store.dispatch('dataverse/updateDataverseUser', this.user.objectId, this.handoffId)
                   .then((dvUserObjectId) => {
                     this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
@@ -153,20 +161,15 @@ export default {
                         .then(() => {
                           this.routeToNextPage(NETWORK_CONSTANTS.WELCOME.PATH)
                         })
-
                   })
-            })
-            .catch((data) => {
-              console.log(data)
-              this.errorMessage = data
-            });
-      } else {
-        this.$store.dispatch('auth/fetchUser')
-            .then(() => {
+            } else {
               this.routeToNextPage(NETWORK_CONSTANTS.MY_DATA.PATH)
-            })
-
-      }
+            }
+          })
+          .catch((data) => {
+            console.log(data)
+            this.errorMessage = data
+          });
     }
   },
   data: () => ({
