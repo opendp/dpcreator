@@ -9,5 +9,5 @@ Cypress.Commands.add('createAccount', (username, email, password) => {
     cy.get('[data-test="password"]').type(password);
     cy.get('[data-test="confirmPassword"').type(password)
     cy.get('[data-test="submit"]').click({force: true});
-    cy.url().should('contains', 'confirmation')
+
 })

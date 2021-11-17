@@ -13,9 +13,15 @@
             class="pl-0"
             :class="{ 'ml-5': $vuetify.breakpoint.xsOnly }"
         >
-          <ColoredBorderAlert type="error" v-if="errorMessage!==null">
+          <ColoredBorderAlert
+              data-test="errorMessage"
+              type="error" v-if="errorMessage!==null">
             <template v-slot:content>
-              {{ errorMessage }}
+              <ul>
+                <li v-for="item in errorMessage">
+                  {{ item }}
+                </li>
+              </ul>
             </template>
           </ColoredBorderAlert>
           <v-form
@@ -119,9 +125,10 @@ import SocialLoginButton from "../SocialLoginButton.vue";
 import SocialLoginSeparator from "../SocialLoginSeparator.vue";
 import NETWORK_CONSTANTS from "../../../router/NETWORK_CONSTANTS";
 import {mapState, mapGetters} from "vuex";
+import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
 
 export default {
-  components: {SocialLoginButton, SocialLoginSeparator, Button},
+  components: {SocialLoginButton, SocialLoginSeparator, Button, ColoredBorderAlert},
   name: "SignUpForm",
   props: ["termsId"],
   methods: {
@@ -143,25 +150,29 @@ export default {
         }
         this.$store.dispatch('signup/createAccount', inputs)
             .then((resp) => {
+              console.log("returned from create acount, resp: " + JSON.stringify(resp))
               const openDPUserId = resp.data[0]
               if (this.handoffId) {
                 this.$store.dispatch('dataverse/updateDataverseUser', openDPUserId, this.handoffId)
                     .then((dvUserObjectId) => {
                       this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
-                          .catch(({data}) => console.log("error: " + data))
-
+                          .catch(({data}) => console.log("update file info error: " + data))
                     })
-                    .catch((data) => console.log(data))
-                this.errorMessage = data
                     .catch((data) => {
-                      console.log(data)
+                      console.log("update dataverse user error " + data)
                       this.errorMessage = data
                     });
               }
+              this.$router.push(`${NETWORK_CONSTANTS.SIGN_UP.PATH}/confirmation`);
             }).catch((error) => {
-          this.errorMessage = error
+          let msg = []
+          Object.keys(error).forEach(function (k) {
+            console.log(k + ' - ' + error[k]);
+            msg.push(error[k])
+          });
+          this.errorMessage = msg
         })
-        this.$router.push(`${NETWORK_CONSTANTS.SIGN_UP.PATH}/confirmation`);
+
       }
     },
     loginGoogle(access_token) {
