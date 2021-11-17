@@ -26,7 +26,22 @@ const initialState = {
 
 const getters = {
   isAuthenticated: state => !!state.token,
+  // Check to see if the user has accepted any terms at all.
+  // (TermsAccepted will be false the first time the user logs in,
+  // because the acceptance happened as the first step in Create Account.)
   isTermsAccepted: state => {
+    let accepted = false
+    if (state.termsOfAccessLog !== null && state.termsOfAccessLog.length > 0) {
+      for (let i in state.termsOfAccessLog) {
+        if (state.termsOfAccessLog[i].user === state.user.objectId) {
+          accepted = true
+        }
+      }
+    }
+    return accepted
+  },
+  // Check if the user has accepted the most recent termsOfUse
+  isCurrentTermsAccepted: state => {
     let accepted = false
     if (state.termsOfAccessLog !== null && state.termsOfAccessLog.length > 0) {
       for (let i in state.termsOfAccessLog) {
@@ -34,7 +49,6 @@ const getters = {
             && state.termsOfAccessLog[i].termsOfAccess === state.currentTerms.objectId) {
           accepted = true
         }
-
       }
     }
     return accepted
@@ -46,14 +60,29 @@ const getters = {
 
 
 const actions = {
-  login({ commit }, { username, password }) {
+  changeUsername({commit, state}, newUsername) {
+    const newUser = null;
+    console.log('current user: ' + JSON.stringify(state.user))
+    Object.assign(newUser, state.user)
+    newUser.username = newUsername
+    auth.updateAccountDetails(newUser)
+        .then((data) => {
+          console.log('resp: ' + JSON.stringify(data))
+          commit(SET_USER, newUser)
+        })
+
+  },
+  login({commit}, {username, password}) {
     commit(LOGIN_BEGIN);
     return auth.login(username, password)
-      .then(({ data }) => {
-        commit(SET_TOKEN, data.key)
-      })
-      .then(() => commit(LOGIN_SUCCESS))
-      .catch((data) => {  commit(LOGIN_FAILURE); return Promise.reject(data)} );
+        .then(({data}) => {
+          commit(SET_TOKEN, data.key)
+        })
+        .then(() => commit(LOGIN_SUCCESS))
+        .catch((data) => {
+          commit(LOGIN_FAILURE);
+          return Promise.reject(data)
+        });
   },
   googleLogin({commit}, token) {
     commit(LOGIN_BEGIN);
@@ -102,9 +131,9 @@ const actions = {
       commit(SET_TERMS_LOG, response)
     })
   },
-  acceptTerms({commit, state}, {user, termsOfAccess}) {
+  acceptTerms({commit, state}, {userId, termsOfAccessId}) {
     console.log("accepting terms ")
-    terms.acceptTermsOfUse(user, termsOfAccess).then(console.log('updated terms'))
+    terms.acceptTermsOfUse(userId, termsOfAccessId).then(console.log('updated terms'))
         .then(() => {
           terms.getTermsOfUseLog().then(response => {
             commit(SET_TERMS_LOG, response)
@@ -154,8 +183,8 @@ const mutations = {
     delete session.defaults.headers.Authorization;
     state.token = null;
   },
-  [SET_USER](state, username) {
-    state.user = username;
+  [SET_USER](state, user) {
+    state.user = user;
   },
   [SET_CURRENT_TERMS](state, currentTerms) {
     state.currentTerms = currentTerms
