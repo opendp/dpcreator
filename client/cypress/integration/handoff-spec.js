@@ -29,9 +29,6 @@
             cy.get('[data-test="username"]').type('dev_admin');
             cy.get('[data-test="password"]').type('admin');
             cy.get('[data-test="Log in"]').click();
-            // first we will be routed to the Terms of Conditions page for the user
-            cy.get('[data-test="confirmTermsCheckbox"]').click({force: true});
-            cy.get('[data-test="confirmTermsContinue"]').click();
             // Next the Welcome page, with the Dataset  message
             cy.url().should('contain', 'welcome')
             cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
@@ -54,11 +51,6 @@
                 cy.get('[data-test="username"]').type('test_user');
                 cy.get('[data-test="password"]').type('dpcreator');
                 cy.get('[data-test="Log in"]').click();
-                // first we will be routed to the Terms of Conditions page for the user
-
-                cy.get('[data-test="confirmTermsCheckbox"]').click({force: true});
-                cy.get('[data-test="confirmTermsContinue"]').click();
-
                 // Next the Welcome page, with the File Locked message
 
                 cy.get('.v-alert__wrapper').should('contain', 'Sorry, the file is locked')

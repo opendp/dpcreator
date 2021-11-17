@@ -221,7 +221,7 @@ Cypress.Commands.add('setupStatisticsPage', (datasetFixture, analysisFixture) =>
         cy.fixture(analysisFixture).then(analysisPlan => {
             cy.intercept('GET', '/api/analyze/' + analysisPlan.objectId + '/', {body: analysisPlan})
         })
-        cy.get('[data-test="My Data"]').click({force: true})
+        cy.visit('/my-data')
         cy.get('tr').should('contain',
             'Replication Data for: Eye-typing experiment')
         cy.get('[data-test="continueWorkflow"]').click({force: true})
