@@ -5,7 +5,7 @@ from django.apps import apps
 from django.core.management.base import BaseCommand
 from opendp_apps.cypress_utils.check_setup import are_cypress_settings_in_place
 from opendp_apps.cypress_utils import static_vals as cystatic
-
+from opendp_apps.user.models import OpenDPUser, DataverseUser
 
 class Command(BaseCommand):
     help = "Deletes data for Cypress tests"
@@ -22,16 +22,25 @@ class Command(BaseCommand):
                            ('analysis', ['AnalysisPlan', 'ReleaseInfo', 'DepositorSetupInfo']),
                            ('dataset', ['UploadFileInfo', 'DataverseFileInfo', 'DataSetInfo']),
                            ('dataverses', ['DataverseHandoff']),
-                           ('user', ['DataverseUser'])
+                           ('user', ['DataverseUser', 'OpenDPUser'])
                            ]
 
         self.stdout.write(self.style.WARNING('Preparing to delete test data'))
 
         for app_name, model_names in models_to_clear:
             for model_name in model_names:
-                ye_model = apps.get_model(app_name, model_name)
-                (del_cnt, _ignore) = ye_model.objects.all().delete()
-                self.stdout.write(self.style.SUCCESS(f"{app_name}.{model_name} {del_cnt} instance(s) deleted."))
+                if model_name == 'OpenDPUser':
+                    (del_cnt, _ignore) = OpenDPUser.objects \
+                        .exclude(username__in=['test_user', 'dev_admin']).delete()
+                    self.stdout.write(self.style.SUCCESS(f"{app_name}.{model_name} {del_cnt} instance(s) deleted."))
+                elif model_name == 'DataverseUser':
+                    (del_cnt, _ignore) = DataverseUser.objects \
+                        .exclude(user__username__in=['test_user', 'dev_admin']).delete()
+                    self.stdout.write(self.style.SUCCESS(f"{app_name}.{model_name} {del_cnt} instance(s) deleted."))
+                else:
+                    ye_model = apps.get_model(app_name, model_name)
+                    (del_cnt, _ignore) = ye_model.objects.all().delete()
+                    self.stdout.write(self.style.SUCCESS(f"{app_name}.{model_name} {del_cnt} instance(s) deleted."))
 
         self.stdout.write(self.style.SUCCESS(f">> Data deletion complete."))
 

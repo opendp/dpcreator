@@ -28,3 +28,4 @@ ROOT_URLCONF = 'opendp_project.urls_cypress'
 ALLOW_CYPRESS_ENDPOINT = 'cypress-in-ci-endpoint'
 
 
+ACCOUNT_EMAIL_VERIFICATION = 'none'

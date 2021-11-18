@@ -9,7 +9,7 @@
                 return false
             })
             cy.clearData()
-            cy.createMockDataset('mockDV.json')
+            cy.createMockDataset('EyeDemoMockDV.json')
 
             // without this wait, sometimes the api/dataset-info/<objectId> call
             // returns a 404.
@@ -60,7 +60,7 @@
                 return false
             })
             cy.clearData()
-            cy.createMockDataset('mockDV.json')
+            cy.createMockDataset('EyeDemoMockDV.json')
             // click on the start Process button on the welcome page,
             // to navigate to the Validate Dataset step of the Wizard.
             // This will setup Vuex state to contain the Dataset.

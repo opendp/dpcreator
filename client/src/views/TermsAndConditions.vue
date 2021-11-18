@@ -6,7 +6,7 @@
     }"
   >
     <v-container>
-      <v-row v-if="isTermsAccepted && currentTerms">
+      <v-row v-if="isCurrentTermsAccepted && currentTerms">
         <v-col offset-sm="1" sm="10" offset-md="2" cols="12" md="6">
           <h1 class="title-size-1">Terms of use</h1>
           <div v-html="currentTerms.description">
@@ -16,7 +16,7 @@
           </template>
         </v-col>
       </v-row>
-      <v-row v-if="!isTermsAccepted && currentTerms">
+      <v-row v-if="!isCurrentTermsAccepted && currentTerms">
         <v-col offset-sm="1" sm="10" offset-md="2" cols="12" md="6">
           <ShadowBoxWithScroll>
             <template v-slot:scrollable-area>
@@ -69,7 +69,7 @@ export default {
   },
   computed: {
     ...mapState('auth', ['currentTerms', 'user']),
-    ...mapGetters('auth', ['isTermsAccepted']),
+    ...mapGetters('auth', ["isCurrentTermsAccepted"]),
     ...mapState('dataverse', ['handoffId']),
   },
   data: () => ({

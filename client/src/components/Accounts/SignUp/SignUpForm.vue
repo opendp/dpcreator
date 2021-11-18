@@ -13,6 +13,17 @@
             class="pl-0"
             :class="{ 'ml-5': $vuetify.breakpoint.xsOnly }"
         >
+          <ColoredBorderAlert
+              data-test="errorMessage"
+              type="error" v-if="errorMessage!==null">
+            <template v-slot:content>
+              <ul>
+                <li v-for="item in errorMessage">
+                  {{ item }}
+                </li>
+              </ul>
+            </template>
+          </ColoredBorderAlert>
           <v-form
               v-model="validSignUpForm"
               ref="signUpForm"
@@ -20,12 +31,14 @@
           >
             <v-text-field
                 v-model="username"
+                data-test="username"
                 label="Username"
                 :rules="usernameRules"
                 required
             ></v-text-field>
             <v-text-field
                 v-model="email"
+                data-test="email"
                 label="Email"
                 required
                 :rules="emailRules"
@@ -33,6 +46,7 @@
             ></v-text-field>
             <v-text-field
                 v-model="password"
+                data-test="password"
                 :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                 :type="showPassword ? 'text' : 'password'"
                 name="input-10-1"
@@ -51,6 +65,7 @@
             >
             <v-text-field
                 v-model="confirmPassword"
+                data-test="confirmPassword"
                 :append-icon="showConfirmPassword ? 'mdi-eye' : 'mdi-eye-off'"
                 :type="showConfirmPassword ? 'text' : 'password'"
                 :rules="[confirmPasswordVerification, ...confirmPasswordRules]"
@@ -60,6 +75,7 @@
                 @click:append="showConfirmPassword = !showConfirmPassword"
             ></v-text-field>
             <Button
+                data-test="submit"
                 classes="mt-5"
                 color="primary"
                 :class="{
@@ -109,9 +125,10 @@ import SocialLoginButton from "../SocialLoginButton.vue";
 import SocialLoginSeparator from "../SocialLoginSeparator.vue";
 import NETWORK_CONSTANTS from "../../../router/NETWORK_CONSTANTS";
 import {mapState, mapGetters} from "vuex";
+import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
 
 export default {
-  components: {SocialLoginButton, SocialLoginSeparator, Button},
+  components: {SocialLoginButton, SocialLoginSeparator, Button, ColoredBorderAlert},
   name: "SignUpForm",
   props: ["termsId"],
   methods: {
@@ -133,28 +150,29 @@ export default {
         }
         this.$store.dispatch('signup/createAccount', inputs)
             .then((resp) => {
+              console.log("returned from create acount, resp: " + JSON.stringify(resp))
               const openDPUserId = resp.data[0]
-              // now that we have a user object,
-              // save user's acceptance of terms of use (step 1 of sign up)
-              if (!this.isTermsAccepted) {
-                this.$store.dispatch('auth/acceptTerms', openDPUserId)
-              }
               if (this.handoffId) {
                 this.$store.dispatch('dataverse/updateDataverseUser', openDPUserId, this.handoffId)
                     .then((dvUserObjectId) => {
                       this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
-                          .catch(({data}) => console.log("error: " + data))
-
+                          .catch(({data}) => console.log("update file info error: " + data))
                     })
-                    .catch((data) => console.log(data))
-                this.errorMessage = data
                     .catch((data) => {
-                      console.log(data)
+                      console.log("update dataverse user error " + data)
                       this.errorMessage = data
                     });
               }
-            })
-        this.$router.push(`${NETWORK_CONSTANTS.SIGN_UP.PATH}/confirmation`);
+              this.$router.push(`${NETWORK_CONSTANTS.SIGN_UP.PATH}/confirmation`);
+            }).catch((error) => {
+          let msg = []
+          Object.keys(error).forEach(function (k) {
+            console.log(k + ' - ' + error[k]);
+            msg.push(error[k][0])
+          });
+          this.errorMessage = msg
+        })
+
       }
     },
     loginGoogle(access_token) {

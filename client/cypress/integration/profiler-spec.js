@@ -7,7 +7,7 @@
                 return false
             })
             cy.clearData()
-            cy.createMockDataset('mockDV.json')
+            cy.createMockDataset('EyeDemoMockDV.json')
 
             cy.request('/api/dataset-info/').then((data) => {
                 // Update Vuex store with the dataset to be profiled
