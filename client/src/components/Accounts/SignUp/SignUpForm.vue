@@ -168,7 +168,7 @@ export default {
           let msg = []
           Object.keys(error).forEach(function (k) {
             console.log(k + ' - ' + error[k]);
-            msg.push(error[k])
+            msg.push(error[k][0])
           });
           this.errorMessage = msg
         })
