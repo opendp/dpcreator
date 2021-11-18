@@ -8,12 +8,10 @@ TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 import json
 
 from django.test import TestCase
-from django.conf import settings
 from django.core.files import File
 
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
-from opendp_apps.profiler.profile_handler import ProfileHandler
 
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.analysis.models import DepositorSetupInfo
