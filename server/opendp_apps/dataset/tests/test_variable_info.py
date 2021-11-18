@@ -27,5 +27,5 @@ class TestVariableInfoHandler(TestCase):
                                                                           'max': 0.987012535,
                                                                           'min': 0.768410701,
                                                                           'name': 'lrPupilCorrelation',
-                                                                          'type': 'float64'
+                                                                          'type': 'Float'
                                                                           })
