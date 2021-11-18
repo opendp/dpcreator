@@ -1,6 +1,8 @@
 """
 Profile a data file
 """
+import numpy as np
+
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler.static_vals import VAR_TYPE_INTEGER, VAR_TYPE_BOOLEAN, VAR_TYPE_FLOAT, VAR_TYPE_CATEGORICAL, \
     VAR_TYPE_NUMERICAL
@@ -42,18 +44,19 @@ class VariableInfoHandler(BasicErrCheck):
                 column_info['categories'] = list(column.dtypes.categories)
                 column_info['type'] = VAR_TYPE_CATEGORICAL
             elif 'int' in str(column.dtype):
-                column_info['min'] = int(column.min())
-                column_info['max'] = int(column.max())
+                column_info['min'] = int(column.min()) if not np.isnan(column.min()) else None
+                column_info['max'] = int(column.max()) if not np.isnan(column.max()) else None
                 column_info['type'] = VAR_TYPE_INTEGER
             elif 'bool' in str(column.dtype):
                 column_info['type'] = VAR_TYPE_BOOLEAN
             elif 'float' in str(column.dtype):
-                column_info['min'] = float(column.min())
-                column_info['max'] = float(column.max())
+                column_info['min'] = float(column.min()) if not np.isnan(column.min()) else None
+                column_info['max'] = float(column.max()) if not np.isnan(column.max()) else None
+                column_info['max'] = float(column.max()) if not np.isnan(column.max()) else None
                 column_info['type'] = VAR_TYPE_FLOAT
             elif str(column.dtypes) != 'object':
-                column_info['min'] = float(column.min())
-                column_info['max'] = float(column.max())
+                column_info['min'] = float(column.min()) if not np.isnan(column.min()) else None
+                column_info['max'] = float(column.max()) if not np.isnan(column.max()) else None
                 column_info['type'] = VAR_TYPE_NUMERICAL
             profile_dict['variables'][col_name] = column_info
 

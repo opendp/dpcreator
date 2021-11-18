@@ -1,6 +1,9 @@
+from opendp_apps.dataset.models import DataSetInfo
+
+
 class DataSetInfoUpdater:
 
-    def __init__(self, dataset_info):
+    def __init__(self, dataset_info: DataSetInfo):
         self.dataset_info = dataset_info
 
     def update_step(self, step):

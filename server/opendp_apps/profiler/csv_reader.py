@@ -11,10 +11,6 @@ class CsvReader:
     def __init__(self, filepath):
         self.filepath = filepath
         self.delimiter = None
-        self.errors = []
-
-    def has_errors(self):
-        return self.errors is not None
 
     def read(self):
         sniffer = csv.Sniffer()
