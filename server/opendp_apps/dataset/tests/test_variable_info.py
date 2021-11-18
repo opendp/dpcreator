@@ -19,14 +19,13 @@ class TestVariableInfoHandler(TestCase):
     def test_run_profile_process(self):
         variable_info_handler = VariableInfoHandler(self.df)
         profile = variable_info_handler.run_profile_process()
-        self.assertEqual(profile['rowCount'], 183)
-        self.assertEqual(profile['variableCount'], 24)
-        self.assertEqual(len(profile['variableOrder']), 24)
+        self.assertEqual(profile['dataset']['rowCount'], 183)
+        self.assertEqual(profile['dataset']['variableCount'], 24)
+        self.assertEqual(len(profile['dataset']['variableOrder']), 24)
         self.assertEqual(len(profile['variables']), 24)
-        last_variable = profile['variables'][-1]
-        self.assertDictEqual(last_variable['lrPupilCorrelation'], {'label': '',
-                                                                   'max': 0.987012535,
-                                                                   'min': 0.768410701,
-                                                                   'name': 'lrPupilCorrelation',
-                                                                   'type': 'float64'
-                                                                   })
+        self.assertDictEqual(profile['variables']['lrPupilCorrelation'], {'label': '',
+                                                                          'max': 0.987012535,
+                                                                          'min': 0.768410701,
+                                                                          'name': 'lrPupilCorrelation',
+                                                                          'type': 'float64'
+                                                                          })

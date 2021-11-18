@@ -1,19 +1,19 @@
-from os.path import abspath, dirname, isdir, isfile, join
+from os.path import abspath, dirname, isfile, join
+
+from opendp_apps.profiler.csv_reader import DelimiterNotFoundException
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
 import json
-from unittest import skip
 
-from django.test import TestCase #Client, tag
+from django.test import TestCase
 from django.conf import settings
 from django.core.files import File
 
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
 from opendp_apps.profiler.profile_handler import ProfileHandler
-from opendp_apps.profiler import static_vals as pstatic
 
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.analysis.models import DepositorSetupInfo
@@ -48,7 +48,6 @@ class ProfilerTest(TestCase):
 
         # Run profiler
         #
-        save_row_count = kwargs.get(pstatic.KEY_SAVE_ROW_COUNT, True)
         profiler = profiler_tasks.run_profile_by_filepath(filepath1, **kwargs)
 
         # Shouldn't have errors
@@ -67,20 +66,16 @@ class ProfilerTest(TestCase):
         num_features_in_profile = len(info['variables'].keys())
         self.assertEqual(num_features_in_profile, num_features_profile)
 
-        pvars = profiler.profile_variables
-        self.assertTrue('variables' in info)
-        self.assertTrue(len(pvars['variables']) <= settings.PROFILER_COLUMN_LIMIT)
-        self.assertEqual(len(pvars['variables']), info['dataset']['variableCount'])
-
+        # pvars = profiler.profile_variables
+        # self.assertTrue('variables' in info)
+        # self.assertTrue(len(pvars['variables']) <= settings.PROFILER_COLUMN_LIMIT)
+        # self.assertEqual(len(pvars['variables']), info['dataset']['variableCount'])
         self.assertEqual(info['dataset']['variableCount'],
                          len(info['dataset']['variableOrder']))
 
         print('rows! ->', info['dataset']['rowCount'])
 
-        if save_row_count is True:
-            self.assertTrue(info['dataset']['rowCount'] == num_rows)
-        else:
-            self.assertTrue(info['dataset']['rowCount'] == None)
+        self.assertTrue(info['dataset']['rowCount'] == num_rows)
 
         # make the sure the "dataset.variableOrder" column names are in the "variables" dict
         #
@@ -98,14 +93,14 @@ class ProfilerTest(TestCase):
 
         msgt('-- Profile voter_validation_lwd.csv')
         # https://github.com/privacytoolsproject/PSI-Service/blob/develop/data/voter_validation_lwd.csv
-        self.profile_good_file('voter_validation_lwd.csv', 35, 20, 20771)
+        self.profile_good_file('voter_validation_lwd.csv', 35, 35, 20771)
 
         msgt('-- Profile teacher_climate_survey_lwd.csv')
         # https://github.com/privacytoolsproject/PSI-Service/blob/develop/data/teacher_climate_survey_lwd.csv
-        self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 20, 1500)
+        self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 132, 1500)
 
         # Don't save row count
-        self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 20, 1500, **dict(save_row_count=False))
+        self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 132, 1500, **dict(save_row_count=False))
 
 
     def test_010_profile_good_file(self):
@@ -146,17 +141,17 @@ class ProfilerTest(TestCase):
         self.assertEqual(dsi.depositor_setup_info.user_step, \
                          DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
 
-        print('-- Profiler reads only first 20 features')
+        # print('-- Profiler reads only first 20 features')
         self.assertTrue('variables' in info)
-        self.assertEqual(len(info['variables'].keys()), settings.PROFILER_COLUMN_LIMIT)
+        # self.assertEqual(len(info['variables'].keys()), settings.PROFILER_COLUMN_LIMIT)
 
         print('-- Profiler output is the same as the output saved to the DataSetInfo object')
         profile_json_str2 = json.dumps(info, cls=DjangoJSONEncoder, indent=4)
         self.assertTrue(profile_json_str1, profile_json_str2)
         print(profile_json_str2)
 
-        self.assertEqual(dsi.profile_variables['dataset']['variableCount'],
-                         settings.PROFILER_COLUMN_LIMIT)
+        # self.assertEqual(dsi.profile_variables['dataset']['variableCount'],
+        #                  settings.PROFILER_COLUMN_LIMIT)
 
         self.assertEqual(dsi.profile_variables['dataset']['variableCount'],
                          len(dsi.profile_variables['dataset']['variableOrder']))
@@ -166,8 +161,6 @@ class ProfilerTest(TestCase):
         for idx, colname in dsi.profile_variables['dataset']['variableOrder']:
             self.assertTrue(colname in dsi.profile_variables['variables'])
 
-
-    #@skip
     def test_020_bad_files(self):
         """(20) Test bad file type"""
         msgt(self.test_020_bad_files.__doc__)
@@ -178,14 +171,15 @@ class ProfilerTest(TestCase):
         filepath = join(TEST_DATA_DIR, 'image_file.png')
         self.assertTrue(isfile(filepath))
 
-        profiler = profiler_tasks.run_profile_by_filepath(filepath)
+        with self.assertRaises(UnicodeDecodeError):
+            profiler = profiler_tasks.run_profile_by_filepath(filepath)
 
         # print(f'!! error: {profiler.get_err_msg()}')
-        self.assertTrue(profiler.has_error())
-        error_msg = profiler.get_err_msg()
-        self.assertTrue(profiler.get_err_msg().find(ProfileHandler.ERR_FAILED_TO_READ_DATASET) > -1)
-        self.assertTrue(error_msg.find('UnicodeDecodeError') > -1 or \
-                        error_msg.find('ParserError') > -1)
+        # self.assertTrue(profiler.has_error())
+        # error_msg = profiler.get_err_msg()
+        # self.assertTrue(profiler.get_err_msg().find(ProfileHandler.ERR_FAILED_TO_READ_DATASET) > -1)
+        # self.assertTrue(error_msg.find('UnicodeDecodeError') > -1 or
+        #                 error_msg.find('ParserError') > -1)
 
         # Bad file: empty file
         #
@@ -193,15 +187,14 @@ class ProfilerTest(TestCase):
         filepath = join(TEST_DATA_DIR, 'empty_file.csv')
         self.assertTrue(isfile(filepath))
 
-        profiler = profiler_tasks.run_profile_by_filepath(filepath)
+        with self.assertRaises(DelimiterNotFoundException):
+            profiler = profiler_tasks.run_profile_by_filepath(filepath)
 
         # print(f'!! error: {profiler.get_err_msg()}')
-        self.assertTrue(profiler.has_error())
-        self.assertTrue(profiler.get_err_msg().find(ProfileHandler.ERR_FAILED_TO_READ_DATASET) > -1)
-        self.assertTrue(profiler.get_err_msg().find('EmptyDataError') > -1)
+        # self.assertTrue(profiler.has_error())
+        # self.assertTrue(profiler.get_err_msg().find(ProfileHandler.ERR_FAILED_TO_READ_DATASET) > -1)
+        # self.assertTrue(profiler.get_err_msg().find('EmptyDataError') > -1)
 
-
-    #@skip
     def test_30_filefield_empty(self):
         """(30) Test with empty file field"""
         msgt(self.test_30_filefield_empty.__doc__)
@@ -222,11 +215,9 @@ class ProfilerTest(TestCase):
 
         # Retrieve the saved DataSetInfo, the DepositorSetupInfo should have a new status
         dsi2 = DataSetInfo.objects.get(object_id=self.ds_01_object_id)
-        self.assertEqual(dsi2.depositor_setup_info.user_step, \
+        self.assertEqual(dsi2.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
 
-
-    #@skip
     def test_40_filefield_correct(self):
         """(40) Test using file file with legit file"""
         msgt(self.test_40_filefield_correct.__doc__)
@@ -261,7 +252,7 @@ class ProfilerTest(TestCase):
 
         info = dsi2.data_profile_as_dict()
 
-        print('-- Profiler reads only first 20 features')
+        # print('-- Profiler reads only first 20 features')
         self.assertTrue('variables' in info)
         self.assertEqual(len(info['variables'].keys()), settings.PROFILER_COLUMN_LIMIT)
 
