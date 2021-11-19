@@ -8,7 +8,7 @@ class DelimiterNotFoundException(Exception):
 
 class CsvReader:
 
-    def __init__(self, filepath, column_limit=20):
+    def __init__(self, filepath, column_limit=None):
         self.filepath = filepath
         self.delimiter = None
         self.column_limit = column_limit
@@ -20,7 +20,9 @@ class CsvReader:
                 dialect = sniffer.sniff(infile.readline())
                 self.delimiter = dialect.delimiter
             df = pd.read_csv(self.filepath, self.delimiter)
-            return df[df.columns[:self.column_limit]]
+            if self.column_limit:
+                return df[df.columns[:self.column_limit]]
+            return df
         except UnicodeDecodeError as ex:
             raise ex
         except csv.Error as ex:
