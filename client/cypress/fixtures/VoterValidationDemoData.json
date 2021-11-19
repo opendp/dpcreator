@@ -2,15 +2,15 @@
   "datasetName": "Voter Validation Dataset",
   "variables": {
     "V201": {
-      "name": "V201",
+      "name": "age",
       "type": "Numerical",
       "min": "0.0",
-      "max": "10.0",
-      "fixedValue": "2.0",
-      "accuracy": "0.0014422738517808759"
+      "max": "100.0",
+      "fixedValue": "45.0",
+      "accuracy": "0.01442267312734562"
     },
     "V208": {
-      "name": "V208",
+      "name": "gendersource",
       "type": "Boolean"
     }
   }

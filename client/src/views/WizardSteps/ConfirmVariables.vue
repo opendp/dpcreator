@@ -406,10 +406,8 @@ export default {
     // Create a list version of variableInfo. A deep copy, so we can edit locally
     createVariableList() {
       let vars = this.datasetInfo.depositorSetupInfo.variableInfo
-      let index = 0;
       for (const key in vars) {
         let row = {}
-        row.index = index
         row.key = key
         row.name = vars[key].name
         row.type = vars[key].type
@@ -429,7 +427,13 @@ export default {
         }
         row['editDisabled'] = true
         this.variables.push(row)
-        index += 1
+      }
+      // Order variables by key (variable name), so we always show the same 20 variables
+      this.variables = this.variables.sort(function (a, b) {
+        return a.key.toLowerCase().localeCompare(b.key.toLowerCase());
+      });
+      for (let i = 0; i < this.variables.length; i++) {
+        this.variables.index = i
       }
       this.loadingVariables = false
     },
