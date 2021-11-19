@@ -43,7 +43,6 @@ class DownloadAndProfileUtil(BasicErrCheck):
         # Run
         self.run_process()
 
-
     def get_profile_variables(self):
         """Re-retrieve the DataSetInfo object which should have the profile_variables"""
         assert self.has_error() is False, "Check that .is_valid() is True before calling this method"
@@ -81,7 +80,6 @@ class DownloadAndProfileUtil(BasicErrCheck):
 
         ws_msg.send_message(self.websocket_id)
 
-
     def run_process(self):
         """Run the download/profile process"""
         if self.has_error():
@@ -104,7 +102,6 @@ class DownloadAndProfileUtil(BasicErrCheck):
         #
         self.send_websocket_success_msg('Start dataset profile...')
         self.profile_file()
-
 
     def check_for_or_download_source_file(self):
         """
@@ -156,6 +153,7 @@ class DownloadAndProfileUtil(BasicErrCheck):
         try:
             df = CsvReader(filefield.path).read()
         except Exception as ex:
+            print("EXCEPTION in profile_file: ", str(ex))
             self.add_err_msg(str(ex))
             self.send_websocket_profiler_err_msg(str(ex))
             if self.dataset_object_id:
@@ -166,7 +164,7 @@ class DownloadAndProfileUtil(BasicErrCheck):
         ph = run_profile(df, self.dataset_object_id)
 
         #self.data_profile = ph.get_data_profile()
-        self.profile_variables = ph.get_profile_variables()
+        self.profile_variables = ph.data_profile
         profile_str = json.dumps(self.profile_variables, cls=DjangoJSONEncoder, indent=4)
 
         self.send_websocket_success_msg('Profile complete!',
