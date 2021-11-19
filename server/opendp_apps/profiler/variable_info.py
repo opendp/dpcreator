@@ -37,11 +37,15 @@ class VariableInfoHandler(BasicErrCheck):
                 "name": col_name,
                 "label": ""
             }
+            # category_limit = 5
+            # Use type checking to filter out numpy Nan
+            # Comment out categories for now
             if str(column.dtypes) == 'object':
-                column_info['categories'] = list(column.unique())
+                # column_info['categories'] = list([x for x in column.unique() if type(x) == str])[:category_limit]
                 column_info['type'] = VAR_TYPE_CATEGORICAL
+
             elif hasattr(column.dtypes, 'categories'):
-                column_info['categories'] = list(column.dtypes.categories)
+                # column_info['categories'] = list([x for x in column.dtypes.categories if type(x) == str])[:category_limit]
                 column_info['type'] = VAR_TYPE_CATEGORICAL
             elif 'int' in str(column.dtype):
                 column_info['min'] = int(column.min()) if not np.isnan(column.min()) else None
