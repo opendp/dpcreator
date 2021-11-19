@@ -51,16 +51,16 @@ class VariableInfoHandler(BasicErrCheck):
                 column_info['categories'] = []  # list([x for x in column.dtypes.categories if type(x) == str])[:category_limit]
                 column_info['type'] = VAR_TYPE_CATEGORICAL
             elif 'int' in str(column.dtype):
-                column_info['min'] = int(column.min()) if not np.isnan(column.min()) else None
-                column_info['max'] = int(column.max()) if not np.isnan(column.max()) else None
+                # column_info['min'] = int(column.min()) if not np.isnan(column.min()) else None
+                # column_info['max'] = int(column.max()) if not np.isnan(column.max()) else None
                 column_info['type'] = VAR_TYPE_NUMERICAL
             elif 'float' in str(column.dtype):
-                column_info['min'] = float(column.min()) if not np.isnan(column.min()) else None
-                column_info['max'] = float(column.max()) if not np.isnan(column.max()) else None
+                # column_info['min'] = float(column.min()) if not np.isnan(column.min()) else None
+                # column_info['max'] = float(column.max()) if not np.isnan(column.max()) else None
                 column_info['type'] = VAR_TYPE_NUMERICAL
             elif str(column.dtypes) != 'object':
-                column_info['min'] = float(column.min()) if not np.isnan(column.min()) else None
-                column_info['max'] = float(column.max()) if not np.isnan(column.max()) else None
+                # column_info['min'] = float(column.min()) if not np.isnan(column.min()) else None
+                # column_info['max'] = float(column.max()) if not np.isnan(column.max()) else None
                 column_info['type'] = VAR_TYPE_NUMERICAL
             profile_dict['variables'][col_name] = column_info
 
@@ -69,9 +69,13 @@ class VariableInfoHandler(BasicErrCheck):
 
 
 if __name__ == '__main__':
-    csv_reader = CsvReader('/Users/ethancowan/IdeaProjects/opendp-ux/server/test_data/voter_validation_lwd.csv')
+
+    import os
+    from pprint import pprint
+    from server.opendp_project.settings.base import BASE_DIR
+
+    csv_reader = CsvReader(os.path.join(BASE_DIR, 'test_data/teacher_climate_survey_lwd.csv'))
     df = csv_reader.read()
     v = VariableInfoHandler(df)
     profile_dict = v.run_profile_process()
-    from pprint import pprint
     pprint(profile_dict)

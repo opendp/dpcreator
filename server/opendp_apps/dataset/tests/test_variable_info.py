@@ -24,8 +24,8 @@ class TestVariableInfoHandler(TestCase):
         self.assertEqual(len(profile['dataset']['variableOrder']), 24)
         self.assertEqual(len(profile['variables']), 24)
         self.assertDictEqual(profile['variables']['lrPupilCorrelation'], {'label': '',
-                                                                          'max': 0.987012535,
-                                                                          'min': 0.768410701,
+                                                                          # 'max': 0.987012535,
+                                                                          # 'min': 0.768410701,
                                                                           'name': 'lrPupilCorrelation',
-                                                                          'type': 'Float'
+                                                                          'type': 'Numerical'
                                                                           })
