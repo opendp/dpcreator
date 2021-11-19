@@ -15,7 +15,7 @@
                 return false
             })
 
-            cy.runDemo('mockDV.json', 'fatigueData.json')
+            cy.runDemo('EyeDemoMockDV.json', 'EyeDemoData.json')
 
 
         })

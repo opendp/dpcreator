@@ -88,9 +88,6 @@ Cypress.Commands.add('createMockDataset', (fixture) => {
         cy.get('[data-test="username"]').type(mockForm['user']);
         cy.get('[data-test="password"]').type(mockForm['password']);
         cy.get('[data-test="Log in"]').click();
-        // first we will be routed to the Terms of Conditions page for the user
-        cy.get('[data-test="confirmTermsCheckbox"]').click({force: true});
-        cy.get('[data-test="confirmTermsContinue"]').click();
         cy.url().should('contain', 'welcome')
     })
 })
@@ -224,7 +221,7 @@ Cypress.Commands.add('setupStatisticsPage', (datasetFixture, analysisFixture) =>
         cy.fixture(analysisFixture).then(analysisPlan => {
             cy.intercept('GET', '/api/analyze/' + analysisPlan.objectId + '/', {body: analysisPlan})
         })
-        cy.get('[data-test="My Data"]').click({force: true})
+        cy.visit('/my-data')
         cy.get('tr').should('contain',
             'Replication Data for: Eye-typing experiment')
         cy.get('[data-test="continueWorkflow"]').click({force: true})
