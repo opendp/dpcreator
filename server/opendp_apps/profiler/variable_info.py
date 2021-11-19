@@ -1,16 +1,10 @@
 """
 Profile a data file
 """
-import numpy as np
-
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler.csv_reader import CsvReader
-from opendp_apps.profiler.static_vals import VAR_TYPE_INTEGER, VAR_TYPE_BOOLEAN, VAR_TYPE_FLOAT, VAR_TYPE_CATEGORICAL, \
-    VAR_TYPE_NUMERICAL
-
-
-class EmptyDataframeException(Exception):
-    pass
+from opendp_apps.profiler.static_vals import VAR_TYPE_BOOLEAN, VAR_TYPE_CATEGORICAL, VAR_TYPE_NUMERICAL
+# VAR_TYPE_INTEGER, VAR_TYPE_FLOAT
 
 
 class VariableInfoHandler(BasicErrCheck):
@@ -25,6 +19,24 @@ class VariableInfoHandler(BasicErrCheck):
         self.data_profile = None
 
     def run_profile_process(self):
+        """
+        Process the dataframe into a complete data profile dictionary
+        :return:
+        {
+            'dataset': {
+                'rowCount': 1500,
+                'variableCount': 132,
+                'variableOrder': [(0, 'some_column'), ....]
+            },
+            'variables': {
+                'some_column': {
+                    'label': '',
+                    'name': 'some_column',
+                    'type': 'Categorical'
+                }
+            }
+        }
+        """
         profile_dict = {'dataset': {}}
         num_rows, num_variables = self.df.shape
         profile_dict['dataset']['rowCount'] = int(num_rows)
@@ -45,10 +57,11 @@ class VariableInfoHandler(BasicErrCheck):
                 column_info['categories'] = []
                 column_info['type'] = VAR_TYPE_BOOLEAN
             elif str(column.dtypes) == 'object':
-                column_info['categories'] = []  #  list([x for x in column.unique() if type(x) == str])[:category_limit]
+                column_info['categories'] = []  # list([x for x in column.unique() if type(x) == str])[:category_limit]
                 column_info['type'] = VAR_TYPE_CATEGORICAL
             elif hasattr(column.dtypes, 'categories'):
-                column_info['categories'] = []  # list([x for x in column.dtypes.categories if type(x) == str])[:category_limit]
+                column_info[
+                    'categories'] = []  # list([x for x in column.dtypes.categories if type(x) == str])[:category_limit]
                 column_info['type'] = VAR_TYPE_CATEGORICAL
             elif 'int' in str(column.dtype):
                 # column_info['min'] = int(column.min()) if not np.isnan(column.min()) else None
@@ -69,7 +82,6 @@ class VariableInfoHandler(BasicErrCheck):
 
 
 if __name__ == '__main__':
-
     import os
     from pprint import pprint
     from server.opendp_project.settings.base import BASE_DIR

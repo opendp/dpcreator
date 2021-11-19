@@ -36,9 +36,9 @@ class DownloadAndProfileUtil(BasicErrCheck):
         self.websocket_id = websocket_id
 
         # To gather
-        self.dataset_info = None    # DataSetInfo object
-        self.data_profile = None    # Profiler output; saved to DataSetInfo object
-        self.profile_variables = None   # Formatted profiler output; saved to DataSetInfo object
+        self.dataset_info = None  # DataSetInfo object
+        self.data_profile = None  # Profiler output; saved to DataSetInfo object
+        self.profile_variables = None  # Formatted profiler output; saved to DataSetInfo object
 
         # Run
         self.run_process()
@@ -58,7 +58,7 @@ class DownloadAndProfileUtil(BasicErrCheck):
         if not self.websocket_id:
             return
 
-        ws_msg = WebsocketMessage.get_fail_message( \
+        ws_msg = WebsocketMessage.get_fail_message(
             async_static.WS_MSG_TYPE_PROFILER,
             user_msg)
         ws_msg.send_message(self.websocket_id)
@@ -73,7 +73,7 @@ class DownloadAndProfileUtil(BasicErrCheck):
         else:
             data_dict = None
 
-        ws_msg = WebsocketMessage.get_success_message( \
+        ws_msg = WebsocketMessage.get_success_message(
             async_static.WS_MSG_TYPE_PROFILER,
             user_msg,
             data=data_dict)
@@ -144,7 +144,13 @@ class DownloadAndProfileUtil(BasicErrCheck):
         return True
 
     def profile_file(self):
-        """"Profile the file"""
+        """
+        1. Get the DataSetInfo object by id
+        2. Read the associated filefield
+        3. Parse it into a dataframe
+        4. Run the variable profiler on the dataframe
+        5. Send results back via websocket
+        """
         try:
             ds_info = DataSetInfo.objects.get(object_id=self.dataset_object_id)
             filefield = ds_info.source_file
@@ -153,7 +159,6 @@ class DownloadAndProfileUtil(BasicErrCheck):
         try:
             df = CsvReader(filefield.path).read()
         except Exception as ex:
-            print("EXCEPTION in profile_file: ", str(ex))
             self.add_err_msg(str(ex))
             self.send_websocket_profiler_err_msg(str(ex))
             if self.dataset_object_id:
@@ -162,25 +167,12 @@ class DownloadAndProfileUtil(BasicErrCheck):
                 dataset_info_updater.update_step(DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
             return
         ph = run_profile(df, self.dataset_object_id)
-
-        #self.data_profile = ph.get_data_profile()
         self.profile_variables = ph.data_profile
         profile_str = json.dumps(self.profile_variables, cls=DjangoJSONEncoder, indent=4)
 
         self.send_websocket_success_msg('Profile complete!',
                                         profile_str=profile_str)
-                                        # profile_str=self.get_data_profile())
 
     def get_data_profile(self):
-        assert(self.has_error() is False), \
-            "Check that .has_error() is False before accessing this method"
+        assert (self.has_error() is False), "Check that .has_error() is False before accessing this method"
         return self.data_profile
-
-
-    #def get_data_profile_as_json_str(self):
-    #    assert (self.has_error() is False), \
-    #        "Check that .has_error() is False before accessing this method"
-    #
-    #    profile_str = json.dumps(self.get_data_profile(), cls=DjangoJSONEncoder, indent=4)
-    #
-    #    return profile_str

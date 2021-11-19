@@ -5,6 +5,12 @@ from opendp_apps.profiler.variable_info import VariableInfoHandler
 
 
 def run_profile(df, dataset_info_object_id):
+    """
+    Process dataframe for variable profiling, while updating the DatasetInfo object at each step
+    :param df:
+    :param dataset_info_object_id:
+    :return: VariableInfoHandler
+    """
     dataset_info = None
     dataset_info_updater = None
 
