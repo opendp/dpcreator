@@ -89,7 +89,7 @@ class ReleaseInfoFormatter(BasicErrCheck):
             "application": "DP Creator",
             "application_url": "https://github.com/opendp/dpcreator",
             "differentially_private_library": {
-                "name": "OpenDPz",
+                "name": "OpenDP",
                 "url": "https://github.com/opendp/opendp",
                 "version": self.release_util.opendp_version,
             },
