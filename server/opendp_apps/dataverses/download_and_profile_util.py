@@ -174,8 +174,6 @@ class DownloadAndProfileUtil(BasicErrCheck):
     def get_data_profile(self):
         assert(self.has_error() is False), \
             "Check that .has_error() is False before accessing this method"
-
-
         return self.data_profile
 
 

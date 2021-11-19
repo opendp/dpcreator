@@ -4,6 +4,7 @@ Profile a data file
 import numpy as np
 
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
+from opendp_apps.profiler.csv_reader import CsvReader
 from opendp_apps.profiler.static_vals import VAR_TYPE_INTEGER, VAR_TYPE_BOOLEAN, VAR_TYPE_FLOAT, VAR_TYPE_CATEGORICAL, \
     VAR_TYPE_NUMERICAL
 
@@ -40,24 +41,23 @@ class VariableInfoHandler(BasicErrCheck):
             # category_limit = 5
             # Use type checking to filter out numpy Nan
             # Comment out categories for now
-            if str(column.dtypes) == 'object':
-                # column_info['categories'] = list([x for x in column.unique() if type(x) == str])[:category_limit]
+            if column.unique().shape[0] == 2:
+                column_info['categories'] = []
+                column_info['type'] = VAR_TYPE_BOOLEAN
+            elif str(column.dtypes) == 'object':
+                column_info['categories'] = []  #  list([x for x in column.unique() if type(x) == str])[:category_limit]
                 column_info['type'] = VAR_TYPE_CATEGORICAL
-
             elif hasattr(column.dtypes, 'categories'):
-                # column_info['categories'] = list([x for x in column.dtypes.categories if type(x) == str])[:category_limit]
+                column_info['categories'] = []  # list([x for x in column.dtypes.categories if type(x) == str])[:category_limit]
                 column_info['type'] = VAR_TYPE_CATEGORICAL
             elif 'int' in str(column.dtype):
                 column_info['min'] = int(column.min()) if not np.isnan(column.min()) else None
                 column_info['max'] = int(column.max()) if not np.isnan(column.max()) else None
-                column_info['type'] = VAR_TYPE_INTEGER
-            elif 'bool' in str(column.dtype):
-                column_info['type'] = VAR_TYPE_BOOLEAN
+                column_info['type'] = VAR_TYPE_NUMERICAL
             elif 'float' in str(column.dtype):
                 column_info['min'] = float(column.min()) if not np.isnan(column.min()) else None
                 column_info['max'] = float(column.max()) if not np.isnan(column.max()) else None
-                column_info['max'] = float(column.max()) if not np.isnan(column.max()) else None
-                column_info['type'] = VAR_TYPE_FLOAT
+                column_info['type'] = VAR_TYPE_NUMERICAL
             elif str(column.dtypes) != 'object':
                 column_info['min'] = float(column.min()) if not np.isnan(column.min()) else None
                 column_info['max'] = float(column.max()) if not np.isnan(column.max()) else None
@@ -66,3 +66,12 @@ class VariableInfoHandler(BasicErrCheck):
 
         self.data_profile = profile_dict
         return profile_dict
+
+
+if __name__ == '__main__':
+    csv_reader = CsvReader('/Users/ethancowan/IdeaProjects/opendp-ux/server/test_data/voter_validation_lwd.csv')
+    df = csv_reader.read()
+    v = VariableInfoHandler(df)
+    profile_dict = v.run_profile_process()
+    from pprint import pprint
+    pprint(profile_dict)
