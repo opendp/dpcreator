@@ -30,7 +30,8 @@
             cy.url().should('contains', 'welcome')
             cy.get('[data-test="My Profile"]').click();
             cy.url().should('contains', 'my-profile')
-            cy.get('[data-test="username"]').should('have.value', username)
+            cy.get('h2').should('contain', 'Edit account information').should('be.visible')
+            cy.get('[data-test="myProfileUsername"]').should('have.value', username)
 
 
         })
@@ -73,8 +74,11 @@
             cy.get('[data-test="username"]').type(username);
             cy.get('[data-test="password"]').type(password);
             cy.get('[data-test="Log in"]').click();
+            cy.url().should('contains', 'my-data')
+
             cy.get('[data-test="My Profile"]').click();
-            cy.get('[data-test="username"]').should('have.value', username)
+            cy.get('h2').should('contain', 'Edit account information').should('be.visible')
+            cy.get('[data-test="myProfileUsername"]').should('have.value', username)
         })
 
     })
