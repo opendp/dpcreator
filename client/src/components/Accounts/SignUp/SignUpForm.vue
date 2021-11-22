@@ -219,7 +219,7 @@ export default {
       'registrationLoading']),
     ...mapState('dataverse', ['handoffId', 'dataverseUser']),
     ...mapState('auth', ['user']),
-    ...mapGetters('auth', ['isTermsAccepted']),
+
 
     registrationErrors() {
       let errs = [];

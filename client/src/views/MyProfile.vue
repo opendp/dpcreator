@@ -15,7 +15,7 @@
           <v-form @submit.prevent="handleEditAccountInformation">
             <v-text-field
                 v-model="username"
-                data-test="username"
+                data-test="myProfileUsername"
                 label="Username"
                 required
             ></v-text-field>
