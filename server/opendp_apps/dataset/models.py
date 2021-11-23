@@ -91,7 +91,6 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
         raise AttributeError('Unknown DataSetinfo type. No access to depositor_setup_info')
 
-
     def get_dataset_size(self) -> BasicResponse:
         """Retrieve the rowCount index from the data_profile -- not always avaiable"""
         if not self.data_profile:

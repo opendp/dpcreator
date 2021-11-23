@@ -96,7 +96,6 @@ class ValidateReleaseUtil(BasicErrCheck):
                                    dp_statistics=None,
                                    compute_mode=True)
 
-
     def add_stat_spec(self, stat_spec: StatSpec):
         """Add a StatSpec subclass to a list"""
         self.stat_spec_list.append(stat_spec)
@@ -177,7 +176,6 @@ class ValidateReleaseUtil(BasicErrCheck):
         # It worked! Save the Release!!
         self.make_release_info(epsilon_used)
 
-
     def make_release_info(self, epsilon_used: float):
         """
         Make a ReleaseInfo object!
@@ -227,7 +225,6 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         return self.release_info
 
-
     def get_final_release_data(self, as_json=False):
         """Build object to save in ReleaseInfo.dp_release"""
         formatter = ReleaseInfoFormatter(self)
@@ -240,14 +237,12 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         return formatter.get_release_data(as_json=as_json)
 
-
     def get_release_stats(self):
         """Return the release stats"""
         assert self.has_error() is False, \
             "Check that .has_error() is False before calling this method"
 
         return self.release_stats
-
 
     def run_validation_process(self):
         """Run the validation"""
@@ -297,7 +292,6 @@ class ValidateReleaseUtil(BasicErrCheck):
                     # Looks good!
                     self.validation_info.append(stat_spec.get_success_msg_dict())
 
-
     def get_variable_indices(self):
         """
         Retrieve variable indices from the dataset profile
@@ -311,7 +305,6 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         self.add_err_msg(variable_indices_info.message)
         return None
-
 
     def build_stat_specs(self):
         """
@@ -428,7 +421,6 @@ class ValidateReleaseUtil(BasicErrCheck):
             else:
                 # Shouldn't reach here, unknown stats are captured up above
                 pass
-
 
     def run_preliminary_steps(self):
         """Run preliminary steps before validation"""

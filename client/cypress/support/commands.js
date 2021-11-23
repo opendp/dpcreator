@@ -144,7 +144,7 @@ Cypress.Commands.add('testMean', (numericVar) => {
     cy.get(minDataTest).type(numericVar.min, {force: true})
     cy.wait(500)
     cy.get(maxDataTest).type(numericVar.max, {force: true})
-    cy.wait('@patchDeposit', {timeout: 5000})
+  //  cy.wait('@patchDeposit', {timeout: 5000})
 
     // Continue to Set Epsilon Step
     cy.get('[data-test="wizardContinueButton"]').last().click();
