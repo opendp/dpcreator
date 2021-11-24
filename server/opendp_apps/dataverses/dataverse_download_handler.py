@@ -149,10 +149,8 @@ class DataverseDownloadHandler(BasicErrCheck):
                               f' (code: dv_download_060)'))
             return False
 
-        try:
-            self.dv_user = DataverseUser.objects.get(user=self.dv_file_info.creator,
-                                                     dv_installation=self.dv_file_info.dv_installation)
-        except DataverseUser.DoesNotExist:
+        self.dv_user = self.dv_file_info.get_dataverse_user()
+        if self.dv_user is None:
             self.add_err_msg((f'The DataverseUser is not available.'
                               f' (code: dv_download_070)'))
             return False

@@ -1,7 +1,14 @@
+from collections import OrderedDict
+import json
+
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 
+from rest_framework import status
+
+from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
@@ -161,12 +168,121 @@ class ReleaseInfo(TimestampedModelWithUUID):
                                    upload_to='release-files/%Y/%m/%d/',
                                    blank=True, null=True)
 
-    #pdf_release
+    dataverse_deposit_info = models.JSONField(blank=True,
+                                              null=True,
+                                              help_text='Only applies to Dataverse files')
+
+    dv_json_deposit_complete = models.BooleanField(\
+                                default=False,
+                                help_text='Only applies to Dataverse datasets')
+
+    dv_pdf_deposit_complete = models.BooleanField(\
+                                default=False,
+                                help_text='Only applies to Dataverse datasets')
 
     class Meta:
         verbose_name = 'Release Information'
         verbose_name_plural = 'Release Information'
         ordering = ('dataset', '-created')
+
+
+    def save(self, *args, **kwargs):
+        """Error check the dataverse_deposit_complete flag"""
+        #if not self.dataset.is_dataverse_dataset(): # can never be True
+        #    self.dv_json_deposit_complete = False
+        #    self.dv_pdf_deposit_complete = False
+        #    self.dataverse_deposit_info = None
+
+        super(ReleaseInfo, self).save(*args, **kwargs)
+
+    @mark_safe
+    def dataverse_deposit_info_json(self):
+        """Return JSON string"""
+        if self.dataverse_deposit_info:
+            return '<pre>' + json.dumps(self.dataverse_deposit_info, indent=4) + '</pre>'
+        return ''
+
+
+class AuxiliaryFileDepositRecord(TimestampedModelWithUUID):
+    """Used to record the depositing of ReleaseInfo files to Dataverse as Auxiliary Files"""
+    name = models.CharField(max_length=255, blank=True, help_text='auto-filled on save')
+    release_info = models.ForeignKey(ReleaseInfo, on_delete=models.CASCADE)
+
+    deposit_success = models.BooleanField(default=False)
+    dv_auxiliary_type = models.CharField(max_length=100, choices=dv_static.DV_DEPOSIT_CHOICES)
+    dv_auxiliary_version = models.CharField(max_length=50, default='v1', help_text='e.g. "v1", "v2", etc')
+
+    http_status_code = models.IntegerField(help_text='HTTP code', default=-1)
+    http_resp_text = models.TextField(blank=True)
+    http_resp_json = models.JSONField(null=True, blank=True)
+    dv_err_msg = models.CharField(max_length=255, blank=True)
+
+    user_msg_text = models.TextField(blank=True, help_text='text version')
+    user_msg_html = models.TextField(blank=True, help_text='HTML version')
+
+    dv_download_url = models.URLField(blank=True)
+
+    def __str__(self):
+        if self.name:
+            return self.name
+        else:
+            return f'{self.release_info} - {self.dv_auxiliary_version} ({self.dv_auxiliary_type})'
+            #return AuxiliaryFileDepositRecord.format_name(self)
+
+    def save(self, *args, **kwargs):
+        self.name = AuxiliaryFileDepositRecord.format_name(self)
+
+        if self.http_status_code in (status.HTTP_200_OK, status.HTTP_201_CREATED):
+            self.deposit_success = True
+        else:
+            self.deposit_success = False
+
+        super(AuxiliaryFileDepositRecord, self).save(*args, **kwargs)
+
+    def as_dict(self):
+        """Return in dict format for API Use"""
+        info_dict = OrderedDict({
+            'name': self.name,
+            'object_id': str(self.object_id),
+            'deposit_success': self.deposit_success,
+            'dv_download_url': self.dv_download_url,
+
+            'dv_auxiliary_type': self.dv_auxiliary_type,
+            'dv_auxiliary_version': self.dv_auxiliary_version,
+
+            'http_status_code': self.http_status_code,
+            'http_resp_text': self.http_resp_text,
+            'http_resp_json': self.http_resp_json,
+            'dv_err_msg': self.dv_err_msg,
+
+            'user_msg_text': self.user_msg_text,
+            'user_msg_html': self.user_msg_html,
+
+
+            'created': self.created.isoformat(),
+            'updated': self.updated.isoformat(),
+        })
+
+        return info_dict
+
+    def as_json_string(self, indent=4):
+        """Return JSON string"""
+        return json.dumps(self.as_dict(), indent=indent)
+
+    @mark_safe
+    def json_string_html(self):
+        """Return JSON string"""
+        return '<pre>' + self.as_json_string() + '</pre>'
+
+
+    @staticmethod
+    def format_name(deposit_rec) -> str:
+        """
+        Name formatting for the AuxiliaryFileDepositRecord
+
+        :param deposit_rec AuxiliaryFileDepositRecord
+        """
+        return f'{deposit_rec.release_info} - {deposit_rec.dv_auxiliary_version} ({deposit_rec.dv_auxiliary_type})'
 
 
 class AnalysisPlan(TimestampedModelWithUUID):
@@ -205,7 +321,11 @@ class AnalysisPlan(TimestampedModelWithUUID):
     #custom_variables = models.JSONField(null=True)
     dp_statistics = models.JSONField(null=True)
 
-    release_info = models.ForeignKey(ReleaseInfo, on_delete=models.PROTECT, null=True, blank=True)
+    release_info = models.ForeignKey(ReleaseInfo,
+                                     on_delete=models.SET_NULL,
+                                     # on_delete=models.PROTECT,
+                                     null=True,
+                                     blank=True)
 
     def __str__(self):
         return f'{self.dataset} - {self.user_step}'
@@ -226,6 +346,11 @@ class AnalysisPlan(TimestampedModelWithUUID):
         #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
         #       depending on the data
         #
+        if self.user_step == self.AnalystSteps.STEP_1200_PROCESS_COMPLETE:
+            self.is_complete = True
+        else:
+            self.is_complete = False
+
         super(AnalysisPlan, self).save(*args, **kwargs)
 
 

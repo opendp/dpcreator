@@ -50,9 +50,7 @@
         "email": "mock_user@some.edu",
         "first_name": "B",
         "last_name": "Martini",
-        "dv_general_token": "shoefly-dont-bother-m3",
-        "dv_sensitive_token": "shoefly-dont-bother-m3",
-        "dv_token_update": null
+        "dv_general_token": "shoefly-dont-bother-m3"
     }
 },
 {

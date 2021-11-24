@@ -3,7 +3,7 @@ Format a DataSetInfo for use in a JSON Release
 """
 import json
 from opendp_apps.dataset.models import DataSetInfo
-from opendp_apps.dataset import static_vals as dstatic
+from opendp_apps.analysis.models import ReleaseInfo
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp, BasicResponse
 
@@ -57,7 +57,7 @@ class DataSetFormatter(BasicErrCheck):
         }
 
         self.formatted_info = ds_dict
-        
+
 
     def format_dataverse_dataset(self):
         """Format UserUpload dataset"""
@@ -98,16 +98,6 @@ class DataSetFormatter(BasicErrCheck):
             "citation": citation,
             "doi": self.dataset.dataset_doi,
             "identifier": self.get_dataset_identifier_or_none(),
-
-            'release_deposit_info': {
-                  "deposited": False,
-                  # if True, add: "release_url": "some-url"
-                  # update with https://github.com/opendp/dpcreator/issues/34
-                  # "release_urls": {
-                      #    "release_json": "http://dataverse.edu/some.json",
-                      #    "release_pdf": "http://dataverse.edu/some.pdf"
-                      # }
-                  },
             'installation': {
                 "name": self.dataset.dv_installation.name,
                 "url": self.dataset.dv_installation.dataverse_url

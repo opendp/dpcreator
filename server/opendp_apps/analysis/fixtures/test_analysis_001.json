@@ -89,10 +89,7 @@
       "email": "dv_user@mock.edu",
       "first_name": "Fname",
       "last_name": "Lname",
-      "dv_general_token": "",
-      "dv_sensitive_token": "",
-      "dv_token_update": null
-    }
+      "dv_general_token": ""}
   },
   {
     "model": "user.dataverseuser",
@@ -107,10 +104,7 @@
       "email": "mock_user@some.edu",
       "first_name": "Mock",
       "last_name": "User",
-      "dv_general_token": "shoefly-dont-bother-m3",
-      "dv_sensitive_token": "shoefly-dont-bother-m3",
-      "dv_token_update": null
-    }
+      "dv_general_token": "shoefly-dont-bother-m3"}
   },
   {
     "model": "user.dataverseuser",
@@ -125,9 +119,7 @@
       "email": "raman_prasad@harvard.edu",
       "first_name": "Raman",
       "last_name": "Prasad",
-      "dv_general_token": "some-old-token",
-      "dv_sensitive_token": "",
-      "dv_token_update": "2021-07-20T15:12:40Z"
+      "dv_general_token": "some-old-token"
     }
   },
   {
