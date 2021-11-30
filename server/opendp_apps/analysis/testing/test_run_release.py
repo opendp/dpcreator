@@ -326,7 +326,7 @@ class TestRunRelease(TestCase):
         #  and check that it a proper url is generated
         # ------------------------------------------------------
         fname_blank = 'near_blank_for_tests.pdf'
-        filepath = join(TEST_DATA_DIR, fname_blank)
+        filepath = join(TEST_DATA_DIR, 'pdfs', fname_blank)
         self.assertTrue(isfile(filepath))
 
         # Attach the file to the `release_info.dp_release_pdf_file` field
