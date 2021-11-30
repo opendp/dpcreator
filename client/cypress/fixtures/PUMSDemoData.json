@@ -3,7 +3,7 @@
   "variables": {
     "age": {
       "name": "age",
-      "type": "Numerical",
+      "type": "Integer",
       "min": "0.0",
       "max": "100.0",
       "fixedValue": "45",

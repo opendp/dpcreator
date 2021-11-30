@@ -65,7 +65,7 @@
             <v-select
                 v-if="showToolTip(item)"
                 v-model="item.type"
-                :items="['Numerical', 'Categorical', 'Boolean']"
+                :items="['Float', 'Integer', 'Categorical', 'Boolean']"
                 standard
                 v-tooltip="'Changing type will clear additional info.'"
                 hide-selected
@@ -78,7 +78,7 @@
         <v-select
             v-else
             v-model="item.type"
-            :items="['Numerical', 'Categorical', 'Boolean']"
+            :items="['Float', 'Integer', 'Categorical', 'Boolean']"
             standard
             hide-selected
             class="d-inline-block select"
@@ -112,7 +112,7 @@
             </template>
           </v-combobox>
         </div>
-        <div v-if="variable.type === 'Numerical'" class="range-input-wrapper">
+        <div v-if="isNumerical(variable.type)" class="range-input-wrapper">
           <v-text-field
               background-color="soft_primary mb-0"
               type="number"
@@ -363,24 +363,31 @@ export default {
   methods: {
     checkMin(value) {
       if (this.currentRow !== null) {
-        const currentMax = this.variables[this.currentRow].additional_information.max
-        if (currentMax !== null && currentMax < Number(value)) {
-          return false
+        if (this.variables[this.currentRow].additional_information !== undefined) {
+          const currentMax = this.variables[this.currentRow].additional_information.max
+          if (currentMax !== null && currentMax < Number(value)) {
+            return false
+          }
         }
       }
       return true
     },
     checkMax(value) {
       if (this.currentRow !== null) {
-        const currentMin = this.variables[this.currentRow].additional_information.min
-        if (currentMin !== null && currentMin > Number(value)) {
-          return false
+        if (this.variables[this.currentRow].additional_information !== undefined) {
+          const currentMin = this.variables[this.currentRow].additional_information.min
+          if (currentMin !== null && currentMin > Number(value)) {
+            return false
+          }
         }
       }
       return true
     },
+    isNumerical(type) {
+      return type === 'Float' || type === 'Integer'
+    },
     showToolTip(item) {
-      const show = (item.type === 'Numerical' && (item.additional_information.max !== null
+      const show = (this.isNumerical(item.type) && (item.additional_information.max !== null
           || item.additional_information.min !== null))
           || (item.type === 'Categorical' && (item.additional_information.categories !== null
               && item.additional_information.categories.length > 0))
@@ -388,7 +395,7 @@ export default {
     },
     isValidRow(variable) {
       let minmaxValid = true
-      if (variable.type == 'Numerical') {
+      if (this.isNumerical(variable.type)) {
         if (variable.additional_information.max !== null && variable.additional_information.min !== null) {
           minmaxValid = (Number(variable.additional_information.min) < Number(variable.additional_information.max))
         }
@@ -417,7 +424,7 @@ export default {
           row.label = vars[key].label
         }
         row.additional_information = {}
-        if (row.type === 'Numerical') {
+        if (this.isNumerical(row.type)) {
           row.additional_information.max = vars[key].max
           row.additional_information.min = vars[key].min
         }

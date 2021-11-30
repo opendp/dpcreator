@@ -52,7 +52,7 @@ Cypress.Commands.add('runDemo', (mockDVfile, demoDatafile) => {
         // try to find one numerical variable
         let numericVar = null
         for (const key in demoData.variables) {
-            if (demoData.variables[key].type == "Numerical") {
+            if (demoData.variables[key].type === 'Float' || demoData.variables[key].type === 'Integer') {
                 numericVar = demoData.variables[key]
             }
         }
