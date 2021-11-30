@@ -157,8 +157,6 @@ class ManifestTestParams(DataverseParams):
     site_url = models.CharField(max_length=255)
     use_mock_dv_api = models.BooleanField('Use Mock Dataverse API', default=False)
 
-    ddi_content = models.TextField(help_text='Use XML', blank=True)
-
     schema_org_content = models.JSONField(null=True, blank=True)
 
     user_info = models.JSONField(null=True, blank=True)
@@ -244,19 +242,20 @@ class ManifestTestParams(DataverseParams):
     mock_user_info_link.allow_tags = True
 
 
+    '''
     @mark_safe
     def ddi_info_link(self):
         """
         Retrieve the DDI information
         """
-        if not (self.use_mock_dv_api and self.ddi_content and self.datasetPid):
+        if not (self.use_mock_dv_api and self.datasetPid):
             return 'n/a'
 
         dataset_lnk = reverse('view_get_dataset_export')
         return (f'<a href="{dataset_lnk}?persistentId={self.datasetPid}'
                 f'&exporter={dv_static.EXPORTER_FORMAT_DDI}">ddi info</a>')
     ddi_info_link.allow_tags = True
-
+    '''
 
     @mark_safe
     def schema_org_info_link(self):

@@ -89,7 +89,7 @@ def run_deposit_api():
 
     files = {'file': open(full_fname, 'rb')}
 
-    print('dv_url', dv_url)
+    # print('dv_url', dv_url)
     response = requests.post(dv_url,
                              headers=headers,
                              data=payload,

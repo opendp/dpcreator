@@ -49,6 +49,8 @@ class ReleaseInfoAdmin(admin.ModelAdmin):
                        'dataset',
                        'dp_release', 'epsilon_used',
                        'dataverse_deposit_info_json',
+                       'download_json_url',
+                       'download_pdf_url',
                        'created', 'updated',)
 
 

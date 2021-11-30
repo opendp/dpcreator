@@ -10,6 +10,7 @@ from django.core.files import File
 from django.test.testcases import TestCase
 
 from rest_framework.test import APIClient
+from rest_framework.reverse import reverse as drf_reverse
 
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.models import AnalysisPlan, AuxiliaryFileDepositRecord
@@ -257,17 +258,87 @@ class TestRunRelease(TestCase):
         updated_plan = AnalysisPlan.objects.get(object_id=analysis_plan.object_id)
         json_filename = ReleaseInfoFormatter.get_json_filename(updated_plan.release_info)
 
+        # Check on the DP Release JSON file
+        # File exists and has a size
         self.assertTrue(updated_plan.release_info.dp_release_json_file.name.endswith(json_filename))
         self.assertTrue(updated_plan.release_info.dp_release_json_file.size >= 2600)
+
 
         self.assertTrue(updated_plan.release_info.dv_json_deposit_complete is False)
         self.assertTrue(updated_plan.release_info.dv_pdf_deposit_complete is False)
 
+        # Check that the AuxiliaryFileDepositRecord objects are correct
+        #
         self.assertTrue(AuxiliaryFileDepositRecord.objects.filter(release_info=updated_plan.release_info).count() > 0)
         for dep_rec in AuxiliaryFileDepositRecord.objects.filter(release_info=updated_plan.release_info):
             self.assertTrue(dep_rec.deposit_success is False)
             self.assertTrue(dep_rec.http_status_code == 403 or\
                             dep_rec.http_status_code < 0)
+
+
+
+    def test_55_success_download_urls(self):
+        """(55) Test PDF and JSOn download Urls"""
+        msgt(self.test_55_success_download_urls.__doc__)
+
+        analysis_plan = self.analysis_plan
+
+        # Send the dp_statistics for validation
+        #
+        analysis_plan.dp_statistics = self.general_stat_specs
+        analysis_plan.save()
+
+        params = dict(object_id=str(analysis_plan.object_id))
+
+        response = self.client.post('/api/release/',
+                                    json.dumps(params),
+                                    content_type='application/json')
+
+        jresp = response.json()
+        # print('jresp', jresp)
+        self.assertEqual(response.status_code, 201)
+
+        updated_plan = AnalysisPlan.objects.get(object_id=analysis_plan.object_id)
+
+        # ------------------------------------
+        # (1) JSON file download url
+        # ------------------------------------
+
+        # (1a) Url should exist....
+        release_info_object_id = str(updated_plan.release_info.object_id)
+        expected_url = drf_reverse('release-download-json', args=[], kwargs=dict(pk=release_info_object_id))
+        self.assertEqual(expected_url, updated_plan.release_info.download_json_url())
+
+        # (1b) Delete file, url should no longer exist
+        updated_plan.release_info.dp_release_json_file.delete()
+        updated_plan.release_info.save()
+        self.assertIsNone(updated_plan.release_info.download_json_url())
+
+        # ------------------------------------
+        # (2) PDF file download url
+        # ------------------------------------
+
+        # (2a) The PDF file url is not generated in this test and should be None
+        self.assertIsNone(updated_plan.release_info.download_pdf_url())
+
+        # ------------------------------------------------------
+        # (2b) Artificially add a PDF file to the ReleaseInfo object
+        #  and check that it a proper url is generated
+        # ------------------------------------------------------
+        fname_blank = 'near_blank_for_tests.pdf'
+        filepath = join(TEST_DATA_DIR, 'pdfs', fname_blank)
+        self.assertTrue(isfile(filepath))
+
+        # Attach the file to the `release_info.dp_release_pdf_file` field
+        #
+        django_file = File(open(filepath, 'rb'))
+        updated_plan.release_info.dp_release_pdf_file.save(fname_blank, django_file)
+        updated_plan.release_info.save()
+
+        # Now a url should be available
+        #
+        expected_pdf_url = drf_reverse('release-download-pdf', args=[], kwargs=dict(pk=release_info_object_id))
+        self.assertEqual(expected_pdf_url, updated_plan.release_info.download_pdf_url())
 
 
     def test_60_analysis_plan_has_release_info(self):
@@ -312,6 +383,9 @@ class TestRunRelease(TestCase):
         self.assertTrue(updated_plan.release_info.dp_release_json_file.name.endswith(json_filename))
         self.assertTrue(updated_plan.release_info.dp_release_json_file.size >= 2600)
 
+
+        # Check that the AuxiliaryFileDepositRecord objects are correct
+        #
         self.assertTrue(AuxiliaryFileDepositRecord.objects.filter(release_info=updated_plan.release_info).count() > 0)
         for dep_rec in AuxiliaryFileDepositRecord.objects.filter(release_info=updated_plan.release_info):
             self.assertTrue(dep_rec.deposit_success is False)
@@ -321,6 +395,7 @@ class TestRunRelease(TestCase):
         # Uncomment next line to show the AnalysisPlan output
         #   with attached ReleaseInfo object
         # print(json.dumps(analysis_plan_jresp, indent=4))
+
 
     def test_70_dataset_formatter_eye_fatigue_file(self):
         """(70) Test the DataSetFormatter -- dataset info formatted for inclusion in ReleaseInfo.dp_release"""
