@@ -69,11 +69,8 @@ class ProfilerTest(TestCase):
         num_features_in_profile = len(info['variables'].keys())
         # self.assertEqual(num_features_in_profile, num_features_profile)
         self.assertTrue(num_features_in_profile <= settings.PROFILER_COLUMN_LIMIT)
+        self.assertEqual(len(info['variables']), info['dataset']['variableCount'])
 
-        # pvars = profiler.profile_variables
-        # self.assertTrue('variables' in info)
-        # self.assertTrue(len(pvars['variables']) <= settings.PROFILER_COLUMN_LIMIT)
-        # self.assertEqual(len(pvars['variables']), info['dataset']['variableCount'])
         self.assertEqual(info['dataset']['variableCount'],
                          len(info['dataset']['variableOrder']))
 
@@ -85,6 +82,10 @@ class ProfilerTest(TestCase):
         #
         for idx, colname in info['dataset']['variableOrder']:
             self.assertTrue(colname in info['variables'])
+            for key_name in ['name', 'label', 'type', 'sort_order']:
+                self.assertTrue(key_name in info['variables'][colname])
+                if key_name == 'sort_order':
+                    self.assertEqual(info['variables'][colname][key_name], idx)
 
     #@skip
     def test_005_profile_good_files(self):

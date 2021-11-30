@@ -51,10 +51,14 @@ class VariableInfoHandler(BasicErrCheck):
         variable_order = [(i, x) for i, x in enumerate(self.df.columns)]
         profile_dict['dataset']['variableOrder'] = variable_order
         profile_dict['variables'] = {}
+
+        sort_order = -1
         for col_name in self.df.columns:
+            sort_order += 1
             column = self.df[col_name]
             column_info = {
                 "name": col_name,
+                "sort_order": sort_order,
                 "label": ""
             }
             # category_limit = 5
