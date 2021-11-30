@@ -151,7 +151,7 @@ class DataverseDepositUtil(BasicErrCheck):
 
             files = {'file': open(file_field.path, 'rb')}
 
-            print('dv_url', dv_deposit_url)
+            # print('dv_url', dv_deposit_url)
             try:
                 response = requests.post(dv_deposit_url,
                                          headers=headers,

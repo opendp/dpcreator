@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from rest_framework import status
+from rest_framework.reverse import reverse as drf_reverse
 
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.analysis import static_vals as astatic
@@ -205,29 +206,31 @@ class ReleaseInfo(TimestampedModelWithUUID):
             return '<pre>' + json.dumps(self.dataverse_deposit_info, indent=4) + '</pre>'
         return ''
 
-    @mark_safe
+    #@mark_safe
     def download_pdf_url(self):
         """
         URL to download the PDF file
         """
-        if not self.dp_release_pdf_file:
+        if (not self.object_id) or (not self.dp_release_pdf_file):
             return None
 
         # see opendp_app/analysis/views/release_view.py
         #
-        return f'/api/release-download/{self.object_id}/pdf/'
+        download_url = drf_reverse('release-download-pdf', args=[], kwargs={'pk': str(self.object_id)})
+        return download_url
 
-    @mark_safe
+    #@mark_safe
     def download_json_url(self):
         """
         URL to download the PDF file
         """
-        if not self.dp_release_json_file:
+        if (not self.object_id) or (not self.dp_release_json_file):
             return None
 
         # see opendp_app/analysis/views/release_view.py
         #
-        return f'/api/release-download/{self.object_id}/json/'
+        download_url = drf_reverse('release-download-json', args=[], kwargs={'pk': str(self.object_id)})
+        return download_url
 
 
 class AuxiliaryFileDepositRecord(TimestampedModelWithUUID):
