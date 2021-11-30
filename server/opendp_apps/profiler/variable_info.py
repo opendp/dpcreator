@@ -3,20 +3,26 @@ Profile a data file
 """
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler.csv_reader import CsvReader
-from opendp_apps.profiler.static_vals import VAR_TYPE_BOOLEAN, VAR_TYPE_CATEGORICAL, VAR_TYPE_NUMERICAL
+from opendp_apps.profiler.static_vals import \
+    (KW_SAVE_NUM_ROWS,
+     VAR_TYPE_BOOLEAN,
+     VAR_TYPE_CATEGORICAL,
+     VAR_TYPE_NUMERICAL)
 # VAR_TYPE_INTEGER, VAR_TYPE_FLOAT
 
 
 class VariableInfoHandler(BasicErrCheck):
 
-    def __init__(self, df):
+    def __init__(self, df, **kwargs):
         """
         Given a dataframe, create a variable profile dictionary
         :param df: Dataframe
         """
         self.df = df
-        self.num_original_features = df.shape[1]
+        self.num_variables = None
         self.data_profile = None
+
+        self.save_num_rows = kwargs.get(KW_SAVE_NUM_ROWS, True)
 
     def run_profile_process(self):
         """
@@ -38,9 +44,10 @@ class VariableInfoHandler(BasicErrCheck):
         }
         """
         profile_dict = {'dataset': {}}
-        num_rows, num_variables = self.df.shape
-        profile_dict['dataset']['rowCount'] = int(num_rows)
-        profile_dict['dataset']['variableCount'] = int(num_variables)
+        num_rows, self.num_variables = self.df.shape
+        if self.save_num_rows is True:
+            profile_dict['dataset']['rowCount'] = int(num_rows)
+        profile_dict['dataset']['variableCount'] = int(self.num_variables)
         variable_order = [(i, x) for i, x in enumerate(self.df.columns)]
         profile_dict['dataset']['variableOrder'] = variable_order
         profile_dict['variables'] = {}

@@ -19,3 +19,5 @@ VALID_VAR_TYPES = [VAR_TYPE_BOOLEAN,
                    VAR_TYPE_INTEGER,
                    VAR_TYPE_FLOAT]
 
+KW_MAX_NUM_FEATURES = 'max_num_features'
+KW_SAVE_NUM_ROWS = 'save_num_rows'

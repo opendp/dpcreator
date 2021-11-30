@@ -1,3 +1,4 @@
+from django.conf import settings
 import csv
 import pandas as pd
 
@@ -9,6 +10,11 @@ class DelimiterNotFoundException(Exception):
     """
     pass
 
+class ColumnLimitLessThanOne(Exception):
+    """
+    This exception should be raised when the column limit is less than 1
+    """
+    pass
 
 class CsvReader:
 
@@ -21,7 +27,13 @@ class CsvReader:
         """
         self.filepath = filepath
         self.delimiter = None
+
         self.column_limit = column_limit
+        if not self.column_limit:
+            self.column_limit = settings.PROFILER_COLUMN_LIMIT
+
+        if self.column_limit < 1:
+            raise ColumnLimitLessThanOne()
 
     def read(self):
         """
@@ -33,7 +45,7 @@ class CsvReader:
             with open(self.filepath, mode='r', encoding='utf-8') as infile:
                 dialect = sniffer.sniff(infile.readline())
                 self.delimiter = dialect.delimiter
-            df = pd.read_csv(self.filepath, self.delimiter)
+            df = pd.read_csv(self.filepath, delimiter=self.delimiter)
             if self.column_limit:
                 return df[df.columns[:self.column_limit]]
             return df

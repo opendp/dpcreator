@@ -8,10 +8,13 @@ TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 import json
 
 from django.test import TestCase
+from django.conf import settings
 from django.core.files import File
 
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
+from opendp_apps.profiler import static_vals as pstatic
+from opendp_apps.profiler.csv_reader import ColumnLimitLessThanOne
 
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.analysis.models import DepositorSetupInfo
@@ -46,6 +49,8 @@ class ProfilerTest(TestCase):
 
         # Run profiler
         #
+        # kwargs[pstatic.KW_MAX_NUM_FEATURES] = num_features_orig
+
         profiler = profiler_tasks.run_profile_by_filepath(filepath1, **kwargs)
 
         # Shouldn't have errors
@@ -55,14 +60,15 @@ class ProfilerTest(TestCase):
         print('-- Profiler should run without error')
         self.assertTrue(profiler.has_error() is False)
 
-        print(f'-- Original dataset has {num_features_orig} features')
-        self.assertEqual(profiler.num_original_features, num_features_orig)
+        # print(f'-- Original dataset has {num_features_orig} features')
+        # self.assertEqual(profiler.num_variables, num_features_orig)
 
         print(f'-- Profile metadata has {num_features_profile} features')
         info = profiler.data_profile
         self.assertTrue('variables' in info)
         num_features_in_profile = len(info['variables'].keys())
-        self.assertEqual(num_features_in_profile, num_features_profile)
+        # self.assertEqual(num_features_in_profile, num_features_profile)
+        self.assertTrue(num_features_in_profile <= settings.PROFILER_COLUMN_LIMIT)
 
         # pvars = profiler.profile_variables
         # self.assertTrue('variables' in info)
@@ -127,8 +133,8 @@ class ProfilerTest(TestCase):
 
         print('-- Profiler should run without error')
         self.assertTrue(profiler.has_error() is False)
-        print('-- Original dataset has 69 features')
-        self.assertEqual(profiler.num_original_features, 69)
+        print('-- Original dataset has 69 features, default limit should set to first 20')
+        self.assertEqual(profiler.num_variables, settings.PROFILER_COLUMN_LIMIT)
 
         profile_json_str1 = json.dumps(profiler.data_profile, cls=DjangoJSONEncoder, indent=4)
 
@@ -141,7 +147,7 @@ class ProfilerTest(TestCase):
 
         # print('-- Profiler reads only first 20 features')
         self.assertTrue('variables' in info)
-        # self.assertEqual(len(info['variables'].keys()), settings.PROFILER_COLUMN_LIMIT)
+        self.assertEqual(len(info['variables'].keys()), settings.PROFILER_COLUMN_LIMIT)
 
         print('-- Profiler output is the same as the output saved to the DataSetInfo object')
         profile_json_str2 = json.dumps(info, cls=DjangoJSONEncoder, indent=4)
@@ -243,7 +249,7 @@ class ProfilerTest(TestCase):
 
         # Should be no error an correct number of features
         self.assertTrue(profiler.has_error() is False)
-        self.assertEqual(profiler.num_original_features, 69)
+        self.assertEqual(profiler.num_variables, settings.PROFILER_COLUMN_LIMIT)
 
         # Re-retrieve DataSetInfo
         #
@@ -272,3 +278,22 @@ class ProfilerTest(TestCase):
         #
         for idx, colname in dsi2.profile_variables['dataset']['variableOrder']:
             self.assertTrue(colname in dsi2.profile_variables['variables'])
+
+
+    def test_050_bad_column_limit(self):
+        """(50) Profile bad column limit"""
+        msgt(self.test_050_bad_column_limit.__doc__)
+
+        # File to profile
+        #
+        filepath = join(TEST_DATA_DIR, 'fearonLaitin.csv')
+        print('-- filepath is readable', filepath)
+        self.assertTrue(isfile(filepath))
+
+        # Run profiler
+        #
+        params = {pstatic.KW_MAX_NUM_FEATURES: -1}
+
+        self.assertRaises(ColumnLimitLessThanOne,
+                          profiler_tasks.run_profile_by_filepath,
+                          filepath, None, **params)
