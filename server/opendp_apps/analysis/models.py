@@ -3,6 +3,7 @@ import json
 
 from django.db import models
 from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
@@ -16,6 +17,8 @@ from opendp_apps.utils.extra_validators import \
     (validate_not_negative,
      validate_epsilon_or_none)
 
+
+RELEASE_FILE_STORAGE = FileSystemStorage(location=settings.RELEASE_FILE_STORAGE_ROOT)
 
 class DepositorSetupInfo(TimestampedModelWithUUID):
     """
@@ -159,12 +162,12 @@ class ReleaseInfo(TimestampedModelWithUUID):
     dp_release = models.JSONField()
 
     dp_release_json_file = models.FileField( \
-                                   # storage=settings.RELEASE_FILE_STORAGE_ROOT,
+                                   storage=RELEASE_FILE_STORAGE,
                                    upload_to='release-files/%Y/%m/%d/',
                                    blank=True, null=True)
 
     dp_release_pdf_file = models.FileField(
-                                   # storage=settings.RELEASE_FILE_STORAGE_ROOT,
+                                   storage=RELEASE_FILE_STORAGE,
                                    upload_to='release-files/%Y/%m/%d/',
                                    blank=True, null=True)
 
@@ -201,6 +204,30 @@ class ReleaseInfo(TimestampedModelWithUUID):
         if self.dataverse_deposit_info:
             return '<pre>' + json.dumps(self.dataverse_deposit_info, indent=4) + '</pre>'
         return ''
+
+    @mark_safe
+    def download_pdf_url(self):
+        """
+        URL to download the PDF file
+        """
+        if not self.dp_release_pdf_file:
+            return None
+
+        # see opendp_app/analysis/views/release_view.py
+        #
+        return f'/api/release-download/{self.object_id}/pdf/'
+
+    @mark_safe
+    def download_json_url(self):
+        """
+        URL to download the PDF file
+        """
+        if not self.dp_release_json_file:
+            return None
+
+        # see opendp_app/analysis/views/release_view.py
+        #
+        return f'/api/release-download/{self.object_id}/json/'
 
 
 class AuxiliaryFileDepositRecord(TimestampedModelWithUUID):

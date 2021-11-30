@@ -46,9 +46,9 @@ class ReleaseInfoAdmin(admin.ModelAdmin):
                     'created',)
     readonly_fields = ('id',
                        'object_id',
-                       'dataset',
-                       'dp_release', 'epsilon_used',
-                       'dataverse_deposit_info_json',
+                       #'dataset',
+                       #'dp_release', 'epsilon_used',
+                       #'dataverse_deposit_info_json',
                        'created', 'updated',)
 
 

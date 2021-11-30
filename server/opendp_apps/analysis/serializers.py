@@ -8,7 +8,29 @@ from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 
 
+class ReleaseInfoFileDownloadSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ReleaseInfo
+        fields = ('object_id',)
+
+
 class ReleaseInfoSerializer(serializers.ModelSerializer):
+
+    # Add custom fields to allow download of files directly from DP Creator
+    #
+    download_json_url = serializers.SerializerMethodField('get_download_json_url')
+    download_pdf_url = serializers.SerializerMethodField('get_download_pdf_url')
+
+    def get_download_json_url(self, obj):
+        if not obj.dp_release_json_file:
+            return None
+        return self.context['request'].build_absolute_uri(obj.download_json_url())
+
+    def get_download_pdf_url(self, obj):
+        if not obj.dp_release_pdf_file:
+            return None
+        return self.context['request'].build_absolute_uri(obj.download_pdf_url())
 
     class Meta:
         model = ReleaseInfo

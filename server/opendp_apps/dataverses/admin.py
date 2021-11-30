@@ -30,7 +30,6 @@ class ManifestTestParamsAdmin(admin.ModelAdmin):
     readonly_fields = ('dataverse_incoming_link_2',
                        'view_as_dict_link',
                        'mock_user_info_link',
-                       'ddi_info_link',
                        'schema_org_info_link')
 
 

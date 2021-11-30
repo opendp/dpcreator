@@ -219,7 +219,7 @@ FILE_UPLOAD_TEMP_DIR = os.environ.get('FILE_UPLOAD_TEMP_DIR', '/tmp')
 #   - will be objects on cloud service. e.g. S3, Azure, etc.
 #
 UPLOADED_FILE_STORAGE_ROOT = os.getenv('UPLOADED_FILE_STORAGE_ROOT',
-                                       os.path.join(BASE_DIR, 'test_setup', 'user_uploaded_data'))
+                                       os.path.join(BASE_DIR, 'test_setup', 'private_uploaded_data'))
 if not os.path.isdir(UPLOADED_FILE_STORAGE_ROOT):
     os.makedirs(UPLOADED_FILE_STORAGE_ROOT)
 
