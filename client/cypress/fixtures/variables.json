@@ -1,7 +1,28 @@
 {
+    "trial": {
+        "name": "Trial",
+        "type": "Integer",
+        "label": ""
+    },
+    "dayNr": {
+        "name": "DayNr",
+        "type": "Integer",
+        "label": ""
+    },
+    "fatigue": {
+        "name": "Fatigue",
+        "type": "Integer",
+        "label": ""
+    },
     "session": {
         "name": "Session",
         "type": "Boolean",
+        "label": "",
+        "categories": []
+    },
+    "subject": {
+        "name": "Subject",
+        "type": "Categorical",
         "label": "",
         "categories": []
     },
@@ -13,6 +34,11 @@
     },
     "eyeHeight": {
         "name": "EyeHeight",
+        "type": "Float",
+        "label": ""
+    },
+    "typingSpeed": {
+        "name": "TypingSpeed",
         "type": "Float",
         "label": ""
     },
@@ -71,25 +97,8 @@
         "type": "Float",
         "label": ""
     },
-    "baselinePupilDiameter": {
-        "name": "BaselinePupilDiameter",
-        "type": "Float",
-        "label": ""
-    },
-    "objectiveTaskDifficulty": {
-        "name": "ObjectiveTaskDifficulty",
-        "type": "Boolean",
-        "label": "",
-        "categories": []
-    },
-    "objectiveTaskDifficultyCat": {
-        "name": "ObjectiveTaskDifficulty_cat",
-        "type": "Categorical",
-        "label": "",
-        "categories": []
-    },
-    "attendedButNotSelectedRate": {
-        "name": "AttendedButNotSelectedRate",
+    "uncorrectedErrorRate": {
+        "name": "UncorrectedErrorRate",
         "type": "Float",
         "label": ""
     }

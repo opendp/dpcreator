@@ -436,11 +436,11 @@ export default {
         this.variables.push(row)
       }
       // Order variables by key (variable name), so we always show the same 20 variables
-      this.variables = this.variables.sort(function (a, b) {
-        return a.key.toLowerCase().localeCompare(b.key.toLowerCase());
-      });
+      // this.variables = this.variables.sort(function (a, b) {
+      //    return a.key.toLowerCase().localeCompare(b.key.toLowerCase());
+      // });
       for (let i = 0; i < this.variables.length; i++) {
-        this.variables.index = i
+        this.variables[i].index = i
       }
       this.loadingVariables = false
     },
