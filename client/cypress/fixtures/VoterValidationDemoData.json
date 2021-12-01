@@ -3,15 +3,15 @@
   "variables": {
     "V201": {
       "name": "age",
-      "type": "Numerical",
+      "type": "Integer",
       "min": "0.0",
       "max": "100.0",
       "fixedValue": "45.0",
       "accuracy": "0.01442267312734562"
     },
     "V208": {
-      "name": "gendersource",
-      "type": "Boolean"
+      "name": "race",
+      "type": "Categorical"
     }
   }
 }

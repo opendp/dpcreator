@@ -30,5 +30,14 @@ class TestVariableInfoHandler(TestCase):
                                                                           # 'max': 0.987012535,
                                                                           # 'min': 0.768410701,
                                                                           'name': 'lrPupilCorrelation',
-                                                                          'type': 'Numerical',
-                                                                          'sort_order': 23,                                                                          })
+                                                                          'type': 'Float'
+                                                                          })
+        self.assertDictEqual(profile['variables']['Trial'], {'label': '',
+                                                             'name': 'Trial',
+                                                             'type': 'Integer'
+                                                             })
+        self.assertDictEqual(profile['variables']['Session'], {'label': '',
+                                                               'name': 'Session',
+                                                               'categories': [],
+                                                               'type': 'Boolean'
+                                                               })
