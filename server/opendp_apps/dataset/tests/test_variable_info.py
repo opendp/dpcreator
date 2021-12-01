@@ -17,6 +17,8 @@ class TestVariableInfoHandler(TestCase):
         self.df = pd.read_csv(join(TEST_DATA_DIR, 'Fatigue_data.tab'), delimiter='\t')
 
     def test_run_profile_process(self):
+        """Test VariableInfoHandler object"""
+        print(self.test_run_profile_process.__doc__)
         variable_info_handler = VariableInfoHandler(self.df)
         profile = variable_info_handler.run_profile_process()
 
@@ -28,5 +30,5 @@ class TestVariableInfoHandler(TestCase):
                                                                           # 'max': 0.987012535,
                                                                           # 'min': 0.768410701,
                                                                           'name': 'lrPupilCorrelation',
-                                                                          'type': 'Numerical'
-                                                                          })
+                                                                          'type': 'Numerical',
+                                                                          'sort_order': 23,                                                                          })
