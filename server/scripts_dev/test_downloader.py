@@ -13,11 +13,11 @@ from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadHandler
 
 
-def test_downloader():
+def test_downloader(dataverse_file_id=3):
     """Test profiler with file"""
 
     print('get object')
-    dfi = DataverseFileInfo.objects.get(pk=3)
+    dfi = DataverseFileInfo.objects.get(pk=dataverse_file_id)
     print('dfi: ', dfi)
 
     # ---------------------------
@@ -51,7 +51,7 @@ def test_downloader():
 
 
 if __name__=='__main__':
-    test_downloader()
+    test_downloader(dataverse_file_id=5)
 
 """
 docker-compose run server python scripts_dev/test_downloader.py

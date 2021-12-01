@@ -42,7 +42,6 @@ class TestDataverseHandoffView(TestCase):
             'first_name': 'test',
             'last_name': 'test',
             dv_static.DV_API_GENERAL_TOKEN: 1234,
-            'dv_token_update': None,
             # TODO: Repeated field, camelcase is for parent model field, snakecase is for serializer
             dv_static.DV_PARAM_SITE_URL: 'https://dataverse.harvard.edu',
             dv_static.DV_PARAM_FILE_ID: 1,

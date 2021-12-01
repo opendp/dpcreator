@@ -173,3 +173,7 @@ dpcreator_volume/
 client/cypress/videos/
 server/static_deploy/
 server/release-files/*
+server/scripts_dev/dv_test_creds.py
+.env
+
+!server/test_data/pdfs/*.pdf

@@ -25,9 +25,7 @@ class TestDataverseUserSerializer(TestCase):
             'email': 'test@test.com',
             'first_name': 'test',
             'last_name': 'test',
-            'dv_general_token': 1234,
-            'dv_sensitive_token': 1234,
-            'dv_token_update': None
+            'dv_general_token': 1234
         })
         self.assertEqual(serializer.is_valid(), True)
         dataverse_user = serializer.save()

@@ -23,7 +23,7 @@ DV_OPTIONAL_PARAMS = [DV_PARAM_FILE_PID,]
 # ref: https://guides.dataverse.org/en/latest/api/native-api.html#schema-org-json-ld
 EXPORTER_FORMAT_DDI = 'ddi'
 EXPORTER_FORMAT_SCHEMA_ORG = 'schema.org'
-EXPORTER_FORMATS = [EXPORTER_FORMAT_DDI, EXPORTER_FORMAT_SCHEMA_ORG]
+EXPORTER_FORMATS = [EXPORTER_FORMAT_SCHEMA_ORG]     #[EXPORTER_FORMAT_DDI, EXPORTER_FORMAT_SCHEMA_ORG]
 
 # -----------------------------
 # Keys for accessing data within
@@ -50,3 +50,19 @@ DV_LAST_NAME = 'lastName'
 # ----------------------------------
 KEY_DP_USER_ID = 'user_id' # OpenDPUser.object_id
 KEY_DV_HANDOFF_ID = 'dataverse_handoff_id'  # DataverseHandoff.object_id
+
+DV_DEPOSIT_TYPE_DP_JSON = 'dpJSON'
+DV_DEPOSIT_TYPE_DP_PDF = 'dpPDF'
+DV_DEPOSIT_TYPES = [DV_DEPOSIT_TYPE_DP_JSON, DV_DEPOSIT_TYPE_DP_PDF]
+DV_DEPOSIT_CHOICES = [(x, x) for x in DV_DEPOSIT_TYPES]
+
+# ----------------------------------
+# Error messages
+# ----------------------------------
+ERR_MSG_DEPOSIT_NO_DV_DATASET_INFO = 'This is not a Dataverse dataset'
+
+ERR_MSG_JSON_DEPOSIT_ALREADY_COMPLETE = 'JSON deposit already complete'
+ERR_MSG_PDF_DEPOSIT_ALREADY_COMPLETE = 'PDF deposit already complete'
+
+ERR_MSG_JSON_DEPOSIT_FAILED = 'JSON deposit to Dataverse failed.'
+ERR_MSG_PDF_DEPOSIT_FAILED = 'PDF deposit to Dataverse failed.'

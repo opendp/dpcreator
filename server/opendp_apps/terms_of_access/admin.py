@@ -6,7 +6,9 @@ class TermsOfAccessAdmin(admin.ModelAdmin):
     save_on_top = True
     search_fields = ('name', 'description')
     list_filter = ('active',)
-    list_display = ('name',
+    list_display_links = ('id', 'name')
+    list_display = ('id',
+                    'name',
                     'version',
                     'active',
                     'description',
