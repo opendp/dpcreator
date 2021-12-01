@@ -1,6 +1,8 @@
 """
 Profile a data file
 """
+from collections import OrderedDict
+
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler.csv_reader import CsvReader
 from opendp_apps.profiler.static_vals import \
@@ -56,11 +58,11 @@ class VariableInfoHandler(BasicErrCheck):
         for col_name in self.df.columns:
             sort_order += 1
             column = self.df[col_name]
-            column_info = {
+            column_info = OrderedDict({
                 "name": col_name,
                 "sort_order": sort_order,
                 "label": ""
-            }
+            })
             # category_limit = 5
             # Use type checking to filter out numpy Nan
             # Comment out categories for now
@@ -97,7 +99,9 @@ if __name__ == '__main__':
     from pprint import pprint
     from server.opendp_project.settings.base import BASE_DIR
 
-    csv_reader = CsvReader(os.path.join(BASE_DIR, 'test_data/teacher_climate_survey_lwd.csv'))
+    fname = 'Fatigue_data.tab'
+    # fname = 'teacher_climate_survey_lwd.csv'
+    csv_reader = CsvReader(os.path.join(BASE_DIR, 'test_data' , 'teacher_climate_survey_lwd.csv'))
     df = csv_reader.read()
     v = VariableInfoHandler(df)
     profile_dict = v.run_profile_process()
