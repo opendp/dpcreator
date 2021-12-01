@@ -14,7 +14,8 @@ from django.core.files import File
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
 from opendp_apps.profiler import static_vals as pstatic
-from opendp_apps.profiler.csv_reader import ColumnLimitLessThanOne
+from opendp_apps.profiler.csv_reader import ColumnLimitInvalid
+from opendp_apps.profiler.profile_runner import ProfileRunner
 
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.analysis.models import DepositorSetupInfo
@@ -49,9 +50,8 @@ class ProfilerTest(TestCase):
 
         # Run profiler
         #
-        # kwargs[pstatic.KW_MAX_NUM_FEATURES] = num_features_orig
-
-        profiler = profiler_tasks.run_profile_by_filepath(filepath1, **kwargs)
+        save_row_count = kwargs.get(pstatic.KEY_SAVE_ROW_COUNT, True)
+        profiler = profiler_tasks.run_profile_by_filepath(filepath1, settings.PROFILER_COLUMN_LIMIT, **kwargs)
 
         # Shouldn't have errors
         if profiler.has_error():
@@ -76,7 +76,10 @@ class ProfilerTest(TestCase):
 
         print('rows! ->', info['dataset']['rowCount'])
 
-        self.assertTrue(info['dataset']['rowCount'] == num_rows)
+        if save_row_count is True:
+            self.assertTrue(info['dataset']['rowCount'] == num_rows)
+        else:
+            self.assertTrue(info['dataset']['rowCount'] == None)
 
         # make the sure the "dataset.variableOrder" column names are in the "variables" dict
         #
@@ -103,9 +106,10 @@ class ProfilerTest(TestCase):
         msgt('-- Profile teacher_climate_survey_lwd.csv')
         # https://github.com/privacytoolsproject/PSI-Service/blob/develop/data/teacher_climate_survey_lwd.csv
         self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 132, 1500)
-
+        
         # Don't save row count
-        self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 132, 1500, **dict(save_row_count=False))
+        params = {pstatic.KEY_SAVE_ROW_COUNT: False}
+        self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 132, 1500, **params)
 
 
     def test_010_profile_good_file(self):
@@ -126,7 +130,7 @@ class ProfilerTest(TestCase):
 
         # Run profiler
         #
-        profiler = profiler_tasks.run_profile_by_filepath(filepath, dsi.object_id)
+        profiler = profiler_tasks.run_profile_by_filepath(filepath, settings.PROFILER_COLUMN_LIMIT, dsi.object_id)
 
         # Shouldn't have errors
         if profiler.has_error():
@@ -176,29 +180,18 @@ class ProfilerTest(TestCase):
         filepath = join(TEST_DATA_DIR, 'image_file.png')
         self.assertTrue(isfile(filepath))
 
-        with self.assertRaises(UnicodeDecodeError):
-            profiler = profiler_tasks.run_profile_by_filepath(filepath)
+        profiler = profiler_tasks.run_profile_by_filepath(filepath)
 
-        # print(f'!! error: {profiler.get_err_msg()}')
-        # self.assertTrue(profiler.has_error())
-        # error_msg = profiler.get_err_msg()
-        # self.assertTrue(profiler.get_err_msg().find(ProfileHandler.ERR_FAILED_TO_READ_DATASET) > -1)
-        # self.assertTrue(error_msg.find('UnicodeDecodeError') > -1 or
-        #                 error_msg.find('ParserError') > -1)
+        self.assertTrue(profiler.has_error())
+        self.assertTrue('UnicodeDecodeError' in profiler.get_err_msg())
 
         # Bad file: empty file
         #
         print('-- Try to profile an empty file')
         filepath = join(TEST_DATA_DIR, 'empty_file.csv')
         self.assertTrue(isfile(filepath))
+        self.assertTrue('UnicodeDecodeError' in profiler.get_err_msg())
 
-        with self.assertRaises(DelimiterNotFoundException):
-            profiler = profiler_tasks.run_profile_by_filepath(filepath)
-
-        # print(f'!! error: {profiler.get_err_msg()}')
-        # self.assertTrue(profiler.has_error())
-        # self.assertTrue(profiler.get_err_msg().find(ProfileHandler.ERR_FAILED_TO_READ_DATASET) > -1)
-        # self.assertTrue(profiler.get_err_msg().find('EmptyDataError') > -1)
 
     def test_30_filefield_empty(self):
         """(30) Test with empty file field"""
@@ -211,13 +204,32 @@ class ProfilerTest(TestCase):
                          DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
 
         # Try to profile and empty Django FileField
-        with self.assertRaises(ValueError):
-            profiler = profiler_tasks.run_profile_by_filefield(dsi.object_id)
+        profiler = profiler_tasks.run_profile_by_filefield(dsi.object_id)
 
         # Error!
-        # print(profiler.get_err_msg())
-        # print('dsi2.depositor_setup_info.user_step', dsi2.depositor_setup_info.user_step)
-        # self.assertTrue(profiler.get_err_msg(), ProfileHandler.ERR_DATASET_POINTER_NOT_SET)
+        self.assertTrue(profiler.has_error())
+        self.assertTrue(pstatic.ERR_MSG_SOURCE_FILE_DOES_NOT_EXIST in profiler.get_err_msg())
+
+        # Retrieve the saved DataSetInfo, the DepositorSetupInfo should have a new status
+        dsi2 = DataSetInfo.objects.get(object_id=self.ds_01_object_id)
+        self.assertEqual(dsi2.depositor_setup_info.user_step,
+                         DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
+
+    def test_35_not_filefield(self):
+        """(35) Not a Django FieldFile"""
+        msgt(self.test_35_not_filefield.__doc__)
+
+        dsi = DataSetInfo.objects.get(object_id=self.ds_01_object_id)
+
+        params = {pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD: True,
+                  pstatic.KEY_DATASET_OBJECT_ID: dsi.object_id,
+                  }
+
+        profiler = ProfileRunner('raining-cats-and-dogs', settings.PROFILER_COLUMN_LIMIT, **params)
+
+        # Error!
+        self.assertTrue(profiler.has_error())
+        self.assertTrue(pstatic.ERR_MSG_DATASET_POINTER_NOT_FIELDFILE in profiler.get_err_msg())
 
         # Retrieve the saved DataSetInfo, the DepositorSetupInfo should have a new status
         dsi2 = DataSetInfo.objects.get(object_id=self.ds_01_object_id)
@@ -225,7 +237,7 @@ class ProfilerTest(TestCase):
                          DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
 
     def test_40_filefield_correct(self):
-        """(40) Test using file file with legit file"""
+        """(40) Test using filefield with legit file"""
         msgt(self.test_40_filefield_correct.__doc__)
 
         # Retrieve DataSetInfo
@@ -234,8 +246,9 @@ class ProfilerTest(TestCase):
         self.assertEqual(dsi.depositor_setup_info.user_step, \
                          DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
 
+        # --------------------------------------------------
         # Attach the file to the DataSetInfo's file field
-        #
+        # --------------------------------------------------
         filename = 'fearonLaitin.csv'
         filepath = join(TEST_DATA_DIR, filename)
         self.assertTrue(isfile(filepath))
@@ -246,9 +259,10 @@ class ProfilerTest(TestCase):
         dsi.save()
 
         # Run the profile using the Django file field
-        profiler = profiler_tasks.run_profile_by_filefield(dsi.object_id)
+        profiler = profiler_tasks.run_profile_by_filefield(dsi.object_id, settings.PROFILER_COLUMN_LIMIT)
 
         # Should be no error an correct number of features
+        # print('profiler.get_err_msg()', profiler.get_err_msg())
         self.assertTrue(profiler.has_error() is False)
         self.assertEqual(profiler.num_variables, settings.PROFILER_COLUMN_LIMIT)
 
@@ -260,7 +274,7 @@ class ProfilerTest(TestCase):
 
         # print('-- Profiler reads only first 20 features')
         self.assertTrue('variables' in info)
-        # self.assertEqual(len(info['variables'].keys()), settings.PROFILER_COLUMN_LIMIT)
+        self.assertEqual(len(info['variables'].keys()), settings.PROFILER_COLUMN_LIMIT)
 
         self.assertEqual(dsi2.depositor_setup_info.user_step, \
                          DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
@@ -288,13 +302,12 @@ class ProfilerTest(TestCase):
         # File to profile
         #
         filepath = join(TEST_DATA_DIR, 'fearonLaitin.csv')
-        print('-- filepath is readable', filepath)
         self.assertTrue(isfile(filepath))
 
         # Run profiler
         #
-        params = {pstatic.KW_MAX_NUM_FEATURES: -1}
+        prunner = profiler_tasks.run_profile_by_filepath(filepath, max_num_features=-1)
 
-        self.assertRaises(ColumnLimitLessThanOne,
-                          profiler_tasks.run_profile_by_filepath,
-                          filepath, None, **params)
+        #if prunner.has_error():   print(prunner.get_err_msg())
+        self.assertTrue(prunner.has_error())
+        self.assertTrue(pstatic.ERR_MSG_COLUMN_LIMIT in prunner.get_err_msg())

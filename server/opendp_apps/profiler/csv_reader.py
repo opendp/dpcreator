@@ -2,6 +2,7 @@ from django.conf import settings
 import csv
 import pandas as pd
 
+from opendp_apps.profiler import static_vals as pstatic
 
 class DelimiterNotFoundException(Exception):
     """
@@ -10,9 +11,9 @@ class DelimiterNotFoundException(Exception):
     """
     pass
 
-class ColumnLimitLessThanOne(Exception):
+class ColumnLimitInvalid(Exception):
     """
-    This exception should be raised when the column limit is less than 1
+    The column limit may be None or an integer > 0
     """
     pass
 
@@ -29,11 +30,13 @@ class CsvReader:
         self.delimiter = None
 
         self.column_limit = column_limit
-        if not self.column_limit:
-            self.column_limit = settings.PROFILER_COLUMN_LIMIT
 
-        if self.column_limit < 1:
-            raise ColumnLimitLessThanOne()
+        if self.column_limit is not None:
+            if not isinstance(self.column_limit, int):
+                raise ColumnLimitInvalid(f'{pstatic.ERR_MSG_COLUMN_LIMIT} Found: "{self.column_limit}"')
+            if self.column_limit < 1:
+                raise ColumnLimitInvalid(f'{pstatic.ERR_MSG_COLUMN_LIMIT} Found: "{self.column_limit}"')
+
 
     def read(self):
         """
@@ -49,6 +52,12 @@ class CsvReader:
             if self.column_limit:
                 return df[df.columns[:self.column_limit]]
             return df
+        except pd.errors.EmptyDataError as err_obj:
+            user_msg = f'{pstatic.ERR_FAILED_TO_READ_DATASET} (EmptyDataError: {err_obj})'
+            return err_resp(user_msg)
+        except pd.errors.ParserError as err_obj:
+            user_msg = f'{pstatic.ERR_FAILED_TO_READ_DATASET} (ParserError: {err_obj})'
+            return err_resp(user_msg)
         except UnicodeDecodeError as ex:
             raise ex
         except csv.Error as ex:

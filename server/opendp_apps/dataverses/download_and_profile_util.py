@@ -14,6 +14,7 @@ Basic workflow:
 import json
 
 from django.core.serializers.json import DjangoJSONEncoder
+from django.conf import settings
 
 from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.async_messages.websocket_message import WebsocketMessage
@@ -25,8 +26,8 @@ from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadHandler
 from opendp_apps.profiler.csv_reader import CsvReader
 from opendp_apps.profiler.dataset_info_updater import DataSetInfoUpdater
-from opendp_apps.profiler.profile_runner import run_profile
-
+from opendp_apps.profiler.profile_runner import ProfileRunner
+from opendp_apps.profiler import static_vals as pstatic
 
 class DownloadAndProfileUtil(BasicErrCheck):
 
@@ -151,23 +152,24 @@ class DownloadAndProfileUtil(BasicErrCheck):
         4. Run the variable profiler on the dataframe
         5. Send results back via websocket
         """
-        try:
-            ds_info = DataSetInfo.objects.get(object_id=self.dataset_object_id)
-            filefield = ds_info.source_file
-        except DataSetInfo.DoesNotExist:
-            filefield = None
-        try:
-            df = CsvReader(filefield.path).read()
-        except Exception as ex:
-            self.add_err_msg(str(ex))
-            self.send_websocket_profiler_err_msg(str(ex))
-            if self.dataset_object_id:
-                dataset_info = DataSetInfo.objects.get(object_id=self.dataset_object_id)
-                dataset_info_updater = DataSetInfoUpdater(dataset_info)
-                dataset_info_updater.update_step(DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
+        if self.has_error():
             return
-        ph = run_profile(df, self.dataset_object_id)
-        self.profile_variables = ph.data_profile
+
+        params = {pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD: True,
+                  pstatic.KEY_DATASET_OBJECT_ID: self.dataset_info.object_id}
+
+        prunner = ProfileRunner(dataset_pointer=self.dataset_info.source_file,
+                           max_num_features=settings.PROFILER_COLUMN_LIMIT,
+                            **params)
+
+        if prunner.has_error():
+            user_msg = prunner.get_err_msg()
+            self.add_err_msg(user_msg)
+            self.send_websocket_profiler_err_msg(user_msg)
+            return
+
+        # self.data_profile = ph.get_data_profile()
+        self.profile_variables = prunner.data_profile
         profile_str = json.dumps(self.profile_variables, cls=DjangoJSONEncoder, indent=4)
 
         self.send_websocket_success_msg('Profile complete!',

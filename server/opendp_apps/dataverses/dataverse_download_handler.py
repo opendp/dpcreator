@@ -20,9 +20,6 @@ from opendp_apps.user.models import DataverseUser
 
 class DataverseDownloadHandler(BasicErrCheck):
 
-    ERR_FAILED_TO_READ_DATASET = 'Failed to read the dataset.'
-    ERR_DATASET_POINTER_NOT_SET = 'In order to profile the data, the "dataset_pointer" must be set.'
-
     def __init__(self, dv_file_info: DataverseFileInfo, **kwargs):
         """
         Download the Dataverse file

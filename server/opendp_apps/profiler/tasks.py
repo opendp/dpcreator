@@ -3,7 +3,7 @@ from django.conf import settings
 from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.profiler.csv_reader import CsvReader
 from opendp_apps.profiler.dataset_info_updater import DataSetInfoUpdater
-from opendp_apps.profiler.profile_runner import run_profile
+from opendp_apps.profiler.profile_runner import ProfileRunner #run_profile
 from opendp_apps.profiler import static_vals as pstatic
 from opendp_project.celery import celery_app
 
@@ -11,30 +11,34 @@ from opendp_apps.dataset.models import DataSetInfo
 
 
 @celery_app.task(ignore_result=True)
-def run_profile_by_filepath(filepath, dataset_info_object_id=None, **kwargs):
-    """Run the profiler using a valid filepath"""
-    max_column_limit = kwargs.get(pstatic.KW_MAX_NUM_FEATURES, settings.PROFILER_COLUMN_LIMIT)
+def run_profile_by_filepath(filepath, max_num_features=None, dataset_info_object_id=None, **kwargs):
+    """Run the profiler using a valid filepath
+    :filepath - filepath
+    :max_column_limit - integer to limit first n columns or None for all columns
+    :dataset_info_object_id - optional, id for DataSetInfo object
+    """
+    kwargs[pstatic.KEY_DATASET_OBJECT_ID] = dataset_info_object_id
 
-    df = CsvReader(filepath, max_column_limit).read()
-    return run_profile(df, dataset_info_object_id)
+    prunner = ProfileRunner(filepath, max_num_features, **kwargs)
+
+    return prunner
 
 
 @celery_app.task(ignore_result=True)
-def run_profile_by_filefield(dataset_info_object_id, **kwargs):
-
-    max_column_limit = kwargs.get(pstatic.KW_MAX_NUM_FEATURES, settings.PROFILER_COLUMN_LIMIT)
+def run_profile_by_filefield(dataset_info_object_id, max_num_features=None, **kwargs):
 
     try:
         ds_info = DataSetInfo.objects.get(object_id=dataset_info_object_id)
         filefield = ds_info.source_file
     except DataSetInfo.DoesNotExist:
         filefield = None
-    try:
-        df = CsvReader(filefield.path, max_column_limit).read()
-    except Exception as ex:
-        if dataset_info_object_id:
-            dataset_info = DataSetInfo.objects.get(object_id=dataset_info_object_id)
-            dataset_info_updater = DataSetInfoUpdater(dataset_info)
-            dataset_info_updater.update_step(DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
-        raise ex
-    return run_profile(df, dataset_info_object_id)
+
+    params = {pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD: True,
+              pstatic.KEY_DATASET_OBJECT_ID: dataset_info_object_id,
+              pstatic.KEY_SAVE_ROW_COUNT: kwargs.get(pstatic.KEY_SAVE_ROW_COUNT, True)
+              }
+
+    prunner = ProfileRunner(filefield, max_num_features, **params)
+
+    return prunner
+

@@ -6,11 +6,12 @@ from collections import OrderedDict
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler.csv_reader import CsvReader
 from opendp_apps.profiler.static_vals import \
-    (KW_SAVE_NUM_ROWS,
+    (KEY_SAVE_ROW_COUNT,
      VAR_TYPE_BOOLEAN,
      VAR_TYPE_CATEGORICAL,
-     VAR_TYPE_NUMERICAL,
-     VAR_TYPE_FLOAT)
+     VAR_TYPE_FLOAT,
+     VAR_TYPE_INTEGER,
+     VAR_TYPE_NUMERICAL)
 
 
 class VariableInfoHandler(BasicErrCheck):
@@ -24,7 +25,7 @@ class VariableInfoHandler(BasicErrCheck):
         self.num_variables = None
         self.data_profile = None
 
-        self.save_num_rows = kwargs.get(KW_SAVE_NUM_ROWS, True)
+        self.save_num_rows = kwargs.get(KEY_SAVE_ROW_COUNT, True)
 
     def run_profile_process(self):
         """
@@ -49,6 +50,9 @@ class VariableInfoHandler(BasicErrCheck):
         num_rows, self.num_variables = self.df.shape
         if self.save_num_rows is True:
             profile_dict['dataset']['rowCount'] = int(num_rows)
+        else:
+            profile_dict['dataset']['rowCount'] = None
+
         profile_dict['dataset']['variableCount'] = int(self.num_variables)
         variable_order = [(i, x) for i, x in enumerate(self.df.columns)]
         profile_dict['dataset']['variableOrder'] = variable_order

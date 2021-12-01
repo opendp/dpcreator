@@ -22,21 +22,24 @@ class TestVariableInfoHandler(TestCase):
         variable_info_handler = VariableInfoHandler(self.df)
         profile = variable_info_handler.run_profile_process()
 
+        # import json; print(json.dumps(profile, indent=4))
+
         self.assertEqual(profile['dataset']['rowCount'], 183)
         self.assertEqual(profile['dataset']['variableCount'], 24)
         self.assertEqual(len(profile['dataset']['variableOrder']), 24)
         self.assertEqual(len(profile['variables']), 24)
         self.assertDictEqual(profile['variables']['lrPupilCorrelation'], {'label': '',
-                                                                          # 'max': 0.987012535,
-                                                                          # 'min': 0.768410701,
+                                                                          'sort_order': 23,
                                                                           'name': 'lrPupilCorrelation',
                                                                           'type': 'Float'
                                                                           })
         self.assertDictEqual(profile['variables']['Trial'], {'label': '',
+                                                             'sort_order': 4,
                                                              'name': 'Trial',
                                                              'type': 'Integer'
                                                              })
         self.assertDictEqual(profile['variables']['Session'], {'label': '',
+                                                               'sort_order': 2,
                                                                'name': 'Session',
                                                                'categories': [],
                                                                'type': 'Boolean'

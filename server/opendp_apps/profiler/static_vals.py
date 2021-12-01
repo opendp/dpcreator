@@ -20,4 +20,12 @@ VALID_VAR_TYPES = [VAR_TYPE_BOOLEAN,
                    VAR_TYPE_FLOAT]
 
 KW_MAX_NUM_FEATURES = 'max_num_features'
-KW_SAVE_NUM_ROWS = 'save_num_rows'
+
+# -----------------------------
+
+ERR_MSG_COLUMN_LIMIT = 'The column_limit may be "None" or an integer greater than 0.'
+ERR_MSG_SOURCE_FILE_DOES_NOT_EXIST = 'The source file does not exist for dataset: '
+ERR_MSG_DATASET_POINTER_NOT_FIELDFILE = 'The dataset pointer is not a Django FieldFile object.'
+
+ERR_FAILED_TO_READ_DATASET = 'Failed to read the dataset.'
+ERR_DATASET_POINTER_NOT_SET = 'In order to profile the data, the "dataset_pointer" must be set.'
