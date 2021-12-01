@@ -189,7 +189,7 @@ const actions = {
         targetVar.name = variableInput.name
         targetVar.label = variableInput.label
         targetVar.type = variableInput.type
-        if (variableInput.type === 'Numerical') {
+        if (variableInput.type === 'Integer' || variableInput.type === 'Float') {
             targetVar.min = Number(variableInput.additional_information.min)
             targetVar.max = Number(variableInput.additional_information.max)
         }

@@ -10,8 +10,8 @@
       "accuracy": "0.01442267312734562"
     },
     "V208": {
-      "name": "gendersource",
-      "type": "Boolean"
+      "name": "race",
+      "type": "Categorical"
     }
   }
 }

@@ -2,7 +2,7 @@
   "datasetName": "Teacher Climate Survey",
   "variables": {
     "subject": {
-      "name": "college_summary",
+      "name": "subject",
       "type": "Categorical",
       "categories": [
         "cat1",

@@ -50,7 +50,7 @@
                 }
                 cy.get('[data-test="Mean"]').click({force: true});
                 for (const key in varsFixture) {
-                    if (varsFixture[key].type !== 'Numerical') {
+                    if (varsFixture[key].type !== 'Integer' && varsFixture[key].type !== 'Float') {
                         cy.get('label').should('not.contain', varsFixture[key].name)
                     }
                 }

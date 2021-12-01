@@ -451,7 +451,9 @@ export default {
       this.saveUserInput(elem)
     },
     saveUserInput(elem) {
+      console.log("saving")
       if (this.isValidRow(elem)) {
+        console.log("valid row")
         this.$store.dispatch('dataset/updateVariableInfo', elem)
       }
 
