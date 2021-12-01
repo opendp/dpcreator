@@ -4,7 +4,7 @@
     "eyeHeight": {
       "name": "EyeHeight",
       "label": "",
-      "type": "Numerical",
+      "type": "Float",
       "min": "0.0",
       "max": "100.0",
       "fixedValue": "10",

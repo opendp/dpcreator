@@ -230,10 +230,13 @@ export default {
         if (displayVar.label === '') {
           displayVar.label = displayVar.name
         }
-
+        //     console.log(displayVar.label)
+        //     console.log(this.variableInfo[key].type)
         if ((this.selectedStatistic == null) ||
             (this.selectedStatistic.label !== 'Mean') ||
-            (this.selectedStatistic.label === 'Mean' && this.variableInfo[key].type === 'Numerical')) {
+            (this.selectedStatistic.label === 'Mean' &&
+                (this.variableInfo[key].type === 'Float' || this.variableInfo[key].type === 'Integer'))) {
+          //      console.log('pushing ' + JSON.stringify(displayVar))
           displayVars.push(displayVar)
         }
 

@@ -3,8 +3,8 @@ Profile a data file
 """
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler.csv_reader import CsvReader
-from opendp_apps.profiler.static_vals import VAR_TYPE_BOOLEAN, VAR_TYPE_CATEGORICAL, VAR_TYPE_NUMERICAL
-# VAR_TYPE_INTEGER, VAR_TYPE_FLOAT
+from opendp_apps.profiler.static_vals import VAR_TYPE_BOOLEAN, VAR_TYPE_CATEGORICAL, VAR_TYPE_NUMERICAL,\
+    VAR_TYPE_INTEGER, VAR_TYPE_FLOAT
 
 
 class VariableInfoHandler(BasicErrCheck):
@@ -60,17 +60,16 @@ class VariableInfoHandler(BasicErrCheck):
                 column_info['categories'] = []  # list([x for x in column.unique() if type(x) == str])[:category_limit]
                 column_info['type'] = VAR_TYPE_CATEGORICAL
             elif hasattr(column.dtypes, 'categories'):
-                column_info[
-                    'categories'] = []  # list([x for x in column.dtypes.categories if type(x) == str])[:category_limit]
+                column_info['categories'] = []  # list([x for x in column.dtypes.categories if type(x) == str])[:category_limit]
                 column_info['type'] = VAR_TYPE_CATEGORICAL
             elif 'int' in str(column.dtype):
                 # column_info['min'] = int(column.min()) if not np.isnan(column.min()) else None
                 # column_info['max'] = int(column.max()) if not np.isnan(column.max()) else None
-                column_info['type'] = VAR_TYPE_NUMERICAL
+                column_info['type'] = VAR_TYPE_INTEGER
             elif 'float' in str(column.dtype):
                 # column_info['min'] = float(column.min()) if not np.isnan(column.min()) else None
                 # column_info['max'] = float(column.max()) if not np.isnan(column.max()) else None
-                column_info['type'] = VAR_TYPE_NUMERICAL
+                column_info['type'] = VAR_TYPE_FLOAT
             elif str(column.dtypes) != 'object':
                 # column_info['min'] = float(column.min()) if not np.isnan(column.min()) else None
                 # column_info['max'] = float(column.max()) if not np.isnan(column.max()) else None

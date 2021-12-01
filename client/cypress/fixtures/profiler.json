@@ -1,17 +1,17 @@
 {
   "trial": {
     "name": "Trial",
-    "type": "Numerical",
+    "type": "Integer",
     "label": ""
   },
   "dayNr": {
     "name": "DayNr",
-    "type": "Numerical",
+    "type": "Integer",
     "label": ""
   },
   "fatigue": {
     "name": "Fatigue",
-    "type": "Numerical",
+    "type": "Integer",
     "label": ""
   },
   "session": {
@@ -34,77 +34,77 @@
   },
   "eyeHeight": {
     "name": "EyeHeight",
-    "type": "Numerical",
+    "type": "Float",
     "label": ""
   },
   "typingSpeed": {
     "name": "TypingSpeed",
-    "type": "Numerical",
+    "type": "Float",
     "label": ""
   },
   "blinkDuration": {
     "name": "BlinkDuration",
-    "type": "Numerical",
+    "type": "Float",
     "label": ""
   },
   "blinkInterval": {
     "name": "BlinkInterval",
-    "type": "Numerical",
+    "type": "Float",
     "label": ""
   },
   "blinkFrequency": {
     "name": "BlinkFrequency",
-    "type": "Numerical",
+    "type": "Float",
     "label": ""
   },
   "correctedError": {
     "name": "CorrectedError",
-    "type": "Numerical",
+    "type": "Float",
     "label": ""
   },
   "saccadeDuration": {
     "name": "SaccadeDuration",
-    "type": "Numerical",
+    "type": "Float",
     "label": ""
   },
   "saccadeVelocity": {
     "name": "SaccadeVelocity",
-    "type": "Numerical",
+    "type": "Float",
     "label": ""
   },
   "blinkBurstRatio": {
     "name": "BlinkBurstRatio",
-    "type": "Numerical",
+    "type": "Float",
     "label": ""
   },
   "saccadeAmplitude": {
     "name": "SaccadeAmplitude",
-    "type": "Numerical",
+    "type": "Float",
     "label": ""
   },
   "lrPupilCorrelation": {
     "name": "lrPupilCorrelation",
-    "type": "Numerical",
+    "type": "Float",
     "label": ""
   },
   "saccadePeakVelocity": {
     "name": "SaccadePeakVelocity",
-    "type": "Numerical",
+    "type": "Float",
     "label": ""
   },
   "readTextEventsRatio": {
     "name": "ReadTextEventsRatio",
-    "type": "Numerical",
+    "type": "Float",
     "label": ""
   },
   "uncorrectedErrorRate": {
     "name": "UncorrectedErrorRate",
-    "type": "Numerical",
+    "type": "Float",
     "label": ""
   },
   "baselinePupilDiameter": {
     "name": "BaselinePupilDiameter",
-    "type": "Numerical",
+    "type": "Float",
     "label": ""
   },
   "objectiveTaskDifficulty": {
@@ -121,7 +121,7 @@
   },
   "attendedButNotSelectedRate": {
     "name": "AttendedButNotSelectedRate",
-    "type": "Numerical",
+    "type": "Float",
     "label": ""
   }
 }
