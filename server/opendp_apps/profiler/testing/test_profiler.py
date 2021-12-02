@@ -11,6 +11,7 @@ from django.test import TestCase
 from django.conf import settings
 from django.core.files import File
 
+from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
 from opendp_apps.profiler import static_vals as pstatic
@@ -18,6 +19,7 @@ from opendp_apps.profiler.csv_reader import ColumnLimitInvalid
 from opendp_apps.profiler.profile_runner import ProfileRunner
 
 from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.analysis.models import DepositorSetupInfo
 from django.core.serializers.json import DjangoJSONEncoder
 
@@ -90,7 +92,6 @@ class ProfilerTest(TestCase):
                 if key_name == 'sort_order':
                     self.assertEqual(info['variables'][colname][key_name], idx)
 
-    #@skip
     def test_005_profile_good_files(self):
         """(05) Profile several good files"""
         msgt(self.test_005_profile_good_files.__doc__)
@@ -293,6 +294,47 @@ class ProfilerTest(TestCase):
         #
         for idx, colname in dsi2.profile_variables['dataset']['variableOrder']:
             self.assertTrue(colname in dsi2.profile_variables['variables'])
+
+
+
+    def test_45_bad_dataset_id(self):
+        """(45) Test using bad DatasetInfo object id"""
+        msgt(self.test_45_bad_dataset_id.__doc__)
+
+        # Get a real but incorrect object_id
+        #
+        reg_dv = RegisteredDataverse.objects.first()
+        self.assertIsNotNone(reg_dv)
+        bad_dataset_object_id = reg_dv.object_id
+
+        # Run the profile using the Django file field
+        profiler = profiler_tasks.run_profile_by_filefield(bad_dataset_object_id, settings.PROFILER_COLUMN_LIMIT)
+
+        # Should be no error an correct number of features
+        self.assertTrue(profiler.has_error())
+        self.assertTrue(dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND in profiler.get_err_msg())
+
+    def test_46_dataset_id_is_none(self):
+        """(46) Test using bad DatasetInfo object id of None"""
+        msgt(self.test_46_dataset_id_is_none.__doc__)
+
+        # Run the profiler with a DatasetInfo object id of None
+        profiler = profiler_tasks.run_profile_by_filefield(None, settings.PROFILER_COLUMN_LIMIT)
+
+        self.assertTrue(profiler.has_error())
+        self.assertTrue(dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND in profiler.get_err_msg())
+
+    def test_47_dataset_id_is_empty_string(self):
+        """(47) Test using bad DatasetInfo object id of None"""
+        msgt(self.test_47_dataset_id_is_empty_string.__doc__)
+
+        # Run the profiler with a DatasetInfo object id of empty string
+        profiler = profiler_tasks.run_profile_by_filefield('', settings.PROFILER_COLUMN_LIMIT)
+
+        # Should be no error an correct number of features
+        self.assertTrue(profiler.has_error())
+        print(profiler.get_err_msg())
+        self.assertTrue(dstatic.ERR_MSG_INVALID_DATASET_INFO_OBJECT_ID in profiler.get_err_msg())
 
 
     def test_050_bad_column_limit(self):

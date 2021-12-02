@@ -1,6 +1,11 @@
 from django.conf import settings
 
+from django.core.exceptions import ValidationError as DjangoValidationError
+
+from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.dataset import static_vals as dstatic
+
 from opendp_apps.profiler.csv_reader import CsvReader
 from opendp_apps.profiler.dataset_info_updater import DataSetInfoUpdater
 from opendp_apps.profiler.profile_runner import ProfileRunner #run_profile
@@ -26,12 +31,22 @@ def run_profile_by_filepath(filepath, max_num_features=None, dataset_info_object
 
 @celery_app.task(ignore_result=True)
 def run_profile_by_filefield(dataset_info_object_id, max_num_features=None, **kwargs):
-
+    """
+    Run the profiler using the DataSetInfo object id
+    :param dataset_info_object_id DataSetInfo.object_id
+    :max_num_features int or None - number of features in the dataset to use, use None for all columns
+    """
     try:
         ds_info = DataSetInfo.objects.get(object_id=dataset_info_object_id)
         filefield = ds_info.source_file
     except DataSetInfo.DoesNotExist:
-        filefield = None
+        return BasicErrCheck.get_instance_with_error(dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND)
+    except DjangoValidationError as ex_obj:
+        user_msg = f'{dstatic.ERR_MSG_INVALID_DATASET_INFO_OBJECT_ID} ({dataset_info_object_id}) ({ex_obj})'
+        return BasicErrCheck.get_instance_with_error(user_msg)
+    except ValueError as ex_obj:
+        user_msg = f'{dstatic.ERR_MSG_INVALID_DATASET_INFO_OBJECT_ID} ({dataset_info_object_id}) ({ex_obj})'
+        return BasicErrCheck.get_instance_with_error(user_msg)
 
     params = {pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD: True,
               pstatic.KEY_DATASET_OBJECT_ID: dataset_info_object_id,

@@ -6,6 +6,7 @@ from django.db.models.fields.files import FieldFile
 
 from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dataset import static_vals as dstatic
 
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 
@@ -88,7 +89,7 @@ class ProfileRunner(BasicErrCheck):
             try:
                 self.dataset_info = DataSetInfo.objects.get(object_id=self.dataset_info_object_id)
             except DataSetInfo.DoesNotExist:
-                self.add_err_msg(pstatic.ERR_MSG_DATASET_INFO_NOT_FOUND)
+                self.add_err_msg(dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND)
                 return
 
             self.dataset_info_updater = DataSetInfoUpdater(self.dataset_info)

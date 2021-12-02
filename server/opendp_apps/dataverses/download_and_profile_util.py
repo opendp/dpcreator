@@ -15,6 +15,7 @@ import json
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.conf import settings
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.async_messages.websocket_message import WebsocketMessage
@@ -95,6 +96,16 @@ class DownloadAndProfileUtil(BasicErrCheck):
             self.add_err_msg(user_msg)
             self.send_websocket_profiler_err_msg(user_msg)
             return
+        except DjangoValidationError as ex_obj:
+            user_msg = f'Invalid DataSetInfo object id. ({self.dataset_object_id}) ({ex_obj})'
+            self.add_err_msg(user_msg)
+            self.send_websocket_profiler_err_msg(user_msg)
+            return
+        except ValueError as ex_obj:
+            user_msg = f'Invalid DataSetInfo object id. (z) ({self.dataset_object_id}) ({ex_obj})'
+            self.add_err_msg(user_msg)
+            self.send_websocket_profiler_err_msg(user_msg)
+            return
 
         # Download file (in the case of Dataverse)
         #
@@ -156,9 +167,6 @@ class DownloadAndProfileUtil(BasicErrCheck):
         """
         if self.has_error():
             return
-
-        #params = {pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD: True,
-        #          pstatic.KEY_DATASET_OBJECT_ID: self.dataset_info.object_id}
 
         prunner = run_profile_by_filefield(self.dataset_info.object_id,
                                            max_num_features=settings.PROFILER_COLUMN_LIMIT)
