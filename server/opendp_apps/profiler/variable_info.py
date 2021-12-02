@@ -1,22 +1,31 @@
 """
 Profile a data file
 """
+from collections import OrderedDict
+
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler.csv_reader import CsvReader
-from opendp_apps.profiler.static_vals import VAR_TYPE_BOOLEAN, VAR_TYPE_CATEGORICAL, VAR_TYPE_NUMERICAL,\
-    VAR_TYPE_INTEGER, VAR_TYPE_FLOAT
+from opendp_apps.profiler.static_vals import \
+    (KEY_SAVE_ROW_COUNT,
+     VAR_TYPE_BOOLEAN,
+     VAR_TYPE_CATEGORICAL,
+     VAR_TYPE_FLOAT,
+     VAR_TYPE_INTEGER,
+     VAR_TYPE_NUMERICAL)
 
 
 class VariableInfoHandler(BasicErrCheck):
 
-    def __init__(self, df):
+    def __init__(self, df, **kwargs):
         """
         Given a dataframe, create a variable profile dictionary
         :param df: Dataframe
         """
         self.df = df
-        self.num_original_features = df.shape[1]
+        self.num_variables = None
         self.data_profile = None
+
+        self.save_num_rows = kwargs.get(KEY_SAVE_ROW_COUNT, True)
 
     def run_profile_process(self):
         """
@@ -38,18 +47,26 @@ class VariableInfoHandler(BasicErrCheck):
         }
         """
         profile_dict = {'dataset': {}}
-        num_rows, num_variables = self.df.shape
-        profile_dict['dataset']['rowCount'] = int(num_rows)
-        profile_dict['dataset']['variableCount'] = int(num_variables)
+        num_rows, self.num_variables = self.df.shape
+        if self.save_num_rows is True:
+            profile_dict['dataset']['rowCount'] = int(num_rows)
+        else:
+            profile_dict['dataset']['rowCount'] = None
+
+        profile_dict['dataset']['variableCount'] = int(self.num_variables)
         variable_order = [(i, x) for i, x in enumerate(self.df.columns)]
         profile_dict['dataset']['variableOrder'] = variable_order
         profile_dict['variables'] = {}
+
+        sort_order = -1
         for col_name in self.df.columns:
+            sort_order += 1
             column = self.df[col_name]
-            column_info = {
+            column_info = OrderedDict({
                 "name": col_name,
+                "sort_order": sort_order,
                 "label": ""
-            }
+            })
             # category_limit = 5
             # Use type checking to filter out numpy Nan
             # Comment out categories for now
@@ -85,7 +102,9 @@ if __name__ == '__main__':
     from pprint import pprint
     from server.opendp_project.settings.base import BASE_DIR
 
-    csv_reader = CsvReader(os.path.join(BASE_DIR, 'test_data/teacher_climate_survey_lwd.csv'))
+    fname = 'Fatigue_data.tab'
+    # fname = 'teacher_climate_survey_lwd.csv'
+    csv_reader = CsvReader(os.path.join(BASE_DIR, 'test_data' , 'teacher_climate_survey_lwd.csv'))
     df = csv_reader.read()
     v = VariableInfoHandler(df)
     profile_dict = v.run_profile_process()

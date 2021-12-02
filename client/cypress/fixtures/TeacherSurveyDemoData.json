@@ -3,6 +3,7 @@
   "variables": {
     "subject": {
       "name": "subject",
+      "sort_order": 0,
       "type": "Categorical",
       "categories": [
         "cat1",
@@ -10,6 +11,7 @@
       ]
     },
     "surveymode": {
+      "sort_order": 1,
       "name": "hssample",
       "type": "Boolean"
     }

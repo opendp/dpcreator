@@ -19,9 +19,6 @@ class DataverseDepositUtil(BasicErrCheck):
     """
     Given a ReleaseInfo, deposit any files to Dataverse
     """
-    ERR_FAILED_TO_READ_DATASET = 'Failed to read the dataset.'
-    ERR_DATASET_POINTER_NOT_SET = 'In order to profile the data, the "dataset_pointer" must be set.'
-
     def __init__(self, release_info: ReleaseInfo, **kwargs):
         """
         Initiate with a ReleaseInfo object
