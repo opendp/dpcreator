@@ -22,8 +22,6 @@ class TestVariableInfoHandler(TestCase):
         variable_info_handler = VariableInfoHandler(self.df)
         profile = variable_info_handler.run_profile_process()
 
-        # import json; print(json.dumps(profile, indent=4))
-
         self.assertEqual(profile['dataset']['rowCount'], 183)
         self.assertEqual(profile['dataset']['variableCount'], 24)
         self.assertEqual(len(profile['dataset']['variableOrder']), 24)

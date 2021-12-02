@@ -27,6 +27,8 @@ from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadH
 from opendp_apps.profiler.csv_reader import CsvReader
 from opendp_apps.profiler.dataset_info_updater import DataSetInfoUpdater
 from opendp_apps.profiler.profile_runner import ProfileRunner
+from opendp_apps.profiler.tasks import run_profile_by_filefield
+
 from opendp_apps.profiler import static_vals as pstatic
 
 class DownloadAndProfileUtil(BasicErrCheck):
@@ -155,12 +157,11 @@ class DownloadAndProfileUtil(BasicErrCheck):
         if self.has_error():
             return
 
-        params = {pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD: True,
-                  pstatic.KEY_DATASET_OBJECT_ID: self.dataset_info.object_id}
+        #params = {pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD: True,
+        #          pstatic.KEY_DATASET_OBJECT_ID: self.dataset_info.object_id}
 
-        prunner = ProfileRunner(dataset_pointer=self.dataset_info.source_file,
-                           max_num_features=settings.PROFILER_COLUMN_LIMIT,
-                            **params)
+        prunner = run_profile_by_filefield(self.dataset_info.object_id,
+                                           max_num_features=settings.PROFILER_COLUMN_LIMIT)
 
         if prunner.has_error():
             user_msg = prunner.get_err_msg()
