@@ -418,6 +418,7 @@ export default {
         row.key = key
         row.name = vars[key].name
         row.type = vars[key].type
+        row.sortOrder = vars[key].sortOrder
         if (vars[key].label === '') {
           row.label = vars[key].name
         } else {
@@ -435,10 +436,9 @@ export default {
         row['editDisabled'] = true
         this.variables.push(row)
       }
-      // Order variables by key (variable name), so we always show the same 20 variables
-      // this.variables = this.variables.sort(function (a, b) {
-      //    return a.key.toLowerCase().localeCompare(b.key.toLowerCase());
-      // });
+      // Order variables by sortOrder returned from the server
+      this.variables = this.variables.sort((a, b) => (a.sortOrder > b.sortOrder) ? 1 : -1)
+
       for (let i = 0; i < this.variables.length; i++) {
         this.variables[i].index = i
       }
@@ -451,9 +451,7 @@ export default {
       this.saveUserInput(elem)
     },
     saveUserInput(elem) {
-      console.log("saving")
       if (this.isValidRow(elem)) {
-        console.log("valid row")
         this.$store.dispatch('dataset/updateVariableInfo', elem)
       }
 

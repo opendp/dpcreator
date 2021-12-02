@@ -17,6 +17,8 @@ class TestVariableInfoHandler(TestCase):
         self.df = pd.read_csv(join(TEST_DATA_DIR, 'Fatigue_data.tab'), delimiter='\t')
 
     def test_run_profile_process(self):
+        """Test VariableInfoHandler object"""
+        print(self.test_run_profile_process.__doc__)
         variable_info_handler = VariableInfoHandler(self.df)
         profile = variable_info_handler.run_profile_process()
 
@@ -25,16 +27,17 @@ class TestVariableInfoHandler(TestCase):
         self.assertEqual(len(profile['dataset']['variableOrder']), 24)
         self.assertEqual(len(profile['variables']), 24)
         self.assertDictEqual(profile['variables']['lrPupilCorrelation'], {'label': '',
-                                                                          # 'max': 0.987012535,
-                                                                          # 'min': 0.768410701,
+                                                                          'sort_order': 23,
                                                                           'name': 'lrPupilCorrelation',
                                                                           'type': 'Float'
                                                                           })
         self.assertDictEqual(profile['variables']['Trial'], {'label': '',
+                                                             'sort_order': 4,
                                                              'name': 'Trial',
                                                              'type': 'Integer'
                                                              })
         self.assertDictEqual(profile['variables']['Session'], {'label': '',
+                                                               'sort_order': 2,
                                                                'name': 'Session',
                                                                'categories': [],
                                                                'type': 'Boolean'

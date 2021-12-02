@@ -7,26 +7,19 @@ import requests
 from tempfile import TemporaryFile
 from urllib.parse import urlsplit
 
-from django.conf import settings
 from django.core.files import File
 
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
-from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.dataverses import static_vals as dv_static
-from opendp_apps.user.models import DataverseUser
 
 
 class DataverseDownloadHandler(BasicErrCheck):
+    """Using DataverseFileInfo, download the Dataverse file"""
 
-    ERR_FAILED_TO_READ_DATASET = 'Failed to read the dataset.'
-    ERR_DATASET_POINTER_NOT_SET = 'In order to profile the data, the "dataset_pointer" must be set.'
-
-    def __init__(self, dv_file_info: DataverseFileInfo, **kwargs):
-        """
-        Download the Dataverse file
-        """
+    def __init__(self, dv_file_info: DataverseFileInfo):
+        """Download the Dataverse file"""
         self.dv_file_info = dv_file_info
         self.content_url = None
         self.new_file_name = None
@@ -34,19 +27,17 @@ class DataverseDownloadHandler(BasicErrCheck):
 
         self.run_download_process()
 
-
     def get_source_file(self):
         """Return the "source_file" field connected to DataverseFileInfo"""
-        assert(self.has_error() is True), 'Please check "has_error()" before calling this method.'
+        assert (self.has_error() is True), 'Please check "has_error()" before calling this method.'
 
         return self.dv_file_info.source_file
-
 
     def set_depositor_info_status(self, new_step: DepositorSetupInfo.DepositorSteps) -> bool:
         """Update the status on the DepositorSetupInfo object.
         Only available if the dv_file_info is populated"""
         if not self.dv_file_info:
-            return
+            return False
 
         # Update the step
         self.dv_file_info.depositor_setup_info.set_user_step(new_step)
@@ -54,16 +45,16 @@ class DataverseDownloadHandler(BasicErrCheck):
         # save it
         self.dv_file_info.depositor_setup_info.save()
 
+        return True
 
     def add_err_msg(self, err_msg):
         """Add an error message and update the DepositorSetupInfo status"""
         super().add_err_msg(err_msg)
         self.set_depositor_info_status(DepositorSetupInfo.DepositorSteps.STEP_9200_DATAVERSE_DOWNLOAD_FAILED)
 
-
     def run_download_process(self):
         """Run the download process!"""
-        if self.has_error():    # currently does nothing, but if code added prior to this
+        if self.has_error():  # currently does nothing, but if code added prior to this
             return
 
         if not self.run_basic_checks_setup():
@@ -98,8 +89,6 @@ class DataverseDownloadHandler(BasicErrCheck):
             django_file_obj = File(tf)
             self.dv_file_info.source_file.save(self.new_file_name, django_file_obj)
 
-
-
     def run_basic_checks_setup(self):
         """Run basic pre-download checks and create a new file name"""
         if self.has_error():
@@ -123,9 +112,9 @@ class DataverseDownloadHandler(BasicErrCheck):
         # --------------------------------------
         # Does the "file_schema_info" have a contentURL?
         # --------------------------------------
-        if not dv_static.SCHEMA_KEY_CONTENTURL in self.dv_file_info.file_schema_info:
+        if dv_static.SCHEMA_KEY_CONTENTURL not in self.dv_file_info.file_schema_info:
             self.add_err_msg((f'The file schema info does not contain a'
-                             f' {dv_static.SCHEMA_KEY_CONTENTURL} parameter. (code: dv_download_040)'))
+                              f' {dv_static.SCHEMA_KEY_CONTENTURL} parameter. (code: dv_download_040)'))
             return False
 
         # --------------------------------------
@@ -139,7 +128,6 @@ class DataverseDownloadHandler(BasicErrCheck):
             self.add_err_msg((f'The file schema info does not contain well-formed'
                               f' {dv_static.SCHEMA_KEY_CONTENTURL}. (code: dv_download_050)'))
             return False
-
 
         # --------------------------------------
         # Is an access token available for download?
@@ -182,11 +170,11 @@ class DataverseDownloadHandler(BasicErrCheck):
 
         return True
 
-"""
+
+'''
 from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadHandler
 
-
 dfi = DataverseFileInfo.objects.get(pk=3)
 dhandler = DataverseDownloadHandler(dfi)
-"""
+'''
