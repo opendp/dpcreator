@@ -1,127 +1,151 @@
 {
-  "trial": {
-    "name": "Trial",
-    "type": "Integer",
-    "label": ""
-  },
-  "dayNr": {
-    "name": "DayNr",
-    "type": "Integer",
-    "label": ""
-  },
-  "fatigue": {
-    "name": "Fatigue",
-    "type": "Integer",
-    "label": ""
-  },
-  "session": {
-    "name": "Session",
-    "type": "Boolean",
-    "label": "",
-    "categories": []
-  },
-  "subject": {
-    "name": "Subject",
-    "type": "Categorical",
-    "label": "",
-    "categories": []
-  },
-  "language": {
-    "name": "Language",
-    "type": "Boolean",
-    "label": "",
-    "categories": []
-  },
-  "eyeHeight": {
-    "name": "EyeHeight",
-    "type": "Float",
-    "label": ""
-  },
-  "typingSpeed": {
-    "name": "TypingSpeed",
-    "type": "Float",
-    "label": ""
-  },
-  "blinkDuration": {
-    "name": "BlinkDuration",
-    "type": "Float",
-    "label": ""
-  },
-  "blinkInterval": {
-    "name": "BlinkInterval",
-    "type": "Float",
-    "label": ""
-  },
-  "blinkFrequency": {
-    "name": "BlinkFrequency",
-    "type": "Float",
-    "label": ""
-  },
-  "correctedError": {
-    "name": "CorrectedError",
-    "type": "Float",
-    "label": ""
-  },
-  "saccadeDuration": {
-    "name": "SaccadeDuration",
-    "type": "Float",
-    "label": ""
-  },
-  "saccadeVelocity": {
-    "name": "SaccadeVelocity",
-    "type": "Float",
-    "label": ""
-  },
-  "blinkBurstRatio": {
-    "name": "BlinkBurstRatio",
-    "type": "Float",
-    "label": ""
-  },
-  "saccadeAmplitude": {
-    "name": "SaccadeAmplitude",
-    "type": "Float",
-    "label": ""
-  },
-  "lrPupilCorrelation": {
-    "name": "lrPupilCorrelation",
-    "type": "Float",
-    "label": ""
-  },
-  "saccadePeakVelocity": {
-    "name": "SaccadePeakVelocity",
-    "type": "Float",
-    "label": ""
-  },
-  "readTextEventsRatio": {
-    "name": "ReadTextEventsRatio",
-    "type": "Float",
-    "label": ""
-  },
-  "uncorrectedErrorRate": {
-    "name": "UncorrectedErrorRate",
-    "type": "Float",
-    "label": ""
-  },
-  "baselinePupilDiameter": {
-    "name": "BaselinePupilDiameter",
-    "type": "Float",
-    "label": ""
-  },
-  "objectiveTaskDifficulty": {
-    "name": "ObjectiveTaskDifficulty",
-    "type": "Boolean",
-    "label": "",
-    "categories": []
-  },
-  "objectiveTaskDifficultyCat": {
-    "name": "ObjectiveTaskDifficulty_cat",
-    "type": "Categorical",
-    "label": "",
-    "categories": []
-  },
-  "attendedButNotSelectedRate": {
-    "name": "AttendedButNotSelectedRate",
-    "type": "Float",
-    "label": ""
-  }
+    "subject": {
+        "name": "Subject",
+        "sort_order": 0,
+        "label": "",
+        "categories": [],
+        "type": "Categorical"
+    },
+    "language": {
+        "name": "Language",
+        "sort_order": 1,
+        "label": "",
+        "categories": [],
+        "type": "Boolean"
+    },
+    "session": {
+        "name": "Session",
+        "sort_order": 2,
+        "label": "",
+        "categories": [],
+        "type": "Boolean"
+    },
+    "objectiveTaskDifficulty": {
+        "name": "ObjectiveTaskDifficulty",
+        "sort_order": 3,
+        "label": "",
+        "categories": [],
+        "type": "Boolean"
+    },
+    "trial": {
+        "name": "Trial",
+        "sort_order": 4,
+        "label": "",
+        "type": "Integer"
+    },
+    "typingSpeed": {
+        "name": "TypingSpeed",
+        "sort_order": 5,
+        "label": "",
+        "type": "Float"
+    },
+    "correctedError": {
+        "name": "CorrectedError",
+        "sort_order": 6,
+        "label": "",
+        "type": "Float"
+    },
+    "readTextEventsRatio": {
+        "name": "ReadTextEventsRatio",
+        "sort_order": 7,
+        "label": "",
+        "type": "Float"
+    },
+    "attendedButNotSelectedRate": {
+        "name": "AttendedButNotSelectedRate",
+        "sort_order": 8,
+        "label": "",
+        "type": "Float"
+    },
+    "uncorrectedErrorRate": {
+        "name": "UncorrectedErrorRate",
+        "sort_order": 9,
+        "label": "",
+        "type": "Float"
+    },
+    "baselinePupilDiameter": {
+        "name": "BaselinePupilDiameter",
+        "sort_order": 10,
+        "label": "",
+        "type": "Float"
+    },
+    "blinkFrequency": {
+        "name": "BlinkFrequency",
+        "sort_order": 11,
+        "label": "",
+        "type": "Float"
+    },
+    "blinkDuration": {
+        "name": "BlinkDuration",
+        "sort_order": 12,
+        "label": "",
+        "type": "Float"
+    },
+    "blinkInterval": {
+        "name": "BlinkInterval",
+        "sort_order": 13,
+        "label": "",
+        "type": "Float"
+    },
+    "blinkBurstRatio": {
+        "name": "BlinkBurstRatio",
+        "sort_order": 14,
+        "label": "",
+        "type": "Float"
+    },
+    "saccadeAmplitude": {
+        "name": "SaccadeAmplitude",
+        "sort_order": 15,
+        "label": "",
+        "type": "Float"
+    },
+    "saccadeDuration": {
+        "name": "SaccadeDuration",
+        "sort_order": 16,
+        "label": "",
+        "type": "Float"
+    },
+    "saccadeVelocity": {
+        "name": "SaccadeVelocity",
+        "sort_order": 17,
+        "label": "",
+        "type": "Float"
+    },
+    "saccadePeakVelocity": {
+        "name": "SaccadePeakVelocity",
+        "sort_order": 18,
+        "label": "",
+        "type": "Float"
+    },
+    "eyeHeight": {
+        "name": "EyeHeight",
+        "sort_order": 19,
+        "label": "",
+        "type": "Float"
+    },
+    "fatigue": {
+        "name": "Fatigue",
+        "sort_order": 20,
+        "label": "",
+        "type": "Integer"
+    },
+    "objectiveTaskDifficulty_cat": {
+        "name": "ObjectiveTaskDifficulty_cat",
+        "sort_order": 21,
+        "label": "",
+        "categories": [],
+        "type": "Categorical"
+    },
+    "dayNr": {
+        "name": "DayNr",
+        "sort_order": 22,
+        "label": "",
+        "type": "Integer"
+    },
+    "lrPupilCorrelation": {
+        "name": "lrPupilCorrelation",
+        "sort_order": 23,
+        "label": "",
+        "type": "Float"
+    }
 }
