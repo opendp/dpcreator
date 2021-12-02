@@ -7,6 +7,17 @@ class BasicErrCheck():
     error_found = False
     error_message = None
 
+    @staticmethod
+    def get_instance_with_error(err_msg):
+        """
+        Create an instance of BasicErrCheck with an error
+        Rare usage where BasicErrCheck  functionality is expected
+        :param err_msg str Error message content
+        """
+        b = BasicErrCheck()
+        b.add_err_msg(err_msg)
+        return b
+
     def has_error(self):
         """Did an error occur?"""
         return self.error_found
