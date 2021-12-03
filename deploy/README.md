@@ -67,8 +67,8 @@ Deployment currently requires the building of two Docker images:
     docker push ghcr.io/opendp/dpcreator/app:YYYY-MMDD   
    
     # Example:
-    # docker build -t ghcr.io/opendp/dpcreator/app:2021-0921 .
-    # docker push ghcr.io/opendp/dpcreator/app:2021-0921  
+    # docker build -t ghcr.io/opendp/dpcreator/app:2021-1203 .
+    # docker push ghcr.io/opendp/dpcreator/app:2021-1203  
     ```
 
 ### (B) DPCreator nginx
@@ -86,8 +86,8 @@ Deployment currently requires the building of two Docker images:
     docker push ghcr.io/opendp/dpcreator/nginx:YYYY-MMDD
   
     # Example:
-    # docker build -t ghcr.io/opendp/dpcreator/nginx:2021-0921 .
-    # docker push ghcr.io/opendp/dpcreator/nginx:2021-0921
+    # docker build -t ghcr.io/opendp/dpcreator/nginx:2021-1203 .
+    # docker push ghcr.io/opendp/dpcreator/nginx:2021-1203
 
     ```
 
@@ -101,7 +101,7 @@ These steps document how to run a Python script which will generate a k8s specif
 
 1. Switch to the "deploy/k8s_maker" directory (from the top-level of the dpcreator repository)
     ```
-    cd deploy/k8s_maker
+    cd ../k8s_maker  # ../deploy/k8s_maker
     pip install -r requirements.txt     # one time install
     ```
 1. Update the `dpcreator_specs_01.py` file.
