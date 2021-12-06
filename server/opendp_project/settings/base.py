@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'opendp_apps.dataset',
     'opendp_apps.analysis',
     'opendp_apps.terms_of_access',
+    'opendp_apps.banner_messages',
     'opendp_apps.communication',
     'opendp_apps.profiler',
 
@@ -166,7 +167,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = os.getenv('TIME_ZONE', 'UTC')
 
 USE_I18N = True
 
