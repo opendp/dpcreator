@@ -6,6 +6,8 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
+from rest_framework.reverse import reverse as drf_reverse
+
 from django_cryptography.fields import encrypt
 
 
@@ -327,7 +329,19 @@ class ManifestTestParams(DataverseParams):
             return f'<a href="{user_lnk}?{url_params}" target="_blank">Test 2: Mock Dataverse incoming link</a>'
         else:
             return f'<a href="{user_lnk}?{url_params}" target="_blank">Test 2: Dataverse incoming link (public dataset)</a>'
-
     dataverse_incoming_link_2.allow_tags = True
+
+    @mark_safe
+    def dataverse_handoff_test_link(self):
+        """Mock an incoming Dataverse Call via the UI"""
+        handoff_url = drf_reverse('dv-handoff-dv-orig-create', args=[], kwargs={})
+
+        url_params = self.get_manifest_url_params()
+
+        if self.use_mock_dv_api:
+            return f'<a href="{handoff_url}?{url_params}" target="_blank">Handoff!: Mock Dataverse incoming link</a>'
+        else:
+            return f'<a href="{handoff_url}?{url_params}" target="_blank">Handoff!: Dataverse incoming link (public dataset)</a>'
+    dataverse_handoff_test_link.allow_tags = True
 
 
