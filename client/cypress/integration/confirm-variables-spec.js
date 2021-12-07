@@ -29,14 +29,6 @@
                 cy.get('[data-test="wizardContinueButton"]').should('not.be.disabled')
 
 
-                /*
-                cy.get("#v-data-table tbody tr")         // selects all rows in #dataTable
-                .contains("Subject")  // pick the one with this text
-                .scrollIntoView()                   // in case the row is not in view
-                .siblings(":first")              // get column previous to description
-                .click()
-
-                 */
             })
         })
     })
