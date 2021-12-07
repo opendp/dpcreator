@@ -71,6 +71,7 @@
                 v-if="showToolTip(item)"
                 v-model="item.type"
                 :items="['Float', 'Integer', 'Categorical', 'Boolean']"
+                :data-test="item.label+':selectToolTip'"
                 standard
                 v-tooltip="'Changing type will clear additional info.'"
                 hide-selected
@@ -84,6 +85,7 @@
             v-else
             v-model="item.type"
             :items="['Float', 'Integer', 'Categorical', 'Boolean']"
+            :data-test="item.label+':select'"
             standard
             hide-selected
             class="d-inline-block select"
@@ -416,6 +418,9 @@ export default {
               && item.additional_information.categories.length > 0))
       return show
     },
+    isBlank(str) {
+      return (!str || /^\s*$/.test(str));
+    },
     isValidRow(variable) {
       // We only need to check selected rows,
       // so if row isn't selected it's always valid
@@ -426,7 +431,11 @@ export default {
         let catValid = true
 
         if (this.isNumerical(variable.type)) {
-          if (variable.additional_information.max !== null && variable.additional_information.min !== null) {
+          if (this.isBlank(variable.additional_information.min)
+              || this.isBlank(variable.additional_information.max)
+          ) {
+            minmaxValid = false
+          } else {
             minmaxValid = (Number(variable.additional_information.min) < Number(variable.additional_information.max))
           }
         }
@@ -497,14 +506,24 @@ export default {
       this.saveUserInput(elem)
     },
     saveUserInput(elem) {
+      console.log("saving input")
       this.$store.dispatch('dataset/updateVariableInfo', elem)
-      if (this.formCompleted() && this.isValidRow(elem)) {
+      if (this.formCompleted() && this.isValidRow(elem) && this.atLeastOneSelected(elem)) {
         this.$emit("stepCompleted", 1, true);
       } else {
         this.$emit("stepCompleted", 1, false);
       }
     },
-
+    atLeastOneSelected(elem) {
+      console.log('this.selected.length: ' + this.selected.length)
+      let othersSelected = false
+      this.selected.forEach(row => {
+        if (row.index !== elem.index) {
+          othersSelected = true
+        }
+      })
+      return elem.selected || othersSelected
+    }
   },
   /**
    * Watch for the variableInfo object to be populated by the Run Profiler action.
