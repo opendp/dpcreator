@@ -139,12 +139,15 @@ Cypress.Commands.add('testMean', (numericVar) => {
     const minDataTest = '[data-test="' + numericVar.name + ':min"]'
     const maxDataTest = '[data-test="' + numericVar.name + ':max"]'
     // Enter min and max for one numericVar so we can validate
+    cy.contains('td', numericVar.name).parent('tr').children().first().click()
     cy.get(minDataTest).should('be.visible')
     cy.get(maxDataTest).should('be.visible')
     cy.get(minDataTest).type(numericVar.min, {force: true})
     cy.wait(500)
     cy.get(maxDataTest).type(numericVar.max, {force: true})
-  //  cy.wait('@patchDeposit', {timeout: 5000})
+    // click back into min input, to trigger change event on max input
+    cy.get(minDataTest).click()
+    //  cy.wait('@patchDeposit', {timeout: 5000})
 
     // Continue to Set Epsilon Step
     cy.get('[data-test="wizardContinueButton"]').last().click();

@@ -1,5 +1,5 @@
 <template>
-  <v-checkbox :data-test=dataTest v-model="checkboxValue" class="checkbox">
+  <v-checkbox v-on:click="handleCheckboxEvent" :data-test=dataTest v-model="checkboxValue" class="checkbox">
     <template v-slot:label>
       <div
           class="primary--text"
@@ -28,8 +28,15 @@ export default {
   mounted: function () {
     this.checkboxValue = this.value;
   },
+  methods: {
+    handleCheckboxEvent() {
+      console.log('checkbox event, child')
+      this.$emit("click");
+    },
+  },
   watch: {
     checkboxValue: function (newCheckboxValue) {
+      console.log("emitting event hello ")
       this.$emit("update:value", newCheckboxValue);
     }
   },
