@@ -6,12 +6,12 @@ class BannerMessageAdmin(admin.ModelAdmin):
     save_on_top = True
     search_fields = ('name',)
     list_filter = ('active', 'is_timed_message', 'type')#, 'editor')
+    list_editable = ['sort_order']
     list_display = ('name',
                     'active',
                     'type',
+                    'sort_order',
                     'is_timed_message',
-                    'view_start_time',
-                    'view_stop_time',
                     'editor',
                     'created',)
     readonly_fields = ('id', 'object_id', 'created', 'updated', 'editor',)
