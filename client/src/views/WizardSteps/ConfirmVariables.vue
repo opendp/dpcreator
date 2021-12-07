@@ -4,7 +4,7 @@
     <p v-html="$t('confirm variables.confirm variables intro')"></p>
     <ColoredBorderAlert type="warning">
       <template v-slot:content>
-        The DPcreator takes the first 20 variables of the dataset. The default
+        The DP Creator takes the first 20 variables of the dataset. The default
         type has been inferred from the dataset. Incorrect type labeling can
         result in privacy violation.
       </template>
@@ -13,8 +13,7 @@
       <template v-slot:content>
         Any changes will be applied for the purpose of creating the differential
         privacy release only, and will <strong>not affect </strong>the original
-        data file. dataset. Incorrect type labeling can result in privacy
-        violation.
+        data file. dataset.
       </template>
     </ColoredBorderAlert>
 
