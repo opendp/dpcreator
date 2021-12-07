@@ -20,11 +20,16 @@
 
     <v-data-table
         :headers="headers"
+        v-model="selected"
         :items="variables"
         class="my-10"
         :items-per-page="20"
         :loading="loadingVariables"
         :hide-default-footer="true"
+        :single-select="false"
+        item-key="name"
+        show-select
+        v-on:item-selected="handleItemSelected"
     >
       <template v-slot:loading>
         <LoadingBar v-for="i in 20" :key="i"/>
@@ -44,6 +49,7 @@
       <template v-slot:[`item.index`]="{ index }">
         <span class="index-td grey--text">{{ index + 1 }}</span>
       </template>
+
       <template v-slot:[`item.label`]="{ item }">
         <div v-if="item.editDisabled">
           <span>{{ item.label }}</span>
@@ -321,6 +327,7 @@ import QuestionIconTooltip from "../../components/DynamicHelpResources/QuestionI
 import ColoredBorderAlert from "../../components/DynamicHelpResources/ColoredBorderAlert.vue";
 import LoadingBar from "../../components/LoadingBar.vue";
 import ChipSelectItem from "../../components/DesignSystem/ChipSelectItem.vue";
+import Checkbox from "../../components/DesignSystem/Checkbox.vue";
 import DynamicQuestionIconTooltip from "@/components/DynamicHelpResources/DynamicQuestionIconTooltip";
 import {mapState, mapGetters} from 'vuex';
 
@@ -331,13 +338,15 @@ export default {
     QuestionIconTooltip,
     DynamicQuestionIconTooltip,
     ColoredBorderAlert,
-    ChipSelectItem
+    ChipSelectItem,
+    Checkbox
   },
   props: ["stepperPosition"],
   computed: {
     ...mapState('auth', ['error', 'user']),
     ...mapState('dataset', ['datasetInfo']),
     ...mapGetters('dataset', ['getDepositorSetupInfo']),
+
   },
   created: function () {
     if (this.datasetInfo.depositorSetupInfo.variableInfo !== null) {
@@ -358,9 +367,24 @@ export default {
         value: "additional_information"
       }
     ],
-    variables: []
+    variables: [],
+    selected: []
   }),
   methods: {
+    formCompleted() {
+      let completed = true
+      this.selected.forEach(row => {
+        if (!this.isValidRow(row)) {
+          completed = false
+        }
+      })
+      return completed
+    },
+    handleItemSelected(event) {
+      this.variables[event.item.sortOrder].selected = event.value
+      this.saveUserInput(this.variables[event.item.sortOrder])
+    },
+
     checkMin(value) {
       if (this.currentRow !== null) {
         if (this.variables[this.currentRow].additional_information !== undefined) {
@@ -394,14 +418,29 @@ export default {
       return show
     },
     isValidRow(variable) {
-      let minmaxValid = true
-      if (this.isNumerical(variable.type)) {
-        if (variable.additional_information.max !== null && variable.additional_information.min !== null) {
-          minmaxValid = (Number(variable.additional_information.min) < Number(variable.additional_information.max))
+      // We only need to check selected rows,
+      // so if row isn't selected it's always valid
+      if (!variable.selected) {
+        return true
+      } else {
+        let minmaxValid = true
+        let catValid = true
+
+        if (this.isNumerical(variable.type)) {
+          if (variable.additional_information.max !== null && variable.additional_information.min !== null) {
+            minmaxValid = (Number(variable.additional_information.min) < Number(variable.additional_information.max))
+          }
         }
+        if (variable.type === 'Categorical' &&
+            (variable.additional_information === 'undefined'
+                || variable.additional_information.categories === 'undefined'
+                || variable.additional_information.categories === null
+                || variable.additional_information.categories.length === 0)) {
+          catValid = false
+        }
+        const valid = (variable.name !== null && minmaxValid && catValid)
+        return valid
       }
-      const valid = (variable.name !== null && minmaxValid)
-      return valid
     },
     removeCategoryFromVariable(category, variable) {
       variable.additional_information["categories"].splice(
@@ -419,6 +458,11 @@ export default {
         row.name = vars[key].name
         row.type = vars[key].type
         row.sortOrder = vars[key].sortOrder
+        if (vars[key].selected === undefined) {
+          row.selected = false
+        } else {
+          row.selected = vars[key].selected
+        }
         if (vars[key].label === '') {
           row.label = vars[key].name
         } else {
@@ -434,6 +478,9 @@ export default {
           row.additional_information.categories = JSON.parse(JSON.stringify(vars[key].categories))
         }
         row['editDisabled'] = true
+        if (row.selected) {
+          this.selected.push(row)
+        }
         this.variables.push(row)
       }
       // Order variables by sortOrder returned from the server
@@ -451,10 +498,12 @@ export default {
       this.saveUserInput(elem)
     },
     saveUserInput(elem) {
-      if (this.isValidRow(elem)) {
-        this.$store.dispatch('dataset/updateVariableInfo', elem)
+      this.$store.dispatch('dataset/updateVariableInfo', elem)
+      if (this.formCompleted() && this.isValidRow(elem)) {
+        this.$emit("stepCompleted", 1, true);
+      } else {
+        this.$emit("stepCompleted", 1, false);
       }
-
     },
 
   },
@@ -474,14 +523,7 @@ export default {
         }
       }
     },
-    // If additional information has been added for all variables, then
-    // send stepCompleted event to the wizard (will enable the continue button
-    variables: function (newValue) {
-      // for now, for ease of use, we will not require additional info for all variables.
-      // TODO: add validation later, or make it conditional to running in dev mode
-      this.$emit("stepCompleted", 1, true);
-      //  }
-    }
+
 
   }
 };

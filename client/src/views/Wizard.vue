@@ -97,6 +97,7 @@ export default {
   methods: {
 
     updateStepStatus: function (stepNumber, completedStatus) {
+      console.log("updateStepStatus: stepNumber: " + stepNumber + " completedStatus: " + completedStatus)
       this.steps[stepNumber].completed = completedStatus;
     },
     // Set the current Wizard stepper position based on the
