@@ -4,11 +4,11 @@ home,notice if not from a Dataverse,"To create a DP Release, please make a reque
 home,stepsTitle,Introduce noise into your statistics to protect privacy,Introduce noise into your statistics to protect privacy
 home,stepsDescription,"DP Creator allows researchers to create high utility statistics using differential privacy (DP). Through a carefully calibrated process, the application of DP introduces random noise to a dataset in order to keep an individual's information protected. The resulting DP statistics are usable by researchers while masking the contribution of any single individual--making it impossible to infer any information specific to an individual.",DP Creator allows researchers to easily <strong>introduce noise into variables</strong> masking specific details to <strong>keep private data private</strong>.
 home,step1 title,Review requirements,Review requirements
-home ,step1 text,"Make sure your data is ready and appropriate to be processed with DP Creator by checking the Tips for Use below, then create your account to get started.","Make sure your data is ready and appropriate to be processed with DP Creator by checking the Tips for Use, then create your account to get started."
-home ,step2 title,Connect a dataset,Connect a dataset
-home ,step2 text,"DP Creator works with a temporary copy of a dataset file you send from a registered Dataverse data repository. This allows you to create differentially private summary statistics from variables you choose. (Note: Currently, DP Creator allows you to work with the first 20 variables in your dataset.)",DP Creator works with a temporary copy of the first 20 variables of a file you send from a registered Dataverse data repository to create differentially private summary statistics from the variables you choose.
+home,step1 text,"Make sure your data is ready and appropriate to be processed with DP Creator by checking the Tips for Use below, then create your account to get started.","Make sure your data is ready and appropriate to be processed with DP Creator by checking the Tips for Use, then create your account to get started."
+home,step2 title,Connect a dataset,Connect a dataset
+home,step2 text,"DP Creator works with a temporary copy of a dataset file you send from a registered Dataverse data repository. This allows you to create differentially private summary statistics from variables you choose. (Note: Currently, DP Creator allows you to work with the first 20 variables in your dataset.)",DP Creator works with a temporary copy of the first 20 variables of a file you send from a registered Dataverse data repository to create differentially private summary statistics from the variables you choose.
 home,step3 title,Work on a release,Work on release
-home ,step3 text,"DP Creator guides you through 4 steps: Confirm variables, Set epsilon value, Create statistics, and Generate DP Release. You can save along the way, and have 72 hours to complete the release."," You can work with your data in 4 steps: Confirm variables, Set epsilon value, Create statistics, Generate DP Release. You'll see more information about the steps during the process. <strong>You have 72 hours to finish your release or the data will be deleted from the tool.</strong>"
+home,step3 text,"DP Creator guides you through 4 steps: Confirm variables, Set epsilon value, Create statistics, and Generate DP Release. You can save along the way, and have 72 hours to complete the release.","You can work with your data in 4 steps: Confirm variables, Set epsilon value, Create statistics, Generate DP Release. You'll see more information about the steps during the process. <strong>You have 72 hours to finish your release or the data will be deleted from the tool.</strong>"
 home,step4 title,Review and submit,Check the release
 home,step4 text,"After processing, review the DP Release in DP Creator. If you choose, DP Creator will deposit the DP release back in the referring Dataverse repository dataset for sharing and publication.","After processing, review the release in DP Creator. When you're ready, submit the release to the referring Dataverse repository dataset for sharing and publication."
 home,service section title,Tips for Use,Tips for Use
@@ -19,7 +19,7 @@ home,service1 text,"<p>If you have deposited restricted datasets in a registered
 home,service2 title,What statistics can be released using this tool?,What statistics can be released using this tool?
 home,service2 text,"<p>DP Creator generates statistics using the <a href=""https://github.com/opendp/opendp"" target=""_blank"">OpenDP library</a>. Currently, you may create differentially private versions of Count, Sum, Mean, Variance, and Histogram. We plan to add more statistics regularly.</p>","Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi iusto in, voluptas quia fugiat soluta labore consectetur harum repellendus accusamus quisquam quasi velit vero totam, optio assumenda atque obcaecati eum!"
 home,service3 title,How does it work?,What type of files are appropriate?
-home ,service3 text,"[This section needs input] Types of files... First 20 variables... Gaussian, Laplace, and Geometric algorithms applied to common statistics...
+home,service3 text,"[This section needs input] Types of files... First 20 variables... Gaussian, Laplace, and Geometric algorithms applied to common statistics...
 epsilon and delta...variables you select will be released with noise for privacy protection. Link to find out more","Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi iusto in, voluptas quia fugiat soluta labore consectetur harum repellendus accusamus quisquam quasi velit vero totam, optio assumenda atque obcaecati eum!"
 home,service4 title,What can be done with the DP Release?,What can be done with the DP Release?
 home,service4 text,"<p>A differentially private (DP) Release includes the statistic or statistics that you have requested. The DP Release consists of two files:</p>
@@ -28,9 +28,9 @@ home,service4 text,"<p>A differentially private (DP) Release includes the statis
 <li>A machine readable JSON file</li>
 <p>Both files include the resulting statistics and how they were calculated.</p> ","Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi iusto in, voluptas quia fugiat soluta labore consectetur harum repellendus accusamus quisquam quasi velit vero totam, optio assumenda atque obcaecati eum!"
 home,checkbox,I have read the tips for use,
-home ,footer title,This is a sentence about Open DP,This is a sentence <br/> about Open DP
+home,footer title,This is a sentence about Open DP,This is a sentence <br/> about Open DP
 home,footer text,"OpenDP is a community effort to build trustworthy, open-source software tools for the statistical analysis of sensitive private data. These tools offer the rigorous protections of differential privacy for the individuals who may be represented in confidential data and statistically valid methods of analysis for researchers who study the data.","Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi iusto in, voluptas quia fugiat soluta labore consectetur harum repellendus accusamus quisquam quasi velit vero totam, optio assumenda atque obcaecati eum!"
-terms of use,TOU text,"    (add a link to the most recent terms of use doc, or copy it here)
+terms of use,TOU text,"(add a link to the most recent terms of use doc, or copy it here)
 
  <p>
             The following Terms govern all use of the Harvard Web Publishing
@@ -88,10 +88,7 @@ terms of use,TOU text,"    (add a link to the most recent terms of use doc, or c
             consectetur adipiscing elit, sed do eiusmod tempor incididun ut
             labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
             exercitation ullamco laboris nisi ut aliquip ex ea link here.
-          </p>
-
-    
-","     <p>
+          </p>","<p>
             The following Terms govern all use of the Harvard Web Publishing
             website (the Site), the web publishing platforms (the Tools), and
             the services available to the Harvard Community (the Service). By
@@ -147,10 +144,7 @@ terms of use,TOU text,"    (add a link to the most recent terms of use doc, or c
             consectetur adipiscing elit, sed do eiusmod tempor incididun ut
             labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
             exercitation ullamco laboris nisi ut aliquip ex ea link here.
-          </p>
-
-    
-"
+          </p>"
 new account,TOU Creating DP,"(add a link to the most recent terms of use doc, or copy it here)
 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi porro nemo inventore, ducimus qui dicta nostrum deleniti maxime, quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus magni at aut sed dignissimos velit dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt eligendi voluptatem deleniti iste! Veritatis, voluptate!</p><p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi porro nemo inventore, ducimus qui dicta nostrum deleniti maxime, quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus magni at aut sed dignissimos velit dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt eligendi voluptatem deleniti iste! Veritatis, voluptate!</p><p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi porro nemo inventore, ducimus qui dicta nostrum deleniti maxime, quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus magni at aut sed dignissimos velit dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt eligendi voluptatem deleniti iste! Veritatis, voluptate!</p>
     ","<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi porro nemo inventore, ducimus qui dicta nostrum deleniti maxime, quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus magni at aut sed dignissimos velit dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt eligendi voluptatem deleniti iste! Veritatis, voluptate!</p><p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi porro nemo inventore, ducimus qui dicta nostrum deleniti maxime, quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus magni at aut sed dignissimos velit dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt eligendi voluptatem deleniti iste! Veritatis, voluptate!</p><p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi porro nemo inventore, ducimus qui dicta nostrum deleniti maxime, quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus magni at aut sed dignissimos velit dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt eligendi voluptatem deleniti iste! Veritatis, voluptate!</p>
@@ -158,7 +152,7 @@ new account,TOU Creating DP,"(add a link to the most recent terms of use doc, or
 new account,TOU Dataverse,"<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi porro nemo inventore, ducimus qui dicta nostrum deleniti maxime, quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus magni at aut sed dignissimos velit dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt eligendi voluptatem deleniti iste! Veritatis, voluptate!</p><p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi porro nemo inventore, ducimus qui dicta nostrum deleniti maxime, quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus magni at aut sed dignissimos velit dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt eligendi voluptatem deleniti iste! Veritatis, voluptate!</p><p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi porro nemo inventore, ducimus qui dicta nostrum deleniti maxime, quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus magni at aut sed dignissimos velit dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt eligendi voluptatem deleniti iste! Veritatis, voluptate!</p>
     ","<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi porro nemo inventore, ducimus qui dicta nostrum deleniti maxime, quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus magni at aut sed dignissimos velit dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt eligendi voluptatem deleniti iste! Veritatis, voluptate!</p><p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi porro nemo inventore, ducimus qui dicta nostrum deleniti maxime, quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus magni at aut sed dignissimos velit dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt eligendi voluptatem deleniti iste! Veritatis, voluptate!</p><p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi porro nemo inventore, ducimus qui dicta nostrum deleniti maxime, quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus magni at aut sed dignissimos velit dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt eligendi voluptatem deleniti iste! Veritatis, voluptate!</p>
     "
-confirm variables,confirm variables intro,"<p>For each variable below, please do the following:</p>
+confirm variables,confirm variables intro,"<p><b>Select the variables</b> you want to use to generate your differentially private statistics. For each selected variable, please do the following:</p>
 <ul><li>Update the <b>Variable name</b> and <b>Variable label</b> (optional)
 </li><li>Check that the Type is correct. [Need button to leave if type is wrong]
 </li><li>For <b>Numerical</b> variables,  please enter upper and lower bounds that a knowledgeable person might estimate without looking at the data.
@@ -168,8 +162,7 @@ confirm variables,confirm variables intro,"<p>For each variable below, please do
 </li></ul></li><li>For <b>Categorical</b> variables, without looking at your data, approximate the categories (or bins) for your categorical variables. Please enter categories that a reasonable person might estimate without looking at the dataset. 
 <ul><li>                For example, if the variable is “eye color”, categories might include “brown, blue, black, green”
 </li></ul></li><li>WARNING: It is important that you DO NOT copy the exact minimum and maximum values or categories for your dataset. If these are not publicly published values,  using exact values can violate privacy. 
-</li></ul>
-","First, you have to review, adjust and confirm the variables of your dataset. These will be considered in the generation of
+</li></ul>","First, you have to review, adjust and confirm the variables of your dataset. These will be considered in the generation of
 the differential privacy release. To adjust the necessary parameters to complete the process, you will need to set a valid
 range depending on the variable's type in the table below."
 confirm variables,help variable,"Examples. Numerical variable ""age"": min: 0, max: 100. Categorical variable ""eye color"": brown, blue, black, green","E.g. Numerical: minX - max: Y; Categorical: cat1,cat2,cat3"
@@ -188,7 +181,7 @@ the dataset would not want publicly shared in their name and should be marked �
 corporations, natural phenomena, etc., that are public record and can be publicly distributed, does not depend on private
 information."
 set epsilon,help data public,"For example, the number of observations in a dataset containing a 5% sample of California voters is public, but the number of observations in a dataset containing all cancer patients in a particular hospital may not be public, as it could be combined with auxiliary information to reveal whether or not a patient has cancer.","For example, the number of observations in a dataset containing a 5% sample of California voters is public, but the number of observations in a dataset containing all cancer patients in a particular hospital may not be public, as it could be combined with auxiliary information to reveal whether or not a patient has cancer."
-create statistics,statistics intro,Create the statistics you would like to release. Confirm the default levels or edit them to change the degree of noise or interference you'd like to add. The default values distribute epsilon evenly across variables. ,"Create the statistics you would like to release. Please edit and confirm the degree of noise or interference you'd like to
+create statistics,statistics intro,Create the statistics you would like to release. Confirm the default levels or edit them to change the degree of noise or interference you'd like to add. The default values distribute epsilon evenly across variables.,"Create the statistics you would like to release. Please edit and confirm the degree of noise or interference you'd like to
 add to the statistics."
 create statistics,more info 1-3,"Where should these links go? (or one link in the epsilon warning, below?)",Where should these links go?
 create statistics,epsilon warning,"Changing the epsilon, delta, or significance level will directly impact the privacy settings. Every DP statistic has a different tradeoff between epsilon value and accuracy. Splitting the budget evenly can diminish the usefulness of statistics. More complex statistics will generally require more budget. Link to more info","Changing the epsilon, delta, or significance level will directly impact the privacy settings. We recommend
@@ -215,7 +208,7 @@ create statistics,confirm 2,"Note: Larger X corresponds to larger privacy loss b
 We do not recommend X exceding 1.","Note: Larger X corresponds to larger privacy loss budget, and hence, less privacy.
 We do not recommend X exceding 1."
 create statistics,confirm 3,Note: X is the probability of a blatant privacy violation. X values larger than the reciprocal of the dataset size are not allowed.,Note: X is the probability of a blatant privacy violation. X values larger than the reciprocal of the dataset size are not allowed.
-create statistics,confirm 4,The level of privacy protection for individuals in the dataset is governed by two privacy-loss parameters - x & x. ,The level of privacy protection for individuals in the dataset is governed by two privacy-loss parameters - x & x. Watch video to learn more.
+create statistics,confirm 4,The level of privacy protection for individuals in the dataset is governed by two privacy-loss parameters - x & x.,The level of privacy protection for individuals in the dataset is governed by two privacy-loss parameters - x & x. Watch video to learn more.
 generate DP,generate text,"The final step is to submit the statistics and generate the differential privacy release. This will finalize the current
 selections and spend your allocated privacy budget on them.","The final step is to submit the statistics and generate the differential privacy release. This will finalize the current
 selections and spend your allocated privacy budget on them."
@@ -239,7 +232,7 @@ more information,registered dataverses text,"<p><a href=""https://dataverse.org/
 
 <p>The registration process uses Dataverse's <a href=""https://guides.dataverse.org/en/latest/admin/external-tools.html"">external tools framework</a>. Alternately, DP Creator may be installed for a specific Dataverse's installation to conform with an organization's security requirements.</p>
 
-<p>For more information, please <a href=""https://docs.opendp.org/en/stable/contact/index.html"">contact us</a>.</p> ",
+<p>For more information, please <a href=""https://docs.opendp.org/en/stable/contact/index.html"">contact us</a>.</p>",
 more information,epsilon title,What is epsilon (&epsilon;)?,
 more information,epsilon text,"<p>An essential component of a differentially private computation is the privacy loss parameter, usually denoted by the Greek letter <b>&epsilon;</b> (epsilon). This parameter determines how much noise is added to the computation. Choosing a value for the privacy loss parameter can be thought of as a tuning knob for balancing privacy and accuracy.</p>
 
@@ -252,11 +245,11 @@ more information,epsilon text,"<p>An essential component of a differentially pri
 
 <p> As a rule of thumb, however, <b>&epsilon;</b> should be thought of as a small number, between approximately 1/100 and 1.</p>
 
-<p><i>(Note: This information has been excerpted from the book chapter <a href=""https://admindatahandbook.mit.edu/book/v1.0/diffpriv.html"" target=""_blank"">Designing Access with Differential Privacy</a>, which also contains illustrative examples.)</i></p> ",
+<p><i>(Note: This information has been excerpted from the book chapter <a href=""https://admindatahandbook.mit.edu/book/v1.0/diffpriv.html"" target=""_blank"">Designing Access with Differential Privacy</a>, which also contains illustrative examples.)</i></p>",
 more information,delta title,What is delta (&delta;)?,
 more information,delta text,"<p>Delta (&delta;) is a second privacy-loss parameter used when calculating some differentially private statistics.</p>  
 
-<p>This parameter  controls the probability that a privacy breach event would happen, and hence should be kept
+<p>This parameter  controls the probability that a privacy breach event would happen, and hence should be kept
 very small (e.g., one in a billion).</p>  ",
 more information,confidence title,What is a confidence level?,
-more information,confidence text,CI is ,
+more information,confidence text,CI is,
