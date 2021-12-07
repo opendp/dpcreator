@@ -1,0 +1,19 @@
+[
+{
+    "model": "banner_messages.bannermessage",
+    "pk": 1,
+    "fields": {
+        "created": "2021-12-07T00:10:07.369Z",
+        "updated": "2021-12-07T14:43:24.093Z",
+        "name": "Demo Site Notice",
+        "active": false,
+        "type": "WARN",
+        "sort_order": 1,
+        "editor": 1,
+        "content": "This site is for demonstration purposes only. Please do not use sensitive or confidential data. For more information, please <a href=\"https://github.com/opendp/dpcreator#readme\" target=\"_blank\">read the tutorial</a> or <a href=\"mailto:info@opendp.org\">contact us</a>.",
+        "is_timed_message": false,
+        "view_start_time": null,
+        "view_stop_time": null
+    }
+}
+]
