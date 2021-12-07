@@ -7,29 +7,39 @@
   "userStep": "step_700",
   "variableInfo": {
     "trial": {
+      "max": 44,
+      "min": 0,
       "name": "Trial",
-      "type": "Integer",
-      "label": "",
+      "type": "Float",
+      "label": "Trial",
+      "selected": true,
+      "categories": [],
       "sortOrder": 4
     },
     "session": {
       "name": "Session",
       "type": "Boolean",
-      "label": "",
+      "label": "Session",
+      "selected": false,
       "categories": [],
       "sortOrder": 2
     },
     "subject": {
       "name": "Subject",
       "type": "Categorical",
-      "label": "",
-      "categories": [],
+      "label": "Subject",
+      "selected": true,
+      "categories": [
+        "one",
+        "two"
+      ],
       "sortOrder": 0
     },
     "language": {
       "name": "Language",
       "type": "Boolean",
-      "label": "",
+      "label": "Language",
+      "selected": true,
       "categories": [],
       "sortOrder": 1
     },
@@ -40,9 +50,12 @@
       "sortOrder": 19
     },
     "typingSpeed": {
+      "max": 25,
+      "min": 10,
       "name": "TypingSpeed",
       "type": "Float",
-      "label": "",
+      "label": "TypingSpeed",
+      "selected": true,
       "sortOrder": 5
     },
     "blinkDuration": {
@@ -64,9 +77,12 @@
       "sortOrder": 11
     },
     "correctedError": {
+      "max": 38,
+      "min": 5,
       "name": "CorrectedError",
       "type": "Float",
-      "label": "",
+      "label": "CorrectedError",
+      "selected": true,
       "sortOrder": 6
     },
     "saccadeDuration": {

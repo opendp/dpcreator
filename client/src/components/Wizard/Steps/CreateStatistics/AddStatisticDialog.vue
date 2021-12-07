@@ -40,7 +40,7 @@
           <span> Which<strong> variable </strong>would you like to use? </span>
           <v-radio-group
               row
-              :multiple="editedIndex === -1"
+              :multiple="false"
               class="radio-group-statistics-modal"
               v-model="editedItemDialog.variable"
           >
@@ -230,14 +230,13 @@ export default {
         if (displayVar.label === '') {
           displayVar.label = displayVar.name
         }
-        //     console.log(displayVar.label)
-        //     console.log(this.variableInfo[key].type)
-        if ((this.selectedStatistic == null) ||
-            (this.selectedStatistic.label !== 'Mean') ||
-            (this.selectedStatistic.label === 'Mean' &&
-                (this.variableInfo[key].type === 'Float' || this.variableInfo[key].type === 'Integer'))) {
-          //      console.log('pushing ' + JSON.stringify(displayVar))
-          displayVars.push(displayVar)
+        if (this.variableInfo[key].selected) {
+          if ((this.selectedStatistic == null) ||
+              (this.selectedStatistic.label !== 'Mean') ||
+              (this.selectedStatistic.label === 'Mean' &&
+                  (this.variableInfo[key].type === 'Float' || this.variableInfo[key].type === 'Integer'))) {
+            displayVars.push(displayVar)
+          }
         }
 
       }
@@ -263,7 +262,7 @@ export default {
     editedItemDialog: {
       statistic: "",
       label: "",
-      variable: [],
+      variable: "",
       epsilon: "",
       delta: '0.0',
       error: "",
@@ -312,33 +311,24 @@ export default {
     checkForDuplicates() {
       let duplicates = false
       if (this.statistics) {
-        // "variable" property may be a string (edit mode)
-        // or an array of strings (create mode)
-        if (typeof this.editedItemDialog.variable === 'string' ||
-            this.editedItemDialog.variable instanceof String) {
+        if (this.editedItemDialog.variable) {
           duplicates = this.isMatchingStatistic(this.editedItemDialog.variable)
-        } else {
-          this.editedItemDialog.variable.forEach((variable) => {
-            // Check for duplicate in the current statistics list
-            if (this.isMatchingStatistic(variable)) {
-              duplicates = true
-            }
-          })
-
         }
       }
       return duplicates
     },
     isMatchingStatistic(variable) {
       let isMatching = false
-      this.statistics.forEach((stat) => {
-        if (stat.statistic === this.editedItemDialog.statistic
-            && stat.variable === variable
-            && stat.missingValuesHandling === this.editedItemDialog.missingValuesHandling
-            && stat.fixedValue === this.editedItemDialog.fixedValue) {
-          isMatching = true
-        }
-      })
+      if (this.statistics) {
+        this.statistics.forEach((stat) => {
+          if (stat.statistic === this.editedItemDialog.statistic
+              && stat.variable === variable
+              && stat.missingValuesHandling === this.editedItemDialog.missingValuesHandling
+              && stat.fixedValue === this.editedItemDialog.fixedValue) {
+            isMatching = true
+          }
+        })
+      }
       return isMatching
     },
 
@@ -349,12 +339,11 @@ export default {
       if (this.editedIndex > -1) {
         tempStats[this.editedIndex] = this.editedItemDialog
       } else {
-        this.editedItemDialog.variable.forEach((variable) => {
-          const label = variable
-          const cl = this.getDepositorSetupInfo.confidenceLevel
-          tempStats.push(Object.assign({}, this.editedItemDialog, {variable}, {label}, {cl})
-          );
-        })
+        const label = this.editedItemDialog.variable
+        const variable = this.editedItemDialog.variable
+        const cl = this.getDepositorSetupInfo.confidenceLevel
+        tempStats.push(Object.assign({}, this.editedItemDialog, {variable}, {label}, {cl}))
+
       }
       createStatsUtils.redistributeValue(this.getDepositorSetupInfo.epsilon, 'epsilon', tempStats)
       createStatsUtils.redistributeValue(this.getDepositorSetupInfo.delta, 'delta', tempStats)
@@ -370,6 +359,7 @@ export default {
     close() {
       this.validationError = false
       this.validationErrorMsg = ""
+      this.selectedStatistic = null
       this.$emit("close");
     },
     updateSelectedVariable(variable, index) {

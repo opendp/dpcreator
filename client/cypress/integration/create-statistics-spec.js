@@ -12,7 +12,7 @@
             cy.setupStatisticsPage('datasetInfoStep600.json', 'analysisPlanStep700.json')
 
         })
-        afterEach(() => cy.logout())
+     /*
         it('Populates Edit Noise Param Dialog', () => {
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
@@ -28,30 +28,40 @@
             cy.get('[data-test="editParamsCancel"]').click({force: true});
 
         })
-        it('Goes to the correct wizard step', () => {
-            cy.on('uncaught:exception', (e, runnable) => {
-                console.log('error', e)
-                console.log('runnable', runnable)
-                return false
-            })
-            cy.get('h1').should('contain', 'Create the statistics')
-        })
+
+      */
+        /* it('Goes to the correct wizard step', () => {
+             cy.on('uncaught:exception', (e, runnable) => {
+                 console.log('error', e)
+                 console.log('runnable', runnable)
+                 return false
+             })
+             cy.get('h1').should('contain', 'Create the statistics')
+         })
+
+         */
         it('Contains correct variables in the Add Statistics dialog ', () => {
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
                 console.log('runnable', runnable)
                 return false
             })
-            cy.fixture('variables').then((varsFixture) => {
+            cy.fixture('analysisPlanStep700').then((analysisFixture) => {
                 // Create your statistic
                 cy.get('[data-test="Add Statistic"]').click({force: true});
-                for (const key in varsFixture) {
-                    cy.get('label').should('contain', varsFixture[key].name)
+                for (const key in analysisFixture.variableInfo) {
+                    if (analysisFixture.variableInfo[key].selected) {
+                        cy.get('label').should('contain', analysisFixture.variableInfo[key].name)
+                    } else {
+                        cy.get('label').should('not.contain', analysisFixture.variableInfo[key].name)
+                    }
                 }
                 cy.get('[data-test="Mean"]').click({force: true});
-                for (const key in varsFixture) {
-                    if (varsFixture[key].type !== 'Integer' && varsFixture[key].type !== 'Float') {
-                        cy.get('label').should('not.contain', varsFixture[key].name)
+                for (const key in analysisFixture.variableInfo) {
+                    if (!analysisFixture.variableInfo[key].selected ||
+                        (analysisFixture.variableInfo[key].type !== 'Integer' &&
+                            analysisFixture.variableInfo[key].type !== 'Float')) {
+                        cy.get('label').should('not.contain', analysisFixture.variableInfo[key].name)
                     }
                 }
                 cy.get('[data-test="Add Statistic Close"]').click({force: true})

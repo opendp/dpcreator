@@ -225,16 +225,16 @@ export default {
       if (this.isEditionMode) {
          Object.assign(this.statistics[this.editedIndex], this.editedItem);
       } else {
-        for (let variable of this.editedItem.variable) {
-          console.log("saving cl: " + this.getDepositorSetupInfo.confidenceLevel)
-          let cl = this.getDepositorSetupInfo.confidenceLevel
-          if (!createStatsUtils.isDeltaStat(this.editedItem.statistic)) {
-            this.editedItem.delta = ""
-          }
-          this.statistics.push(
-              Object.assign({}, this.editedItem, {variable}, {cl})
-          );
+        const variable = this.editedItem.variable
+        console.log("saving cl: " + this.getDepositorSetupInfo.confidenceLevel)
+        let cl = this.getDepositorSetupInfo.confidenceLevel
+        if (!createStatsUtils.isDeltaStat(this.editedItem.statistic)) {
+          this.editedItem.delta = ""
         }
+        this.statistics.push(
+            Object.assign({}, this.editedItem, {variable}, {cl})
+        );
+
       }
       createStatsUtils.redistributeValues(this.statistics, this.delta, this.epsilon, this.getDepositorSetupInfo.defaultDelta)
       this.setAccuracyAndSaveUserInput()
