@@ -386,18 +386,19 @@ class UploadFileInfo(DataSetInfo):
 # Ensure that when a DataSetInfo object is deleted,
 #   the related DepositorInfo is also deleted
 # -----------------------------------------------------
+
 @receiver(post_delete, sender=DataverseFileInfo)
 def post_delete_depositor_setup_from_dataverse_file(sender, instance, *args, **kwargs):
-    if instance.depositor_setup_info: # just in case depositor_setup_info is not specified
-        try:
+    try:
+        if instance.depositor_setup_info: # just in case depositor_setup_info is not specified
             instance.depositor_setup_info.delete()
-        except DepositorSetupInfo.DoesNotExist:
-            pass
+    except DepositorSetupInfo.DoesNotExist:
+        pass
 
 @receiver(post_delete, sender=UploadFileInfo)
 def post_delete_depositor_setup_from_upload_file(sender, instance, *args, **kwargs):
-    if instance.depositor_setup_info: # just in case depositor_setup_info is not specified
-        try:
+    try:
+        if instance.depositor_setup_info:  # just in case depositor_setup_info is not specified
             instance.depositor_setup_info.delete()
-        except DepositorSetupInfo.DoesNotExist:
-            pass
+    except DepositorSetupInfo.DoesNotExist:
+        pass
