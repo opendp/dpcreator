@@ -22,7 +22,11 @@ Through the Azure admin:
 # Add deploy key to GitHub if needed.
 # Assumes a key already exists
 more .ssh/id_ed25519.pub
-# Add key to https://github.com/opendp/dpcreator-deploy/settings/keys
+# Add deploy key setup: 
+#   - https://docs.github.com/en/developers/overview/managing-deploy-keys#deploy-keys
+#   - https://github.com/opendp/dpcreator/settings/keys
+
+
 
 # Clone repository (using SSH)
 #git clone git@github.com:opendp/dpcreator-deploy.git
