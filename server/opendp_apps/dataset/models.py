@@ -380,9 +380,12 @@ class UploadFileInfo(DataSetInfo):
 
         return info
 
+# -----------------------------------------------------
+# "post_delete" signals
 #
-# To ensure that when a DataSetInfo object is deleted, the related DepositorInfo is also deleted
-#
+# Ensure that when a DataSetInfo object is deleted,
+#   the related DepositorInfo is also deleted
+# -----------------------------------------------------
 @receiver(post_delete, sender=DataverseFileInfo)
 def post_delete_depositor_setup_from_dataverse_file(sender, instance, *args, **kwargs):
     if instance.depositor_setup_info: # just in case depositor_setup_info is not specified
