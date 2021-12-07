@@ -15,6 +15,28 @@
                     cy.get('table').contains('td', varsFixture[key].name).should('be.visible')
                     cy.get('table').contains('tr', varsFixture[key].name).should('contain', varsFixture[key].type)
                 }
+                const label = 'Trial'
+                const minInput = label + ':min'
+                const maxInput = label + ':max'
+                cy.get('[data-test="wizardContinueButton"]').should('be.disabled')
+                cy.contains('td', label).parent('tr').children().first().click()
+                cy.get('[data-test="' + minInput + '"]').type('0');
+                cy.get('[data-test="' + maxInput + '"]').type('100');
+                cy.get('[data-test="' + maxInput + '"]').should('have.value', 100)
+                cy.get('[data-test="' + maxInput + '"]').trigger('change')
+                cy.contains('td', 'Session').parent('tr').children().first().click()
+
+                cy.get('[data-test="wizardContinueButton"]').should('not.be.disabled')
+
+
+                /*
+                cy.get("#v-data-table tbody tr")         // selects all rows in #dataTable
+                .contains("Subject")  // pick the one with this text
+                .scrollIntoView()                   // in case the row is not in view
+                .siblings(":first")              // get column previous to description
+                .click()
+
+                 */
             })
         })
     })
