@@ -506,7 +506,6 @@ export default {
       this.saveUserInput(elem)
     },
     saveUserInput(elem) {
-      console.log("saving input")
       this.$store.dispatch('dataset/updateVariableInfo', elem)
       if (this.formCompleted() && this.isValidRow(elem) && this.atLeastOneSelected(elem)) {
         this.$emit("stepCompleted", 1, true);
@@ -515,8 +514,7 @@ export default {
       }
     },
     atLeastOneSelected(elem) {
-      console.log('this.selected.length: ' + this.selected.length)
-      let othersSelected = false
+       let othersSelected = false
       this.selected.forEach(row => {
         if (row.index !== elem.index) {
           othersSelected = true
