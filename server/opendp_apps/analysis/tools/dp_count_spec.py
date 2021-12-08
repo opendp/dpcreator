@@ -31,6 +31,8 @@ class DPCountSpec(StatSpec):
                       cl=CL_95,
                       fixed_value=1)
     """
+    STATISTIC_TYPE = astatic.DP_COUNT
+
     def __init__(self, props: dict):
         """Set the internals using the props dict"""
         super().__init__(props)
@@ -47,17 +49,15 @@ class DPCountSpec(StatSpec):
         """
         Missing value handling, if a fixed_value is given, make it string
         """
-        if not self.statistic == astatic.DP_COUNT:
-            self.add_err_msg(('This is the DP Mean handler'
-                              ' but the "statistic" is "{self.statistic}"'))
-
+        if not self.statistic == self.STATISTIC_TYPE:
+            self.add_err_msg(f'The specified "statistic" is not "{self.STATISTIC_TYPE}". (StatSpec)"')
+            return
 
         # Use the "impute_value" for missing values, make sure it's a float!
         #
         if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
             # Convert the impute value to a float!
             self.fixed_value = str(self.fixed_value)
-
 
     def run_03_custom_validation(self):
         """
@@ -70,7 +70,6 @@ class DPCountSpec(StatSpec):
         pass
         if self.has_error():
             return
-
 
     def check_scale(self, scale, preprocessor, dataset_distance, epsilon):
         """
@@ -85,7 +84,6 @@ class DPCountSpec(StatSpec):
             return
 
         return (preprocessor >> make_base_geometric(scale)).check(dataset_distance, epsilon)
-
 
     def get_preprocessor(self):
         """DP Count preprocessor"""
@@ -138,7 +136,6 @@ class DPCountSpec(StatSpec):
         self.accuracy_msg = self.get_accuracy_text()
 
         return True
-
 
     def run_chain(self, column_names, file_obj, sep_char=","):
         """

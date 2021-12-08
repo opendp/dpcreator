@@ -4,6 +4,7 @@ from opendp.mod import enable_features, binary_search_param, OpenDPException
 from opendp.typing import *
 
 from opendp_apps.analysis.tools.stat_spec import StatSpec
+from opendp_apps.analysis import static_vals as astatic
 
 enable_features("contrib")
 enable_features("floating-point")
@@ -22,9 +23,10 @@ class DPHistogramSpec(StatSpec):
                       cl=CL_95,
                       fixed_value=1)
     """
+    STATISTIC_TYPE = astatic.DP_HISTOGRAM
+
     def __init__(self, props: dict):
         """Set the internals using the props dict"""
-        # TODO: Generates an error when this isn't initialized somewhere
         super().__init__(props)
 
     def additional_required_props(self):
@@ -37,6 +39,10 @@ class DPHistogramSpec(StatSpec):
     def run_01_initial_handling(self):
         """
         """
+        if not self.statistic == self.STATISTIC_TYPE:
+            self.add_err_msg(f'The specified "statistic" is not "{self.STATISTIC_TYPE}". (StatSpec)"')
+            return
+
         if self.fixed_value is not None:
             # attempt conversion to int
             if not self.convert_to_int('fixed_value'):

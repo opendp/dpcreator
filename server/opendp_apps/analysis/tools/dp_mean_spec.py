@@ -35,6 +35,8 @@ class DPMeanSpec(StatSpec):
                       cl=CL_95,
                       fixed_value=1)
     """
+    STATISTIC_TYPE = astatic.DP_MEAN
+
     def __init__(self, props: dict):
         """Set the internals using the props dict"""
         super().__init__(props)
@@ -50,9 +52,8 @@ class DPMeanSpec(StatSpec):
         """
         Make sure values are consistently floats
         """
-        if not self.statistic == astatic.DP_MEAN:
-            self.add_err_msg(('This is the DP Mean handler'
-                              ' but the "statistic" is "{self.statistic}"'))
+        if not self.statistic == self.STATISTIC_TYPE:
+            self.add_err_msg(f'The specified "statistic" is not "{self.STATISTIC_TYPE}". (StatSpec)"')
 
         if self.fixed_value is not None:
             pass
