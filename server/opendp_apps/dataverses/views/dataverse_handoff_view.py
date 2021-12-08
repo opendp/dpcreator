@@ -33,7 +33,7 @@ class DataverseHandoffView(BaseModelViewSet):
         #serializer = DataverseHandoffSerializer(queryset, many=True, context={'request': request})
         #return Response(serializer.data)
 
-    @action(methods=['get'], detail=False,  url_path='dv-orig-create')
+    @action(methods=['get'], detail=False,  url_path='dv_orig_create')
     def dv_orig_create(self, request):
         """
         Access Create via a GET. This is temporary and insecure. Exists until the Dataverse signed urls are available.
