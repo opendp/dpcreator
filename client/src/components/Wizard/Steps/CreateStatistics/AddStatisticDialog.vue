@@ -234,13 +234,10 @@ export default {
         if (displayVar.label === '') {
           displayVar.label = displayVar.name
         }
-        if (this.variableInfo[key].selected) {
-          if ((this.selectedStatistic == null) ||
-              (this.selectedStatistic.label !== 'Mean') ||
-              (this.selectedStatistic.label === 'Mean' &&
-                  (this.variableInfo[key].type === 'Float' || this.variableInfo[key].type === 'Integer'))) {
-            displayVars.push(displayVar)
-          }
+        if (this.variableInfo[key].selected &&
+            (!this.selectedStatistic || this.allowedVariableTypes[this.selectedStatistic.label].includes(this.variableInfo[key].type))) {
+          displayVars.push(displayVar)
+
         }
 
       }
@@ -260,9 +257,15 @@ export default {
     singleVariableStatistics: [
       {value: "mean", label: "Mean"},
       {value: "histogram", label: "Histogram"},
-      {value: "quantile", label: "Quantile"},
+      //  {value: "quantile", label: "Quantile"},
       {value: "count", label: "Count"}
     ],
+    allowedVariableTypes: {
+      "Mean": ["Integer", "Float"],
+      "Count": ["Integer", "Float"],
+      "Histogram": ["Integer", "Float"],
+      "Quantile": ["Integer", "Float"] // not yet available
+    },
     selectedStatistic: null,
     validationError: false,
     validationErrorMsg: null,
