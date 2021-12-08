@@ -41,6 +41,7 @@
         :editedItem="editedItem"
         v-on:saveConfirmed="save"
         v-on:close="close"
+        v-on:addVariable="addVariable"
     />
     <DeleteStatisticDialog
         :dialogDelete="dialogDelete"
@@ -220,10 +221,13 @@ export default {
       }
       return label
     },
+    addVariable() {
+      this.$emit("addVariable")
+    },
     save(editedItemFromDialog) {
       this.editedItem = Object.assign({}, editedItemFromDialog);
       if (this.isEditionMode) {
-         Object.assign(this.statistics[this.editedIndex], this.editedItem);
+        Object.assign(this.statistics[this.editedIndex], this.editedItem);
       } else {
         const variable = this.editedItem.variable
         console.log("saving cl: " + this.getDepositorSetupInfo.confidenceLevel)

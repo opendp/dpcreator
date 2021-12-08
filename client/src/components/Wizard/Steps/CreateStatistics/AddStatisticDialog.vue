@@ -38,6 +38,10 @@
 
         <div>
           <span> Which<strong> variable </strong>would you like to use? </span>
+          <span> (Need to add another variable?
+            <a v-on:click="addVariable">Go back to Confirm Variables Step </a>
+            ) </span>
+
           <v-radio-group
               row
               :multiple="false"
@@ -55,31 +59,32 @@
             ></v-radio>
           </v-radio-group>
         </div>
+        <!--
+                <div>
+                  <span>
+                    How would you like<strong> missing values to be handled</strong>?
+                  </span>
 
+                  <v-radio-group
+                      row
+                      class="radio-group-statistics-modal"
+                      v-model="editedItemDialog.missingValuesHandling"
+                  >
+                    <v-radio
+                        class="rounded-pill mr-2"
+                        v-for="(handlingOption, index) in missingValuesHandling"
+                        :key="handlingOption + '-' + index"
+                        :label="handlingOption.label"
+                        :value="handlingOption.value"
+                        :data-test="handlingOption.label"
+                        on-icon="mdi-check"
+                        @click="() => updateFixedInputVisibility(handlingOption)"
+                    ></v-radio>
+                  </v-radio-group>
+                </div>
+        -->
+        <!--    <div v-if="editedItemDialog.handleAsFixed">-->
         <div>
-          <span>
-            How would you like<strong> missing values to be handled</strong>?
-          </span>
-
-          <v-radio-group
-              row
-              class="radio-group-statistics-modal"
-              v-model="editedItemDialog.missingValuesHandling"
-          >
-            <v-radio
-                class="rounded-pill mr-2"
-                v-for="(handlingOption, index) in missingValuesHandling"
-                :key="handlingOption + '-' + index"
-                :label="handlingOption.label"
-                :value="handlingOption.value"
-                :data-test="handlingOption.label"
-                on-icon="mdi-check"
-                @click="() => updateFixedInputVisibility(handlingOption)"
-            ></v-radio>
-          </v-radio-group>
-        </div>
-
-        <div v-if="editedItemDialog.handleAsFixed">
           <span>Enter your <strong> fixed value:</strong></span>
           <div class="width50">
             <v-text-field
@@ -214,7 +219,6 @@ export default {
       const returnVal = (
           !this.editedItemDialog.statistic ||
           !this.editedItemDialog.variable ||
-          !this.analysisPlan ||
           !this.editedItemDialog.missingValuesHandling
       );
       return returnVal
@@ -246,6 +250,9 @@ export default {
   watch: {
     editedItem: function (newEditedItem) {
       this.editedItemDialog = Object.assign({}, newEditedItem);
+      // automatic assignments added here because we removed the option from the popup
+      this.editedItemDialog.handleAsFixed = true
+      this.editedItemDialog.missingValuesHandling = "insert_fixed"
     },
 
   },
@@ -266,8 +273,8 @@ export default {
       epsilon: "",
       delta: '0.0',
       error: "",
-      missingValuesHandling: "",
-      handleAsFixed: false,
+      missingValuesHandling: "insert_fixed",
+      handleAsFixed: true,
       fixedValue: 0,
       locked: false,
       accuracy: {value: null, message: null}
@@ -355,7 +362,10 @@ export default {
 
 
     },
-
+    addVariable() {
+      this.close()
+      this.$emit("addVariable")
+    },
     close() {
       this.validationError = false
       this.validationErrorMsg = ""
