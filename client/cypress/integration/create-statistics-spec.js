@@ -63,6 +63,8 @@
                 console.log('runnable', runnable)
                 return false
             })
+            cy.login('dev_admin', 'admin')
+            cy.setupStatisticsPage('datasetInfoStep600.json', 'analysisPlanStep700.json')
             cy.get('h1').should('contain', 'Create the statistics')
         })
 
