@@ -65,11 +65,17 @@ Deployment currently requires the building of two Docker images:
     #  -- change YYYY-MMDD to the current date
     docker build -t ghcr.io/opendp/dpcreator/app:YYYY-MMDD .
     docker push ghcr.io/opendp/dpcreator/app:YYYY-MMDD   
+    #
+    docker tag ghcr.io/opendp/dpcreator/app:YYYY-MMDD ghcr.io/opendp/dpcreator/app:latest
+    docker push ghcr.io/opendp/dpcreator/app:latest
    
     # Example:
-    # docker build -t ghcr.io/opendp/dpcreator/app:2021-1203 .
-    # docker push ghcr.io/opendp/dpcreator/app:2021-1203  
-    ```
+    # docker build -t ghcr.io/opendp/dpcreator/app:2021-1208 .
+    # docker push ghcr.io/opendp/dpcreator/app:2021-1208  
+    # docker tag ghcr.io/opendp/dpcreator/app:2021-1208 ghcr.io/opendp/dpcreator/app:latest
+    # docker push ghcr.io/opendp/dpcreator/app:latest    
+   ```
+   
 
 ### (B) DPCreator nginx
 
@@ -84,11 +90,14 @@ Deployment currently requires the building of two Docker images:
     #  -- change YYYY-MMDD to the current date
     docker build -t ghcr.io/opendp/dpcreator/nginx:YYYY-MMDD .
     docker push ghcr.io/opendp/dpcreator/nginx:YYYY-MMDD
+    docker tag ghcr.io/opendp/dpcreator/nginx:YYYY-MMDD ghcr.io/opendp/dpcreator/nginx:latest
+    docker push ghcr.io/opendp/dpcreator/nginx:latest
   
     # Example:
-    # docker build -t ghcr.io/opendp/dpcreator/nginx:2021-1203 .
-    # docker push ghcr.io/opendp/dpcreator/nginx:2021-1203
-
+    # docker build -t ghcr.io/opendp/dpcreator/nginx:2021-1208 .
+    # docker push ghcr.io/opendp/dpcreator/nginx:2021-1208
+    # docker tag ghcr.io/opendp/dpcreator/nginx:2021-1208 ghcr.io/opendp/dpcreator/nginx:latest
+    # docker push ghcr.io/opendp/dpcreator/nginx:latest  
     ```
 
 ## Creating the K8s deployment file(s)
