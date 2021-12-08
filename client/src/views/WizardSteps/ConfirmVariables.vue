@@ -562,12 +562,11 @@ export default {
         if (this.variables.length === 0) {
           this.createVariableList()
         } else {
-          this.updateSelectable()
           this.loadingVariables = false
         }
       }
     },
-    '$store.state.analysisPlan': function () {
+    '$store.state.dataset.analysisPlan': function () {
       console.log('updateSelectable watch triggered')
       if (this.datasetInfo.depositorSetupInfo.variableInfo !== null) {
         console.log('calling updateSelectable')

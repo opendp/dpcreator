@@ -39,7 +39,7 @@
         <div>
           <span> Which<strong> variable </strong>would you like to use? </span>
           <span> (Need to add another variable?
-            <a v-on:click="addVariable">Go back to Confirm Variables Step </a>
+            <a data-test="confirmVariablesLink" v-on:click="addVariable">Go back to Confirm Variables Step </a>
             ) </span>
 
           <v-radio-group

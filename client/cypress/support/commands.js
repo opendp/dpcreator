@@ -57,7 +57,9 @@ Cypress.Commands.add('runDemo', (mockDVfile, demoDatafile) => {
             }
         }
         if (numericVar !== null) {
-            cy.testMean(numericVar)
+            cy.createMeanStatistic(numericVar)
+            cy.checkConfirmVariables(numericVar)
+            cy.submitMeanStatistic()
         }
 
     })
@@ -129,7 +131,7 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
 
 
 })
-Cypress.Commands.add('testMean', (numericVar) => {
+Cypress.Commands.add('createMeanStatistic', (numericVar) => {
     cy.intercept('PATCH', '/api/deposit/**',).as(
         'patchDeposit'
     )
@@ -163,7 +165,7 @@ Cypress.Commands.add('testMean', (numericVar) => {
     cy.get('[data-test="wizardContinueButton"]').last().click();
     cy.wait('@datasetInfo', {timeout: 5000})
 
-    // On the statistics page,
+    // On the statistics page, test edit statistics Params
     cy.get('h1').should('contain', 'Create the statistics').should('be.visible')
     cy.get('[data-test="editConfidenceIcon"]').click({force: true});
     cy.get('h2').should('contain', 'Are you sure you want to proceed?').should('be.visible')
@@ -173,13 +175,12 @@ Cypress.Commands.add('testMean', (numericVar) => {
     cy.get('[data-test="editParamsCancel"]').click({force: true});
 
 
-    // Test Validating EyeHeight mean
+    // Test Creating Mean statistic
     cy.get('[data-test="Add Statistic"]').should('be.visible')
     cy.get('[data-test="Add Statistic"]').click({force: true});
     cy.get('[data-test="Mean"]').click({force: true});
     const varDataTest = '[data-test="' + numericVar.name + '"]'
     cy.get(varDataTest).click({force: true})
-    cy.get('[data-test="Insert fixed value"]').click({force: true})
     cy.get('[data-test="Fixed value"]').type(numericVar.fixedValue)
     cy.get('[data-test="Create statistic"]').click({force: true})
 
@@ -189,12 +190,16 @@ Cypress.Commands.add('testMean', (numericVar) => {
     cy.get('table').contains('td', 'Mean').should('be.visible');
     // Mean should contain correct accuracy value
     cy.get('table').contains('td', numericVar.accuracy).should('be.visible')
-    // Click Continue to go to Generate DP Release Step
+
+
+})
+Cypress.Commands.add('submitMeanStatistic', () => {
+    // Click Continue to go from Create Statistic to Generate DP Release Step
     cy.get('[data-test="wizardContinueButton"]').last().click();
 
-    // Submit Statistic
+    // Submit Mean Statistic
     cy.get('[data-test="Submit statistics"]').click({force: true});
-
+    cy.pause()
     // Go to Details page
     cy.get('[data-test="View Data Details"]').click({force: true});
     cy.url().should('contain', 'my-data-details')
@@ -206,7 +211,6 @@ Cypress.Commands.add('testMean', (numericVar) => {
     cy.get('[data-test="DP Statistics Panel"]').should('contain', 'statistic:"mean"')
     const snippet = 'A differentially private'
     cy.get('[data-test="statistic description"]').should('contain', snippet)
-
 })
 Cypress.Commands.add('setupStatisticsPage', (datasetFixture, analysisFixture) => {
     cy.fixture(datasetFixture).then(dataset => {
