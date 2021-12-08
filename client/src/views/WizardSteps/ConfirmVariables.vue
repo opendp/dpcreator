@@ -45,6 +45,10 @@
             locale-tag="confirm variables.help variable"
         />
       </template>
+      <!--
+      <template v-slot:item.data-table-select="{ on, props }">
+        <v-simple-checkbox color="green" v-bind="props" v-on="on"></v-simple-checkbox>
+      </template>-->
       <template v-slot:[`item.index`]="{ index }">
         <span class="index-td grey--text">{{ index + 1 }}</span>
       </template>
@@ -421,6 +425,19 @@ export default {
     isBlank(str) {
       return (!str || /^\s*$/.test(str));
     },
+    isSelectable(variable) {
+      let selectable = true
+      if (this.datasetInfo.analysisPlan && this.datasetInfo.analysisPlan.statistics) {
+        this.analysisPlan.statistics.forEach(statistic => {
+          if (statistic.name = variable.name) {
+            console.log('found statistic')
+            selectable = false
+          }
+        })
+      }
+      console.log(variable.name + 'returning ' + selectable)
+      return selectable
+    },
     isValidRow(variable) {
       // We only need to check selected rows,
       // so if row isn't selected it's always valid
@@ -486,6 +503,7 @@ export default {
           row.additional_information.categories = JSON.parse(JSON.stringify(vars[key].categories))
         }
         row['editDisabled'] = true
+        row['isSelectable'] = this.isSelectable(vars[key])
         if (row.selected) {
           this.selected.push(row)
         }
