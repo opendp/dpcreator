@@ -5,6 +5,7 @@ from requests.utils import quote
 
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework import status
 
 from opendp_apps.dataverses.models import DataverseHandoff, RegisteredDataverse
 from opendp_apps.dataverses.serializers import DataverseHandoffSerializer
@@ -20,14 +21,23 @@ class DataverseHandoffView(BaseModelViewSet):
     # This needs to be available before login
     permission_classes = []
 
-    def list(self, request, *args, **kwargs):
-        queryset = DataverseHandoff.objects.all()
-        serializer = DataverseHandoffSerializer(queryset, many=True, context={'request': request})
-        return Response(serializer.data)
+    def get(self, request, *args, **kwargs):
+        """Not allowed"""
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    @action(methods=['get'], detail=False)
+    def list(self, request, *args, **kwargs):
+        """Not allowed"""
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        #queryset = DataverseHandoff.objects.all()
+        #serializer = DataverseHandoffSerializer(queryset, many=True, context={'request': request})
+        #return Response(serializer.data)
+
+    @action(methods=['get'], detail=False,  url_path='dv_orig_create')
     def dv_orig_create(self, request):
-        """Access Create via a GET. This is temporary until the Dataverse signed urls are available"""
+        """
+        Access Create via a GET. This is temporary and insecure. Exists until the Dataverse signed urls are available.
+        """
         print('--- createbyget ---')
         request_data = request.query_params.copy()
         return self.process_dataverse_data(request_data)

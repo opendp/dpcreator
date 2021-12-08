@@ -1,9 +1,11 @@
+from collections import OrderedDict
 from os.path import abspath, dirname, isfile, join
 
 from opendp_apps.profiler.csv_reader import DelimiterNotFoundException
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
+PROFILER_FIXTURES_DIR = join(dirname(CURRENT_DIR), 'fixtures')
 
 import json
 
@@ -15,8 +17,8 @@ from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
 from opendp_apps.profiler import static_vals as pstatic
-from opendp_apps.profiler.csv_reader import ColumnLimitInvalid
 from opendp_apps.profiler.profile_runner import ProfileRunner
+from opendp_apps.utils.camel_to_snake import camel_to_snake
 
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.dataverses.models import RegisteredDataverse
@@ -353,3 +355,40 @@ class ProfilerTest(TestCase):
         #if prunner.has_error():   print(prunner.get_err_msg())
         self.assertTrue(prunner.has_error())
         self.assertTrue(pstatic.ERR_MSG_COLUMN_LIMIT in prunner.get_err_msg())
+
+    def test_100_locate_var_info(self):
+        """(100) Locate variable info"""
+        msgt(self.test_100_locate_var_info.__doc__)
+        """
+        The AnalysisPlan contains variable info ({}) where the column names are
+        standardized to snake case. When sending lists of statistics for
+        validation/computation, the UI sends these column names in their original form.
+
+        Make sure that column names with spaces and other changes are locatable.
+        """
+        # Load fixtures files to OrderedDict objects
+        #
+        step1_fixture_file = join(PROFILER_FIXTURES_DIR, 'step1_variable_info.json')
+        self.assertTrue(isfile(step1_fixture_file))
+        orig_var_info = json.loads(open(step1_fixture_file, 'r').read(),
+                                   object_pairs_hook=OrderedDict)
+
+        step2_fixture_file = join(PROFILER_FIXTURES_DIR, 'step2_variable_info.json')
+        self.assertTrue(isfile(step2_fixture_file))
+        plan_var_info = json.loads(open(step2_fixture_file, 'r').read(),
+                                   object_pairs_hook=OrderedDict)
+
+        # Iterate through original variable names, attempt to find them
+        #   variable profile info
+        #
+        for _var_idx, orig_varname in orig_var_info['dataset']['variableOrder']:
+            varname_snakecase = camel_to_snake(orig_varname)
+            var_found = (orig_varname in plan_var_info) or \
+                        (varname_snakecase in plan_var_info)
+            print(f'> Check: {orig_varname}/{varname_snakecase} -> {var_found}')
+            self.assertTrue(var_found)
+
+"""
+docker-compose run server python manage.py test opendp_apps.profiler.testing.test_profiler.ProfilerTest.test_100_locate_var_info
+
+"""
