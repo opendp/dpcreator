@@ -6,9 +6,9 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.db.models.signals import post_delete
-from django.dispatch import receiver
-from django_cryptography.fields import encrypt
+# from django.db.models.signals import post_delete
+# from django.dispatch import receiver
+# from django_cryptography.fields import encrypt
 
 from polymorphic.models import PolymorphicModel
 
@@ -386,7 +386,7 @@ class UploadFileInfo(DataSetInfo):
 # Ensure that when a DataSetInfo object is deleted,
 #   the related DepositorInfo is also deleted
 # -----------------------------------------------------
-
+"""
 @receiver(post_delete, sender=DataverseFileInfo)
 def post_delete_depositor_setup_from_dataverse_file(sender, instance, *args, **kwargs):
     try:
@@ -402,3 +402,4 @@ def post_delete_depositor_setup_from_upload_file(sender, instance, *args, **kwar
             instance.depositor_setup_info.delete()
     except DepositorSetupInfo.DoesNotExist:
         pass
+"""
