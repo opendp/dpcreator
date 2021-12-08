@@ -334,7 +334,7 @@ class ManifestTestParams(DataverseParams):
     @mark_safe
     def dataverse_handoff_test_link(self):
         """Mock an incoming Dataverse Call via the UI"""
-        handoff_url = drf_reverse('dv-handoff-dv_orig_create', args=[], kwargs={})
+        handoff_url = drf_reverse('dv-handoff-dv-orig-create', args=[], kwargs={})
 
         url_params = self.get_manifest_url_params()
 
