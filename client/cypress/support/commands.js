@@ -58,7 +58,6 @@ Cypress.Commands.add('runDemo', (mockDVfile, demoDatafile) => {
         }
         if (numericVar !== null) {
             cy.createMeanStatistic(numericVar)
-            cy.checkConfirmVariables(numericVar)
             cy.submitMeanStatistic()
         }
 
