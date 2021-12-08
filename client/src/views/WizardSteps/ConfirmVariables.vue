@@ -349,7 +349,7 @@ export default {
   props: ["stepperPosition"],
   computed: {
     ...mapState('auth', ['error', 'user']),
-    ...mapState('dataset', ['datasetInfo']),
+    ...mapState('dataset', ['datasetInfo', 'analysisPlan']),
     ...mapGetters('dataset', ['getDepositorSetupInfo']),
 
   },
@@ -427,15 +427,16 @@ export default {
     },
     isSelectable(variable) {
       let selectable = true
-      if (this.datasetInfo.analysisPlan && this.datasetInfo.analysisPlan.statistics) {
-        this.analysisPlan.statistics.forEach(statistic => {
-          if (statistic.name = variable.name) {
-            console.log('found statistic')
+      if (this.analysisPlan && this.analysisPlan.dpStatistics) {
+        this.analysisPlan.dpStatistics.forEach(statistic => {
+          //      console.log( statistic.variable + '===' + variable.name + '?')
+          if (statistic.variable === variable.name) {
+            console.log('found statistic' + variable.name)
             selectable = false
           }
         })
       }
-      console.log(variable.name + 'returning ' + selectable)
+
       return selectable
     },
     isValidRow(variable) {
@@ -473,6 +474,14 @@ export default {
           1
       );
       this.saveUserInput(variable)
+    },
+    // This is run so that as statistics are added, variables are set to unselectable
+    updateSelectable() {
+      //  console.log('update selectable')
+      this.variables.forEach(variable => {
+        //      console.log('updateSelectable + '+ variable.name)
+        variable.isSelectable = this.isSelectable(variable)
+      })
     },
     // Create a list version of variableInfo. A deep copy, so we can edit locally
     createVariableList() {
@@ -553,12 +562,21 @@ export default {
         if (this.variables.length === 0) {
           this.createVariableList()
         } else {
+          this.updateSelectable()
           this.loadingVariables = false
         }
       }
     },
+    '$store.state.analysisPlan': function () {
+      console.log('updateSelectable watch triggered')
+      if (this.datasetInfo.depositorSetupInfo.variableInfo !== null) {
+        console.log('calling updateSelectable')
+        this.updateSelectable()
+
+      }
+    }
+  },
 
 
-  }
 };
 </script>
