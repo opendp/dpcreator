@@ -27,16 +27,28 @@
           <div class="mb-5" v-if="status === COMPLETED">
             <p class="primary--text">DP Release Information:</p>
 
-            <p>This release contains {{ analysisPlan.releaseInfo.dpRelease.statistics.length }} statistic<span v-if="analysisPlan.releaseInfo.dpRelease.statistics.length > 1">s</span>:</p>
+            <p>This release contains {{ analysisPlan.releaseInfo.dpRelease.statistics.length }} statistic<span
+                v-if="analysisPlan.releaseInfo.dpRelease.statistics.length > 1">s</span>:</p>
             <p>&nbsp;</p>
-            <div v-for="(statistic, index) in analysisPlan.releaseInfo.dpRelease.statistics" style="padding-left:20px; padding-right:40px;">
+            <div v-for="(statistic, index) in analysisPlan.releaseInfo.dpRelease.statistics"
+                 style="padding-left:20px; padding-right:40px;">
               <p data-test="statistic description" style="">
-              ({{ index + 1 }}) <span v-html="statistic.description.html"></span></p>
+                ({{ index + 1 }}) <span v-html="statistic.description.html"></span></p>
 
             </div>
-            <p style="padding-left:20px; padding-right:40px;">Created: {{ analysisPlan.releaseInfo.dpRelease.created.humanReadable }}</p>
+            <p style="padding-left:20px; padding-right:40px;">Created:
+              {{ analysisPlan.releaseInfo.dpRelease.created.humanReadable }}</p>
+            <div :v-if="analysisPlan.releaseInfo.dataverseDepositInfo">
+              <p>&nbsp;</p>
+              <p style="padding-left:20px; padding-right:40px;">
+                <span v-html="analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.userMsgHtml"></span>
+              </p>
+            </div>
+
             <p>Please see the panels below for details on the
-              <span v-if="analysisPlan.releaseInfo.dpRelease.statistics.length == 1">statistic</span><span v-if="analysisPlan.releaseInfo.dpRelease.statistics.length> 1">statistics</span>, including the privacy parameters used to generate them.
+              <span v-if="analysisPlan.releaseInfo.dpRelease.statistics.length == 1">statistic</span><span
+                  v-if="analysisPlan.releaseInfo.dpRelease.statistics.length> 1">statistics</span>, including the
+              privacy parameters used to generate them.
             </p>
           </div>
           <div class="mb-5" v-if="status === COMPLETED">

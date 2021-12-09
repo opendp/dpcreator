@@ -40,7 +40,9 @@
             })
             cy.createAccount('ernie', 'ernie@sesame.org', 'ernie123!')
             cy.login('ernie', 'ernie123!')
-            cy.visit('/my-data-details')
+            cy.url().should('contains', 'my-data')
+            cy.get('[data-test="viewDetails"]').click({force: true});
+            cy.url().should('contains', 'my-data-details')
         })
 
 
