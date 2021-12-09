@@ -1,5 +1,8 @@
 {
     describe('Dataverse Handoff mock-dv test', () => {
+        const username = 'test_user'
+        const password = 'dpcreator123!'
+        const email = 'test_user@dpcreator.org'
         it('Displays correct file on Welcome Page', () => {
             Cypress.Cookies.debug(true)
             cy.clearData()
@@ -42,14 +45,15 @@
                     // for now, always return false to allow the test to pass
                     return false
                 })
+                cy.createAccount(username, email, password)
 
                 cy.visit('/mock-dv');
                 cy.get('#postOpenDP > .v-btn__content').click();
                 cy.url().should('contains', '/?id=');
                 cy.get('.v-input--selection-controls__ripple').click();
                 cy.get('#account-buttons--placeholder .v-btn--is-elevated > .v-btn__content').click();
-                cy.get('[data-test="username"]').type('test_user');
-                cy.get('[data-test="password"]').type('dpcreator');
+                cy.get('[data-test="username"]').type(username);
+                cy.get('[data-test="password"]').type(password);
                 cy.get('[data-test="Log in"]').click();
                 // Next the Welcome page, with the File Locked message
 

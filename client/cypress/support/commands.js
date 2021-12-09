@@ -68,6 +68,7 @@ Cypress.Commands.add('runDemo', (mockDVfile, demoDatafile) => {
 
 Cypress.Commands.add('createMockDataset', (fixture) => {
     cy.fixture(fixture).then((mockForm) => {
+        cy.createAccount(mockForm['user'], mockForm['email'], mockForm['password'])
         cy.visit('/mock-dv');
         cy.get('[data-test="siteUrl"]').clear().type(mockForm['siteUrl'])
         cy.get('[data-test="token"]').clear().type(mockForm['token'])
@@ -198,7 +199,6 @@ Cypress.Commands.add('submitMeanStatistic', () => {
 
     // Submit Mean Statistic
     cy.get('[data-test="Submit statistics"]').click({force: true});
-    cy.pause()
     // Go to Details page
     cy.get('[data-test="View Data Details"]').click({force: true});
     cy.url().should('contain', 'my-data-details')
