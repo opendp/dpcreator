@@ -235,8 +235,7 @@ export default {
 
 
     ...mapState('dataset', ['datasetInfo', 'analysisPlan']),
-    ...mapGetters('dataset', ['getDepositorSetupInfo', 'userStep', "getTimeRemaining"]),
-    ...mapState('auth', ['user']),
+    ...mapGetters('dataset', ['userStep', "getTimeRemaining"]),
     datasetDetails: function () {
 
       let datasetDetails = [
