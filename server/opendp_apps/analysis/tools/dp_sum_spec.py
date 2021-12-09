@@ -10,7 +10,7 @@ from opendp.trans import \
      make_split_dataframe, make_sized_bounded_sum)
 from opendp.mod import OpenDPException
 
-enable_features("floating-point")
+enable_features("floating-point", "contrib")
 
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis import static_vals as astatic

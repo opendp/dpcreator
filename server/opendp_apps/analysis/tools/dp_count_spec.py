@@ -12,7 +12,7 @@ from opendp.trans import \
      make_split_dataframe)
 from opendp.mod import OpenDPException
 
-enable_features("floating-point")
+enable_features("floating-point", "contrib")
 
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis import static_vals as astatic
@@ -56,7 +56,6 @@ class DPCountSpec(StatSpec):
         # Use the "impute_value" for missing values, make sure it's a float!
         #
         if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
-            # Convert the impute value to a float!
             self.fixed_value = str(self.fixed_value)
 
     def run_03_custom_validation(self):
@@ -99,7 +98,7 @@ class DPCountSpec(StatSpec):
         preprocessor = (
             # Selects a column of df, Vec<str>
             make_select_column(key=self.col_index, TOA=str) >>
-            # Cast the column as Vec<Optional<Float>>
+            # Cast the column to str
             make_cast(TIA=str, TOA=str) >>
             # Impute missing values
             make_impute_constant(self.fixed_value) >>

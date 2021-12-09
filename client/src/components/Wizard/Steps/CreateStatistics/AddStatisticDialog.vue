@@ -262,7 +262,7 @@ export default {
     ],
     allowedVariableTypes: {
       "Mean": ["Integer", "Float"],
-      "Count": ["Integer", "Float"],
+      "Count": ["Integer", "Float", "Categorical", "Boolean"],
       "Histogram": ["Integer", "Float"],
       "Quantile": ["Integer", "Float"] // not yet available
     },

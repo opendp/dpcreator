@@ -6,8 +6,7 @@ from opendp.typing import *
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis import static_vals as astatic
 
-enable_features("contrib")
-enable_features("floating-point")
+enable_features("floating-point", "contrib")
 
 
 class DPHistogramSpec(StatSpec):
