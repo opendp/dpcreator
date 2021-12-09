@@ -273,9 +273,6 @@ CORS_ALLOWED_ORIGINS = (
     'http://127.0.0.1:8080',
 )
 
-# for dev purposes only, need to remove
-#ACCOUNT_EMAIL_VERIFICATION = 'none'
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.sendgrid.net')
@@ -292,7 +289,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 #   2. Click "verify new sender" and proceed
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL') \
     if os.environ.get('DEFAULT_FROM_EMAIL') else 'kraffmilleropendptest@gmail.com'
-ACCOUNT_EMAIL_VERIFICATION = os.environ.get('ACCOUNT_EMAIL_VERIFICATION', 'mandatory')
+
+# Possible settings for ACCOUNT_EMAIL_VERIFICATION: 'none' or 'mandatory';
+#   - 'mandatory' requires working settings for EMAIL_HOST, EMAIL_USER, etc.
+#
+ACCOUNT_EMAIL_VERIFICATION = os.environ.get('ACCOUNT_EMAIL_VERIFICATION', 'none') # 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = 'true'
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/log-in/'
 

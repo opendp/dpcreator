@@ -56,6 +56,7 @@ class StatSpec:
 
     def __init__(self, props: dict):
         """Set the internals using the props dict"""
+        # print('stat_spec.initial props', props)
         self.variable = props.get('variable')
         self.col_index = props.get('col_index')
         self.statistic = props.get('statistic')

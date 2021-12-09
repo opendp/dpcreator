@@ -23,7 +23,8 @@
                 <SetEpsilonValue :stepperPosition="stepperPosition" v-on:stepCompleted="updateStepStatus"/>
               </v-stepper-content>
               <v-stepper-content :complete="stepperPosition > 3" step="3">
-                <CreateStatistics ref="createStatComponent" :stepperPosition="stepperPosition.sync"
+                <CreateStatistics v-on:addVariable="gotoConfirmVariables" ref="createStatComponent"
+                                  :stepperPosition="stepperPosition.sync"
                                   v-on:stepCompleted="updateStepStatus"/>
               </v-stepper-content>
               <v-stepper-content :complete="stepperPosition > 4" step="4">
@@ -103,9 +104,14 @@ export default {
     // Set the current Wizard stepper position based on the
     // depositorSetup userStep
     initStepperPosition: function () {
+      console.log('INIT stepper position')
       if (this.datasetInfo && this.getDepositorSetupInfo) {
         this.stepperPosition = stepInformation[this.userStep].wizardStepper
       }
+    },
+    gotoConfirmVariables() {
+      console.log("handling variable event")
+      this.stepperPosition = 1
     },
     // If we are on the Confirm Variables step, and the DepositorSetup variables
     // are not set, then run the Profiler

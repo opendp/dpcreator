@@ -22,8 +22,10 @@ class PassthroughRenderer(renderers.BaseRenderer):
     """
     media_type = ''
     format = ''
+
     def render(self, data, accepted_media_type=None, renderer_context=None):
         return data
+
 
 class ReleaseFileDownloadView(viewsets.ReadOnlyModelViewSet):
     """
@@ -53,11 +55,11 @@ class ReleaseFileDownloadView(viewsets.ReadOnlyModelViewSet):
         try:
             file_handle = release_info.dp_release_pdf_file.open()
         except ValueError as err_obj:
-            user_msg = 'Not able to read the PDF Release file. (1)'
+            user_msg = f'Not able to read the PDF Release file. (1) ({err_obj})'
             return Response(get_json_error(user_msg),
                             status=status.HTTP_400_BAD_REQUEST)
         except Exception as err_obj:
-            user_msg = 'Not able to read the PDF Release file. (2)'
+            user_msg = f'Not able to read the PDF Release file. (2) ({err_obj})'
             return Response(get_json_error(user_msg),
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -79,7 +81,7 @@ class ReleaseFileDownloadView(viewsets.ReadOnlyModelViewSet):
         """
         return self.retrieve(request, pk)
 
-    def retrieve(self, request, pk=None):
+    def retrieve(self, request, pk=None, **kwargs):
         """
         Download the JSON release file using the ReleaseInfo object_id
         Example: http://127.0.0.1:8000/api/release-download/18bc23da-cdbf-420e-a6aa-3d9ecdb10c20/
@@ -95,11 +97,11 @@ class ReleaseFileDownloadView(viewsets.ReadOnlyModelViewSet):
         try:
             file_handle = release_info.dp_release_json_file.open()
         except ValueError as err_obj:
-            user_msg = 'Not able to read the JSON Release file. (1)'
+            user_msg = f'Not able to read the JSON Release file. (1) ({err_obj})'
             return Response(get_json_error(user_msg),
                             status=status.HTTP_400_BAD_REQUEST)
         except Exception as err_obj:
-            user_msg = 'Not able to read the JSON Release file. (2)'
+            user_msg = f'Not able to read the JSON Release file. (2) ({err_obj})'
             return Response(get_json_error(user_msg),
                             status=status.HTTP_400_BAD_REQUEST)
             
@@ -178,12 +180,12 @@ class ReleaseView(viewsets.ViewSet):
         # Async: the validate_util process!
         validate_util = ValidateReleaseUtil.compute_mode(request.user,
                                                          analysis_plan_id,
-                                                         #run_dataverse_deposit=False)
                                                          run_dataverse_deposit=True)
         if validate_util.has_error():
             # This is a big error, check for it before evaluating individual statistics
             #
             user_msg = validate_util.get_err_msg()
+            print('release_view.create(...) user_msg', user_msg)
 
             # Can you return a 400 / raise an Exception here with the error message?
             # How should this be used?

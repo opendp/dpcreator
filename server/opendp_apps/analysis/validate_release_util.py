@@ -131,7 +131,11 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         # Any stat specific validation errors?
         #   - Fail on 1st error found
+        # print('validate_release_util. release; show validation errors (if any)')
         for stat_spec in self.stat_spec_list:
+            if stat_spec.has_error():
+                stat_spec.print_debug()
+            #    print(stat_spec.get_single_err_msg())
             if stat_spec.has_error():
                 user_msg = (f'Validation error found for variable "{stat_spec.variable}"'
                             f' and statistic "{stat_spec.statistic}":'

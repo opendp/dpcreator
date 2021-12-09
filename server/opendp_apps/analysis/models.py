@@ -149,6 +149,17 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         self.updated = timezone.now()
         super(DepositorSetupInfo, self).save(*args, **kwargs)
 
+    @mark_safe
+    def variable_info_display(self):
+        """For admin display of the variable info"""
+        if not self.variable_info:
+            return 'n/a'
+
+        try:
+            info_str = json.dumps(self.variable_info, indent=4)
+            return f'<pre>{info_str}</pre>'
+        except Exception as ex_obj:
+            return f'Failed to conver to JSON string {ex_obj}'
 
 class ReleaseInfo(TimestampedModelWithUUID):
     """
@@ -383,5 +394,16 @@ class AnalysisPlan(TimestampedModelWithUUID):
 
         super(AnalysisPlan, self).save(*args, **kwargs)
 
+    @mark_safe
+    def variable_info_display(self):
+        """For admin display of the variable info"""
+        if not self.variable_info:
+            return 'n/a'
+
+        try:
+            info_str = json.dumps(self.variable_info, indent=4)
+            return f'<pre>{info_str}</pre>'
+        except Exception as ex_obj:
+            return f'Failed to conver to JSON string {ex_obj}'
 
 

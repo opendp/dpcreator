@@ -12,7 +12,12 @@ class DepositorSetupInfoAdmin(admin.ModelAdmin):
                     'epsilon',
                     'updated',
                     'created',)
-    readonly_fields = ('id', 'object_id', 'is_complete', 'created', 'updated',)
+    readonly_fields = ('id',
+                       'object_id',
+                       'is_complete',
+                       'variable_info_display',
+                       'created',
+                       'updated',)
 
 
 class AnalysisPlanAdmin(admin.ModelAdmin):
@@ -27,7 +32,12 @@ class AnalysisPlanAdmin(admin.ModelAdmin):
                     #'epsilon',
                     'updated',
                     'created',)
-    readonly_fields = ('id', 'object_id', 'is_complete', 'created', 'updated',)
+    readonly_fields = ('id',
+                       'object_id',
+                       'is_complete',
+                       'variable_info_display',
+                       'created',
+                       'updated',)
 
 
 class AuxiliaryFileDepositRecordInline(admin.TabularInline):

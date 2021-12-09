@@ -45,6 +45,10 @@
             locale-tag="confirm variables.help variable"
         />
       </template>
+      <!--
+      <template v-slot:item.data-table-select="{ on, props }">
+        <v-simple-checkbox color="green" v-bind="props" v-on="on"></v-simple-checkbox>
+      </template>-->
       <template v-slot:[`item.index`]="{ index }">
         <span class="index-td grey--text">{{ index + 1 }}</span>
       </template>
@@ -345,7 +349,7 @@ export default {
   props: ["stepperPosition"],
   computed: {
     ...mapState('auth', ['error', 'user']),
-    ...mapState('dataset', ['datasetInfo']),
+    ...mapState('dataset', ['datasetInfo', 'analysisPlan']),
     ...mapGetters('dataset', ['getDepositorSetupInfo']),
 
   },
@@ -421,6 +425,20 @@ export default {
     isBlank(str) {
       return (!str || /^\s*$/.test(str));
     },
+    isSelectable(variable) {
+      let selectable = true
+      if (this.analysisPlan && this.analysisPlan.dpStatistics) {
+        this.analysisPlan.dpStatistics.forEach(statistic => {
+          //      console.log( statistic.variable + '===' + variable.name + '?')
+          if (statistic.variable === variable.name) {
+            console.log('found statistic' + variable.name)
+            selectable = false
+          }
+        })
+      }
+
+      return selectable
+    },
     isValidRow(variable) {
       // We only need to check selected rows,
       // so if row isn't selected it's always valid
@@ -457,6 +475,14 @@ export default {
       );
       this.saveUserInput(variable)
     },
+    // This is run so that as statistics are added, variables are set to unselectable
+    updateSelectable() {
+      //  console.log('update selectable')
+      this.variables.forEach(variable => {
+        //      console.log('updateSelectable + '+ variable.name)
+        variable.isSelectable = this.isSelectable(variable)
+      })
+    },
     // Create a list version of variableInfo. A deep copy, so we can edit locally
     createVariableList() {
       let vars = this.datasetInfo.depositorSetupInfo.variableInfo
@@ -486,6 +512,7 @@ export default {
           row.additional_information.categories = JSON.parse(JSON.stringify(vars[key].categories))
         }
         row['editDisabled'] = true
+        row['isSelectable'] = this.isSelectable(vars[key])
         if (row.selected) {
           this.selected.push(row)
         }
@@ -539,8 +566,16 @@ export default {
         }
       }
     },
+    '$store.state.dataset.analysisPlan': function () {
+      console.log('updateSelectable watch triggered')
+      if (this.datasetInfo.depositorSetupInfo.variableInfo !== null) {
+        console.log('calling updateSelectable')
+        this.updateSelectable()
+
+      }
+    }
+  },
 
 
-  }
 };
 </script>
