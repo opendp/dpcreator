@@ -1,11 +1,10 @@
 {
     describe('Dataverse Handoff mock-dv test', () => {
-        const username = 'test_user'
-        const password = 'dpcreator123!'
-        const email = 'test_user@dpcreator.org'
+
         it('Displays correct file on Welcome Page', () => {
             Cypress.Cookies.debug(true)
             cy.clearData()
+
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
                 console.log('runnable', runnable)
@@ -22,6 +21,10 @@
                 // for now, always return false to allow the test to pass
                 return false
             })
+            const username = 'handoffuser'
+            const password = 'dpcreator123!'
+            const email = 'handoffuser@dpcreator.org'
+            cy.createAccount(username, email, password)
             cy.visit('/mock-dv');
             cy.get('[data-test="submit button"]').click();
             cy.url().should('contains', '/?id=');
@@ -45,6 +48,9 @@
                     // for now, always return false to allow the test to pass
                     return false
                 })
+                const username = 'seconduser'
+                const password = 'dpcreator123!'
+                const email = 'seconduser@dpcreator.org'
                 cy.createAccount(username, email, password)
 
                 cy.visit('/mock-dv');
