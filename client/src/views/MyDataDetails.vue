@@ -40,8 +40,14 @@
               {{ analysisPlan.releaseInfo.dpRelease.created.humanReadable }}</p>
             <div :v-if="analysisPlan.releaseInfo.dataverseDepositInfo">
               <p>&nbsp;</p>
-              <p v-if="analysisPlan.releaseInfo.dataverseDepositInfo" style="padding-left:20px; padding-right:40px;">
+              <p v-if="analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
+                 style="padding-left:20px; padding-right:40px;">
                 <span v-html="analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.userMsgHtml"></span>
+              </p>
+              <p v-if="!analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
+                 style="padding-left:20px; padding-right:40px;">
+                <b>Dataverse Deposit Error : </b><span
+                  v-html="'JSON ' + analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.dvErrMsg"></span>
               </p>
             </div>
 
