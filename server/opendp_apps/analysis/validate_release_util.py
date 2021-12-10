@@ -70,7 +70,6 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.max_delta = None           # from analysis_plan.dataset.get_depositor_setup_info()
         self.dataset_size = None        # from analysis_plan.dataset
 
-
         self.stat_spec_list = []        # list of StatSpec objects
         self.validation_info = []       # list of StatValidInfo objects to send to UI
 
@@ -85,7 +84,8 @@ class ValidateReleaseUtil(BasicErrCheck):
             self.run_validation_process()
 
     @staticmethod
-    def validate_mode(opendp_user: get_user_model(), analysis_plan_id: int, dp_statistics: list=None):
+    def validate_mode(opendp_user: get_user_model(), analysis_plan_id: int,
+                      dp_statistics: list  =None):
         """
         Use this method to return a ValidateReleaseUtil validates the dp_statistics
         """
@@ -93,7 +93,7 @@ class ValidateReleaseUtil(BasicErrCheck):
 
     @staticmethod
     def compute_mode(opendp_user: get_user_model(), analysis_plan_id: int,
-                     run_dataverse_deposit: bool=False):
+                     run_dataverse_deposit: bool = False):
         """
         Use this method to return a ValidateReleaseUtil which runs the dp_statistics
         """
@@ -155,7 +155,7 @@ class ValidateReleaseUtil(BasicErrCheck):
         # -----------------------------------
         filepath = self.analysis_plan.dataset.source_file.path
         sep_char = get_data_file_separator(filepath)
-        #print('sep_char', sep_char)
+        # print('sep_char', sep_char)
 
         # -----------------------------------
         # Iterate through the stats!
@@ -182,7 +182,7 @@ class ValidateReleaseUtil(BasicErrCheck):
                 self.add_err_msg(user_msg)
                 #
                 # Delete any previous stats
-                del(self.release_stats)
+                del self.release_stats
                 return
 
         # should never happen!
@@ -214,7 +214,6 @@ class ValidateReleaseUtil(BasicErrCheck):
         if not self.run_dataverse_deposit:
             return
 
-
         if not self.release_info:
             # Shouldn't happen!
             self.add_err_msg('ReleaseInfo not available for Dataverse deposit')
@@ -228,11 +227,8 @@ class ValidateReleaseUtil(BasicErrCheck):
         #
         deposit_util = DataverseDepositUtil(self.release_info)
         if deposit_util.has_error():
-            print('deposit failed (ok in tests)')
-            #self.add_err_msg(deposit_util.get_err_msg())
+            # self.add_err_msg(deposit_util.get_err_msg())
             return
-
-
 
     def make_release_info(self, epsilon_used: float):
         """
@@ -245,12 +241,12 @@ class ValidateReleaseUtil(BasicErrCheck):
         #
         formatted_release = self.get_final_release_data()
         if self.has_error():
-            del(self.release_stats)
+            del self.release_stats
             return False
 
         formatted_release_json_str = self.get_final_release_data(as_json=True)
         if self.has_error():
-            del(self.release_stats)
+            del self.release_stats
             return False
 
         # (3) Save the ReleaseInfo object
@@ -279,7 +275,6 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         return True
 
-
     def get_new_release_info_object(self):
         assert self.has_error() is False, \
             "Check that .has_error() is False before calling this method"
@@ -294,7 +289,6 @@ class ValidateReleaseUtil(BasicErrCheck):
             # shouldn't happen, but over time...
             self.add_err_msg(formatter.get_err_msg())
             return
-
 
         return formatter.get_release_data(as_json=as_json)
 
@@ -424,7 +418,7 @@ class ValidateReleaseUtil(BasicErrCheck):
 
             # (2) Is this a known statistic? If not stop here.
             #
-            if not statistic in astatic.DP_STATS_CHOICES:
+            if statistic not in astatic.DP_STATS_CHOICES:
                 # also checked in the DPStatisticSerializer
                 props['error_message'] = f'Statistic "{statistic}" is not supported'
                 self.add_stat_spec(DPSpecError(props))
@@ -532,7 +526,7 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         try:
             validate_not_negative(self.max_delta)
-        except ValidationError as err_obj:
+        except ValidationError as _err_obj:
             user_msg = f'{astatic.ERR_MSG_BAD_TOTAL_DELTA}: {self.max_delta}'
             self.add_err_msg(user_msg)
             return False

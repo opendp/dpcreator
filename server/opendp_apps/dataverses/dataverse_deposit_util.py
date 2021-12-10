@@ -118,17 +118,17 @@ class DataverseDepositUtil(BasicErrCheck):
         expected_num_deposits = 0
         for file_info in file_info_list:
 
-            # build the deposit url
+            # build the deposit/download url
             #
             dv_deposit_url = (f'{self.dv_dataset.dv_installation.dataverse_url}'
-                      f'/api/access/datafile'
-                      f'/{self.dv_dataset.dataverse_file_id}/auxiliary'
-                      f'/{file_info["dv_deposit_type"]}/{format_version}')
+                              f'/api/access/datafile'
+                              f'/{self.dv_dataset.dataverse_file_id}/auxiliary'
+                              f'/{file_info["dv_deposit_type"]}/{format_version}')
 
-            # build the download url -- saved if the deposit works
-            #            #
             dv_download_url = dv_deposit_url
 
+            # Create a AuxiliaryFileDepositRecord to log the attempt
+            #
             deposit_record = AuxiliaryFileDepositRecord(release_info=self.release_info,
                                                         dv_auxiliary_type=file_info["dv_deposit_type"],
                                                         dv_auxiliary_version=format_version,
@@ -142,8 +142,16 @@ class DataverseDepositUtil(BasicErrCheck):
             #   For azure/s3 update: https://github.com/jschneier/django-storages/tree/master/storages/backends
             file_field = file_info["file_field"]
             if not file_field:
-                # file not available to deposit!
+                # No file to deposit. Save AuxiliaryFileDepositRecord for
+                #   logging and go to the next file
+                #
+                deposit_record.http_status_code = -99
+                ftype = {file_info["dv_deposit_type"]}
+                user_deposit_msg = f'A "{ftype}" file for this Release was not generated. Deposit not attempted.'
+                deposit_record.dv_err_msg = user_deposit_msg
+                self.set_deposit_record_user_messages_and_save(deposit_record)
                 continue
+
             expected_num_deposits += 1
 
             files = {'file': open(file_field.path, 'rb')}
@@ -154,19 +162,19 @@ class DataverseDepositUtil(BasicErrCheck):
                                          headers=headers,
                                          data=payload,
                                          files=files)
-            except requests.exceptions.ConnectionError as ex_obj:
+            except requests.exceptions.ConnectionError as _ex_obj:
+                # Connection error, log message
                 deposit_record.http_status_code = -99
-                user_msg = (f'Failed to connect to Dataverse at server'
-                            f' {self.dv_dataset.dv_installation.dataverse_url}')
+                user_msg = (f'Failed to connect to Dataverse at server:'
+                            f' {self.dv_dataset.dv_installation.dataverse_url}.')
                 deposit_record.dv_err_msg = user_msg
-                deposit_record.save()
+                self.set_deposit_record_user_messages_and_save(deposit_record)
                 continue
-            except Exception as ex_obj:
-                print('deposit failed', dv_deposit_url)
-                print(ex_obj)
+            except Exception as _ex_obj:
+                # Deposit failed, log message
                 deposit_record.http_status_code = -99
-                deposit_record.dv_err_msg = f'Error connecting to Dataverse: {ex_obj}'
-                deposit_record.save()
+                deposit_record.dv_err_msg = f'Error connecting to Dataverse.'
+                self.set_deposit_record_user_messages_and_save(deposit_record)
                 continue
 
             # debug start
@@ -201,26 +209,28 @@ class DataverseDepositUtil(BasicErrCheck):
                         'message' in deposit_record.http_resp_json:
 
                         deposit_record.dv_err_msg = deposit_record.http_resp_json['message']
-                    self.add_err_msg(dv_static.ERR_MSG_JSON_DEPOSIT_FAILED)
-                except:
+                    # self.add_err_msg(dv_static.ERR_MSG_JSON_DEPOSIT_FAILED)
+                except Exception as _ex_obj:
                     # could not convert response to JSON
-                    self.add_err_msg(dv_static.ERR_MSG_JSON_DEPOSIT_FAILED)
-                deposit_record.save()
+                    deposit_record.dv_err_msg = (f'Could not convert response to JSON.'
+                                                 f' Status code: {response.status_code}')
 
-            # Format user messages
-            #  - deposit_record needs to be saved before this is set--saving sets the "deposit_success" field
-            #
-            deposit_record.user_msg_text =  render_to_string('dataverses/auxiliary_deposit.txt',
-                                                             {'deposit': deposit_record})
+            self.set_deposit_record_user_messages_and_save(deposit_record)
 
-            deposit_record.user_msg_html = render_to_string('dataverses/auxiliary_deposit.html',
-                                                            {'deposit': deposit_record})
+    def set_deposit_record_user_messages_and_save(self, deposit_record: AuxiliaryFileDepositRecord):
+        """
+        Given an AuxiliaryFileDepositRecord object, set the user messages
+        :param deposit_record AuxiliaryFileDepositRecord
+        """
+        deposit_record.user_msg_text = render_to_string('dataverses/auxiliary_deposit.txt',
+                                                        {'deposit': deposit_record})
 
-            deposit_record.save()
+        deposit_record.user_msg_html = render_to_string('dataverses/auxiliary_deposit.html',
+                                                        {'deposit': deposit_record})
 
-        if num_deposits == 0:
-            self.add_err_msg((f'No files were deposited. (Expected: '
-                              f'{expected_num_deposits} deposit(s)'))
+        # Saving sets the "deposit_success" field
+        #
+        deposit_record.save()
 
     def update_release_info(self):
         """
@@ -229,33 +239,42 @@ class DataverseDepositUtil(BasicErrCheck):
         if self.has_error():
             return
 
-        dv_has_deposit = False
-
         # Get the latest JSON record--assumes there are no records earlier than a success record!
         #
-        json_rec = AuxiliaryFileDepositRecord.objects.filter(\
-                        release_info=self.release_info, dv_auxiliary_type=dv_static.DV_DEPOSIT_TYPE_DP_JSON,
+        json_rec = AuxiliaryFileDepositRecord.objects.filter(
+                        release_info=self.release_info,
+                        dv_auxiliary_type=dv_static.DV_DEPOSIT_TYPE_DP_JSON,
                     ).order_by('-created').first()
+
         if json_rec:
-            json_rec = json_rec.as_dict()
+            json_rec_dict = json_rec.as_dict()
+            self.release_info.dv_json_deposit_complete = json_rec.deposit_success
+        else:
+            self.release_info.dv_json_deposit_complete = False
+            no_rec_err_msg = 'JSON file not found for deposit. (status:-97)'
+            json_rec_dict = dict(deposit_success=False,
+                                 user_msg_text=no_rec_err_msg,
+                                 user_msg_html=no_rec_err_msg)
 
         # Get the latest PDF record--assumes there are no records earlier than a success record!
         #
-        pdf_rec = AuxiliaryFileDepositRecord.objects.filter(\
-                        release_info=self.release_info, dv_auxiliary_type=dv_static.DV_DEPOSIT_TYPE_DP_PDF,
+        pdf_rec = AuxiliaryFileDepositRecord.objects.filter(
+                        release_info=self.release_info,
+                        dv_auxiliary_type=dv_static.DV_DEPOSIT_TYPE_DP_PDF,
                     ).order_by('-created').first()
         if pdf_rec:
-            pdf_rec = pdf_rec.as_dict()
-            self.release_info.dv_pdf_deposit_complete = True
+            pdf_rec_dict = pdf_rec.as_dict()
+            self.release_info.dv_pdf_deposit_complete = pdf_rec.deposit_success
+        else:
+            self.release_info.dv_pdf_deposit_complete = False
+            no_rec_err_msg = 'PDF file not found for deposit. (status:-98)'
+            pdf_rec_dict = dict(deposit_success=False,
+                                user_msg_text=no_rec_err_msg,
+                                user_msg_html=no_rec_err_msg)
 
-        if json_rec or pdf_rec:
-            dv_has_deposit = True
-            self.release_info.dv_json_deposit_complete = True
-
-        deposit_info_dict = OrderedDict({\
-            "deposited": dv_has_deposit,
-            'json_deposit_record': json_rec,
-            'pdf_deposit_record':  pdf_rec,
+        deposit_info_dict = OrderedDict({
+            'json_deposit_record': json_rec_dict,
+            'pdf_deposit_record':  pdf_rec_dict,
         })
 
         self.release_info.dataverse_deposit_info = deposit_info_dict

@@ -250,7 +250,7 @@ class TestRunRelease(TestCase):
                                     content_type='application/json')
 
         jresp = response.json()
-        # print('jresp', jresp)
+        # print('jresp', json.dumps(jresp, indent=4))
         self.assertEqual(response.status_code, 201)
         self.assertIsNotNone(jresp['dp_release'])
         self.assertIsNotNone(jresp['object_id'])
@@ -262,7 +262,6 @@ class TestRunRelease(TestCase):
         # File exists and has a size
         self.assertTrue(updated_plan.release_info.dp_release_json_file.name.endswith(json_filename))
         self.assertTrue(updated_plan.release_info.dp_release_json_file.size >= 2600)
-
 
         self.assertTrue(updated_plan.release_info.dv_json_deposit_complete is False)
         self.assertTrue(updated_plan.release_info.dv_pdf_deposit_complete is False)

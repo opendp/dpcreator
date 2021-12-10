@@ -282,15 +282,25 @@ class AuxiliaryFileDepositRecord(TimestampedModelWithUUID):
 
     def as_dict(self):
         """Return in dict format for API Use"""
+
+        # Note: the upload/download urls are the same
+        #   Don't show the download url on and unsuccessful deposit
+        #
+        dv_upload_url = dv_download_url_blank_if_fail = self.dv_download_url
+        if not self.deposit_success:
+            dv_download_url_blank_if_fail = None
+
         info_dict = OrderedDict({
             'name': self.name,
             'object_id': str(self.object_id),
             'deposit_success': self.deposit_success,
-            'dv_download_url': self.dv_download_url,
+
+            'dv_download_url': dv_download_url_blank_if_fail,
 
             'dv_auxiliary_type': self.dv_auxiliary_type,
             'dv_auxiliary_version': self.dv_auxiliary_version,
 
+            'dv_upload_url': dv_upload_url,
             'http_status_code': self.http_status_code,
             'http_resp_text': self.http_resp_text,
             'http_resp_json': self.http_resp_json,
@@ -298,7 +308,6 @@ class AuxiliaryFileDepositRecord(TimestampedModelWithUUID):
 
             'user_msg_text': self.user_msg_text,
             'user_msg_html': self.user_msg_html,
-
 
             'created': self.created.isoformat(),
             'updated': self.updated.isoformat(),
