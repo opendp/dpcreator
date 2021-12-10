@@ -66,9 +66,11 @@ Cypress.Commands.add('runDemo', (mockDVfile, demoDatafile) => {
 })
 
 
-Cypress.Commands.add('createMockDataset', (fixture) => {
+Cypress.Commands.add('createMockDataset', (fixture, createAccount = true) => {
     cy.fixture(fixture).then((mockForm) => {
-        cy.createAccount(mockForm['user'], mockForm['email'], mockForm['password'])
+        if (createAccount) {
+            cy.createAccount(mockForm['user'], mockForm['email'], mockForm['password'])
+        }
         cy.visit('/mock-dv');
         cy.get('[data-test="siteUrl"]').clear().type(mockForm['siteUrl'])
         cy.get('[data-test="token"]').clear().type(mockForm['token'])

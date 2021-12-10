@@ -1,6 +1,6 @@
 export default {
     viewDetails: "View Details",
-    continueWorkflow: "Continue Workflow",
+    continueWorkflow: "Continue",
     cancelExecution: "Cancel Execution",
     actions: {
         VIEW_DETAILS: "viewDetails",
