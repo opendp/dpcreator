@@ -37,12 +37,17 @@
                         "results": [dataset]
                     }
                 })
+
+                cy.createAccount('ernie', 'ernie@sesame.org', 'ernie123!')
+                cy.login('ernie', 'ernie123!')
+                cy.url().should('contains', 'my-data')
+                cy.get('[data-test="viewDetails"]').click({force: true});
+                cy.url().should('contains', 'my-data-details')
+                cy.get('p').should('contain', "The dpJSON release file, version v1, has been deposited to Dataverse as an auxiliary file.")
+                cy.get('[data-test="jsonDownload"]').should('be.visible')
+                cy.get('[data-test="pdfDownload"]').should('not.exist')
             })
-            cy.createAccount('ernie', 'ernie@sesame.org', 'ernie123!')
-            cy.login('ernie', 'ernie123!')
-            cy.url().should('contains', 'my-data')
-            cy.get('[data-test="viewDetails"]').click({force: true});
-            cy.url().should('contains', 'my-data-details')
+
         })
 
 

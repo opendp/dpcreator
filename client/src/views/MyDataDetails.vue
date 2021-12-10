@@ -80,43 +80,32 @@
           </div>
           <div class="mb-5" v-if="status === COMPLETED">
             <p class="primary--text">Download DP Release:</p>
-            <Button
-                :click="handlePDFDownload"
-                color="primary"
-                classes="d-block mb-2"
+            <Button v-if="analysisPlan.releaseInfo.downloadPdfUrl"
+                    data-test="pdfDownload"
+                    :click="handlePDFDownload"
+                    color="primary"
+                    classes="d-block mb-2"
             >
               <v-icon left>mdi-download</v-icon>
               <span>PDF file</span>
             </Button>
-            <Button
-                :click="handleJSONDownload"
-                color="primary"
-                classes="d-block mb-2"
+            <Button v-if="analysisPlan.releaseInfo.downloadJsonUrl"
+                    data-test="jsonDownload"
+                    :click="handleJSONDownload"
+                    color="primary"
+                    classes="d-block mb-2"
             >
               <v-icon left>mdi-download</v-icon>
               <span>JSON file</span>
             </Button>
-            <Button
-                :click="handleHTMLDownload"
-                color="primary"
-                classes="d-block mb-2"
-            >
-              <v-icon left>mdi-download</v-icon>
-              <span>HTML file</span>
-            </Button>
-            <Button
-                :click="handleXMLDownload"
-                color="primary"
-                classes="d-block mb-2"
-            >
-              <v-icon left>mdi-download</v-icon>
-              <span>XML file</span>
-            </Button>
-            <a class="text-decoration-none d-block mt-10" href=""
-            >Check DP release in Dataverse
-              <v-icon small color="primary">mdi-open-in-new</v-icon>
-            </a
-            >
+
+            <div data-test="dataverseLink">
+              <a class="text-decoration-none d-block mt-10" :href="fileUrl"
+              >Check DP release in Dataverse
+                <v-icon small color="primary">mdi-open-in-new</v-icon>
+              </a
+              >
+            </div>
           </div>
            <div class="pt-5 pb-10">
              <div v-for="(detail, index) in datasetDetails" :key="index">
@@ -248,6 +237,11 @@ export default {
 
     ...mapState('dataset', ['datasetInfo', 'analysisPlan']),
     ...mapGetters('dataset', ['userStep', "getTimeRemaining"]),
+    fileUrl: function () {
+      const host = this.datasetInfo.datasetSchemaInfo.includedInDataCatalog.url
+      return host + '/file.xhtml?fileId=' + this.datasetInfo.dataverseFileId
+
+    },
     datasetDetails: function () {
 
       let datasetDetails = [
