@@ -40,7 +40,7 @@
               {{ analysisPlan.releaseInfo.dpRelease.created.humanReadable }}</p>
             <div :v-if="analysisPlan.releaseInfo.dataverseDepositInfo">
               <p>&nbsp;</p>
-              <p style="padding-left:20px; padding-right:40px;">
+              <p v-if="analysisPlan.releaseInfo.dataverseDepositInfo" style="padding-left:20px; padding-right:40px;">
                 <span v-html="analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.userMsgHtml"></span>
               </p>
             </div>
@@ -99,7 +99,7 @@
               <span>JSON file</span>
             </Button>
 
-            <div data-test="dataverseLink">
+            <div v-if="analysisPlan.releaseInfo.dataverseDepositInfo" data-test="dataverseLink">
               <a class="text-decoration-none d-block mt-10" :href="fileUrl"
               >Check DP release in Dataverse
                 <v-icon small color="primary">mdi-open-in-new</v-icon>
