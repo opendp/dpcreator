@@ -180,3 +180,4 @@ server/scripts_dev/dv_test_creds.py
 !server/opendp_apps/dataverses/fixtures/*.json
 !server/opendp_apps/profiler/fixtures/*.json
 !server/test_data/pdfs/*.pdf
+!dev_notes/api_example_analysis_plan.json

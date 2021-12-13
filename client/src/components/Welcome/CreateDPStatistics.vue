@@ -16,23 +16,26 @@
       | {{ datasetInfo.fileSchemaInfo.name }}
     </a>
 
-    <Button
-        data-test="Start Process"
-        color="primary"
-        classes="d-block"
-        :class="{
+    <div v-if="showButton">
+      <Button
+          data-test="Start Process"
+          color="primary"
+          classes="d-block"
+          :class="{
         'width100 mx-auto': $vuetify.breakpoint.xsOnly
       }"
-        :disabled="$vuetify.breakpoint.xsOnly"
-        :click="() => beginWizard()"
-        label="Start the process"
-    />
+          :disabled="$vuetify.breakpoint.xsOnly"
+          :click="() => beginWizard()"
+          label="Continue"
+      />
+    </div>
   </div>
 </template>
 
 <script>
 import Button from "../DesignSystem/Button.vue";
 import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
+import stepInformation, {STEP_0100_UPLOADED} from "@/data/stepInformation";
 
 export default {
   components: {Button},
@@ -44,8 +47,13 @@ export default {
     NETWORK_CONSTANTS
 
   }),
-
+  computed: {
+    showButton() {
+      return this.datasetInfo.depositorSetupInfo.userStep === STEP_0100_UPLOADED
+    },
+  },
   methods: {
+
     beginWizard() {
       this.$store.dispatch('dataset/setDatasetInfo', this.datasetInfo.objectId)
           .then(() => {

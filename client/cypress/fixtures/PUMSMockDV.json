@@ -4,6 +4,7 @@
   "datasetPid": "doi:10.5072/FK2/RTWAQZ",
   "token": "fbadd596-2957-4381-9e87-235d97380157",
   "filePid": "doi:10.5072/FK2/RTWAQZ",
-  "user": "test_user",
-  "password": "dpcreator"
+  "user": "oscar",
+  "password": "oscar123!",
+  "email": "oscar@thegrouch.com"
 }

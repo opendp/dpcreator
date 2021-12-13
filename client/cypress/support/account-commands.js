@@ -1,4 +1,4 @@
-Cypress.Commands.add('createAccount', (username, email, password) => {
+Cypress.Commands.add('createAccount', (username, email, password, waitForConfirmation = true) => {
     cy.visit('/sign-up')
 
     cy.get('h2').should('contain', '1/2. Check and accept Terms of Use:').should('be.visible')
@@ -9,5 +9,8 @@ Cypress.Commands.add('createAccount', (username, email, password) => {
     cy.get('[data-test="password"]').type(password);
     cy.get('[data-test="confirmPassword"').type(password)
     cy.get('[data-test="submit"]').click({force: true});
+    if (waitForConfirmation) {
+        cy.url().should('contains', 'confirmation')
+    }
 
 })

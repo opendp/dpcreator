@@ -27,16 +27,34 @@
           <div class="mb-5" v-if="status === COMPLETED">
             <p class="primary--text">DP Release Information:</p>
 
-            <p>This release contains {{ analysisPlan.releaseInfo.dpRelease.statistics.length }} statistic<span v-if="analysisPlan.releaseInfo.dpRelease.statistics.length > 1">s</span>:</p>
+            <p>This release contains {{ analysisPlan.releaseInfo.dpRelease.statistics.length }} statistic<span
+                v-if="analysisPlan.releaseInfo.dpRelease.statistics.length > 1">s</span>:</p>
             <p>&nbsp;</p>
-            <div v-for="(statistic, index) in analysisPlan.releaseInfo.dpRelease.statistics" style="padding-left:20px; padding-right:40px;">
+            <div v-for="(statistic, index) in analysisPlan.releaseInfo.dpRelease.statistics"
+                 style="padding-left:20px; padding-right:40px;">
               <p data-test="statistic description" style="">
-              ({{ index + 1 }}) <span v-html="statistic.description.html"></span></p>
+                ({{ index + 1 }}) <span v-html="statistic.description.html"></span></p>
 
             </div>
-            <p style="padding-left:20px; padding-right:40px;">Created: {{ analysisPlan.releaseInfo.dpRelease.created.humanReadable }}</p>
+            <p style="padding-left:20px; padding-right:40px;">Created:
+              {{ analysisPlan.releaseInfo.dpRelease.created.humanReadable }}</p>
+            <div :v-if="analysisPlan.releaseInfo.dataverseDepositInfo">
+              <p>&nbsp;</p>
+              <p v-if="analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
+                 style="padding-left:20px; padding-right:40px;">
+                <span v-html="analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.userMsgHtml"></span>
+              </p>
+              <p v-if="!analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
+                 style="padding-left:20px; padding-right:40px;">
+                <b>Dataverse Deposit Error : </b><span
+                  v-html="'JSON ' + analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.dvErrMsg"></span>
+              </p>
+            </div>
+
             <p>Please see the panels below for details on the
-              <span v-if="analysisPlan.releaseInfo.dpRelease.statistics.length == 1">statistic</span><span v-if="analysisPlan.releaseInfo.dpRelease.statistics.length> 1">statistics</span>, including the privacy parameters used to generate them.
+              <span v-if="analysisPlan.releaseInfo.dpRelease.statistics.length == 1">statistic</span><span
+                  v-if="analysisPlan.releaseInfo.dpRelease.statistics.length> 1">statistics</span>, including the
+              privacy parameters used to generate them.
             </p>
           </div>
           <div class="mb-5" v-if="status === COMPLETED">
@@ -68,43 +86,32 @@
           </div>
           <div class="mb-5" v-if="status === COMPLETED">
             <p class="primary--text">Download DP Release:</p>
-            <Button
-                :click="handlePDFDownload"
-                color="primary"
-                classes="d-block mb-2"
+            <Button v-if="analysisPlan.releaseInfo.downloadPdfUrl"
+                    data-test="pdfDownload"
+                    :click="handlePDFDownload"
+                    color="primary"
+                    classes="d-block mb-2"
             >
               <v-icon left>mdi-download</v-icon>
               <span>PDF file</span>
             </Button>
-            <Button
-                :click="handleJSONDownload"
-                color="primary"
-                classes="d-block mb-2"
+            <Button v-if="analysisPlan.releaseInfo.downloadJsonUrl"
+                    data-test="jsonDownload"
+                    :click="handleJSONDownload"
+                    color="primary"
+                    classes="d-block mb-2"
             >
               <v-icon left>mdi-download</v-icon>
               <span>JSON file</span>
             </Button>
-            <Button
-                :click="handleHTMLDownload"
-                color="primary"
-                classes="d-block mb-2"
-            >
-              <v-icon left>mdi-download</v-icon>
-              <span>HTML file</span>
-            </Button>
-            <Button
-                :click="handleXMLDownload"
-                color="primary"
-                classes="d-block mb-2"
-            >
-              <v-icon left>mdi-download</v-icon>
-              <span>XML file</span>
-            </Button>
-            <a class="text-decoration-none d-block mt-10" href=""
-            >Check DP release in Dataverse
-              <v-icon small color="primary">mdi-open-in-new</v-icon>
-            </a
-            >
+
+            <div v-if="analysisPlan.releaseInfo.dataverseDepositInfo" data-test="dataverseLink">
+              <a class="text-decoration-none d-block mt-10" :href="fileUrl"
+              >Check DP release in Dataverse
+                <v-icon small color="primary">mdi-open-in-new</v-icon>
+              </a
+              >
+            </div>
           </div>
            <div class="pt-5 pb-10">
              <div v-for="(detail, index) in datasetDetails" :key="index">
@@ -215,28 +222,23 @@ export default {
       alert("cancel execution " + item);
     },
     handlePDFDownload() {
-      //TODO: Implement Handler
-      alert("PDF download!");
+       window.location.href = this.analysisPlan.releaseInfo.downloadPdfUrl;
     },
     handleJSONDownload() {
-      //TODO: Implement Handler
-      alert("JSON download!");
+      window.location.href = this.analysisPlan.releaseInfo.downloadJsonUrl;
     },
-    handleHTMLDownload() {
-      //TODO: Implement Handler
-      alert("HTML download!");
-    },
-    handleXMLDownload() {
-      //TODO: Implement Handler
-      alert("XML download!");
-    }
+
   },
   computed: {
 
 
     ...mapState('dataset', ['datasetInfo', 'analysisPlan']),
-    ...mapGetters('dataset', ['getDepositorSetupInfo', 'userStep', "getTimeRemaining"]),
-    ...mapState('auth', ['user']),
+    ...mapGetters('dataset', ['userStep', "getTimeRemaining"]),
+    fileUrl: function () {
+      const host = this.datasetInfo.datasetSchemaInfo.includedInDataCatalog.url
+      return host + '/file.xhtml?fileId=' + this.datasetInfo.dataverseFileId
+
+    },
     datasetDetails: function () {
 
       let datasetDetails = [
