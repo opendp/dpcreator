@@ -197,6 +197,11 @@ class DataverseDepositUtil(BasicErrCheck):
                 deposit_record.http_resp_json = response.json()
                 deposit_record.save()
                 num_deposits += 1
+            elif response.status_code == status.HTTP_403_FORBIDDEN:
+                # Forbidden
+                user_msg = (f'The deposit failed. Dataverse returned a "Forbidden" error.'
+                            f' (Dataverse url: {self.dv_dataset.dv_installation.dataverse_url}).')
+                deposit_record.dv_err_msg = user_msg
             else:
                 # Deposit failed
                 try:
