@@ -222,21 +222,12 @@ export default {
       alert("cancel execution " + item);
     },
     handlePDFDownload() {
-      //TODO: Implement Handler
-      alert("PDF download!");
+       window.location.href = this.analysisPlan.releaseInfo.downloadPdfUrl;
     },
     handleJSONDownload() {
-      //TODO: Implement Handler
-      alert("JSON download!");
+      window.location.href = this.analysisPlan.releaseInfo.downloadJsonUrl;
     },
-    handleHTMLDownload() {
-      //TODO: Implement Handler
-      alert("HTML download!");
-    },
-    handleXMLDownload() {
-      //TODO: Implement Handler
-      alert("XML download!");
-    }
+
   },
   computed: {
 
