@@ -378,7 +378,7 @@ class AnalysisPlan(TimestampedModelWithUUID):
                                      blank=True)
 
     def __str__(self):
-        return f'{self.dataset} - {self.user_step}'
+        return f'{self.dataset}'    # - {self.user_step}'
 
     def is_editable(self) -> bool:
         """
