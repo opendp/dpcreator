@@ -8,6 +8,7 @@ import {
   REMOVE_TOKEN, SET_CURRENT_TERMS, SET_TERMS_ACCEPTED, SET_TERMS_LOG,
   SET_TOKEN,
   SET_USER,
+  SET_BANNER_MESSAGES,
 } from './types';
 import terms from "@/api/terms";
 
@@ -20,7 +21,8 @@ const initialState = {
   token: null,
   user: null,
   currentTerms: null,
-  termsOfAccessLog: null
+  termsOfAccessLog: null,
+  bannerMessages: null
 
 };
 
@@ -98,14 +100,21 @@ const actions = {
           return Promise.reject(data)
         });
   },
-  logout({ commit }) {
+  logout({commit}) {
     return auth.logout()
-      .then(() => commit(LOGOUT))
-      .finally(() => commit(REMOVE_TOKEN));
+        .then(() => commit(LOGOUT))
+        .finally(() => commit(REMOVE_TOKEN));
   },
-
-  fetchUser({ commit,state }) {
-    if (state.token!=null) {
+  fetchBannerMessages({commit}) {
+    auth.getBannerMessages()
+        .then(response => {
+          console.log('banner messages: ' + JSON.stringify(response))
+          commit(SET_BANNER_MESSAGES, response.data.results)
+          Promise.resolve()
+        })
+  },
+  fetchUser({commit, state}) {
+    if (state.token != null) {
       return auth.getAccountDetails()
           .then(response => {
 
@@ -191,6 +200,10 @@ const mutations = {
   },
   [SET_TERMS_LOG](state, termsLog) {
     state.termsOfAccessLog = termsLog
+  },
+  [SET_BANNER_MESSAGES](state, bannerMessages) {
+    console.log('setting banner messages ' + bannerMessages)
+    state.bannerMessages = bannerMessages
   }
 };
 

@@ -7,9 +7,11 @@
         color="header"
         flat
         extended
-        extension-height="50px"
+        extension-height="120px"
     >
+
       <v-container class="my-5 fill-height">
+
         <v-col class="logo" cols="3">
           <router-link class="router-link" :to="NETWORK_CONSTANTS.HOME.PATH"
           >
@@ -20,8 +22,6 @@
             ></v-img>
           </router-link
           >
-
-
         </v-col>
 
         <v-spacer></v-spacer>
@@ -59,6 +59,22 @@
           </span>
         </div>
       </v-container>
+      <template v-slot:extension>
+        <v-spacer></v-spacer>
+        <v-container>
+          <v-row>
+            <v-col cols="12">
+
+              <ColoredBorderAlert type="warning">
+                <template v-slot:content>
+                  <div v-html="bannerMessage"></div>
+                </template>
+              </ColoredBorderAlert>
+            </v-col>
+          </v-row>
+        </v-container>
+      </template>
+
     </v-app-bar>
     <v-navigation-drawer
         v-model="isDrawerActive"
@@ -128,11 +144,24 @@
 <script>
 import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
 import {mapGetters, mapState} from "vuex";
+import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
+
 export default {
   name: "Header",
+  components: {ColoredBorderAlert},
+  created() {
+    this.$store.dispatch('auth/fetchBannerMessages')
+  },
   computed: {
     ...mapGetters('auth', ['isAuthenticated', 'isTermsAccepted']),
-    ...mapState('auth', ['user']),
+    ...mapState('auth', ['user', 'bannerMessages']),
+    bannerMessage() {
+      if (this.bannerMessages) {
+        return this.bannerMessages[0].content
+      } else {
+        return ""
+      }
+    },
     username() {
       return (this.user) ? this.user.username : null
     },

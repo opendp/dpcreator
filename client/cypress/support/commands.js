@@ -122,7 +122,7 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
     cy.get('[data-test="radioOnlyOneIndividualPerRowYes"]').check({force: true})
 
     // click on continue to go to trigger the profiler and go to the Confirm Variables Page
-    cy.get('[data-test="wizardContinueButton"]').last().click();
+    cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
     cy.wait('@datasetInfo')
     cy.get('h1').should('contain', 'Confirm Variables')
     for (const key in variableData) {
@@ -154,7 +154,8 @@ Cypress.Commands.add('createMeanStatistic', (numericVar) => {
     //  cy.wait('@patchDeposit', {timeout: 5000})
 
     // Continue to Set Epsilon Step
-    cy.get('[data-test="wizardContinueButton"]').last().click();
+    cy.scrollTo('top')
+    cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
     cy.wait('@datasetInfo', {timeout: 5000})
 
     cy.get('h1').should('contain', 'Set epsilon value').should('be.visible')
@@ -164,7 +165,8 @@ Cypress.Commands.add('createMeanStatistic', (numericVar) => {
 
 
     // Continue to Create  Statistics Step
-    cy.get('[data-test="wizardContinueButton"]').last().click();
+    cy.scrollTo('top')
+    cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
     cy.wait('@datasetInfo', {timeout: 5000})
 
     // On the statistics page, test edit statistics Params
@@ -197,7 +199,8 @@ Cypress.Commands.add('createMeanStatistic', (numericVar) => {
 })
 Cypress.Commands.add('submitMeanStatistic', () => {
     // Click Continue to go from Create Statistic to Generate DP Release Step
-    cy.get('[data-test="wizardContinueButton"]').last().click();
+    cy.scrollTo('top')
+    cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
 
     // Submit Mean Statistic
     cy.get('[data-test="Submit statistics"]').click({force: true});

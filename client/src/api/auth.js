@@ -2,6 +2,10 @@ import session from './session';
 const camelcaseKeys = require('camelcase-keys');
 
 export default {
+    getBannerMessages() {
+        return session.get('/api/banner-messages/').then(data => camelcaseKeys(data, {deep: true}));
+
+    },
     changePassword(old_password, new_password1, new_password2) {
         session.post('/rest-auth/password/change/', {new_password1, new_password2, old_password})
             .catch(function (data) {
