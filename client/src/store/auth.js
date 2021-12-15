@@ -108,7 +108,6 @@ const actions = {
   fetchBannerMessages({commit}) {
     auth.getBannerMessages()
         .then(response => {
-          console.log('banner messages: ' + JSON.stringify(response))
           commit(SET_BANNER_MESSAGES, response.data.results)
           Promise.resolve()
         })

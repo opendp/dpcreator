@@ -26,10 +26,6 @@
             “Information that could cause risk of harm to individuals or the
             university if disclosed”</span
           >)<br/>
-          <span class="primary--text font-weight-bold pointer"
-          >Modify this selection
-            <v-icon small color="primary">mdi-open-in-new</v-icon></span
-          >
         </span>
         <div
             class="borderBottom soft_primary grey--text text--darken-2 pa-3 my-5 top-borders-radius noise-params d-flex justify-space-between width50"
@@ -48,7 +44,7 @@
         <div
             class="borderBottom soft_primary grey--text text--darken-2 pa-3 my-5 top-borders-radius noise-params d-flex justify-space-between width50"
         >
-          <span>Delta (x)</span>
+          <span>Delta (δ)</span>
           <v-text-field
               class="text-right font-weight-bold"
               type="number"
@@ -69,17 +65,7 @@
               placeholder="Select..."
           ></v-autocomplete>
         </div>
-        <AdditionalInformationAlert>
-          <template v-slot:content>
-            <span
-            >
-              <div v-html="$t('create statistics.confirm 4')"></div>
-              <a href="http://" class="text-decoration-none primary--text"
-              >Watch video to learn more.</a
-              >
-            </span>
-          </template>
-        </AdditionalInformationAlert>
+
       </v-card-text>
       <v-card-actions>
         <Button

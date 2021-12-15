@@ -7,7 +7,7 @@
         color="header"
         flat
         extended
-        extension-height="120px"
+        :extension-height="extensionHeight"
     >
 
       <v-container class="my-5 fill-height">
@@ -67,7 +67,11 @@
 
               <ColoredBorderAlert type="warning">
                 <template v-slot:content>
-                  <div v-html="bannerMessage"></div>
+                  <ul style="list-style-type:none;">
+                    <li v-for="message in bannerMessages">
+                      <div v-html="message.content"></div>
+                    </li>
+                  </ul>
                 </template>
               </ColoredBorderAlert>
             </v-col>
@@ -157,10 +161,17 @@ export default {
     ...mapState('auth', ['user', 'bannerMessages']),
     bannerMessage() {
       if (this.bannerMessages) {
-        return this.bannerMessages[0].content
+        return this.bannerMessages
       } else {
         return ""
       }
+    },
+    extensionHeight() {
+      let height = "50px"
+      if (this.bannerMessages) {
+        height = 100 + (40 * this.bannerMessages.length) + "px"
+      }
+      return height
     },
     username() {
       return (this.user) ? this.user.username : null

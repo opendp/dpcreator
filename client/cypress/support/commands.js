@@ -209,11 +209,7 @@ Cypress.Commands.add('submitMeanStatistic', () => {
     cy.url().should('contain', 'my-data-details')
     // The Release Details should be visible
     cy.get('[data-test="status tag"]').should('contain', 'Release completed')
-    cy.get('[data-test="DP Statistics Panel"]').click({force: true})
-    cy.get('[data-test="DP Statistics Panel"]').should('contain', 'statistic:"mean"')
-    // The statistic description should be visible
-    cy.get('[data-test="DP Statistics Panel"]').should('contain', 'statistic:"mean"')
-    const snippet = 'A differentially private'
+    const snippet = 'A differentially private Mean for variable'
     cy.get('[data-test="statistic description"]').should('contain', snippet)
 })
 Cypress.Commands.add('setupStatisticsPage', (datasetFixture, analysisFixture) => {
