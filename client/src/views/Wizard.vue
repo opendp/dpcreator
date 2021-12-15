@@ -150,7 +150,7 @@ export default {
         completed: false
       },
       {
-        title: "Set Epsilon Value",
+        title: "Set Accuracy Level",
         completed: false
       },
       {
