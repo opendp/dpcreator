@@ -14,7 +14,7 @@
           it('successfully loads', () => {
               cy.visit('/')
               cy.get('h2')
-                  .should('contain', 'Open')
+                  .should('contain', 'Tips for Use')
           })
       })
 
