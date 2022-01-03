@@ -9,7 +9,6 @@
     <TermsOfService/>
     <AccountButtons/>
     <AccountButtonsWaypointActivator/>
-    <AboutOpenDPBanner/>
   </div>
 </template>
 

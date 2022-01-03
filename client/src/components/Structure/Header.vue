@@ -7,9 +7,11 @@
         color="header"
         flat
         extended
-        extension-height="50px"
+        :extension-height="extensionHeight"
     >
+
       <v-container class="my-5 fill-height">
+
         <v-col class="logo" cols="3">
           <router-link class="router-link" :to="NETWORK_CONSTANTS.HOME.PATH"
           >
@@ -20,8 +22,6 @@
             ></v-img>
           </router-link
           >
-
-
         </v-col>
 
         <v-spacer></v-spacer>
@@ -59,6 +59,26 @@
           </span>
         </div>
       </v-container>
+      <template v-if="bannerMessages.length > 0" v-slot:extension>
+        <v-spacer></v-spacer>
+        <v-container>
+          <v-row>
+            <v-col cols="12">
+
+              <ColoredBorderAlert type="warning">
+                <template v-slot:content>
+                  <ul style="list-style-type:none;">
+                    <li v-for="message in bannerMessages">
+                      <div v-html="message.content"></div>
+                    </li>
+                  </ul>
+                </template>
+              </ColoredBorderAlert>
+            </v-col>
+          </v-row>
+        </v-container>
+      </template>
+
     </v-app-bar>
     <v-navigation-drawer
         v-model="isDrawerActive"
@@ -128,11 +148,31 @@
 <script>
 import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
 import {mapGetters, mapState} from "vuex";
+import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
+
 export default {
   name: "Header",
+  components: {ColoredBorderAlert},
+  created() {
+    this.$store.dispatch('auth/fetchBannerMessages')
+  },
   computed: {
     ...mapGetters('auth', ['isAuthenticated', 'isTermsAccepted']),
-    ...mapState('auth', ['user']),
+    ...mapState('auth', ['user', 'bannerMessages']),
+    bannerMessage() {
+      if (this.bannerMessages) {
+        return this.bannerMessages
+      } else {
+        return ""
+      }
+    },
+    extensionHeight() {
+      let height = "50px"
+      if (this.bannerMessages) {
+        height = 100 + (40 * this.bannerMessages.length) + "px"
+      }
+      return height
+    },
     username() {
       return (this.user) ? this.user.username : null
     },

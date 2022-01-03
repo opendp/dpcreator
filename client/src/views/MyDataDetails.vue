@@ -50,6 +50,35 @@
                   v-html="'JSON ' + analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.dvErrMsg"></span>
               </p>
             </div>
+            <div class="pt-5 pb-10">
+              <div v-for="(detail, index) in datasetDetails" :key="index">
+                <v-row v-if="status!==COMPLETED || detail.id!=='timeRemaining'" class="py-3">
+                  <v-col
+                      cols="12"
+                      sm="4"
+                      class="grey--text text--darken-2 d-flex"
+                      :class="{
+                    'py-0': $vuetify.breakpoint.xsOnly
+                  }"
+                  >
+                  <span>
+                    {{ detail.label }}
+                  </span>
+                    <QuestionIconTooltip :text="detail.tooltip"/>
+                  </v-col>
+                  <v-col
+                      cols="12"
+                      sm="8"
+                      :class="{
+                    'pt-0 pb-5': $vuetify.breakpoint.xsOnly
+                  }"
+                  >{{ detail.value }}
+                  </v-col
+                  >
+                </v-row>
+                <v-divider class="hidden-xs-only"/>
+              </div>
+            </div>
 
             <p>Please see the panels below for details on the
               <span v-if="analysisPlan.releaseInfo.dpRelease.statistics.length == 1">statistic</span><span
@@ -62,14 +91,15 @@
               <v-expansion-panel data-test="DP Statistics Panel">
                 <v-expansion-panel-header>DP Statistics</v-expansion-panel-header>
                 <v-expansion-panel-content>
-                  <json-viewer :expand-depth="5" :expanded=true :value="analysisPlan.releaseInfo.dpRelease.statistics">
+                  <json-viewer :expand-depth="5" :expanded="false"
+                               :value="analysisPlan.releaseInfo.dpRelease.statistics">
                   </json-viewer>
                 </v-expansion-panel-content>
               </v-expansion-panel>
               <v-expansion-panel>
                 <v-expansion-panel-header>Dataset</v-expansion-panel-header>
                 <v-expansion-panel-content>
-                  <json-viewer :expand-depth="5" :expanded=true
+                  <json-viewer :expand-depth="5" expanded="false"
                                :value="analysisPlan.releaseInfo.dpRelease.dataset">
                   </json-viewer>
                 </v-expansion-panel-content>
@@ -77,7 +107,7 @@
               <v-expansion-panel>
                 <v-expansion-panel-header>DP Library</v-expansion-panel-header>
                 <v-expansion-panel-content>
-                  <json-viewer :expand-depth="5" :expanded=true
+                  <json-viewer :expand-depth="5" expanded="false"
                                :value="analysisPlan.releaseInfo.dpRelease.differentiallyPrivateLibrary">
                   </json-viewer>
                 </v-expansion-panel-content>
@@ -111,35 +141,6 @@
                 <v-icon small color="primary">mdi-open-in-new</v-icon>
               </a
               >
-            </div>
-          </div>
-           <div class="pt-5 pb-10">
-             <div v-for="(detail, index) in datasetDetails" :key="index">
-               <v-row class="py-3">
-                 <v-col
-                     cols="12"
-                     sm="4"
-                     class="grey--text text--darken-2 d-flex"
-                     :class="{
-                    'py-0': $vuetify.breakpoint.xsOnly
-                  }"
-                 >
-                  <span>
-                    {{ detail.label }}
-                  </span>
-                  <QuestionIconTooltip :text="detail.tooltip"/>
-                </v-col>
-                <v-col
-                    cols="12"
-                    sm="8"
-                    :class="{
-                    'pt-0 pb-5': $vuetify.breakpoint.xsOnly
-                  }"
-                >{{ detail.value }}
-                </v-col
-                >
-              </v-row>
-              <v-divider class="hidden-xs-only"/>
             </div>
           </div>
 
@@ -243,27 +244,32 @@ export default {
 
       let datasetDetails = [
         {
-          label: "DV Installation",
+          id: "installation",
+          label: "Dataverse Installation",
           tooltip: "The Dataverse Installation where dataset originated",
           value: this.datasetInfo.installationName
         },
 
         {
+          id: "timeRemaining",
           label: "Remaining time to complete release",
           tooltip: "3 Days from start of the process",
           value: this.getTimeRemaining
         },
         {
+          id: "doi",
           label: "DV File ID / DOI",
           tooltip: "Persistent Identifier",
           value: this.datasetInfo.fileDoi
         },
         {
+          id: "step",
           label: "Last state in Workflow",
           tooltip: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
           value: stepInformation[this.userStep].label
         },
         {
+          id: "citation",
           label: "Citation",
           tooltip: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
           value: this.datasetInfo.datasetDoi + ' | ' + this.datasetInfo.datasetSchemaInfo.name + ' | ' + this.datasetInfo.fileSchemaInfo.name
@@ -292,7 +298,7 @@ export default {
     statusInformation,
     actionsInformation,
     datasetTitle: "",
-    expandedPanels: [0, 1],
+    expandedPanels: [],
     generalErrorSummary: "Error summary: lorem ipsum dolor sit amet.",
 
     NETWORK_CONSTANTS
