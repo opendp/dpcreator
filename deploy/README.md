@@ -70,9 +70,9 @@ Deployment currently requires the building of two Docker images:
     docker push ghcr.io/opendp/dpcreator/app:latest
    
     # Example:
-    docker build -t ghcr.io/opendp/dpcreator/app:2021-1208 .
-    docker push ghcr.io/opendp/dpcreator/app:2021-1208  
-    docker tag ghcr.io/opendp/dpcreator/app:2021-1208 ghcr.io/opendp/dpcreator/app:latest
+    docker build -t ghcr.io/opendp/dpcreator/app:2022-0104 .
+    docker push ghcr.io/opendp/dpcreator/app:2022-0104  
+    docker tag ghcr.io/opendp/dpcreator/app:2022-0104 ghcr.io/opendp/dpcreator/app:latest
     docker push ghcr.io/opendp/dpcreator/app:latest    
    ```
    
@@ -94,9 +94,9 @@ Deployment currently requires the building of two Docker images:
     docker push ghcr.io/opendp/dpcreator/nginx:latest
   
     # Example:
-    docker build -t ghcr.io/opendp/dpcreator/nginx:2021-1208 .
-    docker push ghcr.io/opendp/dpcreator/nginx:2021-1208
-    docker tag ghcr.io/opendp/dpcreator/nginx:2021-1208 ghcr.io/opendp/dpcreator/nginx:latest
+    docker build -t ghcr.io/opendp/dpcreator/nginx:2022-0104 .
+    docker push ghcr.io/opendp/dpcreator/nginx:2022-0104
+    docker tag ghcr.io/opendp/dpcreator/nginx:2022-0104 ghcr.io/opendp/dpcreator/nginx:latest
     docker push ghcr.io/opendp/dpcreator/nginx:latest  
     ```
 
@@ -113,11 +113,11 @@ These steps document how to run a Python script which will generate a k8s specif
     cd ../k8s_maker  # ../deploy/k8s_maker
     pip install -r requirements.txt     # one time install
     ```
-1. Update the `dpcreator_specs_01.py` file.
+2. Update the `dpcreator_specs_01.py` file.
     - This file contains variables which are passed into a k8s template.
     - __For most cases__, you will only need to change the `dpcreator_container_tag` to the current date. 
       - Example: `dpcreator_container_tag="2021-0608"`
-1. _(Infrequent update)._ If needed, update the templates used to create the k8s file. 
+3. _(Infrequent update)._ If needed, update the templates used to create the k8s file. 
     - Template location: `deploy/k8s_maker/templates`
         - There are two basic templates: one for the database container and another for the app.
     - Open the `make_k8s.py` file. 
@@ -126,14 +126,21 @@ These steps document how to run a Python script which will generate a k8s specif
             - Example: `db_template_name = 'azure_k8s_04_database.yaml'`
         - `app_template_name` 
             - Example: `app_template_name = 'azure_k8s_04_app.yaml'`
-1. Run the script
-   ```
-   # From the "deploy/k8s_maker" directory
-   python make_k8s.py
-   # Expected output, something like:
-   # file written: ~/opendp-creator/deploy/k8s_maker/rendered/dpcreator_05_2021_0608.yaml
-   ```
-1. Check the new/updated k8s file into the [opendp/dpcreator](https://github.com/opendp/dpcreator) repository
+   1. Run the script
+      ```
+      # From the "deploy/k8s_maker" directory
+      python make_k8s.py
+   
+      # Expected output, something like:
+      # ----------------------------------------
+      # file written: /Users/ramanprasad/Documents/github-rp/dpcreator/deploy/k8s_maker/rendered/dev.dpcreator.org_07_2021_1213.yaml
+      # ----------------------------------------
+      # ----------------------------------------
+      # file written: /Users/ramanprasad/Documents/github-rp/dpcreator/deploy/k8s_maker/rendered/test.dpcreator.org_07_2021_1213.yaml
+      # ----------------------------------------   
+      ```
+
+4. Check the new/updated k8s file into the [opendp/dpcreator](https://github.com/opendp/dpcreator) repository
 
 ## Azure: Using the K8s file
 
