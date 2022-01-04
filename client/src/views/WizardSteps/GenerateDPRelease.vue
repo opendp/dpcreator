@@ -11,6 +11,9 @@
         This action cannot be undone.
       </template>
     </ColoredBorderAlert>
+    <span> (Need to add or edit the statistics?
+            <a data-test="addStatisticsLink" v-on:click="addStatistic">Go back to Create Statistics Step </a>
+            ) </span>
     <v-form class="my-5" ref="form" @submit.prevent="handleFormSubmit">
       <p class="mb-2">
         <strong>Confirm the email to send notifications to:</strong>
@@ -126,6 +129,9 @@ export default {
     }
   },
   methods: {
+    addStatistic() {
+      this.$emit("addStatistic")
+    },
     handleFormSubmit: function () {
       if (this.$refs.form.validate()) {
         this.areStatisticsSubmitted = true;

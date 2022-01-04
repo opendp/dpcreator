@@ -1,21 +1,12 @@
 <template>
   <div class="set-epsilon-page">
-    <h1 class="title-size-1">Set epsilon value</h1>
+    <h1 class="title-size-1">Set Accuracy Level</h1>
     <p>
       {{
         $t('set epsilon.epsilon intro')
       }}
     </p>
-    <BorderTopAlertDismissible>
-      <template v-slot:content>
-        <strong>What is Epsilon (ε)?</strong>
-        <p class="my-1">
-          Epsilon is a metric of privacy loss at a differentially change in data
-          (adding, removing 1 entry). The smaller the value is, the better
-          privacy protection.
-        </p>
-      </template>
-    </BorderTopAlertDismissible>
+
     <span class="font-weight-bold title-size-2 d-flex"
     ><v-icon color="primary" left>mdi-play</v-icon> Is your data a secret and
       simple random sample from a larger population?
@@ -51,7 +42,7 @@
     >
       <span class="font-weight-bold title-size-2 d-flex"
       ><v-icon color="primary" left>mdi-play</v-icon> Can the number of
-        observations in your dataset be made public knowledge?
+        observations in your data file be made public knowledge?
       </span>
       <v-radio-group
           v-model="observationsNumberCanBePublic"

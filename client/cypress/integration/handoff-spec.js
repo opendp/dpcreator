@@ -1,8 +1,10 @@
 {
     describe('Dataverse Handoff mock-dv test', () => {
+
         it('Displays correct file on Welcome Page', () => {
             Cypress.Cookies.debug(true)
             cy.clearData()
+
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
                 console.log('runnable', runnable)
@@ -19,6 +21,10 @@
                 // for now, always return false to allow the test to pass
                 return false
             })
+            const username = 'handoffuser'
+            const password = 'dpcreator123!'
+            const email = 'handoffuser@dpcreator.org'
+            cy.createAccount(username, email, password)
             cy.visit('/mock-dv');
             cy.get('[data-test="submit button"]').click();
             cy.url().should('contains', '/?id=');
@@ -42,14 +48,18 @@
                     // for now, always return false to allow the test to pass
                     return false
                 })
+                const username = 'seconduser'
+                const password = 'dpcreator123!'
+                const email = 'seconduser@dpcreator.org'
+                cy.createAccount(username, email, password)
 
                 cy.visit('/mock-dv');
                 cy.get('#postOpenDP > .v-btn__content').click();
                 cy.url().should('contains', '/?id=');
                 cy.get('.v-input--selection-controls__ripple').click();
                 cy.get('#account-buttons--placeholder .v-btn--is-elevated > .v-btn__content').click();
-                cy.get('[data-test="username"]').type('test_user');
-                cy.get('[data-test="password"]').type('dpcreator');
+                cy.get('[data-test="username"]').type(username);
+                cy.get('[data-test="password"]').type(password);
                 cy.get('[data-test="Log in"]').click();
                 // Next the Welcome page, with the File Locked message
 

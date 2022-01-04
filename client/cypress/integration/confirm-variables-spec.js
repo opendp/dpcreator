@@ -32,9 +32,11 @@
                 // change numeric type to Categorical without adding categories - continue button should be disabled
                 cy.get('[data-test="' + label + ':selectToolTip' + '"]').type('Categorical', {force: true})
                 cy.get('[data-test="wizardContinueButton"]').should('be.disabled')
+
                 // uncheck the variable and continue button should be enabled
                 cy.contains('td', label).parent('tr').children().first().click()
                 cy.get('[data-test="wizardContinueButton"]').should('not.be.disabled')
+
                 // uncheck the other variable, then continue should be disabled because no variables are selected
                 cy.contains('td', booleanLabel).parent('tr').children().first().click()
                 cy.get('[data-test="wizardContinueButton"]').should('be.disabled')

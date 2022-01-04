@@ -24,7 +24,10 @@
           <span>Delta (&delta;)</span>
           <span>
             {{ delta }}
-            <v-icon right :disabled="delta === 0" @click="emitEditEvent">mdi-pencil</v-icon>
+            <!--v-icon right :disabled="delta === 0" @click="emitEditEvent">mdi-pencil</v-icon-->
+              <QuestionIconTooltip
+                  text="Reserved for future use."
+              />
           </span>
         </div>
         <router-link to="/more-information#more-info-delta" class="primary--text caption">More information about Delta
@@ -58,8 +61,11 @@
 </style>
 
 <script>
+import QuestionIconTooltip from "../../../DynamicHelpResources/QuestionIconTooltip.vue";
+
 export default {
   name: "NoiseParams",
+  components: {QuestionIconTooltip},
   props: ["epsilon", "delta", "confidenceLevel"],
   computed: {
     confidencePercent: function () {

@@ -16,8 +16,7 @@
 
     <ColoredBorderAlert type="warning" locale-tag="create statistics.epsilon warning">
     </ColoredBorderAlert>
-    <ColoredBorderAlert type="info" locale-tag="create statistics.statistics help">
-    </ColoredBorderAlert>
+
 
     <StatisticsTable
         :statistics="statistics"
