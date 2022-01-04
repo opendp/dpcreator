@@ -153,12 +153,12 @@ new account,TOU Dataverse,"<p>Lorem ipsum dolor sit amet consectetur adipisicing
     ","<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi porro nemo inventore, ducimus qui dicta nostrum deleniti maxime, quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus magni at aut sed dignissimos velit dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt eligendi voluptatem deleniti iste! Veritatis, voluptate!</p><p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi porro nemo inventore, ducimus qui dicta nostrum deleniti maxime, quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus magni at aut sed dignissimos velit dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt eligendi voluptatem deleniti iste! Veritatis, voluptate!</p><p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem tempora reiciendis eum asperiores, doloribus totam excepturi quaerat eligendi porro nemo inventore, ducimus qui dicta nostrum deleniti maxime, quisquam soluta voluptatum. Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus magni at aut sed dignissimos velit dolor beatae cumque assumenda quisquam pariatur quidem ullam, incidunt eligendi voluptatem deleniti iste! Veritatis, voluptate!</p>
     "
 confirm variables,confirm variables intro,"<p><b>Select the variables</b> you want to use to generate your differentially private statistics. For each selected variable, please do the following:</p>
-<ul><li>Update the <b>Variable name</b> and <b>Variable label</b> (optional)
-</li><li>Check that the Type is correct. [Need button to leave if type is wrong]
-</li><li>For <b>Numerical</b> variables,  please enter upper and lower bounds that a knowledgeable person might estimate without looking at the data.
-<ul><li>        Ranges that are too broad may add too much noise. 
-</li><li>        Ranges that art too narrow may censor values and introduce bias.
-</li><li>        For example, if the variable is “age”, a reasonable range might be a min of 0 and a max of 100.
+<ul><li>Update the <b>Variable label</b> (optional)
+</li><li>Check that the <b>Type</b> is correct. An incorrect <b>Type</b> can result in privacy violation.
+</li><li>For <b>Float</b> and <b>Integer</b> variables,  please enter upper and lower bounds that a knowledgeable person might estimate without looking at the data.
+<ul><li>Ranges that are too broad may add too much noise.
+</li><li>Ranges that art too narrow may censor values and introduce bias.
+</li><li>For example, if the variable is “age”, a reasonable range might be a min of 0 and a max of 100.
 </li></ul></li><li>For <b>Categorical</b> variables, without looking at your data, approximate the categories (or bins) for your categorical variables. Please enter categories that a reasonable person might estimate without looking at the dataset. 
 <ul><li>                For example, if the variable is “eye color”, categories might include “brown, blue, black, green”
 </li></ul></li><li>WARNING: It is important that you DO NOT copy the exact minimum and maximum values or categories for your dataset. If these are not publicly published values,  using exact values can violate privacy. 
