@@ -26,8 +26,9 @@
             <p class="grey--text text--darken-2" v-html="$t('more information.registered dataverses text')"></p>
 
             <!-- List the currently registered Dataverses -->
-            <div v-if="registeredDvs.length > 0">
-              <hr /><br />
+            <div v-if="registeredDvs && registeredDvs.length > 0">
+              <hr/>
+              <br/>
               <p>
                 Dataverses currently registered:
               </p>
