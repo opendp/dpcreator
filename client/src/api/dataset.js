@@ -1,4 +1,4 @@
-import session from './session';
+import {session, wrappedSession} from './session';
 const camelcaseKeys = require('camelcase-keys');
 
 export default {
@@ -7,16 +7,16 @@ export default {
      *
      */
     getUserDatasets() {
-        return session.get('/api/dataset-info/').then(resp => camelcaseKeys(resp, {deep: true}))
+        return wrappedSession.get('/api/dataset-info/').then(resp => camelcaseKeys(resp, {deep: true}))
 
     },
     // Gets the DatasetInfo object for the given objectId
     getDatasetInfo(objectId) {
-        return session.get('/api/dataset-info/' + objectId + '/').then(resp => camelcaseKeys(resp, {deep: true}))
+        return wrappedSession.get('/api/dataset-info/' + objectId + '/').then(resp => camelcaseKeys(resp, {deep: true}))
 
     },
     runProfiler(datasetId, userId) {
-        session.post('/api/profile/run-async-profile/',
+        wrappedSession.post('/api/profile/run-async-profile/',
             {object_id: datasetId})
             .then(resp => camelcaseKeys(resp, {deep: true}))
 
