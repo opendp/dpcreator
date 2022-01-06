@@ -12,7 +12,7 @@ export default {
      * @returns {Promise<AxiosResponse<any>>} DataverseUser object
      */
     updateFileInfo(openDPUserId, handoffId) {
-        return wrappedSession.post('/api/dv-file/',
+        return session.post('/api/dv-file/',
             {handoff_id: handoffId, creator: openDPUserId})
             .then(resp => camelcaseKeys(resp, {deep: true}))
     },
