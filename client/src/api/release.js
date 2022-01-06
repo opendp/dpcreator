@@ -1,4 +1,4 @@
-import session from './session';
+import {session, wrappedSession} from './session';
 
 const camelcaseKeys = require('camelcase-keys');
 const snakecaseKeys = require('snakecase-keys');
@@ -6,11 +6,10 @@ const snakecaseKeys = require('snakecase-keys');
 
 export default {
     generateRelease(analysisPlanId) {
-        return session.post('/api/release/',
+        return wrappedSession.post('/api/release/',
             {object_id: analysisPlanId})
             .then(resp => {
                 camelcaseKeys(resp.data, {deep: true})
-                console.log("generate release API, received response: " + JSON.stringify(resp))
             })
 
 
@@ -18,7 +17,6 @@ export default {
     validate(analysisPlanId, dpStatistics) {
         if (dpStatistics && dpStatistics.length > 0) {
             dpStatistics = snakecaseKeys(dpStatistics, {deep: true})
-            console.log(JSON.stringify(dpStatistics));
 
 
             return session.post('/api/validation/',

@@ -1,4 +1,4 @@
-import session from './session';
+import {session, wrappedSession} from './session';
 
 const camelcaseKeys = require('camelcase-keys');
 const snakecaseKeys = require('snakecase-keys');
@@ -14,23 +14,23 @@ export default {
      */
     patchDepositorSetup(objectId, props) {
         const snakeProps = snakecaseKeys(props, {deep: true})
-        return session.patch('/api/deposit/' + objectId + '/',
+        return wrappedSession.patch('/api/deposit/' + objectId + '/',
             snakeProps).then(resp => camelcaseKeys(resp.data, {deep: true}))
-            .catch((error) => console.log('error'))
+
     },
     createAnalysisPlan(datasetId) {
-        return session.post('/api/analyze/',
+        return wrappedSession.post('/api/analyze/',
             {object_id: datasetId})
             .then(resp => camelcaseKeys(resp.data, {deep: true}))
     },
     getAnalysisPlan(analysisId) {
-        return session.get('/api/analyze/' + analysisId + '/')
+        return wrappedSession.get('/api/analyze/' + analysisId + '/')
             .then(resp => camelcaseKeys(resp.data, {deep: true}))
     },
     patchAnalysisPlan(objectId, props) {
         const snakeProps = snakecaseKeys(props, {deep: true})
-        return session.patch('/api/analyze/' + objectId + '/',
-            snakeProps).catch((error) => console.log('error'))
+        return wrappedSession.patch('/api/analyze/' + objectId + '/',
+            snakeProps)
     },
 
 };

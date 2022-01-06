@@ -59,7 +59,7 @@
           </span>
         </div>
       </v-container>
-      <template v-if="bannerMessages.length > 0" v-slot:extension>
+      <template v-if="bannerMessages && bannerMessages.length > 0" v-slot:extension>
         <v-spacer></v-spacer>
         <v-container>
           <v-row>
