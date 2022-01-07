@@ -25,6 +25,8 @@ data:
   #
   # Require email verification for account creation
   ACCOUNT_EMAIL_VERIFICATION: "{{ ACCOUNT_EMAIL_VERIFICATION }}"
+  #
+  DEFAULT_FROM_EMAIL: "info@opendp.org"
   # REDIS_HOST: "localhost",
   #
   # REDIS_PORT: 6379
@@ -143,6 +145,11 @@ spec:
                 secretKeyRef:
                   name: dpcreator-app-secrets
                   key: CRYPTOGRAPHY_KEY
+            - name: SENDGRID_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: dpcreator-app-secrets
+                  key: SENDGRID_API_KEY
         # -------------------------------------------------
         # (4) Celery Queue - same image/settings as except for "command"
         # -------------------------------------------------
@@ -199,6 +206,11 @@ spec:
                 secretKeyRef:
                   name: dpcreator-app-secrets
                   key: CRYPTOGRAPHY_KEY
+            - name: SENDGRID_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: dpcreator-app-secrets
+                  key: SENDGRID_API_KEY
 ---
 # ---------------------------
 # DPCreator - Service
