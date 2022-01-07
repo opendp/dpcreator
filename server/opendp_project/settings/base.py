@@ -277,18 +277,16 @@ CORS_ALLOWED_ORIGINS = (
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.sendgrid.net')
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'apikey')
-EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY') \
-    if os.environ.get('SENDGRID_API_KEY') else 'sendgrid-key-not-set'
+EMAIL_HOST_PASSWORD = os.environ.get('SENDGRID_API_KEY', 'sendgrid-key-not-set')
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
 EMAIL_USE_TLS = True
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 
 # TODO: Make this a product-wide address.
 # To verify a new account:
 #   1. Go to https://app.sendgrid.com/settings/sender_auth/senders
 #   2. Click "verify new sender" and proceed
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL') \
-    if os.environ.get('DEFAULT_FROM_EMAIL') else 'kraffmilleropendptest@gmail.com'
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'info@opendp.org')
 
 # Possible settings for ACCOUNT_EMAIL_VERIFICATION: 'none' or 'mandatory';
 #   - 'mandatory' requires working settings for EMAIL_HOST, EMAIL_USER, etc.
