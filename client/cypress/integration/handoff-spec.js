@@ -30,11 +30,7 @@
             cy.url().should('contains', '/?id=');
             cy.scrollTo("bottom");
             cy.get('[data-test="termsOfServiceCheckbox"]').click({force: true});
-            cy.get('[data-test="loginButton"]').click({force: true, multiple: true});
-            cy.url().should('contain', 'log-in')
-            cy.get('[data-test="username"]').type('dev_admin');
-            cy.get('[data-test="password"]').type('admin');
-            cy.get('[data-test="Log in"]').click();
+            cy.get('[data-test="accountContinueButton"]').click({force: true, multiple: true});
             // Next the Welcome page, with the Dataset  message
             cy.url().should('contain', 'welcome')
             cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
@@ -54,13 +50,11 @@
                 cy.createAccount(username, email, password)
 
                 cy.visit('/mock-dv');
-                cy.get('#postOpenDP > .v-btn__content').click();
+                cy.get('[data-test="submit button"]').click();
                 cy.url().should('contains', '/?id=');
-                cy.get('.v-input--selection-controls__ripple').click();
-                cy.get('#account-buttons--placeholder .v-btn--is-elevated > .v-btn__content').click();
-                cy.get('[data-test="username"]').type(username);
-                cy.get('[data-test="password"]').type(password);
-                cy.get('[data-test="Log in"]').click();
+                cy.scrollTo("bottom");
+                cy.get('[data-test="termsOfServiceCheckbox"]').click({force: true});
+                cy.get('[data-test="accountContinueButton"]').click({force: true, multiple: true});
                 // Next the Welcome page, with the File Locked message
 
                 cy.get('.v-alert__wrapper').should('contain', 'Sorry, the file is locked')

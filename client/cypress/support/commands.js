@@ -14,7 +14,6 @@ Cypress.Commands.add('loginAPI', (username, password) => {
     })
 })
 Cypress.Commands.add('clearData', () => {
-    cy.logout()
     cy.intercept('POST', 'rest-auth/login').as('login')
     cy.intercept('POST', 'rest-auth/logout').as('logout')
     cy.login('dev_admin', 'admin')
@@ -32,6 +31,7 @@ Cypress.Commands.add('logout', () => {
             cy.intercept('POST', 'rest-auth/logout').as('logout')
             cy.get('[data-test="Logout Link"]').click()
             cy.wait('@logout')
+            cy.get('[data-test="My Profile"]').should('not.exist');
         }
     }
 })
@@ -70,8 +70,12 @@ Cypress.Commands.add('createMockDataset', (fixture, createAccount = true) => {
     cy.fixture(fixture).then((mockForm) => {
         if (createAccount) {
             cy.createAccount(mockForm['user'], mockForm['email'], mockForm['password'])
+            //      cy.pause()
+            cy.logout()
+            //      cy.pause()
         }
         cy.visit('/mock-dv');
+        //   cy.pause()
         cy.get('[data-test="siteUrl"]').clear().type(mockForm['siteUrl'])
         cy.get('[data-test="token"]').clear().type(mockForm['token'])
         cy.get('[data-test="fileId"]').clear().type(mockForm['fileId'])

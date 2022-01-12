@@ -20,13 +20,6 @@
             cy.get('[data-test="createAccountButton"]').click({force: true, multiple: true});
             cy.url().should('contain', 'sign-up')
             cy.createAccount(username, email, password)
-            // We have turned off email confirmation for Cypress, so we should be able
-            // to log in now with the new account.
-            cy.visit('/log-in')
-            cy.get('[data-test="username"]').type(username);
-            cy.get('[data-test="password"]').type(password);
-            cy.get('[data-test="Log in"]').click();
-            cy.url().should('contains', 'welcome')
             cy.get('[data-test="My Profile"]').click();
             cy.url().should('contains', 'my-profile')
             cy.get('h2').should('contain', 'Edit account information').should('be.visible')
@@ -65,12 +58,6 @@
             const email = 'oscar@thegrouch.com'
             const password = 'oscar123!'
             cy.createAccount(username, email, password)
-            cy.visit('/log-in')
-            cy.get('[data-test="username"]').type(username);
-            cy.get('[data-test="password"]').type(password);
-            cy.get('[data-test="Log in"]').click();
-            cy.url().should('contains', 'my-data')
-
             cy.get('[data-test="My Profile"]').click();
             cy.get('h2').should('contain', 'Edit account information').should('be.visible')
             cy.get('[data-test="myProfileUsername"]').should('have.value', username)

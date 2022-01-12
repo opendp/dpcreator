@@ -7,7 +7,7 @@
                 console.log('runnable', runnable)
                 return false
             })
-            cy.logout()
+          //  cy.logout()
             cy.clearData()
             cy.login('dev_admin', 'admin')
             cy.setupStatisticsPage('datasetInfoStep600.json', 'analysisPlanStep700.json')
