@@ -25,12 +25,14 @@
             const password = 'dpcreator123!'
             const email = 'handoffuser@dpcreator.org'
             cy.createAccount(username, email, password)
+            cy.wait(500)
             cy.visit('/mock-dv');
             cy.get('[data-test="submit button"]').click();
             cy.url().should('contains', '/?id=');
             cy.scrollTo("bottom");
             cy.get('[data-test="termsOfServiceCheckbox"]').click({force: true});
             cy.get('[data-test="accountContinueButton"]').click({force: true, multiple: true});
+            cy.wait(1000)
             // Next the Welcome page, with the Dataset  message
             cy.url().should('contain', 'welcome')
             cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
