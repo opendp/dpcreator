@@ -113,7 +113,7 @@ data:
   FILE_UPLOAD_MAX_MEMORY_SIZE: "2621440"
   #
   # Require email verification for account creation
-  ACCOUNT_EMAIL_VERIFICATION: "none"
+  ACCOUNT_EMAIL_VERIFICATION: "mandatory"
   #
   DEFAULT_FROM_EMAIL: "info@opendp.org"
   # REDIS_HOST: "localhost",

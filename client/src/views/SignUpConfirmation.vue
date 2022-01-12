@@ -24,8 +24,8 @@
             us at
             <a
                 class="font-weight-bold text-decoration-none"
-                href="mailto:support@opendp.com"
-            >support@opendp.com</a
+                href="mailto:info@opendp.org"
+            >info@opendp.org</a
             >
           </p>
         </v-col>
