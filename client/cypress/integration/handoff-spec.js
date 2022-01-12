@@ -1,6 +1,9 @@
 {
     describe('Dataverse Handoff mock-dv test', () => {
-
+        cy.on("window:before:load", (win) => {
+            cy.spy(win.console, "log");
+            cy.spy(win.console, "error")
+        })
         it('Displays correct file on Welcome Page', () => {
             Cypress.Cookies.debug(true)
             cy.clearData()
@@ -21,19 +24,9 @@
                 // for now, always return false to allow the test to pass
                 return false
             })
-            const username = 'handoffuser'
-            const password = 'dpcreator123!'
-            const email = 'handoffuser@dpcreator.org'
-            cy.createAccount(username, email, password)
-            cy.wait(500)
-            cy.visit('/mock-dv');
-            cy.get('[data-test="submit button"]').click();
-            cy.url().should('contains', '/?id=');
-            cy.scrollTo("bottom");
-            cy.get('[data-test="termsOfServiceCheckbox"]').click({force: true});
-            cy.get('[data-test="accountContinueButton"]').click({force: true, multiple: true});
-            cy.wait(1000)
-            // Next the Welcome page, with the Dataset  message
+            cy.clearData()
+            cy.createMockDataset('EyeDemoMockDV.json')
+
             cy.url().should('contain', 'welcome')
             cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
                 ' doi:10.7910/DVN/PUXVDH | Replication Data for: Eye-typing experiment | Fatigue_data.tab ')
@@ -46,19 +39,10 @@
                     // for now, always return false to allow the test to pass
                     return false
                 })
-                const username = 'seconduser'
-                const password = 'dpcreator123!'
-                const email = 'seconduser@dpcreator.org'
-                cy.createAccount(username, email, password)
 
-                cy.visit('/mock-dv');
-                cy.get('[data-test="submit button"]').click();
-                cy.url().should('contains', '/?id=');
-                cy.scrollTo("bottom");
-                cy.get('[data-test="termsOfServiceCheckbox"]').click({force: true});
-                cy.get('[data-test="accountContinueButton"]').click({force: true, multiple: true});
-                // Next the Welcome page, with the File Locked message
 
+                cy.createMockDataset('HandoffSpec.json')
+                cy.url().should('contain', 'welcome')
                 cy.get('.v-alert__wrapper').should('contain', 'Sorry, the file is locked')
 
 
