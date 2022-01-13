@@ -79,7 +79,7 @@ export default {
           });
   },
   getAccountDetails() {
-      return session.get('/rest-auth/user/').then(data => camelcaseKeys(data, {deep: true}));
+      return wrappedSession.get('/rest-auth/user/').then(data => camelcaseKeys(data, {deep: true}));
   },
   updateAccountDetails(data) {
       return wrappedSession.patch('/rest-auth/user/', data);
