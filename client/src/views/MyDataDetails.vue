@@ -123,7 +123,7 @@
                     classes="d-block mb-2"
             >
               <v-icon left>mdi-download</v-icon>
-              <span>PDF file</span>
+              <span>PDF File</span>
             </Button>
             <Button v-if="analysisPlan.releaseInfo.downloadJsonUrl"
                     data-test="jsonDownload"
@@ -132,7 +132,7 @@
                     classes="d-block mb-2"
             >
               <v-icon left>mdi-download</v-icon>
-              <span>JSON file</span>
+              <span>JSON File</span>
             </Button>
 
             <div v-if="analysisPlan.releaseInfo.dataverseDepositInfo" data-test="dataverseLink">

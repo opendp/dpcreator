@@ -35,7 +35,7 @@
               <Button
                   type="submit"
                   color="primary"
-                  label="Save changes"
+                  label="Save Changes"
                   :class="{
                   'width80 mx-auto d-block mb-2': $vuetify.breakpoint.xsOnly,
                   'mr-2 mb-2': $vuetify.breakpoint.smAndUp
@@ -96,7 +96,7 @@
               <Button
                   type="submit"
                   color="primary"
-                  label="Save changes"
+                  label="Save Changes"
                   :class="{
                   'width80 mx-auto d-block mb-2': $vuetify.breakpoint.xsOnly,
                   'mr-2 mb-2': $vuetify.breakpoint.smAndUp

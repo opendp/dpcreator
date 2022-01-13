@@ -49,7 +49,7 @@
                   color="primary"
                   :disabled="!validLoginForm"
                   :click="handleLogin"
-                  label="Log in"
+                  label="Log In"
               />
               <Button
                   color="primary"

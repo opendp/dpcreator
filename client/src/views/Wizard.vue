@@ -9,7 +9,7 @@
               <span class="d-block mt-5"
               >Used data file:
                 <a href="http://" class="text-decoration-none"
-                >{{ datasetInfo.name }}
+                >{{ datasetInfo.fileSchemaInfo.name }}
                   <v-icon small color="primary">mdi-open-in-new</v-icon></a
                 ></span
               >
@@ -158,7 +158,7 @@ export default {
         completed: false
       },
       {
-        title: "Generate DP",
+        title: "Generate DP Release",
         completed: true
       }
     ]
