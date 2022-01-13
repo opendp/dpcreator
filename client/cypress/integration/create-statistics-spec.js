@@ -47,7 +47,7 @@
             })
             cy.login('dev_admin', 'admin')
             cy.setupStatisticsPage('datasetInfoStep600.json', 'analysisPlanStep700.json')
-            cy.get('h1').should('contain', 'Create the statistics')
+            cy.get('h1').should('contain', 'Create Statistics')
             cy.get('[data-test="editConfidenceIcon"]').click({force: true});
             cy.get('h2').should('contain', 'Are you sure you want to proceed?').should('be.visible')
             cy.get('[data-test="confirmButton"]').click({force: true});
@@ -65,7 +65,7 @@
             })
             cy.login('dev_admin', 'admin')
             cy.setupStatisticsPage('datasetInfoStep600.json', 'analysisPlanStep700.json')
-            cy.get('h1').should('contain', 'Create the statistics')
+            cy.get('h1').should('contain', 'Create Statistics')
         })
 
 
