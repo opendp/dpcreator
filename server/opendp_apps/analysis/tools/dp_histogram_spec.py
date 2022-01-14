@@ -5,6 +5,7 @@ from opendp.typing import *
 
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.profiler.static_vals import VAR_TYPE_INTEGER
 
 enable_features("floating-point", "contrib")
 
@@ -44,14 +45,15 @@ class DPHistogramSpec(StatSpec):
 
         if self.fixed_value is not None:
             # attempt conversion to int
-            if not self.convert_to_int('fixed_value'):
-                return
+            if self.var_type == VAR_TYPE_INTEGER:
+                if not self.convert_to_int('fixed_value'):
+                    return
 
         # TODO: These default values are allowing the tests to pass,
         #  but we need to process cases where min and max are referring to counts of a
         #  categorical variable.
         if not self.min:
-            self.min =  0.0
+            self.min = 0.0
         elif self.convert_to_int('min') is False:
             return
 
@@ -59,7 +61,6 @@ class DPHistogramSpec(StatSpec):
             self.max = 10.0
         elif self.convert_to_int('max') is False:
             return
-
 
     def run_03_custom_validation(self):
         """
@@ -71,7 +72,8 @@ class DPHistogramSpec(StatSpec):
         if self.has_error():
             return
 
-        self.check_numeric_fixed_value()
+        if self.var_type == VAR_TYPE_INTEGER:
+            self.check_numeric_fixed_value()
 
     def check_scale(self, scale, preprocessor):
         """
