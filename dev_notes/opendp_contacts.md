@@ -10,7 +10,8 @@ General website: https://opendp.org
 
 2. GitHub: 
     - [Discussions](https://github.com/opendp/opendp/discussions): Community questions and discussions 
-      - https://github.com/opendp/opendp/discussions
+      - Overall: https://github.com/opendp/opendp/discussions
+      - SmartNoise specific: https://github.com/opendp/opendp/discussions/categories/smartnoise
     - [Issues](https://github.com/opendp/opendp/issues): Tracking specific software issues and related fixes
       - https://github.com/opendp/opendp/issues
 
