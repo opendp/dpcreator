@@ -294,6 +294,7 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'info@opendp.org')
 ACCOUNT_EMAIL_VERIFICATION = os.environ.get('ACCOUNT_EMAIL_VERIFICATION', 'none') # 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = 'true'
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/log-in/'
+ACCOUNT_TEMPLATE_EXTENSION = 'html'
 
 # ---------------------------
 # Profiler - Dataset reading
