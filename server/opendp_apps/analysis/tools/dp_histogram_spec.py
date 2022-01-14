@@ -113,14 +113,14 @@ class DPHistogramSpec(StatSpec):
         self.preprocessor = preprocessor
         return preprocessor
 
-
     def set_accuracy(self):
         """Return the accuracy measure using Laplace and the confidence interval as alpha"""
         if self.has_error():
             return False
 
-        self.accuracy_val = None  # Future: self.geometric_scale_to_accuracy()
-        self.accuracy_msg = None
+        # TODO: These are placeholders to make the frontend process finish
+        self.accuracy_val = 100.0  # Future: self.geometric_scale_to_accuracy()
+        self.accuracy_msg = "Test"
 
         return True
 
