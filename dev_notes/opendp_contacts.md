@@ -18,8 +18,11 @@ General website: https://opendp.org
 3. OpenDP Slack: 
     - Anyone is welcome to [join](https://join.slack.com/t/opendp/shared_invite/zt-zw7o1k2s-dHg8NQE8WTfAGFnN_cwomA)!
       - Slack invitation link: https://join.slack.com/t/opendp/shared_invite/zt-zw7o1k2s-dHg8NQE8WTfAGFnN_cwomA
-    - `#lib-support` for OpenDP/SmartNoise users
-    - `#lib-dev` for contributors
+    - Feel free to ask questions
+    - Channels
+      - `#general` - place to start to ask questions
+      - `#lib-support` for OpenDP/SmartNoise users
+      - `#lib-dev` for contributors
 
 3. Email
     - info@opendp.org
