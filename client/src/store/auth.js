@@ -27,7 +27,7 @@ const initialState = {
 };
 
 const getters = {
-  isAuthenticated: state => !!state.token,
+  isAuthenticated: state => !!state.user,
   // Check to see if the user has accepted any terms at all.
   // (TermsAccepted will be false the first time the user logs in,
   // because the acceptance happened as the first step in Create Account.)
@@ -64,12 +64,10 @@ const getters = {
 const actions = {
   changeUsername({commit, state}, newUsername) {
     let newUser = null;
-    console.log('current user: ' + JSON.stringify(state.user))
     newUser = Object.assign({}, state.user)
     newUser.username = newUsername
     auth.updateAccountDetails(newUser)
         .then((data) => {
-          console.log('resp: ' + JSON.stringify(data))
           commit(SET_USER, newUser)
         })
 
@@ -113,21 +111,15 @@ const actions = {
         })
   },
   fetchUser({commit, state}) {
-    if (state.token != null) {
-      return auth.getAccountDetails()
-          .then(response => {
-
-            commit('SET_USER', response.data)
-            return Promise.resolve()
-          })
-          .catch(error => {
-            console.log('There was an error:', error.response)
-            return Promise.reject(error)
-          })
-    } else {
-      commit('SET_USER', null)
-      return Promise.resolve()
-    }
+    return auth.getAccountDetails()
+        .then(response => {
+          commit('SET_USER', response.data)
+          return Promise.resolve()
+        })
+        .catch(error => {
+          commit('SET_USER', null)
+          return Promise.resolve()
+        })
   },
   fetchCurrentTerms({commit, state}) {
     return terms.getCurrentTerms().then((response) => {
@@ -140,15 +132,17 @@ const actions = {
     })
   },
   acceptTerms({commit, state}, {userId, termsOfAccessId}) {
-    console.log("accepting terms ")
-    terms.acceptTermsOfUse(userId, termsOfAccessId).then(console.log('updated terms'))
+    terms.acceptTermsOfUse(userId, termsOfAccessId)
         .then(() => {
           terms.getTermsOfUseLog().then(response => {
             commit(SET_TERMS_LOG, response)
           })
         })
   },
-  initialize({commit}) {
+  initializeState({commit}) {
+    commit(LOGOUT)
+  },
+  initializeToken({commit}) {
     const token = localStorage.getItem(TOKEN_STORAGE_KEY);
 
     if (isProduction && token) {
@@ -179,6 +173,7 @@ const mutations = {
     state.error = false;
     state.user = null;
     state.currentTerms = null,
+        state.token = null,
         state.termsOfAccessLog = null
   },
   [SET_TOKEN](state, token) {
@@ -201,7 +196,6 @@ const mutations = {
     state.termsOfAccessLog = termsLog
   },
   [SET_BANNER_MESSAGES](state, bannerMessages) {
-    console.log('setting banner messages ' + bannerMessages)
     state.bannerMessages = bannerMessages
   }
 };
