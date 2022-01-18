@@ -27,143 +27,151 @@
         },
         "variableInfo": {
             "trial": {
+                "max": 44,
+                "min": 0,
                 "name": "Trial",
-                "type": "Categorical",
-                "label": "",
-                "categories": null
+                "type": "Float",
+                "label": "Trial",
+                "selected": true,
+                "categories": [],
+                "sortOrder": 4
             },
             "session": {
                 "name": "Session",
                 "type": "Boolean",
-                "label": ""
+                "label": "Session",
+                "selected": false,
+                "categories": [],
+                "sortOrder": 2
             },
             "subject": {
                 "name": "Subject",
                 "type": "Categorical",
-                "label": "",
-                "categories": null
+                "label": "Subject",
+                "selected": true,
+                "categories": [
+                    "one",
+                    "two"
+                ],
+                "sortOrder": 0
             },
             "language": {
                 "name": "Language",
                 "type": "Boolean",
-                "label": ""
+                "label": "Language",
+                "selected": true,
+                "categories": [],
+                "sortOrder": 1
             },
             "eyeHeight": {
-                "max": 100,
-                "min": 1,
                 "name": "EyeHeight",
-                "type": "Numerical",
-                "label": "EyeHeight"
+                "type": "Float",
+                "label": "",
+                "sortOrder": 19
             },
             "typingSpeed": {
-                "max": null,
-                "min": null,
+                "max": 25,
+                "min": 10,
                 "name": "TypingSpeed",
-                "type": "Numerical",
-                "label": ""
+                "type": "Float",
+                "label": "TypingSpeed",
+                "selected": true,
+                "sortOrder": 5
             },
             "blinkDuration": {
-                "max": null,
-                "min": null,
                 "name": "BlinkDuration",
-                "type": "Numerical",
-                "label": ""
+                "type": "Float",
+                "label": "",
+                "sortOrder": 12
             },
             "blinkInterval": {
-                "max": null,
-                "min": null,
                 "name": "BlinkInterval",
-                "type": "Numerical",
-                "label": ""
+                "type": "Float",
+                "label": "",
+                "sortOrder": 13
             },
             "blinkFrequency": {
-                "max": null,
-                "min": null,
                 "name": "BlinkFrequency",
-                "type": "Numerical",
-                "label": ""
+                "type": "Float",
+                "label": "",
+                "sortOrder": 11
             },
             "correctedError": {
-                "max": null,
-                "min": null,
+                "max": 38,
+                "min": 5,
                 "name": "CorrectedError",
-                "type": "Numerical",
-                "label": ""
+                "type": "Float",
+                "label": "CorrectedError",
+                "selected": true,
+                "sortOrder": 6
             },
             "saccadeDuration": {
-                "max": null,
-                "min": null,
                 "name": "SaccadeDuration",
-                "type": "Numerical",
-                "label": ""
+                "type": "Float",
+                "label": "",
+                "sortOrder": 16
             },
             "saccadeVelocity": {
-                "max": null,
-                "min": null,
                 "name": "SaccadeVelocity",
-                "type": "Numerical",
-                "label": ""
+                "type": "Float",
+                "label": "",
+                "sortOrder": 17
             },
             "blinkBurstRatio": {
-                "max": null,
-                "min": null,
                 "name": "BlinkBurstRatio",
-                "type": "Numerical",
-                "label": ""
+                "type": "Float",
+                "label": "",
+                "sortOrder": 14
             },
             "saccadeAmplitude": {
-                "max": null,
-                "min": null,
                 "name": "SaccadeAmplitude",
-                "type": "Numerical",
-                "label": ""
+                "type": "Float",
+                "label": "",
+                "sortOrder": 15
             },
             "saccadePeakVelocity": {
-                "max": null,
-                "min": null,
                 "name": "SaccadePeakVelocity",
-                "type": "Numerical",
-                "label": ""
+                "type": "Float",
+                "label": "",
+                "sortOrder": 18
             },
             "readTextEventsRatio": {
-                "max": null,
-                "min": null,
                 "name": "ReadTextEventsRatio",
-                "type": "Numerical",
-                "label": ""
+                "type": "Float",
+                "label": "",
+                "sortOrder": 7
             },
             "uncorrectedErrorRate": {
-                "max": null,
-                "min": null,
                 "name": "UncorrectedErrorRate",
-                "type": "Numerical",
-                "label": ""
+                "type": "Float",
+                "label": "",
+                "sortOrder": 9
             },
             "baselinePupilDiameter": {
-                "max": null,
-                "min": null,
                 "name": "BaselinePupilDiameter",
-                "type": "Numerical",
-                "label": ""
+                "type": "Float",
+                "label": "",
+                "sortOrder": 10
             },
             "objectiveTaskDifficulty": {
                 "name": "ObjectiveTaskDifficulty",
                 "type": "Boolean",
-                "label": ""
+                "label": "",
+                "categories": [],
+                "sortOrder": 3
             },
             "attendedButNotSelectedRate": {
-                "max": null,
-                "min": null,
                 "name": "AttendedButNotSelectedRate",
-                "type": "Numerical",
-                "label": ""
+                "type": "Float",
+                "label": "",
+                "sortOrder": 8
             }
         },
         "defaultEpsilon": 1,
         "epsilon": 1,
         "defaultDelta": 0.00001,
         "delta": 0.00001,
-        "confidenceInterval": 0.01,
+        "confidenceLevel": 0.99,
         "creator": 1
     },
     "datasetSchemaInfo": {

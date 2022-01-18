@@ -1,9 +1,9 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
-
+import store from "../store/index"
 import NETWORK_CONSTANTS from "./NETWORK_CONSTANTS";
-
+import auth from "../api/auth"
 const {
   HOME,
   WELCOME,
@@ -32,18 +32,29 @@ const routes = [
     path: `${WIZARD.PATH}/`,
     name: WIZARD.NAME,
     // dynamic segments start with a colon
-    component: () => import("../views/Wizard.vue")
+    component: () => import("../views/Wizard.vue"),
+    meta: {
+      requiresAuth: true,
+      requiresDataset: true
+    }
   },
 
   {
     path: MY_DATA.PATH,
     name: MY_DATA.NAME,
-    component: () => import("../views/MyData.vue")
+    component: () => import("../views/MyData.vue"),
+    meta: {
+      requiresAuth: true,
+    }
   },
   {
     path: `${MY_DATA_DETAILS.PATH}`,
     name: "MyDataDetails",
-    component: () => import("../views/MyDataDetails.vue")
+    component: () => import("../views/MyDataDetails.vue"),
+    meta: {
+      requiresAuth: true,
+      requiresDataset: true
+    }
   },
   {
     path: SIGN_UP.PATH,
@@ -68,7 +79,10 @@ const routes = [
   {
     path: WELCOME.PATH,
     name: WELCOME.NAME,
-    component: () => import("../views/Welcome.vue")
+    component: () => import("../views/Welcome.vue"),
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: TERMS_AND_CONDITIONS.PATH,
@@ -83,7 +97,10 @@ const routes = [
   {
     path: MY_PROFILE.PATH,
     name: MY_PROFILE.NAME,
-    component: () => import("../views/MyProfile.vue")
+    component: () => import("../views/MyProfile.vue"),
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: MOCK_DV.PATH,
@@ -116,6 +133,33 @@ const router = new VueRouter({
   }
 });
 
+router.beforeEach((to, from, next) => {
+  // check if user is logged in, because localStorage may be stale
+  auth.getAccountDetails().then((response) => {
+    store.commit('auth/SET_USER', response.data)
+    if (to.name === NETWORK_CONSTANTS.LOGIN.NAME && store.state.auth.user !== null) {
+      next({name: NETWORK_CONSTANTS.MY_DATA.NAME})
+      // If user is logged in and tries to go directly to a page that requires
+      // Vuex state which hasn't been populated, redirect to My Data page
+    } else if (to.matched.some(record => record.meta.requiresDataset
+        && store.state.dataset.datasetInfo == null)) {
+      next({name: NETWORK_CONSTANTS.MY_DATA.NAME})
+    } else {
+      // If everything is fine, go to the next page
+      next()
+    }
+  }).catch((data) => {
+    store.commit('auth/LOGOUT')
+    if (to.matched.some(record => record.meta.requiresAuth) && store.state.auth.user == null) {
+      sessionStorage.setItem('redirectPath', to.path);
+      next({name: NETWORK_CONSTANTS.LOGIN.NAME})
+
+    } else {
+      next()
+    }
+  })
+
+})
 router.afterEach(() => {
   window.scrollTo(0, 0);
 });

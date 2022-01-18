@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'opendp_apps.dataset',
     'opendp_apps.analysis',
     'opendp_apps.terms_of_access',
+    'opendp_apps.banner_messages',
     'opendp_apps.communication',
     'opendp_apps.profiler',
 
@@ -166,7 +167,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = os.getenv('TIME_ZONE', 'UTC')
 
 USE_I18N = True
 
@@ -219,7 +220,7 @@ FILE_UPLOAD_TEMP_DIR = os.environ.get('FILE_UPLOAD_TEMP_DIR', '/tmp')
 #   - will be objects on cloud service. e.g. S3, Azure, etc.
 #
 UPLOADED_FILE_STORAGE_ROOT = os.getenv('UPLOADED_FILE_STORAGE_ROOT',
-                                       os.path.join(BASE_DIR, 'test_setup', 'user_uploaded_data'))
+                                       os.path.join(BASE_DIR, 'test_setup', 'private_uploaded_data'))
 if not os.path.isdir(UPLOADED_FILE_STORAGE_ROOT):
     os.makedirs(UPLOADED_FILE_STORAGE_ROOT)
 
@@ -272,9 +273,6 @@ CORS_ALLOWED_ORIGINS = (
     'http://127.0.0.1:8080',
 )
 
-# for dev purposes only, need to remove
-#ACCOUNT_EMAIL_VERIFICATION = 'none'
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.sendgrid.net')
@@ -291,7 +289,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 #   2. Click "verify new sender" and proceed
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL') \
     if os.environ.get('DEFAULT_FROM_EMAIL') else 'kraffmilleropendptest@gmail.com'
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+
+# Possible settings for ACCOUNT_EMAIL_VERIFICATION: 'none' or 'mandatory';
+#   - 'mandatory' requires working settings for EMAIL_HOST, EMAIL_USER, etc.
+#
+ACCOUNT_EMAIL_VERIFICATION = os.environ.get('ACCOUNT_EMAIL_VERIFICATION', 'none') # 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = 'true'
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/log-in/'
 
@@ -320,9 +322,19 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
 
+# ------------------------------------------------------
+# Application name for deposit use
+# ------------------------------------------------------
+DP_CREATOR_APP_NAME = os.environ.get('DP_CREATOR_APP_NAME', 'DP Creator (test)')
+
 # ---------------------------
 # Cookies
 # ---------------------------
+SESSION_EXPIRE_AT_BROWSER_CLOSE = bool(strtobool(os.environ.get('SESSION_EXPIRE_AT_BROWSER_CLOSE', 'True')))
+SESSION_DEFAULT_COOKIE_AGE = (60 * 60) * 2  # 2 hour sessions, in seconds
+SESSION_COOKIE_AGE = int(os.getenv('SESSION_COOKIE_AGE', SESSION_DEFAULT_COOKIE_AGE))
+
+
 # SESSION_COOKIE_NAME = os.environ.get('SESSION_COOKIE_NAME', 'dpcreator')
 # CSRF_COOKIE_NAME = os.environ.get('CSRF_COOKIE_NAME', 'dpcreator_csrf')
 # discard a process after executing task, because automl solvers are incredibly leaky

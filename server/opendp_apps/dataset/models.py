@@ -1,11 +1,14 @@
 from collections import OrderedDict
 import json
 
+from django.apps import apps
+from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.conf import settings
-from django_cryptography.fields import encrypt
+# from django.db.models.signals import post_delete
+# from django.dispatch import receiver
+# from django_cryptography.fields import encrypt
 
 from polymorphic.models import PolymorphicModel
 
@@ -47,13 +50,8 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
                                     encoder=DjangoJSONEncoder)
 
     profile_variables = models.JSONField(default=None,
-                                    null=True, blank=True,
-                                    encoder=DjangoJSONEncoder)
-
-    #data_profile = encrypt(models.JSONField(default=None, null=True, blank=True, encoder=DjangoJSONEncoder))
-
-    # Formatted version of the "data_profile"
-    # profile_variables = encrypt(models.JSONField(default=None, null=True, blank=True, encoder=DjangoJSONEncoder))
+                                         null=True, blank=True,
+                                         encoder=DjangoJSONEncoder)
 
     # Switch to encryption!
     #
@@ -82,6 +80,11 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
         return info
 
+    @property
+    def depositor_setup_info(self):
+        """shortcut to access the DepositorSetupInfo"""
+        return self.get_depositor_setup_info()
+
     def get_depositor_setup_info(self):
         """Hack; need to address https://github.com/opendp/dpcreator/issues/257"""
         if hasattr(self, 'dataversefileinfo'):
@@ -91,16 +94,15 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
         raise AttributeError('Unknown DataSetinfo type. No access to depositor_setup_info')
 
-
     def get_dataset_size(self) -> BasicResponse:
         """Retrieve the rowCount index from the data_profile -- not always avaiable"""
         if not self.data_profile:
             return err_resp('Data profile not available')
 
-        if not 'dataset' in self.data_profile:
+        if 'dataset' not in self.data_profile:
             return err_resp('Dataset information not available in profile')
 
-        if not 'rowCount' in self.data_profile['dataset']:
+        if 'rowCount' not in self.data_profile['dataset']:
             return err_resp('"rowCount" information not available in profile.')
 
         row_count = self.data_profile['dataset']['rowCount']
@@ -141,8 +143,10 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         if as_indices:
             try:
                 return ok_resp([idx for idx, _var_name in variable_order])
-            except:
-                return err_resp('"variableOrder" information not in proper format: {variable_order}')
+            except Exception as ex_obj:
+                user_msg = (f'"variableOrder" information not in proper format: {variable_order}'
+                            f' (exception: {ex_obj}')
+                return err_resp(user_msg)
 
         return ok_resp(variable_order)
 
@@ -166,10 +170,10 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         if not self.data_profile:
             return err_resp('Data profile not available')
 
-        if not 'dataset' in self.data_profile:
+        if 'dataset' not in self.data_profile:
             return err_resp('Dataset information not available in profile')
 
-        if not 'variableOrder' in self.data_profile['dataset']:
+        if 'variableOrder' not in self.data_profile['dataset']:
             return err_resp('"variableOrder" information not available in profile (id:2')
 
         variable_order = self.data_profile['dataset']['variableOrder']
@@ -229,6 +233,26 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         except json.JSONDecodeError:
             return None
 
+    def is_dataverse_dataset(self) -> bool:
+        """Shortcut to check if it's a Dataverse dataset"""
+        return self.source == DataSetInfo.SourceChoices.Dataverse
+
+    def get_dataverse_user(self):
+        """
+        Check if this is a Dataverse dataset, if so return the DataverseUser
+        """
+        if self.is_dataverse_dataset():
+            return self.dataversefileinfo.get_dataverse_user()
+        return None
+
+    def get_dataverse_file_info(self):
+        """
+        Check if this is a Dataverse dataset, if so return the DataverseFileInfo
+        """
+        if self.is_dataverse_dataset():
+            return self.dataversefileinfo
+        return None
+
 
 class DataverseFileInfo(DataSetInfo):
     """
@@ -240,7 +264,9 @@ class DataverseFileInfo(DataSetInfo):
     file_doi = models.CharField(max_length=255, blank=True)
     dataset_schema_info = models.JSONField(null=True, blank=True)
     file_schema_info = models.JSONField(null=True, blank=True)
-    depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo', on_delete=models.CASCADE, null=True)
+    depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo',
+                                                on_delete=models.CASCADE,
+                                                null=True)
 
     class Meta:
         verbose_name = 'Dataverse File Information'
@@ -255,16 +281,19 @@ class DataverseFileInfo(DataSetInfo):
         return f'{self.name} ({self.dv_installation.name})'
 
     def save(self, *args, **kwargs):
-        # Future: is_complete can be auto-filled based on either field values or the STEP
-        #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
-        #       depending on the data
-        #
+        """
+        Future: is_complete can be auto-filled based on either field values or the STEP
+        Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
+              depending on the data
+        """
         if not self.depositor_setup_info:
             dsi = DepositorSetupInfo.objects.create(creator=self.creator)
             self.depositor_setup_info = dsi
+
         if not self.name:
             self.name = f'{self.dataset_doi} ({self.dv_installation})'
         self.source = DataSetInfo.SourceChoices.Dataverse
+
         super(DataverseFileInfo, self).save(*args, **kwargs)
 
     @property
@@ -303,13 +332,22 @@ class DataverseFileInfo(DataSetInfo):
 
         return info
 
+    def get_dataverse_user(self):
+        """Convenience method to retrieve the Dataverse User associated with this dataset"""
+
+        dv_user_model = apps.get_model(app_label='user', model_name='DataverseUser')
+        try:
+            return dv_user_model.objects.get(user=self.creator, dv_installation=self.dv_installation)
+        except dv_user_model.DoesNotExist:
+            return None
 
 
 class UploadFileInfo(DataSetInfo):
     """
     Refers to a file uploaded independently of DV
     """
-    depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo', on_delete=models.CASCADE, null=True)
+    depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo',
+                                                on_delete=models.CASCADE, null=True)
 
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the STEP
@@ -341,3 +379,27 @@ class UploadFileInfo(DataSetInfo):
                     object_id=self.object_id.hex)
 
         return info
+
+# -----------------------------------------------------
+# "post_delete" signals
+#
+# Ensure that when a DataSetInfo object is deleted,
+#   the related DepositorInfo is also deleted
+# -----------------------------------------------------
+"""
+@receiver(post_delete, sender=DataverseFileInfo)
+def post_delete_depositor_setup_from_dataverse_file(sender, instance, *args, **kwargs):
+    try:
+        if instance.depositor_setup_info: # just in case depositor_setup_info is not specified
+            instance.depositor_setup_info.delete()
+    except DepositorSetupInfo.DoesNotExist:
+        pass
+
+@receiver(post_delete, sender=UploadFileInfo)
+def post_delete_depositor_setup_from_upload_file(sender, instance, *args, **kwargs):
+    try:
+        if instance.depositor_setup_info:  # just in case depositor_setup_info is not specified
+            instance.depositor_setup_info.delete()
+    except DepositorSetupInfo.DoesNotExist:
+        pass
+"""

@@ -19,6 +19,21 @@ class FileViewGetTest(TestCase):
         self.user_obj, _created = get_user_model().objects.get_or_create(username='dv_depositor')
         self.client.force_login(self.user_obj)
 
+    def test_05_manifest_params_url(self):
+        """(05) manifest params url"""
+        msgt(self.test_05_manifest_params_url.__doc__)
+
+        # From fixture file: "test_manifest_params_04.json"
+        tparams = ManifestTestParams.objects.get(object_id='4bcad631-ce7c-475e-a569-29e71ee0b2ee')
+
+        # Test url reversal for dv-handoff
+        test_url = tparams.dataverse_handoff_test_link()
+        self.assertTrue('dv-handoff/dv_orig_create' in test_url)
+
+        url_params = tparams.get_manifest_url_params()
+        self.assertTrue(url_params in test_url)
+
+
     @requests_mock.Mocker()
     def test_10_successful_get(self, req_mocker):
         """(10) test_successful_creation"""
@@ -26,6 +41,7 @@ class FileViewGetTest(TestCase):
 
         # From fixture file: "test_manifest_params_04.json"
         tparams = ManifestTestParams.objects.get(object_id='4bcad631-ce7c-475e-a569-29e71ee0b2ee')
+
         handoff_req = tparams.make_test_handoff_object()
         self.assertTrue(handoff_req.success is True)
         handoff_obj = handoff_req.data

@@ -7,7 +7,7 @@
             <StepperHeader :steps="steps" :stepperPosition="stepperPosition"/>
             <v-stepper-items>
               <span class="d-block mt-5"
-              >Used dataset:
+              >Used data file:
                 <a href="http://" class="text-decoration-none"
                 >{{ datasetInfo.name }}
                   <v-icon small color="primary">mdi-open-in-new</v-icon></a
@@ -23,11 +23,12 @@
                 <SetEpsilonValue :stepperPosition="stepperPosition" v-on:stepCompleted="updateStepStatus"/>
               </v-stepper-content>
               <v-stepper-content :complete="stepperPosition > 3" step="3">
-                <CreateStatistics ref="createStatComponent" :stepperPosition="stepperPosition.sync"
+                <CreateStatistics v-on:addVariable="gotoStep(1)" ref="createStatComponent"
+                                  :stepperPosition="stepperPosition.sync"
                                   v-on:stepCompleted="updateStepStatus"/>
               </v-stepper-content>
               <v-stepper-content :complete="stepperPosition > 4" step="4">
-                <GenerateDPRelease v-on:stepCompleted="updateStepStatus"/>
+                <GenerateDPRelease v-on:addStatistic="gotoStep(3)" v-on:stepCompleted="updateStepStatus"/>
               </v-stepper-content>
             </v-stepper-items>
           </v-stepper>
@@ -97,14 +98,20 @@ export default {
   methods: {
 
     updateStepStatus: function (stepNumber, completedStatus) {
+      console.log("updateStepStatus: stepNumber: " + stepNumber + " completedStatus: " + completedStatus)
       this.steps[stepNumber].completed = completedStatus;
     },
     // Set the current Wizard stepper position based on the
     // depositorSetup userStep
     initStepperPosition: function () {
+      console.log('INIT stepper position')
       if (this.datasetInfo && this.getDepositorSetupInfo) {
         this.stepperPosition = stepInformation[this.userStep].wizardStepper
       }
+    },
+    gotoStep(step) {
+      console.log("handling variable event")
+      this.stepperPosition = step
     },
     // If we are on the Confirm Variables step, and the DepositorSetup variables
     // are not set, then run the Profiler
@@ -143,7 +150,7 @@ export default {
         completed: false
       },
       {
-        title: "Set Epsilon Value",
+        title: "Set Accuracy Level",
         completed: false
       },
       {

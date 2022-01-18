@@ -10,6 +10,11 @@
             :class="{ 'px-10': $vuetify.breakpoint.xsOnly }"
         >
           <h1 class="title-size-1">Log in</h1>
+          <ColoredBorderAlert type="error" v-if="errorMessage!==null">
+            <template v-slot:content>
+              {{ errorMessage.non_field_errors[0] }}
+            </template>
+          </ColoredBorderAlert>
           <v-form data-test="login form" v-model="validLoginForm">
             <v-text-field
                 data-test="username"
@@ -95,13 +100,14 @@ import SocialLoginSeparator from "../components/Accounts/SocialLoginSeparator.vu
 import Button from "../components/DesignSystem/Button.vue";
 import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
 import {mapState, mapGetters} from 'vuex';
+import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
 
 export default {
   name: "MyData",
-  components: {SocialLoginButton, SocialLoginSeparator, Button},
+  components: {SocialLoginButton, SocialLoginSeparator, Button, ColoredBorderAlert},
   computed: {
-    ...mapState('auth', ['error', 'user']),
-    ...mapGetters('auth', ['isTermsAccepted']),
+    ...mapState('auth', ['error', 'user', 'currentTerms']),
+    ...mapGetters('auth', ['isTermsAccepted', 'isCurrentTermsAccepted']),
     ...mapState('dataverse', ['handoffId']),
   },
   methods: {
@@ -111,6 +117,9 @@ export default {
           .then(() => {
             this.processLogin();
           })
+          .catch((data) => {
+            this.errorMessage = data
+          })
     },
     handleGoogle(access_token) {
       this.$store.dispatch('auth/googleLogin', access_token)
@@ -118,48 +127,55 @@ export default {
             this.processLogin();
           })
     },
-    routeToNextPage() {
+    routeToNextPage(defaultPath) {
       Promise.all([
         this.$store.dispatch('auth/fetchCurrentTerms'),
         this.$store.dispatch('auth/fetchTermsLog')
       ]).then(() => {
-        if (this.isTermsAccepted) {
-          this.$router.push(NETWORK_CONSTANTS.WELCOME.PATH)
+        // If no terms have been accepted, this means it is the first time logging in,
+        // and terms were accepted at the time of account creation.  So set the terms as accepted
+        if (!this.isTermsAccepted) {
+          this.$store.dispatch('auth/acceptTerms', {
+            userId: this.user.objectId,
+            termsOfAccessId: this.currentTerms.objectId
+          })
+          this.routeToNextPage(defaultPath)
+        } else if (this.isCurrentTermsAccepted) {
+          // Go back to redirect page, or default page
+          this.$router.replace(sessionStorage.getItem('redirectPath') || defaultPath);
+          //Cleanup redirectPath
+          sessionStorage.removeItem('redirectPath');
         } else {
           this.$router.push(NETWORK_CONSTANTS.TERMS_AND_CONDITIONS.PATH)
         }
       })
     },
     processLogin() {
-      if (this.handoffId) {
-        this.$store.dispatch('auth/fetchUser')
-            .then((data) => {
+      this.$store.dispatch('auth/fetchUser')
+          .then((data) => {
+            if (this.handoffId) {
               this.$store.dispatch('dataverse/updateDataverseUser', this.user.objectId, this.handoffId)
                   .then((dvUserObjectId) => {
                     this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
-                        .catch(({data}) => console.log("error: " + data))
+                        .catch(({data}) => this.errorMessage = data)
                         .then(() => {
-                          this.routeToNextPage()
+                          this.routeToNextPage(NETWORK_CONSTANTS.WELCOME.PATH)
                         })
-
                   })
-            })
-            .catch((data) => {
-              console.log(data)
-              this.errorMessage = data
-            });
-      } else {
-        this.$store.dispatch('auth/fetchUser')
-            .then(() => {
-              this.routeToNextPage()
-            })
-
-      }
+            } else {
+              this.routeToNextPage(NETWORK_CONSTANTS.MY_DATA.PATH)
+            }
+          })
+          .catch((data) => {
+            console.log(data)
+            this.errorMessage = data
+          });
     }
   },
   data: () => ({
     validLoginForm: false,
     showPassword: false,
+    errorMessage: null,
     inputs: {
       username: '',
       password: '',

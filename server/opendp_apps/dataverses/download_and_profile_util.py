@@ -14,17 +14,23 @@ Basic workflow:
 import json
 
 from django.core.serializers.json import DjangoJSONEncoder
+from django.conf import settings
+from django.core.exceptions import ValidationError as DjangoValidationError
 
+from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.async_messages.websocket_message import WebsocketMessage
 from opendp_apps.async_messages import static_vals as async_static
 
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
-from opendp_apps.dataset.models import DataSetInfo #, DataverseFileInfo
+from opendp_apps.dataset.models import DataSetInfo
 
 from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadHandler
-from opendp_apps.profiler.profile_handler import ProfileHandler
-from opendp_apps.profiler import static_vals as pstatic
+from opendp_apps.profiler.csv_reader import CsvReader
+from opendp_apps.profiler.dataset_info_updater import DataSetInfoUpdater
+from opendp_apps.profiler.profile_runner import ProfileRunner
+from opendp_apps.profiler.tasks import run_profile_by_filefield
 
+from opendp_apps.profiler import static_vals as pstatic
 
 class DownloadAndProfileUtil(BasicErrCheck):
 
@@ -34,13 +40,12 @@ class DownloadAndProfileUtil(BasicErrCheck):
         self.websocket_id = websocket_id
 
         # To gather
-        self.dataset_info = None    # DataSetInfo object
-        self.data_profile = None    # Profiler output; saved to DataSetInfo object
-        self.profile_variables = None   # Formatted profiler output; saved to DataSetInfo object
+        self.dataset_info = None  # DataSetInfo object
+        self.data_profile = None  # Profiler output; saved to DataSetInfo object
+        self.profile_variables = None  # Formatted profiler output; saved to DataSetInfo object
 
         # Run
         self.run_process()
-
 
     def get_profile_variables(self):
         """Re-retrieve the DataSetInfo object which should have the profile_variables"""
@@ -57,7 +62,7 @@ class DownloadAndProfileUtil(BasicErrCheck):
         if not self.websocket_id:
             return
 
-        ws_msg = WebsocketMessage.get_fail_message( \
+        ws_msg = WebsocketMessage.get_fail_message(
             async_static.WS_MSG_TYPE_PROFILER,
             user_msg)
         ws_msg.send_message(self.websocket_id)
@@ -72,13 +77,12 @@ class DownloadAndProfileUtil(BasicErrCheck):
         else:
             data_dict = None
 
-        ws_msg = WebsocketMessage.get_success_message( \
+        ws_msg = WebsocketMessage.get_success_message(
             async_static.WS_MSG_TYPE_PROFILER,
             user_msg,
             data=data_dict)
 
         ws_msg.send_message(self.websocket_id)
-
 
     def run_process(self):
         """Run the download/profile process"""
@@ -92,6 +96,16 @@ class DownloadAndProfileUtil(BasicErrCheck):
             self.add_err_msg(user_msg)
             self.send_websocket_profiler_err_msg(user_msg)
             return
+        except DjangoValidationError as ex_obj:
+            user_msg = f'Invalid DataSetInfo object id. ({self.dataset_object_id}) ({ex_obj})'
+            self.add_err_msg(user_msg)
+            self.send_websocket_profiler_err_msg(user_msg)
+            return
+        except ValueError as ex_obj:
+            user_msg = f'Invalid DataSetInfo object id. (z) ({self.dataset_object_id}) ({ex_obj})'
+            self.add_err_msg(user_msg)
+            self.send_websocket_profiler_err_msg(user_msg)
+            return
 
         # Download file (in the case of Dataverse)
         #
@@ -102,7 +116,6 @@ class DownloadAndProfileUtil(BasicErrCheck):
         #
         self.send_websocket_success_msg('Start dataset profile...')
         self.profile_file()
-
 
     def check_for_or_download_source_file(self):
         """
@@ -144,46 +157,33 @@ class DownloadAndProfileUtil(BasicErrCheck):
         self.send_websocket_success_msg('The Dataverse file has been copied.')
         return True
 
-
     def profile_file(self):
-        """"Profile the file"""
+        """
+        1. Get the DataSetInfo object by id
+        2. Read the associated filefield
+        3. Parse it into a dataframe
+        4. Run the variable profiler on the dataframe
+        5. Send results back via websocket
+        """
         if self.has_error():
             return
 
-        params = {pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD: True,
-                  pstatic.KEY_DATASET_OBJECT_ID: self.dataset_info.object_id}
+        prunner = run_profile_by_filefield(self.dataset_info.object_id,
+                                           max_num_features=settings.PROFILER_COLUMN_LIMIT)
 
-        ph = ProfileHandler(dataset_pointer=self.dataset_info.source_file,
-                            **params)
-
-        if ph.has_error():
-            user_msg = ph.get_err_msg()
+        if prunner.has_error():
+            user_msg = prunner.get_err_msg()
             self.add_err_msg(user_msg)
             self.send_websocket_profiler_err_msg(user_msg)
             return
 
-
-        #self.data_profile = ph.get_data_profile()
-        self.profile_variables = ph.get_profile_variables()
+        # self.data_profile = ph.get_data_profile()
+        self.profile_variables = prunner.data_profile
         profile_str = json.dumps(self.profile_variables, cls=DjangoJSONEncoder, indent=4)
-
 
         self.send_websocket_success_msg('Profile complete!',
                                         profile_str=profile_str)
-                                        # profile_str=self.get_data_profile())
 
     def get_data_profile(self):
-        assert(self.has_error() is False), \
-            "Check that .has_error() is False before accessing this method"
-
-
+        assert (self.has_error() is False), "Check that .has_error() is False before accessing this method"
         return self.data_profile
-
-
-    #def get_data_profile_as_json_str(self):
-    #    assert (self.has_error() is False), \
-    #        "Check that .has_error() is False before accessing this method"
-    #
-    #    profile_str = json.dumps(self.get_data_profile(), cls=DjangoJSONEncoder, indent=4)
-    #
-    #    return profile_str

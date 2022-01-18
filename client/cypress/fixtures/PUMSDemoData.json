@@ -1,9 +1,9 @@
 {
-  "datasetName": "Demo PUMS 5-Percent",
+  "datasetName": "2000 PUMS 5-Percent",
   "variables": {
     "age": {
       "name": "age",
-      "type": "Numerical",
+      "type": "Integer",
       "min": "0.0",
       "max": "100.0",
       "fixedValue": "45",

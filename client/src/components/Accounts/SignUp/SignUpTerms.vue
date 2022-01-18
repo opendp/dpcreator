@@ -12,6 +12,7 @@
       </template>
       <template v-slot:actions>
         <Checkbox
+            data-test="signupTermsCheckbox"
             :value.sync="confirmTerms"
             text="I have read and agree to the Terms of Service."
         />
@@ -19,6 +20,7 @@
     </ShadowBoxWithScroll>
 
     <Button
+        data-test="continue"
         :disabled="!confirmTerms"
         classes="mt-6"
         :class="{

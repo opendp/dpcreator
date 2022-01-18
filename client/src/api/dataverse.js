@@ -1,4 +1,4 @@
-import session from './session';
+import {session, wrappedSession} from './session';
 const camelcaseKeys = require('camelcase-keys');
 
 export default {
@@ -25,7 +25,7 @@ export default {
      * @returns {Promise<AxiosResponse<any>>} DataverseUser object
      */
     updateDataverseUser(openDPUserId, handoffId) {
-        return session.post('/api/dv-user/',
+        return wrappedSession.post('/api/dv-user/',
             {dv_handoff: handoffId, user: openDPUserId});
     },
     testHandoff(site_url, fileId, datasetPid, filePid, token) {
@@ -40,13 +40,11 @@ export default {
         /* INSECURE */
         /* Using the GET endpoint - For testing prior to Dataverse signed urls */
         const asQueryString = new URLSearchParams(formData).toString();
-        session.get('/api/dv-handoff/dv_orig_create/?' + asQueryString)
+        wrappedSession.get('/api/dv-handoff/dv_orig_create/?' + asQueryString)
             .then(function (response) {
                 window.location = response.request.responseURL; // full URI to redirect to
             })
-            .catch((error) => {
-                console.log(error)
-            })
+
 
         /* Using the POST endpoint */
         /*
@@ -60,7 +58,7 @@ export default {
         */
     },
     getDataverseHandoff(handoffId) {
-        return session.get('/api/dv-handoff/', {
+        return wrappedSession.get('/api/dv-handoff/', {
             params: {
                 object_id: 'xyz'
             }
@@ -72,7 +70,7 @@ export default {
     },
     // Gets the DatasetInfo object for the given objectId
     getRegisteredDataverses() {
-        return session.get('/api/registered-dvs/').then(resp => camelcaseKeys(resp, {deep: true}))
+        return wrappedSession.get('/api/registered-dvs/').then(resp => camelcaseKeys(resp, {deep: true}))
 
     },
 

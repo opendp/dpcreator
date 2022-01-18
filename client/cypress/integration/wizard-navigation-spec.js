@@ -7,6 +7,7 @@
                 console.log('runnable', runnable)
                 return false
             })
+          //  cy.logout()
             cy.clearData()
             cy.login('dev_admin', 'admin')
             cy.setupStatisticsPage('datasetInfoStep600.json', 'analysisPlanStep700.json')
@@ -34,7 +35,7 @@
             cy.get('[data-test="step0"]').click({force: true})
             cy.get('h1').should('contain', 'Validate Dataset').should('be.visible')
             // Click continue, this will go to next step in the wizard, but will not update user step
-            cy.get('[data-test="wizardContinueButton"]').last().click();
+            cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
             cy.get('h1').should('contain', 'Confirm Variables').should('be.visible')
 
             // Go back to my data page

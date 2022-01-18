@@ -9,7 +9,11 @@
                 return false
             })
             cy.clearData()
-            cy.createMockDataset('mockDV.json')
+            cy.createMockDataset('EyeDemoMockDV.json')
+
+            // without this wait, sometimes the api/dataset-info/<objectId> call
+            // returns a 404.
+            cy.wait(1000)
             // click on the start Process button on the welcome page,
             // to navigate to the Validate Dataset step of the Wizard.
             // This will setup Vuex state to contain the Dataset.
@@ -17,7 +21,7 @@
             cy.url().should('contain', 'wizard')
             cy.request('/api/dataset-info/').then((data) => {
                 // save the original copy of the object
-                const datasetInfo = data.body.results[0] 
+                const datasetInfo = data.body.results[0]
                 //   console.log('returned depositorSetupInfo' + JSON.stringify(datasetInfo.depositorSetupInfo))
                 const depositorSetupId = datasetInfo.depositor_setup_info.object_id
                 // update the user step
@@ -56,7 +60,7 @@
                 return false
             })
             cy.clearData()
-            cy.createMockDataset('mockDV.json')
+            cy.createMockDataset('EyeDemoMockDV.json')
             // click on the start Process button on the welcome page,
             // to navigate to the Validate Dataset step of the Wizard.
             // This will setup Vuex state to contain the Dataset.

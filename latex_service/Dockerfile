@@ -1,9 +1,13 @@
-FROM python:3.9
+# Base image includes Python 3.9 and TeX Live package
+FROM ghcr.io/opendp/dpcreator/texlive-base:latest
 
-ENV PYTHONUNBUFFERED=1
+MAINTAINER OpenDP https://github.com/opendp
 
-RUN apt-get update && apt-get install -y \
-  texlive-full
+LABEL organization="OpenDP" \
+      version="0.1-alpha" \
+      release-date="2022-10-14" \
+      description="DP Creator LaTeX service"
+
 # -------------------------------------
 # Copy over the requirements and run them
 # -------------------------------------

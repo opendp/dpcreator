@@ -10,7 +10,7 @@
           <span>Epsilon (&epsilon;)</span>
           <span>
             {{ epsilon }}
-            <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
+            <v-icon data-test="editEpsilonIcon" right @click="emitEditEvent">mdi-pencil</v-icon>
           </span>
         </div>
         <router-link to="/more-information" class="primary--text caption">More information about Epsilon</router-link>
@@ -24,7 +24,10 @@
           <span>Delta (&delta;)</span>
           <span>
             {{ delta }}
-            <v-icon right :disabled="delta === 0" @click="emitEditEvent">mdi-pencil</v-icon>
+            <!--v-icon right :disabled="delta === 0" @click="emitEditEvent">mdi-pencil</v-icon-->
+              <QuestionIconTooltip
+                  text="Reserved for future use."
+              />
           </span>
         </div>
         <router-link to="/more-information#more-info-delta" class="primary--text caption">More information about Delta
@@ -35,10 +38,10 @@
         <div
             class="borderBottom soft_primary grey--text text--darken-2 pa-3 top-borders-radius noise-params d-flex justify-space-between"
         >
-          <span>Significance Level</span>
+          <span>Confidence Level</span>
           <span>
-            {{ confidenceInterval }}
-            <v-icon right @click="emitEditEvent">mdi-pencil</v-icon>
+            {{ confidencePercent }}
+            <v-icon right data-test="editConfidenceIcon" @click="emitEditEvent">mdi-pencil</v-icon>
           </span>
         </div><span>&nbsp;</span>
         <!--
@@ -58,9 +61,22 @@
 </style>
 
 <script>
+import QuestionIconTooltip from "../../../DynamicHelpResources/QuestionIconTooltip.vue";
+
 export default {
   name: "NoiseParams",
-  props: ["epsilon", "delta", "confidenceInterval"],
+  components: {QuestionIconTooltip},
+  props: ["epsilon", "delta", "confidenceLevel"],
+  computed: {
+    confidencePercent: function () {
+      const percent = Number(this.confidenceLevel).toLocaleString(undefined, {
+        style: 'percent',
+        minimumFractionDigits: 0
+      });
+      return percent
+    }
+
+  },
   methods: {
     emitEditEvent: function () {
       this.$emit("editNoiseParams");

@@ -6,6 +6,8 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
+from rest_framework.reverse import reverse as drf_reverse
+
 from django_cryptography.fields import encrypt
 
 
@@ -157,8 +159,6 @@ class ManifestTestParams(DataverseParams):
     site_url = models.CharField(max_length=255)
     use_mock_dv_api = models.BooleanField('Use Mock Dataverse API', default=False)
 
-    ddi_content = models.TextField(help_text='Use XML', blank=True)
-
     schema_org_content = models.JSONField(null=True, blank=True)
 
     user_info = models.JSONField(null=True, blank=True)
@@ -244,19 +244,20 @@ class ManifestTestParams(DataverseParams):
     mock_user_info_link.allow_tags = True
 
 
+    '''
     @mark_safe
     def ddi_info_link(self):
         """
         Retrieve the DDI information
         """
-        if not (self.use_mock_dv_api and self.ddi_content and self.datasetPid):
+        if not (self.use_mock_dv_api and self.datasetPid):
             return 'n/a'
 
         dataset_lnk = reverse('view_get_dataset_export')
         return (f'<a href="{dataset_lnk}?persistentId={self.datasetPid}'
                 f'&exporter={dv_static.EXPORTER_FORMAT_DDI}">ddi info</a>')
     ddi_info_link.allow_tags = True
-
+    '''
 
     @mark_safe
     def schema_org_info_link(self):
@@ -328,7 +329,19 @@ class ManifestTestParams(DataverseParams):
             return f'<a href="{user_lnk}?{url_params}" target="_blank">Test 2: Mock Dataverse incoming link</a>'
         else:
             return f'<a href="{user_lnk}?{url_params}" target="_blank">Test 2: Dataverse incoming link (public dataset)</a>'
-
     dataverse_incoming_link_2.allow_tags = True
+
+    @mark_safe
+    def dataverse_handoff_test_link(self):
+        """Mock an incoming Dataverse Call via the UI"""
+        handoff_url = drf_reverse('dv-handoff-dv-orig-create', args=[], kwargs={})
+
+        url_params = self.get_manifest_url_params()
+
+        if self.use_mock_dv_api:
+            return f'<a href="{handoff_url}?{url_params}" target="_blank">Handoff!: Mock Dataverse incoming link</a>'
+        else:
+            return f'<a href="{handoff_url}?{url_params}" target="_blank">Handoff!: Dataverse incoming link (public dataset)</a>'
+    dataverse_handoff_test_link.allow_tags = True
 
 

@@ -2,14 +2,10 @@
   <div class="validateDatasetStep">
     <h1 class="title-size-1">Validate Dataset</h1>
     <p>
-      Firstly, we need to confirm the dataset's characteristics to determine if
+      Confirm the data file's characteristics to determine if
       it's adequate for the differential privacy release process.
     </p>
-    <ColoredBorderAlert type="warning" class="mb-10 mt-10">
-      <template v-slot:content>
-        You must complete this questionnaire before starting the process.
-      </template>
-    </ColoredBorderAlert>
+
     <div>
       <div class="mb-10">
         <span class="font-weight-bold title-size-2 d-flex"
@@ -60,7 +56,7 @@
             class="pl-2"
         >
           <RadioItem
-              label="Public information."
+              label="Public information. (Note: Differential privacy isn't needed for public information.)"
               :value="this.privacyTypes.PUBLIC"
               :data-test="this.privacyTypes.PUBLIC"
               :on="{
@@ -124,7 +120,7 @@
               <div>
                 Information that
                 <strong>would cause severe harm </strong>to individuals or the
-                university if disclosed.
+                university if disclosed. Use of this application is not recommended.
               </div>
             </template>
           </RadioItem>
@@ -132,7 +128,8 @@
         <AdditionalInformationAlert>
           <template v-slot:content>
             If you are unsure, please reference our
-            <a class="primary--text font-weight-bold d-inline-flex">
+            <a href="https://policy.security.harvard.edu/view-data-security-level"
+               class="primary--text font-weight-bold d-inline-flex">
               data classification examples.
               <v-icon small color="blue darken-1" class="px-2">
                 mdi-open-in-new
@@ -150,9 +147,7 @@
         "
       >
         <span class="font-weight-bold title-size-2 d-flex"
-        ><v-icon color="primary" left>mdi-play</v-icon> Does your dataset
-          contain only one individual per row?</span
-        >
+        ><v-icon color="primary" left>mdi-play</v-icon> Does each individual appear in only one row?</span>
         <v-radio-group
             :disabled="radioOnlyOneIndividualPerRowShouldBeDisabled"
             v-model="radioOnlyOneIndividualPerRow"
@@ -191,10 +186,10 @@
         </v-icon
         >
         <h2 class="title-size-2 font-weight-bold mb-8">
-          The dataset should not be used in DPcreator
+          The data file should not be used in DP Creator
         </h2>
         <p class="mb-8 pr-16">
-          According to your dataset's characteristics, it is not possible to
+          According to your data file's characteristics, it is not possible to
           continue with the differential privacy release generation process.
         </p>
         <Button
@@ -288,6 +283,9 @@ export default {
         },
         defaultEpsilon: this.defaultEpsilon,
         defaultDelta: this.defaultDDelta,
+        // Have to set the actual epsilon, not just the default
+        // in order to complete the depositor setup (which happens before
+        // the Create Statistics page.)
         epsilon: this.defaultEpsilon,
         delta: this.defaultDDelta
       }

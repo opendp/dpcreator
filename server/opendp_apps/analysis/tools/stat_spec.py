@@ -8,17 +8,20 @@ BaseClass for Univariate statistics for OpenDP.
 - Implementing the "get_preprocessor" method acts as validation.
 -
 """
-import abc
+import abc # import ABC, ABCMeta, abstractmethod
+from collections import OrderedDict
+import decimal
 
 from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
+
 
 from opendp.mod import OpenDPException
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.utils.extra_validators import \
-    (validate_confidence_interval,
+    (validate_confidence_level,
      validate_float,
      validate_statistic,
      validate_epsilon_not_null,
@@ -39,7 +42,7 @@ class StatSpec:
                            #
                            epsilon=validate_epsilon_not_null,
                            delta=validate_not_negative,  # add something more!
-                           ci=validate_confidence_interval,
+                           cl=validate_confidence_level,
                            #
                            min=validate_float,
                            max=validate_float,
@@ -53,6 +56,7 @@ class StatSpec:
 
     def __init__(self, props: dict):
         """Set the internals using the props dict"""
+        # print('stat_spec.initial props', props)
         self.variable = props.get('variable')
         self.col_index = props.get('col_index')
         self.statistic = props.get('statistic')
@@ -60,7 +64,9 @@ class StatSpec:
         #
         self.epsilon = props.get('epsilon')
         self.delta = props.get('delta')
-        self.ci = props.get('ci')
+
+        self.cl = props.get('cl')      # confidence level coefficient (e.g. .95, .99, etc)
+
         #
         self.accuracy_val = None
         self.accuracy_msg = None
@@ -89,20 +95,22 @@ class StatSpec:
         self.run_02_basic_validation()  # always the same
         self.run_03_custom_validation()  # customize, if types need converting, etc.
 
-    def get_ci_text(self):
+
+    def get_cl_text(self):
         """Return the ci as text. e.g. .05 is returned as 95%"""
-        if not self.ci:
+        if not self.cl:
             return None
 
-        ci_num = (1 - self.ci) * 100
-        return f'{ci_num}%'
+        cl_fmt = self.cl * 100
+
+        return f'{cl_fmt}%'
 
     @abc.abstractmethod
     def additional_required_props(self):
         """
         Add a list of required properties.
         For example, a DP Mean might be:
-        `   return ['min', 'max', 'ci']`
+        `   return ['min', 'max', 'cl']`
         """
         raise NotImplementedError('additional_required_props')
 
@@ -273,7 +281,7 @@ class StatSpec:
         assert isinstance(more_props_to_floatify, list), \
             '"more_props_to_floatify" must be a list, even and empty list'
 
-        props_to_floatify = ['epsilon', 'ci', 'min', 'max', ] \
+        props_to_floatify = ['epsilon', 'cl', 'min', 'max',] \
                             + more_props_to_floatify
 
         for prop_name in props_to_floatify:
@@ -456,27 +464,44 @@ class StatSpec:
         # print(desc)
         return desc
 
-    def get_release_dict(self):
+
+    def get_accuracy_text(self, template_name=None):
+        """
+        Create an HTML description using a ReleaseInfo object
+        """
+        info_dict = {
+            'stat': self,
+        }
+
+        if not template_name:
+            template_name = 'analysis/dp_stat_accuracy_default.txt'
+
+        desc = render_to_string(template_name, info_dict)
+
+        # print(desc)
+        return desc
+
+    def get_release_dict(self) -> OrderedDict:
         """Final release info"""
         assert not self.has_error(), \
             'Do not call this method before checking that ".has_error()" is False'
         assert self.value, \
             'Only use this after "run_chain()" was completed successfully"'
 
-        final_info = {
-            "statistic": self.statistic,
-            "variable": self.variable,
-            "result": {
-                "value": self.value
-            },
-            "epsilon": self.epsilon,
-            "delta": self.delta,
-        }
+        final_info = OrderedDict({
+                         "statistic": self.statistic,
+                         "variable": self.variable,
+                         "result":{
+                            "value": self.value
+                         },
+                         "epsilon": self.epsilon,
+                         "delta": self.delta,
+                    })
 
         # Min/Max
         #
         if 'min' in self.additional_required_props():
-            final_info['bounds'] = {'min': self.min, 'max': self.max}
+            final_info['bounds'] = OrderedDict({'min': self.min, 'max': self.max})
 
         # Categories
         #
@@ -485,53 +510,84 @@ class StatSpec:
 
         # Missing values
         #
-        final_info['missing_value_handling'] = {"type": self.missing_values_handling}
+        final_info['missing_value_handling'] = OrderedDict({"type": self.missing_values_handling})
         if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
             final_info['missing_value_handling']['fixed_value'] = self.fixed_value
 
         # Add accuracy
         #
         if self.accuracy_val or self.accuracy_msg:
-            final_info['confidence_interval'] = self.ci
-            final_info['accuracy'] = {}
+            final_info['confidence_level'] = self.cl
+            final_info['confidence_level_alpha'] = self.get_confidence_level_alpha()
+            final_info['accuracy'] = OrderedDict()
             if self.accuracy_val:
                 final_info['accuracy']['value'] = self.accuracy_val
             if self.accuracy_msg:
                 final_info['accuracy']['message'] = self.accuracy_msg
 
-        final_info['description'] = dict(html=self.get_short_description_html(),
-                                         text=self.get_short_description_text())
+        final_info['description'] = OrderedDict()
+        final_info['description']['html'] = self.get_short_description_html()
+        final_info['description']['text'] = self.get_short_description_text()
 
         return final_info
 
-    def has_error(self):
+    def get_confidence_level_alpha(self) -> float:
+        """Get the confidence level (CL) alpha. e.g. if CL coefficient is .99, return .01
+        Assumes that `self.cl` has passed through the validator: `validate_confidence_level`
+        """
+        if not self.cl:
+            user_msg = f'{astatic.ERR_MSG_CL_ALPHA_CL_NOT_SET} ("{self.cl}")'
+            self.add_err_msg(user_msg)
+            return None
+
+        try:
+            dec_alpha = decimal.Decimal(1 - self.cl).quantize(decimal.Decimal('.01'),
+                                                              rounding=decimal.ROUND_DOWN)
+        except TypeError as ex_obj:
+            user_msg = f'{astatic.ERR_MSG_CL_ALPHA_CL_NOT_NUMERIC} "{self.cl}" ({ex_obj})'
+            self.add_err_msg(user_msg)
+            return None
+
+        if dec_alpha > 1:
+            user_msg = f'{astatic.ERR_MSG_CL_ALPHA_CL_GREATER_THAN_1} ("{dec_alpha}")'
+            self.add_err_msg(user_msg)
+            return None
+
+        if dec_alpha < 0:
+            user_msg = f'{astatic.ERR_MSG_CL_ALPHA_CL_LESS_THAN_0} ("{dec_alpha}")'
+            self.add_err_msg(user_msg)
+            return None
+
+        return float(dec_alpha)
+
+    def has_error(self) -> bool:
         """Did an error occur?"""
         return self.error_found
 
-    def get_error_messages(self):
+    def get_error_messages(self) -> list:
         """Return the error message if 'has_error' is True"""
         assert self.has_error(), \
             "Please check that '.has_error()' is True before using this method"
 
         return self.error_messages
 
-    def get_err_msgs(self):
+    def get_err_msgs(self) -> list:
         """Return the error message if 'has_error' is True"""
         return self.get_error_messages()
 
-    def get_err_msgs_concat(self, sep_char=' '):
+    def get_err_msgs_concat(self, sep_char=' ') -> str:
         return f'{sep_char}'.join(self.get_error_messages())
 
-    def get_error_messages_concat(self, sep_char=' '):
+    def get_error_messages_concat(self, sep_char=' ') -> str:
         return self.get_err_msgs_concat(sep_char)
 
-    def add_err_msg(self, err_msg):
+    def add_err_msg(self, err_msg: str):
         """Add an error message"""
         # print('add_err_msg. type', type(err_msg))
 
         self.error_found = True
         self.error_messages.append(err_msg)
 
-    def add_error_message(self, err_msg):
+    def add_error_message(self, err_msg: str):
         """Add an error message -- same as "add_err_msg" """
         self.add_err_msg(err_msg)

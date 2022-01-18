@@ -15,16 +15,22 @@
           <v-form @submit.prevent="handleEditAccountInformation">
             <v-text-field
                 v-model="username"
+                data-test="myProfileUsername"
                 label="Username"
                 required
             ></v-text-field>
+            <!-- For now, don't allow editing of the email, because it would require a new endpoint
+            and another email verification
             <v-text-field
                 v-model="email"
                 label="Email"
                 required
                 :rules="emailRules"
                 type="email"
-            ></v-text-field>
+            ></v-text-field> -->
+            <div class="mt-5 mb-10">
+              {{ email }}
+            </div>
             <div class="mt-5 mb-10">
               <Button
                   type="submit"
@@ -118,10 +124,19 @@
 import Button from "../components/DesignSystem/Button.vue";
 import EventSuccessAlert from "../components/Home/EventSuccessAlert.vue";
 import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
+import {mapState} from "vuex";
+import auth from '../api/auth';
 
 export default {
   name: "MyProfile",
   components: {Button, EventSuccessAlert},
+  computed: {
+    ...mapState('auth', ['user']),
+  },
+  created: function () {
+    this.username = this.user.username
+    this.email = this.user.email
+  },
   methods: {
     confirmNewPasswordRules() {
       return (
@@ -129,16 +144,19 @@ export default {
       );
     },
     handleEditAccountInformation() {
-      //TODO: Implement Edit Account Information Handler
-      alert("edit account information form submitted!");
+      this.$store.dispatch('auth/changeUsername', this.username)
       this.$router.push(`${NETWORK_CONSTANTS.MY_PROFILE.PATH}?saved=true`);
-      this.$router.go();
     },
     handleChangePassword() {
-      //TODO: Implement Change Password Handler
-      alert("change password form submitted!");
-      this.$router.push(`${NETWORK_CONSTANTS.MY_PROFILE.PATH}?saved=true`);
-      this.$router.go();
+      auth.changePassword(this.password, this.newPassword, this.confirmNewPassword)
+          .then(() => {
+                this.password = "",
+                    this.newPassword = "",
+                    this.confirmNewPassword = "",
+                    this.$router.push(`${NETWORK_CONSTANTS.MY_PROFILE.PATH}?saved=true`);
+              }
+          )
+
     }
   },
 

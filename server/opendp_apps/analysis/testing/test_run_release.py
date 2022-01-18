@@ -1,31 +1,32 @@
-from os.path import abspath, dirname, isdir, isfile, join
+import json
+
+from os.path import abspath, dirname, isfile, join
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
-from unittest import skip
 
-import json
 from django.contrib.auth import get_user_model
 from django.core.files import File
 from django.test.testcases import TestCase
 
 from rest_framework.test import APIClient
+from rest_framework.reverse import reverse as drf_reverse
 
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
-from opendp_apps.analysis.models import AnalysisPlan
+from opendp_apps.analysis.models import AnalysisPlan, AuxiliaryFileDepositRecord
 from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.analysis.serializers import ReleaseValidationSerializer
 from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
+from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.dataset.dataset_formatter import DataSetFormatter
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
+from opendp_apps.profiler import  static_vals as pstatic
 from opendp_apps.utils.extra_validators import VALIDATE_MSG_EPSILON
-from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 
 
 class TestRunRelease(TestCase):
-    fixtures = ['test_dataset_data_001.json', ]
+    fixtures = ['test_dataset_data_001.json']
 
     def setUp(self):
         # test client
@@ -62,7 +63,7 @@ class TestRunRelease(TestCase):
                 "variable": "EyeHeight",
                 "epsilon": .25,
                 "delta": 0,
-                "ci": astatic.CI_95,
+                "cl": astatic.CL_95,
                 "error": "",
                 "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
                 "handle_as_fixed": False,
@@ -72,7 +73,7 @@ class TestRunRelease(TestCase):
                 "variable_info": {
                     "min": 0,
                     "max": 100,
-                    "type": "Float"
+                    "type": pstatic.VAR_TYPE_FLOAT
                 }
             },
             {
@@ -80,7 +81,7 @@ class TestRunRelease(TestCase):
                 "variable": "TypingSpeed",
                 "epsilon": .25,
                 "delta": 0,
-                "ci": astatic.CI_99,
+                "cl": astatic.CL_99,
                 "error": "",
                 "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
                 "handle_as_fixed": False,
@@ -90,7 +91,7 @@ class TestRunRelease(TestCase):
                 "variable_info": {
                     "min": 0,
                     "max": 100,
-                    "type": "Float"
+                    "type": pstatic.VAR_TYPE_FLOAT
                 }
             },
             {
@@ -100,7 +101,7 @@ class TestRunRelease(TestCase):
                 'dataset_size': 183,
                 'epsilon': 0.5,
                 'delta': 0.0,
-                'ci': astatic.CI_95,
+                'cl': astatic.CL_95,
                 'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                 'fixed_value': 5,
                 'variable_info': {
@@ -108,7 +109,7 @@ class TestRunRelease(TestCase):
                     'max': 5,
                     'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"', '"cw"',
                                    '"jp"', '"rh"', '"aq"', '"ph"', '"le"', '"mn"', '"ls2"', '"no"', '"af"'],
-                    'type': 'Float'
+                    'type': pstatic.VAR_TYPE_FLOAT
                 }
              }
         ]
@@ -157,9 +158,11 @@ class TestRunRelease(TestCase):
 
         # Check the basics
         #
-        release_util = ValidateReleaseUtil.compute_mode(
+        release_util = ValidateReleaseUtil.compute_mode(\
             self.user_obj,
-            analysis_plan.object_id)
+            analysis_plan.object_id,
+            run_dataverse_deposit=False)
+
         if release_util.has_error():
             print('release_util:', release_util.get_err_msg())
         self.assertFalse(release_util.has_error())
@@ -247,7 +250,7 @@ class TestRunRelease(TestCase):
                                     content_type='application/json')
 
         jresp = response.json()
-        # print('jresp', jresp)
+        # print('jresp', json.dumps(jresp, indent=4))
         self.assertEqual(response.status_code, 201)
         self.assertIsNotNone(jresp['dp_release'])
         self.assertIsNotNone(jresp['object_id'])
@@ -255,8 +258,86 @@ class TestRunRelease(TestCase):
         updated_plan = AnalysisPlan.objects.get(object_id=analysis_plan.object_id)
         json_filename = ReleaseInfoFormatter.get_json_filename(updated_plan.release_info)
 
+        # Check on the DP Release JSON file
+        # File exists and has a size
         self.assertTrue(updated_plan.release_info.dp_release_json_file.name.endswith(json_filename))
         self.assertTrue(updated_plan.release_info.dp_release_json_file.size >= 2600)
+
+        self.assertTrue(updated_plan.release_info.dv_json_deposit_complete is False)
+        self.assertTrue(updated_plan.release_info.dv_pdf_deposit_complete is False)
+
+        # Check that the AuxiliaryFileDepositRecord objects are correct
+        #
+        self.assertTrue(AuxiliaryFileDepositRecord.objects.filter(release_info=updated_plan.release_info).count() > 0)
+        for dep_rec in AuxiliaryFileDepositRecord.objects.filter(release_info=updated_plan.release_info):
+            self.assertTrue(dep_rec.deposit_success is False)
+            self.assertTrue(dep_rec.http_status_code == 403 or\
+                            dep_rec.http_status_code < 0)
+
+
+
+    def test_55_success_download_urls(self):
+        """(55) Test PDF and JSOn download Urls"""
+        msgt(self.test_55_success_download_urls.__doc__)
+
+        analysis_plan = self.analysis_plan
+
+        # Send the dp_statistics for validation
+        #
+        analysis_plan.dp_statistics = self.general_stat_specs
+        analysis_plan.save()
+
+        params = dict(object_id=str(analysis_plan.object_id))
+
+        response = self.client.post('/api/release/',
+                                    json.dumps(params),
+                                    content_type='application/json')
+
+        jresp = response.json()
+        # print('jresp', jresp)
+        self.assertEqual(response.status_code, 201)
+
+        updated_plan = AnalysisPlan.objects.get(object_id=analysis_plan.object_id)
+
+        # ------------------------------------
+        # (1) JSON file download url
+        # ------------------------------------
+
+        # (1a) Url should exist....
+        release_info_object_id = str(updated_plan.release_info.object_id)
+        expected_url = drf_reverse('release-download-json', args=[], kwargs=dict(pk=release_info_object_id))
+        self.assertEqual(expected_url, updated_plan.release_info.download_json_url())
+
+        # (1b) Delete file, url should no longer exist
+        updated_plan.release_info.dp_release_json_file.delete()
+        updated_plan.release_info.save()
+        self.assertIsNone(updated_plan.release_info.download_json_url())
+
+        # ------------------------------------
+        # (2) PDF file download url
+        # ------------------------------------
+
+        # (2a) The PDF file url is not generated in this test and should be None
+        self.assertIsNone(updated_plan.release_info.download_pdf_url())
+
+        # ------------------------------------------------------
+        # (2b) Artificially add a PDF file to the ReleaseInfo object
+        #  and check that it a proper url is generated
+        # ------------------------------------------------------
+        fname_blank = 'near_blank_for_tests.pdf'
+        filepath = join(TEST_DATA_DIR, 'pdfs', fname_blank)
+        self.assertTrue(isfile(filepath))
+
+        # Attach the file to the `release_info.dp_release_pdf_file` field
+        #
+        django_file = File(open(filepath, 'rb'))
+        updated_plan.release_info.dp_release_pdf_file.save(fname_blank, django_file)
+        updated_plan.release_info.save()
+
+        # Now a url should be available
+        #
+        expected_pdf_url = drf_reverse('release-download-pdf', args=[], kwargs=dict(pk=release_info_object_id))
+        self.assertEqual(expected_pdf_url, updated_plan.release_info.download_pdf_url())
 
 
     def test_60_analysis_plan_has_release_info(self):
@@ -301,9 +382,19 @@ class TestRunRelease(TestCase):
         self.assertTrue(updated_plan.release_info.dp_release_json_file.name.endswith(json_filename))
         self.assertTrue(updated_plan.release_info.dp_release_json_file.size >= 2600)
 
+
+        # Check that the AuxiliaryFileDepositRecord objects are correct
+        #
+        self.assertTrue(AuxiliaryFileDepositRecord.objects.filter(release_info=updated_plan.release_info).count() > 0)
+        for dep_rec in AuxiliaryFileDepositRecord.objects.filter(release_info=updated_plan.release_info):
+            self.assertTrue(dep_rec.deposit_success is False)
+            self.assertTrue(dep_rec.http_status_code == 403 or\
+                            dep_rec.http_status_code < 0)
+
         # Uncomment next line to show the AnalysisPlan output
         #   with attached ReleaseInfo object
         # print(json.dumps(analysis_plan_jresp, indent=4))
+
 
     def test_70_dataset_formatter_eye_fatigue_file(self):
         """(70) Test the DataSetFormatter -- dataset info formatted for inclusion in ReleaseInfo.dp_release"""
@@ -316,9 +407,6 @@ class TestRunRelease(TestCase):
             "citation": null,
             "doi": "doi:10.7910/DVN/PUXVDH",
             "identifier": null,
-            "release_deposit_info": {
-                "deposited": false
-            },
             "installation": {
                 "name": "Mock Local Dataverse",
                 "url": "http://127.0.0.1:8000/dv-mock-api"
@@ -337,15 +425,12 @@ class TestRunRelease(TestCase):
         self.assertFalse(formatter.has_error())
         ds_info = formatter.get_formatted_info()
 
-        # print(json.dumps(ds_info, indent=4))
-
         self.assertEqual(ds_info['type'], "dataverse")
         self.assertEqual(ds_info['name'], "Replication Data for: Eye-typing experiment")
         self.assertIsNone(ds_info['citation'])
 
         self.assertEqual(ds_info['doi'], "doi:10.7910/DVN/PUXVDH")
         self.assertIsNone(ds_info['identifier'])
-        self.assertFalse(ds_info['release_deposit_info']['deposited'])
 
         self.assertEqual(ds_info['installation']['name'], 'Mock Local Dataverse')
         self.assertEqual(ds_info['installation']['url'], 'http://127.0.0.1:8000/dv-mock-api')
@@ -397,7 +482,6 @@ class TestRunRelease(TestCase):
 
         self.assertEqual(ds_info['doi'], "doi:10.7910/DVN/OLD7MB")
         self.assertIsNone(ds_info['identifier'])
-        self.assertFalse(ds_info['release_deposit_info']['deposited'])
 
         self.assertEqual(ds_info['installation']['name'], 'Harvard Dataverse')
         self.assertEqual(ds_info['installation']['url'], 'https://dataverse.harvard.edu')
@@ -405,3 +489,83 @@ class TestRunRelease(TestCase):
         self.assertEqual(ds_info['file_information']['name'], "crisis.tab",)
         self.assertEqual(ds_info['file_information']['identifier'], "https://doi.org/10.7910/DVN/OLD7MB/ZI4N3J")
         self.assertEqual(ds_info['file_information']['fileFormat'], "text/tab-separated-values")
+
+
+    def test_90_dp_count_pums_data(self):
+        """
+        (90) Via API, Test DP Count with PUMS data.
+        Note: This is very hack! A full DataSetInfo object with related objects should be saved as a separate fixture
+        """
+        msgt(self.test_90_dp_count_pums_data.__doc__)
+
+        dataset_info = DataSetInfo.objects.get(id=4)
+
+        # Hack 1: Update to the PUMS data profile
+        dataset_info.data_profile = {"self": {"created_at": "2021-10-04 15:20:00", "description": "TwoRavens metadata generated by https://github.com/TwoRavens/raven-metadata-service"}, "$schema": "https://github.com/TwoRavens/raven-metadata-service/schema/jsonschema/1-2-0.json#", "dataset": {"rowCount": 10000, "variableCount": 11, "variableOrder": [[0, "X"], [1, "state"], [2, "puma"], [3, "sex"], [4, "age"], [5, "educ"], [6, "income"], [7, "latino"], [8, "black"], [9, "asian"], [10, "married"]]}, "variables": {"X": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "X"}, "age": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "age"}, "sex": {"binary": True, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "sex"}, "educ": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "educ"}, "puma": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "puma"}, "asian": {"binary": True, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "asian"}, "black": {"binary": True, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "black"}, "state": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "state"}, "income": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "income"}, "latino": {"binary": True, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "latino"}, "married": {"binary": True, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "married"}}}
+
+        # Hack 2: Update to the PUMS data profile_variables
+        dataset_info.profile_variables = {"dataset": {"rowCount": 10000, "variableCount": 11,
+             "variableOrder": [[0, "X"], [1, "state"], [2, "puma"], [3, "sex"], [4, "age"], [5, "educ"], [6, "income"], [7, "latino"], [8, "black"], [9, "asian"], [10, "married"]]},
+ "variables": {"X": {"max": None, "min": None, "name": "X", "type": "Numerical", "label": ""},
+               "age": {"max": None, "min": None, "name": "age", "type": "Numerical", "label": ""},
+               "sex": {"name": "sex", "type": "Boolean", "label": ""},
+               "educ": {"max": None, "min": None, "name": "educ", "type": "Numerical", "label": ""},
+               "puma": {"max": None, "min": None, "name": "puma", "type": "Numerical", "label": ""},
+               "asian": {"name": "asian", "type": "Boolean", "label": ""},
+               "black": {"name": "black", "type": "Boolean", "label": ""},
+               "state": {"max": None, "min": None, "name": "state", "type": "Numerical", "label": ""},
+               "income": {"max": None, "min": None, "name": "income", "type": "Numerical", "label": ""},
+               "latino": {"name": "latino", "type": "Boolean", "label": ""},
+               "married": {"name": "married", "type": "Boolean", "label": ""}}}
+
+        self.add_source_file(dataset_info, 'PUMS5extract10000.csv', True)
+
+        #from django.core import serializers
+        #data = serializers.serialize("json", DataSetInfo.objects.filter(pk=4))
+        #print('data', data)
+        #return
+
+        analysis_plan = self.analysis_plan
+
+        # Hack 3: Update to the PUMS data variable_info
+        analysis_plan.variable_info = {"x": {"max": None, "min": None, "name": "X", "type": "Numerical", "label": ""}, "age": {"max": 100, "min": 0, "name": "age", "type": "Numerical", "label": "age"}, "sex": {"name": "sex", "type": "Boolean", "label": ""}, "educ": {"max": None, "min": None, "name": "educ", "type": "Numerical", "label": ""}, "puma": {"max": None, "min": None, "name": "puma", "type": "Numerical", "label": ""}, "asian": {"name": "asian", "type": "Boolean", "label": ""}, "black": {"name": "black", "type": "Boolean", "label": ""}, "state": {"max": None, "min": None, "name": "state", "type": "Numerical", "label": ""}, "income": {"max": 100016, "min": 0, "name": "income", "type": "Numerical", "label": "income"}, "latino": {"name": "latino", "type": "Boolean", "label": ""}, "married": {"name": "married", "type": "Boolean", "label": ""}}
+
+        # Send the dp_statistics for validation
+        #
+        analysis_plan.dp_statistics =   [{'variable': 'age',
+                      'col_index': 4,
+                      'statistic': astatic.DP_SUM,
+                      'dataset_size': 10_000,
+                      'epsilon': 1.0,
+                      'delta': 0.0,
+                      'cl': astatic.CL_95,
+                      'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+                      'fixed_value': '44',
+                      'variable_info': {'min': 18,
+                                        'max': 95,
+                                        'type': pstatic.VAR_TYPE_INTEGER},
+                      }]
+
+        analysis_plan.save()
+
+        params = dict(object_id=str(analysis_plan.object_id))
+        response = self.client.post('/api/release/',
+                                    json.dumps(params),
+                                    content_type='application/json')
+
+        jresp = response.json()
+        #print('jresp', json.dumps(jresp,))
+
+        self.assertEqual(response.status_code, 201)
+        self.assertIsNotNone(jresp['dp_release'])
+        self.assertIsNotNone(jresp['object_id'])
+        self.assertIsNotNone(jresp['dp_release']['differentially_private_library'])
+        self.assertIsNotNone(jresp['dp_release']['statistics'])
+
+        dp_sum_stat = jresp['dp_release']['statistics'][0]
+
+        self.assertEqual(dp_sum_stat['statistic'], astatic.DP_SUM)
+        self.assertEqual(dp_sum_stat['variable'], 'age')
+        self.assertIsNotNone(dp_sum_stat['result'])
+        self.assertIsNotNone(dp_sum_stat['result']['value'])
+        self.assertGreater(dp_sum_stat['result']['value'], 400_000)

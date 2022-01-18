@@ -9,7 +9,7 @@
             it('successfully loads', () => {
                 cy.visit('/')
                 cy.get('h2')
-                    .should('contain', 'Open')
+                    .should('contain', 'Tips for Use')
             })
         })
 
@@ -17,7 +17,7 @@
             it('correctly renders locale text', () => {
                 cy.visit('/')
                 cy.get('p')
-                    .should('contain', 'DP Creator allows researchers to create high utility statistics')
+                    .should('contain', 'A differentially private (DP) Release includes the statistic or statistics that you have requested. ')
             })
         })
 }

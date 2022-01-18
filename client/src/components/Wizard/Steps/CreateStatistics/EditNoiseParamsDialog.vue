@@ -26,18 +26,15 @@
             “Information that could cause risk of harm to individuals or the
             university if disclosed”</span
           >)<br/>
-          <span class="primary--text font-weight-bold pointer"
-          >Modify this selection
-            <v-icon small color="primary">mdi-open-in-new</v-icon></span
-          >
         </span>
         <div
             class="borderBottom soft_primary grey--text text--darken-2 pa-3 my-5 top-borders-radius noise-params d-flex justify-space-between width50"
         >
           <span>Epsilon (&epsilon;)</span>
-          <input
+          <v-text-field
               class="text-right font-weight-bold"
               type="number"
+              data-test="editEpsilonInput"
               v-model="editEpsilon"
           />
         </div>
@@ -47,8 +44,8 @@
         <div
             class="borderBottom soft_primary grey--text text--darken-2 pa-3 my-5 top-borders-radius noise-params d-flex justify-space-between width50"
         >
-          <span>Delta (x)</span>
-          <input
+          <span>Delta (δ)</span>
+          <v-text-field
               class="text-right font-weight-bold"
               type="number"
               v-model="editDelta"
@@ -60,25 +57,15 @@
         <div
             class="soft_primary grey--text text--darken-2 top-borders-radius width50 pl-3 mb-5 borderBottom"
         >
-          <span class="d-inline-block width50">Significance level</span>
+          <span class="d-inline-block width50">Confidence Level</span>
           <v-autocomplete
-              v-model="editConfidenceInterval"
+              v-model="editConfidenceLevel"
               :items="confidenceLevelOptions"
               class="d-inline-block confidenceLevel pl-5 pt-2 font-weight-bold width50 text-right"
               placeholder="Select..."
           ></v-autocomplete>
         </div>
-        <AdditionalInformationAlert>
-          <template v-slot:content>
-            <span
-            >
-              <div v-html="$t('create statistics.confirm 4')"></div>
-              <a href="http://" class="text-decoration-none primary--text"
-              >Watch video to learn more.</a
-              >
-            </span>
-          </template>
-        </AdditionalInformationAlert>
+
       </v-card-text>
       <v-card-actions>
         <Button
@@ -92,6 +79,7 @@
             outlined
             classes="px-5"
             :click="handleCancelEditNoiseParamsDialog"
+            data-test="editParamsCancel"
             label="Cancel"
         />
       </v-card-actions>
@@ -128,6 +116,7 @@
 <script>
 import Button from "../../../DesignSystem/Button.vue";
 import AdditionalInformationAlert from "../../../DynamicHelpResources/AdditionalInformationAlert";
+import {confLevelOptions} from "@/shared/createStatsUtils";
 
 export default {
   name: "EditNoiseParamsDialog",
@@ -139,16 +128,30 @@ export default {
     return {
       editEpsilon: this.epsilon,
       editDelta: this.delta,
-      editConfidenceInterval: this.confidenceInterval,
-      confidenceLevelOptions: [.01, .05]
+      editConfidenceLevel: this.confidenceLevel,
+      confidenceLevelOptions: confLevelOptions
     };
   },
-  props: ["dialogEditNoiseParams", "epsilon", "delta", "confidenceInterval"],
+  props: ["dialogEditNoiseParams", "epsilon", "delta", "confidenceLevel"],
+  // Sometimes the properties are updated
+  // after the data has been initialized. (Because the component is created on the first navigation to the Wizard)
+  // To handle this add a watch for updated property values)
+  watch: {
+    epsilon: function (newVal) {
+      this.editEpsilon = newVal
+    },
+    delta: function (newVal) {
+      this.editDelta = newVal
+    },
+    confidenceLevel: function (newVal) {
+      this.editConfidenceLevel = newVal
+    },
+  },
   methods: {
     handleCancelEditNoiseParamsDialog() {
       this.editEpsilon = this.epsilon;
       this.editDelta = this.delta;
-      this.editConfidenceInterval = this.confidenceInterval;
+      this.editConfidenceLevel = this.confidenceLevel;
       this.$emit("update:dialogEditNoiseParams", false);
     },
     handleSaveEditNoiseParamsDialog() {
@@ -156,7 +159,7 @@ export default {
           "noiseParamsUpdated",
           this.editEpsilon,
           this.editDelta,
-          this.editConfidenceInterval
+          this.editConfidenceLevel
       );
       this.$emit("update:dialogEditNoiseParams", false);
     }

@@ -1,49 +1,19 @@
+import json
+import decimal
+
 from os.path import abspath, dirname, isfile, join
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
-import json
-import decimal
-
-from django.contrib.auth import get_user_model
-from django.test.testcases import TestCase
-
-from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
-from opendp_apps.analysis.models import AnalysisPlan
-from opendp_apps.dataset.models import DataSetInfo
-
-from unittest import skip
+from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
 from opendp_apps.analysis.tools.dp_histogram_spec import DPHistogramSpec
-
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.utils.extra_validators import *
 
 
-class HistogramStatSpecTest(TestCase):
+class HistogramStatSpecTest(StatSpecTestCase):
     fixtures = ['test_dataset_data_001.json', ]
-
-    def setUp(self):
-        """Make a user"""
-        self.user_obj, _created = get_user_model().objects.get_or_create(username='dev_admin')
-
-    def retrieve_new_plan(self):
-        """Convenience method to create a new plan"""
-
-        # Create a plan
-        #
-        dataset_info = DataSetInfo.objects.get(id=4)
-
-        plan_info = AnalysisPlanUtil.create_plan(dataset_info.object_id, self.user_obj)
-        self.assertTrue(plan_info.success)
-        orig_plan = plan_info.data
-
-        # Retrieve it
-        #
-        analysis_plan = AnalysisPlan.objects.first()
-        self.assertEqual(orig_plan.object_id, analysis_plan.object_id)
-
-        return analysis_plan
 
     def test_10_debug(self):
         """(10) Test DP Mean Spec"""
@@ -55,7 +25,7 @@ class HistogramStatSpecTest(TestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95,
+                      'cl': astatic.CL_95,
                       # 'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': 0,
@@ -96,7 +66,7 @@ class HistogramStatSpecTest(TestCase):
                 'dataset_size': 183,
                 'epsilon': 1.0,
                 'delta': 0.0,
-                'ci': astatic.CI_95,
+                'cl': astatic.CL_95,
                 'col_index': 0,
                 'fixed_value': 1,
                 'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
@@ -149,7 +119,7 @@ class HistogramStatSpecTest(TestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95,
+                      'cl': astatic.CL_95,
                       # 'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': 5,
@@ -171,9 +141,9 @@ class HistogramStatSpecTest(TestCase):
             self.assertTrue(dp_hist.is_chain_valid())
 
         print('   --------')
-        for ci_val in [x[0] for x in astatic.CI_CHOICES]:
-            print(f'> Valid ci val: {ci_val}')
-            spec_props['ci'] = ci_val
+        for cl_val in [x[0] for x in astatic.CL_CHOICES]:
+            print(f'> Valid cl val: {cl_val}')
+            spec_props['cl'] = cl_val
             dp_hist = DPHistogramSpec(spec_props)
             self.assertTrue(dp_hist.is_chain_valid())
 
@@ -184,9 +154,9 @@ class HistogramStatSpecTest(TestCase):
             print(f'> Valid dataset_size: {good_ds}')
             self.assertTrue(dp_hist.is_chain_valid())
 
-    def test_30_bad_ci(self):
-        """(30) Bad ci vals"""
-        msgt(self.test_30_bad_ci.__doc__)
+    def test_30_bad_confidence_levels(self):
+        """(30) Bad confidence level values"""
+        msgt(self.test_30_bad_confidence_levels.__doc__)
 
         spec_props = {'variable': 'Subject',
                       'col_index': 0,
@@ -194,7 +164,7 @@ class HistogramStatSpecTest(TestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95,
+                      'cl': astatic.CL_95,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': 5,
                       'variable_info': {'min': -8,
@@ -210,9 +180,9 @@ class HistogramStatSpecTest(TestCase):
                 yield float(start)
                 start += decimal.Decimal(step)
 
-        for ci_val in list(float_range(-1, 3, '0.1')) + ['alphabet', 'soup']:
+        for cl_val in list(float_range(-1, 3, '0.1')) + ['alphabet', 'soup']:
             # print(f'> Invalid ci val: {ci_val}')
-            spec_props['ci'] = ci_val
+            spec_props['cl'] = cl_val
             dp_hist = DPHistogramSpec(spec_props)
             # print(dp_hist.is_chain_valid())
             self.assertTrue(dp_hist.is_chain_valid())
@@ -227,7 +197,7 @@ class HistogramStatSpecTest(TestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95,
+                      'cl': astatic.CL_95,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': 5,
                       'variable_info': {'min': -8,
@@ -276,7 +246,7 @@ class HistogramStatSpecTest(TestCase):
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
-                      'ci': astatic.CI_95,
+                      'cl': astatic.CL_95,
                       # 'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': 5,
@@ -324,7 +294,7 @@ class HistogramStatSpecTest(TestCase):
             'dataset_size': 183,
             'epsilon': 1.0,
             'delta': 0.0,
-            'ci': astatic.CI_95,
+            'cl': astatic.CL_95,
             'fixed_value': 1,
             'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
             'variable_info': {

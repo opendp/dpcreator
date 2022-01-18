@@ -1,6 +1,18 @@
+import os
+from urllib import parse
+
 from django.db import models
 from django.conf import settings
+
 from opendp_apps.model_helpers.models import TimestampedModelWithUUID
+
+
+class DifferentTermsOfAccessException(Exception):
+    pass
+
+
+class InvalidTermsOfServiceVersionNumber(Exception):
+    pass
 
 
 class TermsOfAccess(TimestampedModelWithUUID):
@@ -20,6 +32,30 @@ class TermsOfAccess(TimestampedModelWithUUID):
 
     def __str__(self):
         return f'{self.name} - v{self.version}'
+
+    def save(self, *args, **kwargs):
+        """
+        Save a TermsOfAccess model.
+        :param args:
+        :param kwargs: Potentially contains template_path
+        :return:
+        """
+        # For testing and flexibility, we should allow this method to accept an argument `template_path` which
+        # specifies the location of the template to be compared against.
+        try:
+            template_path = kwargs.pop('template_path')
+        except KeyError:
+            template_path = os.path.dirname(os.path.realpath(__file__)) + f'/templates/{self.version}.html'
+        try:
+            with open(template_path, 'r') as infile:
+                toa_file = infile.read().replace(' ', '').replace('\n', '').replace('\t', '')
+                description = parse.unquote_plus(self.description)
+                description = description.replace(' ', '').replace('\n', '').replace('\r', '').replace('\t', '')
+                if toa_file != description:
+                    raise DifferentTermsOfAccessException(f"Invalid description for version {self.version}")
+        except FileNotFoundError:
+            raise InvalidTermsOfServiceVersionNumber(f"No template file exists for version {self.version}")
+        super(TermsOfAccess, self).save(*args, **kwargs)
 
 
 class TermsOfAccessLog(TimestampedModelWithUUID):

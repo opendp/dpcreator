@@ -33,7 +33,7 @@
       "updated": "2021-07-12T18:56:59.730Z",
       "object_id": "b16d47b3-c1c7-403e-9b66-e32d49aa7a5f",
       "name": "Test Dataverse EC2",
-      "dataverse_url": "http://ec2-18-232-125-211.compute-1.amazonaws.com",
+      "dataverse_url": "http://ec2-35-171-244-178.compute-1.amazonaws.com",
       "active": true,
       "notes": "Test Dataverse. Created on 7/12/2021"
     }
@@ -89,9 +89,7 @@
       "email": "dv_user@mock.edu",
       "first_name": "Fname",
       "last_name": "Lname",
-      "dv_general_token": "",
-      "dv_sensitive_token": "",
-      "dv_token_update": null
+      "dv_general_token": ""
     }
   },
   {
@@ -107,9 +105,7 @@
       "email": "mock_user@some.edu",
       "first_name": "Mock",
       "last_name": "User",
-      "dv_general_token": "shoefly-dont-bother-m3",
-      "dv_sensitive_token": "shoefly-dont-bother-m3",
-      "dv_token_update": null
+      "dv_general_token": "shoefly-dont-bother-m3"
     }
   },
   {
@@ -125,9 +121,7 @@
       "email": "raman_prasad@harvard.edu",
       "first_name": "Raman",
       "last_name": "Prasad",
-      "dv_general_token": "some-old-token",
-      "dv_sensitive_token": "",
-      "dv_token_update": "2021-07-20T15:12:40Z"
+      "dv_general_token": "some-old-token"
     }
   },
   {

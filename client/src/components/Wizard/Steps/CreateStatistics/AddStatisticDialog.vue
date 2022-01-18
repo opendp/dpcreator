@@ -5,7 +5,7 @@
       @click:outside="close"
   >
     <v-card elevation="2" class="px-10 py-12 add-statistic-dialog">
-      <v-icon style="position: absolute; right: 40px" @click="close"
+      <v-icon data-test="Add Statistic Close" style="position: absolute; right: 40px" @click="close"
       >mdi-close
       </v-icon
       >
@@ -38,9 +38,13 @@
 
         <div>
           <span> Which<strong> variable </strong>would you like to use? </span>
+          <span> (Need to add another variable?
+            <a data-test="confirmVariablesLink" v-on:click="addVariable">Go back to Confirm Variables Step </a>
+            ) </span>
+
           <v-radio-group
               row
-              :multiple="editedIndex === -1"
+              :multiple="false"
               class="radio-group-statistics-modal"
               v-model="editedItemDialog.variable"
           >
@@ -55,31 +59,32 @@
             ></v-radio>
           </v-radio-group>
         </div>
+        <!--
+                <div>
+                  <span>
+                    How would you like<strong> missing values to be handled</strong>?
+                  </span>
 
+                  <v-radio-group
+                      row
+                      class="radio-group-statistics-modal"
+                      v-model="editedItemDialog.missingValuesHandling"
+                  >
+                    <v-radio
+                        class="rounded-pill mr-2"
+                        v-for="(handlingOption, index) in missingValuesHandling"
+                        :key="handlingOption + '-' + index"
+                        :label="handlingOption.label"
+                        :value="handlingOption.value"
+                        :data-test="handlingOption.label"
+                        on-icon="mdi-check"
+                        @click="() => updateFixedInputVisibility(handlingOption)"
+                    ></v-radio>
+                  </v-radio-group>
+                </div>
+        -->
+        <!--    <div v-if="editedItemDialog.handleAsFixed">-->
         <div>
-          <span>
-            How would you like<strong> missing values to be handled</strong>?
-          </span>
-
-          <v-radio-group
-              row
-              class="radio-group-statistics-modal"
-              v-model="editedItemDialog.missingValuesHandling"
-          >
-            <v-radio
-                class="rounded-pill mr-2"
-                v-for="(handlingOption, index) in missingValuesHandling"
-                :key="handlingOption + '-' + index"
-                :label="handlingOption.label"
-                :value="handlingOption.value"
-                :data-test="handlingOption.label"
-                on-icon="mdi-check"
-                @click="() => updateFixedInputVisibility(handlingOption)"
-            ></v-radio>
-          </v-radio-group>
-        </div>
-
-        <div v-if="editedItemDialog.handleAsFixed">
           <span>Enter your <strong> fixed value:</strong></span>
           <div class="width50">
             <v-text-field
@@ -214,7 +219,6 @@ export default {
       const returnVal = (
           !this.editedItemDialog.statistic ||
           !this.editedItemDialog.variable ||
-          !this.analysisPlan ||
           !this.editedItemDialog.missingValuesHandling
       );
       return returnVal
@@ -230,11 +234,10 @@ export default {
         if (displayVar.label === '') {
           displayVar.label = displayVar.name
         }
-
-        if ((this.selectedStatistic == null) ||
-            (this.selectedStatistic.label !== 'Mean') ||
-            (this.selectedStatistic.label === 'Mean' && this.variableInfo[key].type === 'Numerical')) {
+        if (this.variableInfo[key].selected &&
+            (!this.selectedStatistic || this.allowedVariableTypes[this.selectedStatistic.label].includes(this.variableInfo[key].type))) {
           displayVars.push(displayVar)
+
         }
 
       }
@@ -244,6 +247,9 @@ export default {
   watch: {
     editedItem: function (newEditedItem) {
       this.editedItemDialog = Object.assign({}, newEditedItem);
+      // automatic assignments added here because we removed the option from the popup
+      this.editedItemDialog.handleAsFixed = true
+      this.editedItemDialog.missingValuesHandling = "insert_fixed"
     },
 
   },
@@ -251,22 +257,27 @@ export default {
     singleVariableStatistics: [
       {value: "mean", label: "Mean"},
       {value: "histogram", label: "Histogram"},
-      {value: "quantile", label: "Quantile"},
+      //  {value: "quantile", label: "Quantile"},
       {value: "count", label: "Count"}
     ],
+    allowedVariableTypes: {
+      "Mean": ["Integer", "Float"],
+      "Count": ["Integer", "Float", "Categorical", "Boolean"],
+      "Histogram": ["Integer", "Float"],
+      "Quantile": ["Integer", "Float"] // not yet available
+    },
     selectedStatistic: null,
     validationError: false,
     validationErrorMsg: null,
     editedItemDialog: {
       statistic: "",
       label: "",
-      variable: [],
+      variable: "",
       epsilon: "",
       delta: '0.0',
-      ci: null,
       error: "",
-      missingValuesHandling: "",
-      handleAsFixed: false,
+      missingValuesHandling: "insert_fixed",
+      handleAsFixed: true,
       fixedValue: 0,
       locked: false,
       accuracy: {value: null, message: null}
@@ -310,33 +321,24 @@ export default {
     checkForDuplicates() {
       let duplicates = false
       if (this.statistics) {
-        // "variable" property may be a string (edit mode)
-        // or an array of strings (create mode)
-        if (typeof this.editedItemDialog.variable === 'string' ||
-            this.editedItemDialog.variable instanceof String) {
+        if (this.editedItemDialog.variable) {
           duplicates = this.isMatchingStatistic(this.editedItemDialog.variable)
-        } else {
-          this.editedItemDialog.variable.forEach((variable) => {
-            // Check for duplicate in the current statistics list
-            if (this.isMatchingStatistic(variable)) {
-              duplicates = true
-            }
-          })
-
         }
       }
       return duplicates
     },
     isMatchingStatistic(variable) {
       let isMatching = false
-      this.statistics.forEach((stat) => {
-        if (stat.statistic === this.editedItemDialog.statistic
-            && stat.variable === variable
-            && stat.missingValuesHandling === this.editedItemDialog.missingValuesHandling
-            && stat.fixedValue === this.editedItemDialog.fixedValue) {
-          isMatching = true
-        }
-      })
+      if (this.statistics) {
+        this.statistics.forEach((stat) => {
+          if (stat.statistic === this.editedItemDialog.statistic
+              && stat.variable === variable
+              && stat.missingValuesHandling === this.editedItemDialog.missingValuesHandling
+              && stat.fixedValue === this.editedItemDialog.fixedValue) {
+            isMatching = true
+          }
+        })
+      }
       return isMatching
     },
 
@@ -347,12 +349,11 @@ export default {
       if (this.editedIndex > -1) {
         tempStats[this.editedIndex] = this.editedItemDialog
       } else {
-        this.editedItemDialog.variable.forEach((variable) => {
-          const label = variable
-          const ci = this.getDepositorSetupInfo.confidenceInterval
-          tempStats.push(Object.assign({}, this.editedItemDialog, {variable}, {label}, {ci})
-          );
-        })
+        const label = this.editedItemDialog.variable
+        const variable = this.editedItemDialog.variable
+        const cl = this.getDepositorSetupInfo.confidenceLevel
+        tempStats.push(Object.assign({}, this.editedItemDialog, {variable}, {label}, {cl}))
+
       }
       createStatsUtils.redistributeValue(this.getDepositorSetupInfo.epsilon, 'epsilon', tempStats)
       createStatsUtils.redistributeValue(this.getDepositorSetupInfo.delta, 'delta', tempStats)
@@ -364,10 +365,14 @@ export default {
 
 
     },
-
+    addVariable() {
+      this.close()
+      this.$emit("addVariable")
+    },
     close() {
       this.validationError = false
       this.validationErrorMsg = ""
+      this.selectedStatistic = null
       this.$emit("close");
     },
     updateSelectedVariable(variable, index) {

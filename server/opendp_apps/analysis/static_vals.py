@@ -1,12 +1,27 @@
+# ---------------------------------
+# Confidence level static values
+# ---------------------------------
+CL_90 = 0.90    # just to look at
+CL_95 = 0.95
+CL_99 = 0.99
 
-CI_90 = 0.10    # just to look at
-CI_95 = 0.05
-CI_99 = 0.01
-CI_CHOICES = (
-    (CI_90, '90% CI'),
-    (CI_95, '95% CI'),
-    (CI_99, '99% CI'),
+CL_90test_30_bad_confidence_levels = 0.10
+CL_95_ALPHA = 0.05
+CL_99_ALPHA = 0.01
+
+CL_CHOICES = (
+    (CL_90, '90% CL'),
+    (CL_95, '95% CL'),
+    (CL_99, '99% CL'),
 )
+
+# --------------------------------------
+# Often-used Delta values
+# --------------------------------------
+DELTA_0 = 0.0
+DELTA_10_NEG_5 = 10.0 ** -5
+DELTA_10_NEG_6 = 10.0 ** -6
+DELTA_10_NEG_7 = 10.0 ** -7
 
 # --------------------------------------
 # Statistic Types
@@ -17,10 +32,6 @@ DP_COUNT = 'count'
 DP_HISTOGRAM = 'histogram'
 DP_QUANTILE = 'quantile'
 DP_STATS_CHOICES = [DP_MEAN, DP_SUM, DP_COUNT, DP_HISTOGRAM, DP_QUANTILE]
-
-DP_STAT_NEED_MIN_MAX = {DP_MEAN: True,
-                        DP_HISTOGRAM: False}
-
 
 # --------------------------------------
 # Missing value handling
@@ -53,3 +64,13 @@ ERR_MSG_INVALID_MIN_MAX = 'The "max" must be greater than the "min"'
 
 ERR_IMPUTE_PHRASE_MIN = 'cannot be less than the "min"'
 ERR_IMPUTE_PHRASE_MAX = 'cannot be more than the "max"'
+
+ERR_MSG_CL_ALPHA_CL_NOT_SET = 'Attempted to calculate confidence level (CL) alpha when CL was not set'
+ERR_MSG_CL_ALPHA_CL_NOT_NUMERIC = 'Failed to calculate confidence level (CL) alpha using CL of'
+ERR_MSG_CL_ALPHA_CL_GREATER_THAN_1 = 'Failed to calculate confidence level (CL) alpha. Value was greater than 1'
+ERR_MSG_CL_ALPHA_CL_LESS_THAN_0 = 'Failed to calculate confidence level (CL) alpha. Value was less than 0'
+
+ERR_MSG_DEPOSIT_NO_JSON_FILE = 'A JSON file is not avilable for deposit.'
+ERR_MSG_DEPOSIT_NO_PDF_FILE = 'A PDF file is not avilable for deposit.'
+ERR_MSG_DEPOSIT_NOT_DATAVERSE = 'Deposit functionality is not available for a non-Dataverse file'
+ERR_MSG_DEPOSIT_NO_DV_USER = 'The Datavese user could not be for this release.'

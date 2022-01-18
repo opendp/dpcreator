@@ -115,6 +115,7 @@ def view_get_dataset_export(request, format='ddi'):
 
         # Replicate the DDI API call
         #
+        """
         if export_format == dv_static.EXPORTER_FORMAT_DDI:
             if not mock_params.ddi_content:
                 user_msg = f'DDI info not available for ManifestTestParams id: {mock_params.id}'
@@ -126,10 +127,11 @@ def view_get_dataset_export(request, format='ddi'):
             response = HttpResponse(mock_params.ddi_content, content_type='application/xml')
             response['Content-Disposition'] = f'inline;filename={ddi_download_name}'
             return response
+        """
 
         # Replicate the schema.org API call
         #
-        elif export_format == dv_static.EXPORTER_FORMAT_SCHEMA_ORG:
+        if export_format == dv_static.EXPORTER_FORMAT_SCHEMA_ORG:
             if not mock_params.schema_org_content:
                 user_msg = f'schema.org content not available for ManifestTestParams id: {mock_params.id}'
                 return JsonResponse({dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_ERROR,

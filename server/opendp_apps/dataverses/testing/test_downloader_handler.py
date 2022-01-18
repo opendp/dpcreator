@@ -84,7 +84,6 @@ class DownloadHandlerTests(TestCase):
         print('>>> new_file_name', dhandler.new_file_name)
         self.assertEqual(dhandler.new_file_name, 'crisis.tab')
 
-
         # ---------------------------
         # Run the Profile Handler!
         # ---------------------------

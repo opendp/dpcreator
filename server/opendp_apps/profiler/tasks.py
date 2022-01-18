@@ -1,38 +1,59 @@
+from django.conf import settings
+
+from django.core.exceptions import ValidationError as DjangoValidationError
+
+from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
+from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.dataset import static_vals as dstatic
+
+from opendp_apps.profiler.csv_reader import CsvReader
+from opendp_apps.profiler.dataset_info_updater import DataSetInfoUpdater
+from opendp_apps.profiler.profile_runner import ProfileRunner #run_profile
+from opendp_apps.profiler import static_vals as pstatic
 from opendp_project.celery import celery_app
 
 from opendp_apps.dataset.models import DataSetInfo
-from opendp_apps.profiler.profile_handler import ProfileHandler
-from opendp_apps.profiler import static_vals as pstatic
 
 
 @celery_app.task(ignore_result=True)
-def run_profile_by_filepath(filepath, dataset_object_id=None, **kwargs):
-    """Run the profiler using a valid filepath"""
-    params = {pstatic.KEY_DATASET_IS_FILEPATH: True}
+def run_profile_by_filepath(filepath, max_num_features=None, dataset_info_object_id=None, **kwargs):
+    """Run the profiler using a valid filepath
+    :filepath - filepath
+    :max_column_limit - integer to limit first n columns or None for all columns
+    :dataset_info_object_id - optional, id for DataSetInfo object
+    """
+    kwargs[pstatic.KEY_DATASET_OBJECT_ID] = dataset_info_object_id
 
-    params[pstatic.KEY_DATASET_OBJECT_ID] = dataset_object_id
-    params[pstatic.KEY_SAVE_ROW_COUNT] = kwargs.get(pstatic.KEY_SAVE_ROW_COUNT, True)
+    prunner = ProfileRunner(filepath, max_num_features, **kwargs)
 
-    ph = ProfileHandler(dataset_pointer=filepath, **params)
-
-    return ph
+    return prunner
 
 
 @celery_app.task(ignore_result=True)
-def run_profile_by_filefield(dataset_info_object_id, **kwargs):
-    """Run the profiler using a valid filepath"""
+def run_profile_by_filefield(dataset_info_object_id, max_num_features=None, **kwargs):
+    """
+    Run the profiler using the DataSetInfo object id
+    :param dataset_info_object_id DataSetInfo.object_id
+    :max_num_features int or None - number of features in the dataset to use, use None for all columns
+    """
+    try:
+        ds_info = DataSetInfo.objects.get(object_id=dataset_info_object_id)
+        filefield = ds_info.source_file
+    except DataSetInfo.DoesNotExist:
+        return BasicErrCheck.get_instance_with_error(dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND)
+    except DjangoValidationError as ex_obj:
+        user_msg = f'{dstatic.ERR_MSG_INVALID_DATASET_INFO_OBJECT_ID} ({dataset_info_object_id}) ({ex_obj})'
+        return BasicErrCheck.get_instance_with_error(user_msg)
+    except ValueError as ex_obj:
+        user_msg = f'{dstatic.ERR_MSG_INVALID_DATASET_INFO_OBJECT_ID} ({dataset_info_object_id}) ({ex_obj})'
+        return BasicErrCheck.get_instance_with_error(user_msg)
+
     params = {pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD: True,
               pstatic.KEY_DATASET_OBJECT_ID: dataset_info_object_id,
               pstatic.KEY_SAVE_ROW_COUNT: kwargs.get(pstatic.KEY_SAVE_ROW_COUNT, True)
               }
 
-    try:
-        ds_info = DataSetInfo.objects.get(object_id=dataset_info_object_id)
-        filefield = ds_info.source_file
-    except DataSetInfo.DoesNotExist:
-        filefield = None
+    prunner = ProfileRunner(filefield, max_num_features, **params)
 
-    ph = ProfileHandler(dataset_pointer=filefield, **params)
-
-    return ph
+    return prunner
 

@@ -1,0 +1,113 @@
+{
+  "myDataList": [
+    {
+      "datasetInfo": {
+        "objectId": "29b14152-ebb3-47f1-b34d-2009dfb567e6",
+        "name": "Mock Data",
+        "created": "2021-12-09T21:14:28.684160Z",
+        "creator": "ernie",
+        "installationName": "Test Dataverse EC2",
+        "dataverseFileId": 88,
+        "datasetDoi": "doi:10.5072/FK2/MBRUWW",
+        "fileDoi": "doi:10.5072/FK2/MBRUWW",
+        "status": "step_100",
+        "depositorSetupInfo": {
+          "id": 22,
+          "created": "2021-12-09T21:14:28.680831Z",
+          "updated": "2021-12-09T21:14:28.680873Z",
+          "objectId": "10c223a4-f0ae-41ec-b4c9-eec8083017c8",
+          "isComplete": false,
+          "userStep": "step_100",
+          "datasetQuestions": null,
+          "epsilonQuestions": null,
+          "variableInfo": null,
+          "defaultEpsilon": null,
+          "epsilon": null,
+          "defaultDelta": 0,
+          "delta": 0,
+          "confidenceLevel": 0.95,
+          "creator": 21
+        },
+        "datasetSchemaInfo": {
+          "@id": "https://doi.org/10.5072/FK2/MBRUWW",
+          "name": "Mock Data",
+          "@type": "Dataset",
+          "author": [
+            {
+              "name": "Kraffmiller, Ellen"
+            }
+          ],
+          "creator": [
+            {
+              "name": "Kraffmiller, Ellen"
+            }
+          ],
+          "license": {
+            "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+            "text": "CC0",
+            "@type": "Dataset"
+          },
+          "version": "3",
+          "@context": "http://schema.org",
+          "keywords": [
+            "Computer and Information Science"
+          ],
+          "provider": {
+            "name": "Root",
+            "@type": "Organization"
+          },
+          "publisher": {
+            "name": "Root",
+            "@type": "Organization"
+          },
+          "identifier": "https://doi.org/10.5072/FK2/MBRUWW",
+          "description": [
+            "test"
+          ],
+          "dateModified": "2021-12-09",
+          "distribution": [
+            {
+              "name": "bonabo MOCK_DATA-1.tab",
+              "@type": "DataDownload",
+              "contentUrl": "http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88",
+              "fileFormat": "text/tab-separated-values",
+              "contentSize": 234725
+            },
+            {
+              "name": "bonabo MOCK_DATA.tab",
+              "@type": "DataDownload",
+              "contentUrl": "http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/87",
+              "fileFormat": "text/tab-separated-values",
+              "contentSize": 234725
+            },
+            {
+              "name": "MOCK_DATA.tab",
+              "@type": "DataDownload",
+              "contentUrl": "http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/86",
+              "fileFormat": "text/tab-separated-values",
+              "contentSize": 85701
+            }
+          ],
+          "datePublished": "2021-12-07",
+          "includedInDataCatalog": {
+            "url": "http://ec2-35-171-244-178.compute-1.amazonaws.com",
+            "name": "Root",
+            "@type": "DataCatalog"
+          }
+        },
+        "fileSchemaInfo": {
+          "name": "bonabo MOCK_DATA-1.tab",
+          "@type": "DataDownload",
+          "contentUrl": "http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88",
+          "fileFormat": "text/tab-separated-values",
+          "contentSize": 234725
+        },
+        "analysisPlans": [],
+        "resourcetype": "DataverseFileInfo"
+      },
+      "analysisPlan": null,
+      "userStep": "step_100",
+      "timeRemaining": "2d 23h 59min"
+    }
+  ]
+}

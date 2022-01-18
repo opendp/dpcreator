@@ -1,5 +1,5 @@
 import auth from '../api/auth';
-import session from '../api/session';
+import {session} from '../api/session';
 import {
   LOGIN_BEGIN,
   LOGIN_FAILURE,
@@ -8,6 +8,7 @@ import {
   REMOVE_TOKEN, SET_CURRENT_TERMS, SET_TERMS_ACCEPTED, SET_TERMS_LOG,
   SET_TOKEN,
   SET_USER,
+  SET_BANNER_MESSAGES,
 } from './types';
 import terms from "@/api/terms";
 
@@ -20,13 +21,29 @@ const initialState = {
   token: null,
   user: null,
   currentTerms: null,
-  termsOfAccessLog: null
+  termsOfAccessLog: null,
+  bannerMessages: null
 
 };
 
 const getters = {
-  isAuthenticated: state => !!state.token,
+  isAuthenticated: state => !!state.user,
+  // Check to see if the user has accepted any terms at all.
+  // (TermsAccepted will be false the first time the user logs in,
+  // because the acceptance happened as the first step in Create Account.)
   isTermsAccepted: state => {
+    let accepted = false
+    if (state.termsOfAccessLog !== null && state.termsOfAccessLog.length > 0) {
+      for (let i in state.termsOfAccessLog) {
+        if (state.termsOfAccessLog[i].user === state.user.objectId) {
+          accepted = true
+        }
+      }
+    }
+    return accepted
+  },
+  // Check if the user has accepted the most recent termsOfUse
+  isCurrentTermsAccepted: state => {
     let accepted = false
     if (state.termsOfAccessLog !== null && state.termsOfAccessLog.length > 0) {
       for (let i in state.termsOfAccessLog) {
@@ -34,7 +51,6 @@ const getters = {
             && state.termsOfAccessLog[i].termsOfAccess === state.currentTerms.objectId) {
           accepted = true
         }
-
       }
     }
     return accepted
@@ -46,14 +62,27 @@ const getters = {
 
 
 const actions = {
-  login({ commit }, { username, password }) {
+  changeUsername({commit, state}, newUsername) {
+    let newUser = null;
+    newUser = Object.assign({}, state.user)
+    newUser.username = newUsername
+    auth.updateAccountDetails(newUser)
+        .then((data) => {
+          commit(SET_USER, newUser)
+        })
+
+  },
+  login({commit}, {username, password}) {
     commit(LOGIN_BEGIN);
     return auth.login(username, password)
-      .then(({ data }) => {
-        commit(SET_TOKEN, data.key)
-      })
-      .then(() => commit(LOGIN_SUCCESS))
-      .catch((data) => {  commit(LOGIN_FAILURE); return Promise.reject(data)} );
+        .then(({data}) => {
+          commit(SET_TOKEN, data.key)
+        })
+        .then(() => commit(LOGIN_SUCCESS))
+        .catch((data) => {
+          commit(LOGIN_FAILURE);
+          return Promise.reject(data)
+        });
   },
   googleLogin({commit}, token) {
     commit(LOGIN_BEGIN);
@@ -69,28 +98,28 @@ const actions = {
           return Promise.reject(data)
         });
   },
-  logout({ commit }) {
+  logout({commit}) {
     return auth.logout()
-      .then(() => commit(LOGOUT))
-      .finally(() => commit(REMOVE_TOKEN));
+        .then(() => commit(LOGOUT))
+        .finally(() => commit(REMOVE_TOKEN));
   },
-
-  fetchUser({ commit,state }) {
-    if (state.token!=null) {
-      return auth.getAccountDetails()
-          .then(response => {
-
-            commit('SET_USER', response.data)
-            return Promise.resolve()
-          })
-          .catch(error => {
-            console.log('There was an error:', error.response)
-            return Promise.reject(error)
-          })
-    } else {
-      commit('SET_USER', null)
-      return Promise.resolve()
-    }
+  fetchBannerMessages({commit}) {
+    auth.getBannerMessages()
+        .then(response => {
+          commit(SET_BANNER_MESSAGES, response.data.results)
+          Promise.resolve()
+        })
+  },
+  fetchUser({commit, state}) {
+    return auth.getAccountDetails()
+        .then(response => {
+          commit('SET_USER', response.data)
+          return Promise.resolve()
+        })
+        .catch(error => {
+          commit('SET_USER', null)
+          return Promise.resolve()
+        })
   },
   fetchCurrentTerms({commit, state}) {
     return terms.getCurrentTerms().then((response) => {
@@ -102,16 +131,18 @@ const actions = {
       commit(SET_TERMS_LOG, response)
     })
   },
-  acceptTerms({commit, state}, {user, termsOfAccess}) {
-    console.log("accepting terms ")
-    terms.acceptTermsOfUse(user, termsOfAccess).then(console.log('updated terms'))
+  acceptTerms({commit, state}, {userId, termsOfAccessId}) {
+    terms.acceptTermsOfUse(userId, termsOfAccessId)
         .then(() => {
           terms.getTermsOfUseLog().then(response => {
             commit(SET_TERMS_LOG, response)
           })
         })
   },
-  initialize({commit}) {
+  initializeState({commit}) {
+    commit(LOGOUT)
+  },
+  initializeToken({commit}) {
     const token = localStorage.getItem(TOKEN_STORAGE_KEY);
 
     if (isProduction && token) {
@@ -141,6 +172,9 @@ const mutations = {
     state.authenticating = false;
     state.error = false;
     state.user = null;
+    state.currentTerms = null,
+        state.token = null,
+        state.termsOfAccessLog = null
   },
   [SET_TOKEN](state, token) {
     if (!isProduction) localStorage.setItem(TOKEN_STORAGE_KEY, token);
@@ -152,14 +186,17 @@ const mutations = {
     delete session.defaults.headers.Authorization;
     state.token = null;
   },
-  [SET_USER](state, username) {
-    state.user = username;
+  [SET_USER](state, user) {
+    state.user = user;
   },
   [SET_CURRENT_TERMS](state, currentTerms) {
     state.currentTerms = currentTerms
   },
   [SET_TERMS_LOG](state, termsLog) {
     state.termsOfAccessLog = termsLog
+  },
+  [SET_BANNER_MESSAGES](state, bannerMessages) {
+    state.bannerMessages = bannerMessages
   }
 };
 

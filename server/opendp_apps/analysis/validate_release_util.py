@@ -25,12 +25,14 @@ from opendp.mod import OpenDPException
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
+from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
 from opendp_apps.analysis.stat_valid_info import StatValidInfo
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
 from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
 from opendp_apps.analysis.tools.dp_histogram_spec import DPHistogramSpec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
+from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
 
 from opendp_apps.utils.extra_validators import \
     (validate_epsilon_not_null,
@@ -59,11 +61,14 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.analysis_plan_id = analysis_plan_id
         self.analysis_plan = None       # to be retrieved
 
+        self.dp_statistics = dp_statistics  # User defined
+        self.compute_mode = compute_mode
+
+        self.run_dataverse_deposit = kwargs.get('run_dataverse_deposit', False)
+
         self.max_epsilon = None         # from analysis_plan.dataset.get_depositor_setup_info()
         self.max_delta = None           # from analysis_plan.dataset.get_depositor_setup_info()
         self.dataset_size = None        # from analysis_plan.dataset
-
-        self.dp_statistics = dp_statistics  # User defined
 
         self.stat_spec_list = []        # list of StatSpec objects
         self.validation_info = []       # list of StatValidInfo objects to send to UI
@@ -73,35 +78,45 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         self.opendp_version = pkg_resources.get_distribution('opendp').version
 
-        self.compute_mode = compute_mode
         if self.compute_mode is True:
             self.run_release_process()
         else:
             self.run_validation_process()
 
     @staticmethod
-    def validate_mode(opendp_user: get_user_model(), analysis_plan_id: int, dp_statistics: list=None):
+    def validate_mode(opendp_user: get_user_model(), analysis_plan_id: int,
+                      dp_statistics: list  =None):
         """
         Use this method to return a ValidateReleaseUtil validates the dp_statistics
         """
         return ValidateReleaseUtil(opendp_user, analysis_plan_id, dp_statistics)
 
     @staticmethod
-    def compute_mode(opendp_user: get_user_model(), analysis_plan_id: int):
+    def compute_mode(opendp_user: get_user_model(), analysis_plan_id: int,
+                     run_dataverse_deposit: bool = False):
         """
         Use this method to return a ValidateReleaseUtil which runs the dp_statistics
         """
-        return ValidateReleaseUtil(opendp_user, analysis_plan_id,
+        return ValidateReleaseUtil(opendp_user,
+                                   analysis_plan_id,
                                    dp_statistics=None,
-                                   compute_mode=True)
-
+                                   compute_mode=True,
+                                   **dict(run_dataverse_deposit=run_dataverse_deposit))
 
     def add_stat_spec(self, stat_spec: StatSpec):
         """Add a StatSpec subclass to a list"""
         self.stat_spec_list.append(stat_spec)
 
     def run_release_process(self):
-        """Run the release process"""
+        """
+        Run the release process which includes:
+        - validation of the analysis plan
+        - running the computation chain for each statistic
+        - create a ReleaseInfo object
+            - create/add a JSON file
+            - create/add a PDF file
+        - deposit the files to Dataverse (if appropriate)
+        """
         if self.has_error():
             return
 
@@ -116,7 +131,11 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         # Any stat specific validation errors?
         #   - Fail on 1st error found
+        # print('validate_release_util. release; show validation errors (if any)')
         for stat_spec in self.stat_spec_list:
+            if stat_spec.has_error():
+                stat_spec.print_debug()
+            #    print(stat_spec.get_single_err_msg())
             if stat_spec.has_error():
                 user_msg = (f'Validation error found for variable "{stat_spec.variable}"'
                             f' and statistic "{stat_spec.statistic}":'
@@ -136,7 +155,7 @@ class ValidateReleaseUtil(BasicErrCheck):
         # -----------------------------------
         filepath = self.analysis_plan.dataset.source_file.path
         sep_char = get_data_file_separator(filepath)
-        #print('sep_char', sep_char)
+        # print('sep_char', sep_char)
 
         # -----------------------------------
         # Iterate through the stats!
@@ -163,7 +182,7 @@ class ValidateReleaseUtil(BasicErrCheck):
                 self.add_err_msg(user_msg)
                 #
                 # Delete any previous stats
-                del(self.release_stats)
+                del self.release_stats
                 return
 
         # should never happen!
@@ -176,6 +195,40 @@ class ValidateReleaseUtil(BasicErrCheck):
         # It worked! Save the Release!!
         self.make_release_info(epsilon_used)
 
+        # Deposit release files in Dataverse
+        #
+        if not self.has_error():
+            self.deposit_to_dataverse()
+
+    def deposit_to_dataverse(self):
+        """
+        Using the ReleaseInfo object, deposit any release files to Dataverse
+        """
+        if self.has_error():
+            return
+
+        if not self.analysis_plan.dataset.is_dataverse_dataset():
+            # Not needed for this ReleaseInfo
+            return
+
+        if not self.run_dataverse_deposit:
+            return
+
+        if not self.release_info:
+            # Shouldn't happen!
+            self.add_err_msg('ReleaseInfo not available for Dataverse deposit')
+
+        self.analysis_plan.user_step = AnalysisPlan.AnalystSteps.STEP_1200_PROCESS_COMPLETE
+        self.analysis_plan.save()
+        print('ValidateReleaseUtil: Deposit complete!')
+
+        # If the ReleaseInfo object was crated and deposit fails,
+        # the error for the deposit will be sent to the user
+        #
+        deposit_util = DataverseDepositUtil(self.release_info)
+        if deposit_util.has_error():
+            # self.add_err_msg(deposit_util.get_err_msg())
+            return
 
     def make_release_info(self, epsilon_used: float):
         """
@@ -188,13 +241,13 @@ class ValidateReleaseUtil(BasicErrCheck):
         #
         formatted_release = self.get_final_release_data()
         if self.has_error():
-            del(self.release_stats)
-            return
+            del self.release_stats
+            return False
 
         formatted_release_json_str = self.get_final_release_data(as_json=True)
         if self.has_error():
-            del(self.release_stats)
-            return
+            del self.release_stats
+            return False
 
         # (3) Save the ReleaseInfo object
         #
@@ -216,16 +269,17 @@ class ValidateReleaseUtil(BasicErrCheck):
         # (5) Attach the ReleaseInfo to the AnalysisPlan, AnalysisPlan.release_info
         #
         self.analysis_plan.release_info = self.release_info
-        self.analysis_plan.user_step = AnalysisPlan.AnalystSteps.STEP_1200_PROCESS_COMPLETE
+        self.analysis_plan.user_step = AnalysisPlan.AnalystSteps.STEP_1000_RELEASE_COMPLETE
         self.analysis_plan.save()
         # print('ValidateReleaseUtil - self.release_stats', json.dumps(self.release_stats, indent=4))
+
+        return True
 
     def get_new_release_info_object(self):
         assert self.has_error() is False, \
             "Check that .has_error() is False before calling this method"
 
         return self.release_info
-
 
     def get_final_release_data(self, as_json=False):
         """Build object to save in ReleaseInfo.dp_release"""
@@ -236,9 +290,7 @@ class ValidateReleaseUtil(BasicErrCheck):
             self.add_err_msg(formatter.get_err_msg())
             return
 
-
         return formatter.get_release_data(as_json=as_json)
-
 
     def get_release_stats(self):
         """Return the release stats"""
@@ -246,7 +298,6 @@ class ValidateReleaseUtil(BasicErrCheck):
             "Check that .has_error() is False before calling this method"
 
         return self.release_stats
-
 
     def run_validation_process(self):
         """Run the validation"""
@@ -296,7 +347,6 @@ class ValidateReleaseUtil(BasicErrCheck):
                     # Looks good!
                     self.validation_info.append(stat_spec.get_success_msg_dict())
 
-
     def get_variable_indices(self):
         """
         Retrieve variable indices from the dataset profile
@@ -310,7 +360,6 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         self.add_err_msg(variable_indices_info.message)
         return None
-
 
     def build_stat_specs(self):
         """
@@ -369,7 +418,7 @@ class ValidateReleaseUtil(BasicErrCheck):
 
             # (2) Is this a known statistic? If not stop here.
             #
-            if not statistic in astatic.DP_STATS_CHOICES:
+            if statistic not in astatic.DP_STATS_CHOICES:
                 # also checked in the DPStatisticSerializer
                 props['error_message'] = f'Statistic "{statistic}" is not supported'
                 self.add_stat_spec(DPSpecError(props))
@@ -403,25 +452,30 @@ class ValidateReleaseUtil(BasicErrCheck):
 
             # Okay, "props" are built! Let's see if they work!
             #
-            if statistic == astatic.DP_MEAN:
-                self.add_stat_spec(DPMeanSpec(props))
-                continue
-            elif statistic in astatic.DP_HISTOGRAM:
-                spec = DPHistogramSpec(props)
-                self.add_stat_spec(spec)
-                continue
-            elif statistic == astatic.DP_COUNT:
+            if statistic == astatic.DP_COUNT:
+                # DP Count!
                 self.add_stat_spec(DPCountSpec(props))
-                continue
+
+            elif statistic in astatic.DP_HISTOGRAM:
+                # DP Histogram!
+                self.add_stat_spec(DPHistogramSpec(props))
+
+            elif statistic == astatic.DP_MEAN:
+                # DP Mean!
+                self.add_stat_spec(DPMeanSpec(props))
+
+            elif statistic == astatic.DP_SUM:
+                # DP Mean!
+                self.add_stat_spec(DPSumSpec(props))
+
             elif statistic in astatic.DP_STATS_CHOICES:
+                # Stat not yet available or an error
                 props['error_message'] = (f'Statistic "{statistic}" will be supported'
                                           f' soon!')
                 self.add_stat_spec(DPSpecError(props))
-                continue
             else:
                 # Shouldn't reach here, unknown stats are captured up above
                 pass
-
 
     def run_preliminary_steps(self):
         """Run preliminary steps before validation"""
@@ -472,7 +526,7 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         try:
             validate_not_negative(self.max_delta)
-        except ValidationError as err_obj:
+        except ValidationError as _err_obj:
             user_msg = f'{astatic.ERR_MSG_BAD_TOTAL_DELTA}: {self.max_delta}'
             self.add_err_msg(user_msg)
             return False

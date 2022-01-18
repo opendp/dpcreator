@@ -173,3 +173,11 @@ dpcreator_volume/
 client/cypress/videos/
 server/static_deploy/
 server/release-files/*
+server/scripts_dev/dv_test_creds.py
+.env
+!server/opendp_apps/banner_messages/fixtures/*.json
+!server/opendp_apps/banner_messages/fixtures/*.json
+!server/opendp_apps/dataverses/fixtures/*.json
+!server/opendp_apps/profiler/fixtures/*.json
+!server/test_data/pdfs/*.pdf
+!dev_notes/api_example_analysis_plan.json

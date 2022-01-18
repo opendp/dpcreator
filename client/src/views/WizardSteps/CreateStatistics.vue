@@ -10,14 +10,13 @@
     <NoiseParams
         :epsilon="epsilon"
         :delta="delta"
-        :confidenceInterval="confidenceInterval"
+        :confidenceLevel="confidenceLevel"
         v-on:editNoiseParams="dialogEditNoiseParamsConfirmation = true"
     />
 
     <ColoredBorderAlert type="warning" locale-tag="create statistics.epsilon warning">
     </ColoredBorderAlert>
-    <ColoredBorderAlert type="info" locale-tag="create statistics.statistics help">
-    </ColoredBorderAlert>
+
 
     <StatisticsTable
         :statistics="statistics"
@@ -41,6 +40,7 @@
         :editedItem="editedItem"
         v-on:saveConfirmed="save"
         v-on:close="close"
+        v-on:addVariable="addVariable"
     />
     <DeleteStatisticDialog
         :dialogDelete="dialogDelete"
@@ -57,7 +57,7 @@
         v-on:noiseParamsUpdated="handleSaveEditNoiseParamsDialog"
         :epsilon="epsilon"
         :delta="delta"
-        :confidenceInterval="confidenceInterval"
+        :confidenceLevel="confidenceLevel"
     />
   </div>
 </template>
@@ -120,26 +120,15 @@ export default {
       return this.editedIndex > -1;
     }
   },
-  created() {
-    this.initializeForm()
-  },
   watch: {
     statistics: function (newStatisticsArray) {
       this.$emit("stepCompleted", 3, newStatisticsArray.length !== 0);
     },
-    stepperPosition: function (val, oldVal) {
-      // If the wizard has landed on the CreateStatistics Step,
-      // initialize the form with data from Vuex store
-      if (val === 3) {
-        this.initializeForm()
-      }
-    }
-
   },
   data: () => ({
     epsilon: null,
     delta: null,
-    confidenceInterval: null,
+    confidenceLevel: null,
     statistics: [],
     dialogAddStatistic: false,
     dialogDelete: false,
@@ -171,6 +160,7 @@ export default {
   }),
   methods: {
     initializeForm() {
+      console.log('begin initialize form')
       if (this.analysisPlan !== null && this.analysisPlan.dpStatistics !== null) {
         // make a deep copy of the Vuex state so it can be edited locally
         this.statistics = JSON.parse(JSON.stringify(this.analysisPlan.dpStatistics))
@@ -182,10 +172,11 @@ export default {
       } else {
         this.epsilon = this.getDepositorSetupInfo.epsilon
       }
-      if (this.getDepositorSetupInfo.confidenceInterval == null) {
-        this.confidenceInterval = .01
+      console.log("initialize form, epsilon = " + this.epsilon)
+      if (this.getDepositorSetupInfo.confidenceLevel == null) {
+        this.confidenceLevel = .99
       } else {
-        this.confidenceInterval = this.getDepositorSetupInfo.confidenceInterval
+        this.confidenceLevel = this.getDepositorSetupInfo.confidenceLevel
       }
 
       if (!createStatsUtils.statisticsUseDelta(this.statistics)) {
@@ -195,17 +186,20 @@ export default {
       } else {
         this.delta = this.getDepositorSetupInfo.delta
       }
-
+      console.log('end initialize form')
     },
 
     handleOpenEditNoiseParamsDialog() {
       this.dialogEditNoiseParamsConfirmation = false;
       this.dialogEditNoiseParams = true;
     },
-    handleSaveEditNoiseParamsDialog(epsilon, delta, confidenceInterval) {
+    handleSaveEditNoiseParamsDialog(epsilon, delta, confidenceLevel) {
       this.epsilon = epsilon;
       this.delta = delta;
-      this.confidenceInterval = confidenceInterval;
+      this.confidenceLevel = confidenceLevel;
+      this.statistics.forEach((dpStat) => {
+        dpStat.cl = confidenceLevel
+      })
       createStatsUtils.redistributeValues(this.statistics, this.delta, this.epsilon, this.getDepositorSetupInfo.defaultDelta)
       // update stats with the accuracy values
       // (we don't have to check validation because that was done in the Dialog)
@@ -226,20 +220,24 @@ export default {
       }
       return label
     },
+    addVariable() {
+      this.$emit("addVariable")
+    },
     save(editedItemFromDialog) {
       this.editedItem = Object.assign({}, editedItemFromDialog);
       if (this.isEditionMode) {
-         Object.assign(this.statistics[this.editedIndex], this.editedItem);
+        Object.assign(this.statistics[this.editedIndex], this.editedItem);
       } else {
-        for (let variable of this.editedItem.variable) {
-          let ci = this.getDepositorSetupInfo.confidenceInterval
-          if (!createStatsUtils.isDeltaStat(this.editedItem.statistic)) {
-            this.editedItem.delta = ""
-          }
-          this.statistics.push(
-              Object.assign({}, this.editedItem, {variable}, {ci})
-          );
+        const variable = this.editedItem.variable
+        console.log("saving cl: " + this.getDepositorSetupInfo.confidenceLevel)
+        let cl = this.getDepositorSetupInfo.confidenceLevel
+        if (!createStatsUtils.isDeltaStat(this.editedItem.statistic)) {
+          this.editedItem.delta = ""
         }
+        this.statistics.push(
+            Object.assign({}, this.editedItem, {variable}, {cl})
+        );
+
       }
       createStatsUtils.redistributeValues(this.statistics, this.delta, this.epsilon, this.getDepositorSetupInfo.defaultDelta)
       this.setAccuracyAndSaveUserInput()
@@ -276,7 +274,7 @@ export default {
       let props = {
         epsilon: this.epsilon,
         delta: this.delta,
-        confidenceInterval: this.confidenceInterval
+        confidenceLevel: this.confidenceLevel
       }
       const payload = {objectId: this.getDepositorSetupInfo.objectId, props: props}
       this.$store.dispatch('dataset/updateDepositorSetupInfo',

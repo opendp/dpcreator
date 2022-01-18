@@ -1,0 +1,180 @@
+{
+   "id":{
+      "name":"id",
+      "type":"Integer",
+      "label":"",
+      "sort_order":0
+   },
+   "ein":{
+      "name":"EIN",
+      "type":"Categorical",
+      "label":"",
+      "categories":[
+
+      ],
+      "sort_order":17
+   },
+   "email":{
+      "name":"email",
+      "type":"Categorical",
+      "label":"",
+      "categories":[
+
+      ],
+      "sort_order":3
+   },
+   "byebye_color1":{
+      "name":"bye bye Color 1",
+      "type":"Categorical",
+      "label":"",
+      "categories":[
+
+      ],
+      "sort_order":12
+   },
+   "color2":{
+      "name":"Color 2",
+      "type":"Categorical",
+      "label":"",
+      "categories":[
+
+      ],
+      "sort_order":13
+   },
+   "gender":{
+      "name":"gender",
+      "type":"Categorical",
+      "label":"",
+      "categories":[
+
+      ],
+      "sort_order":4
+   },
+   "boolean1":{
+      "name":"Boolean1",
+      "type":"Boolean",
+      "label":"",
+      "categories":[
+
+      ],
+      "sort_order":7
+   },
+   "boolean2":{
+      "name":"Boolean2",
+      "type":"Categorical",
+      "label":"",
+      "categories":[
+
+      ],
+      "sort_order":8
+   },
+   "boolean3":{
+      "name":"Boolean3",
+      "type":"Categorical",
+      "label":"",
+      "categories":[
+
+      ],
+      "sort_order":9
+   },
+   "car_make":{
+      "name":"Car Make",
+      "type":"Categorical",
+      "label":"",
+      "categories":[
+
+      ],
+      "sort_order":10
+   },
+   "currency":{
+      "name":"Currency",
+      "type":"Categorical",
+      "label":"",
+      "categories":[
+
+      ],
+      "sort_order":16
+   },
+   "last_name":{
+      "name":"last_name",
+      "type":"Categorical",
+      "label":"",
+      "categories":[
+
+      ],
+      "sort_order":2
+   },
+   "first_name":{
+      "name":"first_name",
+      "type":"Categorical",
+      "label":"",
+      "categories":[
+
+      ],
+      "sort_order":1
+   },
+   "ip_address":{
+      "name":"ip_address",
+      "type":"Categorical",
+      "label":"",
+      "categories":[
+
+      ],
+      "sort_order":5
+   },
+   "app_version":{
+      "name":"App Version",
+      "type":"Categorical",
+      "label":"",
+      "categories":[
+
+      ],
+      "sort_order":6
+   },
+   "car_model_year":{
+      "name":"Car Model Year",
+      "type":"Float",
+      "label":"",
+      "sort_order":11
+   },
+   "gender_facebook":{
+      "name":"Gender Facebook",
+      "type":"Categorical",
+      "label":"",
+      "categories":[
+
+      ],
+      "sort_order":19
+   },
+   "credit_card_type":{
+      "name":"Credit Card Type",
+      "type":"Categorical",
+      "label":"Credit Card Type",
+      "categories":[
+         "americanexpress",
+         "bankcard",
+         "china-unionpay",
+         "diners-club-carte-blanche",
+         "jcb"
+      ],
+      "sort_order":15
+   },
+   "family_name_chinese":{
+      "name":"Family Name Chinese",
+      "type":"Categorical",
+      "label":"",
+      "categories":[
+
+      ],
+      "sort_order":18
+   },
+   "construction_material":{
+      "name":"Construction  Material",
+      "type":"Categorical",
+      "label":"",
+      "categories":[
+
+      ],
+      "sort_order":14
+   }
+}

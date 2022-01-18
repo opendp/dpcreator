@@ -44,9 +44,7 @@
         "email": "raman_prasad@harvard.edu",
         "first_name": "Raman",
         "last_name": "Prasad",
-        "dv_general_token": "some-old-token",
-        "dv_sensitive_token": "",
-        "dv_token_update": "2021-07-20T15:12:40Z"
+        "dv_general_token": "some-old-token"
     }
 },
 {
