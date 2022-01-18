@@ -4,7 +4,7 @@
     <p v-html="$t('confirm variables.confirm variables intro')"></p>
     <ColoredBorderAlert type="warning">
       <template v-slot:content>
-        Currently, the DP Creator takes the first 20 variables of the dataset.
+        Currently, the DP Creator takes the first 20 variables of the data file.
       </template>
     </ColoredBorderAlert>
     <ColoredBorderAlert type="info" icon="mdi-shield-half-full">
