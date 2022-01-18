@@ -15,12 +15,15 @@
         <v-col offset-md="2" offset-sm="1" sm="8" md="5">
           <p class="mt-2 mb-8">
             If you don’t receive it within 5 minutes, please
-            <span class="font-weight-bold">check your spam folder</span> or
-            <span
+            <span class="font-weight-bold">check your spam folder</span>.
+          </p>
+          <!--  or <span
                 class="font-weight-bold primary--text pointer"
                 @click="handleResendEmail"
             >resend the email</span
-            >. If you’re still having issues receiving the email, please contact
+            >. -->
+          <p class="mt-2 mb-8">
+            If you’re still having issues receiving the email, please contact
             us at
             <a
                 class="font-weight-bold text-decoration-none"
