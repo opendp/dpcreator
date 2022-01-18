@@ -218,7 +218,7 @@ export default {
       search: "",
       headers: [
         {value: "num"},
-        {text: "Dataset", value: "datasetInfo.fileSchemaInfo.name"},
+        {text: "Data File", value: "datasetInfo.name"},
         {text: "Status", value: "status"},
         {text: "Remaining time to complete release", value: "timeRemaining"},
         {text: "Options", value: "options", align: "end"}

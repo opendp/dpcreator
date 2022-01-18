@@ -14,13 +14,16 @@
 cd /code/server
 
 # -----------------------------------------
-# Run migration script
+# Run migration scripts
 # -----------------------------------------
 printf "\n(10) Run migration script"
 
 # Make sure the db connection is ready...
 python manage.py waitdb --seconds=10 --max_retries=20
 sh -c "./migrate.sh"
+
+printf "\n(15) Run sites script for dev.dpcreator.org"
+python /code/server/manage.py loaddata opendp_apps/content_pages/fixtures/sites-dev.dpcreator.org.json
 
 # -----------------------------------------
 # Collect static files to a shared volume
