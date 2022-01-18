@@ -8,6 +8,7 @@ specs_01 = dict(bird='song',
                 dpcreator_app_container="ghcr.io/opendp/dpcreator/app",
                 dpcreator_nginx_container="ghcr.io/opendp/dpcreator/nginx",
                 dpcreator_container_tag="latest", # "latest", "2021-1203"
+                dpcreator_startup_script_filename="azure_dev.dpcreator.org.sh",
                 # dpcreator_container_tag="2022-0104", # "latest", "2021-1203"
                 #                #
                 DEFAULT_FROM_EMAIL='info@opendp.org',
@@ -26,6 +27,7 @@ specs_01_test = dict(bird='song',
                 dpcreator_nginx_container="ghcr.io/opendp/dpcreator/nginx",
                 # dpcreator_container_tag="2022-0104", # "latest", "2021-1203"
                 dpcreator_container_tag="latest", # "latest", "2021-1203"
+                dpcreator_startup_script_filename="azure_demo.dpcreator.org.sh",
                 #
                 DEFAULT_FROM_EMAIL='info@opendp.org',
                 # Make these two the same!!!

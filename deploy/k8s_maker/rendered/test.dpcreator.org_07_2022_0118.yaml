@@ -182,7 +182,7 @@ spec:
         - name: dpcreator-app
           image: ghcr.io/opendp/dpcreator/app:latest
           imagePullPolicy: Always
-          command: [ "azure_start_01.sh" ]
+          command: [ "azure_demo.dpcreator.org.sh" ]
           #command: [ "/bin/sh" ]
           # args: [ "-c", "./migrate.sh && python manage.py runserver 0.0.0.0:8000"]
           ports:

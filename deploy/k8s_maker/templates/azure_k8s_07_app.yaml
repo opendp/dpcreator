@@ -93,7 +93,7 @@ spec:
         - name: dpcreator-app
           image: {{ dpcreator_app_container }}:{{ dpcreator_container_tag }}
           imagePullPolicy: Always
-          command: [ "azure_start_01.sh" ]
+          command: [ "{{ dpcreator_startup_script_filename }}" ]
           #command: [ "/bin/sh" ]
           # args: [ "-c", "./migrate.sh && python manage.py runserver 0.0.0.0:8000"]
           ports:
