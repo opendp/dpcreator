@@ -20,6 +20,7 @@ from opendp.mod import OpenDPException
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.profiler import static_vals as pstatic
+from opendp_apps.profiler.static_vals import VAR_TYPE_INTEGER
 from opendp_apps.utils.extra_validators import \
     (validate_confidence_level,
      validate_float,
@@ -79,9 +80,10 @@ class StatSpec:
         self.variable_info = props.get('variable_info', {})  # derive the min/max if needed
         self.min = self.variable_info.get('min')
         self.max = self.variable_info.get('max')
-
         self.categories = self.variable_info.get('categories')
         self.var_type = self.variable_info.get('type')
+        if self.var_type == VAR_TYPE_INTEGER:
+            self.categories = [i for i in range(self.min, self.max)]
 
         self.preprocessor = None  # set this each time get_preprocessor is called--hopefully once
         self.value = None
@@ -491,7 +493,7 @@ class StatSpec:
         final_info = OrderedDict({
                          "statistic": self.statistic,
                          "variable": self.variable,
-                         "result":{
+                         "result": {
                             "value": self.value
                          },
                          "epsilon": self.epsilon,

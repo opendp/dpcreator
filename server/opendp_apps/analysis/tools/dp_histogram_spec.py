@@ -5,6 +5,7 @@ from opendp.typing import *
 
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.profiler.static_vals import VAR_TYPE_INTEGER
 
 enable_features("floating-point", "contrib")
 
@@ -44,14 +45,15 @@ class DPHistogramSpec(StatSpec):
 
         if self.fixed_value is not None:
             # attempt conversion to int
-            if not self.convert_to_int('fixed_value'):
-                return
+            if self.var_type == VAR_TYPE_INTEGER:
+                if not self.convert_to_int('fixed_value'):
+                    return
 
         # TODO: These default values are allowing the tests to pass,
         #  but we need to process cases where min and max are referring to counts of a
         #  categorical variable.
         if not self.min:
-            self.min =  0.0
+            self.min = 0.0
         elif self.convert_to_int('min') is False:
             return
 
@@ -70,8 +72,8 @@ class DPHistogramSpec(StatSpec):
         """
         if self.has_error():
             return
-
-        self.check_numeric_fixed_value()
+        if self.var_type == VAR_TYPE_INTEGER:
+            self.check_numeric_fixed_value()
 
     def check_scale(self, scale, preprocessor):
         """
@@ -113,14 +115,14 @@ class DPHistogramSpec(StatSpec):
         self.preprocessor = preprocessor
         return preprocessor
 
-
     def set_accuracy(self):
         """Return the accuracy measure using Laplace and the confidence interval as alpha"""
         if self.has_error():
             return False
 
-        self.accuracy_val = None  # Future: self.geometric_scale_to_accuracy()
-        self.accuracy_msg = None
+        # TODO: These are placeholders to make the frontend process finish
+        self.accuracy_val = 100.0  # Future: self.geometric_scale_to_accuracy()
+        self.accuracy_msg = "Test"
 
         return True
 
