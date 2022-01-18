@@ -17,6 +17,7 @@ const {
   MOCK_DV,
   MORE_INFORMATION,
   TERMS_AND_CONDITIONS,
+  READ_ONLY_TERMS_AND_CONDITIONS,
   FORGOT_YOUR_PASSWORD
 } = NETWORK_CONSTANTS;
 
@@ -87,7 +88,15 @@ const routes = [
   {
     path: TERMS_AND_CONDITIONS.PATH,
     name: TERMS_AND_CONDITIONS.NAME,
-    component: () => import("../views/TermsAndConditions.vue")
+    component: () => import("../views/TermsAndConditions.vue"),
+    meta: {
+      requiresAuth: true,
+    }
+  },
+  {
+    path: READ_ONLY_TERMS_AND_CONDITIONS.PATH,
+    name: READ_ONLY_TERMS_AND_CONDITIONS.NAME,
+    component: () => import("../views/ReadOnlyTermsAndConditions.vue")
   },
   {
     path: CONTACT_US.PATH,
