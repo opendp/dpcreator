@@ -1,6 +1,6 @@
 <template>
   <div class="wizard-page">
-    <v-container v-if="!loading">
+    <v-container v-if="!loading && datasetInfo">
       <v-row>
         <v-col>
           <v-stepper v-model="stepperPosition" id="wizard-content" alt-labels>
