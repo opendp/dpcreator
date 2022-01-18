@@ -1,0 +1,10 @@
+[
+  {
+      "model": "sites.site",
+      "pk": 3,
+      "fields": {
+          "domain": "dev.dpcreator.org",
+          "name": "DP Creator"
+      }
+  }
+]

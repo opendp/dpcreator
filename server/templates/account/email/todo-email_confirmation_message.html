@@ -1,0 +1,11 @@
+{% extends "account/email/base_message.txt" %}
+{% load account %}
+{% load i18n %}
+
+{% block content %}{% autoescape off %}{% user_display user as user_display %}{% blocktrans with site_name=current_site.name site_domain=current_site.domain %}<p>You're receiving this e-mail because user <b>{{ user_display }}</b> has given your e-mail address to register an account on <b>{{ site_domain }}</b>.</p>
+
+<p>By clicking on the following link, you are confirming your email address: <a href="{{ activate_url }}"><b>Confirm Email</b></a>.{% endblocktrans %}{% endautoescape %}{% endblock %}</p>
+
+<p>(Note: Email service is provided by <a href="https://sendgrid.com/">SendGrid</a>.)</p>
+
+

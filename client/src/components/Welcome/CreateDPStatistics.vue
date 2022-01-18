@@ -9,7 +9,7 @@
     <h2 class="title-size-2 mb-6 font-weight-bold">Create DP Statistics</h2>
     <p>
       You have been redirected to DP Creator from the <b>{{ datasetInfo.installationName }}</b> to create DP
-      statistics for this dataset:
+      statistics for this data file:
     </p>
     <a v-bind:class="beginWizard" @click="beginWizard" class="text-decoration-none font-weight-bold my-6 d-block">{{ datasetInfo.datasetDoi }}
       | {{ datasetInfo.datasetSchemaInfo.name }}
