@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import createLogger from 'vuex/dist/logger';
 import createPersistedState from 'vuex-persistedstate';
+import createMultiTabState from 'vuex-multi-tab-state';
 
 import auth from './auth';
 import password from './password';
@@ -21,5 +22,5 @@ export default new Vuex.Store({
     dataset
   },
   strict: debug,
-  plugins: debug ? [createLogger(), createPersistedState({storage: window.sessionStorage})] : [createPersistedState({storage: window.sessionStorage})],
+  plugins: debug ? [createMultiTabState({statesPaths: ['auth']}), createLogger(), createMultiTabState({statesPaths: ['auth']}), createPersistedState({storage: window.sessionStorage})] : [createPersistedState({storage: window.sessionStorage})],
 });

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-data-table
+    <v-data-table v-if="datasets"
         data-test="my-data-table"
         :headers="headers"
         :items="datasets"
