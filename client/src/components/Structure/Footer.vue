@@ -10,7 +10,7 @@
           >Contact us</a
           >
           <router-link
-              :to="NETWORK_CONSTANTS.TERMS_AND_CONDITIONS.PATH"
+              :to="NETWORK_CONSTANTS.READ_ONLY_TERMS_AND_CONDITIONS.PATH"
               class="d-block text-decoration-none footer-links"
           >Terms & Conditions
           </router-link
