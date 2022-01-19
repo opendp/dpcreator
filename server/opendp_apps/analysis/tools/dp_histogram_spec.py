@@ -101,15 +101,19 @@ class DPHistogramSpec(StatSpec):
         if self.preprocessor is not None:
             # Yes!
             return self.preprocessor
-        if self.var_type == VAR_TYPE_CATEGORICAL:
-            toa = str
-            tia = str
-        elif self.var_type == VAR_TYPE_INTEGER:
+
+        # TODO: More general type handling
+        if self.var_type == VAR_TYPE_INTEGER:
             toa = int
             tia = int
+        else:
+            toa = str
+            tia = str
 
         preprocessor = (
-            make_select_column(key=self.col_index, TOA=toa) >>
+            make_select_column(key=self.col_index, TOA=str) >>
+            make_cast(TIA=str, TOA=toa) >>
+            make_impute_constant(self.fixed_value) >>
             make_count_by_categories(categories=self.categories, MO=L1Distance[int], TIA=tia)
         )
 
@@ -171,6 +175,7 @@ class DPHistogramSpec(StatSpec):
             self.value = computation_chain(file_obj.read())
 
         except OpenDPException as ex_obj:
+            print(ex_obj)
             self.add_err_msg(f'{ex_obj.message} (OpenDPException)')
             return False
         except Exception as ex_obj:
