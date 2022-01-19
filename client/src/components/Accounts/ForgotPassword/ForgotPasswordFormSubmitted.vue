@@ -14,17 +14,20 @@
       >
       <p class="my-8">
         If you don’t receive it within 5 minutes, please
-        <span class="font-weight-bold">check your spam folder</span> or
+        <span class="font-weight-bold">check your spam folder</span>.
+        <!--or
         <span
             class="font-weight-bold primary--text pointer"
             @click="handleResendEmail"
         >resend the email</span
-        >. If you’re still having issues receiving the email, please contact us
+        >. -->
+        </p>
+      <p class="my-8">If you’re still having issues receiving the email, please contact us
         at
         <a
             class="font-weight-bold text-decoration-none"
-            href="mailto:support@opendp.com"
-        >support@opendp.com</a
+            href="mailto:info@opendp.org"
+        >info@opendp.org</a
         >
       </p>
       <Button

@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="{% block lang %}en{% endblock lang %}">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="https://getbootstrap.ru/docs/3.3.7/favicon.ico">
+    <title>{% block title %}Page Title{% endblock title %}</title>
+    <link href="https://getbootstrap.ru/docs/3.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://getbootstrap.ru/docs/3.3.7/assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="https://getbootstrap.ru/docs/3.3.7/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link href="{% static 'css/extra/email.css' %}" rel="stylesheet">
+    {% block additional_files_head %}{% endblock additional_files_head %}
+</head>
+
+<body>
+<div class="container">
+    <div class="row lingo">
+        <div class="col-lg-3 col-md-3 col-sm-12 col-xl-2 img-wrap">
+            <img class="img-logo" title="DjangoKatya - Django Investigations"
+                 alt="DjangoKatya - Django Investigations"
+                 src="{% block logo %}https://djangokatya.files.wordpress.com/2020/09/pyton.png{% endblock logo %}">
+        </div>
+        <div class="col-lg-9 col-md-9 col-sm-12 col-xl-9 menu-div">
+            <ul class="pull-right menu-list">{% block menu_li %}
+                <li role="presentation"><a href="https://djangokatya.wordpress.com/category/django/">Django</a></li>
+                <li role="presentation"><a href="https://djangokatya.wordpress.com/category/frontend/">Frontend</a></li>
+                <li role="presentation"><a href="https://djangokatya.wordpress.com/category/guides/">Guides</a></li>
+                </li>{% endblock menu_li %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="row body-wrap">
+        <div class="col-lg-8 col-md-9 col-sm-12 col-12 col-xl-10 body-wrap-window">
+            <h1 class="body-title">{% block main_title %}Main Block Title{% endblock main_title %}</h1>
+            <p class="lead">
+                {% block main %}
+                    {# Put here anything django-allauth wants you to #}
+                {% endblock main %}
+                {% block sign %}
+                    <div class="team-div">Team DjangoKatya
+                        <a href="https://djangokatya.wordpress.com">djangokatya.wordpress.com</a></div>
+                {% endblock sign %}
+            </p>
+        </div>
+    </div>
+    {% block additional_below %}
+        {# What Jumbotron offers #}
+        <div class="row marketing">
+            <div class="col-lg-6">
+                <h4>Subheading</h4>
+                <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+
+                <h4>Subheading</h4>
+                <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet
+                    fermentum.</p>
+
+                <h4>Subheading</h4>
+                <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+            </div>
+
+            <div class="col-lg-6">
+                <h4>Subheading</h4>
+                <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
+
+                <h4>Subheading</h4>
+                <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet
+                    fermentum.</p>
+
+                <h4>Subheading</h4>
+                <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+            </div>
+        </div>
+    {% endblock additional_below %}
+
+    <footer class="footer">
+        <p>&copy; 2019-2020 DjangoKatya</p>
+    </footer>
+
+</div> <!-- /container -->
+
+
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="https://getbootstrap.ru/docs/3.3.7/assets/js/ie10-viewport-bug-workaround.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{% load i18n %}{% autoescape off %}{% blocktrans with site_name=current_site.name %}Hello from {{ site_name }}!{% endblocktrans %}
+
+{% block content %}{% endblock %}
+
+{% blocktrans with site_name=current_site.name site_domain=current_site.domain %}<p>Thank you for using <b>{{ site_name }}</b>!
+    <br />{{ site_domain }}</p>
+
+<hr />
+<p>DP Creator is an <a href="https://www.opendp.org">OpenDP</a> project. For assistance, please contact us at <a href="mailto:info@opendp.org">info@opendp.org</a>.
+<img src="https://projects.iq.harvard.edu/files/opendifferentialprivacy/files/logo-bold.png?m=1607975113" alt="OpenDP logo" />
+</p>
+{% endblocktrans %}
+
+{% endautoescape %}

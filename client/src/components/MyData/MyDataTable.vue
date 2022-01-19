@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-data-table
+    <v-data-table v-if="datasets"
         data-test="my-data-table"
         :headers="headers"
         :items="datasets"
@@ -218,7 +218,7 @@ export default {
       search: "",
       headers: [
         {value: "num"},
-        {text: "Dataset", value: "datasetInfo.name"},
+        {text: "Data File", value: "datasetInfo.name"},
         {text: "Status", value: "status"},
         {text: "Remaining time to complete release", value: "timeRemaining"},
         {text: "Options", value: "options", align: "end"}
