@@ -133,8 +133,10 @@ class ValidateReleaseUtil(BasicErrCheck):
         #   - Fail on 1st error found
         # print('validate_release_util. release; show validation errors (if any)')
         for stat_spec in self.stat_spec_list:
+            # print(stat_spec)
             if stat_spec.has_error():
                 stat_spec.print_debug()
+                # print(stat_spec.get_error_msg_dict())
             #    print(stat_spec.get_single_err_msg())
             if stat_spec.has_error():
                 user_msg = (f'Validation error found for variable "{stat_spec.variable}"'
@@ -169,6 +171,8 @@ class ValidateReleaseUtil(BasicErrCheck):
             file_handle = open(filepath, 'r')
             stat_spec.run_chain(col_indices, file_handle, sep_char=sep_char)
             file_handle.close()
+
+            # print(stat_spec.get_error_msg_dict())
 
             # Any errors?
             #

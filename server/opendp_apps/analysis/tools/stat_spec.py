@@ -83,9 +83,11 @@ class StatSpec:
 
         self.categories = self.variable_info.get('categories')
         self.var_type = self.variable_info.get('type')
+        # print("VAR TYPE", self.var_type)
         if self.var_type == VAR_TYPE_INTEGER:
-            self.categories = [i for i in range(self.min, self.max)]
-
+            self.categories = [int(i) for i in range(self.min, self.max)]
+            self.fixed_value = int(self.fixed_value)
+            # print(self.categories, self.fixed_value)
         self.preprocessor = None  # set this each time get_preprocessor is called--hopefully once
         self.value = None
         self.scale = None

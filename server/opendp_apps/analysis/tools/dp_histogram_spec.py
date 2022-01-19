@@ -5,7 +5,7 @@ from opendp.typing import *
 
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.profiler.static_vals import VAR_TYPE_INTEGER
+from opendp_apps.profiler.static_vals import VAR_TYPE_INTEGER, VAR_TYPE_CATEGORICAL
 
 enable_features("floating-point", "contrib")
 
@@ -101,10 +101,16 @@ class DPHistogramSpec(StatSpec):
         if self.preprocessor is not None:
             # Yes!
             return self.preprocessor
+        if self.var_type == VAR_TYPE_CATEGORICAL:
+            toa = str
+            tia = str
+        elif self.var_type == VAR_TYPE_INTEGER:
+            toa = int
+            tia = int
 
         preprocessor = (
-            make_select_column(key=self.col_index, TOA=str) >>
-            make_count_by_categories(categories=self.categories, MO=L1Distance[int], TIA=str)
+            make_select_column(key=self.col_index, TOA=toa) >>
+            make_count_by_categories(categories=self.categories, MO=L1Distance[int], TIA=tia)
         )
 
         self.scale = binary_search_param(
