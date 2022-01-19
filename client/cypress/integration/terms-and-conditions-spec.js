@@ -17,6 +17,7 @@
             const email = 'bigbird@nest.com'
             const password = 'bigbird123!'
             cy.createAccount(username, email, password)
+            cy.logout()
             cy.login(username, password).then(() => {
                 console.log(sessionStorage)
                 const sessionObj = JSON.parse(sessionStorage.getItem('vuex'))
@@ -53,7 +54,7 @@
                 const email = 'bigbird@nest.com'
                 const password = 'bigbird123!'
                 cy.createAccount(username, email, password)
-
+                cy.logout()
                 cy.login(username, password).then(() => {
                     console.log(sessionStorage)
                     const sessionObj = JSON.parse(sessionStorage.getItem('vuex'))

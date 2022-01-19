@@ -11,6 +11,8 @@ Cypress.Commands.add('createAccount', (username, email, password, waitForConfirm
     cy.get('[data-test="submit"]').click({force: true});
     if (waitForConfirmation) {
         cy.url().should('contains', 'confirmation')
+
     }
+
 
 })

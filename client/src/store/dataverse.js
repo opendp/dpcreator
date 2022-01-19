@@ -70,6 +70,34 @@ const actions = {
           console.log(error.response.status);
         })
   },
+
+
+  /**
+   *
+   * @param commit
+   * @param state
+   * @param OpenDPUserId currently logged in OpenDP user
+   * Update dataverseUser and dataverseFile based on handoff object
+   */
+  doHandoff({dispatch, commit, state}, {handoffId, OpenDPUserId}) {
+      dataverse.updateDataverseUser(OpenDPUserId, handoffId)
+          .then((resp) => {
+              const dvUser = resp.data.data['dv_user']
+              commit('SET_DATAVERSE_USER', dvUser)
+              dataverse.updateFileInfo(dvUser, handoffId)
+                  .then((resp) => {
+                      commit('SET_DATAVERSE_FILE_INFO', resp.data.data)
+                      commit('SET_DV_HANDOFF', null)
+                      dispatch('dataset/setDatasetList', null, {root: true})
+                  }).catch((error) => {
+                  if (error.response.status == 423) {
+                      commit('SET_DATAVERSE_FILE_LOCKED', true)
+                  }
+
+              })
+          })
+  },
+
 };
 
 const mutations = {

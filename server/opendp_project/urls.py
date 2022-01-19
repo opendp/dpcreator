@@ -81,7 +81,7 @@ urlpatterns = [
       TemplateView.as_view(template_name="user_details.html"),
       name='user-details'),
     url(r'^rest-auth/', include('dj_rest_auth.urls')),
-    url(r'^rest-auth/registration/', OpenDPRegister.as_view(), name='opendp-register'),
+    # url(r'^rest-auth/registration/', OpenDPRegister.as_view(), name='opendp-register'),
     url(r'^rest-auth/registration/', include('dj_rest_auth.registration.urls')),
     url(r'^account/', include('allauth.urls')),
     url(r'^accounts/profile/$', RedirectView.as_view(url='/', permanent=True), name='profile-redirect'),
