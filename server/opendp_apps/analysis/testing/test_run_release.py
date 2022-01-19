@@ -103,7 +103,7 @@ class TestRunRelease(TestCase):
                 'delta': 0.0,
                 'cl': astatic.CL_95,
                 'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                'fixed_value': 5,
+                'fixed_value': '"ac"',
                 'variable_info': {
                     'min': 0,
                     'max': 5,
