@@ -35,6 +35,10 @@ export default {
         PATH: "/terms-and-conditions",
         NAME: "TermsAndConditions"
     },
+    READ_ONLY_TERMS_AND_CONDITIONS: {
+        PATH: "/readonly-terms-and-conditions",
+        NAME: "ReadOnlyTermsAndConditions"
+    },
     CONTACT_US: {
         PATH: "/contact-us",
         NAME: "ContactUs"
