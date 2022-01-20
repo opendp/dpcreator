@@ -12,7 +12,7 @@
       </template>
     </ColoredBorderAlert>
     <span> (Need to add or edit the statistics?
-            <a data-test="addStatisticsLink" v-on:click="addStatistic">Go back to Create Statistics Step </a>
+            <a data-test="addStatisticsLink" v-on:click="addStatistic">Go back to the Create Statistics step. </a>
             ) </span>
     <v-form class="my-5" ref="form" @submit.prevent="handleFormSubmit">
       <p class="mb-2">
@@ -29,7 +29,7 @@
           color="primary"
           type="submit"
           classes="mt-5"
-          label="Submit statistics"
+          label="Submit Statistics"
           data-test="Submit statistics"
       />
     </v-form>

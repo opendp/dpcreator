@@ -174,7 +174,7 @@ Cypress.Commands.add('createMeanStatistic', (numericVar) => {
     cy.wait('@datasetInfo', {timeout: 5000})
 
     // On the statistics page, test edit statistics Params
-    cy.get('h1').should('contain', 'Create the statistics').should('be.visible')
+    cy.get('h1').should('contain', 'Create Statistics').should('be.visible')
     cy.get('[data-test="editConfidenceIcon"]').click({force: true});
     cy.get('h2').should('contain', 'Are you sure you want to proceed?').should('be.visible')
     cy.get('[data-test="confirmButton"]').click({force: true});
@@ -212,7 +212,7 @@ Cypress.Commands.add('submitMeanStatistic', () => {
     cy.get('[data-test="View Data Details"]').click({force: true});
     cy.url().should('contain', 'my-data-details')
     // The Release Details should be visible
-    cy.get('[data-test="status tag"]').should('contain', 'Release completed')
+    cy.get('[data-test="status tag"]').should('contain', 'Release Completed')
     const snippet = 'A differentially private Mean for variable'
     cy.get('[data-test="statistic description"]').should('contain', snippet)
 })
