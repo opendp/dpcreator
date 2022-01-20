@@ -19,7 +19,7 @@
                 console.log('runnable', runnable)
                 return false
             })
-            cy.get('h1').should('contain', 'Create the statistics')
+            cy.get('h1').should('contain', 'Create Statistics')
         })
 
         it('Allows re-do of Wizard Steps ', () => {
@@ -33,7 +33,7 @@
 
             // go to Validate Dataset page
             cy.get('[data-test="step0"]').click({force: true})
-            cy.get('h1').should('contain', 'Validate Dataset').should('be.visible')
+            cy.get('h1').should('contain', 'Validate Data File').should('be.visible')
             // Click continue, this will go to next step in the wizard, but will not update user step
             cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
             cy.get('h1').should('contain', 'Confirm Variables').should('be.visible')
@@ -43,7 +43,7 @@
             // Click Continue Workflow
             cy.get('[data-test="continueWorkflow"]').click({force: true})
             // We should go back to Create Statistics step
-            cy.get('h1').should('contain', 'Create the statistics').should('be.visible')
+            cy.get('h1').should('contain', 'Create Statistics').should('be.visible')
         })
 
     })

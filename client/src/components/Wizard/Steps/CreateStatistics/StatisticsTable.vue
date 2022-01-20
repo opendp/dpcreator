@@ -3,7 +3,7 @@
     <v-data-table
         :headers="headers"
         :items="statistics"
-        no-data-text="Create your first statistic"
+        no-data-text="Create statistic"
         hide-default-footer
     >
       <template v-slot:[`header.error`]="{ header }">
@@ -106,7 +106,7 @@
         :click="() => $emit('newStatisticButtonPressed')"
     >
       <v-icon left>mdi-plus-box</v-icon>
-      Create new statistic
+      Create New Statistic
     </Button>
   </div>
 </template>

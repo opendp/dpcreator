@@ -1,6 +1,6 @@
 <template>
   <div class="validateDatasetStep">
-    <h1 class="title-size-1">Validate Dataset</h1>
+    <h1 class="title-size-1">Validate Data File</h1>
     <p>
       Confirm the data file's characteristics to determine if
       it's adequate for the differential privacy release process.
@@ -9,7 +9,7 @@
     <div>
       <div class="mb-10">
         <span class="font-weight-bold title-size-2 d-flex"
-        ><v-icon color="primary" left>mdi-play</v-icon> Does your dataset
+        ><v-icon color="primary" left>mdi-play</v-icon> Does your data file
           depend on private information of subjects?</span
         >
         <v-radio-group
@@ -47,7 +47,7 @@
       >
         <span class="font-weight-bold title-size-2 d-flex"
         ><v-icon color="primary" left>mdi-play</v-icon> Which of the following
-          best describes your dataset?</span
+          best describes your data file?</span
         >
         <v-radio-group
             data-test="radioBestDescribes"
@@ -196,14 +196,14 @@
             color="primary"
             classes="mr-2 mb-2 font-weight-bold"
             :click="handleCloseProcess"
-            label="Close process"
+            label="Close Process"
         />
         <Button
             color="primary"
             outlined
             classes="font-weight-bold mb-2"
             :click="handleGoBackInDialog"
-            label="Go back"
+            label="Go Back"
         />
       </v-card>
     </v-dialog>
