@@ -48,7 +48,7 @@
             }"
               classes="font-weight-bold mt-5"
               :click="() => $router.push(NETWORK_CONSTANTS.MY_DATA.PATH)"
-              label="See all my datasets"
+              label="See All My Data Files"
           />
         </v-col>
       </v-row>
