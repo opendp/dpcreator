@@ -4,7 +4,7 @@
     <p v-html="$t('confirm variables.confirm variables intro')"></p>
     <ColoredBorderAlert type="warning">
       <template v-slot:content>
-        The DP Creator takes the first 20 variables of the dataset.
+        Currently, the DP Creator takes the first 20 variables of the data file.
       </template>
     </ColoredBorderAlert>
     <ColoredBorderAlert type="info" icon="mdi-shield-half-full">
@@ -362,11 +362,11 @@ export default {
     loadingVariables: true,
     headers: [
       {value: "index"},
-      {text: "Variable name", value: "name"},
-      {text: "Variable label", value: "label"},
+      {text: "Variable Name", value: "name"},
+      {text: "Variable Label", value: "label"},
       {text: "Type", value: "type"},
       {
-        text: "Additional variable information",
+        text: "Additional Variable Information",
         value: "additional_information"
       }
     ],

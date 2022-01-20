@@ -85,7 +85,7 @@
         -->
         <!--    <div v-if="editedItemDialog.handleAsFixed">-->
         <div>
-          <span>Enter your <strong> fixed value:</strong></span>
+          <span>Enter a <strong> fixed value</strong></span> for missing values:
           <div class="width50">
             <v-text-field
                 v-model="editedItemDialog.fixedValue"
@@ -121,7 +121,7 @@
             :click="save"
             :disabled="isButtonDisabled"
             data-test="Create statistic"
-            label="Create statistic"
+            label="Create Statistic"
         />
 
         <Button

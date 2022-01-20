@@ -79,8 +79,12 @@ class TestDataverseHandoffView(TestCase):
         #
         url = reverse('dv-handoff-list')
 
+        #self.data[dv_static.DV_PARAM_SITE_URL] = 'dataverse.harvard.edu'
+
         response = self.client.post(url, data=self.data, format='json')
-        msg(response)
+
+        #msg(response)
+
         # Ensure redirect
         self.assertEqual(response.status_code, 302)
         # Ensure there is only one param in the redirect URL, and that it is an id
