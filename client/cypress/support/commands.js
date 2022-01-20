@@ -234,7 +234,7 @@ Cypress.Commands.add('setupStatisticsPage', (datasetFixture, analysisFixture) =>
         })
         cy.visit('/my-data')
         cy.get('tr').should('contain',
-            'Fatigue_data.tab')
+            'Replication Data for: Eye-typing experiment')
         cy.get('[data-test="continueWorkflow"]').click({force: true})
     })
 })

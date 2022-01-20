@@ -12,7 +12,7 @@
             cy.visit('/my-data')
 
             cy.get('tr').should('contain',
-                'Fatigue_data.tab')
+                'Replication Data for: Eye-typing experiment')
             cy.get('tr').should('contain',
                 'Uploaded')
             cy.get('[data-test="continueWorkflow"]').click({force: true});
