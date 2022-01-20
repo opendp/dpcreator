@@ -502,8 +502,13 @@ export default {
         }
         row.additional_information = {}
         if (this.isNumerical(row.type)) {
-          row.additional_information.max = vars[key].max
-          row.additional_information.min = vars[key].min
+          // Min and max are stored as ints, but the form expects them to be strings
+          if (vars[key].max !== undefined && vars[key].max !== null) {
+            row.additional_information.max = vars[key].max.toString()
+          }
+          if (vars[key].min !== undefined && vars[key].min !== null) {
+            row.additional_information.min = vars[key].min.toString()
+          }
         }
         if (row.type === 'Categorical') {
           // make a deep copy of the categories, so we can edit locally

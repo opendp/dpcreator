@@ -292,6 +292,9 @@ export default {
       const payload = {objectId: this.getDepositorSetupInfo.objectId, props: userInput}
       this.$store.dispatch('dataset/updateDepositorSetupInfo',
           payload)
+      if (this.radioOnlyOneIndividualPerRow == 'yes') {
+        this.$emit("stepCompleted", 0, true);
+      }
 
     },
     /* Epsilon & Delta are derived from the answers to the level of harm question,
@@ -345,12 +348,6 @@ export default {
       this.radioOnlyOneIndividualPerRow = "";
     }
   },
-  watch: {
-    radioOnlyOneIndividualPerRow: function (newValue) {
-      if (newValue !== "" && newValue !== "no") {
-        this.$emit("stepCompleted", 0, true);
-      }
-    }
-  }
+
 };
 </script>
