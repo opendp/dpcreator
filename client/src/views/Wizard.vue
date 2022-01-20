@@ -1,6 +1,6 @@
 <template>
   <div class="wizard-page">
-    <v-container v-if="!loading">
+    <v-container v-if="!loading && datasetInfo">
       <v-row>
         <v-col>
           <v-stepper v-model="stepperPosition" id="wizard-content" alt-labels>
@@ -107,6 +107,9 @@ export default {
       console.log('INIT stepper position')
       if (this.datasetInfo && this.getDepositorSetupInfo) {
         this.stepperPosition = stepInformation[this.userStep].wizardStepper
+        for (let index = 0; index < this.stepperPosition; index++) {
+          this.steps[index].completed = true
+        }
       }
     },
     gotoStep(step) {
