@@ -80,8 +80,7 @@ class RegisteredDataverse(TimestampedModelWithUUID):
         if dv_url.startswith('http://') or dv_url.startswith('https://'):
             return dv_url
 
-        if not dv_url.startswith('http://'):
-            dv_url = f'http://{dv_url}'
+        dv_url = f'http://{dv_url}'
 
         return dv_url
 
