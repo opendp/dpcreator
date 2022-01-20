@@ -12,7 +12,7 @@ matplotlib.use('Agg')  # Not to use X server.
 
 class PDFRenderer(object):
 
-    def __init__(self, statistics: List, histograms: List, figure_width=8):
+    def __init__(self, statistics: Dict, histograms: Dict, figure_width=8):
         """
         :param statistics: List of tuples (name, value)
         :param histograms: List of tuples (name, list[int])
@@ -42,8 +42,8 @@ class PDFRenderer(object):
             table1.add_hline()
             table1.add_row((MultiColumn(2, align='|c|', data='Summary'),))
             table1.add_hline()
-            for stat in self.statistics:
-                table1.add_row((stat['statistic'], stat['result']['value']))
+            for stat_key, stat_value in self.statistics.items():
+                table1.add_row((stat_key, stat_value))
                 table1.add_hline()
             self.doc.append(table1)
 
@@ -52,10 +52,12 @@ class PDFRenderer(object):
             return
         fig = plt.figure(tight_layout=True, figsize=self.figure_size)
         gs = gridspec.GridSpec(len(self.histograms), 2)
-        for i, hist_dict in enumerate(self.histograms):
+
+        for i, hist_dict in enumerate(self.histograms.values()):
             ax = fig.add_subplot(gs[i, :])
             ax.bar(x=hist_dict['data'], height=hist_dict['height'])
             ax.set_xlabel(hist_dict['name'])
+
         with self.doc.create(Section('DP Histograms')):
             with self.doc.create(Figure(position='htbp')) as plot:
                 plot.add_plot()
@@ -75,11 +77,16 @@ class PDFRenderer(object):
         return self.doc.dumps()
 
 
-def generate_example_histogram(title, data_size):
-    data = range(0, data_size)
-    labels = data
-    heights = np.random.randint(low=5, high=10, size=data_size)
-    return title, {'data': data, 'labels': labels, 'height': heights}
+def generate_example_histograms(title_template, data_size, number_of_histograms):
+    result = {}
+    for i in range(0, number_of_histograms):
+        title = title_template % str(i)
+        data = range(0, data_size)
+        labels = data
+        heights = np.random.randint(low=5, high=10, size=data_size)
+        result[title_template] = {'title': title, 'data': data, 'labels': labels,
+                                  'height': heights, 'name': 'something random'}
+        return result
 
 
 if __name__ == '__main__':
@@ -88,12 +95,12 @@ if __name__ == '__main__':
     number_of_histograms = 2
     data_size = 10
 
-    statistics = [("mean", 3.14159), ("count", 10)]
-    histograms = [generate_example_histogram(f'Histogram {i}', data_size) for i in range(0, number_of_histograms)]
+    statistics = {"mean": 3.14159, "count": 10}
+    histograms = generate_example_histograms(f'Histogram %s', data_size, number_of_histograms)
 
     renderer = PDFRenderer(statistics, histograms)
     renderer.set_title("Test Output")
     renderer.add_author("Ethan Cowan")
     renderer.set_date()
     renderer.fill_document()
-    renderer.save_pdf('test.pdf')
+    renderer.save_pdf('test')
