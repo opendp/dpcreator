@@ -62,6 +62,7 @@ class DataverseHandoffView(BaseModelViewSet):
 
         if dv_static.DV_PARAM_SITE_URL in request_data:
             init_site_url = request_data[dv_static.DV_PARAM_SITE_URL]
+            init_site_url = RegisteredDataverse.hack_format_dv_url_http(init_site_url)
             request_data[dv_static.DV_PARAM_SITE_URL] = RegisteredDataverse.format_dv_url(init_site_url)
 
         handoff_serializer = DataverseHandoffSerializer(data=request_data)
