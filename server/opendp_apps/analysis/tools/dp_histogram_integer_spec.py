@@ -47,13 +47,13 @@ class DPHistogramIntegerSpec(StatSpec):
         #
         if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
             # Convert the impute value to a float!
-            if not self.convert_to_int('fixed_value'):
+            if not self.cast_property_to_int('fixed_value'):
                 return
 
-        if not self.convert_to_int('min'):
+        if not self.cast_property_to_int('min'):
             return
 
-        if not self.convert_to_int('max'):
+        if not self.cast_property_to_int('max'):
             return
 
         # Make sure the fixed value is between the min/max
@@ -61,8 +61,8 @@ class DPHistogramIntegerSpec(StatSpec):
         self.check_numeric_fixed_value()
 
         # Create categories
-        self.categories = [x for x in range(self.min, self.max)] + [self.max]
-
+        #
+        self.categories = [x for x in range(self.min, self.max+1)]
 
     def run_03_custom_validation(self):
         """
@@ -102,14 +102,11 @@ class DPHistogramIntegerSpec(StatSpec):
             # Yes!
             return self.preprocessor
 
-        toa_type = int
-        tia_type = int
-
         preprocessor = (
             make_select_column(key=self.col_index, TOA=str) >>
-            make_cast(TIA=str, TOA=toa_type) >>
+            make_cast(TIA=str, TOA=int) >>
             make_impute_constant(self.fixed_value) >>
-            make_count_by_categories(categories=self.categories, MO=L1Distance[int], TIA=tia_type)
+            make_count_by_categories(categories=self.categories, MO=L1Distance[int], TIA=int)
         )
 
         self.scale = binary_search_param(

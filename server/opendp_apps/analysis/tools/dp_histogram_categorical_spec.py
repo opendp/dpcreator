@@ -114,14 +114,11 @@ class DPHistogramCategoricalSpec(StatSpec):
             # Yes!
             return self.preprocessor
 
-        tia_type = str
-        toa_type = str
-
         preprocessor = (
             make_select_column(key=self.col_index, TOA=str) >>
-            make_cast(TIA=str, TOA=toa_type) >>
+            make_cast(TIA=str, TOA=str) >>
             make_impute_constant(self.fixed_value) >>
-            make_count_by_categories(categories=self.categories, MO=L1Distance[int], TIA=tia_type)
+            make_count_by_categories(categories=self.categories, MO=L1Distance[int], TIA=str)
         )
 
         self.scale = binary_search_param(
