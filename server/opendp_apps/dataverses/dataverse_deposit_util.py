@@ -284,5 +284,5 @@ class DataverseDepositUtil(BasicErrCheck):
 
         self.release_info.dataverse_deposit_info = deposit_info_dict
 
-        print('>>> deposit_info_dict', deposit_info_dict)
+        # print('>>> deposit_info_dict', deposit_info_dict)
         self.release_info.save()

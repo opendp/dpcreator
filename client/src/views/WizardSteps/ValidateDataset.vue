@@ -315,7 +315,7 @@ export default {
       // The other types will require the user to go back and change their
       // answer, so in that case set the values to null.
       if (option === this.privacyTypes.NOT_HARM) {
-        this.defaultEpsilon = 1
+        this.defaultEpsilon = 1.0
         this.defaultDDelta = 0.00001
       } else if (option === this.privacyTypes.COULD_HARM) {
         this.defaultEpsilon = .25

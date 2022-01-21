@@ -1,5 +1,9 @@
 {
   "datasetName": "2000 PUMS 5-Percent",
+   "statistics":  [
+    {"statistic": "Mean",
+      "variable": "age"}
+    ],
   "variables": {
     "age": {
       "name": "age",
