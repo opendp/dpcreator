@@ -62,8 +62,8 @@ class StatSpec:
         self.statistic = props.get('statistic')
         self.dataset_size = props.get('dataset_size')
         #
-        self.epsilon = float(props.get('epsilon'))
-        self.delta = float(props.get('delta'))
+        self.epsilon = props.get('epsilon')
+        self.delta = props.get('delta')
 
         self.cl = props.get('cl')      # confidence level coefficient (e.g. .95, .99, etc)
 
@@ -284,7 +284,7 @@ class StatSpec:
                             + more_props_to_floatify
 
         for prop_name in props_to_floatify:
-            if not self.convert_to_float(prop_name):
+            if not self.cast_property_to_float(prop_name):
                 return
 
     def run_02_basic_validation(self):
@@ -300,6 +300,15 @@ class StatSpec:
         self.validate_property('col_index')
         self.validate_property('missing_values_handling')
 
+        # Epsilon should always be a float
+        if not self.cast_property_to_float('epsilon'):
+            return
+
+        # Delta, if specified, should be a float
+        if self.delta is not None:
+            if not self.cast_property_to_float('delta'):
+                return
+
         if not self.var_type in pstatic.VALID_VAR_TYPES:
             self.add_err_msg(f'Invalid variable type: "{self.var_type}"')
             return
@@ -310,10 +319,11 @@ class StatSpec:
             if prop_name in self.prop_validators:
                 self.validate_property(prop_name)
 
-        # check the min/max relationship
-        #
         if self.has_error():
             return
+
+        # check the min/max relationship
+        #
         if 'min' in self.additional_required_props() and \
                 'max' in self.additional_required_props():
             # print('checking min/max!')
@@ -374,7 +384,7 @@ class StatSpec:
 
         return True
 
-    def convert_to_float(self, prop_name):
+    def cast_property_to_float(self, prop_name):
         """Attempt to convert a value to a float"""
         prop_val = getattr(self, prop_name)
 

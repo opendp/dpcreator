@@ -228,14 +228,14 @@ class HistogramStatSpecTest(StatSpecTestCase):
             'col_index': 4,
             'statistic': astatic.DP_HISTOGRAM,
             'dataset_size': 183,
-            'epsilon': 1.0,
+            'epsilon': 1,
             'delta': 0.0,
             'cl': astatic.CL_95,
             'fixed_value': "3",
             'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
             'variable_info': {
                 'min': 0,
-                'max': 8,
+                'max': 7,
                 'type': 'Integer'
             }
         }

@@ -177,19 +177,24 @@ class DPHistogramIntegerSpec(StatSpec):
                 self.add_err_msg(f'{ex_obj} (Exception)')
             return False
 
+        fmt_categories = self.categories + ['uncategorized']
+
         # Show warning if category count doesn't match values count
-        #
-        if len(self.categories) != len(self.value):
-            print('=' * 40)
-            print('! Warning - Categories and Values are not the same size!')
-            print('=' * 40)
+        if len(fmt_categories) > len(self.value):
+
+            user_msg = (f'Warning. There are more categories (n={len(self.fmt_categories)})'
+                        f' than values (n={len(self.value)})')
+            self.add_err_msg(user_msg)
+
+            print(user_msg)
             print(f'Categories (n={len(self.categories)}): {self.categories}')
             print(f'Values (n={len(self.value)}): {self.value}')
-            print('-' * 40)
-            print('')
+            return
 
-        self.value = dict(categories=self.categories,
-                          values=self.value)
+
+        self.value = dict(categories=fmt_categories,
+                          values=self.value,
+                          category_value_pairs=list(zip(fmt_categories, self.value)))
 
 
         print((f"Epsilon: {self.epsilon}"
