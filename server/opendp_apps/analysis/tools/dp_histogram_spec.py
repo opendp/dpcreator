@@ -43,7 +43,7 @@ class DPHistogramSpec(StatSpec):
         #
         if self.var_type == VAR_TYPE_INTEGER:
             if self.fixed_value is not None:
-                if not self.convert_to_int('fixed_value'):
+                if not self.cast_property_to_int('fixed_value'):
                     return
 
         # if self.var_type == VAR_TYPE_CATEGORICAL:
@@ -55,12 +55,12 @@ class DPHistogramSpec(StatSpec):
         #  categorical variable.
         if not self.min:
             self.min = 0
-        elif self.convert_to_int('min') is False:
+        elif self.cast_property_to_int('min') is False:
             return
 
         if not self.max:
             self.max = 10
-        elif self.convert_to_int('max') is False:
+        elif self.cast_property_to_int('max') is False:
             return
 
     def run_03_custom_validation(self):

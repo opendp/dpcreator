@@ -391,7 +391,7 @@ class StatSpec:
 
         return True
 
-    def convert_to_int(self, prop_name):
+    def cast_property_to_int(self, prop_name):
         """Attempt to convert a value to an integer"""
         prop_val = getattr(self, prop_name)
 

@@ -231,11 +231,11 @@ class HistogramStatSpecTest(StatSpecTestCase):
             'epsilon': 1.0,
             'delta': 0.0,
             'cl': astatic.CL_95,
-            'fixed_value': 3,
+            'fixed_value': "3",
             'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
             'variable_info': {
                 'min': 0,
-                'max': 7,
+                'max': 8,
                 'type': 'Integer'
             }
         }
