@@ -1,5 +1,9 @@
 {
   "datasetName": "Eye-typing experiment",
+  "statistics":  [
+    { "name": "Mean",
+      "variable": "eyeHeight"}
+    ],
   "variables": {
     "eyeHeight": {
       "name": "EyeHeight",

@@ -4,7 +4,7 @@
     <link :href="fontUrl" rel="stylesheet"/>
     <Header/>
     <v-main class="">
-      <template v-if="error || apiErrorMessage">
+      <template v-if="error || errorObject">
         <v-container>
           <v-row>
             <v-col cols="1">
@@ -21,18 +21,25 @@
                 </template>
 
               </ColoredBorderAlert>
-              <ColoredBorderAlert v-if="apiErrorMessage" type="error">
+              <ColoredBorderAlert v-if="errorObject" type="error">
+
                 <template v-slot:content>
-                  <b>API Error:</b> {{ apiErrorMessage.config.url }} <br>
-                  Status: {{ apiErrorMessage.status }} {{ apiErrorMessage.statusText }} <br>
-                  Detail: {{ apiErrorMessage.data.detail }} <br>
+                    <b>Runtime Error:</b>
+                    <json-viewer
+                               :value="errorObject">
+                  </json-viewer>
                 </template>
               </ColoredBorderAlert>
             </v-col>
           </v-row>
+            <Button
+            data-test="ErrorContinueButton"
+            :click="continueAction"
+            label="Continue"
+    />
         </v-container>
       </template>
-      <router-view v-if="!(error || apiErrorMessage)"/>
+      <router-view v-if="!(error || errorObject)"/>
     </v-main>
     <Footer/>
   </v-app>
@@ -48,6 +55,7 @@ import Footer from "./components/Structure/Footer.vue";
 import Header from "./components/Structure/Header.vue";
 import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
 import {mapState} from "vuex";
+import NETWORK_CONSTANTS from "@/router/NETWORK_CONSTANTS";
 
 export default {
   title: 'DP Creator',
@@ -55,18 +63,22 @@ export default {
   data: () => ({
     error: false,
     errMsg: null,
-    apiErrorMessage: null,
+    errorObject: null,
+    errorRequest:  null,
     fontUrl: settings.google_fonts_url
   }),
   created() {
     window.addEventListener('unhandledrejection', (event) => {
       console.log("unhandled rejection")
       console.log('event.promise: ' + event.promise)
-      console.log('event.reason: ' + event.reason)
-      this.apiErrorMessage = event.reason
-      console.log('event url: ' + this.apiErrorMessage.config.url)
-      //event.promise contains the promise object
-      //event.reason contains the reason for the rejection
+      console.log('event.reason: ' + JSON.stringify(event.reason))
+      // if the reason has a request object, display it seprately
+      if (event.reason.request){
+        this.errorRequest = event.reason.request
+        delete event.reason.request
+      }
+
+      this.errorObject = event.reason
 
 
     });
@@ -90,6 +102,11 @@ export default {
     this.error = true
     this.errMsg = err
     // return false to stop the propagation of errors further to parent or global error handler
+  },
+  methods: {
+    continueAction() {
+      this.$router.push(NETWORK_CONSTANTS.HOME.PATH)
+    }
   }
 };
 </script>
