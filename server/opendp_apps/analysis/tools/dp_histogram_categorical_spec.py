@@ -10,11 +10,12 @@ from opendp_apps.profiler.static_vals import VAR_TYPE_INTEGER, VAR_TYPE_CATEGORI
 enable_features("floating-point", "contrib")
 
 
-class DPHistogramSpec(StatSpec):
+class DPHistogramCategoricalSpec(StatSpec):
     """
-
+    Create a Histogram using categorical (string) values.
+    Requires "categories" to be specificed in the constructor
     """
-    STATISTIC_TYPE = astatic.DP_HISTOGRAM
+    STATISTIC_TYPE = astatic.DP_HISTOGRAM   #_CATEGORICAL
 
     def __init__(self, props: dict):
         """Set the internals using the props dict"""
@@ -25,43 +26,54 @@ class DPHistogramSpec(StatSpec):
         Add a list of required properties
         example: ['min', 'max']
         """
-        return ['min', 'max']
+        return ['categories']
 
     def run_01_initial_handling(self):
         """
         """
         if not self.statistic == self.STATISTIC_TYPE:
-            self.add_err_msg(f'The specified "statistic" is not "{self.STATISTIC_TYPE}". (StatSpec)"')
+            user_msg = f'The specified "statistic" is not "{self.STATISTIC_TYPE}".'
+            self.add_err_msg(user_msg)
             return
 
-        if self.var_type == VAR_TYPE_INTEGER:
-            self.categories = [int(i) for i in range(self.min, self.max)]
-            self.fixed_value = int(self.fixed_value)
-            # print(self.categories, self.fixed_value)
+        if not self.var_type == VAR_TYPE_CATEGORICAL:
+            user_msg = (f'The specified variable type ("var_type")'
+                        f' is not "{VAR_TYPE_CATEGORICAL}". ({self.STATISTIC_TYPE})')
 
-        # Using integers
+            self.add_err_msg(user_msg)
+            return
+
+
+        # Convert fixed value to string
         #
-        if self.var_type == VAR_TYPE_INTEGER:
-            if self.fixed_value is not None:
-                if not self.convert_to_int('fixed_value'):
-                    return
+        if self.fixed_value is not None:
+            try:
+                self.fixed_value = str(self.fixed_value)
+            except NameError as ex_obj:
+                user_msg = 'Failed to convert fixed_value to string.'
+                self.add_err_msg(user_msg)
+                return
 
-        # if self.var_type == VAR_TYPE_CATEGORICAL:
+        # Stringify categorical values (although they should be already)
+        #
+        updated_cats = []
+        for idx, x in enumerate(self.categories):
+            try:
+                if not isinstance(x, str):
+                    x = str(x)
+                updated_cats.append(x)
+            except NameError as _ex_obj:
+                user_msg = 'Failed to convert category to string. (Failed category index {idx})'
+                self.add_err_msg(user_msg)
+                return
 
+        # remove duplicate categories while preserving order
+        #
+        # self.categories = sorted(set(updated_cats), key=updated_cats.index)
 
+        # remove duplicate categories and sort them
+        self.categories = sorted(set(updated_cats))
 
-        # TODO: These default values are allowing the tests to pass,
-        #  but we need to process cases where min and max are referring to counts of a
-        #  categorical variable.
-        if not self.min:
-            self.min = 0
-        elif self.convert_to_int('min') is False:
-            return
-
-        if not self.max:
-            self.max = 10
-        elif self.convert_to_int('max') is False:
-            return
 
     def run_03_custom_validation(self):
         """
@@ -73,8 +85,7 @@ class DPHistogramSpec(StatSpec):
         if self.has_error():
             return
 
-        if self.var_type == VAR_TYPE_INTEGER:
-            self.check_numeric_fixed_value()
+        pass    # Nothing to see here
 
     def check_scale(self, scale, preprocessor):
         """
@@ -103,19 +114,14 @@ class DPHistogramSpec(StatSpec):
             # Yes!
             return self.preprocessor
 
-        # TODO: More general type handling
-        if self.var_type == VAR_TYPE_INTEGER:
-            toa = int
-            tia = int
-        else:
-            toa = str
-            tia = str
+        tia_type = str
+        toa_type = str
 
         preprocessor = (
             make_select_column(key=self.col_index, TOA=str) >>
-            make_cast(TIA=str, TOA=toa) >>
+            make_cast(TIA=str, TOA=toa_type) >>
             make_impute_constant(self.fixed_value) >>
-            make_count_by_categories(categories=self.categories, MO=L1Distance[int], TIA=tia)
+            make_count_by_categories(categories=self.categories, MO=L1Distance[int], TIA=tia_type)
         )
 
         self.scale = binary_search_param(
@@ -133,7 +139,7 @@ class DPHistogramSpec(StatSpec):
 
         # TODO: These are placeholders to make the frontend process finish
         self.accuracy_val = 100.0  # Future: self.geometric_scale_to_accuracy()
-        self.accuracy_msg = "Test"
+        self.accuracy_msg = "Test - Accuracy Not Available!"
 
         return True
 
@@ -164,7 +170,7 @@ class DPHistogramSpec(StatSpec):
             return False
 
         if not isinstance(column_names, list):
-            self.add_err_msg('DPHistogramSpec.run_chain(..): column_names must be a list. Found: (type({column_names}))')
+            self.add_err_msg('DPHistogramSpecCategorical.run_chain(..): column_names must be a list. Found: (type({column_names}))')
             return
 
         try:
@@ -186,18 +192,27 @@ class DPHistogramSpec(StatSpec):
                 self.add_err_msg(f'{ex_obj} (Exception)')
             return False
 
+        # Show warning if category count doesn't match values count
+        #
+        if len(self.categories) != len(self.value):
+            print('=' * 40)
+            print('! Warning - Categories and Values are not the same size!')
+            print('=' * 40)
+            print(f'Categories (n={len(self.categories)}): {self.categories}')
+            print(f'Values (n={len(self.value)}): {self.value}')
+            print('-' * 40)
+            print('')
+
+        # Update the "value" to include the histogram categories
+        #
+        self.value = dict(categories=self.categories,
+                          values=self.value)
+
         print((f"Epsilon: {self.epsilon}"
                f"\nColumn name: {self.variable}"
                f"\nColumn index: {self.col_index}"
                f"\nAccuracy value: {self.accuracy_val}"
                f"\nAccuracy message: {self.accuracy_msg}"
-               f"\n\nDP Histogram (n={len(self.value)}): {self.value}" ))
-
-        if self.var_type == VAR_TYPE_CATEGORICAL:
-            print(f"Categories (n={len(self.categories)}): {self.categories}")
-        elif self.var_type == VAR_TYPE_INTEGER:
-            int_cats = [x for x in range(self.min, self.max)] + [self.max]
-            print(f"Categories (integers) (n={len(int_cats)}): {int_cats}")
-
+               f"\n\nDP Histogram: {self.value}" ))
 
         return True

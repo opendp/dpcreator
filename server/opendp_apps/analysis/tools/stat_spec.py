@@ -20,7 +20,6 @@ from opendp.mod import OpenDPException
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.profiler import static_vals as pstatic
-from opendp_apps.profiler.static_vals import VAR_TYPE_INTEGER
 from opendp_apps.utils.extra_validators import \
     (validate_confidence_level,
      validate_float,
@@ -83,11 +82,7 @@ class StatSpec:
 
         self.categories = self.variable_info.get('categories')
         self.var_type = self.variable_info.get('type')
-        # print("VAR TYPE", self.var_type)
-        if self.var_type == VAR_TYPE_INTEGER:
-            self.categories = [int(i) for i in range(self.min, self.max)]
-            self.fixed_value = int(self.fixed_value)
-            # print(self.categories, self.fixed_value)
+
         self.preprocessor = None  # set this each time get_preprocessor is called--hopefully once
         self.value = None
         self.scale = None
@@ -401,7 +396,7 @@ class StatSpec:
         prop_val = getattr(self, prop_name)
 
         try:
-            prop_val_float = int(prop_val)
+            prop_val_int = int(prop_val)
         except TypeError:
             self.add_err_msg(f'Failed to convert "{prop_name}" to an integer. (value: "{prop_val}")')
             return False
@@ -409,7 +404,12 @@ class StatSpec:
             self.add_err_msg(f'Failed to convert "{prop_name}" to a integer. (value: "{prop_val}")')
             return False
 
-        setattr(self, prop_name, prop_val_float)
+        if isinstance(prop_val, float):
+            if prop_val != prop_val_int:
+                self.add_err_msg(f'Failed to convert "{prop_name}" to an equivalent integer. (original: {prop_val}, converted: {prop_val_int})')
+                return False
+
+        setattr(self, prop_name, prop_val_int)
 
         return True
 

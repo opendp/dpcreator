@@ -30,9 +30,11 @@ from opendp_apps.analysis.stat_valid_info import StatValidInfo
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
 from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
-from opendp_apps.analysis.tools.dp_histogram_spec import DPHistogramSpec
+from opendp_apps.analysis.tools.dp_histogram_integer_spec import DPHistogramIntegerSpec
+from opendp_apps.analysis.tools.dp_histogram_categorical_spec import DPHistogramCategoricalSpec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
+from opendp_apps.profiler import static_vals as pstatic
 
 from opendp_apps.utils.extra_validators import \
     (validate_epsilon_not_null,
@@ -411,6 +413,7 @@ class ValidateReleaseUtil(BasicErrCheck):
             variable = props.get('variable')
             statistic = props.get('statistic', 'shrug?')
             epsilon = props.get('epsilon')
+            var_type = None
 
             # (1) Is variable defined?
             #
@@ -439,6 +442,7 @@ class ValidateReleaseUtil(BasicErrCheck):
 
             if variable_info:
                 props['variable_info'] = variable_info
+                var_type = variable_info.get('type')
             else:
                 props['error_message'] = 'Variable info not found.'
                 self.add_stat_spec(DPSpecError(props))
@@ -461,8 +465,19 @@ class ValidateReleaseUtil(BasicErrCheck):
                 self.add_stat_spec(DPCountSpec(props))
 
             elif statistic in astatic.DP_HISTOGRAM:
-                # DP Histogram!
-                self.add_stat_spec(DPHistogramSpec(props))
+                if var_type == pstatic.VAR_TYPE_CATEGORICAL:
+                    # DP Histogram (Categorical)!
+                    self.add_stat_spec(DPHistogramCategoricalSpec(props))
+
+                elif var_type == pstatic.VAR_TYPE_INTEGER:
+                    # DP Histogram (Integer)!
+                    self.add_stat_spec(DPHistogramIntegerSpec(props))
+                else:
+                    # DP Histogram - unsupported type
+                    props['error_message'] = (f'Statistic is "{astatic.DP_HISTOGRAM}" but '
+                                              f' variable type is unsupported: "{var_type}"')
+                    self.add_stat_spec(DPSpecError(props))
+                    continue  # to the next dp_stat specification
 
             elif statistic == astatic.DP_MEAN:
                 # DP Mean!

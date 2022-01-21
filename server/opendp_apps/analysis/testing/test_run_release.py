@@ -103,13 +103,11 @@ class TestRunRelease(TestCase):
                 'delta': 0.0,
                 'cl': astatic.CL_95,
                 'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                'fixed_value': '"ac"',
+                'fixed_value': 'ac',
                 'variable_info': {
-                    'min': 0,
-                    'max': 5,
-                    'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"', '"cw"',
-                                   '"jp"', '"rh"', '"aq"', '"ph"', '"le"', '"mn"', '"ls2"', '"no"', '"af"'],
-                    'type': pstatic.VAR_TYPE_FLOAT
+                    'categories': ['ac', 'kj', 'ys', 'bh1', 'bh2', 'jm', 'mh', 'cw',
+                                   'jp', 'rh', 'aq', 'ph', 'le', 'mn', 'ls2', 'no', 'af'],
+                    'type': pstatic.VAR_TYPE_CATEGORICAL
                 }
              }
         ]
@@ -367,11 +365,18 @@ class TestRunRelease(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(analysis_plan_jresp['release_info'])
 
+        # print(json.dumps(analysis_plan_jresp, indent=4))
         histogram_results = list(filter(lambda x: x['statistic'] == 'histogram',
                                         analysis_plan_jresp['release_info']['dp_release']['statistics']))
         self.assertIsNotNone(histogram_results)
-        self.assertEqual(len(histogram_results), 1)
-        self.assertTrue(type(histogram_results[0]['result']), list)
+
+        #print(json.dumps(histogram_results, indent=4))
+        self.assertTrue(type(histogram_results[0]['result']), dict)
+        histogram_values = histogram_results[0]['result']['value']
+        self.assertTrue('categories' in histogram_values)
+        self.assertTrue('values' in histogram_values)
+
+
         self.assertIn('dp_release', analysis_plan_jresp['release_info'])
 
         self.assertIn('dataset', analysis_plan_jresp['release_info']['dp_release'])
