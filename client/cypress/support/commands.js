@@ -40,7 +40,17 @@ Cypress.Commands.add('vuex', () =>
     cy.window()
         .its('app.$store')
 )
+Cypress.Commands.add('epsilonStep', () => {
+    cy.scrollTo('top')
+    cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
+    cy.wait('@datasetInfo', {timeout: 5000})
 
+    cy.get('h1').should('contain', 'Set Accuracy Level').should('be.visible')
+    cy.get('[data-test="Larger Population - no"]').check({force: true})
+    //  cy.get('[data-test="Public Observations - yes"]').should('be.visible')
+    cy.get('[data-test="Public Observations - yes"]').check({force: true})
+
+})
 Cypress.Commands.add('runDemo', (mockDVfile, demoDatafile) => {
     cy.clearData()
     cy.createMockDataset(mockDVfile)
@@ -54,15 +64,7 @@ Cypress.Commands.add('runDemo', (mockDVfile, demoDatafile) => {
         cy.selectVariable(demoData.variables)
 
         // Continue to Set Epsilon Step
-        cy.scrollTo('top')
-        cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
-        cy.wait('@datasetInfo', {timeout: 5000})
-
-        cy.get('h1').should('contain', 'Set Accuracy Level').should('be.visible')
-        cy.get('[data-test="Larger Population - no"]').check({force: true})
-        //  cy.get('[data-test="Public Observations - yes"]').should('be.visible')
-        cy.get('[data-test="Public Observations - yes"]').check({force: true})
-
+        cy.epsilonStep()
         // Add all the statistics in the Create Statistics Step
         cy.createStatistics(demoData)
 
@@ -166,6 +168,8 @@ Cypress.Commands.add('selectVariable',(demoVariables)=> {
             cy.get(maxDataTest).type(demoVar.max, {force: true})
             // click back into min input, to trigger change event on max input
             cy.get(minDataTest).click()
+            cy.wait(500)
+            cy.get(maxDataTest).should('have.value', demoVar.max)
         }
     // TODO: add handling of Categorical vars
     })
@@ -190,22 +194,23 @@ Cypress.Commands.add('createStatistics', (demoData) => {
 
     // Create statistic for every statistics item in the fixture
     cy.get('[data-test="Add Statistic"]').should('be.visible')
-    demoData.statistics.forEach((demoStat)=> {
-         let demoVar = demoData.variables[demoStat.variable]
-         cy.get('[data-test="Add Statistic"]').click({force: true});
-         cy.get('[data-test="'+demoStat.name+'"]').click({force: true});
-         const varDataTest = '[data-test="' + demoVar.name + '"]'
-         cy.get(varDataTest).click({force: true})
-         cy.get('[data-test="Fixed value"]').type(demoVar.fixedValue)
-         cy.get('[data-test="Create statistic"]').click({force: true})
+    cy.pause()
+    demoData.statistics.forEach((demoStat) => {
+        let demoVar = demoData.variables[demoStat.variable]
+        cy.get('[data-test="Add Statistic"]').click({force: true});
+        cy.get('[data-test="' + demoStat.statistic + '"]').click({force: true});
+        const varDataTest = '[data-test="' + demoVar.name + '"]'
+        cy.get(varDataTest).click({force: true})
+        cy.get('[data-test="Fixed value"]').type(demoVar.fixedValue)
+        cy.get('[data-test="Create statistic"]').click({force: true})
 
-         // The statistic should have been created
-         // cy.get('[data-test="statistic"]').should('contain', 'Mean')
-         cy.get('tr').first().get('td').should('contain', demoStat.name)
-         cy.get('table').contains('td', demoStat.name).should('be.visible');
-         // Statistic should contain correct accuracy value
-         cy.get('table').contains('td', demoVar.accuracy).should('be.visible')
-     })
+        // The statistic should have been created
+        // cy.get('[data-test="statistic"]').should('contain', 'Mean')
+        cy.get('tr').first().get('td').should('contain', demoStat.statistic)
+        cy.get('table').contains('td', demoStat.statistic).should('be.visible');
+        // Statistic should contain correct accuracy value
+        cy.get('table').contains('td', demoVar.accuracy).should('be.visible')
+    })
 }),
 
 
@@ -245,9 +250,8 @@ Cypress.Commands.add('submitStatistics', (demoData) => {
     cy.url().should('contain', 'my-data-details')
     // The Release Details should be visible
     cy.get('[data-test="status tag"]').should('contain', 'Release Completed')
-    // TODO - allow more than one statistic
     demoData.statistics.forEach((demoStat)=> {
-        let snippet = 'A differentially private ' + demoStat.name + ' for variable ' + demoData.variables[demoStat.variable].name
+        let snippet = 'A differentially private ' + demoStat.statistic + ' for variable ' + demoData.variables[demoStat.variable].name
         cy.get('[data-test="statistic description"]').should('contain', snippet)
     })
 })

@@ -1,8 +1,10 @@
 {
   "datasetName": "Eye-typing experiment",
   "statistics":  [
-    { "name": "Histogram",
-      "variable": "trial"}
+    {
+      "statistic": "Histogram",
+      "variable": "trial"
+    }
     ],
   "variables": {
     "trial": {
