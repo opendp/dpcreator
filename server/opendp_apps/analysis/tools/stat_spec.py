@@ -62,8 +62,8 @@ class StatSpec:
         self.statistic = props.get('statistic')
         self.dataset_size = props.get('dataset_size')
         #
-        self.epsilon = props.get('epsilon')
-        self.delta = props.get('delta')
+        self.epsilon = float(props.get('epsilon'))
+        self.delta = float(props.get('delta'))
 
         self.cl = props.get('cl')      # confidence level coefficient (e.g. .95, .99, etc)
 
