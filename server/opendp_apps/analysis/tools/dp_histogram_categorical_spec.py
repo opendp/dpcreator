@@ -28,6 +28,14 @@ class DPHistogramCategoricalSpec(StatSpec):
         """
         return ['categories']
 
+    def _add_double_quotes(self, value):
+        """
+        Categories and values need to be enclosed by double
+        quotes in order to be handled by OpenDP
+        :return:
+        """
+        return f'"{value}"'
+
     def run_01_initial_handling(self):
         """
         """
@@ -43,12 +51,11 @@ class DPHistogramCategoricalSpec(StatSpec):
             self.add_err_msg(user_msg)
             return
 
-
         # Convert fixed value to string
         #
         if self.fixed_value is not None:
             try:
-                self.fixed_value = str(self.fixed_value)
+                self.fixed_value = self._add_double_quotes(self.fixed_value)
             except NameError as ex_obj:
                 user_msg = 'Failed to convert fixed_value to string.'
                 self.add_err_msg(user_msg)
@@ -59,8 +66,10 @@ class DPHistogramCategoricalSpec(StatSpec):
         updated_cats = []
         for idx, x in enumerate(self.categories):
             try:
+                # TODO: This should never be reached
                 if not isinstance(x, str):
                     x = str(x)
+                x = self._add_double_quotes(x)
                 updated_cats.append(x)
             except NameError as _ex_obj:
                 user_msg = 'Failed to convert category to string. (Failed category index {idx})'
