@@ -62,8 +62,8 @@ class StatSpec:
         self.statistic = props.get('statistic')
         self.dataset_size = props.get('dataset_size')
         #
-        self.epsilon = props.get('epsilon')
-        self.delta = props.get('delta')
+        self.epsilon = float(props.get('epsilon')) if props.get('epsilon') else None
+        self.delta = float(props.get('delta')) if props.get('delta') else None
 
         self.cl = props.get('cl')      # confidence level coefficient (e.g. .95, .99, etc)
 
@@ -94,7 +94,6 @@ class StatSpec:
         self.run_01_initial_handling()  # customize, if types need converting, etc.
         self.run_02_basic_validation()  # always the same
         self.run_03_custom_validation()  # customize, if types need converting, etc.
-
 
     def get_cl_text(self):
         """Return the ci as text. e.g. .05 is returned as 95%"""
@@ -285,7 +284,7 @@ class StatSpec:
                             + more_props_to_floatify
 
         for prop_name in props_to_floatify:
-            if not self.convert_to_float(prop_name):
+            if not self.cast_property_to_float(prop_name):
                 return
 
     def run_02_basic_validation(self):
@@ -301,6 +300,15 @@ class StatSpec:
         self.validate_property('col_index')
         self.validate_property('missing_values_handling')
 
+        # Epsilon should always be a float
+        if not self.cast_property_to_float('epsilon'):
+            return
+
+        # Delta, if specified, should be a float
+        if self.delta is not None:
+            if not self.cast_property_to_float('delta'):
+                return
+
         if not self.var_type in pstatic.VALID_VAR_TYPES:
             self.add_err_msg(f'Invalid variable type: "{self.var_type}"')
             return
@@ -311,10 +319,11 @@ class StatSpec:
             if prop_name in self.prop_validators:
                 self.validate_property(prop_name)
 
-        # check the min/max relationship
-        #
         if self.has_error():
             return
+
+        # check the min/max relationship
+        #
         if 'min' in self.additional_required_props() and \
                 'max' in self.additional_required_props():
             # print('checking min/max!')
@@ -375,7 +384,7 @@ class StatSpec:
 
         return True
 
-    def convert_to_float(self, prop_name):
+    def cast_property_to_float(self, prop_name):
         """Attempt to convert a value to a float"""
         prop_val = getattr(self, prop_name)
 
@@ -392,12 +401,12 @@ class StatSpec:
 
         return True
 
-    def convert_to_int(self, prop_name):
+    def cast_property_to_int(self, prop_name):
         """Attempt to convert a value to an integer"""
         prop_val = getattr(self, prop_name)
 
         try:
-            prop_val_float = int(prop_val)
+            prop_val_int = int(prop_val)
         except TypeError:
             self.add_err_msg(f'Failed to convert "{prop_name}" to an integer. (value: "{prop_val}")')
             return False
@@ -405,7 +414,12 @@ class StatSpec:
             self.add_err_msg(f'Failed to convert "{prop_name}" to a integer. (value: "{prop_val}")')
             return False
 
-        setattr(self, prop_name, prop_val_float)
+        if isinstance(prop_val, float):
+            if prop_val != prop_val_int:
+                self.add_err_msg(f'Failed to convert "{prop_name}" to an equivalent integer. (original: {prop_val}, converted: {prop_val_int})')
+                return False
+
+        setattr(self, prop_name, prop_val_int)
 
         return True
 
@@ -491,7 +505,7 @@ class StatSpec:
         final_info = OrderedDict({
                          "statistic": self.statistic,
                          "variable": self.variable,
-                         "result":{
+                         "result": {
                             "value": self.value
                          },
                          "epsilon": self.epsilon,
