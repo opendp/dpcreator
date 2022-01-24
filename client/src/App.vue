@@ -7,36 +7,42 @@
       <template v-if="error || errorObject">
         <v-container>
           <v-row>
-            <v-col cols="1">
-              <!-- left side padding to center the alert box -->
-            </v-col>
-            <v-col cols="11">
-
-              <v-spacer></v-spacer>
+            <v-col>
               <ColoredBorderAlert v-if="errMsg" type="error">
                 <template v-slot:content>
                   <b>Vue Runtime Error:</b> {{ errMsg.message }}
                   <v-spacer></v-spacer>
                   <b>Stack Trace: </b>{{ errMsg.stack }}
                 </template>
-
               </ColoredBorderAlert>
-              <ColoredBorderAlert v-if="errorObject" type="error">
-
+              <ColoredBorderAlert v-if="error && errorObject" type="error">
                 <template v-slot:content>
+                  <template v-if="errorObject.status==403">
+                    You do not have authorization to view this page.
+                  </template>
+                  <template v-else>
                     <b>Runtime Error:</b>
-                    <json-viewer
-                               :value="errorObject">
-                  </json-viewer>
+                    <json-viewer :value="errorObject"></json-viewer>
+                  </template>
                 </template>
               </ColoredBorderAlert>
             </v-col>
           </v-row>
-            <Button
-            data-test="ErrorContinueButton"
-            :click="continueAction"
-            label="Continue"
-    />
+          <v-row>
+            <v-col>
+              <v-spacer></v-spacer>
+            </v-col>
+            <v-col>
+              <Button
+                  data-test="ErrorContinueButton"
+                  :click="continueAction"
+                  label="Go To Homepage"
+              />
+            </v-col>
+            <v-col>
+              <v-spacer></v-spacer>
+            </v-col>
+          </v-row>
         </v-container>
       </template>
       <router-view v-if="!(error || errorObject)"/>
@@ -56,19 +62,20 @@ import Header from "./components/Structure/Header.vue";
 import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
 import {mapState} from "vuex";
 import NETWORK_CONSTANTS from "@/router/NETWORK_CONSTANTS";
-
+import Button from "@/components/DesignSystem/Button";
 export default {
   title: 'DP Creator',
-  components: {Footer, Header, ColoredBorderAlert},
+  components: {Footer, Header, ColoredBorderAlert, Button},
   data: () => ({
     error: false,
     errMsg: null,
     errorObject: null,
-    errorRequest:  null,
+    errorRequest: null,
     fontUrl: settings.google_fonts_url
   }),
   created() {
     window.addEventListener('unhandledrejection', (event) => {
+      this.error = true
       console.log("unhandled rejection")
       console.log('event.promise: ' + event.promise)
       console.log('event.reason: ' + JSON.stringify(event.reason))
@@ -105,7 +112,11 @@ export default {
   },
   methods: {
     continueAction() {
-      this.$router.push(NETWORK_CONSTANTS.HOME.PATH)
+      window.location.replace('/')
+      this.error = false
+      this.errorObject = null
+      this.errMsg = null
+      this.errorRequest = null
     }
   }
 };
