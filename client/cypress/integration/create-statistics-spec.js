@@ -20,22 +20,20 @@
                 cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
                     demoData['datasetName'])
                 cy.goToConfirmVariables(demoData.variables)
-                // try to find one numerical variable
-                let numericVar = null
-                for (const key in demoData.variables) {
-                    if (demoData.variables[key].type === 'Float' || demoData.variables[key].type === 'Integer') {
-                        numericVar = demoData.variables[key]
-                    }
-                }
-                if (numericVar !== null) {
-                    cy.createMeanStatistic(numericVar)
-                    cy.get('[data-test="Add Statistic"]').should('be.visible')
-                    cy.get('[data-test="Add Statistic"]').click({force: true});
-                    cy.get('[data-test="confirmVariablesLink"]').click({force: true});
-                    cy.get('h1').should('contain', 'Confirm Variables').should('be.visible')
-                    cy.contains('td', numericVar.name).parent('tr').children()
-                        .first().children().get(":has(.v-simple-checkbox--disabled)").should('be.visible')
-                }
+                // select the variables we will use
+                cy.selectVariable(demoData.variables)
+
+                // Continue to Set Epsilon Step
+                cy.epsilonStep()
+                // Add all the statistics in the Create Statistics Step
+                cy.createStatistics(demoData)
+                cy.get('[data-test="Add Statistic"]').should('be.visible')
+                cy.get('[data-test="Add Statistic"]').click({force: true});
+                cy.get('[data-test="confirmVariablesLink"]').click({force: true});
+                cy.get('h1').should('contain', 'Confirm Variables').should('be.visible')
+                cy.contains('td', demoData.variables[demoData.statistics[0].variable].name).parent('tr').children()
+                    .first().children().get(":has(.v-simple-checkbox--disabled)").should('be.visible')
+
 
             })
         })

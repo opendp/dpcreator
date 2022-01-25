@@ -13,7 +13,6 @@ from opendp_apps.utils.extra_validators import *
 
 
 class DPMeanStatSpecTest(StatSpecTestCase):
-
     fixtures = ['test_dataset_data_001.json', ]
 
     def setUp(self):
@@ -21,18 +20,18 @@ class DPMeanStatSpecTest(StatSpecTestCase):
         super().setUp()
 
         self.spec_props = {'variable': 'EyeHeight',
-                          'col_index': 19,
-                          'statistic': astatic.DP_MEAN,
-                          'dataset_size': 183,
-                          'epsilon': 1.0,
-                          'delta': 0.0,
-                          'cl': astatic.CL_95,
-                          'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                          'fixed_value': '5',
-                          'variable_info': {'min': -8,
-                                            'max': 5,
-                                            'type': 'Float', },
-                        }
+                           'col_index': 19,
+                           'statistic': astatic.DP_MEAN,
+                           'dataset_size': 183,
+                           'epsilon': 1.0,
+                           'delta': 0.0,
+                           'cl': astatic.CL_95,
+                           'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+                           'fixed_value': '5',
+                           'variable_info': {'min': -8,
+                                             'max': 5,
+                                             'type': 'Float', },
+                           }
 
         self.spec_props_income = {'variable': 'income',
                                   'col_index': 6,
@@ -45,10 +44,10 @@ class DPMeanStatSpecTest(StatSpecTestCase):
                                   'fixed_value': '31000',
                                   'variable_info': {'min': 0,
                                                     'max': 650000,
-                                                    'type': 'Float',},
+                                                    'type': 'Float', },
                                   }
 
-    #@skip
+    # @skip
     def test_10_debug_mean(self):
         """(10) Test DP Mean Spec"""
         msgt(self.test_10_debug_mean.__doc__)
@@ -74,7 +73,6 @@ class DPMeanStatSpecTest(StatSpecTestCase):
             print('\n-- Looks good! --')
             print('\nUI info:', json.dumps(dp_mean.get_success_msg_dict()))
 
-
     def test_05_get_variable_order(self):
         """(05) Test get variable order"""
         msgt(self.test_05_get_variable_order.__doc__)
@@ -85,7 +83,6 @@ class DPMeanStatSpecTest(StatSpecTestCase):
 
         self.assertTrue(variable_indices_info.success)
         self.assertEqual(variable_indices_info.data, [x for x in range(20)])
-
 
     def test_10_valid_spec(self):
         """(10) Run DP Mean valid spec"""
@@ -98,12 +95,12 @@ class DPMeanStatSpecTest(StatSpecTestCase):
                       'epsilon': 1.0,
                       'delta': 0.0,
                       'cl': astatic.CL_95,
-                      #'accuracy': None,
+                      # 'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
                       'fixed_value': '5',
                       'variable_info': {'min': -8,
                                         'max': 5,
-                                        'type': 'Float',},
+                                        'type': 'Float', },
                       }
 
         dp_mean = DPMeanSpec(spec_props)
@@ -123,7 +120,7 @@ class DPMeanStatSpecTest(StatSpecTestCase):
             self.assertTrue(dp_mean.is_chain_valid())
 
         print('   --------')
-        for good_ds in [1, 2, 10, 100, 56**3,]:
+        for good_ds in [1, 2, 10, 100, 56 ** 3, ]:
             spec_props['dataset_size'] = good_ds
             dp_mean = DPMeanSpec(spec_props)
             print(f'> Valid dataset_size: {good_ds}')
@@ -136,7 +133,6 @@ class DPMeanStatSpecTest(StatSpecTestCase):
 
         spec_props = self.spec_props
 
-
         for epsilon_val in [1.01, -0.01, 10]:
             print(f'> Bad epsilon val: {epsilon_val}')
             spec_props['epsilon'] = epsilon_val
@@ -144,21 +140,14 @@ class DPMeanStatSpecTest(StatSpecTestCase):
 
             self.assertFalse(dp_mean.is_chain_valid())
             err_info = dp_mean.get_error_msg_dict()
-            self.assertTrue(err_info['valid'] == False)
+            self.assertTrue(err_info['valid'] is False)
             print(err_info['message'])
             self.assertTrue(err_info['message'].find(VALIDATE_MSG_EPSILON) > -1)
 
         for epsilon_val in ['a', 'carrot', 'cake']:
             print(f'> Bad epsilon val: {epsilon_val}')
             spec_props['epsilon'] = epsilon_val
-            dp_mean = DPMeanSpec(spec_props)
-
-            self.assertFalse(dp_mean.is_chain_valid())
-            err_info = dp_mean.get_error_msg_dict()
-            self.assertTrue(err_info['valid'] == False)
-            print(err_info['message'])
-            self.assertTrue(err_info['message'].find('Failed to convert') > -1)
-
+            self.assertRaises(ValueError, DPMeanSpec, spec_props)
 
         spec_props['epsilon'] = 1
         for bad_ds in [-1, 0, 1.0, .03, 'brick', 'cookie']:
@@ -179,18 +168,18 @@ class DPMeanStatSpecTest(StatSpecTestCase):
                 start += decimal.Decimal(step)
 
         for cl_val in list(float_range(-1, 3, '0.08')):
-            #print(f'> Invalid ci val: {ci_val}')
+            # print(f'> Invalid ci val: {ci_val}')
             spec_props['cl'] = cl_val
             dp_mean = DPMeanSpec(spec_props)
-            #print(dp_mean.is_chain_valid())
+            # print(dp_mean.is_chain_valid())
             self.assertFalse(dp_mean.is_chain_valid())
             self.assertTrue(dp_mean.get_single_err_msg().find(VALIDATE_MSG_NOT_VALID_CL_VALUE) > -1)
 
         for cl_val in ['alphabet', 'soup', 'c']:
-            #print(f'> Invalid ci val: {ci_val}')
+            # print(f'> Invalid ci val: {ci_val}')
             spec_props['cl'] = cl_val
             dp_mean = DPMeanSpec(spec_props)
-            #print(dp_mean.is_chain_valid())
+            # print(dp_mean.is_chain_valid())
             self.assertFalse(dp_mean.is_chain_valid())
             self.assertTrue(dp_mean.get_single_err_msg().find('Failed to convert "cl" to a float') > -1)
 
@@ -256,14 +245,12 @@ class DPMeanStatSpecTest(StatSpecTestCase):
 
         spec_props = self.spec_props
 
-
         dp_mean = DPMeanSpec(spec_props)
         self.assertTrue(dp_mean.is_chain_valid())
 
-
-        bad_impute_info = [  (-10, astatic.ERR_IMPUTE_PHRASE_MIN)
-                           , (45, astatic.ERR_IMPUTE_PHRASE_MAX)
-                           , (5.2, astatic.ERR_IMPUTE_PHRASE_MAX)]
+        bad_impute_info = [(-10, astatic.ERR_IMPUTE_PHRASE_MIN)
+            , (45, astatic.ERR_IMPUTE_PHRASE_MAX)
+            , (5.2, astatic.ERR_IMPUTE_PHRASE_MAX)]
 
         for bad_impute, stat_err_msg in bad_impute_info:
             print(f'> bad impute: {bad_impute}')
@@ -276,7 +263,6 @@ class DPMeanStatSpecTest(StatSpecTestCase):
             print(f"  - {err_dict['message']}")
             self.assertTrue(err_dict['message'].find(stat_err_msg) > -1)
 
-
         good_impute_info = [-8, 5, '-8.0', '5.0000', -7, 0, '0.0']
 
         for good_impute in good_impute_info:
@@ -286,33 +272,30 @@ class DPMeanStatSpecTest(StatSpecTestCase):
             dp_mean = DPMeanSpec(new_props)
             self.assertTrue(dp_mean.is_chain_valid())
 
-
-
-    #@skip
+    # @skip
     def test_100_run_dpmean_calculation(self):
         """(100) Run DP mean calculation"""
         msgt(self.test_100_run_dpmean_calculation.__doc__)
 
         spec_props = self.spec_props
 
-
         dp_mean = DPMeanSpec(spec_props)
         self.assertTrue(dp_mean.is_chain_valid())
         if dp_mean.has_error():
             print(dp_mean.get_error_messages())
             return
-        #print('\nUI info:', json.dumps(dp_mean.get_success_msg_dict()))
+        # print('\nUI info:', json.dumps(dp_mean.get_success_msg_dict()))
 
         # ------------------------------------------------------
         # Run the actual mean
         # ------------------------------------------------------
         # Column indexes - We know this data has 20 columns
-        col_indexes = [idx for idx in range(0,20)]
+        col_indexes = [idx for idx in range(0, 20)]
 
         # File object
         #
         eye_fatigue_filepath = join(TEST_DATA_DIR, 'Fatigue_data.tab')
-        #print('eye_fatigue_filepath', eye_fatigue_filepath)
+        # print('eye_fatigue_filepath', eye_fatigue_filepath)
         self.assertTrue(isfile(eye_fatigue_filepath))
 
         file_obj = open(eye_fatigue_filepath, 'r')
@@ -326,10 +309,7 @@ class DPMeanStatSpecTest(StatSpecTestCase):
         self.assertIn('text', final_dict['description'])
         self.assertIn('html', final_dict['description'])
 
-
         print('Actual mean: -0.9503854412185792')
-
-
 
     def test_110_run_dpmean_calculation(self):
         """(110) Run another DP mean calculation"""

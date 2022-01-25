@@ -263,7 +263,7 @@ export default {
     allowedVariableTypes: {
       "Mean": ["Integer", "Float"],
       "Count": ["Integer", "Float", "Categorical", "Boolean"],
-      "Histogram": ["Integer", "Float"],
+      "Histogram": ["Categorical", "Integer"],
       "Quantile": ["Integer", "Float"] // not yet available
     },
     selectedStatistic: null,

@@ -2,101 +2,53 @@ import json
 import decimal
 
 from os.path import abspath, dirname, isfile, join
+from unittest import skip
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
 from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
-from opendp_apps.analysis.tools.dp_histogram_spec import DPHistogramSpec
+# from opendp_apps.analysis.tools.dp_histogram_spec import DPHistogramSpec
+from opendp_apps.analysis.tools.dp_histogram_categorical_spec import DPHistogramCategoricalSpec
+from opendp_apps.analysis.tools.dp_histogram_integer_spec import DPHistogramIntegerSpec
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.utils.extra_validators import *
+from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.profiler import static_vals as pstatic
 
 
 class HistogramStatSpecTest(StatSpecTestCase):
     fixtures = ['test_dataset_data_001.json', ]
 
-    def test_10_debug(self):
-        """(10) Test DP Mean Spec"""
-        msgt(self.test_10_debug.__doc__)
+    def setUp(self):
 
-        spec_props = {'variable': 'Subject',
+        super().setUp()
+
+        """Reusable properties for testing basic 'StatSpec' functionality"""
+
+        self.spec_props = {'variable': 'Subject',
                       'col_index': 0,
                       'statistic': astatic.DP_HISTOGRAM,
                       'dataset_size': 183,
                       'epsilon': 1.0,
                       'delta': 0.0,
                       'cl': astatic.CL_95,
-                      # 'accuracy': None,
                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'fixed_value': 0,
-                      'variable_info': {'min': 0,
-                                        'max': 100,
-                                        'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"', '"cw"',
-                                                       '"jp"', '"rh"', '"aq"', '"ph"', '"le"', '"mn"', '"ls2"', '"no"',
-                                                       '"af"'],
-                                        'type': 'Integer', },
+                      'fixed_value': 'ac',
+                      'variable_info': {'categories': ['ac', 'kj', 'ys', 'bh1', 'bh2', 'jm', 'mh', 'cw',
+                                                       'jp', 'rh', 'aq', 'ph', 'le', 'mn', 'ls2', 'no',
+                                                       'af'],
+                                        'type': pstatic.VAR_TYPE_CATEGORICAL},
                       }
 
-        dp_hist = DPHistogramSpec(spec_props)
-        print('(1) Run initial check, before using the OpenDp library')
-        print('  - Error found?', dp_hist.has_error())
-        if dp_hist.has_error():
-            print('\n-- Errors --')
-            print(dp_hist.get_error_messages())
-            print('\nUI info:', json.dumps(dp_hist.get_error_msg_dict()))
-            return
+        self.dp_hist = DPHistogramCategoricalSpec(self.spec_props)
 
-        print('(2) Use the OpenDP library to check validity')
-        print('  - Is valid?', dp_hist.is_chain_valid())
-        if dp_hist.has_error():
-            print('\n-- Errors --')
-            print(dp_hist.get_error_messages())
-            print('\nUI info:', json.dumps(dp_hist.get_error_msg_dict()))
-        else:
-            print('\n-- Looks good! --')
-            print('\nUI info:', json.dumps(dp_hist.get_success_msg_dict()))
+        if self.dp_hist.has_error():
+            print(self.dp_hist.get_error_messages())
+        self.assertFalse(self.dp_hist.has_error())
+        self.assertTrue(self.dp_hist.is_chain_valid())
 
-    def test_15_categorial_variables(self):
-        """(15) Test DP Mean Spec with categorial variables"""
-        msgt(self.test_15_categorial_variables.__doc__)
 
-        spec_props = {
-                'variable': 'Subject',
-                'statistic': astatic.DP_HISTOGRAM,
-                'dataset_size': 183,
-                'epsilon': 1.0,
-                'delta': 0.0,
-                'cl': astatic.CL_95,
-                'col_index': 0,
-                'fixed_value': 1,
-                'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                'variable_info': {
-                    'min': 0,
-                    'max': 1E5,
-                    'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"', '"cw"',
-                                   '"jp"', '"rh"', '"aq"', '"ph"', '"le"', '"mn"', '"ls2"', '"no"', '"af"'],
-                    'type': 'Categorical'
-                }
-            }
-
-        dp_hist = DPHistogramSpec(spec_props)
-        print('(1) Run initial check, before using the OpenDp library')
-        print('  - Error found?', dp_hist.has_error())
-        if dp_hist.has_error():
-            print('\n-- Errors --')
-            print(dp_hist.get_error_messages())
-            print('\nUI info:', json.dumps(dp_hist.get_error_msg_dict()))
-            return
-
-        print('(2) Use the OpenDP library to check validity')
-        print('  - Is valid?', dp_hist.is_chain_valid())
-        if dp_hist.has_error():
-            print('\n-- Errors --')
-            print(dp_hist.get_error_messages())
-            print('\nUI info:', json.dumps(dp_hist.get_error_msg_dict()))
-        else:
-            print('\n-- Looks good! --')
-            print('\nUI info:', json.dumps(dp_hist.get_success_msg_dict()))
 
     def test_05_get_variable_order(self):
         """(05) Test get variable order"""
@@ -113,44 +65,25 @@ class HistogramStatSpecTest(StatSpecTestCase):
         """(10) Run DP Mean valid spec"""
         msgt(self.test_10_valid_spec.__doc__)
 
-        spec_props = {'variable': 'Subject',
-                      'col_index': 0,
-                      'statistic': astatic.DP_HISTOGRAM,
-                      'dataset_size': 183,
-                      'epsilon': 1.0,
-                      'delta': 0.0,
-                      'cl': astatic.CL_95,
-                      # 'accuracy': None,
-                      'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'fixed_value': 5,
-                      'variable_info': {'min': -8,
-                                        'max': 5,
-                                        'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"', '"cw"',
-                                                       '"jp"', '"rh"', '"aq"', '"ph"', '"le"', '"mn"', '"ls2"', '"no"',
-                                                       '"af"'],
-                                        'type': 'Float', },
-                      }
-
-        dp_hist = DPHistogramSpec(spec_props)
-        self.assertTrue(dp_hist.is_chain_valid())
+        spec_props = self.spec_props.copy()
 
         for epsilon_val in [0.1, .25, .65, .431, 1.0]:
             print(f'> Valid epsilon val: {epsilon_val}')
             spec_props['epsilon'] = epsilon_val
-            dp_hist = DPHistogramSpec(spec_props)
+            dp_hist = DPHistogramCategoricalSpec(spec_props)
             self.assertTrue(dp_hist.is_chain_valid())
 
         print('   --------')
         for cl_val in [x[0] for x in astatic.CL_CHOICES]:
             print(f'> Valid cl val: {cl_val}')
             spec_props['cl'] = cl_val
-            dp_hist = DPHistogramSpec(spec_props)
+            dp_hist = DPHistogramCategoricalSpec(spec_props)
             self.assertTrue(dp_hist.is_chain_valid())
 
         print('   --------')
         for good_ds in [1, 2, 10, 100, 56 ** 3, ]:
             spec_props['dataset_size'] = good_ds
-            dp_hist = DPHistogramSpec(spec_props)
+            dp_hist = DPHistogramCategoricalSpec(spec_props)
             print(f'> Valid dataset_size: {good_ds}')
             self.assertTrue(dp_hist.is_chain_valid())
 
@@ -158,22 +91,7 @@ class HistogramStatSpecTest(StatSpecTestCase):
         """(30) Bad confidence level values"""
         msgt(self.test_30_bad_confidence_levels.__doc__)
 
-        spec_props = {'variable': 'Subject',
-                      'col_index': 0,
-                      'statistic': astatic.DP_HISTOGRAM,
-                      'dataset_size': 183,
-                      'epsilon': 1.0,
-                      'delta': 0.0,
-                      'cl': astatic.CL_95,
-                      'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'fixed_value': 5,
-                      'variable_info': {'min': -8,
-                                        'max': 5,
-                                        'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"', '"cw"',
-                                                       '"jp"', '"rh"', '"aq"', '"ph"', '"le"', '"mn"', '"ls2"', '"no"',
-                                                       '"af"'],
-                                        'type': 'Float', },
-                      }
+        spec_props = self.spec_props
 
         def float_range(start, stop, step):
             while start < stop:
@@ -183,32 +101,20 @@ class HistogramStatSpecTest(StatSpecTestCase):
         for cl_val in list(float_range(-1, 3, '0.1')) + ['alphabet', 'soup']:
             # print(f'> Invalid ci val: {ci_val}')
             spec_props['cl'] = cl_val
-            dp_hist = DPHistogramSpec(spec_props)
+            dp_hist = DPHistogramCategoricalSpec(spec_props)
             # print(dp_hist.is_chain_valid())
             self.assertTrue(dp_hist.is_chain_valid())
 
+    @skip
+    # Not clear that this test should pass anymore, since min/max was referring to
+    # numerical values and this is categorical
     def test_40_test_impute(self):
         """(40) Test impute validation"""
         msgt(self.test_40_test_impute.__doc__)
 
-        spec_props = {'variable': 'Subject',
-                      'col_index': 0,
-                      'statistic': astatic.DP_HISTOGRAM,
-                      'dataset_size': 183,
-                      'epsilon': 1.0,
-                      'delta': 0.0,
-                      'cl': astatic.CL_95,
-                      'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'fixed_value': 5,
-                      'variable_info': {'min': -8,
-                                        'max': 5,
-                                        'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"', '"cw"',
-                                                       '"jp"', '"rh"', '"aq"', '"ph"', '"le"', '"mn"', '"ls2"', '"no"',
-                                                       '"af"'],
-                                        'type': 'Float', },
-                      }
+        spec_props = self.spec_props.copy()
 
-        dp_hist = DPHistogramSpec(spec_props)
+        dp_hist = DPHistogramCategoricalSpec(spec_props)
         if not dp_hist.is_chain_valid():
             print(dp_hist.get_error_messages())
         self.assertTrue(dp_hist.is_chain_valid())
@@ -219,7 +125,7 @@ class HistogramStatSpecTest(StatSpecTestCase):
             print(f'> bad impute: {bad_impute}')
             new_props = spec_props.copy()
             new_props['fixed_value'] = bad_impute
-            dp_hist2 = DPHistogramSpec(new_props)
+            dp_hist2 = DPHistogramIntegerSpec(new_props)
 
             self.assertFalse(dp_hist2.is_chain_valid())
             err_dict = dp_hist2.get_error_msg_dict()
@@ -235,34 +141,60 @@ class HistogramStatSpecTest(StatSpecTestCase):
             dp_hist = DPHistogramSpec(new_props)
             self.assertTrue(dp_hist.is_chain_valid())
 
-    # @skip
-    def test_100_run_dphist_calculation(self):
-        """(100) Run DP mean calculation"""
-        msgt(self.test_100_run_dphist_calculation.__doc__)
+    def test_100_run_dphist_calculation_categorical(self):
+        """(100) Run DP histogram calculation"""
+        msgt(self.test_100_run_dphist_calculation_categorical.__doc__)
 
-        spec_props = {'variable': 'Subject',
-                      'col_index': 0,
-                      'statistic': astatic.DP_HISTOGRAM,
-                      'dataset_size': 183,
-                      'epsilon': 1.0,
-                      'delta': 0.0,
-                      'cl': astatic.CL_95,
-                      # 'accuracy': None,
-                      'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'fixed_value': 5,
-                      'variable_info': {'min': -8,
-                                        'max': 5,
-                                        'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"',
-                                                       '"cw"', '"jp"', '"rh"', '"aq"', '"ph"', '"le"', '"mn"',
-                                                       '"ls2"', '"no"', '"af"'],
-                                        'type': 'Integer', },
-                      }
+        dp_hist = self.dp_hist
+        # ------------------------------------------------------
+        # Run the actual mean
+        # ------------------------------------------------------
+        # Column indexes - We know this data has 20 columns
+        col_indexes = [idx for idx in range(0, 20)]
 
-        dp_hist = DPHistogramSpec(spec_props)
-        print(dp_hist.has_error(), dp_hist.error_messages)
+        # File object
+        #
+        eye_fatigue_filepath = join(TEST_DATA_DIR, 'Fatigue_data.tab')
+        # print('eye_fatigue_filepath', eye_fatigue_filepath)
+        self.assertTrue(isfile(eye_fatigue_filepath))
+
+        file_obj = open(eye_fatigue_filepath, 'r')
+
+        # Call run_chain
+        #
+        dp_hist.run_chain(col_indexes, file_obj, sep_char="\t")
+        self.assertFalse(dp_hist.has_error())
+        self.assertTrue('categories' in dp_hist.value)
+        self.assertTrue('values' in dp_hist.value)
+
+
+    def test_110_run_dphist_calculation_categorical2(self):
+        """(110) Run DP 2nd categorical calculation, with only 2 categories"""
+        msgt(self.test_110_run_dphist_calculation_categorical2.__doc__)
+
+        spec_props = {
+            'variable': 'Language',
+            'col_index': 1,
+            'statistic': astatic.DP_HISTOGRAM,
+            'dataset_size': 183,
+            'epsilon': 1.0,
+            'delta': 0.0,
+            'cl': astatic.CL_95,
+            'fixed_value': 'EN',
+            'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+            'variable_info': {
+                'categories': ['EN', 'DA'],
+                'type': 'Categorical'
+            }
+        }
+
+        dp_hist = DPHistogramCategoricalSpec(spec_props)
+        print(f"DPHistogramSpec valid? {dp_hist.has_error()}. get_error_msg_dict: {dp_hist.get_error_msg_dict()}")
         if dp_hist.has_error():
-            print(dp_hist.get_error_messages())
+            print(f"get_error_messages(): {dp_hist.get_error_messages()}")
+
         self.assertTrue(dp_hist.is_chain_valid())
+
         # print('\nUI info:', json.dumps(dp_hist.get_success_msg_dict()))
 
         # ------------------------------------------------------
@@ -282,32 +214,34 @@ class HistogramStatSpecTest(StatSpecTestCase):
         # Call run_chain
         #
         dp_hist.run_chain(col_indexes, file_obj, sep_char="\t")
+        self.assertFalse(dp_hist.has_error())
+        self.assertTrue('categories' in dp_hist.value)
+        self.assertTrue('values' in dp_hist.value)
 
-    def test_105_run_dphist_calculation_categorical(self):
-        """(105) Run DP mean calculation with labels"""
-        msgt(self.test_105_run_dphist_calculation_categorical.__doc__)
+
+    def test_120_run_dphist_calculation_integer(self):
+        """(120) Run DP histogram calculation with integer values"""
+        msgt(self.test_120_run_dphist_calculation_integer.__doc__)
 
         spec_props = {
-            'variable': 'Subject',
-            'col_index': 0,
+            'variable': 'Trial',
+            'col_index': 4,
             'statistic': astatic.DP_HISTOGRAM,
             'dataset_size': 183,
-            'epsilon': 1.0,
+            'epsilon': 1,
             'delta': 0.0,
             'cl': astatic.CL_95,
-            'fixed_value': 1,
+            'fixed_value': "3",
             'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
             'variable_info': {
                 'min': 0,
-                'max': 1E5,
-                'categories': ['"ac"', '"kj"', '"ys"', '"bh1"', '"bh2"', '"jm"', '"mh"', '"cw"', '"jp"', '"rh"', '"aq"',
-                               '"ph"', '"le"', '"mn"', '"ls2"', '"no"', '"af"'],
-                'type': 'Categorical'
+                'max': 7,
+                'type': 'Integer'
             }
         }
 
-        dp_hist = DPHistogramSpec(spec_props)
-        print(f"DPHistogramSpec valid? {dp_hist.has_error()}. get_error_msg_dict: {dp_hist.get_error_msg_dict()}")
+        dp_hist = DPHistogramIntegerSpec(spec_props)
+        print(f"DPHistogramIntegerSpecSpec valid? {dp_hist.has_error()}. get_error_msg_dict: {dp_hist.get_error_msg_dict()}")
         if dp_hist.has_error():
             print(f"get_error_messages(): {dp_hist.get_error_messages()}")
         self.assertTrue(dp_hist.is_chain_valid())
@@ -330,5 +264,7 @@ class HistogramStatSpecTest(StatSpecTestCase):
         # Call run_chain
         #
         dp_hist.run_chain(col_indexes, file_obj, sep_char="\t")
-        print(dp_hist.statistic)
 
+        self.assertFalse(dp_hist.has_error())
+        self.assertTrue('categories' in dp_hist.value)
+        self.assertTrue('values' in dp_hist.value)

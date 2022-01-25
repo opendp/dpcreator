@@ -57,7 +57,7 @@ class DPSumSpec(StatSpec):
         #
         if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
             # Convert the impute value to a float!
-            if not self.convert_to_float('fixed_value'):
+            if not self.cast_property_to_float('fixed_value'):
                 return
         self.floatify_int_values()
 
