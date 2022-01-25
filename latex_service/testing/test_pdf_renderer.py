@@ -13,9 +13,7 @@ class TestPDFRenderer(TestCase):
                     },
                     "variable": "EyeHeight",
                     "statistic": "mean",
-                }
-            ]
-        self.histograms = [
+                },
                 {
                     "name": "test",
                     "data": [1, 2, 3, 4, 5],
@@ -24,5 +22,6 @@ class TestPDFRenderer(TestCase):
             ]
 
     def test_render(self):
-        pdf_renderer = PDFRenderer(self.statistics, self.histograms)
+        from mock_data import dp_release
+        pdf_renderer = PDFRenderer(dp_release, self.statistics, 4, 4)
         self.assertIsNotNone(pdf_renderer.get_latex())
