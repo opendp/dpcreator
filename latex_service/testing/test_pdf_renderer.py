@@ -1,27 +1,20 @@
 from unittest import TestCase
 
+from mock_data import dp_release, statistics
 from pdf_renderer import PDFRenderer
 
 
 class TestPDFRenderer(TestCase):
 
     def setUp(self) -> None:
-        self.statistics = [
-                {
-                    "result": {
-                        "value": 0.3684799824191177
-                    },
-                    "variable": "EyeHeight",
-                    "statistic": "mean",
-                },
-                {
-                    "name": "test",
-                    "data": [1, 2, 3, 4, 5],
-                    "height": [1, 2, 3, 4, 5]
-                }
-            ]
+        self.pdf_renderer = PDFRenderer(dp_release, statistics, 4, 4)
 
     def test_render(self):
-        from mock_data import dp_release
-        pdf_renderer = PDFRenderer(dp_release, self.statistics, 4, 4)
-        self.assertIsNotNone(pdf_renderer.get_latex())
+        self.assertIsNotNone(self.pdf_renderer.get_latex())
+
+    def test_parameter_formatter(self):
+        formatted_parameters = self.pdf_renderer.parameter_formatter(statistics[0])
+        self.assertEqual('Epsilon: 1.0	Delta: 0.0 	CL: 0.95	Accuracy: 8.987196833391316 	'
+                         'Missing value type: insert_fixed 	Missing value: 4', formatted_parameters)
+
+

@@ -46,10 +46,12 @@ class PDFRenderer(object):
         :param statistic:
         :return:
         """
-        return '\t'.join(f'Epsilon: {statistic["epsilon"]} Delta: {statistic["delta"]} '
-                         f'CL: {statistic["confidence_level"]} Accuracy: {statistic["accuracy"]["value"]} '
-                         f'Missing value type: {statistic["missing_value_handling"]["type"]} '
-                         f'Missing value: {statistic["missing_value_handling"]["fixed_value"]}'.split())
+        return '\t'.join([
+            f'Epsilon: {statistic["epsilon"]}', f'Delta: {statistic["delta"]} ',
+            f'CL: {statistic["confidence_level"]}', f'Accuracy: {statistic["accuracy"]["value"]} ',
+            f'Missing value type: {statistic["missing_value_handling"]["type"]} ',
+            f'Missing value: {statistic["missing_value_handling"]["fixed_value"]}'
+        ])
 
     def build_header(self):
         """
