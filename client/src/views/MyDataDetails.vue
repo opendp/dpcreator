@@ -26,16 +26,42 @@
 
           <div class="mb-5" v-if="status === COMPLETED">
             <p class="primary--text">DP Release Information:</p>
+            <v-data-table
+                :headers="statsHeaders"
+                :items="statsItems"
+                :single-expand="false"
+                :expanded.sync="expanded"
+                item-key="index"
+                show-expand
+                class="elevation-1"
+                sortable="false"
+            >
 
-            <p>This release contains {{ analysisPlan.releaseInfo.dpRelease.statistics.length }} statistic<span
-                v-if="analysisPlan.releaseInfo.dpRelease.statistics.length > 1">s</span>:</p>
-            <p>&nbsp;</p>
-            <div v-for="(statistic, index) in analysisPlan.releaseInfo.dpRelease.statistics"
-                 style="padding-left:20px; padding-right:40px;">
-              <p data-test="statistic description" style="">
-                ({{ index + 1 }}) <span v-html="statistic.description.html"></span></p>
+              <template v-slot:[`item.description`]="{ item }">
+                <div v-html="getConfidenceLevel(item)"></div>
+              </template>
+              <template v-slot:[`item.result`]="{ item }">
+                <div v-html="getResult(item)"></div>
+                <a v-if="displayExpandLink(item)" v-on:click="() => toggleExpand(item)">Show more</a>
 
-            </div>
+              </template>
+
+              <template v-slot:expanded-item="{ headers, item }">
+
+                <td :colspan="statsHeaders.length+1">
+                  <v-container>
+                    <v-row>
+                      <v-col cols="2">Parameters:</v-col>
+                      <v-col cols="10">
+                        <div v-html="getParameters(item)"></div>
+
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                </td>
+              </template>
+            </v-data-table>
+
             <p style="padding-left:20px; padding-right:40px;">Created:
               {{ analysisPlan.releaseInfo.dpRelease.created.humanReadable }}</p>
             <div :v-if="analysisPlan.releaseInfo.dataverseDepositInfo">
@@ -87,6 +113,7 @@
             </p>
           </div>
           <div class="mb-5" v-if="status === COMPLETED">
+
             <v-expansion-panels multiple v-model="expandedPanels">
               <v-expansion-panel data-test="DP Statistics Panel">
                 <v-expansion-panel-header>DP Statistics</v-expansion-panel-header>
@@ -94,6 +121,7 @@
                   <json-viewer :expand-depth="5" :expanded="false"
                                :value="analysisPlan.releaseInfo.dpRelease.statistics">
                   </json-viewer>
+
                 </v-expansion-panel-content>
               </v-expansion-panel>
               <v-expansion-panel>
@@ -223,12 +251,66 @@ export default {
       alert("cancel execution " + item);
     },
     handlePDFDownload() {
-       window.location.href = this.analysisPlan.releaseInfo.downloadPdfUrl;
+      window.location.href = this.analysisPlan.releaseInfo.downloadPdfUrl;
     },
     handleJSONDownload() {
       window.location.href = this.analysisPlan.releaseInfo.downloadJsonUrl;
     },
+    toggleExpand(item) {
+      console.log('toggleExpand: ' + JSON.stringify(item))
+      const indexRow = item.index;
+      const indexExpanded = this.expanded.findIndex(i => i === item);
+      if (indexExpanded > -1) {
+        this.expanded.splice(indexExpanded, 1)
+      } else {
+        this.expanded.push(item);
+      }
+    },
+    expandedText: function (item) {
+      return item.epsilon
+    },
+    displayExpandLink(item) {
+      return (typeof (item.result.value) === 'object' &&
+          item.result.value.values.length > this.maxResults)
+    },
+    getResult: function (item) {
 
+      if (typeof (item.result.value) === 'object') {
+        if (item.result.value.values.length > this.maxResults) {
+          let arrayString = JSON.stringify(item.result.value.values.slice(0, this.maxResults))
+          return arrayString.substr(0, arrayString.length - 1) + '...'
+        } else {
+          return JSON.stringify(item.result.value.values)
+        }
+      }
+      return item.result.value
+    },
+    getParameters(item) {
+      console.log('getting params')
+      let params = 'Epsilon: ' + item.epsilon + ',&nbsp;&nbsp;&nbsp;'
+      if (item.delta) {
+        params += 'Delta: ' + item.delta + ',&nbsp;&nbsp;&nbsp;'
+      } else {
+        params += 'Delta: n/a,&nbsp;&nbsp;&nbsp;'
+      }
+      if (item.bounds) {
+        params += 'Bounds: [' + item.bounds.min + ',' + item.bounds.max + '],&nbsp;&nbsp;&nbsp;'
+      }
+      if (item.result.value.categories) {
+        params += 'Categories: ' + JSON.stringify(item.result.value.categories)
+
+        params += ',&nbsp;&nbsp;&nbsp;'
+      }
+      params += 'Missing value type: ' + item.missingValueHandling.type + ',&nbsp;&nbsp;&nbsp;'
+      params += 'Missing value: ' + item.missingValueHandling.fixedValue + ',&nbsp;&nbsp;&nbsp;'
+      return params
+    },
+    getConfidenceLevel(item) {
+      return 'There is a probability of ' + (Number(item.confidenceLevel) * 100) +
+          '% that the DP ' + item.statistic + ' will differ from the true ' +
+          item.statistic + ' by at most ' + item.accuracy.value + ' units. '
+
+    }
   },
   computed: {
 
@@ -285,7 +367,32 @@ export default {
     },
     permissionsError: function () {
       return false;
+    },
+
+    getExpanded: function () {
+      if (this.analysisPlan !== undefined) {
+        return this.analysisPlan.releaseInfo.dpRelease.statistics
+      } else {
+        return []
+      }
+    },
+
+  },
+  created() {
+    if (this.analysisPlan !== undefined) {
+      let index = 0;
+      this.analysisPlan.releaseInfo.dpRelease.statistics.forEach((stat) => {
+        let statsItem = stat
+        statsItem.index = index
+        this.statsItems.push(statsItem)
+        // Make only the first statistic expanded
+        if (index === 0) {
+          this.expanded.push(statsItem)
+        }
+        index++
+      })
     }
+
   },
   data: () => ({
     IN_PROGRESS,
@@ -299,8 +406,14 @@ export default {
     actionsInformation,
     datasetTitle: "",
     expandedPanels: [],
+    expanded: [],
+    statsItems: [],
+    maxResults: 10,
     generalErrorSummary: "Error summary: lorem ipsum dolor sit amet.",
-
+    statsHeaders: [{text: 'Statistic', value: 'statistic', sortable: false},
+      {text: 'Variable', value: 'variable', sortable: false},
+      {text: 'Result', value: 'result', sortable: false},
+      {text: 'Confidence Level', value: 'description', sortable: false}],
     NETWORK_CONSTANTS
   })
 };
