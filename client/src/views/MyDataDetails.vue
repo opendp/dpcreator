@@ -5,6 +5,26 @@
         <v-container>
           <h1 class="title-size-2">{{ datasetInfo.datasetSchemaInfo.name }}</h1>
           <StatusTag class="my-5" :status="status"/>
+
+          <v-row>
+            <v-col cols="6">
+              Created: {{ analysisPlan.releaseInfo.dpRelease.created.humanReadable }}
+            </v-col>
+
+            <v-col cols="6">
+              <a v-if="analysisPlan.releaseInfo.dataverseDepositInfo"
+                 data-test="dataverseLink"
+                 class="text-decoration-none" :href="fileUrl"
+              >Check DP release in Dataverse
+                <v-icon small color="primary">mdi-open-in-new</v-icon>
+              </a>
+            </v-col>
+          </v-row>
+          <p v-if="!analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
+             style="padding-bottom:20px; padding-top: 10px;">
+            <b>Dataverse Deposit Error : </b><span
+              v-html="'JSON ' + analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.dvErrMsg"></span>
+          </p>
           <ColoredBorderAlert type="warning" v-if="$vuetify.breakpoint.xsOnly">
             <template v-slot:content>
               If you want to start or continue the process you have to
@@ -25,7 +45,8 @@
           </ColoredBorderAlert>
 
           <div class="mb-5" v-if="status === COMPLETED">
-            <p class="primary--text">DP Release Information:</p>
+
+            <p><b>Statistics:</b></p>
             <v-data-table
                 :headers="statsHeaders"
                 :items="statsItems"
@@ -62,21 +83,44 @@
               </template>
             </v-data-table>
 
-            <p style="padding-left:20px; padding-right:40px;">Created:
-              {{ analysisPlan.releaseInfo.dpRelease.created.humanReadable }}</p>
             <div :v-if="analysisPlan.releaseInfo.dataverseDepositInfo">
               <p>&nbsp;</p>
               <p v-if="analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
                  style="padding-left:20px; padding-right:40px;">
                 <span v-html="analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.userMsgHtml"></span>
               </p>
-              <p v-if="!analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
-                 style="padding-left:20px; padding-right:40px;">
-                <b>Dataverse Deposit Error : </b><span
-                  v-html="'JSON ' + analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.dvErrMsg"></span>
-              </p>
+
             </div>
             <div class="pt-5 pb-10">
+              <p><b>Library Details</b></p>
+              <div v-for="(detail, index) in libraryDetails" :key="index">
+                <v-row v-if="status!==COMPLETED || detail.id!=='timeRemaining'" class="py-3">
+                  <v-col
+                      cols="12"
+                      sm="4"
+                      class="grey--text text--darken-2 d-flex"
+                      :class="{
+                    'py-0': $vuetify.breakpoint.xsOnly
+                  }"
+                  >
+                  <span>
+                    {{ detail.label }}
+                  </span>
+
+                  </v-col>
+                  <v-col
+                      cols="12"
+                      sm="8"
+                      :class="{
+                    'pt-0 pb-5': $vuetify.breakpoint.xsOnly
+                  }"
+                  >{{ detail.value }}
+                  </v-col
+                  >
+                </v-row>
+                <v-divider class="hidden-xs-only"/>
+              </div>
+              <p style="padding-top:20px;"><b>Dataset Details</b></p>
               <div v-for="(detail, index) in datasetDetails" :key="index">
                 <v-row v-if="status!==COMPLETED || detail.id!=='timeRemaining'" class="py-3">
                   <v-col
@@ -90,7 +134,7 @@
                   <span>
                     {{ detail.label }}
                   </span>
-                    <QuestionIconTooltip :text="detail.tooltip"/>
+
                   </v-col>
                   <v-col
                       cols="12"
@@ -115,23 +159,6 @@
           <div class="mb-5" v-if="status === COMPLETED">
 
             <v-expansion-panels multiple v-model="expandedPanels">
-              <v-expansion-panel data-test="DP Statistics Panel">
-                <v-expansion-panel-header>DP Statistics</v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <json-viewer :expand-depth="5" :expanded="false"
-                               :value="analysisPlan.releaseInfo.dpRelease.statistics">
-                  </json-viewer>
-
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-              <v-expansion-panel>
-                <v-expansion-panel-header>Dataset</v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <json-viewer :expand-depth="5" expanded="false"
-                               :value="analysisPlan.releaseInfo.dpRelease.dataset">
-                  </json-viewer>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
               <v-expansion-panel>
                 <v-expansion-panel-header>DP Library</v-expansion-panel-header>
                 <v-expansion-panel-content>
@@ -163,13 +190,6 @@
               <span>JSON File</span>
             </Button>
 
-            <div v-if="analysisPlan.releaseInfo.dataverseDepositInfo" data-test="dataverseLink">
-              <a class="text-decoration-none d-block mt-10" :href="fileUrl"
-              >Check DP release in Dataverse
-                <v-icon small color="primary">mdi-open-in-new</v-icon>
-              </a
-              >
-            </div>
           </div>
 
           <Button
@@ -322,9 +342,26 @@ export default {
       return host + '/file.xhtml?fileId=' + this.datasetInfo.dataverseFileId
 
     },
+    libraryDetails: function () {
+      let libraryDetails = [
+        {
+          id: "libraryName",
+          label: "Name",
+          tooltip: "Name of DP Library",
+          value: this.analysisPlan.releaseInfo.dpRelease.differentiallyPrivateLibrary.name
+        },
+        {
+          id: "libraryVersion",
+          label: "Version",
+          tooltip: "Version of DP Library",
+          value: this.analysisPlan.releaseInfo.dpRelease.differentiallyPrivateLibrary.version
+        }
+      ]
+      return libraryDetails
+    },
     datasetDetails: function () {
-
       let datasetDetails = [
+
         {
           id: "installation",
           label: "Dataverse Installation",
