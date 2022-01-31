@@ -40,7 +40,17 @@ Cypress.Commands.add('vuex', () =>
     cy.window()
         .its('app.$store')
 )
+Cypress.Commands.add('epsilonStep', () => {
+    cy.scrollTo('top')
+    cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
+    cy.wait('@datasetInfo', {timeout: 5000})
 
+    cy.get('h1').should('contain', 'Set Accuracy Level').should('be.visible')
+    cy.get('[data-test="Larger Population - no"]').check({force: true})
+    //  cy.get('[data-test="Public Observations - yes"]').should('be.visible')
+    cy.get('[data-test="Public Observations - yes"]').check({force: true})
+
+})
 Cypress.Commands.add('runDemo', (mockDVfile, demoDatafile) => {
     cy.clearData()
     cy.createMockDataset(mockDVfile)
@@ -49,17 +59,19 @@ Cypress.Commands.add('runDemo', (mockDVfile, demoDatafile) => {
         cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
             demoData['datasetName'])
         cy.goToConfirmVariables(demoData.variables)
-        // try to find one numerical variable
-        let numericVar = null
-        for (const key in demoData.variables) {
-            if (demoData.variables[key].type === 'Float' || demoData.variables[key].type === 'Integer') {
-                numericVar = demoData.variables[key]
-            }
-        }
-        if (numericVar !== null) {
-            cy.createMeanStatistic(numericVar)
-            cy.submitMeanStatistic()
-        }
+
+        // select the variables we will use
+        cy.selectVariable(demoData.variables)
+
+        // Continue to Set Epsilon Step
+        cy.epsilonStep()
+        // Add all the statistics in the Create Statistics Step
+        cy.createStatistics(demoData)
+
+        // Submit the statistics
+
+        cy.submitStatistics(demoData)
+
 
     })
 
@@ -137,6 +149,71 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
 
 
 })
+Cypress.Commands.add('selectVariable',(demoVariables)=> {
+    Object.keys(demoVariables).forEach((varKey)=> {
+        const demoVar = demoVariables[varKey]
+        console.log('testing ' +JSON.stringify(demoVar.name))
+        cy.contains('td', demoVar.name).parent('tr').should('be.visible')
+        cy.contains('td', demoVar.name).parent('tr').children().first().click()
+        // If numeric, enter min & max
+        if (demoVar.type === 'Float' || demoVar.type === 'Integer') {
+            const minDataTest = '[data-test="' + demoVar.name + ':min"]'
+            const maxDataTest = '[data-test="' + demoVar.name + ':max"]'
+            // Enter min and max for one numericVar so we can validate
+
+            cy.get(minDataTest).should('be.visible')
+            cy.get(maxDataTest).should('be.visible')
+            cy.get(minDataTest).type(demoVar.min, {force: true})
+            cy.wait(500)
+            cy.get(maxDataTest).type(demoVar.max, {force: true})
+            // click back into min input, to trigger change event on max input
+            cy.get(minDataTest).click()
+            cy.wait(500)
+            cy.get(maxDataTest).should('have.value', demoVar.max)
+        }
+    // TODO: add handling of Categorical vars
+    })
+
+})
+
+Cypress.Commands.add('createStatistics', (demoData) => {
+    // Continue to Create  Statistics Step
+    cy.scrollTo('top')
+    cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
+    cy.wait('@datasetInfo', {timeout: 5000})
+
+    // On the statistics page, test edit statistics Params
+    cy.get('h1').should('contain', 'Create Statistics').should('be.visible')
+    cy.get('[data-test="editConfidenceIcon"]').click({force: true});
+    cy.get('h2').should('contain', 'Are you sure you want to proceed?').should('be.visible')
+    cy.get('[data-test="confirmButton"]').click({force: true});
+
+    cy.get('[data-test="editEpsilonInput"]').should('have.value', 1)
+    cy.get('[data-test="editParamsCancel"]').click({force: true});
+
+
+    // Create statistic for every statistics item in the fixture
+    cy.get('[data-test="Add Statistic"]').should('be.visible')
+    cy.pause()
+    demoData.statistics.forEach((demoStat) => {
+        let demoVar = demoData.variables[demoStat.variable]
+        cy.get('[data-test="Add Statistic"]').click({force: true});
+        cy.get('[data-test="' + demoStat.statistic + '"]').click({force: true});
+        const varDataTest = '[data-test="' + demoVar.name + '"]'
+        cy.get(varDataTest).click({force: true})
+        cy.get('[data-test="Fixed value"]').type(demoVar.fixedValue)
+        cy.get('[data-test="Create statistic"]').click({force: true})
+
+        // The statistic should have been created
+        // cy.get('[data-test="statistic"]').should('contain', 'Mean')
+        cy.get('tr').first().get('td').should('contain', demoStat.statistic)
+        cy.get('table').contains('td', demoStat.statistic).should('be.visible');
+        // Statistic should contain correct accuracy value
+        cy.get('table').contains('td', demoVar.accuracy).should('be.visible')
+    })
+}),
+
+
 Cypress.Commands.add('createMeanStatistic', (numericVar) => {
     cy.intercept('PATCH', '/api/deposit/**',).as(
         'patchDeposit'
@@ -157,64 +234,26 @@ Cypress.Commands.add('createMeanStatistic', (numericVar) => {
     cy.get(minDataTest).click()
     //  cy.wait('@patchDeposit', {timeout: 5000})
 
-    // Continue to Set Epsilon Step
-    cy.scrollTo('top')
-    cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
-    cy.wait('@datasetInfo', {timeout: 5000})
 
-    cy.get('h1').should('contain', 'Set Accuracy Level').should('be.visible')
-    cy.get('[data-test="Larger Population - no"]').check({force: true})
-    //  cy.get('[data-test="Public Observations - yes"]').should('be.visible')
-    cy.get('[data-test="Public Observations - yes"]').check({force: true})
-
-
-    // Continue to Create  Statistics Step
-    cy.scrollTo('top')
-    cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
-    cy.wait('@datasetInfo', {timeout: 5000})
-
-    // On the statistics page, test edit statistics Params
-    cy.get('h1').should('contain', 'Create the statistics').should('be.visible')
-    cy.get('[data-test="editConfidenceIcon"]').click({force: true});
-    cy.get('h2').should('contain', 'Are you sure you want to proceed?').should('be.visible')
-    cy.get('[data-test="confirmButton"]').click({force: true});
-
-    cy.get('[data-test="editEpsilonInput"]').should('have.value', 1)
-    cy.get('[data-test="editParamsCancel"]').click({force: true});
-
-
-    // Test Creating Mean statistic
-    cy.get('[data-test="Add Statistic"]').should('be.visible')
-    cy.get('[data-test="Add Statistic"]').click({force: true});
-    cy.get('[data-test="Mean"]').click({force: true});
-    const varDataTest = '[data-test="' + numericVar.name + '"]'
-    cy.get(varDataTest).click({force: true})
-    cy.get('[data-test="Fixed value"]').type(numericVar.fixedValue)
-    cy.get('[data-test="Create statistic"]').click({force: true})
-
-    // The statistic should have been created
-    // cy.get('[data-test="statistic"]').should('contain', 'Mean')
-    cy.get('tr').first().get('td').should('contain', 'Mean')
-    cy.get('table').contains('td', 'Mean').should('be.visible');
-    // Mean should contain correct accuracy value
-    cy.get('table').contains('td', numericVar.accuracy).should('be.visible')
 
 
 })
-Cypress.Commands.add('submitMeanStatistic', () => {
+Cypress.Commands.add('submitStatistics', (demoData) => {
     // Click Continue to go from Create Statistic to Generate DP Release Step
     cy.scrollTo('top')
     cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
 
-    // Submit Mean Statistic
+    // Submit  Statistic
     cy.get('[data-test="Submit statistics"]').click({force: true});
     // Go to Details page
     cy.get('[data-test="View Data Details"]').click({force: true});
     cy.url().should('contain', 'my-data-details')
     // The Release Details should be visible
-    cy.get('[data-test="status tag"]').should('contain', 'Release completed')
-    const snippet = 'A differentially private Mean for variable'
-    cy.get('[data-test="statistic description"]').should('contain', snippet)
+    cy.get('[data-test="status tag"]').should('contain', 'Release Completed')
+    demoData.statistics.forEach((demoStat)=> {
+        let snippet = 'A differentially private ' + demoStat.statistic + ' for variable ' + demoData.variables[demoStat.variable].name
+        cy.get('[data-test="statistic description"]').should('contain', snippet)
+    })
 })
 Cypress.Commands.add('setupStatisticsPage', (datasetFixture, analysisFixture) => {
     cy.fixture(datasetFixture).then(dataset => {

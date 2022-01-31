@@ -1,6 +1,6 @@
 <template>
   <div id="create-statistics-page">
-    <h1 class="title-size-1">Create the statistics</h1>
+    <h1 class="title-size-1">Create Statistics</h1>
     <p>
       {{
         $t('create statistics.statistics intro')
@@ -113,8 +113,8 @@ export default {
 
     formTitle() {
       return this.isEditionMode
-          ? "Edit your statistic"
-          : "Create your statistic";
+          ? "Edit Statistic"
+          : "Create Statistic";
     },
     isEditionMode() {
       return this.editedIndex > -1;

@@ -67,11 +67,30 @@ class RegisteredDataverse(TimestampedModelWithUUID):
         return False
 
     @staticmethod
+    def hack_format_dv_url_http(dv_url):
+        """Hack for DV external tools change; If the url does not start with http(s), add 'http://'"""
+        if not isinstance(dv_url, str):
+            return None
+
+        dv_url = dv_url.lower().strip()
+
+        if not dv_url:
+            return None
+
+        if dv_url.startswith('http://') or dv_url.startswith('https://'):
+            return dv_url
+
+        dv_url = f'http://{dv_url}'
+
+        return dv_url
+
+    @staticmethod
     def format_dv_url(dv_url):
         """Trim trailing "/" and make lowercase. If it's an empty string or None, return None"""
         if not isinstance(dv_url, str):
             return None
 
+        dv_url = dv_url.strip()
         while dv_url and dv_url.endswith('/'):
             dv_url = dv_url[:-1]
 

@@ -51,5 +51,18 @@
         "active": true,
         "notes": "Test Dataverse. Created on 7/12/2021"
     }
+},
+{
+    "model": "dataverses.registereddataverse",
+    "pk": 4,
+    "fields": {
+        "created": "2022-01-19T17:43:38.158Z",
+        "updated": "2022-01-19T17:45:52.624Z",
+        "object_id": "5bb1c891-3d85-4d27-8efa-7f14f7cd4779",
+        "name": "dev-dataverse.dpcreator.org",
+        "dataverse_url": "http://dev-dataverse.dpcreator.org",
+        "active": true,
+        "notes": ""
+    }
 }
 ]

@@ -70,9 +70,9 @@ Deployment currently requires the building of two Docker images:
     docker push ghcr.io/opendp/dpcreator/app:latest
    
     # Example:
-    docker build -t ghcr.io/opendp/dpcreator/app:2022-0118 .
-    docker push ghcr.io/opendp/dpcreator/app:2022-0118  
-    docker tag ghcr.io/opendp/dpcreator/app:2022-0118 ghcr.io/opendp/dpcreator/app:latest
+    docker build -t ghcr.io/opendp/dpcreator/app:2022-0119 .
+    docker push ghcr.io/opendp/dpcreator/app:2022-0119  
+    docker tag ghcr.io/opendp/dpcreator/app:2022-0119 ghcr.io/opendp/dpcreator/app:latest
     docker push ghcr.io/opendp/dpcreator/app:latest    
    ```
    
@@ -94,9 +94,9 @@ Deployment currently requires the building of two Docker images:
     docker push ghcr.io/opendp/dpcreator/nginx:latest
   
     # Example:
-    docker build -t ghcr.io/opendp/dpcreator/nginx:2022-0118 .
-    docker push ghcr.io/opendp/dpcreator/nginx:2022-0118
-    docker tag ghcr.io/opendp/dpcreator/nginx:2022-0118 ghcr.io/opendp/dpcreator/nginx:latest
+    docker build -t ghcr.io/opendp/dpcreator/nginx:2022-0119 .
+    docker push ghcr.io/opendp/dpcreator/nginx:2022-0119
+    docker tag ghcr.io/opendp/dpcreator/nginx:2022-0119 ghcr.io/opendp/dpcreator/nginx:latest
     docker push ghcr.io/opendp/dpcreator/nginx:latest  
     ```
 

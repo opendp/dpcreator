@@ -36,7 +36,7 @@
           'mx-auto': $vuetify.breakpoint.mdAndUp
         }"
           :click="() => $root.$emit('areStatisticsSubmitted')"
-          label="Submit statistics"
+          label="Submit Statistics"
       />
     </div>
     <div
