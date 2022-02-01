@@ -43,10 +43,19 @@
               {{ generalErrorSummary }}
             </template>
           </ColoredBorderAlert>
-
           <div class="mb-5" v-if="status === COMPLETED">
-
             <p><b>Statistics:</b></p>
+            <template v-if="hasJSONandPDF">
+              <p>The following information can also be downloaded as a
+                <a v-on:click="handleJSONDownload">JSON</a>
+                or <a v-on:click="handlePDFDownload">PDF</a> file.
+              </p>
+            </template>
+            <template v-if="hasJSONOnly">
+              <p>The following information can also be downloaded as a
+                <a v-on:click="handleJSONDownload">JSON</a>
+                file. </p>
+            </template>
             <v-data-table
                 :headers="statsHeaders"
                 :items="statsItems"
@@ -60,6 +69,7 @@
 
               <template v-slot:[`item.description`]="{ item }">
                 <div v-html="getConfidenceLevel(item)"></div>
+
               </template>
               <template v-slot:[`item.result`]="{ item }">
                 <div v-html="getResult(item)"></div>
@@ -77,6 +87,13 @@
                         <div v-html="getParameters(item)"></div>
 
                       </v-col>
+                    </v-row>
+                    <v-row v-if="item.statistic === 'histogram'" cols="12">
+                      <Chart
+                          :axisData="getAxisData(item)"
+                          title="Tickets vs. Value"
+
+                      />
                     </v-row>
                   </v-container>
                 </td>
@@ -169,28 +186,6 @@
               </v-expansion-panel>
             </v-expansion-panels>
           </div>
-          <div class="mb-5" v-if="status === COMPLETED">
-            <p class="primary--text">Download DP Release:</p>
-            <Button v-if="analysisPlan.releaseInfo.downloadPdfUrl"
-                    data-test="pdfDownload"
-                    :click="handlePDFDownload"
-                    color="primary"
-                    classes="d-block mb-2"
-            >
-              <v-icon left>mdi-download</v-icon>
-              <span>PDF File</span>
-            </Button>
-            <Button v-if="analysisPlan.releaseInfo.downloadJsonUrl"
-                    data-test="jsonDownload"
-                    :click="handleJSONDownload"
-                    color="primary"
-                    classes="d-block mb-2"
-            >
-              <v-icon left>mdi-download</v-icon>
-              <span>JSON File</span>
-            </Button>
-
-          </div>
 
           <Button
               v-for="(action, index) in statusInformation[
@@ -235,6 +230,8 @@ import SupportBanner from "../components/SupportBanner.vue";
 import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
 import {mapGetters, mapState} from "vuex";
 import stepInformation from "@/data/stepInformation";
+import Chart from "../components/MyData/Chart.vue";
+import {coupons} from "../assets/coupons.json";
 
 const {
   IN_PROGRESS,
@@ -256,7 +253,8 @@ export default {
     ColoredBorderAlert,
     StatusTag,
     Button,
-    SupportBanner
+    SupportBanner,
+    Chart
   },
 
   methods: {
@@ -274,6 +272,7 @@ export default {
       window.location.href = this.analysisPlan.releaseInfo.downloadPdfUrl;
     },
     handleJSONDownload() {
+      console.log('handleJSONDownload')
       window.location.href = this.analysisPlan.releaseInfo.downloadJsonUrl;
     },
     toggleExpand(item) {
@@ -337,6 +336,15 @@ export default {
 
     ...mapState('dataset', ['datasetInfo', 'analysisPlan']),
     ...mapGetters('dataset', ['userStep', "getTimeRemaining"]),
+    hasJSONOnly() {
+      return (this.analysisPlan.releaseInfo.downloadJsonUrl && !this.analysisPlan.releaseInfo.downloadPdfUrl) ? true : false
+    },
+    hasPDFOnly() {
+      return (this.analysisPlan.releaseInfo.downloadPdfUrl && !this.analysisPlan.releaseInfo.downloadJsonUrl) ? true : false
+    },
+    hasJSONandPDF() {
+      return (this.analysisPlan.releaseInfo.downloadPdfUrl && this.analysisPlan.releaseInfo.downloadJsonUrl) ? true : false
+    },
     fileUrl: function () {
       const host = this.datasetInfo.datasetSchemaInfo.includedInDataCatalog.url
       return host + '/file.xhtml?fileId=' + this.datasetInfo.dataverseFileId
@@ -451,7 +459,18 @@ export default {
       {text: 'Variable', value: 'variable', sortable: false},
       {text: 'Result', value: 'result', sortable: false},
       {text: 'Confidence Level', value: 'description', sortable: false}],
-    NETWORK_CONSTANTS
+    NETWORK_CONSTANTS,
+
+    axisData: coupons
+        .filter(el => el.promotion_type === 'percent-off')
+        .map(el => ({x: el.coupon_id, y: el.value, company: el.webshop_id})),
+
+    getAxisData(item) {
+
+      return item.result.value.categoryValuePairs.map(el => ({x: el[0], y: el[1], company: 'nordstrom'}))
+    }
+
+
   })
 };
 </script>
