@@ -233,7 +233,6 @@ import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
 import {mapGetters, mapState} from "vuex";
 import stepInformation from "@/data/stepInformation";
 import Chart from "../components/MyData/Chart.vue";
-import {coupons} from "../assets/coupons.json";
 
 const {
   IN_PROGRESS,
@@ -462,10 +461,6 @@ export default {
       {text: 'Result', value: 'result', sortable: false},
       {text: 'Confidence Level', value: 'description', sortable: false}],
     NETWORK_CONSTANTS,
-
-    axisData: coupons
-        .filter(el => el.promotion_type === 'percent-off')
-        .map(el => ({x: el.coupon_id, y: el.value, company: el.webshop_id})),
 
     getAxisData(item) {
 
