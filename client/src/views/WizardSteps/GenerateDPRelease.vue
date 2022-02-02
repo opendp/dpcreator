@@ -61,7 +61,7 @@
           </p>
           <p>
             Your statistics are now on
-            <StatusTag :status="status"/>
+            <StatusTag data-test="generate release status" :status="status"/>
             status, you can view more details in the
             <router-link
                 :to="releaseLink"

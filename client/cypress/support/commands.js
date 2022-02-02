@@ -194,7 +194,6 @@ Cypress.Commands.add('createStatistics', (demoData) => {
 
     // Create statistic for every statistics item in the fixture
     cy.get('[data-test="Add Statistic"]').should('be.visible')
-    cy.pause()
     demoData.statistics.forEach((demoStat) => {
         let demoVar = demoData.variables[demoStat.variable]
         cy.get('[data-test="Add Statistic"]').click({force: true});
@@ -245,13 +244,17 @@ Cypress.Commands.add('submitStatistics', (demoData) => {
 
     // Submit  Statistic
     cy.get('[data-test="Submit statistics"]').click({force: true});
+    cy.get('[data-test="generate release status"]').should('be.visible')
+
+    cy.get('[data-test="generate release status"]').should('contain', 'Release Completed')
     // Go to Details page
     cy.get('[data-test="View Data Details"]').click({force: true});
     cy.url().should('contain', 'my-data-details')
     // The Release Details should be visible
     cy.get('[data-test="status tag"]').should('contain', 'Release Completed')
-    demoData.statistics.forEach((demoStat)=> {
-        let snippet = 'A differentially private ' + demoStat.statistic + ' for variable ' + demoData.variables[demoStat.variable].name
+    demoData.statistics.forEach((demoStat) => {
+        let snippet = 'There is a probability of 95% that the DP ' + demoStat.statistic.toLowerCase() +
+            ' will differ from the true ' + demoStat.statistic.toLowerCase() + ' by at most'
         cy.get('[data-test="statistic description"]').should('contain', snippet)
     })
 })

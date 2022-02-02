@@ -53,7 +53,7 @@
             </template>
             <template v-if="hasJSONOnly">
               <p>The following information can also be downloaded as a
-                <a v-on:click="handleJSONDownload">JSON</a>
+                <a data-test="jsonDownload" v-on:click="handleJSONDownload">JSON</a>
                 file. </p>
             </template>
             <v-data-table
@@ -61,14 +61,14 @@
                 :items="statsItems"
                 :single-expand="false"
                 :expanded.sync="expanded"
-                item-key="index"
+                item-key="variable+statistic"
                 show-expand
                 class="elevation-1"
                 sortable="false"
             >
 
               <template v-slot:[`item.description`]="{ item }">
-                <div v-html="getConfidenceLevel(item)"></div>
+                <div data-test="statistic description" v-html="getConfidenceLevel(item)"></div>
 
               </template>
               <template v-slot:[`item.result`]="{ item }">
@@ -91,7 +91,9 @@
                     <v-row v-if="item.statistic === 'histogram'" cols="12">
                       <Chart
                           :axisData="getAxisData(item)"
-                          title="Tickets vs. Value"
+                          :title="item.variable + ' Values'"
+                          :index="item.index"
+                          :variable="item.variable"
 
                       />
                     </v-row>
@@ -467,7 +469,7 @@ export default {
 
     getAxisData(item) {
 
-      return item.result.value.categoryValuePairs.map(el => ({x: el[0], y: el[1], company: 'nordstrom'}))
+      return item.result.value.categoryValuePairs.map(el => ({x: el[0], y: el[1]}))
     }
 
 

@@ -1,5 +1,6 @@
 <template>
   <div
+
       style="
     padding: 0;
     margin: 0;
@@ -9,10 +10,10 @@
     overflow: visible;
     height: 310px;
     width: 800px;">
-    <h3>Demo Histogram</h3>
+    <h3>{{ variable }} Histogram</h3>
 
     <br/>
-    <svg></svg>
+    <svg :id="svgId"></svg>
   </div>
 </template>
 
@@ -21,17 +22,27 @@ import * as d3 from "d3"
 
 export default {
   name: 'Chart',
-  props: ['axisData'],
+  props: ['axisData', 'index', 'variable'],
 
   computed: {
+    svgId() {
+      return 'svg' + this.index
+    },
+    svgSelector() {
+      return '#' + this.svgId
+    },
     filteredData() {
-      return this.axisData.filter(el => el.company === 'nordstrom')
+      return this.axisData
     },
     maxValue() {
       return Math.max(...this.filteredData.map(el => el.y))
     },
+    minValue() {
+      return Math.min(...this.filteredData.map(el => el.y))
+    },
   },
   created() {
+    console.log('index: ' + this.index)
     console.log('axisData: ' + JSON.stringify(this.axisData))
   },
   methods: {
@@ -49,10 +60,10 @@ export default {
 
       const yScale = d3
           .scaleLinear()
-          .domain([0, this.maxValue])
+          .domain([this.minValue, this.maxValue])
           .range([roundedHeight, 10])
 
-      const container = d3.select('svg')
+      const container = d3.select(this.svgSelector)
           .classed('chart-container', true)
           .style('height', `${roundedHeight}px`)
           .style('width', `${width}px`)
@@ -88,7 +99,7 @@ export default {
     this.renderChart()
   },
   beforeUpdate() {
-    var svg = d3.select("svg")
+    var svg = d3.select(this.svgSelector)
     svg
         .selectAll('*')
         .remove()
