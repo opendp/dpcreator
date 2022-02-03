@@ -44,18 +44,25 @@
             </template>
           </ColoredBorderAlert>
           <div class="mb-5" v-if="status === COMPLETED">
-            <p><b>Statistics:</b></p>
-            <template v-if="hasJSONandPDF">
-              <p>The following information can also be downloaded as a
+
+            <p><b>Statistics</b></p>
+            <p>Please see the table below for details on the
+              <span v-if="analysisPlan.releaseInfo.dpRelease.statistics.length == 1">statistic</span><span
+                  v-if="analysisPlan.releaseInfo.dpRelease.statistics.length> 1">statistics</span>, including the
+              privacy parameters used to generate them.
+              <template v-if="hasJSONandPDF">
+                The following information can also be downloaded as a
                 <a v-on:click="handleJSONDownload">JSON</a>
                 or <a v-on:click="handlePDFDownload">PDF</a> file.
-              </p>
-            </template>
-            <template v-if="hasJSONOnly">
-              <p>The following information can also be downloaded as a
+
+              </template>
+              <template v-if="hasJSONOnly">
+                The following information can also be downloaded as a
                 <a data-test="jsonDownload" v-on:click="handleJSONDownload">JSON</a>
-                file. </p>
-            </template>
+                file.
+              </template>
+            </p>
+
             <v-data-table
                 :headers="statsHeaders"
                 :items="statsItems"
@@ -169,25 +176,9 @@
               </div>
             </div>
 
-            <p>Please see the panels below for details on the
-              <span v-if="analysisPlan.releaseInfo.dpRelease.statistics.length == 1">statistic</span><span
-                  v-if="analysisPlan.releaseInfo.dpRelease.statistics.length> 1">statistics</span>, including the
-              privacy parameters used to generate them.
-            </p>
-          </div>
-          <div class="mb-5" v-if="status === COMPLETED">
 
-            <v-expansion-panels multiple v-model="expandedPanels">
-              <v-expansion-panel>
-                <v-expansion-panel-header>DP Library</v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <json-viewer :expand-depth="5" expanded="false"
-                               :value="analysisPlan.releaseInfo.dpRelease.differentiallyPrivateLibrary">
-                  </json-viewer>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-            </v-expansion-panels>
           </div>
+
 
           <Button
               v-for="(action, index) in statusInformation[
@@ -306,7 +297,6 @@ export default {
       return item.result.value
     },
     getParameters(item) {
-      console.log('getting params')
       let params = 'Epsilon: ' + item.epsilon + ',&nbsp;&nbsp;&nbsp;'
       if (item.delta) {
         params += 'Delta: ' + item.delta + ',&nbsp;&nbsp;&nbsp;'
@@ -318,7 +308,8 @@ export default {
       }
       if (item.result.value.categories) {
         params += 'Categories: ' + JSON.stringify(item.result.value.categories)
-
+        params += ',&nbsp;&nbsp;&nbsp;'
+        params += 'Category value pairs: ' + JSON.stringify(item.result.value.categoryValuePairs)
         params += ',&nbsp;&nbsp;&nbsp;'
       }
       params += 'Missing value type: ' + item.missingValueHandling.type + ',&nbsp;&nbsp;&nbsp;'
@@ -456,10 +447,12 @@ export default {
     statsItems: [],
     maxResults: 10,
     generalErrorSummary: "Error summary: lorem ipsum dolor sit amet.",
-    statsHeaders: [{text: 'Statistic', value: 'statistic', sortable: false},
+    statsHeaders: [
       {text: 'Variable', value: 'variable', sortable: false},
+      {text: 'Statistic', value: 'statistic', sortable: false},
       {text: 'Result', value: 'result', sortable: false},
-      {text: 'Confidence Level', value: 'description', sortable: false}],
+      {text: 'Confidence Level', value: 'description', sortable: false}
+    ],
     NETWORK_CONSTANTS,
 
     getAxisData(item) {
