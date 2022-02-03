@@ -24,7 +24,9 @@
       >* If you would like to change your email address, you can edit it in
         your profile area.</span
       >
-
+<v-container>
+  <v-row>
+    <v-col cols="6">
       <Button
           color="primary"
           type="submit"
@@ -32,6 +34,18 @@
           label="Submit Statistics"
           data-test="Submit statistics"
       />
+    </v-col>
+    <v-col cols="6">
+      <Button
+          color="primary"
+          outlined
+          :click="() => $router.push(NETWORK_CONSTANTS.MY_DATA.PATH)"
+          label="Cancel"
+          classes="mt-5"
+      />
+    </v-col>
+  </v-row>
+</v-container>
     </v-form>
     <v-overlay :value="areStatisticsSubmitted">
       <div class="d-flex flex-column align-center">
