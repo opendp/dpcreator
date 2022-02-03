@@ -264,11 +264,9 @@ export default {
       window.location.href = this.analysisPlan.releaseInfo.downloadPdfUrl;
     },
     handleJSONDownload() {
-      console.log('handleJSONDownload')
       window.location.href = this.analysisPlan.releaseInfo.downloadJsonUrl;
     },
     toggleExpand(item) {
-      console.log('toggleExpand: ' + JSON.stringify(item))
       const indexRow = item.index;
       const indexExpanded = this.expanded.findIndex(i => i === item);
       if (indexExpanded > -1) {
@@ -420,7 +418,7 @@ export default {
       let index = 0;
       this.analysisPlan.releaseInfo.dpRelease.statistics.forEach((stat) => {
         let statsItem = stat
-        statsItem.index = index
+        statsItem.id = index
         this.statsItems.push(statsItem)
         // Make only the first statistic expanded
         if (index === 0) {
