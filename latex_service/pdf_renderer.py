@@ -1,3 +1,4 @@
+import datetime
 import matplotlib
 import matplotlib.pyplot as plt
 
@@ -17,7 +18,7 @@ class PDFRenderer(object):
         :param dp_release: Dict of data points related to the computation
         :param statistics: Dict
         """
-        self.doc = Document('output', geometry_options={'margin': "2cm"})
+        self.doc = Document('output', geometry_options={'margin': "3cm"})
         self.dp_release = dp_release
         self.title = dp_release['name']
         self.created = dp_release['created']['human_readable']
@@ -29,7 +30,8 @@ class PDFRenderer(object):
         Add a title for the document in latex
         :return:
         """
-        self.doc.preamble.append(Command('title', 'Replication Data for: ' + self.title))
+        self.doc.preamble.append(Command('title', f'Differentially Private Release: '
+                                                  f'Replication Data for \"{self.title}\"'))
         self.doc.append(NoEscape(r'\maketitle'))
 
     def add_author(self, author):
@@ -47,8 +49,8 @@ class PDFRenderer(object):
         :return:
         """
         return '\t'.join([
-            f'Epsilon: {statistic["epsilon"]}', f'Delta: {statistic["delta"]} ',
-            f'CL: {statistic["confidence_level"]}', f'Accuracy: {statistic["accuracy"]["value"]} ',
+            f'Epsilon: {statistic["epsilon"]:.4f}', f'Delta: {statistic["delta"]:.4f} ',
+            f'CL: {statistic["confidence_level"]}', f'Accuracy: {statistic["accuracy"]["value"]:.4f} ',
             f'Missing value type: {statistic["missing_value_handling"]["type"]} ',
             f'Missing value: {statistic["missing_value_handling"]["fixed_value"]}'
         ])
@@ -58,30 +60,36 @@ class PDFRenderer(object):
         Build the header for the document, including the title
         :return:
         """
+        date = datetime.date.today().strftime("%B %d, %Y")
         self.set_title()
-        self.doc.append("Replication Data for: " + self.title)
+        # self.doc.append(f"Dataset: \"Replication Data for: {self.title}\"")
+        header_table = Tabular('p{40cm}', row_height=3)
+        self.doc.append(header_table)
+        self.doc.append(f"This report contains differentially private statistics calculated by a user of the DP Creator"
+                        f" application on {date} using the dataset  \"{self.title}\" "
+                        f"from the Dataverse repository at http://dataverse.harvard.edu.")
         self.doc.append(LineBreak())
         self.doc.append(LineBreak())
-        self.doc.append("Created: " + self.created)
+        self.doc.append("Differentially private (DP) statistics have calibrated levels of random noise added to them "
+                        "by the DP Creator user to protect the privacy of individuals in a dataset while still being "
+                        "of high utility. (Links to explanation, etc.). The accuracy/utility of these statistics "
+                        "depends on the parameters used to generate the DP statistics. This result contains both the "
+                        "DP statistics as well as the parameters used to create them.", )
         self.doc.append(LineBreak())
         self.doc.append(LineBreak())
-        self.doc.append('Dataverse url: tbd')
+        self.doc.append(LineBreak())
+        self.doc.append(LineBreak())
 
-    def _build_row(self, statistic):
-        """
-        Add a single row of results. Works for both single values and histograms.
-        :param statistic:
-        :return:
-        """
-        result_table = Tabular('p{2cm}p{4cm}p{2cm}p{8cm}', row_height=3)
-        result_table.add_row((statistic['statistic'], statistic['variable'], statistic['result']['value'],
-                              statistic['accuracy']['message']))
-        self.doc.append(result_table)
-        self.doc.append(LineBreak())
-        param_table = Tabular('p{2cm}p{9cm}p{9cm}')
-        param_table.add_row(('Parameters: ', self.parameter_formatter(statistic), ''))
-        self.doc.append(param_table)
-        self.doc.append(LineBreak())
+    def build_table_of_contents(self):
+        header_table = Tabular('p{15cm}', row_height=3)
+        header_table.add_hline()
+        header_table.append("DP Statistics")
+        header_table.add_row(("",))
+        header_table.append("The variables and statistics calculated were:")
+        header_table.add_row(("",))
+        for index, stat in enumerate(self.statistics):
+            header_table.add_row((f"{index+1}. {stat['variable']} - {stat['statistic']}",))
+        self.doc.append(header_table)
 
     def _build_histogram(self, statistic):
         """
@@ -93,32 +101,33 @@ class PDFRenderer(object):
         ax = fig.add_subplot()
         ax.bar(x=statistic['result']['categories'], height=statistic['result']['value'])
         ax.set_xlabel(statistic['variable'])
-        with self.doc.create(Figure(position='htbp')) as plot:
+        with self.doc.create(Figure(position='h!')) as plot:
             plot.add_plot()
 
     def build_statistics_table(self):
-        """
-        Iterate over all of the given statistics, adding rows and images based on the
-        statistic type
-        :return:
-        """
-        if not self.statistics:
-            return
-        self.doc.append(Command('centering'))
-        with self.doc.create(Section('Statistics')):
-            header_table = Tabular('p{2cm}p{4cm}p{2cm}p{8cm}', row_height=3)
-            header_table.add_row(('Statistic', 'Variable', 'Result', 'Confidence Level',))
-            header_table.add_hline()
-            self.doc.append(header_table)
+        self.doc.append(LineBreak())
+        self.doc.append(LineBreak())
+        for index, stat in enumerate(self.statistics):
+            stat_table = Tabular('p{15cm}', row_height=3)
+            stat_table.add_hline()
+            stat_table.add_row((f"{index+1} {stat['variable']} - {stat['statistic']}", ))
+            if stat['statistic'] == 'histogram':
+                stat_table.add_row((f"Result: {stat['result']['value']}", ))
+                stat_table.add_row((self._build_histogram(stat), ))
+
+            else:
+                stat_table.add_row((f"Result: {stat['result']['value']:.4f}", ))
+
+            stat_table.add_row((f"Parameters: {self.parameter_formatter(stat)}", ))
+            # stat_table.add_row((f"Parameters: Epsilon: {stat['epsilon']:.4f}\tDelta: {stat['delta']:.4f}"
+            #                     f"\tCL: {stat['confidence_level']}\tAccuracy: {stat['accuracy']['value']:.4f}\t'"
+            #                     f"Missing value type: {stat['missing_value_handling']['type']} '"
+            #                     f"Missing value: {stat['missing_value_handling']['fixed_value']}'", ))
+            # if stat['statistic'] == 'histogram':
+            # else:
+            #     stat_table.add_row(("", ))
+            self.doc.append(stat_table)
             self.doc.append(LineBreak())
-            single_value_stats = [x for x in self.statistics if x['statistic'] != 'histogram']
-            histograms = [x for x in self.statistics if x['statistic'] == 'histogram']
-            for statistic in single_value_stats:
-                self._build_row(statistic)
-            for histogram in histograms:
-                self.doc.append(NewPage())
-                self._build_row(histogram)
-                self._build_histogram(histogram)
 
     def fill_document(self):
         """
@@ -127,6 +136,7 @@ class PDFRenderer(object):
         """
 
         self.build_header()
+        self.build_table_of_contents()
         self.build_statistics_table()
 
     def save_pdf(self, filepath):
