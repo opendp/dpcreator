@@ -32,6 +32,8 @@ class PDFRenderer(object):
         """
         self.doc.preamble.append(Command('title', f'Differentially Private Release: '
                                                   f'Replication Data for \"{self.title}\"'))
+        self.doc.preamble.append(NoEscape(r'\usepackage{graphicx}'))
+        self.doc.preamble.append(NoEscape(r'\graphicspath{ {./images/} }'))
         self.doc.append(NoEscape(r'\maketitle'))
 
     def add_author(self, author):
@@ -101,8 +103,8 @@ class PDFRenderer(object):
         ax = fig.add_subplot()
         ax.bar(x=statistic['result']['categories'], height=statistic['result']['value'])
         ax.set_xlabel(statistic['variable'])
-        with self.doc.create(Figure(position='h!')) as plot:
-            plot.add_plot()
+        filename = '_'.join([statistic['variable'], statistic['statistic']])
+        fig.savefig('./images/' + filename + '.png')
 
     def build_statistics_table(self):
         self.doc.append(LineBreak())
@@ -113,8 +115,11 @@ class PDFRenderer(object):
             stat_table.add_row((f"{index+1} {stat['variable']} - {stat['statistic']}", ))
             if stat['statistic'] == 'histogram':
                 stat_table.add_row((f"Result: {stat['result']['value']}", ))
-                stat_table.add_row((self._build_histogram(stat), ))
-
+                self._build_histogram(stat)
+                self.doc.append(LineBreak())
+                filename = './images/' + '_'.join([stat['variable'], stat['statistic']])
+                self.doc.append(NoEscape(r'\includegraphics{' + filename + '.png}'))
+                self.doc.append(LineBreak())
             else:
                 stat_table.add_row((f"Result: {stat['result']['value']:.4f}", ))
 
