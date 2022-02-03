@@ -4,7 +4,6 @@
       style="
     padding: 0;
     margin: 0;
-    border: 1px solid navy;
     margin-left: auto;
     margin-right: auto;
     overflow: visible;
@@ -116,7 +115,7 @@ export default {
 }
 
 .bar {
-  fill: rgb(255, 0, 212);
+  fill: rgb(144, 202, 249);
 }
 
 text {
