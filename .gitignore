@@ -4,7 +4,7 @@ client/src/locales/en.json
 client/cypress/screenshots
 server/db.sqlite3
 server/static/dist/
-
+server/templates/base-vue.html
 /.idea/
 /venv/
 Pipfile
