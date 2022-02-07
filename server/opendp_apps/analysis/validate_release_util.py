@@ -157,7 +157,14 @@ class ValidateReleaseUtil(BasicErrCheck):
         # -----------------------------------
         # Get the file/dataset pointer -- needs adjusting for blob/S3 type objects
         # -----------------------------------
-        filepath = self.analysis_plan.dataset.source_file.path
+        try:
+            filepath = self.analysis_plan.dataset.source_file.path
+        except ValueError as err_obj:
+            user_msg = (f'Failed to calculate statistics. Unable to access the data file. '
+                        f' ({err_obj})')
+            self.add_err_msg(user_msg)
+            return
+
         sep_char = get_data_file_separator(filepath)
         # print('sep_char', sep_char)
 
