@@ -68,7 +68,6 @@
                 :items="statsItems"
                 :single-expand="false"
                 :expanded.sync="expanded"
-                item-key="variable+statistic"
                 show-expand
                 class="elevation-1"
                 sortable="false"
