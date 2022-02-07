@@ -9,7 +9,7 @@
     overflow: visible;
     height: 310px;
     width: 800px;">
-    <h3>{{ variable }} Histogram</h3>
+    <h3>{{ variable }} Histogram Values</h3>
 
     <br/>
     <svg :id="svgId"></svg>

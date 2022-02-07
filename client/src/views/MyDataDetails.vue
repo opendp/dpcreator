@@ -44,9 +44,8 @@
             </template>
           </ColoredBorderAlert>
           <div class="mb-5" v-if="status === COMPLETED">
-
             <p><b>Statistics</b></p>
-            <p>Please see the table below for details on the
+            <p>Please see below for details on the
               <span v-if="analysisPlan.releaseInfo.dpRelease.statistics.length == 1">statistic</span><span
                   v-if="analysisPlan.releaseInfo.dpRelease.statistics.length> 1">statistics</span>, including the
               privacy parameters used to generate them.
@@ -62,51 +61,47 @@
                 file.
               </template>
             </p>
+            <div v-for="(item,index) in statsItems" class="pt-5 pb-10">
+              <p><b>{{ index + 1 }}. {{ item.variable }} - {{ item.statistic }} </b></p>
 
-            <v-data-table
-                :headers="statsHeaders"
-                :items="statsItems"
-                :single-expand="false"
-                :expanded.sync="expanded"
-                show-expand
-                class="elevation-1"
-                sortable="false"
-            >
+              <div v-for="(detail, index) in getStatsDetails(item)" :key="index">
+                <v-row class="py-3">
+                  <v-col
+                      cols="12"
+                      sm="4"
+                      class="grey--text text--darken-2 d-flex"
+                      :class="{
+                    'py-0': $vuetify.breakpoint.xsOnly
+                  }"
+                  >
+                  <span>
+                   {{ detail.label }}
+                  </span>
+                  </v-col>
+                  <v-col
+                      cols="12"
+                      sm="8"
+                      :class="{
+                    'pt-0 pb-5': $vuetify.breakpoint.xsOnly
+                  }"
+                  >
+                    <div v-html="detail.value"></div>
+                  </v-col
+                  >
+                </v-row>
+                <v-divider class="hidden-xs-only"/>
+              </div>
+              <div v-if="item.statistic === 'histogram'" class="pt-5 pb-10">
+                <Chart
+                    :axisData="getAxisData(item)"
+                    :title="item.variable + ' Values'"
+                    :index="index"
+                    :variable="item.variable"
 
-              <template v-slot:[`item.description`]="{ item }">
-                <div data-test="statistic description" v-html="getConfidenceLevel(item)"></div>
-
-              </template>
-              <template v-slot:[`item.result`]="{ item }">
-                <div v-html="getResult(item)"></div>
-                <a v-if="displayExpandLink(item)" v-on:click="() => toggleExpand(item)">Show more</a>
-
-              </template>
-
-              <template v-slot:expanded-item="{ headers, item }">
-
-                <td :colspan="statsHeaders.length+1">
-                  <v-container>
-                    <v-row>
-                      <v-col cols="2">Parameters:</v-col>
-                      <v-col cols="10">
-                        <div v-html="getParameters(item)"></div>
-
-                      </v-col>
-                    </v-row>
-                    <v-row v-if="item.statistic === 'histogram'" cols="12">
-                      <Chart
-                          :axisData="getAxisData(item)"
-                          :title="item.variable + ' Values'"
-                          :index="item.index"
-                          :variable="item.variable"
-
-                      />
-                    </v-row>
-                  </v-container>
-                </td>
-              </template>
-            </v-data-table>
+                />
+                <v-divider class="hidden-xs-only"/>
+              </div>
+            </div>
 
             <div :v-if="analysisPlan.releaseInfo.dataverseDepositInfo">
               <p>&nbsp;</p>
@@ -284,7 +279,7 @@ export default {
     getResult: function (item) {
 
       if (typeof (item.result.value) === 'object') {
-        if (item.result.value.values.length > this.maxResults) {
+        if (false) {
           let arrayString = JSON.stringify(item.result.value.values.slice(0, this.maxResults))
           return arrayString.substr(0, arrayString.length - 1) + '...'
         } else {
@@ -318,7 +313,27 @@ export default {
           '% that the DP ' + item.statistic + ' will differ from the true ' +
           item.statistic + ' by at most ' + item.accuracy.value + ' units. '
 
-    }
+    },
+    getStatsDetails(statsItem) {
+      let statsDetails = [
+        {
+          id: "result",
+          label: "Result",
+          value: this.getResult(statsItem)
+        },
+        {
+          id: "params",
+          label: "Parameters",
+          value: this.getParameters(statsItem)
+        },
+        {
+          id: "desc",
+          label: "Description",
+          value: statsItem.description.html
+        }
+      ]
+      return statsDetails
+    },
   },
   computed: {
 
@@ -356,6 +371,7 @@ export default {
       ]
       return libraryDetails
     },
+
     datasetDetails: function () {
       let datasetDetails = [
 
