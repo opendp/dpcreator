@@ -8,6 +8,32 @@
         <v-container>
           <v-row>
             <v-col>
+              <v-spacer></v-spacer>
+            </v-col>
+            <v-col>
+              <ColoredBorderAlert v-if="appErrMsg" type="error">
+                <template v-slot:content>
+                  <b>Error Message:</b> {{ appErrMsg }}
+                </template>
+              </ColoredBorderAlert>
+              <ColoredBorderAlert v-else type="warning">
+                <template v-slot:content>
+                  Sorry! An error occurred.
+                </template>
+              </ColoredBorderAlert>
+              <Button
+                  data-test="ErrorContinueButton"
+                  :click="continueAction"
+                  label="Go To Homepage"
+                  class="primary"
+              />
+            </v-col>
+            <v-col>
+              <v-spacer></v-spacer>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
               <ColoredBorderAlert v-if="errMsg" type="error">
                 <template v-slot:content>
                   <b>Vue Runtime Error:</b> {{ errMsg.message }}
@@ -36,6 +62,7 @@
               <Button
                   data-test="ErrorContinueButton"
                   :click="continueAction"
+                  class="primary"
                   label="Go To Homepage"
               />
             </v-col>
@@ -71,6 +98,7 @@ export default {
     errMsg: null,
     errorObject: null,
     errorRequest: null,
+    appErrMsg: null,
     fontUrl: settings.google_fonts_url
   }),
   created() {
@@ -79,13 +107,17 @@ export default {
       console.log("unhandled rejection")
       console.log('event.promise: ' + event.promise)
       console.log('event.reason: ' + JSON.stringify(event.reason))
-      // if the reason has a request object, display it seprately
+      // if the reason has a request object, display it separately
       if (event.reason.request){
         this.errorRequest = event.reason.request
         delete event.reason.request
       }
 
       this.errorObject = event.reason
+      if (('data' in this.errorObject) && ('message' in this.errorObject.data)){
+        this.appErrMsg = this.errorObject.data.message;
+      }
+
 
 
     });
