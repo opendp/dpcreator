@@ -5,18 +5,17 @@
         <v-container>
           <h1 class="title-size-2">{{ datasetInfo.datasetSchemaInfo.name }}</h1>
           <StatusTag class="my-5" :status="status"/>
+           <v-row>
+             <v-col cols="6">
+               Created: {{ analysisPlan.releaseInfo.dpRelease.created.humanReadable }}
+             </v-col>
 
-          <v-row>
-            <v-col cols="6">
-              Created: {{ analysisPlan.releaseInfo.dpRelease.created.humanReadable }}
-            </v-col>
-
-            <v-col cols="6">
-              <a v-if="analysisPlan.releaseInfo.dataverseDepositInfo"
-                 data-test="dataverseLink"
-                 class="text-decoration-none" :href="fileUrl"
-              >Check DP release in Dataverse
-                <v-icon small color="primary">mdi-open-in-new</v-icon>
+             <v-col cols="6">
+               <a v-if="analysisPlan.releaseInfo.dataverseDepositInfo"
+                  data-test="dataverseLink"
+                  class="text-decoration-none" :href="fileUrl"
+               >Check DP release in Dataverse
+                 <v-icon small color="primary">mdi-open-in-new</v-icon>
               </a>
             </v-col>
           </v-row>
@@ -44,25 +43,44 @@
             </template>
           </ColoredBorderAlert>
           <div class="mb-5" v-if="status === COMPLETED">
-            <p><b>Statistics</b></p>
-            <p>Please see below for details on the
+            <p><b>DP Release</b></p>
+            <p>This section contains details for the differentially private
               <span v-if="analysisPlan.releaseInfo.dpRelease.statistics.length == 1">statistic</span><span
                   v-if="analysisPlan.releaseInfo.dpRelease.statistics.length> 1">statistics</span>, including the
               privacy parameters used to generate them.
-              <template v-if="hasJSONandPDF">
-                The following information can also be downloaded as a
-                <a v-on:click="handleJSONDownload">JSON</a>
-                or <a v-on:click="handlePDFDownload">PDF</a> file.
-
-              </template>
-              <template v-if="hasJSONOnly">
-                The following information can also be downloaded as a
-                <a data-test="jsonDownload" v-on:click="handleJSONDownload">JSON</a>
-                file.
-              </template>
+              This information can also be downloaded in other formats.
             </p>
+            <p class="primary--text">Download DP Release:</p>
+            <Button v-if="hasPDF"
+                    data-test="pdfDownload"
+                    :click="handlePDFDownload"
+                    color="primary"
+                    classes="d-block mb-2"
+            >
+              <v-icon left>mdi-download</v-icon>
+              <span>DP Release PDF File</span>
+            </Button>
+            <Button v-if="hasJSON"
+                    data-test="jsonDownload"
+                    :click="handleJSONDownload"
+                    color="primary"
+                    classes="d-block mb-2"
+            >
+              <v-icon left>mdi-download</v-icon>
+              <span>DP Release JSON File</span>
+            </Button>
+            <p></p>
+            <p><b>DP Release Details</b></p>
+            <template v-for="(item,index) in statsItems">
+              <a @click="$vuetify.goTo('#'+getAnchor(item)) ">{{ index + 1 }}. {{ item.variable }} - {{
+                  item.statistic
+                }}</a>
+              <br/>
+            </template>
+
             <div v-for="(item,index) in statsItems" class="pt-5 pb-10">
-              <p><b>{{ index + 1 }}. {{ item.variable }} - {{ item.statistic }} </b></p>
+              <div :id="getAnchor(item)"><p><b>{{ index + 1 }}. {{ item.variable }} - {{ item.statistic }} </b></p>
+              </div>
 
               <div v-for="(detail, index) in getStatsDetails(item)" :key="index">
                 <v-row class="py-3">
@@ -334,12 +352,21 @@ export default {
       ]
       return statsDetails
     },
+    getAnchor(item) {
+      return item.statistic + item.variable
+    }
   },
   computed: {
 
 
     ...mapState('dataset', ['datasetInfo', 'analysisPlan']),
     ...mapGetters('dataset', ['userStep', "getTimeRemaining"]),
+    hasJSON() {
+      return !!this.analysisPlan.releaseInfo.downloadJsonUrl
+    },
+    hasPDF() {
+      return !!this.analysisPlan.releaseInfo.downloadPdfUrl
+    },
     hasJSONOnly() {
       return (this.analysisPlan.releaseInfo.downloadJsonUrl && !this.analysisPlan.releaseInfo.downloadPdfUrl) ? true : false
     },
