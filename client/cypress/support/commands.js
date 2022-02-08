@@ -194,7 +194,7 @@ Cypress.Commands.add('createStatistics', (demoData) => {
 
     // Create statistic for every statistics item in the fixture
     cy.get('[data-test="Add Statistic"]').should('be.visible')
-    cy.pause()
+    // cy.pause()
     demoData.statistics.forEach((demoStat) => {
         let demoVar = demoData.variables[demoStat.variable]
         cy.get('[data-test="Add Statistic"]').click({force: true});
