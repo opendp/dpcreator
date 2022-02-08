@@ -9,10 +9,11 @@
     overflow: visible;
     height: 310px;
     width: 800px;">
-    <h3>{{ variable }} Histogram Values</h3>
 
     <br/>
     <svg :id="svgId"></svg>
+    <h3 style="padding-top:20px;">{{ variable }}</h3>
+
   </div>
 </template>
 

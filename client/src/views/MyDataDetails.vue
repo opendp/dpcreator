@@ -50,7 +50,8 @@
               privacy parameters used to generate them.
 
             </p>
-            <p class="primary--text"> This information can also be downloaded in other formats:</p>
+            <p>(Usage/Appropriateness Text goes here)</p>
+            <p> This information can also be downloaded in other formats:</p>
             <Button v-if="hasPDF"
                     data-test="pdfDownload"
                     :click="handlePDFDownload"
@@ -86,28 +87,18 @@
                 <v-row class="py-3">
                   <v-col
                       cols="12"
-                      sm="4"
                       class="grey--text text--darken-2 d-flex"
                       :class="{
                     'py-0': $vuetify.breakpoint.xsOnly
                   }"
                   >
-                  <span>
-                   {{ detail.label }}
-                  </span>
+
+                    <div :data-test="'statistic '+detail.id" v-html="getDetailText(detail.label,detail.value)"></div>
+
                   </v-col>
-                  <v-col
-                      cols="12"
-                      sm="8"
-                      :class="{
-                    'pt-0 pb-5': $vuetify.breakpoint.xsOnly
-                  }"
-                  >
-                    <div :data-test="'statistic '+detail.id" v-html="detail.value"></div>
-                  </v-col
-                  >
+
                 </v-row>
-                <v-divider class="hidden-xs-only"/>
+
               </div>
               <div v-if="item.statistic === 'histogram'" class="pt-5 pb-10">
                 <Chart
@@ -117,8 +108,9 @@
                     :variable="item.variable"
 
                 />
-                <v-divider class="hidden-xs-only"/>
+
               </div>
+              <v-divider class="hidden-xs-only"/>
             </div>
 
             <div :v-if="analysisPlan.releaseInfo.dataverseDepositInfo">
@@ -331,6 +323,9 @@ export default {
           '% that the DP ' + item.statistic + ' will differ from the true ' +
           item.statistic + ' by at most ' + item.accuracy.value + ' units. '
 
+    },
+    getDetailText(label, value) {
+      return label + ': ' + value
     },
     getStatsDetails(statsItem) {
       let statsDetails = [
