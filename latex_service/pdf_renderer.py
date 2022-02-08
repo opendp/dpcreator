@@ -53,7 +53,7 @@ class PDFRenderer(object):
         return '\t'.join([
             f'Epsilon: {statistic["epsilon"]:.4f}', f'Delta: {statistic["delta"]:.4f} ',
             f'CL: {statistic["confidence_level"]}', f'Accuracy: {statistic["accuracy"]["value"]:.4f} ',
-            f'Missing value type: {statistic["missing_value_handling"]["type"]} ',
+            f'\nMissing value type: {statistic["missing_value_handling"]["type"]} ',
             f'Missing value: {statistic["missing_value_handling"]["fixed_value"]}'
         ])
 
@@ -113,17 +113,21 @@ class PDFRenderer(object):
             stat_table = Tabular('p{15cm}', row_height=3)
             stat_table.add_hline()
             stat_table.add_row((f"{index+1} {stat['variable']} - {stat['statistic']}", ))
+            stat_table.add_row((f"Parameters: {self.parameter_formatter(stat)}", ))
+
             if stat['statistic'] == 'histogram':
                 stat_table.add_row((f"Result: {stat['result']['value']}", ))
-                self._build_histogram(stat)
+                stat_table.add_row((stat['accuracy']['message'], ))
+                self.doc.append(LineBreak())
+                self.doc.append(stat_table)
                 self.doc.append(LineBreak())
                 filename = './images/' + '_'.join([stat['variable'], stat['statistic']])
+                self._build_histogram(stat)
                 self.doc.append(NoEscape(r'\includegraphics{' + filename + '.png}'))
-                self.doc.append(LineBreak())
             else:
                 stat_table.add_row((f"Result: {stat['result']['value']:.4f}", ))
+                self.doc.append(stat_table)
 
-            stat_table.add_row((f"Parameters: {self.parameter_formatter(stat)}", ))
             # stat_table.add_row((f"Parameters: Epsilon: {stat['epsilon']:.4f}\tDelta: {stat['delta']:.4f}"
             #                     f"\tCL: {stat['confidence_level']}\tAccuracy: {stat['accuracy']['value']:.4f}\t'"
             #                     f"Missing value type: {stat['missing_value_handling']['type']} '"
@@ -131,7 +135,6 @@ class PDFRenderer(object):
             # if stat['statistic'] == 'histogram':
             # else:
             #     stat_table.add_row(("", ))
-            self.doc.append(stat_table)
             self.doc.append(LineBreak())
 
     def fill_document(self):
