@@ -48,9 +48,9 @@
               <span v-if="analysisPlan.releaseInfo.dpRelease.statistics.length == 1">statistic</span><span
                   v-if="analysisPlan.releaseInfo.dpRelease.statistics.length> 1">statistics</span>, including the
               privacy parameters used to generate them.
-              This information can also be downloaded in other formats.
+
             </p>
-            <p class="primary--text">Download DP Release:</p>
+            <p class="primary--text"> This information can also be downloaded in other formats:</p>
             <Button v-if="hasPDF"
                     data-test="pdfDownload"
                     :click="handlePDFDownload"
@@ -103,7 +103,7 @@
                     'pt-0 pb-5': $vuetify.breakpoint.xsOnly
                   }"
                   >
-                    <div v-html="detail.value"></div>
+                    <div :data-test="'statistic '+detail.id" v-html="detail.value"></div>
                   </v-col
                   >
                 </v-row>
@@ -345,7 +345,7 @@ export default {
           value: this.getParameters(statsItem)
         },
         {
-          id: "desc",
+          id: "description",
           label: "Description",
           value: statsItem.description.html
         }
