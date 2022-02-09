@@ -184,3 +184,16 @@ server/scripts_dev/dv_test_creds.py
 !dev_notes/api_example_analysis_plan.json
 .env
 !deploy/dataverse/*.json
+client/.idea/*.*
+latex_service/images/SomeVariable3_histogram.png
+latex_service/images/SomeVariable2_histogram.png
+latex_service/images/SomeVariable1_histogram.png
+latex_service/images/SomeVariable0_histogram.png
+latex_service/images/EyeWidth_histogram.png
+client/.idea/workspace.xml
+client/.idea/vcs.xml
+client/.idea/modules.xml
+client/.idea/misc.xml
+client/.idea/inspectionProfiles/Project_Default.xml
+client/.idea/inspectionProfiles/profiles_settings.xml
+client/.idea/aws.xml
