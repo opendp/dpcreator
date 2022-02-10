@@ -85,6 +85,6 @@ export default {
       return wrappedSession.patch('/rest-auth/user/', data);
   },
   verifyAccountEmail(key) {
-      return wrappedSession.post('/registration/verify-email/', {key});
+      return wrappedSession.post('/rest-auth/registration/verify-email/', {key});
   },
 };

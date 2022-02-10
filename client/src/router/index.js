@@ -12,6 +12,7 @@ const {
   WIZARD,
   SIGN_UP,
   LOGIN,
+  VERIFY_EMAIL,
   CONTACT_US,
   MY_PROFILE,
   MOCK_DV,
@@ -61,6 +62,11 @@ const routes = [
     path: SIGN_UP.PATH,
     name: SIGN_UP.NAME,
     component: () => import("../views/SignUp.vue")
+  },
+  {
+    path: VERIFY_EMAIL.PATH,
+    name: VERIFY_EMAIL.NAME,
+    component: () => import("../views/VerifyEmail.vue")
   },
   {
     path: `${SIGN_UP.PATH}/confirmation`,

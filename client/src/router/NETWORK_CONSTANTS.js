@@ -31,6 +31,10 @@ export default {
         PATH: "/sign-up",
         NAME: "SignUp"
     },
+    VERIFY_EMAIL: {
+        PATH: "/verify-email/:key",
+        NAME: "Verify Email"
+    },
     TERMS_AND_CONDITIONS: {
         PATH: "/terms-and-conditions",
         NAME: "TermsAndConditions"
