@@ -79,6 +79,10 @@ class DPHistogramCategoricalSpec(StatSpec):
         # Stringify categorical values (although they should be already)
         #
         updated_cats = []
+        # The categories may come from the frontend as a single string,
+        # so we need to split them
+        if len(self.categories) == 1:
+            self.categories = self.categories[0].split(',')
         for idx, x in enumerate(self.categories):
             try:
                 # TODO: This should never be reached
