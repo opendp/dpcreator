@@ -286,6 +286,11 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.analysis_plan.save()
         # print('ValidateReleaseUtil - self.release_stats', json.dumps(self.release_stats, indent=4))
 
+        # Delete the source file since we won't need it again
+        dataset = self.analysis_plan.dataset
+        dataset.source_file = None
+        dataset.save()
+
         return True
 
     def get_new_release_info_object(self):
