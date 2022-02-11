@@ -6,7 +6,7 @@ COPY package*.json /code/client/
 COPY build_locale/*.* /code/client/build_locale/
 # COPY src/locales/* /code/client/src/locales/
 
-RUN npm install --prefer-offline --no-audit --loglevel verbose
+RUN npm install
 # If you are building your code for production
 # RUN npm ci --only=production
 
