@@ -49,7 +49,11 @@ export default {
     },
     FORGOT_YOUR_PASSWORD: {
         PATH: "/forgot-your-password",
-        NAME: "ForgorYourPassword"
+        NAME: "ForgotYourPassword"
+    },
+    PASSWORD_RESET_CONFIRM: {
+        PATH: "/password-reset-confirm/:uid/:token",
+        NAME: "PasswordResetConfirm"
     },
     MOCK_DV: {
         PATH: "/mock-dv",

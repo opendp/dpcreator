@@ -19,7 +19,8 @@ const {
   MORE_INFORMATION,
   TERMS_AND_CONDITIONS,
   READ_ONLY_TERMS_AND_CONDITIONS,
-  FORGOT_YOUR_PASSWORD
+  FORGOT_YOUR_PASSWORD,
+  PASSWORD_RESET_CONFIRM
 } = NETWORK_CONSTANTS;
 
 Vue.use(VueRouter);
@@ -82,6 +83,11 @@ const routes = [
     path: FORGOT_YOUR_PASSWORD.PATH,
     name: FORGOT_YOUR_PASSWORD.NAME,
     component: () => import("../views/ForgotYourPassword.vue")
+  },
+  {
+    name: PASSWORD_RESET_CONFIRM.NAME,
+    path: PASSWORD_RESET_CONFIRM.PATH,
+    component: () => import("../views/PasswordResetConfirm.vue")
   },
   {
     path: WELCOME.PATH,
