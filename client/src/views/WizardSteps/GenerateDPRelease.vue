@@ -11,10 +11,8 @@
         This action cannot be undone.
       </template>
     </ColoredBorderAlert>
-    <span> (Need to add or edit the statistics?
-            <a data-test="addStatisticsLink" v-on:click="addStatistic">Go back to the Create Statistics step. </a>
-            ) </span>
-    <v-form class="my-5" ref="form" @submit.prevent="handleFormSubmit">
+
+    <v-form class="my-5" ref="form" v-on:submit.prevent="onSubmit">
       <p class="mb-2">
         <strong>Confirm the email to send notifications to:</strong>
       </p>
@@ -27,12 +25,21 @@
 
       <Button
           color="primary"
-          type="submit"
-          classes="mt-5"
+          classes="mt-5 mr-2"
           label="Submit Statistics"
           data-test="Submit statistics"
+          :click="handleFormSubmit"
       />
+      <Button
+            color="primary"
+            outlined
+            classes="font-weight-bold mt-5 xmb-5"
+            :click="returnToCreateStatisticsStep"
+            label="Go Back"
+        />
+
     </v-form>
+
     <v-overlay :value="areStatisticsSubmitted">
       <div class="d-flex flex-column align-center">
         <v-progress-circular indeterminate size="64"></v-progress-circular>
@@ -61,7 +68,7 @@
           </p>
           <p>
             Your statistics are now on
-            <StatusTag :status="status"/>
+            <StatusTag data-test="generate release status" :status="status"/>
             status, you can view more details in the
             <router-link
                 :to="releaseLink"
@@ -129,9 +136,15 @@ export default {
     }
   },
   methods: {
-    addStatistic() {
-      this.$emit("addStatistic")
+    /**
+     * Return to the "Create Statistics" page
+     */
+    returnToCreateStatisticsStep() {
+      this.$emit("addStatistic");
     },
+    /**
+     * Handle the form submission
+    */
     handleFormSubmit: function () {
       if (this.$refs.form.validate()) {
         this.areStatisticsSubmitted = true;
