@@ -10,11 +10,16 @@
         <input v-model="inputs.password2" type="password" id="password2"
                placeholder="confirm password">
       </form>
-      <button @click="resetPassword(inputs)">
-        reset password
+      <button @click="submitPasswordReset(inputs)">
+        Reset Password
       </button>
       <span class="error" v-show="resetError">
-        A error occured while processing your request.
+        A error occurred while processing your request:
+           <ul>
+                <li v-for="item in errorMessage">
+                  {{ item }}
+                </li>
+              </ul>
       </span>
     </template>
     <template v-else>
@@ -30,6 +35,7 @@ import {mapActions, mapState} from 'vuex';
 export default {
   data() {
     return {
+      errorMessage: "",
       inputs: {
         password1: '',
         password2: '',
@@ -43,10 +49,22 @@ export default {
     'resetError',
     'resetLoading',
   ]),
-  methods: mapActions('password', [
-    'resetPassword',
-    'clearResetStatus',
-  ]),
+  methods: {
+    submitPasswordReset(inputs) {
+      this.$store.dispatch('password/resetPassword', inputs)
+          .then((resp) => {
+          }).catch((error) => {
+        console.log('error: ' + JSON.stringify(error))
+        let msg = []
+        Object.keys(error).forEach(function (k) {
+          console.log(k + ' - ' + error[k]);
+          msg.push(k + ' - ' + error[k][0])
+        });
+        this.errorMessage = msg
+      })
+    }
+  }
+
 };
 </script>
 
