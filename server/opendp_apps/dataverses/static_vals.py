@@ -51,7 +51,7 @@ DV_LAST_NAME = 'lastName'
 KEY_DP_USER_ID = 'user_id' # OpenDPUser.object_id
 KEY_DV_HANDOFF_ID = 'dataverse_handoff_id'  # DataverseHandoff.object_id
 
-DV_DEPOSIT_TYPE_DP_JSON = 'dpJSON'
+DV_DEPOSIT_TYPE_DP_JSON = 'dpJson'  # <-- case matches Dataverse expectation
 DV_DEPOSIT_TYPE_DP_PDF = 'dpPDF'
 DV_DEPOSIT_TYPES = [DV_DEPOSIT_TYPE_DP_JSON, DV_DEPOSIT_TYPE_DP_PDF]
 DV_DEPOSIT_CHOICES = [(x, x) for x in DV_DEPOSIT_TYPES]
