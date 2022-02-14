@@ -164,10 +164,17 @@ class DataverseDepositUtil(BasicErrCheck):
             # Dataverse includes an optional "filetype" parameter
             # b/c it doesn't detect JSON directly
             #  - The value for "file" is a tuple:
-            #    - format:   ("filename_as_str.json", ["file contents"], "filetype_as_str")
-            #    - example: ('release_01.json", open(file_field.path, 'rb'), "application/json")
+            #    - format:   ("filename_as_str.json",
+            #                 ["file contents"],
+            #                 "filetype_as_str")
             #
-            files = {'file': (file_field.filename, open(file_field.path, 'rb'), file_info['FILETYPE'])}
+            #    - example: ('release_01.json",
+            #                open(file_field.path, 'rb'),
+            #                "application/json")
+            #
+            files = {'file': (basename(file_field.name),
+                              open(file_field.path, 'rb'),
+                              file_info['FILETYPE'])}
             #files = {'file': open(file_field.path, 'rb')}
 
             # print('dv_url', dv_deposit_url)
