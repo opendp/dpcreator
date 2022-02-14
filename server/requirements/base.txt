@@ -13,7 +13,7 @@ django-rest-polymorphic==0.1.9
 django-cors-headers==3.6.0
 idna==2.10
 jsonschema==4.2.1
-lxml==4.6.3
+lxml==4.6.5
 numpy==1.21.4
 opendp==0.3.0
 packaging==20.4
