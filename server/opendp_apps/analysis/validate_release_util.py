@@ -11,13 +11,9 @@
         - Retrieve the variable type/min/max/categories from AnalysisPlan.variable_info
         - Retrieve
 """
-import json
-from io import BytesIO
 import pkg_resources
-import tempfile
 
 from django.core.files.base import ContentFile
-from django.core.files import File
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
@@ -34,6 +30,7 @@ from opendp_apps.analysis.tools.dp_histogram_integer_spec import DPHistogramInte
 from opendp_apps.analysis.tools.dp_histogram_categorical_spec import DPHistogramCategoricalSpec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
+from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.profiler import static_vals as pstatic
 
 from opendp_apps.utils.extra_validators import \
@@ -87,7 +84,7 @@ class ValidateReleaseUtil(BasicErrCheck):
 
     @staticmethod
     def validate_mode(opendp_user: get_user_model(), analysis_plan_id: int,
-                      dp_statistics: list  =None):
+                      dp_statistics: list = None):
         """
         Use this method to return a ValidateReleaseUtil validates the dp_statistics
         """
@@ -286,6 +283,13 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.analysis_plan.save()
         # print('ValidateReleaseUtil - self.release_stats', json.dumps(self.release_stats, indent=4))
 
+        # (6) Delete the "source_file"
+        #
+        delete_result = DataSetInfo.delete_source_file(self.analysis_plan.dataset)
+        if not delete_result.success:
+            self.add_err_msg(delete_result.message)
+            return False
+
         return True
 
     def get_new_release_info_object(self):
@@ -384,10 +388,6 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.stat_spec_list = []
         stat_num = 0
 
-        # track total epsilon
-        #
-        running_epsilon = 0
-
         for dp_stat in self.dp_statistics:
             stat_num += 1       # not used yet...
             """
@@ -419,7 +419,7 @@ class ValidateReleaseUtil(BasicErrCheck):
             #
             variable = props.get('variable')
             statistic = props.get('statistic', 'shrug?')
-            epsilon = props.get('epsilon')
+            # epsilon = props.get('epsilon')
             var_type = None
 
             # (1) Is variable defined?
@@ -437,7 +437,6 @@ class ValidateReleaseUtil(BasicErrCheck):
                 props['error_message'] = f'Statistic "{statistic}" is not supported'
                 self.add_stat_spec(DPSpecError(props))
                 continue  # to the next dp_stat specification
-
 
             # (3) Add variable_info which has min/max/categories, variable type, etc.
             #
@@ -556,7 +555,6 @@ class ValidateReleaseUtil(BasicErrCheck):
             user_msg = f'{astatic.ERR_MSG_BAD_TOTAL_DELTA}: {self.max_delta}'
             self.add_err_msg(user_msg)
             return False
-
 
         return True
 
