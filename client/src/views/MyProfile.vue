@@ -54,6 +54,16 @@
             </div>
           </v-form>
           <h2 class="title-size-2 mt-10">Change password</h2>
+          <ColoredBorderAlert type="error" v-if="errorMessage">
+            <template v-slot:content>
+              Form Error:
+              <ul>
+                <li v-for="item in errorMessage">
+                  {{ item }}
+                </li>
+              </ul>
+            </template>
+          </ColoredBorderAlert>
           <v-form @submit.prevent="handleChangePassword">
             <v-text-field
                 v-model="password"
@@ -126,10 +136,11 @@ import EventSuccessAlert from "../components/Home/EventSuccessAlert.vue";
 import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
 import {mapState} from "vuex";
 import auth from '../api/auth';
+import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
 
 export default {
   name: "MyProfile",
-  components: {Button, EventSuccessAlert},
+  components: {Button, EventSuccessAlert, ColoredBorderAlert},
   computed: {
     ...mapState('auth', ['user']),
   },
@@ -155,7 +166,14 @@ export default {
                     this.confirmNewPassword = "",
                     this.$router.push(`${NETWORK_CONSTANTS.MY_PROFILE.PATH}?saved=true`);
               }
-          )
+          ).catch((error) => {
+        let msg = []
+        Object.keys(error).forEach(function (k) {
+          console.log(k + ' - ' + error[k]);
+          msg.push(k + ' - ' + error[k])
+        });
+        this.errorMessage = msg
+      })
 
     }
   },
@@ -164,6 +182,7 @@ export default {
     showPassword: false,
     showNewPassword: false,
     showConfirmNewPassword: false,
+    errorMessage: null,
     username: "",
     email: "",
     password: "",
