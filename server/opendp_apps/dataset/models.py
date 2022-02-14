@@ -6,10 +6,7 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-# from django.db.models.signals import post_delete
-# from django.dispatch import receiver
 # from django_cryptography.fields import encrypt
-
 from polymorphic.models import PolymorphicModel
 
 from opendp_apps.analysis.models import DepositorSetupInfo
@@ -17,7 +14,6 @@ from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.models import \
     (TimestampedModelWithUUID,)
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp, BasicResponse
-
 # Temp workaround!!! See Issue #300
 # https://github.com/opendp/dpcreator/issues/300
 from opendp_apps.utils.camel_to_snake import camel_to_snake
@@ -46,7 +42,8 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     # Switch to encryption!
     #
     data_profile = models.JSONField(default=None,
-                                    null=True, blank=True,
+                                    null=True,
+                                    blank=True,
                                     encoder=DjangoJSONEncoder)
 
     profile_variables = models.JSONField(default=None,
@@ -66,6 +63,29 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
     def __str__(self):
         return self.name
+
+    @staticmethod
+    def delete_source_file(dataset_info) -> BasicResponse:
+        """
+        Delete the source_file, if it exists
+        - Returns a BasicResponse object with success = True if file is deleted
+           or not set to start with
+        """
+        if not dataset_info.source_file:
+            # No source file
+            return ok_resp(True)
+
+        # source_file found, delete it
+        try:
+            dataset_info.source_file.delete()
+            dataset_info.save()
+            return ok_resp(True)
+        except OSError as err_obj:
+            # OSError found
+            return err_resp(f'Failed to delete source_file. ({err_obj})')
+        except Exception as err_obj:
+            # General exception found
+            return err_resp(f'Failed to delete source_file. ({err_obj})')
 
     def as_dict(self):
         """
@@ -132,10 +152,10 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         if not self.data_profile:
             return err_resp('Data profile not available')
 
-        if not 'dataset' in self.data_profile:
+        if 'dataset' not in self.data_profile:
             return err_resp('Dataset information not available in profile')
 
-        if not 'variableOrder' in self.data_profile['dataset']:
+        if 'variableOrder' not in self.data_profile['dataset']:
             return err_resp('"variableOrder" information not available in profile (id:2')
 
         variable_order = self.data_profile['dataset']['variableOrder']
@@ -211,7 +231,8 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
         try:
             if isinstance(self.data_profile, str):  # messy; decode escaped string to JSON string
-                load1 = json.loads(self.data_profile, object_pairs_hook=OrderedDict)
+                load1 = json.loads(self.data_profile,
+                                   object_pairs_hook=OrderedDict)
             else:
                 load1 = self.data_profile
 
@@ -224,7 +245,10 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
             return None
 
     def data_profile_as_json_str(self):
-        """Return the dataprofile as a dict or None. Messy in that this is an encrypted JSONField"""
+        """
+        Return the dataprofile as a dict or None.
+        Messy in that this is an encrypted JSONField
+        """
         if not self.data_profile:
             return None
 
@@ -299,6 +323,7 @@ class DataverseFileInfo(DataSetInfo):
     @property
     def status(self):
         """
+        Return the user_step object
         """
         try:
             return self.depositor_setup_info.user_step
@@ -308,6 +333,7 @@ class DataverseFileInfo(DataSetInfo):
     @property
     def status_name(self):
         """
+        Return the user_step label
         """
         try:
             return self.depositor_setup_info.user_step.label
@@ -347,7 +373,8 @@ class UploadFileInfo(DataSetInfo):
     Refers to a file uploaded independently of DV
     """
     depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo',
-                                                on_delete=models.CASCADE, null=True)
+                                                on_delete=models.CASCADE,
+                                                null=True)
 
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the STEP
@@ -373,33 +400,8 @@ class UploadFileInfo(DataSetInfo):
                     name=self.name,
                     creator=str(self.creator),
                     source=str(self.source),
-                    #data_file=self.data_file,
                     updated=str(self.updated),
                     created=str(self.created),
                     object_id=self.object_id.hex)
 
         return info
-
-# -----------------------------------------------------
-# "post_delete" signals
-#
-# Ensure that when a DataSetInfo object is deleted,
-#   the related DepositorInfo is also deleted
-# -----------------------------------------------------
-"""
-@receiver(post_delete, sender=DataverseFileInfo)
-def post_delete_depositor_setup_from_dataverse_file(sender, instance, *args, **kwargs):
-    try:
-        if instance.depositor_setup_info: # just in case depositor_setup_info is not specified
-            instance.depositor_setup_info.delete()
-    except DepositorSetupInfo.DoesNotExist:
-        pass
-
-@receiver(post_delete, sender=UploadFileInfo)
-def post_delete_depositor_setup_from_upload_file(sender, instance, *args, **kwargs):
-    try:
-        if instance.depositor_setup_info:  # just in case depositor_setup_info is not specified
-            instance.depositor_setup_info.delete()
-    except DepositorSetupInfo.DoesNotExist:
-        pass
-"""
