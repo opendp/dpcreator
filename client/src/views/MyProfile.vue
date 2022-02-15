@@ -1,7 +1,7 @@
 <template>
   <div class="my-profile mt-5">
-    <EventSuccessAlert queryParam="saved" text="Changes saved"/>
-
+    <EditSuccessAlert :successFlag="saved" text="Changes saved"/>
+    {{ this.$route.query['saved'] }}
     <v-container
         class="py-5"
         :class="{
@@ -12,47 +12,76 @@
         <v-col offset-md="2" md="5">
           <h1 class="title-size-1">My Profile</h1>
           <h2 class="title-size-2 mt-8">Edit account information</h2>
-          <v-form @submit.prevent="handleEditAccountInformation">
-            <v-text-field
-                v-model="username"
-                data-test="myProfileUsername"
-                label="Username"
-                required
-            ></v-text-field>
-            <!-- For now, don't allow editing of the email, because it would require a new endpoint
-            and another email verification
-            <v-text-field
-                v-model="email"
-                label="Email"
-                required
-                :rules="emailRules"
-                type="email"
-            ></v-text-field> -->
-            <div class="mt-5 mb-10">
-              {{ email }}
-            </div>
-            <div class="mt-5 mb-10">
-              <Button
-                  type="submit"
-                  color="primary"
-                  label="Save Changes"
-                  :class="{
+          <template v-if="editUserLoading">
+            loading...
+          </template>
+          <template v-else-if="editUserError">
+            Error editing user
+          </template>
+          <template v-else-if="!editUserCompleted">
+
+            <v-form @submit.prevent="handleEditAccountInformation">
+              <v-text-field
+                  v-model="username"
+                  data-test="myProfileUsername"
+                  label="Username"
+                  required
+              ></v-text-field>
+              <!-- For now, don't allow editing of the email, because it would require a new endpoint
+              and another email verification
+              <v-text-field
+                  v-model="email"
+                  label="Email"
+                  required
+                  :rules="emailRules"
+                  type="email"
+              ></v-text-field> -->
+              <div class="mt-5 mb-10">
+                {{ email }}
+              </div>
+              <div class="mt-5 mb-10">
+                <Button
+                    type="submit"
+                    color="primary"
+                    label="Save Changes"
+                    :class="{
                   'width80 mx-auto d-block mb-2': $vuetify.breakpoint.xsOnly,
                   'mr-2 mb-2': $vuetify.breakpoint.smAndUp
                 }"
-              />
-              <Button
-                  color="primary"
-                  outlined
-                  :click="() => $router.push(NETWORK_CONSTANTS.HOME.PATH)"
-                  :class="{
+                />
+                <Button
+                    color="primary"
+                    outlined
+                    :click="() => $router.push(NETWORK_CONSTANTS.HOME.PATH)"
+                    :class="{
                   'width80 mx-auto d-block': $vuetify.breakpoint.xsOnly,
                   'mb-2': $vuetify.breakpoint.smAndUp
                 }"
-                  label="Cancel"
-              />
-            </div>
-          </v-form>
+                    label="Cancel"
+                />
+              </div>
+            </v-form>
+          </template>
+          <template v-else>
+            <p></p>
+            <ColoredBorderAlert type="info" icon="mdi-check">
+              <template v-slot:content>
+                Username has been changed
+              </template>
+            </ColoredBorderAlert>
+            <p><b>Username:</b> {{ username }}</p>
+            <Button
+                color="primary"
+                outlined
+                :click="clearEditUserStatus"
+                label="Show Edit Form"
+                :class="{
+                  'width80 mx-auto d-block mb-2': $vuetify.breakpoint.xsOnly,
+                  'mb-2': $vuetify.breakpoint.smAndUp
+                }"
+            />
+          </template>
+
           <h2 class="title-size-2 mt-10">Change password</h2>
           <ColoredBorderAlert type="error" v-if="errorMessage">
             <template v-slot:content>
@@ -64,7 +93,10 @@
               </ul>
             </template>
           </ColoredBorderAlert>
-          <v-form @submit.prevent="handleChangePassword">
+          <EditSuccessAlert :successFlag="passwordSaved" text="New password saved"/>
+
+
+          <v-form ref="passwordForm" @submit.prevent="handleChangePassword">
             <v-text-field
                 v-model="password"
                 :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
@@ -134,21 +166,27 @@
 import Button from "../components/DesignSystem/Button.vue";
 import EventSuccessAlert from "../components/Home/EventSuccessAlert.vue";
 import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
-import {mapState} from "vuex";
+import {mapState, mapActions} from "vuex";
 import auth from '../api/auth';
 import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
-
+import EditSuccessAlert from "@/components/DynamicHelpResources/EditSuccessAlert";
 export default {
   name: "MyProfile",
-  components: {Button, EventSuccessAlert, ColoredBorderAlert},
+  components: {Button, EventSuccessAlert, EditSuccessAlert, ColoredBorderAlert},
   computed: {
-    ...mapState('auth', ['user']),
+    ...mapState('auth', ['user', 'editUserCompleted', 'editUserLoading', 'editUserError']),
+
   },
   created: function () {
     this.username = this.user.username
     this.email = this.user.email
   },
+  beforeRouteLeave(to, from, next) {
+    this.clearEditUserStatus();
+    next();
+  },
   methods: {
+    ...mapActions('auth', ['clearEditUserStatus']),
     confirmNewPasswordRules() {
       return (
           this.newPassword === this.confirmNewPassword || `Passwords don't match`
@@ -156,15 +194,12 @@ export default {
     },
     handleEditAccountInformation() {
       this.$store.dispatch('auth/changeUsername', this.username)
-      this.$router.push(`${NETWORK_CONSTANTS.MY_PROFILE.PATH}?saved=true`);
     },
     handleChangePassword() {
       auth.changePassword(this.password, this.newPassword, this.confirmNewPassword)
           .then(() => {
-                this.password = "",
-                    this.newPassword = "",
-                    this.confirmNewPassword = "",
-                    this.$router.push(`${NETWORK_CONSTANTS.MY_PROFILE.PATH}?saved=true`);
+                this.$refs.passwordForm.reset()
+                this.passwordSaved = true
               }
           ).catch((error) => {
         let msg = []
@@ -179,6 +214,8 @@ export default {
   },
 
   data: () => ({
+    saved: false,
+    passwordSaved: false,
     showPassword: false,
     showNewPassword: false,
     showConfirmNewPassword: false,
