@@ -45,9 +45,10 @@ celery==5.2.2
 channels==3.0.3
 channels-redis==3.2.0
 
+# for PDF creation
+borb==2.0.18
 
 # for testing, mocks requests
 requests-mock==1.8.0
 responses==0.13.3
-
 

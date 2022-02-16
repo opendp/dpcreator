@@ -66,7 +66,7 @@ INSTALLED_APPS = [
     'opendp_apps.banner_messages',
     'opendp_apps.communication',
     'opendp_apps.profiler',
-
+    'opendp_apps.dp_reports',
 ]
 
 MIDDLEWARE = [
