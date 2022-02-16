@@ -64,7 +64,7 @@ export default {
   },
   data: () => ({
     googleSignInParams: {
-      client_id: '725082195083-1srivl3ra9mpc1q5ogi7aur17vkjuabg.apps.googleusercontent.com',
+      client_id: process.env.GOOGLE_CLIENT,
     }
   })
 }
