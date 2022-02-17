@@ -14,6 +14,7 @@ import json
 
 import random
 import typing
+from borb.pdf.canvas.layout.image.image import Image
 from borb.pdf.canvas.layout.image.barcode import Barcode, BarcodeType
 from borb.pdf.canvas.layout.image.chart import Chart
 from borb.pdf.canvas.layout.layout_element import Alignment
@@ -21,7 +22,7 @@ from borb.pdf.canvas.layout.page_layout.multi_column_layout import SingleColumnL
 from borb.pdf.canvas.layout.page_layout.page_layout import PageLayout
 from borb.pdf.canvas.line_art.line_art_factory import LineArtFactory
 #from borb.pdf.canvas.layout.table.fixed_column_width_table import FixedColumnWidthTable as Table
-from borb.pdf.canvas.layout.table.flexible_column_width_table import FlexibleColumnWidthTable  as Table
+from borb.pdf.canvas.layout.table.flexible_column_width_table import FlexibleColumnWidthTable
 from borb.pdf.canvas.layout.table.table import TableCell
 
 from borb.pdf.canvas.layout.table.fixed_column_width_table import FixedColumnWidthTable
@@ -47,7 +48,8 @@ from opendp_apps.dp_reports.font_util import \
      OPEN_SANS_REGULAR,
      OPEN_SANS_SEMI_BOLD,
      OPEN_SANS_BOLD,
-     OPEN_SANS_ITALIC)
+     OPEN_SANS_ITALIC,
+     DPCREATOR_LOGO_PATH)
 
 class PDFReportMaker(BasicErrCheck):
 
@@ -61,7 +63,10 @@ class PDFReportMaker(BasicErrCheck):
             self.release_dict = self.get_test_release()
 
         self.basic_font = get_custom_font(OPEN_SANS_LIGHT)
+        self.basic_font_italic = get_custom_font(OPEN_SANS_ITALIC)
         self.basic_font_size = Decimal(10)
+        self.tbl_font_size = Decimal(9)
+        self.tbl_border_color = HexColor("#cbcbcb")
 
         self.layout = None
         self.creation_date = None
@@ -92,6 +97,45 @@ class PDFReportMaker(BasicErrCheck):
                       text_alignment=Alignment.CENTERED)
         return p
 
+    def get_tbl_cell_ital(self, content, col_span=1, padding=0):
+        """Get table cell, putting the content in italics"""
+        return self._get_tbl_cell(content,
+                                 self.basic_font_italic,
+                                 self.tbl_font_size,
+                                 Alignment.LEFT,
+                                 col_span=col_span,
+                                 padding_left=padding)
+
+    def get_tbl_cell_lft_pad(self, content, padding=10):
+        return self._get_tbl_cell(content,
+                                  self.basic_font,
+                                  self.tbl_font_size,
+                                  Alignment.LEFT,
+                                  col_span=1,
+                                  padding_left=padding)
+
+    def get_tbl_cell_align_rt(self, content):
+        return self._get_tbl_cell(content, self.basic_font, self.tbl_font_size, Alignment.RIGHT)
+
+    def _get_tbl_cell(self, content, font=None, font_size=None, text_alignment=None, col_span=1, padding_left=0) -> TableCell:
+        """Return a Paragraph within a TableCell"""
+        if not font:
+            font = self.basic_font
+        if not font_size:
+            font = self.basic_font_size
+        if not text_alignment:
+            text_alignment = Alignment.LEFT
+
+        p = Paragraph(content,
+                      font=font,
+                      font_size=font_size,
+                      padding_left=Decimal(padding_left),
+                      text_alignment=text_alignment)
+        return TableCell(p,
+                         border_color=self.tbl_border_color,
+                         col_span=col_span)
+
+
     def create_pdf(self):
         """Start making the PDF"""
         doc: Document = Document()
@@ -100,6 +144,9 @@ class PDFReportMaker(BasicErrCheck):
         doc.append_page(page)
 
         self.layout: PageLayout = SingleColumnLayout(page)
+
+        #self.layout.add(Image(DPCREATOR_LOGO_PATH,
+        #    width=Decimal(144), height=64))
 
         # Add line at the top
         #
@@ -122,84 +169,68 @@ class PDFReportMaker(BasicErrCheck):
         for stat_info in self.release_dict['statistics']:
             stat_cnt += 1
             if stat_info['statistic'] == astatic.DP_MEAN:
-                subtitle = f"{stat_cnt}. {stat_info['variable']} - {stat_info['statistic']}"
+
+                subtitle = f"{stat_cnt}. Variable: {stat_info['variable']}; Statistic: Differentially Private {stat_info['statistic']}"
+
                 self.layout.add(Paragraph(subtitle,
                                           font=get_custom_font(OPEN_SANS_SEMI_BOLD),
                                           font_size=self.basic_font_size,
                                           multiplied_leading=Decimal(1.75)))
 
+                self.layout.add(Paragraph(stat_info['description']['text'],
+                                          font=self.basic_font,
+                                          font_size=self.basic_font_size,
+                                          multiplied_leading=Decimal(1.75)))
+                # --------------------------------------
+                # Create table for parameters
+                # --------------------------------------
                 tbl_font_size = self.basic_font_size - 1
-                table_001 = Table(number_of_rows=8, number_of_columns=2)
-                table_001.add(TableCell(Paragraph("Privacy Parameters",
-                                                  font=get_custom_font(OPEN_SANS_ITALIC),
-                                                  font_size=tbl_font_size,
-                                                  ), col_span=2))
 
-                table_001.add(Paragraph("Epsilon",
-                                        font=self.basic_font,
-                                        font_size=tbl_font_size,
-                                        padding_left=Decimal(10),
-                                        ))
-                table_001.add(Paragraph(f"{stat_info['epsilon']}",
-                                        font=self.basic_font,
-                                        font_size=tbl_font_size,
-                                        text_alignment=Alignment.RIGHT
-                                        ))
-                table_001.add(Paragraph("Delta",
-                                        font=self.basic_font,
-                                        font_size=tbl_font_size,
-                                        padding_left=Decimal(10),
-                                        ))
-                table_001.add(Paragraph(f"{stat_info['delta']}",
-                                        font=self.basic_font,
-                                        font_size=tbl_font_size,
-                                        text_alignment=Alignment.RIGHT
-                                        ))
+                table_001 = FlexibleColumnWidthTable(number_of_rows=11,
+                                                    number_of_columns=2,
+                                                     padding_left=Decimal(20),
+                                                    #border_color=self.tbl_border_color
+                                                     )
 
-                table_001.add(TableCell(Paragraph("Metadata Parameters",
-                                                  font=get_custom_font(OPEN_SANS_ITALIC),
-                                                  font_size=tbl_font_size,
-                                                  ), col_span=2))
+                table_001.add(self.get_tbl_cell_ital("Privacy Parameters", col_span=2))
 
-                table_001.add(TableCell(Paragraph("Bounds",
-                                                  font=get_custom_font(OPEN_SANS_ITALIC),
-                                                  font_size=tbl_font_size,
-                                                  padding_left=Decimal(10),
-                                                  ), col_span=2))
-                table_001.add(Paragraph("Min",
-                                        font=self.basic_font,
-                                        font_size=tbl_font_size,
-                                        padding_left=Decimal(20),
-                                        ))
-                table_001.add(Paragraph(f"{stat_info['bounds']['min']}",
-                                        font=self.basic_font,
-                                        font_size=tbl_font_size,
-                                        text_alignment=Alignment.RIGHT
-                                        ))
-                table_001.add(Paragraph("Max",
-                                        font=self.basic_font,
-                                        font_size=self.basic_font_size,
-                                        padding_left=Decimal(20)
-                                        ))
-                table_001.add(Paragraph(f"{stat_info['bounds']['max']}",
-                                        font=self.basic_font,
-                                        font_size=self.basic_font_size,
-                                        text_alignment=Alignment.RIGHT
-                                        ))
-                table_001.add(Paragraph("Confidence Level",
-                                        font=self.basic_font,
-                                        font_size=self.basic_font_size,
-                                        padding_left=Decimal(10)
-                                        ))
-                table_001.add(Paragraph(f"{stat_info['confidence_level']}",
-                                        font=self.basic_font,
-                                        font_size=self.basic_font_size,
-                                        text_alignment=Alignment.RIGHT
-                                        ))
+                table_001.add(self.get_tbl_cell_lft_pad("Epsilon", padding=20))
+                table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['epsilon']}"))
+
+                table_001.add(self.get_tbl_cell_lft_pad("Delta", padding=20))
+                table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['delta']}"))
+
+                table_001.add(self.get_tbl_cell_ital("Metadata Parameters", col_span=2))
+
+                table_001.add(self.get_tbl_cell_ital("Bounds", col_span=2, padding=20))
+
+                table_001.add(self.get_tbl_cell_lft_pad("Min", padding=40))
+                table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['bounds']['min']}"))
+
+                table_001.add(self.get_tbl_cell_lft_pad("Max", padding=40))
+                table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['bounds']['max']}"))
+
+                table_001.add(self.get_tbl_cell_lft_pad("Confidence Level", padding=20))
+                table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['confidence_level']}"))
+
+                # Missing Value Handling
+                table_001.add(self.get_tbl_cell_ital("Missing Value Handling", col_span=2))
+
+                table_001.add(self.get_tbl_cell_lft_pad("Type", padding=20))
+                missing_val_handling = stat_info['missing_value_handling']['type']
+                print('>>> missing_val_handling', missing_val_handling)
+                if missing_val_handling == astatic.MISSING_VAL_INSERT_FIXED:
+                    table_001.add(self.get_tbl_cell_lft_pad(\
+                        astatic.missing_val_label(astatic.MISSING_VAL_INSERT_FIXED)))
+
+                    table_001.add(self.get_tbl_cell_lft_pad("Value", padding=20))
+                    table_001.add(self.get_tbl_cell_align_rt(\
+                        f"{stat_info['missing_value_handling']['fixed_value']}"))
 
                 table_001.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
 
                 #table_001.no_borders()
+                table_001.set_borders_on_all_cells(True, False, True, False) # top, right, left, bottom
                 self.layout.add(table_001)
 
                 # Add test plot
@@ -247,10 +278,23 @@ class PDFReportMaker(BasicErrCheck):
         """
         ps: typing.Tuple[Decimal, Decimal] = PageSize.LETTER_PORTRAIT.value
 
+        line_height = 16
+
         # Line
         print('ps[0]', ps[0], ps[1])
+        # Add logo at the top
+        #
+        logo_height = 32 # 64 / 2
+        logo_width = 72 # 144 / 2
+        rect_logo: Rectangle = Rectangle(Decimal(10), ps[1] - line_height - logo_height - Decimal(10),
+                                 Decimal(logo_width), Decimal(logo_height))
+        Image(
+            DPCREATOR_LOGO_PATH,
+            width=Decimal(logo_width),
+            height=Decimal(logo_height),
+        ).layout(page, rect_logo)
 
-        line_height = 16
+
         # lower_left_x, lower_left_y, width, height
         r: Rectangle = Rectangle(Decimal(0), ps[1] - line_height, ps[0], Decimal(line_height))
         Shape(
