@@ -441,10 +441,12 @@ class ValidateReleaseUtil(BasicErrCheck):
 
             # (3) Add variable_info which has min/max/categories, variable type, etc.
             #
+            print('variable info 1', variable)
             variable_info = self.analysis_plan.variable_info.get(variable)
             if not variable_info:
                 # Temp workaround!!! See Issue #300
                 # https://github.com/opendp/dpcreator/issues/300
+                print('variable info 2', camel_to_snake(variable))
                 variable_info = self.analysis_plan.variable_info.get(camel_to_snake(variable))
 
             if variable_info:
