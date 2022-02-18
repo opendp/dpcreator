@@ -6,7 +6,7 @@ from decimal import getcontext as get_dec_context
 import json
 
 import os
-from os.path import abspath, dirname, join
+from os.path import abspath, dirname, isfile, join
 import dateutil
 import random
 import typing
@@ -18,6 +18,7 @@ from django.template.loader import render_to_string
 from borb.pdf.canvas.layout.image.image import Image
 from borb.pdf.canvas.layout.image.barcode import Barcode, BarcodeType
 from borb.pdf.canvas.layout.image.chart import Chart
+from borb.pdf.canvas.layout.list.unordered_list import UnorderedList
 from borb.pdf.canvas.layout.layout_element import Alignment
 from borb.pdf.canvas.layout.page_layout.multi_column_layout import SingleColumnLayout
 from borb.pdf.canvas.layout.page_layout.page_layout import PageLayout
@@ -68,11 +69,15 @@ class PDFReportMaker(BasicErrCheck):
         self.release_dict = release_dict
         if not release_dict:
             self.release_dict = self.get_test_release()
-            self.release_json_bytes = bytes(json.dumps(self.release_dict, indent=4), encoding="latin1")
+        self.release_json_bytes = bytes(json.dumps(self.release_dict, indent=4), encoding="latin1")
 
         self.basic_font_size = Decimal(9)
         self.tbl_font_size = Decimal(9)
         self.tbl_border_color = HexColor("#cbcbcb")
+
+        self.pdf_output_file = join(CURRENT_DIR,
+                                    'test_data',
+                                    'pdf_report_01_%s.pdf' % (self.random_with_N_digits(6)))
 
         self.layout = None
         self.creation_date = None
@@ -80,6 +85,12 @@ class PDFReportMaker(BasicErrCheck):
         self.format_release()
 
         self.create_pdf()
+
+    def random_with_N_digits(self, n):
+        range_start = 10 ** (n - 1)
+        range_end = (10 ** n) - 1
+        return random.randint(range_start, range_end)
+
 
     def format_release(self):
         """Update release values"""
@@ -96,7 +107,7 @@ class PDFReportMaker(BasicErrCheck):
         p = Paragraph(s,
                       font=get_custom_font(OPEN_SANS_SEMI_BOLD),
                       font_size=Decimal(10),
-                      font_color=HexColor('#666666'),
+                      font_color=self.color_crimson,
                       multiplied_leading=Decimal(1.25),
                       respect_newlines_in_text=True,
                       text_alignment=Alignment.CENTERED)
@@ -144,9 +155,32 @@ class PDFReportMaker(BasicErrCheck):
         """Return a chunk of text with a regular font"""
         return ChunkOfText(val, font=self.basic_font, font_size=self.basic_font_size)
 
+    def txt_reg_para(self, val):
+        """Return a chunk of text with a regular font"""
+        return Paragraph(val, font=self.basic_font, font_size=self.basic_font_size)
+
+    def txt_list_para(self, val, padding_left=Decimal(40)):
+        """Return a chunk of text with a regular font"""
+        return Paragraph(val,
+                         # font=self.basic_font,
+                         font=get_custom_font(OPEN_SANS_SEMI_BOLD),
+                         font_size=self.basic_font_size,
+                         font_color=self.color_crimson,
+                         padding_left=padding_left,
+                         padding_bottom=Decimal(0),
+                         padding_top=Decimal(0),
+                         margin_top=Decimal(0),
+                         margin_bottom=Decimal(0),
+                         multiplied_leading=Decimal(.5),
+                         )
+
     def txt_bld(self, val):
         """Return a chunk of text with a bold font"""
         return ChunkOfText(val, font=self.basic_font_bold, font_size=self.basic_font_size)
+
+    def txt_bld_para(self, val):
+        """Return a chunk of text with a bold font"""
+        return Paragraph(val, font=self.basic_font_bold, font_size=self.basic_font_size)
 
     def create_pdf(self):
         """Start making the PDF"""
@@ -177,33 +211,58 @@ class PDFReportMaker(BasicErrCheck):
                                   font_size=self.basic_font_size,
                                   multiplied_leading=Decimal(1.75)))
 
+        self.layout.add(Paragraph(('Please read the report carefully, especially in'
+                                   'regard to usage of these statistics.'),
+                                  font=self.basic_font,
+                                  font_size=self.basic_font_size,
+                                  multiplied_leading=Decimal(1.75)))
+
+        self.layout.add(Paragraph(('Contents'),
+                                  font=get_custom_font(OPEN_SANS_SEMI_BOLD),
+                                  font_size=self.basic_font_size,
+                                  multiplied_leading=Decimal(1.75)))
+
+        self.layout.add(self.txt_list_para('1. Statistics'))
+        stat_cnt = 0
+        for stat_info in self.release_dict['statistics']:
+            stat_cnt += 1
+            stat_type = stat_info['statistic']
+            var_name = stat_info['variable']
+            self.layout.add(self.txt_list_para(f'1.{stat_cnt}. {var_name} - {stat_type}', 60))
+
+        self.layout.add(self.txt_list_para('2. Data source'))
+        self.layout.add(self.txt_list_para('3. OpenDP Library / Usage'))
+        self.layout.add(self.txt_list_para('4. Parameter Definitions'))
+
         stat_cnt = 0
         for stat_info in self.release_dict['statistics']:
             stat_cnt += 1
             stat_type = stat_info['statistic']
             var_name = stat_info['variable']
 
+            subtitle = f"1.{stat_cnt}. {var_name} - " + stat_type.title()
+            self.layout.add(Paragraph(subtitle,
+                                      font=get_custom_font(OPEN_SANS_SEMI_BOLD),
+                                      font_size=self.basic_font_size + Decimal(1),
+                                      font_color=self.color_crimson,
+                                      multiplied_leading=Decimal(1.75)))
+
+            text_chunks_01 = [
+                self.txt_bld(f'Result.'),
+                self.txt_reg(f' A '),
+                self.txt_bld(f'differentially private (DP) {stat_type}'),
+                self.txt_reg(' has been calculated for the variable'),
+                self.txt_bld(f" {var_name}."),
+                self.txt_reg(' The result,'),
+                self.txt_reg(' accuracy measures,'),
+                self.txt_reg(' and parameters used to create the statistic are shown below:'),
+            ]
+
+            self.layout.add(HeterogeneousParagraph(text_chunks_01,
+                                                   padding_left=Decimal(10)))
+
             if stat_info['statistic'] == astatic.DP_MEAN:
 
-                subtitle = f"{stat_cnt}. {var_name} - " + stat_type.title()
-
-                text_chunks_01 = [
-                    self.txt_bld(f'Result. '),
-                    self.txt_reg('A'),
-                    self.txt_bld(f' differentially private (DP) {stat_type}'),
-                    self.txt_reg(' has been calculated for the variable'),
-                    self.txt_bld(f" {var_name}."),
-                    self.txt_reg(' The result, accuracy measures,'),
-                    self.txt_reg(' and parameters used to create the statistic are shown below:'),
-                ]
-
-                self.layout.add(Paragraph(subtitle,
-                                          font=get_custom_font(OPEN_SANS_SEMI_BOLD),
-                                          font_size=self.basic_font_size + Decimal(1),
-                                          font_color=self.color_crimson,
-                                          multiplied_leading=Decimal(1.75)))
-
-                self.layout.add(HeterogeneousParagraph(text_chunks_01))
 
                 # -------------------------------------
                 # Result table
@@ -211,8 +270,9 @@ class PDFReportMaker(BasicErrCheck):
 
                 tbl_result = FlexibleColumnWidthTable(number_of_rows=4,
                                                       number_of_columns=2,
-                                                      padding_left=Decimal(20),
-                                                      padding_bottom=Decimal(50),
+                                                      padding_left=Decimal(40),
+                                                      padding_right=Decimal(40),
+                                                      padding_bottom=Decimal(20),
                                                       )
 
                 tbl_result.add(self.get_tbl_cell_lft_pad("DP Mean", padding=0))
@@ -231,9 +291,9 @@ class PDFReportMaker(BasicErrCheck):
                 tbl_result.add(self.get_tbl_cell_lft_pad("Description", padding=0))
 
 
-                acc_desc = (f'There is a probability of {clevel}% that the DP {stat_type.upper()} '
+                acc_desc = (f'There is a probability of {clevel}% that the DP {stat_type.title()} '
                             f' will differ'
-                            f' from the true {stat_type.upper()} by at most {acc_fmt} units.'
+                            f' from the true {stat_type.title()} by at most {acc_fmt} units.'
                             f' The units are the same units the variable {var_name} has in the dataset.')
 
                 tbl_result.add(self.get_tbl_cell_lft_pad(acc_desc))
@@ -249,12 +309,28 @@ class PDFReportMaker(BasicErrCheck):
                 #                          font=self.basic_font,
                 #                          font_size=self.basic_font_size,
                 #                          multiplied_leading=Decimal(1.75)))
+
+                text_chunks_02 = [
+                    self.txt_bld(f'Parameters.'),
+                    self.txt_reg(f' The table below shows the parameters used when calculating the DP Mean. For reference, '),
+                    self.txt_reg(' a description of each'),
+                    self.txt_reg(' parameter may be found at the end of the document.'),
+                ]
+
+                self.layout.add(HeterogeneousParagraph(text_chunks_02,
+                                                       padding_left=Decimal(10)))
+
+                # self.layout.add(self.txt_bld_para(f'Parameters.'))
+                # self.layout.add(self.txt_reg_para(' The table below shows the parameters used when calculating the DP Mean. For reference, a description of each parameter may be found at the end of the document.'))
+
+
                 # --------------------------------------
                 # Create table for parameters
                 # --------------------------------------
                 table_001 = FlexibleColumnWidthTable(number_of_rows=11,
                                                      number_of_columns=2,
-                                                     padding_left=Decimal(20),
+                                                     padding_left=Decimal(40),
+                                                     padding_right=Decimal(40),
                                                      border_color=self.color_crimson)
 
 
@@ -264,7 +340,10 @@ class PDFReportMaker(BasicErrCheck):
                 table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['epsilon']}"))
 
                 table_001.add(self.get_tbl_cell_lft_pad("Delta", padding=20))
-                table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['delta']}"))
+                delta_val = stat_info['delta']
+                if delta_val is None:
+                    delta_val = '(not applicable)'
+                table_001.add(self.get_tbl_cell_align_rt(f'{delta_val}'))
 
                 table_001.add(self.get_tbl_cell_ital("Metadata Parameters", col_span=2))
 
@@ -295,11 +374,12 @@ class PDFReportMaker(BasicErrCheck):
 
                 table_001.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
 
-                table_001.set_border_color_on_all_cells(self.tbl_border_color)
+                #table_001.set_border_color_on_all_cells(self.tbl_border_color)
+                table_001.set_border_color_on_all_cells(self.color_crimson)
                 # table_001.no_borders()
                 table_001.set_borders_on_all_cells(True, False, True, False)  # top, right, left, bottom
 
-                self.layout.add(table_001)
+                # self.layout.add(table_001)
 
                 # Add test plot
         #
@@ -315,12 +395,23 @@ class PDFReportMaker(BasicErrCheck):
         #
         doc.append_embedded_file("release_data.json", self.release_json_bytes)
 
-        fname = join(CURRENT_DIR, 'test_data', 'pdf_report_01.pdf')
-        with open(fname, "wb") as out_file_handle:
+        with open(self.pdf_output_file, "wb") as out_file_handle:
             PDF.dumps(out_file_handle, doc)
-        print(f'PDF created: {fname}')
-        os.system(f'open {fname}')
+        print(f'PDF created: {self.pdf_output_file}')
+        os.system(f'open {self.pdf_output_file}')
 
+    def get_pdf_contents(self):
+        """Return the PDF contents"""
+        if self.has_error():
+            return False, self.get_err_msg()
+
+        if not isfile(self.pdf_output_file):
+            return False, f'Not a file: {self.pdf_output_file}'
+
+        with open(self.pdf_output_file, 'rb') as f:
+            contents = f.read()
+
+        return True, contents
 
     def create_plot(self):
 

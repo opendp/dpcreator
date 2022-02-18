@@ -1,5 +1,1 @@
-
-This report contains differentially private statistics calculated by a user of the DP Creator application using the dataset "{{ dataset.name }}" from the repository {{ dataset.installation.name }} at {{ dataset.installation.url }}.
-
-
-
+This report contains differentially private statistics calculated by a user of the DP Creator application using the dataset "{{ dataset.name }}" from the repository {{ dataset.installation.name }} at {{ dataset.installation.url }}. Please read the report carefully, especially in regard to usage of these statistics.
