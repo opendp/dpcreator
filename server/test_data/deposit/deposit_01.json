@@ -1,0 +1,159 @@
+{
+   "name":"Replication Data for: Eye-typing experiment",
+   "created":{
+      "iso":"2022-02-14T11:32:45.350067",
+      "human_readable":"February 14, 2022 at 11:32:45:350067"
+   },
+   "dataset":{
+      "doi":"doi:10.7910/DVN/PUXVDH",
+      "name":"Replication Data for: Eye-typing experiment",
+      "type":"dataverse",
+      "citation":null,
+      "identifier":null,
+      "installation":{
+         "url":"http://127.0.0.1:8000/dv-mock-api",
+         "name":"Mock Local Dataverse"
+      },
+      "file_information":{
+         "name":"Fatigue_data.tab",
+         "fileFormat":"text/tab-separated-values",
+         "identifier":null
+      }
+   },
+   "statistics":[
+      {
+         "delta":null,
+         "bounds":{
+            "max":19.0,
+            "min":3.0
+         },
+         "result":{
+            "value":9.446210936535781
+         },
+         "epsilon":0.3333333333333333,
+         "accuracy":{
+            "value":0.7857658516941997,
+            "message":"There is a probability of 95.0% that the DP Mean will differ from the true Mean by at most 0.7857658516941997 units. Here the units are the same units the variable TypingSpeed has in the dataset."
+         },
+         "variable":"TypingSpeed",
+         "statistic":"mean",
+         "description":{
+            "html":"A differentially private <b>Mean</b> for variable <b>TypingSpeed</b> was calculated with the result <b>9.446210936535781</b>. There is a probability of <b>95.0%</b> that the <b>DP Mean</b> will differ from the true Mean by at most <b>0.7857658516941997</b> units. Here the units are the same units the variable <b>TypingSpeed</b>} has in the dataset.",
+            "text":"A differentially private Mean for variable \"TypingSpeed\" was calculated with the result 9.446210936535781. There is a probability of 95.0% that the DP Mean will differ from the true Mean by at most 0.7857658516941997 units. Here the units are the same units the variable TypingSpeed has in the dataset."
+         },
+         "confidence_level":0.95,
+         "confidence_level_alpha":0.05,
+         "missing_value_handling":{
+            "type":"insert_fixed",
+            "fixed_value":9.1
+         }
+      },
+      {
+         "delta":null,
+         "result":{
+            "value":{
+               "values":[
+                  11,
+                  13,
+                  8,
+                  12,
+                  15,
+                  127
+               ],
+               "categories":[
+                  "ac",
+                  "bh2",
+                  "cw",
+                  "jm",
+                  "mh",
+                  "uncategorized"
+               ],
+               "category_value_pairs":[
+                  [
+                     "ac",
+                     11
+                  ],
+                  [
+                     "bh2",
+                     13
+                  ],
+                  [
+                     "cw",
+                     8
+                  ],
+                  [
+                     "jm",
+                     12
+                  ],
+                  [
+                     "mh",
+                     15
+                  ],
+                  [
+                     "uncategorized",
+                     127
+                  ]
+               ]
+            }
+         },
+         "epsilon":0.3333333333333333,
+         "accuracy":{
+            "value":100.0,
+            "message":"Test - Accuracy Not Available!"
+         },
+         "variable":"Subject",
+         "statistic":"histogram",
+         "categories":[
+            "\"ac\"",
+            "\"bh2\"",
+            "\"cw\"",
+            "\"jm\"",
+            "\"mh\""
+         ],
+         "description":{
+            "html":"A differentially private <b>Histogram</b> for variable <b>Subject</b> was calculated with the result <b>{&#x27;categories&#x27;: [&#x27;ac&#x27;, &#x27;bh2&#x27;, &#x27;cw&#x27;, &#x27;jm&#x27;, &#x27;mh&#x27;, &#x27;uncategorized&#x27;], &#x27;values&#x27;: [11, 13, 8, 12, 15, 127], &#x27;category_value_pairs&#x27;: [(&#x27;ac&#x27;, 11), (&#x27;bh2&#x27;, 13), (&#x27;cw&#x27;, 8), (&#x27;jm&#x27;, 12), (&#x27;mh&#x27;, 15), (&#x27;uncategorized&#x27;, 127)]}</b>. There is a probability of <b>95.0%</b> that the <b>DP Histogram</b> will differ from the true Histogram by at most <b>100.0</b> units. Here the units are the same units the variable <b>Subject</b>} has in the dataset.",
+            "text":"A differentially private Histogram for variable \"Subject\" was calculated with the result {&#x27;categories&#x27;: [&#x27;ac&#x27;, &#x27;bh2&#x27;, &#x27;cw&#x27;, &#x27;jm&#x27;, &#x27;mh&#x27;, &#x27;uncategorized&#x27;], &#x27;values&#x27;: [11, 13, 8, 12, 15, 127], &#x27;category_value_pairs&#x27;: [(&#x27;ac&#x27;, 11), (&#x27;bh2&#x27;, 13), (&#x27;cw&#x27;, 8), (&#x27;jm&#x27;, 12), (&#x27;mh&#x27;, 15), (&#x27;uncategorized&#x27;, 127)]}. There is a probability of 95.0% that the DP Histogram will differ from the true Histogram by at most 100.0 units. Here the units are the same units the variable Subject has in the dataset."
+         },
+         "confidence_level":0.95,
+         "confidence_level_alpha":0.05,
+         "missing_value_handling":{
+            "type":"insert_fixed",
+            "fixed_value":"\"mh\""
+         }
+      },
+      {
+         "delta":null,
+         "bounds":{
+            "max":40.0,
+            "min":0.0
+         },
+         "result":{
+            "value":6.178952437521644
+         },
+         "epsilon":0.3333333333333333,
+         "accuracy":{
+            "value":1.964414607438678,
+            "message":"There is a probability of 95.0% that the DP Mean will differ from the true Mean by at most 1.964414607438678 units. Here the units are the same units the variable BlinkInterval has in the dataset."
+         },
+         "variable":"BlinkInterval",
+         "statistic":"mean",
+         "description":{
+            "html":"A differentially private <b>Mean</b> for variable <b>BlinkInterval</b> was calculated with the result <b>6.178952437521644</b>. There is a probability of <b>95.0%</b> that the <b>DP Mean</b> will differ from the true Mean by at most <b>1.964414607438678</b> units. Here the units are the same units the variable <b>BlinkInterval</b>} has in the dataset.",
+            "text":"A differentially private Mean for variable \"BlinkInterval\" was calculated with the result 6.178952437521644. There is a probability of 95.0% that the DP Mean will differ from the true Mean by at most 1.964414607438678 units. Here the units are the same units the variable BlinkInterval has in the dataset."
+         },
+         "confidence_level":0.95,
+         "confidence_level_alpha":0.05,
+         "missing_value_handling":{
+            "type":"insert_fixed",
+            "fixed_value":4.9
+         }
+      }
+   ],
+   "application":"DP Creator",
+   "application_url":"https://github.com/opendp/dpcreator",
+   "differentially_private_library":{
+      "url":"https://github.com/opendp/opendp",
+      "name":"OpenDP",
+      "version":"0.3.0"
+   }
+}
