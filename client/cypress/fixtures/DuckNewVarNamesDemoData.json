@@ -1,0 +1,19 @@
+{
+  "datasetName": "duck test var names",
+  "statistics": [
+    {
+      "statistic": "Mean",
+      "variable": "FloatMinus"
+    }
+  ],
+  "variables": {
+    "FloatMinus": {
+      "name": "FloatMinus",
+      "type": "Float",
+      "min": "-1.0",
+      "max": "1.0",
+      "fixedValue": "0",
+      "accuracy": "0.005991466575432961"
+    }
+  }
+}
