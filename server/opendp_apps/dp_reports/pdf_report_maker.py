@@ -40,6 +40,9 @@ from borb.pdf.canvas.line_art.line_art_factory import LineArtFactory
 from borb.pdf.canvas.geometry.rectangle import Rectangle
 from borb.pdf.canvas.layout.shape.shape import Shape
 from borb.pdf.canvas.color.color import HSVColor, HexColor, Color
+from borb.pdf.canvas.layout.table.flexible_column_width_table import FlexibleColumnWidthTable
+from borb.pdf.canvas.layout.table.table import TableCell
+from borb.pdf.canvas.color.color import HSVColor, HexColor, Color
 
 import matplotlib.pyplot as MatPlotLibPlot
 import numpy as np
@@ -379,8 +382,12 @@ class PDFReportMaker(BasicErrCheck):
                 # table_001.no_borders()
                 table_001.set_borders_on_all_cells(True, False, True, False)  # top, right, left, bottom
 
-                # self.layout.add(table_001)
-
+                try:
+                    self.layout.add(table_001)
+                except AssertionError:
+                    #self.layout.switch_to_next_page()
+                    #self.layout.add(table_001)
+                    pass
                 # Add test plot
         #
         self.layout.add(Chart(self.create_plot(),
@@ -453,11 +460,16 @@ class PDFReportMaker(BasicErrCheck):
         logo_width = 72 # 144 / 2
         rect_logo: Rectangle = Rectangle(Decimal(10), ps[1] - line_height - logo_height - Decimal(10),
                                  Decimal(logo_width), Decimal(logo_height))
-        Image(
+        logo_img_obj = Image(
             DPCREATOR_LOGO_PATH,
             width=Decimal(logo_width),
             height=Decimal(logo_height),
-        ).layout(page, rect_logo)
+        )
+        logo_img_obj.layout(page, rect_logo)
+
+        page.append_remote_go_to_annotation(
+            logo_img_obj.get_bounding_box(), uri="https://www.opendp.org"
+        )
 
 
         # lower_left_x, lower_left_y, width, height

@@ -22,6 +22,11 @@ def main():
                              Decimal(100))  # height
     p.layout(page, r)
 
+    for x in dir(page):
+        print(x)
+    print(page.keys())
+    print(page.get_page_info())
+
     # write
     pdf_fname = "output.pdf"
     with open(pdf_fname, "wb") as pdf_file_handle:
