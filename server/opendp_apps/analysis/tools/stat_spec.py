@@ -36,6 +36,8 @@ from opendp_apps.analysis.stat_valid_info import StatValidInfo
 class StatSpec:
     __metaclass__ = abc.ABCMeta
 
+    STATISTIC_TYPE = None
+
     prop_validators = dict(statistic=validate_statistic,
                            dataset_size=validate_int_greater_than_zero,
                            col_index=validate_int_not_negative,
@@ -453,9 +455,9 @@ class StatSpec:
         # for key, val in self.__dict__.items():
         #    print(f'{key}: {val}')
 
-    def get_short_description_text(self):
+    def get_short_description_text(self, template_name=None):
         """Get description in plain text"""
-        template_name = 'analysis/dp_stat_general_description.txt'
+        template_name = template_name if template_name else 'analysis/dp_stat_general_description.txt'
         return self.get_short_description_html(template_name)
 
     def get_short_description_html(self, template_name=None):
@@ -477,7 +479,6 @@ class StatSpec:
 
         # print(desc)
         return desc
-
 
     def get_accuracy_text(self, template_name=None):
         """
@@ -540,8 +541,12 @@ class StatSpec:
                 final_info['accuracy']['message'] = self.accuracy_msg
 
         final_info['description'] = OrderedDict()
-        final_info['description']['html'] = self.get_short_description_html()
-        final_info['description']['text'] = self.get_short_description_text()
+        template_name_html = 'analysis/dp_stat_general_histogram_description.html' \
+            if self.STATISTIC_TYPE == astatic.DP_HISTOGRAM else 'analysis/dp_stat_general_description.html'
+        template_name_txt = 'analysis/dp_stat_general_histogram_description.txt' \
+            if self.STATISTIC_TYPE == astatic.DP_HISTOGRAM else 'analysis/dp_stat_general_description.txt'
+        final_info['description']['html'] = self.get_short_description_html(template_name=template_name_html)
+        final_info['description']['text'] = self.get_short_description_text(template_name=template_name_txt)
 
         return final_info
 
