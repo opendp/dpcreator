@@ -12,13 +12,15 @@ const {
   WIZARD,
   SIGN_UP,
   LOGIN,
+  VERIFY_EMAIL,
   CONTACT_US,
   MY_PROFILE,
   MOCK_DV,
   MORE_INFORMATION,
   TERMS_AND_CONDITIONS,
   READ_ONLY_TERMS_AND_CONDITIONS,
-  FORGOT_YOUR_PASSWORD
+  FORGOT_YOUR_PASSWORD,
+  PASSWORD_RESET_CONFIRM
 } = NETWORK_CONSTANTS;
 
 Vue.use(VueRouter);
@@ -63,6 +65,11 @@ const routes = [
     component: () => import("../views/SignUp.vue")
   },
   {
+    path: VERIFY_EMAIL.PATH,
+    name: VERIFY_EMAIL.NAME,
+    component: () => import("../views/VerifyEmail.vue")
+  },
+  {
     path: `${SIGN_UP.PATH}/confirmation`,
     name: "SignUpConfirmation",
     component: () => import("../views/SignUpConfirmation.vue")
@@ -76,6 +83,11 @@ const routes = [
     path: FORGOT_YOUR_PASSWORD.PATH,
     name: FORGOT_YOUR_PASSWORD.NAME,
     component: () => import("../views/ForgotYourPassword.vue")
+  },
+  {
+    name: PASSWORD_RESET_CONFIRM.NAME,
+    path: PASSWORD_RESET_CONFIRM.PATH,
+    component: () => import("../views/PasswordResetConfirm.vue")
   },
   {
     path: WELCOME.PATH,
