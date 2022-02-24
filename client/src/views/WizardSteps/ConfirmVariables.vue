@@ -333,7 +333,7 @@ import ChipSelectItem from "../../components/DesignSystem/ChipSelectItem.vue";
 import Checkbox from "../../components/DesignSystem/Checkbox.vue";
 import DynamicQuestionIconTooltip from "@/components/DynamicHelpResources/DynamicQuestionIconTooltip";
 import {mapState, mapGetters} from 'vuex';
-
+import {snakeCase} from 'snake-case'
 export default {
   name: "ConfirmVariables",
   components: {
@@ -427,9 +427,9 @@ export default {
       let selectable = true
       if (this.analysisPlan && this.analysisPlan.dpStatistics) {
         this.analysisPlan.dpStatistics.forEach(statistic => {
-          //      console.log( statistic.variable + '===' + variable.name + '?')
-          if (statistic.variable === variable.name) {
-            console.log('found statistic' + variable.name)
+          // console.log( statistic.variable + '===' + variable.name + '?')
+          // in dpStatistics, the 'variable' property is saved in snakeCase (to match the key on the server side)
+          if (statistic.variable === snakeCase(variable.key)) {
             selectable = false
           }
         })

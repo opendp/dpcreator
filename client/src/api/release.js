@@ -1,5 +1,5 @@
 import {session, wrappedSession} from './session';
-
+import {snakeCase} from "snake-case";
 const camelcaseKeys = require('camelcase-keys');
 const snakecaseKeys = require('snakecase-keys');
 
@@ -17,8 +17,9 @@ export default {
     validate(analysisPlanId, dpStatistics) {
         if (dpStatistics && dpStatistics.length > 0) {
             dpStatistics = snakecaseKeys(dpStatistics, {deep: true})
-
-
+            dpStatistics.forEach((dpStat) => {
+                dpStat.variable = snakeCase(dpStat.variable)
+            })
             return session.post('/api/validation/',
                 {analysis_plan_id: analysisPlanId, dp_statistics: dpStatistics})
                 .then(resp => camelcaseKeys(resp.data, {deep: true}))
