@@ -428,8 +428,7 @@ export default {
       if (this.analysisPlan && this.analysisPlan.dpStatistics) {
         this.analysisPlan.dpStatistics.forEach(statistic => {
           // console.log( statistic.variable + '===' + variable.name + '?')
-          // in dpStatistics, the 'variable' property is saved in snakeCase (to match the key on the server side)
-          if (statistic.variable === snakeCase(variable.key)) {
+          if (statistic.variable === variable.key) {
             selectable = false
           }
         })
