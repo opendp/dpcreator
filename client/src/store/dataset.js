@@ -224,11 +224,6 @@ const actions = {
      * @param statInput - Array of JSON objects from statistics table
      */
     updateDPStatistics({commit, state}, statList) {
-        statList.forEach((dpStat) => {
-            // the variable property is a key into the variableInfo object,
-            // so it needs to be snake case.
-            dpStat.variable = snakeCase(dpStat.variable)
-        })
         const patch = {
             dpStatistics: statList
         }
