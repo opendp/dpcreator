@@ -47,6 +47,8 @@ import NETWORK_CONSTANTS from "../../../router/NETWORK_CONSTANTS";
 export default {
   components: {Button},
   name: "ForgotYourPasswordFormSubmitted",
+  props: ["email"],
+
   methods: {
     handleResendEmail: function () {
       //TODO: Implement the logic that resends the forgot password email
@@ -55,7 +57,6 @@ export default {
   },
   data: () => ({
     //TODO: Change this email for the current one of the user
-    email: "danny-fi@gmail.com",
     NETWORK_CONSTANTS
   })
 };

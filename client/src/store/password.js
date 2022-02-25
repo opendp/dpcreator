@@ -5,6 +5,10 @@ import {
   PASSWORD_RESET_CLEAR,
   PASSWORD_RESET_FAILURE,
   PASSWORD_RESET_SUCCESS,
+  PASSWORD_CHANGE_BEGIN,
+  PASSWORD_CHANGE_CLEAR,
+  PASSWORD_CHANGE_FAILURE,
+  PASSWORD_CHANGE_SUCCESS,
   PASSWORD_EMAIL_BEGIN,
   PASSWORD_EMAIL_CLEAR,
   PASSWORD_EMAIL_FAILURE,
@@ -20,9 +24,12 @@ export default {
     resetCompleted: false,
     resetError: false,
     resetLoading: false,
+    changeCompleted: false,
+    changeError: false,
+    changeLoading: false,
   },
   actions: {
-    resetPassword({ commit }, { uid, token, password1, password2 }) {
+    resetPassword({commit}, {uid, token, password1, password2}) {
       commit(PASSWORD_RESET_BEGIN);
       return auth.resetAccountPassword(uid, token, password1, password2)
           .then(() => commit(PASSWORD_RESET_SUCCESS))
@@ -31,17 +38,29 @@ export default {
             return Promise.reject(data)
           });
     },
-    sendPasswordResetEmail({ commit }, { email }) {
+    changePassword({commit}, {oldPassword, password1, password2}) {
+      commit(PASSWORD_CHANGE_BEGIN);
+      return auth.changePassword(oldPassword, password1, password2)
+          .then(() => commit(PASSWORD_CHANGE_SUCCESS))
+          .catch((data) => {
+            commit(PASSWORD_CHANGE_FAILURE);
+            return Promise.reject(data)
+          });
+    },
+    sendPasswordResetEmail({commit}, {email}) {
       commit(PASSWORD_EMAIL_BEGIN);
       return auth.sendAccountPasswordResetEmail(email)
-        .then(() => commit(PASSWORD_EMAIL_SUCCESS))
-        .catch(() => commit(PASSWORD_EMAIL_FAILURE));
+          .then(() => commit(PASSWORD_EMAIL_SUCCESS))
+          .catch(() => commit(PASSWORD_EMAIL_FAILURE));
     },
-    clearResetStatus({ commit }) {
+    clearResetStatus({commit}) {
       commit(PASSWORD_RESET_CLEAR);
     },
-    clearEmailStatus({ commit }) {
+    clearEmailStatus({commit}) {
       commit(PASSWORD_EMAIL_CLEAR);
+    },
+    clearPasswordStatus({commit}) {
+      commit(PASSWORD_CHANGE_CLEAR);
     },
   },
   mutations: {
@@ -52,6 +71,20 @@ export default {
       state.resetCompleted = false;
       state.resetError = false;
       state.resetLoading = false;
+    },
+    [PASSWORD_CHANGE_CLEAR](state) {
+      state.changeCompleted = false;
+      state.changeError = false;
+      state.changeLoading = false;
+    },
+    [PASSWORD_CHANGE_FAILURE](state) {
+      state.changeError = true;
+      state.changeLoading = false;
+    },
+    [PASSWORD_CHANGE_SUCCESS](state) {
+      state.changeCompleted = true;
+      state.changeError = false;
+      state.changeLoading = false;
     },
     [PASSWORD_RESET_FAILURE](state) {
       state.resetError = true;

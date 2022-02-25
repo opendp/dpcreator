@@ -19,6 +19,7 @@ Pipfile.lock
 *.aux
 *.fdb_latexmk
 *.fls
+*.png
 
 
 # Byte-compiled / optimized / DLL files
