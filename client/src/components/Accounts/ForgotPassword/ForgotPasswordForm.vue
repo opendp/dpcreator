@@ -57,15 +57,19 @@
 <script>
 import Button from "../../DesignSystem/Button.vue";
 import NETWORK_CONSTANTS from "../../../router/NETWORK_CONSTANTS";
+import auth from '../../../api/auth';
 
 export default {
   components: {Button},
   name: "ForgotYourPasswordForm",
+
   methods: {
     handleFormSubmit: function () {
       if (this.$refs.forgotPasswordForm.validate()) {
-        //TODO: Implement Reset Password Logic here
+        auth.sendAccountPasswordResetEmail(this.email)
+
         this.$emit("update:submitted", true);
+        this.$emit("update:email", this.email)
       }
     }
   },
