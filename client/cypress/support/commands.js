@@ -208,7 +208,7 @@ Cypress.Commands.add('createStatistics', (demoData) => {
         cy.get('tr').first().get('td').should('contain', demoStat.statistic)
         cy.get('table').contains('td', demoStat.statistic).should('be.visible');
         // Statistic should contain correct accuracy value
-        cy.get('table').contains('td', demoVar.accuracy).should('be.visible')
+        cy.get('table').contains('td', demoStat.accuracy).should('be.visible')
     })
 }),
 

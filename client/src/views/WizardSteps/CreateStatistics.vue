@@ -137,7 +137,7 @@ export default {
     editedIndex: -1,
     editedItem: {
       statistic: "",
-      variable: [],
+      variable: "",
       epsilon: "",
       error: "",
       missingValuesHandling: "",
@@ -148,7 +148,7 @@ export default {
     },
     defaultItem: {
       statistic: "",
-      variable: [],
+      variable: "",
       epsilon: "",
       error: "",
       missingValuesHandling: "",
@@ -167,12 +167,17 @@ export default {
       } else {
         this.statistics = []
       }
+      this.statistics.forEach((stat) => {
+        stat.epsilon = Number(stat.epsilon).toPrecision(2)
+        if (stat.error !== null) {
+          stat.error = (Number(stat.error)).toPrecision(2)
+        }
+      })
       if (this.getDepositorSetupInfo.epsilon == null) {
         this.epsilon = this.getDepositorSetupInfo.defaultEpsilon
       } else {
         this.epsilon = this.getDepositorSetupInfo.epsilon
       }
-      console.log("initialize form, epsilon = " + this.epsilon)
       if (this.getDepositorSetupInfo.confidenceLevel == null) {
         this.confidenceLevel = .99
       } else {
@@ -253,7 +258,7 @@ export default {
             .then((validateResults) => {
               for (let i = 0; i < this.statistics.length; i++) {
                 const accuracy = validateResults.data[i].accuracy
-                this.statistics[i].accuracy.value = accuracy.value
+                this.statistics[i].accuracy.value = (Number(accuracy.value)).toPrecision(2)
                 this.statistics[i].accuracy.message = accuracy.message
                 // this assigment below didn't work!  Can't change the object reference, need to change the values
                 //  this.statistics[i] = Object.assign({}, this.statistics[i], { accuracy })

@@ -3,7 +3,8 @@
   "statistics":  [
     {
       "statistic": "Histogram",
-      "variable": "trial"
+      "variable": "trial",
+      "accuracy": "1.0e+2"
     }
     ],
   "variables": {
@@ -13,8 +14,7 @@
       "type": "Integer",
       "min": "0",
       "max": "10",
-      "fixedValue": "5",
-      "accuracy": "100"
+      "fixedValue": "5"
     }
   }
 }
