@@ -1,2 +1,2 @@
 A differentially private {{ stat.statistic|title }} for variable "{{ stat.variable}}" was calculated with the result
-{{ stat.value|slice:':10'}}. {% if stat.accuracy_val %}{% include "analysis/dp_histogram_accuracy_default.txt" %}{% endif %}
+{{ histogram_values }}. {% if stat.accuracy_val %}{% include "analysis/dp_histogram_accuracy_default.txt" %}{% endif %}

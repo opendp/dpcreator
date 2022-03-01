@@ -464,8 +464,15 @@ class StatSpec:
         """
         Create an HTML description using a ReleaseInfo object
         """
+        slice_length = 10
+        value = {}
+        # For histogram specs, we need to limit the number of categories and values we display in the front end
+        if self.STATISTIC_TYPE == astatic.DP_HISTOGRAM:
+            for k, v in self.value.items():
+                value[k] = v[:slice_length]
         info_dict = {
             'stat': self,
+            'histogram_values': value,
             'use_min_max': 'min' in self.additional_required_props(),
             'MISSING_VAL_INSERT_FIXED': astatic.MISSING_VAL_INSERT_FIXED,
             'MISSING_VAL_INSERT_RANDOM': astatic.MISSING_VAL_INSERT_RANDOM
