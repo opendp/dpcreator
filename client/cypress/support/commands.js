@@ -253,11 +253,11 @@ Cypress.Commands.add('submitStatistics', (demoData) => {
     // The Release Details should be visible
     cy.get('[data-test="status tag"]').should('contain', 'Release Completed')
     demoData.statistics.forEach((demoStat) => {
-        let snippet = 'There is a probability of 95.0%'
-            + ' that the DP ' + demoStat.statistic +
-            ' will differ from the true ' + demoStat.statistic + ' by at most'
-        cy.get('[data-test="statistic description"]').should('contain', snippet)
+        let accuracy = demoData.variables[demoStat.variable].accuracy
+        cy.get('[data-test="statistic description"]').should('contain', demoStat.statistic)
+        cy.get('[data-test="statistic description"]').should('contain', accuracy)
     })
+
 })
 Cypress.Commands.add('setupStatisticsPage', (datasetFixture, analysisFixture) => {
     cy.fixture(datasetFixture).then(dataset => {
