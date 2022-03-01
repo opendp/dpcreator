@@ -98,12 +98,15 @@ class HistogramStatSpecTest(StatSpecTestCase):
                 yield float(start)
                 start += decimal.Decimal(step)
 
-        for cl_val in list(float_range(-1, 3, '0.1')) + ['alphabet', 'soup']:
+        for cl_val in list(float_range(-1, 0, '0.1')) + ['alphabet', 'soup']:
             # print(f'> Invalid ci val: {ci_val}')
             spec_props['cl'] = cl_val
             dp_hist = DPHistogramCategoricalSpec(spec_props)
             # print(dp_hist.is_chain_valid())
-            self.assertTrue(dp_hist.is_chain_valid())
+            valid = dp_hist.is_chain_valid()
+            print(dp_hist.error_messages)
+            print(cl_val)
+            self.assertFalse(valid)
 
     @skip
     # Not clear that this test should pass anymore, since min/max was referring to
