@@ -20,11 +20,12 @@ class DataverseUserAdmin(admin.ModelAdmin):
     list_filter = ('dv_installation',)
     list_display = ('user',
                     'dv_installation',
-                    'persistent_id',
+                    #'persistent_id',
+                    'object_id',
                     'email',
                     'updated',
                     'created',)
-    readonly_fields = ('created', 'updated',)
+    readonly_fields = ('created', 'updated', 'object_id')
 
 
 admin.site.register(OpenDPUser, OpenDPUserAdmin)
