@@ -7,25 +7,23 @@ This class is hooked into the OpenDP User register/login steps and does the foll
 -
 """
 from json import JSONDecodeError
-from django.http import JsonResponse
 from requests.exceptions import InvalidSchema
 from rest_framework import status as http_status
 
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
-from django.conf import settings
-from opendp_apps.user.models import DataverseUser
+from opendp_apps.user.models import OpenDPUser, DataverseUser
 
 from opendp_apps.dataverses.models import DataverseHandoff
-from opendp_apps.dataverses.serializers import DataverseUserSerializer
 
-from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses.dataverse_client import DataverseClient
+from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
+from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses import static_vals as dv_static
 
 
 class DataverseUserInitializer(BasicErrCheck):
 
-    def __init__(self, opendp_user: settings.AUTH_MODEL_USER, dv_handoff_id: str):
+    def __init__(self, opendp_user: OpenDPUser, dv_handoff_id: str):
         """Initialize the class with an OpenDPUser and DataverseHandoff.object_id"""
         self.opendp_user = opendp_user
         self.dv_handoff_id = dv_handoff_id
@@ -40,7 +38,6 @@ class DataverseUserInitializer(BasicErrCheck):
 
         self.run_initializer_steps()
 
-
     def run_initializer_steps(self):
         """Run through the initializer steps which include:
 
@@ -50,22 +47,29 @@ class DataverseUserInitializer(BasicErrCheck):
 
         # Retrieve the DataverseHandoff object
         #
+        print('>> DataverseUserInitializer 1')
         if not self.retrieve_handoff_obj():
             return
 
         # Create or update the Dataverse user
         #
+        print('>> DataverseUserInitializer 2')
         if not self.init_update_dv_user():
             return
 
         # Retrieve the latest Dataverse user info from Dataverse
+        print('>> DataverseUserInitializer 3')
         if not self.retrieve_latest_dv_user_info():
             return
 
         #
         #
+        print('>> DataverseUserInitializer 4')
         if not self.init_update_dv_file_info():
             return
+
+        print('>> DataverseUserInitializer 5')
+
 
     def retrieve_handoff_obj(self) -> bool:
         """Retrieve the DataverseHandoff object"""
@@ -75,8 +79,8 @@ class DataverseUserInitializer(BasicErrCheck):
         try:
             self.dv_handoff = DataverseHandoff.objects.get(object_id=self.dv_handoff_id)
         except DataverseHandoff.DoesNotExist:
-            user_msg = 'Failed to retieve the DataverseHandoff object'
-            self.add_user_msg(user_msg)
+            user_msg = f'Failed to retieve the DataverseHandoff object (id: {self.dv_handoff_id})'
+            self.add_err_msg(user_msg)
             self.http_resp_code = http_status.HTTP_400_BAD_REQUEST
             return False
 
@@ -88,7 +92,7 @@ class DataverseUserInitializer(BasicErrCheck):
             return False
 
         try:
-            self.dv_user = DataverseUser.objects.get(user__object=self.opendp_user,
+            self.dv_user = DataverseUser.objects.get(user=self.opendp_user,
                                                      dv_installation=self.dv_handoff.dv_installation)
 
         except DataverseUser.DoesNotExist:
@@ -122,18 +126,18 @@ class DataverseUserInitializer(BasicErrCheck):
             dataverse_response = dataverse_client.get_user_info()
         except InvalidSchema:
             user_msg = f'The Site {site_url} is not valid'
-            self.add_user_msg(user_msg)
+            self.add_err_msg(user_msg)
             self.http_resp_code = http_status.HTTP_400_BAD_REQUEST
             return False
         except JSONDecodeError:
             user_msg = f'Error reading data from {site_url}'
-            self.add_user_msg(user_msg)
+            self.add_err_msg(user_msg)
             self.http_resp_code = http_status.HTTP_400_BAD_REQUEST
             return False
 
         if dataverse_response.success is not True:
             user_msg = dataverse_response.message
-            self.add_user_msg(user_msg)
+            self.add_err_msg(user_msg)
             self.http_resp_code = http_status.HTTP_400_BAD_REQUEST
             return False
 
@@ -156,7 +160,7 @@ class DataverseUserInitializer(BasicErrCheck):
             self.dv_user.email = dataverse_user_info['email']
         except (AttributeError, KeyError) as ex:
             user_msg = f"Malformed Dataverse response when retrieving user info: {ex}"
-            self.add_user_msg(user_msg)
+            self.add_err_msg(user_msg)
             self.http_resp_code = http_status.HTTP_400_BAD_REQUEST
             return False
 
@@ -164,7 +168,7 @@ class DataverseUserInitializer(BasicErrCheck):
 
         return True
 
-    def init_dv_file_info(self) -> bool:
+    def init_update_dv_file_info(self) -> bool:
         """Create of update the DataverseFileInfo object"""
         if self.has_error():
             return False
@@ -201,50 +205,63 @@ class DataverseUserInitializer(BasicErrCheck):
         if self.dv_file_info.dataset_schema_info and self.dv_file_info.file_schema_info:
             if not self.dv_file_info.id:
                 self.dv_file_info.save()    # shouldn't be needed...
+            self.http_resp_code = http_status.HTTP_200_OK
             return True
 
-        return 
+        return self.retrieve_dv_file_info(self.dv_file_info)
+
+    def retrieve_dv_file_info(self, dv_file_info: DataverseFileInfo) -> bool:
+        """Use the Dataverse API to retrieve dataset schema info for the DataverseFileInfo object"""
+        if self.has_error():
+            return False
+
+        site_url = self.dv_handoff.dv_installation.dataverse_url
+        if not site_url:
+            user_msg = 'The Dataverse url has not been set.'
+            self.add_err_msg(user_msg)
+            self.http_resp_code = http_status.HTTP_400_BAD_REQUEST
+            return False
 
         params = self.dv_file_info.as_dict()
-        site_url = self.dv_handoff.dv_installation.dataverse_url
         params[dv_static.DV_PARAM_SITE_URL] = site_url
 
-            if not site_url:
-                # shouldn't happen....
-                return Response({'success': False, 'message': 'The Dataverse url has not been set.'},
-                                status=status.HTTP_400_BAD_REQUEST)
+        # (1) Retrieve the JSON LD info
+        client = DataverseClient(site_url, self.dv_user.dv_general_token)
+        schema_org_resp = client.get_schema_org(self.dv_handoff.datasetPid)
+        if schema_org_resp.status_code != 200:
+            self.add_err_msg(schema_org_resp.message)
+            self.http_resp_code = http_status.HTTP_400_BAD_REQUEST
+            return False
 
-            # (1) Retrieve the JSON LD info
-            client = DataverseClient(site_url, handoff.apiGeneralToken)
-            schema_org_resp = client.get_schema_org(handoff.datasetPid)
-            if schema_org_resp.status_code >= 400:
-                return Response({'success': False, 'message': schema_org_resp.message},
-                                status=status.HTTP_400_BAD_REQUEST)
+        # (2) Retrieve the file specific info from the JSON-LD
+        #
+        schema_org_content = schema_org_resp.json()
+        file_schema_resp = DataverseManifestParams.get_file_specific_schema_info(
+                                    schema_org_content,
+                                    self.dv_handoff.fileId,
+                                    self.dv_handoff.filePid)
 
-            # (2) Retrieve the file specific info from the JSON-LD
-            #
-            schema_org_content = schema_org_resp.json()
-            file_schema_resp = DataverseManifestParams.get_file_specific_schema_info(schema_org_content,
-                                                                                     handoff.fileId,
-                                                                                     handoff.filePid)
-            if not file_schema_resp.success:
-                return Response({'success': False, 'message': file_schema_resp.message},
-                                status=status.HTTP_400_BAD_REQUEST)
+        if not file_schema_resp.success:
+            self.add_err_msg(file_schema_resp.message)
+            self.http_resp_code = http_status.HTTP_400_BAD_REQUEST
+            return False
 
-            # Update the DataverseFileInfo object
-            #
-            file_info.creator = dataverse_user.user
-            file_info.dataset_schema_info = schema_org_content
-            file_info.file_schema_info = file_schema_resp.data
-            # This will fail if the dataset_schema_info is malformed, use DOI as backup just in case:
-            file_info.name = file_info.dataset_schema_info.get('name', file_info.dataset_doi)
+        # Update the DataverseFileInfo object
+        #
+        dv_file_info.dataset_schema_info = schema_org_content
+        dv_file_info.file_schema_info = file_schema_resp.data
 
-            # Save the DataverseFileInfo updates
-            file_info.save()
+        # This will fail if the dataset_schema_info is malformed, use DOI as backup just in case:
+        dv_file_info.name = dv_file_info.dataset_schema_info.get('name', dv_file_info.dataset_doi)
 
-        serializer = DataverseFileInfoSerializer(file_info, context={'request': request})
-        return Response({'success': True, 'data': serializer.data},
-                        status=status.HTTP_201_CREATED)
+        # Save the DataverseFileInfo updates
+        dv_file_info.save()
+
+        self.dv_file_info = dv_file_info    # little messy here...
+
+        self.http_resp_code = http_status.HTTP_201_CREATED
+        return True
+
 
 """
 from opendp_apps.dataverses.serializers import DataverseUserSerializer
