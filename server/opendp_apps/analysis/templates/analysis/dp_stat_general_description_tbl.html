@@ -11,7 +11,7 @@
     {% if stat.accuracy_val %}
     <tr>
         <th>Accuracy</th>
-        <td>{{ stat.accuracy_val}}</td>
+        <td>{{ stat.accuracy_val|floatformat:2 }}</td>
     </tr>
     <tr>
         <th>Accuracy Message</th>
