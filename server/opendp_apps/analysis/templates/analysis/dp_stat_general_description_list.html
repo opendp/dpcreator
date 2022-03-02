@@ -4,7 +4,7 @@
     <li><b>Result:</b> {{ stat.value}}</li>
     {% if stat.accuracy_val %}
     <li><b>Accuracy:</b> {{ stat.accuracy_val}}
-        <p>There is a probability of {{ stat.get_cl_text }} that the output count will differ from the true count by at most {{ stat.accuracy_val}} units. Here the units are the same units the variable has in the dataset.</p>
+        <p>There is a probability of {{ stat.get_cl_text }} that the output count will differ from the true count by at most {{ stat.accuracy_val|floatformat:2 }} units. Here the units are the same units the variable has in the dataset.</p>
     </li>
     {% endif %}
     <li><b>Parameters:</b>
