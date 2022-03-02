@@ -253,9 +253,8 @@ Cypress.Commands.add('submitStatistics', (demoData) => {
     // The Release Details should be visible
     cy.get('[data-test="status tag"]').should('contain', 'Release Completed')
     demoData.statistics.forEach((demoStat) => {
-        let accuracy = demoData.variables[demoStat.variable].accuracy
         cy.get('[data-test="statistic description"]').should('contain', demoStat.statistic)
-        cy.get('[data-test="statistic description"]').should('contain', accuracy)
+        cy.get('[data-test="statistic description"]').should('contain', demoStat.accuracy)
     })
 
 })
