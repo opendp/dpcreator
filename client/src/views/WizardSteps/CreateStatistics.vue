@@ -258,7 +258,7 @@ export default {
             .then((validateResults) => {
               for (let i = 0; i < this.statistics.length; i++) {
                 const accuracy = validateResults.data[i].accuracy
-                this.statistics[i].accuracy.value = (Number(accuracy.value)).toPrecision(2)
+                this.statistics[i].accuracy.value = (Number(accuracy.value)).toPrecision(3)
                 this.statistics[i].accuracy.message = accuracy.message
                 // this assigment below didn't work!  Can't change the object reference, need to change the values
                 //  this.statistics[i] = Object.assign({}, this.statistics[i], { accuracy })
