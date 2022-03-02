@@ -4,7 +4,9 @@
     {
       "statistic": "Histogram",
       "variable": "trial",
-      "accuracy": "5.39"
+      "roundedAccuracy": "5.39",
+      "accuracy": "5.393627586538017",
+      "fixedValue": "5"
     }
     ],
   "variables": {
@@ -13,9 +15,7 @@
       "label": "",
       "type": "Integer",
       "min": "0",
-      "max": "10",
-
-      "fixedValue": "5"
+      "max": "10"
     }
   }
 }
