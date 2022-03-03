@@ -216,12 +216,14 @@ export default {
       return count
     },
     isButtonDisabled: function () {
-      const returnVal = (
-          !this.editedItemDialog.statistic ||
-          !this.editedItemDialog.variable ||
-          !this.editedItemDialog.missingValuesHandling
-      );
-      return returnVal
+      let disabled = false
+      if (this.editedItemDialog.statistic == ""
+          || this.editedItemDialog.variable == ""
+          || this.editedItemDialog.variable == undefined
+          || this.editedItemDialog.fixedValue == "") {
+        disabled = true
+      }
+      return disabled
     },
     isMultiple: function () {
       return this.editedIndex === -1;
@@ -383,6 +385,7 @@ export default {
       }
     },
     updateSelectedStatistic(statistic) {
+      console.log('update selected statistic: ' + JSON.stringify(statistic))
       this.selectedStatistic = statistic
     },
     updateFixedInputVisibility(handlingOption) {

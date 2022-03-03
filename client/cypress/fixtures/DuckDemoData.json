@@ -3,7 +3,10 @@
   "statistics": [
     {
       "statistic": "Mean",
-      "variable": "FloatMinus1to1"
+      "variable": "FloatMinus1to1",
+      "fixedValue": "0",
+      "accuracy": "0.005991466575432961",
+      "roundedAccuracy": "0.00599"
     }
   ],
   "variables": {
@@ -11,9 +14,7 @@
       "name": "FloatMinus1to1",
       "type": "Float",
       "min": "-1.0",
-      "max": "1.0",
-      "fixedValue": "0",
-      "accuracy": "0.005991466575432961"
+      "max": "1.0"
     }
   }
 }
