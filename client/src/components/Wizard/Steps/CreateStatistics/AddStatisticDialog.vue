@@ -53,7 +53,7 @@
                 v-for="(variable, index) in variables"
                 :key="variable + index"
                 :label="variable['label']"
-                :value="variable['label']"
+                :value="variable['key']"
                 :data-test="variable['label']"
                 on-icon="mdi-check"
             ></v-radio>
