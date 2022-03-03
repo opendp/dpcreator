@@ -40,7 +40,7 @@
       />
       <p></p>
       <Button v-if="stepperPosition > 0"
-              data-test="wizardContinueButton"
+              data-test="wizardGoBackButton"
               classes="d-block"
               :class="{
           'mx-auto': $vuetify.breakpoint.mdAndUp
