@@ -21,6 +21,7 @@ from opendp.mod import OpenDPException
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
+from opendp_apps.analysis.tools.dp_variance_spec import DPVarianceSpec
 from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
 from opendp_apps.analysis.stat_valid_info import StatValidInfo
 from opendp_apps.analysis.tools.stat_spec import StatSpec
@@ -43,7 +44,6 @@ from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
 # Temp workaround!!! See Issue #300
 # https://github.com/opendp/dpcreator/issues/300
 from opendp_apps.utils.camel_to_snake import camel_to_snake
-
 
 
 class ValidateReleaseUtil(BasicErrCheck):
@@ -487,6 +487,9 @@ class ValidateReleaseUtil(BasicErrCheck):
             elif statistic == astatic.DP_SUM:
                 # DP Mean!
                 self.add_stat_spec(DPSumSpec(props))
+
+            elif statistic == astatic.DP_VARIANCE:
+                self.add_stat_spec(DPVarianceSpec(props))
 
             elif statistic in astatic.DP_STATS_CHOICES:
                 # Stat not yet available or an error

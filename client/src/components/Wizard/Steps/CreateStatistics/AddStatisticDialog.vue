@@ -258,11 +258,13 @@ export default {
       {value: "mean", label: "Mean"},
       {value: "histogram", label: "Histogram"},
       //  {value: "quantile", label: "Quantile"},
-      {value: "count", label: "Count"}
+      {value: "count", label: "Count"},
+      {value: "variance", label: "Variance"}
     ],
     allowedVariableTypes: {
       "Mean": ["Integer", "Float"],
       "Count": ["Integer", "Float", "Categorical", "Boolean"],
+      "Variance": ["Integer", "Float"],
       "Histogram": ["Categorical", "Integer"],
       "Quantile": ["Integer", "Float"] // not yet available
     },
