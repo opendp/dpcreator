@@ -147,21 +147,15 @@ export default {
           password1: this.password,
           password2: this.confirmPassword,
           email: this.email,
+          handoffId: this.handoffId
         }
         this.$store.dispatch('signup/createAccount', inputs)
             .then((resp) => {
               console.log("returned from create acount, resp: " + JSON.stringify(resp))
               const openDPUserId = resp.data[0]
               if (this.handoffId) {
-                this.$store.dispatch('dataverse/updateDataverseUser', openDPUserId, this.handoffId)
-                    .then((dvUserObjectId) => {
-                      this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
-                          .catch(({data}) => console.log("update file info error: " + data))
-                    })
-                    .catch((data) => {
-                      console.log("update dataverse user error " + data)
-                      this.errorMessage = data
-                    });
+                  this.$store.dispatch('dataverse/updateFileInfo', openDPUserId, this.handoffId)
+                      .catch(({data}) => console.log("update file info error: " + data))
               }
               this.$router.push(`${NETWORK_CONSTANTS.SIGN_UP.PATH}/confirmation`);
             }).catch((error) => {

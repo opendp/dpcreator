@@ -27,9 +27,9 @@ export default {
       },
   },
   actions: {
-    createAccount({ commit,state }, { username, password1, password2, email }) {
+    createAccount({ commit,state }, { username, password1, password2, email, handoffId }) {
       commit(REGISTRATION_BEGIN);
-      return auth.createAccount(username, password1, password2, email)
+      return auth.createAccount(username, password1, password2, email, handoffId)
           .then((data) => {
             commit(REGISTRATION_SUCCESS)
             return Promise.resolve(data)

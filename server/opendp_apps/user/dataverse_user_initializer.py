@@ -10,7 +10,9 @@ from json import JSONDecodeError
 from requests.exceptions import InvalidSchema
 from rest_framework import status as http_status
 
+from opendp_apps.model_helpers.basic_response import BasicResponse, ok_resp, err_resp
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
+
 from opendp_apps.user.models import OpenDPUser, DataverseUser
 
 from opendp_apps.dataverses.models import DataverseHandoff
@@ -36,7 +38,45 @@ class DataverseUserInitializer(BasicErrCheck):
         # http response code
         self.http_resp_code = None
 
-        self.run_initializer_steps()
+
+    @staticmethod
+    def create_update_dv_user_workflow(opendp_user: OpenDPUser, dv_handoff_id: str):
+        """
+        Used when creating an OpenDP User, also create/update a DataverseUser
+        returns the DataverseUserInitializer object
+        """
+        util = DataverseUserInitializer(opendp_user, dv_handoff_id)
+        util.run_dv_user_steps()
+
+        return util
+        #if util.has_error():
+        #    return err_resp(util.get_err_msg())
+
+        #return ok_resp(util)
+
+    def run_dv_user_steps(self):
+        """
+        Using an OpenDPUser and DataverseHandoff, create/update a DataverseUser object
+        """
+        if self.has_error():
+            return
+
+        # Retrieve the DataverseHandoff object
+        #
+        print('>> DataverseUserInitializer 1')
+        if not self.retrieve_handoff_obj():
+            return
+
+        # Create or update the Dataverse user
+        #
+        print('>> DataverseUserInitializer 2')
+        if not self.init_update_dv_user():
+            return
+
+        # Retrieve the latest Dataverse user info from Dataverse
+        print('>> DataverseUserInitializer 3')
+        if not self.retrieve_latest_dv_user_info():
+            return
 
     def run_initializer_steps(self):
         """Run through the initializer steps which include:
@@ -69,7 +109,9 @@ class DataverseUserInitializer(BasicErrCheck):
             return
 
         print('>> DataverseUserInitializer 5')
-
+        print('-' * 40)
+        print('>> DataverseUserInitializer 5 -- it worked!')
+        print('-' * 40)
 
     def retrieve_handoff_obj(self) -> bool:
         """Retrieve the DataverseHandoff object"""

@@ -154,14 +154,11 @@ export default {
       this.$store.dispatch('auth/fetchUser')
           .then((data) => {
             if (this.handoffId) {
-              this.$store.dispatch('dataverse/updateDataverseUser', this.user.objectId, this.handoffId)
-                  .then((dvUserObjectId) => {
-                    this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)
-                        .catch(({data}) => this.errorMessage = data)
-                        .then(() => {
-                          this.routeToNextPage(NETWORK_CONSTANTS.WELCOME.PATH)
-                        })
-                  })
+               this.$store.dispatch('dataverse/updateFileInfo', this.user.objectId, this.handoffId)
+                    .catch(({data}) => this.errorMessage = data)
+                    .then(() => {
+                      this.routeToNextPage(NETWORK_CONSTANTS.WELCOME.PATH)
+                    })
             } else {
               this.routeToNextPage(NETWORK_CONSTANTS.MY_DATA.PATH)
             }
@@ -179,6 +176,7 @@ export default {
     inputs: {
       username: '',
       password: '',
+      handoffId: this.handoffId
     },
     emailRules: [
       v => !!v || "E-mail is required",

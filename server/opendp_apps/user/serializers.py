@@ -21,7 +21,7 @@ class SessionSerializer(serializers.HyperlinkedModelSerializer):
 
 class OpenDPUserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = settings.AUTH_USER_MODEL
+        model = OpenDPUser
         fields = ['url', 'username', 'email', 'groups', 'object_id']
 
 
@@ -38,15 +38,14 @@ class CustomLoginSerializer(LoginSerializer):
 
     Orig LoginSerializer: https://github.com/iMerica/dj-rest-auth/blob/master/dj_rest_auth/serializers.py
     """
-    handoff_id = serializers.UUIDField(required=False)
+    handoffId = serializers.UUIDField(required=False)
 
-    def validate_handoff_id(self, value):
+    def validate_handoffId(self, value):
         """
-        Validate that the handoffId has an existing DataverseHandoff object
+        The handoffId may be None or an existing DataverseHandoff object
         """
-        print('CustomRegisterSerializer.validate_handoff_id')
         if not value:
-            return value
+            return None
 
         try:
             DataverseHandoff.objects.get(object_id=value)
@@ -65,43 +64,46 @@ class CustomLoginSerializer(LoginSerializer):
 
 class CustomRegisterSerializer(RegisterSerializer):
     """
-    Add the "handoff_id". As well as creating an OpenDP User, also
-    create/update related objects: DataverseUser and DataverseFileInfo
+    Create an OpenDP User (which happens w/o customization)
+    Add the "handoffId". If a "handoffId" is included, also create a DataverseUser
+
+    Orig RegisterSerializer: https://github.com/iMerica/dj-rest-auth/blob/master/dj_rest_auth/registration/serializers.py#L194
     """
     objectId = serializers.models.UUIDField
-    handoff_id = serializers.models.UUIDField
+    handoffId = serializers.UUIDField(required=False)
+
+    def validate_handoffId(self, value):
+        """
+        The handoffId may be None or an existing DataverseHandoff object
+        """
+        if not value:
+            return None
+
+        try:
+            DataverseHandoff.objects.get(object_id=value)
+        except DataverseHandoff.DoesNotExist:
+            raise serializers.ValidationError("DataverseHandoff does not exist")
+
+        return value
 
     # Define transaction.atomic to rollback the save operation in case of error
     @transaction.atomic
     def save(self, request):
-        print('CustomRegisterSerializer.save 1')
-        """Override the save method"""
+        """
+        Override the save method.
+        If a handoffId is included, then create/update a related DataverseUser object
+        """
         user = super().save(request)
-
-        user.objectId = self.data.get('objectId')
+        # user.objectId = self.data.get('objectId')
         user.save()
 
-        print('CustomRegisterSerializer.save 2')
-
-        # As part of a longer workflow, create or update the
-        #   DataverseUser as well as DataverseFileInfo
+        # If a handoffId is included, then create a related DataverseUser object
         #
-        handoff_id = self.data.get('handoff_id')
+        handoff_id = self.data.get('handoffId')
+        if handoff_id:
+            util = DataverseUserInitializer.create_update_dv_user_workflow(user, handoff_id)
+            if util.has_error():
+                raise serializers.ValidationError(detail=util.get_err_msg())
 
-        # next line for testing until UI is updated
-        if handoff_id is None:
-            handoff_id = DataverseHandoff.objects.all()[0].object_id
-
-        # !! Future note: If there is no handoff_id, then simply return the user
-        #  e.g. It's not a Dataverse case.
-
-
-        util = DataverseUserInitializer(user, handoff_id)
-        if util.has_error():
-            print('CustomRegisterSerializer.save 2a')
-            print('util.get_err_msg()', util.get_err_msg())
-            raise serializers.ValidationError(detail=util.get_err_msg())
-
-        print('CustomRegisterSerializer save 3')
         return user
 
