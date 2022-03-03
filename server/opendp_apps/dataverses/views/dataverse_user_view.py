@@ -27,7 +27,7 @@ class DataverseUserView(BaseModelViewSet):
         # ----------------------------------
         # Validate the input
         # ----------------------------------
-        # print(f"data: {request.data}")
+        print(f"DataverseUserView 1 data: {request.data}")
         request_data = request.data.copy()
 
         user_id = request.data.get('user')
@@ -37,13 +37,17 @@ class DataverseUserView(BaseModelViewSet):
         request_data['user'] = user_id
 
         handoff_obj = get_object_or_error_response(DataverseHandoff, object_id=handoff_id)
+        print(f"DataverseUserView 2")
 
         try:
+            print(f"DataverseUserView 3")
+
             dataverse_user = DataverseUser.objects.get(user__object_id=user_id,
                                                        dv_installation=handoff_obj.dv_installation)
             opendp_user = dataverse_user.user
 
         except DataverseUser.DoesNotExist:
+            print(f"DataverseUserView 3a")
             # ----------------------------------
             # Create the DataverseUser object
             # ----------------------------------
@@ -62,6 +66,7 @@ class DataverseUserView(BaseModelViewSet):
 
             opendp_user = dataverse_user_serializer.validated_data.get('user')
 
+        print(f"DataverseUserView 4")
 
         # ----------------------------------
         # Call the Dataverse API
@@ -71,6 +76,8 @@ class DataverseUserView(BaseModelViewSet):
         api_general_token = dataverse_user.dv_general_token
 
         dataverse_client = DataverseClient(site_url, api_general_token)
+        print(f"DataverseUserView 5")
+
         try:
             dataverse_response = dataverse_client.get_user_info(user_api_token=api_general_token)
         except InvalidSchema:
@@ -81,13 +88,19 @@ class DataverseUserView(BaseModelViewSet):
         if dataverse_response.success is not True:
             return Response(get_json_error(dataverse_response.message), status=status.HTTP_400_BAD_REQUEST)
 
+        print(f"DataverseUserView 6")
+
         try:
+            print(f"DataverseUserView 7")
             handler = DataverseUserHandler(opendp_user.id, site_url,
                                            api_general_token,
                                            dataverse_response.__dict__)
             update_response = handler.update_dataverse_user()
         except DataverseResponseError as ex:
+            print(f"DataverseUserView 7a")
             return Response(get_json_error(f'Error {ex}'), status=status.HTTP_400_BAD_REQUEST)
+
+        print(f"DataverseUserView 8")
 
         return Response(get_json_success('success', data={'dv_user': dataverse_user.object_id}),
                         status=status.HTTP_201_CREATED)
