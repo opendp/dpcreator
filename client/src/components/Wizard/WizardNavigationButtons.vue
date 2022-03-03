@@ -38,6 +38,18 @@
           :click="() => $root.$emit('areStatisticsSubmitted')"
           label="Submit Statistics"
       />
+      <p></p>
+      <Button v-if="stepperPosition > 0"
+              data-test="wizardContinueButton"
+              classes="d-block"
+              :class="{
+          'mx-auto': $vuetify.breakpoint.mdAndUp
+        }"
+              color="primary"
+              :click="handleBack"
+              label="Go Back"
+
+      />
     </div>
     <div
         class="mt-3"
