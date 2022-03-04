@@ -38,7 +38,7 @@ class CustomLoginSerializer(LoginSerializer):
 
     Orig LoginSerializer: https://github.com/iMerica/dj-rest-auth/blob/master/dj_rest_auth/serializers.py
     """
-    handoffId = serializers.UUIDField(required=False)
+    handoffId = serializers.UUIDField(required=False, allow_null=True)
 
     def validate_handoffId(self, handoff_id):
         """

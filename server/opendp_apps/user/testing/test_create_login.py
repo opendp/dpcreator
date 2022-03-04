@@ -1,3 +1,9 @@
+"""
+For more context regarding these tests, please see the document:
+- /server/opendp_apps/user/README.md
+
+
+"""
 from unittest import skip
 
 import requests_mock
@@ -40,6 +46,13 @@ class TestDataverseHandoffView(TestCase):
                             "email":"some_email@harvard-edu.com",
                             "handoffId":"7db30776-cd08-4b25-af4d-b5a42a84e3d9",
                            }
+
+        self.login_url = '/rest-auth/login/'
+
+        self.login_data = dict(username=self.signup_data['username'],
+                               password=self.signup_data['password1'],
+                               handoffId=self.signup_data['handoffId'])
+
         # self.user_obj, _created = get_user_model().objects.get_or_create(username='dv_depositor')
 
         # self.client.force_login(self.user_obj)
@@ -80,6 +93,20 @@ class TestDataverseHandoffView(TestCase):
         req_mocker.get('http://www.invalidsite.com/api/v1/users/:me')
 
         req_mocker.get('https://dataverse.harvard.edu/api/v1/users/:me', json=user_info)
+
+    def setup_register_user(self, handoff_id=None):
+        """Register user as a setup"""
+        self.signup_data["handoffId"] = handoff_id
+
+        response = self.client.post(self.registration_url,
+                                    data=self.signup_data,
+                                    format='json')
+
+        self.assertEqual(response.status_code, http_status.HTTP_201_CREATED)
+
+        resp_json = response.json()
+        self.assertTrue('key' in resp_json)
+
 
     def test_10_register_handoff_is_none(self, req_mocker):
         """(10) Register w/ handoff id set to None"""
@@ -208,6 +235,66 @@ class TestDataverseHandoffView(TestCase):
         self.assertEqual(resp_json['handoffId'][0], 'DataverseHandoff does not exist')
 
         self.assertEqual(DataverseUser.objects.count(), 0)
+
+    def test_50_login_no_handoff(self, req_mocker):
+        """(50) Login w/o a handoff id"""
+        msgt(self.test_50_login_no_handoff.__doc__)
+
+        self.setup_register_user(handoff_id=None)  # Create an OpenDPUser, without a DataversUser
+
+        self.login_data["handoffId"] = None
+
+        resp = self.client.post(self.login_url,
+                                    data=self.login_data,
+                                    format='json')
+
+        print('resp.status_code', resp.status_code)
+        print('resp.content', resp.content)
+        self.assertEqual(resp.status_code, http_status.HTTP_200_OK)
+        return
+
+        resp_json = response.json()
+        self.assertTrue('key' in resp_json)
+        response = self.client.post(self.registration_url,
+                                    data=self.signup_data,
+                                    format='json')
+
+        self.assertEqual(response.status_code, http_status.HTTP_201_CREATED)
+
+        resp_json = response.json()
+        self.assertTrue('key' in resp_json)
+
+        # ref: https://github.com/encode/django-rest-framework/blob/master/rest_framework/authtoken/models.py#L43
+        token_proxy = TokenProxy.objects.get(key=resp_json.get('key'))
+
+        self.assertEqual(token_proxy.user.username, self.signup_data['username'])
+        self.assertEqual(token_proxy.user.email, self.signup_data['email'])
+
+        # No associated DataverseUser objects
+        self.assertEqual(DataverseUser.objects.filter(user=token_proxy.user).count(), 0)
+
+        # Try to register again with the same username, email
+        #
+        fail_resp = self.client.post(self.registration_url,
+                                    data=self.signup_data,
+                                    format='json')
+        # print(fail_resp.status_code)
+        # print(fail_resp.content)
+
+        self.assertEqual(fail_resp.status_code, http_status.HTTP_400_BAD_REQUEST)
+        resp_json2 = fail_resp.json()
+        # Expected JSON response:
+        #   {"username":["A user with that username already exists."],
+        #    "email":["A user is already registered with this e-mail address."]}
+
+        self.assertTrue('username' in resp_json2)
+        self.assertTrue('email' in resp_json2)
+
+        username_msg = 'A user with that username already exists.'
+        self.assertEqual(resp_json2['username'][0], username_msg)
+
+        email_msg = 'A user is already registered with this e-mail address.'
+        self.assertEqual(resp_json2['email'][0], email_msg)
 
 
     @skip
