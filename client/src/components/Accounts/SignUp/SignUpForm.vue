@@ -149,9 +149,11 @@ export default {
           email: this.email,
           handoffId: this.handoffId
         }
+        console.log("SignUpForm.vue inputs: " + JSON.stringify(inputs))
+
         this.$store.dispatch('signup/createAccount', inputs)
             .then((resp) => {
-              console.log("returned from create acount, resp: " + JSON.stringify(resp))
+              console.log("returned from create account, resp: " + JSON.stringify(resp))
               const openDPUserId = resp.data[0]
               if (this.handoffId) {
                   this.$store.dispatch('dataverse/updateFileInfo', openDPUserId, this.handoffId)

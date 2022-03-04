@@ -112,8 +112,13 @@ export default {
   },
   methods: {
     handleLogin: function () {
+      // Format loginParams, including the handoffId (which can be null)
+      let loginParams = Object.assign({}, this.inputs);
+      loginParams.handoffId = this.handoffId
+
+      console.log('Login.vue; loginParams: ' + JSON.stringify(loginParams))
       this.errorMessage = null;
-      this.$store.dispatch('auth/login', this.inputs)
+      this.$store.dispatch('auth/login', loginParams)
           .then(() => {
             this.processLogin();
           })
@@ -176,7 +181,7 @@ export default {
     inputs: {
       username: '',
       password: '',
-      handoffId: this.handoffId
+      //handoffId: this.handoffId,
     },
     emailRules: [
       v => !!v || "E-mail is required",

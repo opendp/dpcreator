@@ -40,27 +40,36 @@ class CustomLoginSerializer(LoginSerializer):
     """
     handoffId = serializers.UUIDField(required=False)
 
-    def validate_handoffId(self, value):
+    def validate_handoffId(self, handoff_id):
         """
         The handoffId may be None or an existing DataverseHandoff object
         """
-        if not value:
+        print('CustomLoginSerializer.validate_handoffId:', handoff_id)
+        if not handoff_id:
             return None
 
         try:
-            DataverseHandoff.objects.get(object_id=value)
+            DataverseHandoff.objects.get(object_id=handoff_id)
         except DataverseHandoff.DoesNotExist:
             raise serializers.ValidationError("DataverseHandoff does not exist")
 
-        return value
+        return handoff_id
 
     def authenticate(self, **kwargs):
         """Override authenticate method"""
-        print('authenticate kwargs:', kwargs)
-        return super().authenticate(**kwargs)
+        print('CustomLoginSerializer.authenticate self.initial_data:', self.initial_data)
+        user = super().authenticate(**kwargs)
+        print('response', user, type(user))
 
-        #return authenticate(self.context['request'], **kwargs)
+        handoff_id = self.initial_data.get('handoffId')
+        print('CustomLoginSerializer.authenticate handoff_id', handoff_id)
+        if handoff_id:
+            util = DataverseUserInitializer.create_update_dv_user_workflow(user, handoff_id)
+            if util.has_error():
+                print('CustomLoginSerializer.authenticate; util.get_err_msg', util.get_err_msg())
+                pass
 
+        return user
 
 class CustomRegisterSerializer(RegisterSerializer):
     """
@@ -69,22 +78,22 @@ class CustomRegisterSerializer(RegisterSerializer):
 
     Orig RegisterSerializer: https://github.com/iMerica/dj-rest-auth/blob/master/dj_rest_auth/registration/serializers.py#L194
     """
-    objectId = serializers.models.UUIDField
-    handoffId = serializers.UUIDField(required=False)
+    handoffId = serializers.UUIDField(required=False, allow_null=True)
 
-    def validate_handoffId(self, value):
+    def validate_handoffId(self, handoff_id):
         """
         The handoffId may be None or an existing DataverseHandoff object
         """
-        if not value:
+        print('CustomRegisterSerializer.validate_handoffId', handoff_id)
+        if not handoff_id:
             return None
 
         try:
-            DataverseHandoff.objects.get(object_id=value)
+            DataverseHandoff.objects.get(object_id=handoff_id)
         except DataverseHandoff.DoesNotExist:
             raise serializers.ValidationError("DataverseHandoff does not exist")
 
-        return value
+        return handoff_id
 
     # Define transaction.atomic to rollback the save operation in case of error
     @transaction.atomic
@@ -93,8 +102,9 @@ class CustomRegisterSerializer(RegisterSerializer):
         Override the save method.
         If a handoffId is included, then create/update a related DataverseUser object
         """
+        print('CustomRegisterSerializer.save self.data', self.data)
+
         user = super().save(request)
-        # user.objectId = self.data.get('objectId')
         user.save()
 
         # If a handoffId is included, then create a related DataverseUser object
