@@ -1,8 +1,8 @@
 import {session, wrappedSession} from './session';
 
-const camelcaseKeys = require('camelcase-keys');
-const snakecaseKeys = require('snakecase-keys');
 
+const camelcaseKeys = require('camelcase-keys');
+import caseConversion from "@/shared/caseConversion";
 
 export default {
 
@@ -13,7 +13,7 @@ export default {
      * @returns {Promise<AxiosResponse<any>>} the updated object
      */
     patchDepositorSetup(objectId, props) {
-        const snakeProps = snakecaseKeys(props, {deep: true})
+        const snakeProps = caseConversion.customSnakecaseKeys(props)
         return wrappedSession.patch('/api/deposit/' + objectId + '/',
             snakeProps).then(resp => camelcaseKeys(resp.data, {deep: true}))
 
@@ -28,7 +28,7 @@ export default {
             .then(resp => camelcaseKeys(resp.data, {deep: true}))
     },
     patchAnalysisPlan(objectId, props) {
-        const snakeProps = snakecaseKeys(props, {deep: true})
+        const snakeProps = caseConversion.customSnakecaseKeys(props)
         return wrappedSession.patch('/api/analyze/' + objectId + '/',
             snakeProps)
     },
