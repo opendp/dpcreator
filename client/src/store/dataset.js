@@ -1,7 +1,7 @@
 import dataset from "@/api/dataset";
 import analysis from "@/api/analysis";
 const camelcaseKeys = require('camelcase-keys');
-
+import {snakeCase} from "snake-case";
 import {
     SET_DATASET_LIST,
     SET_DATASET_INFO,

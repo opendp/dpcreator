@@ -321,7 +321,7 @@ export default {
     getConfidenceLevel(item) {
       return 'There is a probability of ' + (Number(item.confidenceLevel) * 100) +
           '% that the DP ' + item.statistic + ' will differ from the true ' +
-          item.statistic + ' by at most ' + item.accuracy.value + ' units. '
+          item.statistic + ' by at most ' + (Number(item.accuracy.value)).toPrecision(2) + ' units. '
 
     },
     getDetailText(label, value) {
