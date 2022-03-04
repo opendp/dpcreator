@@ -49,7 +49,7 @@ class CustomLoginSerializer(LoginSerializer):
             return None
 
         try:
-            DataverseHandoff.objects.get(object_id=handoff_id)
+            _dv_handoff = DataverseHandoff.objects.get(object_id=handoff_id)
         except DataverseHandoff.DoesNotExist:
             raise serializers.ValidationError("DataverseHandoff does not exist")
 
@@ -60,7 +60,9 @@ class CustomLoginSerializer(LoginSerializer):
         print('CustomLoginSerializer.authenticate self.initial_data:', self.initial_data)
         user = super().authenticate(**kwargs)
         print('response', user, type(user))
+        return user
 
+        """
         # If there's a handoffId, attempt to create/update the DataverseUser
         #
         handoff_id = self.initial_data.get('handoffId')
@@ -68,9 +70,11 @@ class CustomLoginSerializer(LoginSerializer):
         if handoff_id:
             util = DataverseUserInitializer.create_update_dv_user_workflow(user, handoff_id)
             if util.has_error():
+                # Delete the DataverseHandoff object and continue on!
+                DataverseHandoff.delete_handoff(handoff_id)
                 print('CustomLoginSerializer.authenticate; util.get_err_msg', util.get_err_msg())
                 pass
-
+        """
         return user
 
 class CustomRegisterSerializer(RegisterSerializer):
@@ -91,7 +95,7 @@ class CustomRegisterSerializer(RegisterSerializer):
             return None
 
         try:
-            DataverseHandoff.objects.get(object_id=handoff_id)
+            _dv_handoff = DataverseHandoff.objects.get(object_id=handoff_id)
         except DataverseHandoff.DoesNotExist:
             raise serializers.ValidationError("DataverseHandoff does not exist")
 
@@ -115,7 +119,16 @@ class CustomRegisterSerializer(RegisterSerializer):
         if handoff_id:
             util = DataverseUserInitializer.create_update_dv_user_workflow(user, handoff_id)
             if util.has_error():
-                raise serializers.ValidationError(detail=util.get_err_msg())
+                # Delete the DataverseHandoff object
+                DataverseHandoff.delete_handoff(handoff_id)
 
+                # Raise an error
+                raise serializers.ValidationError(detail=util.get_err_msg())
+            else:
+                # The DataverseUser has been successfully created:
+                #  - Save a temp reference to the DataverseHandoff for
+                #    when the OpenDPUser logs in
+                user.handoff_id = handoff_id
+                user.save()
         return user
 
