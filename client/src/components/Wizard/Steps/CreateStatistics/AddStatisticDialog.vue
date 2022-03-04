@@ -53,7 +53,7 @@
                 v-for="(variable, index) in variables"
                 :key="variable + index"
                 :label="variable['label']"
-                :value="variable['label']"
+                :value="variable['key']"
                 :data-test="variable['label']"
                 on-icon="mdi-check"
             ></v-radio>
@@ -216,12 +216,14 @@ export default {
       return count
     },
     isButtonDisabled: function () {
-      const returnVal = (
-          !this.editedItemDialog.statistic ||
-          !this.editedItemDialog.variable ||
-          !this.editedItemDialog.missingValuesHandling
-      );
-      return returnVal
+      let disabled = false
+      if (this.editedItemDialog.statistic == ""
+          || this.editedItemDialog.variable == ""
+          || this.editedItemDialog.variable == undefined
+          || this.editedItemDialog.fixedValue == "") {
+        disabled = true
+      }
+      return disabled
     },
     isMultiple: function () {
       return this.editedIndex === -1;
@@ -258,11 +260,13 @@ export default {
       {value: "mean", label: "Mean"},
       {value: "histogram", label: "Histogram"},
       //  {value: "quantile", label: "Quantile"},
-      {value: "count", label: "Count"}
+      {value: "count", label: "Count"},
+      {value: "variance", label: "Variance"}
     ],
     allowedVariableTypes: {
       "Mean": ["Integer", "Float"],
       "Count": ["Integer", "Float", "Categorical", "Boolean"],
+      "Variance": ["Integer", "Float"],
       "Histogram": ["Categorical", "Integer"],
       "Quantile": ["Integer", "Float"] // not yet available
     },
@@ -381,6 +385,7 @@ export default {
       }
     },
     updateSelectedStatistic(statistic) {
+      console.log('update selected statistic: ' + JSON.stringify(statistic))
       this.selectedStatistic = statistic
     },
     updateFixedInputVisibility(handlingOption) {
