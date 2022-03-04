@@ -42,13 +42,11 @@ class TestDataverseHandoffView(TestCase):
                             "email":"some_email@harvard-edu.com",
                             "handoffId":"7db30776-cd08-4b25-af4d-b5a42a84e3d9",
                            }
-        return
+        # self.user_obj, _created = get_user_model().objects.get_or_create(username='dv_depositor')
 
-        self.user_obj, _created = get_user_model().objects.get_or_create(username='dv_depositor')
-
-        self.client.force_login(self.user_obj)
+        # self.client.force_login(self.user_obj)
         self.mock_params = ManifestTestParams.objects.filter(use_mock_dv_api=True).first()
-
+        return
         self.data = {
             # 'dv_installation': 'https://dataverse.harvard.edu',
             'user': '4472310a-f591-403a-b8d6-dfb562f8b32f',
@@ -68,7 +66,7 @@ class TestDataverseHandoffView(TestCase):
         """
         Set up test urls that are used by the requests library
         """
-        return
+        #return
         # Server Info
         server_info = {dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_OK,
                        'data': {'message': 'dataverse.MOCK-SERVER.edu'}}
@@ -83,7 +81,7 @@ class TestDataverseHandoffView(TestCase):
         req_mocker.get('www.invalidsite.com/api/v1/users/:me')
         req_mocker.get('http://www.invalidsite.com/api/v1/users/:me')
 
-        req_mocker.get('https://dataverse.harvard.edu/api/v1/users/:me')
+        req_mocker.get('https://dataverse.harvard.edu/api/v1/users/:me', json=user_info)
 
     def test_10_register_handoff_is_none(self, req_mocker):
         """(10) Register w/ handoff id set to None"""
@@ -105,6 +103,9 @@ class TestDataverseHandoffView(TestCase):
 
         self.assertEqual(token_proxy.user.username, self.signup_data['username'])
         self.assertEqual(token_proxy.user.email, self.signup_data['email'])
+
+        # No associated DataverseUser objects
+        self.assertEqual(DataverseUser.objects.filter(user=token_proxy.user).count(), 0)
 
         # Try to register again with the same username, email
         #
@@ -129,8 +130,6 @@ class TestDataverseHandoffView(TestCase):
         email_msg = 'A user is already registered with this e-mail address.'
         self.assertEqual(resp_json2['email'][0], email_msg)
 
-
-    @skip
     def test_20_register_no_handoff(self, req_mocker):
         """(20) Register w/o a handoff id"""
         msgt(self.test_20_register_no_handoff.__doc__)
@@ -151,6 +150,67 @@ class TestDataverseHandoffView(TestCase):
 
         self.assertEqual(token_proxy.user.username, self.signup_data['username'])
         self.assertEqual(token_proxy.user.email, self.signup_data['email'])
+
+        # No associated DataverseUser objects
+        self.assertEqual(DataverseUser.objects.filter(user=token_proxy.user).count(), 0)
+
+    def test_30_register_with_handoff(self, req_mocker):
+        """(30) Register w/ a handoff id"""
+        msgt(self.test_30_register_with_handoff.__doc__)
+
+        # set the mock requests
+        self.set_mock_requests(req_mocker)
+
+        response = self.client.post(self.registration_url,
+                                    data=self.signup_data,
+                                    format='json')
+
+        self.assertEqual(response.status_code, http_status.HTTP_201_CREATED)
+
+        resp_json = response.json()
+        print(resp_json)
+        self.assertTrue('key' in resp_json)
+
+        # ref: https://github.com/encode/django-rest-framework/blob/master/rest_framework/authtoken/models.py#L43
+        token_proxy = TokenProxy.objects.get(key=resp_json.get('key'))
+
+        self.assertEqual(token_proxy.user.username, self.signup_data['username'])
+        self.assertEqual(token_proxy.user.email, self.signup_data['email'])
+
+        # One associated DataverseUser objects
+        self.assertEqual(DataverseUser.objects.filter(user=token_proxy.user).count(), 1)
+
+        # test params in test_manifest_params_04.json
+        dv_user = DataverseUser.objects.get(user=token_proxy.user, email='mock_user@some.edu')
+        self.assertIsNotNone(dv_user)
+        self.assertEqual(dv_user.persistent_id, 'https://fed.some-it.some.edu/idp/shibboleth|92459eabc12ec34@some.edu')
+
+    def test_40_register_bad_handoff(self, req_mocker):
+        """(40) Register w/ a bad handoff id"""
+        msgt(self.test_40_register_bad_handoff.__doc__)
+
+        # set the mock requests
+        self.set_mock_requests(req_mocker)
+
+        # handoff id w/ no corresponding object
+        self.signup_data["handoffId"] = 'f776261c-0443-4d0d-98aa-f089e7728dc2'
+
+        response = self.client.post(self.registration_url,
+                                    data=self.signup_data,
+                                    format='json')
+
+        self.assertEqual(response.status_code, http_status.HTTP_400_BAD_REQUEST)
+
+        resp_json = response.json()
+        # expected response: {'handoffId': ['DataverseHandoff does not exist']}
+        # print(resp_json)
+
+        self.assertTrue('handoffId' in resp_json)
+        self.assertTrue(len(resp_json['handoffId']), 1)
+        self.assertEqual(resp_json['handoffId'][0], 'DataverseHandoff does not exist')
+
+        self.assertEqual(DataverseUser.objects.count(), 0)
+
 
     @skip
     def test_20_blank_data_for_creation(self, req_mocker):
