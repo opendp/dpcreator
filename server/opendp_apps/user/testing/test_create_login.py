@@ -1,10 +1,8 @@
 from unittest import skip
-import uuid
 
 import requests_mock
 
 from django.test import TestCase, override_settings
-from django.contrib.auth import get_user_model
 
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient

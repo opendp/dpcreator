@@ -61,6 +61,8 @@ class CustomLoginSerializer(LoginSerializer):
         user = super().authenticate(**kwargs)
         print('response', user, type(user))
 
+        # If there's a handoffId, attempt to create/update the DataverseUser
+        #
         handoff_id = self.initial_data.get('handoffId')
         print('CustomLoginSerializer.authenticate handoff_id', handoff_id)
         if handoff_id:
