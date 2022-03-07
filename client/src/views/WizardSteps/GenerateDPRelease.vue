@@ -67,8 +67,7 @@
             (An email has also been sent with a link to the release.)
           </p>
           <p v-else>
-            <strong>You will receive an email </strong>to confirm the submission
-            and another one <strong>when the release is ready </strong>
+            You will receive an email <strong>when the release is ready </strong>.
           </p>
           <p>
             Your statistics are now on
