@@ -153,7 +153,6 @@ export default {
 
         this.$store.dispatch('signup/createAccount', inputs)
             .then((resp) => {
-              console.log("returned from create account, resp: " + JSON.stringify(resp))
               const openDPUserId = resp.data[0]
               if (this.handoffId) {
                   this.$store.dispatch('dataverse/updateFileInfo', openDPUserId, this.handoffId)
@@ -182,6 +181,7 @@ export default {
       if (this.handoffId) {
         this.$store.dispatch('auth/fetchUser')
             .then((data) => {
+              console.log("processLogin: fetchUser data " + JSON.stringify(data))
               this.$store.dispatch('dataverse/updateDataverseUser', this.user.objectId, this.handoffId)
                   .then((dvUserObjectId) => {
                     this.$store.dispatch('dataverse/updateFileInfo', dvUserObjectId, this.handoffId)

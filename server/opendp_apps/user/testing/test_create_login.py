@@ -38,7 +38,11 @@ class TestDataverseHandoffView(TestCase):
 
         self.registration_url = '/rest-auth/registration/'
 
+        # connected to a DataverseHandoff object in the fixtures
         self.test_handoff_id = "7db30776-cd08-4b25-af4d-b5a42a84e3d9"
+
+        # Not connected to a DataverseHandoff object
+        self.bad_handoff_id = 'f776261c-0443-4d0d-98aa-f089e7728dc2'
 
         self.signup_data = {"username": "a_user_name",
                             "password1": "Heyhey-20",
@@ -50,6 +54,8 @@ class TestDataverseHandoffView(TestCase):
 
         self.login_data = dict(username=self.signup_data['username'],
                                password=self.signup_data['password1'])
+
+        self.dv_user_url = reverse('dv-user-list')  # '/api/dv-user/'
 
         # self.user_obj, _created = get_user_model().objects.get_or_create(username='dv_depositor')
 
@@ -209,7 +215,7 @@ class TestDataverseHandoffView(TestCase):
         self.set_mock_requests(req_mocker)
 
         # handoff id w/ no corresponding object
-        self.signup_data["handoffId"] = 'f776261c-0443-4d0d-98aa-f089e7728dc2'
+        self.signup_data["handoffId"] = self.bad_handoff_id
 
         response = self.client.post(self.registration_url,
                                     data=self.signup_data,
@@ -286,3 +292,83 @@ class TestDataverseHandoffView(TestCase):
         # The logged in OpenDPUser and DataverseUser.user should be the same
         self.assertEqual(dv_user.user, token_proxy.user)
 
+    def test_70_create_dv_user_post_registration(self, req_mocker):
+        """(70) Rough imitation to the sequence for Social Auth login
+        - Register a new OpenDPUser  (would be through Social Auth, OAuth)
+        - Via the '/api/dv-user' endpoint, use the OpenDPUser id and handoff_id to create a DataverseUser
+        - Use the same endpoint which should update the DV user (if needed) by making a call to the Dataverse API
+        """
+        msgt(self.test_70_create_dv_user_post_registration.__doc__)
+
+        self.set_mock_requests(req_mocker)
+
+        # Register a new user
+        #
+        reg_opendp_user = self.setup_register_user(handoff_id=None)
+        self.assertEqual(str(reg_opendp_user.username), self.signup_data['username'])
+
+
+        dv_user_data = dict(user=reg_opendp_user.object_id,
+                            dv_handoff=self.test_handoff_id)
+
+        print('dv_user_data', dv_user_data)
+        resp = self.client.post(self.dv_user_url,
+                                data=dv_user_data,
+                                format='json')
+        print('resp.status', resp.status_code)
+        print('resp.content', resp.content)
+
+        # Should be a 201 status code
+        self.assertEqual(resp.status_code, http_status.HTTP_201_CREATED)
+
+        # Example  {"success":true,
+        #           "message":"success",
+        #           "data":{"dv_user":"3807dd12-a2c2-43dc-ba4d-a373bef8760b"}}'
+        #
+        resp_json = resp.json()
+        self.assertTrue(resp_json['success'] is True)
+        self.assertTrue('dv_user' in resp_json['data'])
+        dv_user_object_id = resp_json['data']['dv_user']
+
+        # Make the same API call, it should be a 200, not a 201
+        #
+        resp_update = self.client.post(self.dv_user_url,
+                                data=dv_user_data,
+                                format='json')
+
+        # print('resp_update.status', resp_update.status_code)
+        # print('resp_update.content', resp_update.content)
+        self.assertEqual(resp_update.status_code, http_status.HTTP_200_OK)
+
+        resp_update_json = resp_update.json()
+        self.assertTrue(resp_update_json['success'] is True)
+        self.assertTrue('dv_user' in resp_update_json['data'])
+        self.assertEqual(resp_update_json['data']['dv_user'], dv_user_object_id)
+
+    def test_80_create_dv_user_post_registration_bad_handoff(self, req_mocker):
+        """(80) Rough imitation to the sequence for Social Auth login, but with a bad handoff_id
+        - Register a new OpenDPUser  (would be through Social Auth, OAuth)
+        - Via the '/api/dv-user' endpoint, use the OpenDPUser id and handoff_id to create a DataverseUser
+        - Should fail -- bad handoff id
+        """
+        msgt(self.test_80_create_dv_user_post_registration_bad_handoff.__doc__)
+
+        self.set_mock_requests(req_mocker)
+
+        # Register a new user
+        #
+        reg_opendp_user = self.setup_register_user(handoff_id=None)
+        self.assertEqual(str(reg_opendp_user.username), self.signup_data['username'])
+
+        dv_user_data = dict(user=reg_opendp_user.object_id,
+                            dv_handoff=self.bad_handoff_id)
+
+        resp = self.client.post(self.dv_user_url,
+                                data=dv_user_data,
+                                format='json')
+
+        # print('resp.status', resp.status_code)
+        # print('resp.content', resp.content)
+
+        # Should be a 400 status code
+        self.assertEqual(resp.status_code, http_status.HTTP_400_BAD_REQUEST)

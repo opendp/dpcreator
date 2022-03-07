@@ -119,7 +119,9 @@ export default {
       console.log('Login.vue; loginParams: ' + JSON.stringify(loginParams))
       this.errorMessage = null;
       this.$store.dispatch('auth/login', loginParams)
-          .then(() => {
+          .then((data) => {
+            console.log('Login.vue; handleLogin, login results: ' + JSON.stringify(data))
+
             this.processLogin();
           })
           .catch((data) => {
@@ -158,6 +160,8 @@ export default {
     processLogin() {
       this.$store.dispatch('auth/fetchUser')
           .then((data) => {
+            console.log('Login.vue; processLogin, login results: ' + JSON.stringify(data))
+
             if (this.handoffId) {
                this.$store.dispatch('dataverse/updateFileInfo', this.user.objectId, this.handoffId)
                     .catch(({data}) => this.errorMessage = data)

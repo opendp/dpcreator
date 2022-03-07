@@ -49,10 +49,28 @@ class DataverseUserInitializer(BasicErrCheck):
         util.run_dv_user_steps()
 
         return util
-        #if util.has_error():
-        #    return err_resp(util.get_err_msg())
 
-        #return ok_resp(util)
+    @staticmethod
+    def create_update_dv_user_social_auth(opendp_user_id: str, dv_handoff_id: str):
+        """
+        Used when creating an OpenDP User, also create/update a DataverseUser
+        returns the DataverseUserInitializer object
+        """
+        print('create_update_dv_user_social_auth 1')
+        print('create_update_dv_user_social_auth 2 - opendp_user_id', opendp_user_id)
+        print('create_update_dv_user_social_auth 2 - v', dv_handoff_id)
+        try:
+            opendp_user = OpenDPUser.objects.get(object_id=opendp_user_id)
+        except OpenDPUser.DoesNotExist:
+            return err_resp(f'No OpenDPUser found for id: {opendp_user_id}')
+
+        util = DataverseUserInitializer(opendp_user, dv_handoff_id)
+        util.run_dv_user_steps()
+
+        if util.has_error():
+            return err_resp(util.get_err_msg())
+
+        return ok_resp(util)
 
     def run_dv_user_steps(self):
         """
@@ -137,6 +155,8 @@ class DataverseUserInitializer(BasicErrCheck):
             self.dv_user = DataverseUser.objects.get(user=self.opendp_user,
                                                      dv_installation=self.dv_handoff.dv_installation)
 
+            self.http_resp_code = http_status.HTTP_200_OK
+
         except DataverseUser.DoesNotExist:
 
             # initialize dv_user, don't save it yet
@@ -146,6 +166,7 @@ class DataverseUserInitializer(BasicErrCheck):
                                          last_name=self.opendp_user.last_name,
                                          email=self.opendp_user.email,
                                          )
+            self.http_resp_code = http_status.HTTP_201_CREATED
 
         # Update the dv_user with the latest token from the DataverseHandoff object
         #
