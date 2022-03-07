@@ -10,6 +10,26 @@
             cy.clearData()
 
         })
+        it('Displays correct precision', () => {
+            const mockDVfile = 'EyeDemoMockDV.json'
+            const demoDatafile = 'EyeDemoData.json'
+
+            cy.createMockDataset(mockDVfile)
+            cy.fixture(demoDatafile).then((demoData) => {
+                cy.url().should('contain', 'welcome')
+                cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
+                    demoData['datasetName'])
+                cy.goToConfirmVariables(demoData.variables)
+                // select the variables we will use
+                cy.selectVariable(demoData.variables)
+
+                // Continue to Set Epsilon Step
+                cy.epsilonStep()
+                // Add all the statistics in the Create Statistics Step
+                cy.createStatistics(demoData)
+            })
+        })
+
         it('Goes back to the Confirm Variables Page', () => {
             const mockDVfile = 'EyeDemoMockDV.json'
             const demoDatafile = 'EyeDemoData.json'

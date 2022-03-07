@@ -200,7 +200,7 @@ Cypress.Commands.add('createStatistics', (demoData) => {
         cy.get('[data-test="' + demoStat.statistic + '"]').click({force: true});
         const varDataTest = '[data-test="' + demoVar.name + '"]'
         cy.get(varDataTest).click({force: true})
-        cy.get('[data-test="Fixed value"]').type(demoVar.fixedValue)
+        cy.get('[data-test="Fixed value"]').type(demoStat.fixedValue)
         cy.get('[data-test="Create statistic"]').click({force: true})
 
         // The statistic should have been created
@@ -208,7 +208,7 @@ Cypress.Commands.add('createStatistics', (demoData) => {
         cy.get('tr').first().get('td').should('contain', demoStat.statistic)
         cy.get('table').contains('td', demoStat.statistic).should('be.visible');
         // Statistic should contain correct accuracy value
-        cy.get('table').contains('td', demoVar.accuracy).should('be.visible')
+        cy.get('table').contains('td', demoStat.roundedAccuracy).should('be.visible')
     })
 }),
 
@@ -253,11 +253,10 @@ Cypress.Commands.add('submitStatistics', (demoData) => {
     // The Release Details should be visible
     cy.get('[data-test="status tag"]').should('contain', 'Release Completed')
     demoData.statistics.forEach((demoStat) => {
-        let snippet = 'There is a probability of 95.0%'
-            + ' that the DP ' + demoStat.statistic +
-            ' will differ from the true ' + demoStat.statistic + ' by at most'
-        cy.get('[data-test="statistic description"]').should('contain', snippet)
+        cy.get('[data-test="statistic description"]').should('contain', demoStat.statistic)
+        cy.get('[data-test="statistic description"]').should('contain', demoStat.accuracy)
     })
+
 })
 Cypress.Commands.add('setupStatisticsPage', (datasetFixture, analysisFixture) => {
     cy.fixture(datasetFixture).then(dataset => {

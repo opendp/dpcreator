@@ -59,12 +59,15 @@
         </v-icon
         >
         <v-card-title>
-          <h2 class="title-size-2 mb-5">Statistics are being processed</h2>
+          <h2 v-if="areStatisticsGenerated" class="title-size-2 mb-5">DP Release Complete</h2>
+          <h2 v-else class="title-size-2 mb-5">Statistics are being processed</h2>
         </v-card-title>
         <v-card-text class="text--primary">
-          <p>
-            <strong>You will receive an email </strong>to confirm the submission
-            and another one <strong>when the release is ready </strong>
+          <p v-if="areStatisticsGenerated">
+            (An email has also been sent with a link to the release.)
+          </p>
+          <p v-else>
+            You will receive an email <strong>when the release is ready </strong>.
           </p>
           <p>
             Your statistics are now on
@@ -148,7 +151,6 @@ export default {
     handleFormSubmit: function () {
       if (this.$refs.form.validate()) {
         this.areStatisticsSubmitted = true;
-        //TODO: make call to Release API to submit statistics
         const completedStepProp = {
           userStep: STEP_0900_STATISTICS_SUBMITTED
         }

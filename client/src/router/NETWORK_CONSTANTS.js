@@ -31,6 +31,10 @@ export default {
         PATH: "/sign-up",
         NAME: "SignUp"
     },
+    VERIFY_EMAIL: {
+        PATH: "/verify-email/:key",
+        NAME: "Verify Email"
+    },
     TERMS_AND_CONDITIONS: {
         PATH: "/terms-and-conditions",
         NAME: "TermsAndConditions"
@@ -45,7 +49,11 @@ export default {
     },
     FORGOT_YOUR_PASSWORD: {
         PATH: "/forgot-your-password",
-        NAME: "ForgorYourPassword"
+        NAME: "ForgotYourPassword"
+    },
+    PASSWORD_RESET_CONFIRM: {
+        PATH: "/password-reset-confirm/:uid/:token",
+        NAME: "PasswordResetConfirm"
     },
     MOCK_DV: {
         PATH: "/mock-dv",
