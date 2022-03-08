@@ -56,9 +56,6 @@ class DataverseUserInitializer(BasicErrCheck):
         Used when creating an OpenDP User, also create/update a DataverseUser
         returns the DataverseUserInitializer object
         """
-        print('create_update_dv_user_social_auth 1')
-        print('create_update_dv_user_social_auth 2 - opendp_user_id', opendp_user_id)
-        print('create_update_dv_user_social_auth 2 - v', dv_handoff_id)
         try:
             opendp_user = OpenDPUser.objects.get(object_id=opendp_user_id)
         except OpenDPUser.DoesNotExist:
@@ -66,6 +63,25 @@ class DataverseUserInitializer(BasicErrCheck):
 
         util = DataverseUserInitializer(opendp_user, dv_handoff_id)
         util.run_dv_user_steps()
+
+        if util.has_error():
+            return err_resp(util.get_err_msg())
+
+        return ok_resp(util)
+
+    @staticmethod
+    def create_dv_file_info(opendp_user_id: str, dv_handoff_id: str):
+        """
+        Used when creating an OpenDP User, also create/update a DataverseUser
+        returns the DataverseUserInitializer object
+        """
+        try:
+            opendp_user = OpenDPUser.objects.get(object_id=opendp_user_id)
+        except OpenDPUser.DoesNotExist:
+            return err_resp(f'No OpenDPUser found for id: {opendp_user_id}')
+
+        util = DataverseUserInitializer(opendp_user, dv_handoff_id)
+        util.run_make_dv_file_info_steps()
 
         if util.has_error():
             return err_resp(util.get_err_msg())
@@ -81,20 +97,41 @@ class DataverseUserInitializer(BasicErrCheck):
 
         # Retrieve the DataverseHandoff object
         #
-        print('>> DataverseUserInitializer 1')
         if not self.retrieve_handoff_obj():
             return
 
-        # Create or update the Dataverse user
+        # Retrieve or create the Dataverse user
         #
-        print('>> DataverseUserInitializer 2')
-        if not self.init_update_dv_user():
+        if not self.init_or_retrieve_dv_user():
             return
 
         # Retrieve the latest Dataverse user info from Dataverse
         print('>> DataverseUserInitializer 3')
         if not self.retrieve_latest_dv_user_info():
             return
+
+    def run_make_dv_file_info_steps(self):
+        """
+        Create a DataverseFileInfo object using an existing OpenDPUser/DataverseHandoff object
+        """
+        if self.has_error():
+            return
+
+        # Retrieve the DataverseHandoff object
+        #
+        if not self.retrieve_handoff_obj():
+            return
+
+        # Create or update the Dataverse user (DataverseUser should already be there_
+        #
+        if not self.init_or_retrieve_dv_user():
+            return
+
+        # Create the DataverseFileInfo
+        #
+        if not self.init_update_dv_file_info():
+            return
+
 
     def run_initializer_steps(self):
         """Run through the initializer steps which include:
@@ -112,7 +149,7 @@ class DataverseUserInitializer(BasicErrCheck):
         # Create or update the Dataverse user
         #
         print('>> DataverseUserInitializer 2')
-        if not self.init_update_dv_user():
+        if not self.init_or_retrieve_dv_user():
             return
 
         # Retrieve the latest Dataverse user info from Dataverse
@@ -146,7 +183,7 @@ class DataverseUserInitializer(BasicErrCheck):
 
         return True
 
-    def init_update_dv_user(self) -> bool:
+    def init_or_retrieve_dv_user(self) -> bool:
         """Retrieve the DataverseUser object or Create one if it doesn't exist"""
         if self.has_error():
             return False
@@ -325,24 +362,3 @@ class DataverseUserInitializer(BasicErrCheck):
         self.http_resp_code = http_status.HTTP_201_CREATED
         return True
 
-
-"""
-from opendp_apps.dataverses.serializers import DataverseUserSerializer
-from opendp_apps.user.models import OpenDPUser, DataverseUser
-from opendp_apps.dataverses.models import DataverseHandoff
-
-handoff_id = '45be40eb-86ed-4539-b5e8-e716dc71df6d'
-dv_user_id = 'ed0bfb7e-c68a-42e0-b510-62ab3062ee40'
-opendp_user_id = 'b579c31c-5ffa-411f-8830-31466d4cb641'
-
-handoff = DataverseHandoff.objects.get(object_id=handoff_id)
-
-dv_user = DataverseUser.objects.get(object_id=dv_user_id)
-
-data = dict(user=opendp_user_id, dv_handoff=handoff_id)
-s = DataverseUserSerializer(data=data)
-s.is_valid()
-
-
-s.update(
-"""

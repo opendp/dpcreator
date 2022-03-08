@@ -6,6 +6,7 @@ from django.test import TestCase
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
 from opendp_apps.dataverses.models import ManifestTestParams
 from opendp_apps.dataverses.testing import schema_test_data
+from opendp_apps.user.models import DataverseUser
 from opendp_apps.model_helpers.msg_util import msgt
 
 
@@ -17,6 +18,9 @@ class FileViewGetTest(TestCase):
 
     def setUp(self) -> None:
         self.user_obj, _created = get_user_model().objects.get_or_create(username='dv_depositor')
+
+        self.test_opendp_user = DataverseUser.objects.get(object_id='6c4986b1-e90d-48a2-98d5-3a37da1fd331').user
+
         self.client.force_login(self.user_obj)
 
     def test_05_manifest_params_url(self):
@@ -36,7 +40,7 @@ class FileViewGetTest(TestCase):
 
     @requests_mock.Mocker()
     def test_10_successful_get(self, req_mocker):
-        """(10) test_successful_creation"""
+        """(10) test_10_successful_get"""
         msgt(self.test_10_successful_get.__doc__)
 
         # From fixture file: "test_manifest_params_04.json"
@@ -55,9 +59,9 @@ class FileViewGetTest(TestCase):
 
         response = self.client.get('/api/dv-file/',
                                    data={'handoff_id': handoff_obj.object_id,
-                                         'user_id': '6c4986b1-e90d-48a2-98d5-3a37da1fd331'},
+                                         'creator': self.test_opendp_user.object_id},
                                    content_type='application/json')
-        # print(response.json())
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json().get('success'), True)
         self.assertEqual(response.json().get('data'), [])
@@ -83,9 +87,9 @@ class FileViewGetTest(TestCase):
 
         response = self.client.post('/api/dv-file/',
                                     data={'handoff_id': handoff_obj.object_id,
-                                          'creator': '6c4986b1-e90d-48a2-98d5-3a37da1fd331'},
+                                          'creator': self.test_opendp_user.object_id},
                                     content_type='application/json')
-        print(response.json())
+        # print(response.json())
         # print('response.status_code', response.status_code)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json().get('success'), True)
@@ -109,7 +113,7 @@ class FileViewGetTest(TestCase):
                     '?exporter=schema.org&persistentId=doi:10.7910/DVN/PUXVDH'
                     '&User-Agent=pydataverse&key=shoefly-dont-bother-m3')
 
-        # Changing the schema org reponse so that it doesn't contain any file info
+        # Changing the schema org response so that it doesn't contain any file info
         schema_content = tparams.schema_org_content
         schema_content['distribution'] = [] # no file info
 
@@ -117,12 +121,13 @@ class FileViewGetTest(TestCase):
 
         response = self.client.post('/api/dv-file/',
                                     data={'handoff_id': handoff_obj.object_id,
-                                          'user_id': '6c4986b1-e90d-48a2-98d5-3a37da1fd331'},
+                                          'creator': self.test_opendp_user.object_id},
                                     content_type='application/json')
-        # print(response.json())
-        # print('response.status_code', response.status_code)
+
+        print(response.json())
+        print('response.status_code', response.status_code)
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json().get('success'), 'False')
+        self.assertEqual(response.json().get('success'), False)
         self.assertTrue('message' in response.json())
 
     def test_20_schema_info_parsing(self):
