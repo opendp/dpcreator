@@ -7,7 +7,7 @@ from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.models import DataverseHandoff
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
 from opendp_apps.dataverses.serializers import DataverseFileInfoMakerSerializer
-from opendp_apps.user.models import DataverseUser
+from opendp_apps.user.models import OpenDPUser, DataverseUser
 from opendp_apps.user.dataverse_user_initializer import DataverseUserInitializer
 from opendp_apps.utils.view_helper import get_object_or_error_response
 from opendp_project.views import BaseModelViewSet
@@ -34,17 +34,26 @@ class DataverseFileView(BaseModelViewSet):
         """
         # TODO: changing user_id to creator to match DB, we should standardize this naming convention
         handoff_id = request.data.get('handoff_id')
-        user_id = request.data.get('creator')
+        opendp_user_id = request.data.get('creator')
 
-        resp = DataverseUserInitializer.create_dv_file_info(user_id, handoff_id)
-        if not resp.success:
-            return Response({'success': False, 'message': resp.message},
-                            status=status.HTTP_400_BAD_REQUEST)
+        # (1) Retrieve the OpenDPUser
+        #
+        try:
+            opendp_user = OpenDPUser.objects.get(object_id=opendp_user_id)
+        except OpenDPUser.DoesNotExist:
+            return Response({'success': False,
+                             'message': f'No OpenDPUser found for id: {opendp_user_id}'},
+                             status=status.HTTP_400_BAD_REQUEST)
 
-        dv_user_util = resp.data  # Instance of a DataverseUserInitializer w/o errors
+        # (2) Create the DataverseFileInfo object
+        #
+        util = DataverseUserInitializer.create_dv_file_info(opendp_user, handoff_id)
+        if util.has_error():
+            return Response({'success': False, 'message': util.get_err_msg()},
+                            status=util.http_resp_code)
 
-        serializer = DataverseFileInfoMakerSerializer(dv_user_util.dv_file_info,
+        serializer = DataverseFileInfoMakerSerializer(util.dv_file_info,
                                                       context={'request': request})
 
         return Response({'success': True, 'data': serializer.data},
-                        status=dv_user_util.http_resp_code)
+                        status=util.http_resp_code)

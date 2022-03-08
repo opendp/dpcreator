@@ -18,7 +18,7 @@ class DataverseManifestParams(BasicErrCheck):
         """
         Set initial params
         """
-        if not (isinstance(incoming_params, dict) or \
+        if not (isinstance(incoming_params, dict) or
                 isinstance(incoming_params, QueryDict)):
             self.add_error_message(('"incoming_params" must be python dict or'
                                     ' Django QueryDict object (e.g. request.GET)'))
@@ -32,7 +32,7 @@ class DataverseManifestParams(BasicErrCheck):
         self.apiGeneralToken = self.format_param(incoming_params.get(dv_static.DV_API_GENERAL_TOKEN))
 
         # RegisteredDataverse connected with self.site_url
-        self.registerd_dataverse = None
+        self.registered_dataverse = None
 
         self.check_required_params()
 
@@ -68,7 +68,7 @@ class DataverseManifestParams(BasicErrCheck):
                 self.add_err_msg(user_msg)
                 return
             else:
-                self.registerd_dataverse = reg_dv
+                self.registered_dataverse = reg_dv
 
         for param in required_params:
             if not self.__dict__.get(param):
@@ -103,11 +103,9 @@ class DataverseManifestParams(BasicErrCheck):
 
         return user_info
 
-
     def retrieve_file_specific_info(self, schema_info):
         """Retrieve file specific info from the Dataverse dataset JSON-LD schema """
         return DataverseManifestParams.get_file_specific_schema_info(schema_info, self.fileId, self.filePid)
-
 
     @staticmethod
     def get_file_specific_schema_info(full_schema_info, file_id=None, file_persistent_id=None):
@@ -119,7 +117,8 @@ class DataverseManifestParams(BasicErrCheck):
              "name":"Crisis.PDF",
              "fileFormat":"application/pdf",
              "contentSize":677112,
-             "description":"Article related to this study: The Supreme Court During Crisis: How War Affects Only Nonwar Cases",
+             "description":"Article related to this study:
+                    The Supreme Court During Crisis: How War Affects Only Nonwar Cases",
              "@id":"https://doi.org/10.7910/DVN/OLD7MB/PZPDJF",
              "identifier":"https://doi.org/10.7910/DVN/OLD7MB/PZPDJF",
              "contentUrl":"https://dataverse.harvard.edu/api/access/datafile/101646"
@@ -127,16 +126,17 @@ class DataverseManifestParams(BasicErrCheck):
           (etc)
         ]
         """
-        print('get_file_specific_schema_info', file_id, file_persistent_id)
+        # print('get_file_specific_schema_info', file_id, file_persistent_id)
         if not isinstance(full_schema_info, dict):
             return err_resp('"full_schema_info" must be a Python dict')
 
-        if not dv_static.SCHEMA_KEY_DISTRIBUTION in full_schema_info:
+        if dv_static.SCHEMA_KEY_DISTRIBUTION not in full_schema_info:
             return err_resp(f'"{dv_static.SCHEMA_KEY_DISTRIBUTION}" not found in the schema')
 
         url_ending_1 = f'/{file_id}'
         file_doi = file_persistent_id.split(':')[-1] if file_persistent_id else None
-        print('file_doi', file_doi)
+
+        # print('file_doi', file_doi)
         for file_info in full_schema_info[dv_static.SCHEMA_KEY_DISTRIBUTION]:
 
             # Try to match the the /{fileId} id to the end of the contentURL
@@ -158,7 +158,7 @@ class DataverseManifestParams(BasicErrCheck):
 
         if file_id:
             user_msg = f'Did not find fileId "{file_id}"'
-        elif file_info:
+        elif file_doi:
             user_msg = f'Did not find file DOI "{file_doi}"'
         else:
             user_msg = ''

@@ -6,6 +6,8 @@ This class is hooked into the OpenDP User register/login steps and does the foll
     - Includes making an API call to Dataverse
 -
 """
+from __future__ import annotations
+
 from json import JSONDecodeError
 from requests.exceptions import InvalidSchema
 from rest_framework import status as http_status
@@ -15,6 +17,7 @@ from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 
 from opendp_apps.user.models import OpenDPUser, DataverseUser
 
+from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataverses.models import DataverseHandoff
 
 from opendp_apps.dataverses.dataverse_client import DataverseClient
@@ -40,7 +43,7 @@ class DataverseUserInitializer(BasicErrCheck):
 
 
     @staticmethod
-    def create_update_dv_user_workflow(opendp_user: OpenDPUser, dv_handoff_id: str):
+    def create_update_dv_user_workflow(opendp_user: OpenDPUser, dv_handoff_id: str) -> DataverseUserInitializer:
         """
         Used when creating an OpenDP User, also create/update a DataverseUser
         returns the DataverseUserInitializer object
@@ -70,23 +73,15 @@ class DataverseUserInitializer(BasicErrCheck):
         return ok_resp(util)
 
     @staticmethod
-    def create_dv_file_info(opendp_user_id: str, dv_handoff_id: str):
+    def create_dv_file_info(opendp_user: OpenDPUser, dv_handoff_id: str)-> DataverseUserInitializer:
         """
         Used when creating an OpenDP User, also create/update a DataverseUser
         returns the DataverseUserInitializer object
         """
-        try:
-            opendp_user = OpenDPUser.objects.get(object_id=opendp_user_id)
-        except OpenDPUser.DoesNotExist:
-            return err_resp(f'No OpenDPUser found for id: {opendp_user_id}')
-
         util = DataverseUserInitializer(opendp_user, dv_handoff_id)
         util.run_make_dv_file_info_steps()
 
-        if util.has_error():
-            return err_resp(util.get_err_msg())
-
-        return ok_resp(util)
+        return util
 
     def run_dv_user_steps(self):
         """
@@ -284,7 +279,7 @@ class DataverseUserInitializer(BasicErrCheck):
             #  If not, notify the user that the file is locked
             #
             if self.dv_file_info.creator != self.opendp_user:
-                user_msg = 'This Dataverse file is locked by another user.'
+                user_msg = dstatic.ERR_MSG_DATASET_LOCKED_BY_ANOTHER_USER
                 self.add_err_msg(user_msg)
                 self.http_resp_code = http_status.HTTP_423_LOCKED
                 return False
