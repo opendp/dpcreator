@@ -41,7 +41,6 @@ class DataverseUserInitializer(BasicErrCheck):
         # http response code
         self.http_resp_code = None
 
-
     @staticmethod
     def create_update_dv_user_workflow(opendp_user: OpenDPUser, dv_handoff_id: str) -> DataverseUserInitializer:
         """
@@ -54,20 +53,11 @@ class DataverseUserInitializer(BasicErrCheck):
         return util
 
     @staticmethod
-    def create_update_dv_user_social_auth(opendp_user: OpenDPUser, dv_handoff_id: str) -> DataverseUserInitializer:
+    def create_dv_file_info(opendp_user: OpenDPUser, dv_handoff_id: str) -> DataverseUserInitializer:
         """
-        Used when creating an OpenDP User, also create/update a DataverseUser
-        returns the DataverseUserInitializer object
-        """
-        util = DataverseUserInitializer(opendp_user, dv_handoff_id)
-        util.run_dv_user_steps()
+        Uses the DataverseHandoff and DataverseUser objects to create a DataverseFileInfo object.
+        - See "run_make_dv_file_info_steps"
 
-        return util
-
-    @staticmethod
-    def create_dv_file_info(opendp_user: OpenDPUser, dv_handoff_id: str)-> DataverseUserInitializer:
-        """
-        Used when creating an OpenDP User, also create/update a DataverseUser
         returns the DataverseUserInitializer object
         """
         util = DataverseUserInitializer(opendp_user, dv_handoff_id)
@@ -78,6 +68,9 @@ class DataverseUserInitializer(BasicErrCheck):
     def run_dv_user_steps(self):
         """
         Using an OpenDPUser and DataverseHandoff, create/update a DataverseUser object
+        (1) Retrieve the DataverseHandoff object
+        (2) Creates or retrieves the DataverseUser
+        (3) Uses the Dataverse API to update to the DataverseUser
         """
         if self.has_error():
             return
@@ -93,12 +86,15 @@ class DataverseUserInitializer(BasicErrCheck):
             return
 
         # Retrieve the latest Dataverse user info from Dataverse
-        print('>> DataverseUserInitializer 3')
         if not self.retrieve_latest_dv_user_info():
             return
 
     def run_make_dv_file_info_steps(self):
         """
+        (1) Retrieve the DataverseHandoff object
+        (2) Retrieve the DataverseUser
+        (2) Creates the DataverseFileInfo object
+            (3a) Uses the Dataverse API to retrieve the dataset schema for the DataverseFileInfo
         Create a DataverseFileInfo object using an existing OpenDPUser/DataverseHandoff object
         """
         if self.has_error():
@@ -109,7 +105,7 @@ class DataverseUserInitializer(BasicErrCheck):
         if not self.retrieve_handoff_obj():
             return
 
-        # Create or update the Dataverse user (DataverseUser should already be there_
+        # Create or update the Dataverse user (DataverseUser should already be there)
         #
         if not self.init_or_retrieve_dv_user():
             return
@@ -119,10 +115,14 @@ class DataverseUserInitializer(BasicErrCheck):
         if not self.init_update_dv_file_info():
             return
 
-
     def run_initializer_steps(self):
-        """Run through the initializer steps which include:
-
+        """
+        Not currently used! This runs all available workflows:
+        (1) Retrieve the DataverseHandoff object
+        (2) Creates or retrieves the DataverseUser
+        (3) Uses the Dataverse API to update to the DataverseUser
+        (4) Creates the DataverseFileInfo object
+            (4a) Uses the Dataverse API to retrieve the dataset schema for the DataverseFileInfo
         """
         if self.has_error():
             return
@@ -144,7 +144,6 @@ class DataverseUserInitializer(BasicErrCheck):
         if not self.retrieve_latest_dv_user_info():
             return
 
-        #
         #
         print('>> DataverseUserInitializer 4')
         if not self.init_update_dv_file_info():
@@ -255,6 +254,16 @@ class DataverseUserInitializer(BasicErrCheck):
 
         return True
 
+    def remove_handoff(self):
+        """
+        Remove the OpenDPUser.handoff_id, if it exists
+        - Future: delete the DataverseHandoff object
+        """
+        if not self.opendp_user:
+            return False
+
+        return OpenDPUser.remove_handoff_id(self.opendp_user)
+
     def init_update_dv_file_info(self) -> bool:
         """Create of update the DataverseFileInfo object"""
         if self.has_error():
@@ -293,6 +302,7 @@ class DataverseUserInitializer(BasicErrCheck):
             if not self.dv_file_info.id:
                 self.dv_file_info.save()    # shouldn't be needed...
             self.http_resp_code = http_status.HTTP_200_OK
+            self.remove_handoff()
             return True
 
         return self.retrieve_dv_file_info(self.dv_file_info)
@@ -347,5 +357,8 @@ class DataverseUserInitializer(BasicErrCheck):
         self.dv_file_info = dv_file_info    # little messy here...
 
         self.http_resp_code = http_status.HTTP_201_CREATED
+
+        self.remove_handoff()
+
         return True
 

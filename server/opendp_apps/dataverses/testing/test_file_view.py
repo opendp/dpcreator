@@ -9,7 +9,7 @@ from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
 from opendp_apps.dataverses.models import ManifestTestParams
 from opendp_apps.dataverses.testing import schema_test_data
-from opendp_apps.user.models import DataverseUser
+from opendp_apps.user.models import OpenDPUser, DataverseUser
 from opendp_apps.model_helpers.msg_util import msgt
 
 
@@ -119,8 +119,9 @@ class DataverseFileViewTest(TestCase):
         self.assertEqual(response.json().get('success'), False)
         self.assertTrue('message' in response.json())
 
+
     def test_20_schema_info_parsing(self):
-        """Retrieve the correct dataset from schema info, using File Ids"""
+        """(20) Retrieve the correct dataset from schema info, using File Ids"""
         msgt(self.test_20_schema_info_parsing.__doc__)
 
         # Schema contains file info, when file Id is an int
@@ -147,7 +148,7 @@ class DataverseFileViewTest(TestCase):
         self.assertTrue(file_resp.data['contentUrl'].endswith(str(schema_test_data.schema_info_01_file_id)))
 
     def test_30_schema_info_parsing_bad_id(self):
-        """Bad File Id used to retrieve data from schema info"""
+        """(30) Bad File Id used to retrieve data from schema info"""
         msgt(self.test_30_schema_info_parsing_bad_id.__doc__)
 
         # Bad File Id, as a string, used to retrieve data from schema info
@@ -171,7 +172,7 @@ class DataverseFileViewTest(TestCase):
         self.assertTrue(file_resp.message.find(str(bad_file_id)) > -1)
 
     def test_40_schema_info_parsing(self):
-        """Retrieve the correct dataset from schema info, uses DOIs"""
+        """(40) Retrieve the correct dataset from schema info, uses DOIs"""
         msgt(self.test_40_schema_info_parsing.__doc__)
 
         # Schema contains file info, when file Id is an int
@@ -224,3 +225,64 @@ class DataverseFileViewTest(TestCase):
         self.assertEqual(bad_response.status_code, status.HTTP_423_LOCKED)
         self.assertEqual(bad_response.json()['message'], dstatic.ERR_MSG_DATASET_LOCKED_BY_ANOTHER_USER)
 
+    @requests_mock.Mocker()
+    def test_60_handoff_id_removed_from_user(self, req_mocker):
+        """(60) On unsuccessful file creation, if there's an OpenDPUser.handoff_id, it is removed"""
+        msgt(self.test_60_handoff_id_removed_from_user.__doc__)
+
+        # The Mock url is for when the applications calls "Dataverse" to retrieve JSON-LD metadata
+        #
+        mock_url = ('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export'
+                    '?exporter=schema.org&persistentId=doi:10.7910/DVN/PUXVDH'
+                    '&User-Agent=pydataverse&key=shoefly-dont-bother-m3')
+
+        schema_content = self.test_manifest_params.schema_org_content
+        req_mocker.get(mock_url, json=schema_content)
+
+        # Add a handoff_id to the OpenDPUser object
+        self.test_opendp_user.handoff_id = self.handoff_obj.object_id
+        self.test_opendp_user.save()
+
+        # Create a DataverseFileInfo object
+        #
+        response = self.client.post('/api/dv-file/',
+                                    data={'handoff_id': self.handoff_obj.object_id,
+                                          'creator': self.test_opendp_user.object_id},
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        retrieve_user = OpenDPUser.objects.get(object_id=self.test_opendp_user.object_id)
+        self.assertTrue(retrieve_user.handoff_id is None)
+
+    @requests_mock.Mocker()
+    def test_70_handoff_id_stays_on_unsuccessful_creation(self, req_mocker):
+        """(70) On unsuccessful file creation, if there's an OpenDPUser.handoff_id, it remains"""
+        msgt(self.test_70_handoff_id_stays_on_unsuccessful_creation.__doc__)
+
+        # The Mock url is for when the applications calls "Dataverse" to retrieve JSON-LD metadata
+        #
+        mock_url = ('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export'
+                    '?exporter=schema.org&persistentId=doi:10.7910/DVN/PUXVDH'
+                    '&User-Agent=pydataverse&key=shoefly-dont-bother-m3')
+
+        # Changing the schema org response so that it doesn't contain any file info
+        schema_content = self.test_manifest_params.schema_org_content
+        schema_content['distribution'] = []  # no file info
+
+        req_mocker.get(mock_url, json=schema_content)
+
+        # Add a handoff_id to the OpenDPUser object
+        self.test_opendp_user.handoff_id = self.handoff_obj.object_id
+        self.test_opendp_user.save()
+
+        response = self.client.post('/api/dv-file/',
+                                    data={'handoff_id': self.handoff_obj.object_id,
+                                          'creator': self.test_opendp_user.object_id},
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Test than the handoff_id is still there -- keeping there for now on failure
+        #
+        retrieve_user = OpenDPUser.objects.get(object_id=self.test_opendp_user.object_id)
+        self.assertEqual(retrieve_user.handoff_id, self.handoff_obj.object_id)

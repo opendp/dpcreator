@@ -31,7 +31,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'name']
 
 
-class CustomLoginSerializer(LoginSerializer):
+class xCustomLoginSerializer(LoginSerializer):
     """
     Add an optional "handoff_id". If the handoff id is included, then use the
     DataverseUserInitializer to create/update related objects: DataverseUser and DataverseFileInfo
@@ -62,20 +62,6 @@ class CustomLoginSerializer(LoginSerializer):
         print('response', user, type(user))
         return user
 
-        """
-        # If there's a handoffId, attempt to create/update the DataverseUser
-        #
-        handoff_id = self.initial_data.get('handoffId')
-        print('CustomLoginSerializer.authenticate handoff_id', handoff_id)
-        if handoff_id:
-            util = DataverseUserInitializer.create_update_dv_user_workflow(user, handoff_id)
-            if util.has_error():
-                # Delete the DataverseHandoff object and continue on!
-                DataverseHandoff.delete_handoff(handoff_id)
-                print('CustomLoginSerializer.authenticate; util.get_err_msg', util.get_err_msg())
-                pass
-        """
-        return user
 
 class CustomRegisterSerializer(RegisterSerializer):
     """

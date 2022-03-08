@@ -42,7 +42,7 @@ class DataverseUserView(BaseModelViewSet):
 
         # (2) Update the DataverseUser object
         #
-        util = DataverseUserInitializer.create_update_dv_user_social_auth(opendp_user, handoff_id)
+        util = DataverseUserInitializer.create_update_dv_user_workflow(opendp_user, handoff_id)
         if util.has_error():
             return Response({'success': False, 'message': util.get_err_msg()},
                             status=util.http_resp_code)
@@ -67,7 +67,7 @@ class DataverseUserView(BaseModelViewSet):
 
         # (2) Update the DataverseUser object
         #
-        util = DataverseUserInitializer.create_update_dv_user_social_auth(opendp_user, handoff_id)
+        util = DataverseUserInitializer.create_update_dv_user_workflow(opendp_user, handoff_id)
         if util.has_error():
             return Response({'success': False, 'message': util.get_err_msg()},
                             status=util.http_resp_code)
