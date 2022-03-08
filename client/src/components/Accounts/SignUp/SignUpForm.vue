@@ -149,15 +149,9 @@ export default {
           email: this.email,
           handoffId: this.handoffId
         }
-        console.log("SignUpForm.vue inputs: " + JSON.stringify(inputs))
 
         this.$store.dispatch('signup/createAccount', inputs)
             .then((resp) => {
-              const openDPUserId = resp.data[0]
-              if (this.handoffId) {
-                  this.$store.dispatch('dataverse/updateFileInfo', openDPUserId, this.handoffId)
-                      .catch(({data}) => console.log("update file info error: " + data))
-              }
               this.$router.push(`${NETWORK_CONSTANTS.SIGN_UP.PATH}/confirmation`);
             }).catch((error) => {
           let msg = []

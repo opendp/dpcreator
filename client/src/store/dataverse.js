@@ -57,18 +57,18 @@ const actions = {
    * @param dataverseUserId (object_id field of DataverseUser object)
    * @returns {Promise<void>}
    */
-  updateFileInfo({commit, state}, dataverseUserId) {
-    return dataverse.updateFileInfo(dataverseUserId, state.handoffId)
-        .then((resp) => {
-          commit('SET_DATAVERSE_FILE_INFO', resp.data.data)
-          //   return resp.data.data
-        }).catch((error) => {
-          if (error.response.status == 423) {
-            commit('SET_DATAVERSE_FILE_LOCKED', true)
-          }
-          console.log(error.response.data);
-          console.log(error.response.status);
-        })
+  updateFileInfo({commit, state}, {openDPUserId, handoffId}) {
+      return dataverse.updateFileInfo(openDPUserId, handoffId)
+          .then((resp) => {
+              commit('SET_DATAVERSE_FILE_INFO', resp.data.data)
+              //   return resp.data.data
+          }).catch((error) => {
+              if (error.response.status == 423) {
+                  commit('SET_DATAVERSE_FILE_LOCKED', true)
+              }
+              console.log(error.response.data);
+              console.log(error.response.status);
+          })
   },
 
 

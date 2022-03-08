@@ -115,14 +115,10 @@ export default {
       // Format loginParams, including the handoffId (which can be null)
       let loginParams = Object.assign({}, this.inputs);
       loginParams.handoffId = this.handoffId
-
-      console.log('Login.vue; loginParams: ' + JSON.stringify(loginParams))
       this.errorMessage = null;
       this.$store.dispatch('auth/login', loginParams)
           .then((data) => {
-            console.log('Login.vue; handleLogin, login results: ' + JSON.stringify(data))
-
-            this.processLogin();
+             this.processLogin();
           })
           .catch((data) => {
             this.errorMessage = data
@@ -160,14 +156,19 @@ export default {
     processLogin() {
       this.$store.dispatch('auth/fetchUser')
           .then((data) => {
-            console.log('Login.vue; processLogin, login results: ' + JSON.stringify(data))
-
-            if (this.handoffId) {
-               this.$store.dispatch('dataverse/updateFileInfo', this.user.objectId, this.handoffId)
-                    .catch(({data}) => this.errorMessage = data)
-                    .then(() => {
-                      this.routeToNextPage(NETWORK_CONSTANTS.WELCOME.PATH)
-                    })
+            if (this.handoffId !== null) {
+              this.$store.dispatch('dataverse/updateDataverseUser', this.user.objectId, this.handoffId)
+            }
+            let handoffId = this.handoffId
+            if (handoffId == null) {
+              handoffId = this.user.handoffId
+            }
+            if (handoffId !== null) {
+              this.$store.dispatch('dataverse/updateFileInfo', {openDPUserId: this.user.objectId, handoffId: handoffId})
+                  .catch(({data}) => this.errorMessage = data)
+                  .then(() => {
+                    this.routeToNextPage(NETWORK_CONSTANTS.WELCOME.PATH)
+                  })
             } else {
               this.routeToNextPage(NETWORK_CONSTANTS.MY_DATA.PATH)
             }
