@@ -211,9 +211,13 @@ class DataverseFileViewTest(TestCase):
         # Attempt to create the same DataverseFileInfo object with a different user
         #   - Should receive a file locked message
         #
+        handoff_req = self.test_manifest_params.make_test_handoff_object()
+        self.assertTrue(handoff_req.success is True)
+        new_handoff_obj = handoff_req.data  # DataverseHandoff
+
         another_user = get_user_model().objects.get(username='dv_depositor')
         bad_response = self.client.post('/api/dv-file/',
-                                        data={'handoff_id': self.handoff_obj.object_id,
+                                        data={'handoff_id': new_handoff_obj.object_id,
                                               'creator': another_user.object_id},
                                         content_type='application/json')
 

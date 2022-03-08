@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import uuid as uuid
 
 from django.contrib.auth.models import AbstractUser
@@ -15,7 +17,7 @@ class OpenDPUser(AbstractUser):
     Core App User. May be extended in the future
     """
     object_id = models.UUIDField(default=uuid.uuid4, editable=False)
-    handoff_id = models.UUIDField(\
+    handoff_id = models.UUIDField(
                     default=uuid.uuid4,
                     null=True,
                     help_text=('Temporary storage of a DataverseHandoff.object_id'
@@ -25,8 +27,18 @@ class OpenDPUser(AbstractUser):
         verbose_name = 'OpenDP User'
 
     def __str__(self):
-        return self.username #str(self.object_id)
+        return self.username  # str(self.object_id)
 
+    @staticmethod
+    def remove_handoff_id(opendp_user: OpenDPUser) -> bool:
+        """Return True if the handoff_id is successfully set to None or already None"""
+        if not opendp_user.handoff_id:
+            return True
+
+        opendp_user.handoff_id = None
+        opendp_user.save()
+
+        return True
 
 class DataverseUser(TimestampedModelWithUUID):
     """
@@ -38,7 +50,7 @@ class DataverseUser(TimestampedModelWithUUID):
 
     dv_installation = models.ForeignKey(RegisteredDataverse, on_delete=models.PROTECT)
 
-    #TODO: Shouldn't this be unique?
+    # TODO: Shouldn't this be unique?
     persistent_id = models.CharField(max_length=255)  # Persistent DV user id within an installation
 
     email = models.EmailField(max_length=255, blank=True)
@@ -79,8 +91,6 @@ class DataverseUser(TimestampedModelWithUUID):
                     created=str(self.created),
                     object_id=self.object_id.hex)
 
-
-
 class Group(models.Model):
     """
     Organize OpenDP Users into (potentially multiple)
@@ -88,7 +98,6 @@ class Group(models.Model):
     """
     name = models.CharField(max_length=128)
     created = models.DateTimeField(auto_now_add=True, blank=True)
-
 
 class GroupMembership(models.Model):
     """

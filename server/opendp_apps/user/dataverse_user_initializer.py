@@ -54,23 +54,15 @@ class DataverseUserInitializer(BasicErrCheck):
         return util
 
     @staticmethod
-    def create_update_dv_user_social_auth(opendp_user_id: str, dv_handoff_id: str):
+    def create_update_dv_user_social_auth(opendp_user: OpenDPUser, dv_handoff_id: str) -> DataverseUserInitializer:
         """
         Used when creating an OpenDP User, also create/update a DataverseUser
         returns the DataverseUserInitializer object
         """
-        try:
-            opendp_user = OpenDPUser.objects.get(object_id=opendp_user_id)
-        except OpenDPUser.DoesNotExist:
-            return err_resp(f'No OpenDPUser found for id: {opendp_user_id}')
-
         util = DataverseUserInitializer(opendp_user, dv_handoff_id)
         util.run_dv_user_steps()
 
-        if util.has_error():
-            return err_resp(util.get_err_msg())
-
-        return ok_resp(util)
+        return util
 
     @staticmethod
     def create_dv_file_info(opendp_user: OpenDPUser, dv_handoff_id: str)-> DataverseUserInitializer:

@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 
-from opendp_apps.user.models import DataverseUser
+from opendp_apps.user.models import OpenDPUser, DataverseUser
 from opendp_apps.dataverses.serializers import DataverseUserSerializer
 from opendp_apps.user.dataverse_user_initializer import DataverseUserInitializer
 from opendp_apps.utils.view_helper import get_json_error, get_json_success, get_object_or_error_response
@@ -30,31 +30,48 @@ class DataverseUserView(BaseModelViewSet):
         user_id = request.data.get('user')
         handoff_id = request.data.get('dv_handoff')
 
-        resp = DataverseUserInitializer.create_update_dv_user_social_auth(user_id, handoff_id)
-        if not resp.success:
-            return Response(get_json_error(resp.message), status=status.HTTP_400_BAD_REQUEST)
+        # (1) Retrieve the OpenDPUser
+        #
 
-        dv_user_util = resp.data  # Instance of a DataverseUserInitializer w/o errors
+        try:
+            opendp_user = OpenDPUser.objects.get(object_id=user_id)
+        except OpenDPUser.DoesNotExist:
+            return Response({'success': False,
+                             'message': f'No OpenDPUser found for id: {user_id}'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
-        json_resp = {'success': True,
-                     'message': 'Success',
-                     'data': {'dv_user': dv_user_util.dv_user.object_id}}
+        # (2) Update the DataverseUser object
+        #
+        util = DataverseUserInitializer.create_update_dv_user_social_auth(opendp_user, handoff_id)
+        if util.has_error():
+            return Response({'success': False, 'message': util.get_err_msg()},
+                            status=util.http_resp_code)
 
-        return Response(json_resp, status=dv_user_util.http_resp_code)
-
+        return Response({'success': True,
+                         'data': {'dv_user': util.dv_user.object_id}},
+                        status=util.http_resp_code)
 
     def update(self, request, *args, **kwargs):
         """Update the Dataverse User. Expects JSON"""
-        user_id = request.data.get('user')
+        opendp_user_id = request.data.get('user')
         handoff_id = request.data.get('dv_handoff')
 
-        resp = DataverseUserInitializer.create_update_dv_user_social_auth(user_id, handoff_id)
-        if not resp.success:
-            return Response(get_json_error(resp.message), status=status.HTTP_400_BAD_REQUEST)
+        # (1) Retrieve the OpenDPUser
+        #
+        try:
+            opendp_user = OpenDPUser.objects.get(object_id=opendp_user_id)
+        except OpenDPUser.DoesNotExist:
+            return Response({'success': False,
+                             'message': f'No OpenDPUser found for id: {opendp_user_id}'},
+                             status=status.HTTP_400_BAD_REQUEST)
 
-        dv_user_util = resp.data  # Instance of a DataverseUserInitializer w/o errors
+        # (2) Update the DataverseUser object
+        #
+        util = DataverseUserInitializer.create_update_dv_user_social_auth(opendp_user, handoff_id)
+        if util.has_error():
+            return Response({'success': False, 'message': util.get_err_msg()},
+                            status=util.http_resp_code)
 
-        json_resp = get_json_success('success',
-                                     data={'dv_user': dv_user_util.dv_user.object_id})
-
-        return Response(json_resp, status=dv_user_util.http_resp_code)
+        return Response({'success': True,
+                         'data': {'dv_user': util.dv_user.object_id}},
+                        status=util.http_resp_code)
