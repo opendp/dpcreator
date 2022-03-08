@@ -17,6 +17,7 @@
           >
             <v-img
                 :src="require('../../assets/DPCreator_from_OpenDP.svg')"
+                data-test="homeLogo"
                 contain
                 aspect-ratio="4"
             ></v-img>
@@ -112,6 +113,7 @@
 
           <v-list-item-content>
             <v-list-item-title
+                :data-test="item.title"
                 @click="$router.push(item.link)"
                 class="grey--text"
             >{{ item.title }}

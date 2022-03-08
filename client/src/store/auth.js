@@ -68,11 +68,12 @@ const getters = {
 
 
 const actions = {
-  changeUsername({commit, state}, newUsername) {
+  updateProfile({commit, state}, {newUsername, newEmail}) {
     commit(EDIT_USER_BEGIN)
     let newUser = null;
     newUser = Object.assign({}, state.user)
     newUser.username = newUsername
+    newUser.email = newEmail
     return auth.updateAccountDetails(newUser)
         .then((data) => {
           commit(SET_USER, newUser)
