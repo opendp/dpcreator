@@ -153,25 +153,35 @@ export default {
         }
       })
     },
+    processDVFileInfo(handoffId) {
+      return this.$store.dispatch('dataverse/updateFileInfo',
+          {openDPUserId: this.user.objectId, handoffId: handoffId})
+          .catch(({data}) => this.errorMessage = data)
+          .then(() => {
+            this.routeToNextPage(NETWORK_CONSTANTS.WELCOME.PATH)
+          })
+    },
     processLogin() {
       this.$store.dispatch('auth/fetchUser')
           .then((data) => {
             if (this.handoffId !== null) {
+              // the Vuex store handoffId exists, which means the user
+              // has just come from Dataverse, so update the DVUser and DVFileInfo
+              // based on the handoff parameters.
               this.$store.dispatch('dataverse/updateDataverseUser', this.user.objectId, this.handoffId)
-            }
-            let handoffId = this.handoffId
-            if (handoffId == null) {
-              handoffId = this.user.handoffId
-            }
-            if (handoffId !== null) {
-              this.$store.dispatch('dataverse/updateFileInfo', {openDPUserId: this.user.objectId, handoffId: handoffId})
-                  .catch(({data}) => this.errorMessage = data)
                   .then(() => {
-                    this.routeToNextPage(NETWORK_CONSTANTS.WELCOME.PATH)
+                    this.processDVFileInfo(this.handoffId)
                   })
+            } else if (this.user.handoffId !== null) {
+              // If the user comes from dataverse and creates an account, then original handoffId
+              // is stored in the user object. So when the user logs in after verifying the account,
+              // create the DVFile here using the handoffId
+              // (No need to create or update the DVUser because it was created when the account was created.)
+              this.processDVFileInfo(this.user.handoffId)
             } else {
               this.routeToNextPage(NETWORK_CONSTANTS.MY_DATA.PATH)
             }
+
           })
           .catch((data) => {
             console.log(data)
