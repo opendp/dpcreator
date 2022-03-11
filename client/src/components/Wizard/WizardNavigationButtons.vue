@@ -32,6 +32,7 @@
       <Button
           v-else
           color="primary"
+          data-test="wizardSubmitStatistics"
           :class="{
           'mx-auto': $vuetify.breakpoint.mdAndUp
         }"
