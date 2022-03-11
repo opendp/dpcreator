@@ -273,10 +273,10 @@ class PDFReportMaker(BasicErrCheck):
             self.start_new_page()
 
             stat_cnt += 1
-            stat_type = stat_info['statistic']
+            stat_type = stat_info['statistic'].title()
             var_name = stat_info['variable']
 
-            subtitle = f"1.{stat_cnt}. {var_name} - " + stat_type.title()
+            subtitle = f"1.{stat_cnt}. {var_name} - " + stat_type
             self.add_to_layout(Paragraph(subtitle,
                                          font=get_custom_font(OPEN_SANS_SEMI_BOLD),
                                          font_size=self.basic_font_size + Decimal(1),
@@ -284,60 +284,22 @@ class PDFReportMaker(BasicErrCheck):
                                          multiplied_leading=Decimal(1.75)))
 
             text_chunks_01 = [
-                self.txt_reg(f'A '),
+                self.txt_bld('Result.'),
+                self.txt_reg(f' A '),
                 self.txt_bld(f'differentially private (DP) {stat_type}'),
                 self.txt_reg(' has been calculated for the variable'),
                 self.txt_bld(f" {var_name}."),
                 self.txt_reg(' The result,'),
-                self.txt_reg(' accuracy measures,'),
-                self.txt_reg(' and parameters used to create the statistic are shown below:'),
+                self.txt_reg(' accuracy,'),
+                self.txt_reg(' and a description are shown below:'),
             ]
 
             self.add_to_layout(HeterogeneousParagraph(text_chunks_01,
                                                       padding_left=Decimal(10)))
 
-            self.add_to_layout(HeterogeneousParagraph([self.txt_bld_para('Result')],
-                                                      padding_left=Decimal(10)))
-            # HeterogeneousParagraph(text_chunks_01, padding_left=Decimal(10)))
-
             if stat_info['statistic'] == astatic.DP_MEAN:
 
-                # -------------------------------------
-                # Result table
-                # -------------------------------------
-                tbl_result = FlexibleColumnWidthTable(number_of_rows=4,
-                                                      number_of_columns=2,
-                                                      padding_left=Decimal(40),
-                                                      padding_right=Decimal(60),
-                                                      padding_bottom=Decimal(0),
-                                                      )
-
-                tbl_result.add(self.get_tbl_cell_lft_pad("DP Mean", padding=0))
-                res_fmt = round(stat_info['result']['value'], 4)
-                tbl_result.add(self.get_tbl_cell_align_rt(f"{res_fmt}"))
-
-                tbl_result.add(self.get_tbl_cell_lft_pad("Accuracy", padding=0))
-                acc_fmt = round(stat_info['accuracy']['value'], 4)
-                tbl_result.add(self.get_tbl_cell_align_rt(f"{acc_fmt}"))
-
-                clevel = round(stat_info['confidence_level'] * 100.0, 1)
-
-                tbl_result.add(self.get_tbl_cell_lft_pad("Confidence Level", padding=0))
-                tbl_result.add(self.get_tbl_cell_align_rt(f"{clevel}%"))
-
-                tbl_result.add(self.get_tbl_cell_lft_pad("Description", padding=0))
-
-                acc_desc = (f'There is a probability of {clevel}% that the DP {stat_type.title()} '
-                            f' will differ'
-                            f' from the true {stat_type.title()} by at most {acc_fmt} units.'
-                            f' The units are the same units the variable {var_name} has in the dataset.')
-
-                tbl_result.add(self.get_tbl_cell_lft_pad(acc_desc))
-
-                tbl_result.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
-                tbl_result.set_border_color_on_all_cells(self.color_crimson)
-                tbl_result.set_borders_on_all_cells(True, False, True, False)  # top, right, left, bottom
-                self.add_to_layout(tbl_result)
+                self.add_single_stat_result_table(stat_info, stat_type, var_name)
 
                 text_chunks_02 = [
                     self.txt_bld(f'Parameters.'),
@@ -349,11 +311,6 @@ class PDFReportMaker(BasicErrCheck):
 
                 self.add_to_layout(HeterogeneousParagraph(text_chunks_02,
                                                           padding_left=Decimal(10)))
-
-                # self.layout.add(self.txt_bld_para(f'Parameters.'))
-                # self.layout.add(self.txt_reg_para(' The table below shows the parameters used
-                # when calculating the DP Mean. For reference, a description of each parameter
-                # may be found at the end of the document.'))
 
                 # --------------------------------------
                 # Create table for parameters
@@ -434,6 +391,54 @@ class PDFReportMaker(BasicErrCheck):
         W: Decimal = Decimal(1000)  # max width you would allow
         H: Decimal = Decimal(1000)  # max height you would allow
         return p.layout(pg, Rectangle(zero_dec, zero_dec, W, H))
+
+    def add_single_stat_result_table(self, stat_info: dict, stat_type: str, var_name: str):
+        """
+        Add the result table for a single stat, such as DP Mean. Example:
+            DP Mean                 2.9442
+            Accuracy                0.1964
+            Confidence Level        95.0%
+            Description             There is a probability of 95.0% that the ... (etc)
+        """
+        tbl_result = FlexibleColumnWidthTable(number_of_rows=4,
+                                              number_of_columns=2,
+                                              padding_left=Decimal(40),
+                                              padding_right=Decimal(60),
+                                              padding_bottom=Decimal(0),
+                                              )
+        # Statistic name and result
+        tbl_result.add(self.get_tbl_cell_lft_pad(f'DP {stat_type}', padding=0))
+        res_fmt = round(stat_info['result']['value'], 4)
+        tbl_result.add(self.get_tbl_cell_align_rt(f"{res_fmt}"))
+
+        # Accuracy
+        tbl_result.add(self.get_tbl_cell_lft_pad("Accuracy", padding=0))
+        acc_fmt = round(stat_info['accuracy']['value'], 4)
+        tbl_result.add(self.get_tbl_cell_align_rt(f"{acc_fmt}"))
+
+        # Confidence Level
+        clevel = round(stat_info['confidence_level'] * 100.0, 1)
+        tbl_result.add(self.get_tbl_cell_lft_pad("Confidence Level", padding=0))
+        tbl_result.add(self.get_tbl_cell_align_rt(f"{clevel}%"))
+
+        # Description
+        #
+        tbl_result.add(self.get_tbl_cell_lft_pad("Description", padding=0))
+
+        acc_desc = (f'There is a probability of {clevel}% that the DP {stat_type} '
+                    f' will differ'
+                    f' from the true {stat_type} by at most {acc_fmt} units.'
+                    f' The units are the same units the variable {var_name} has in the dataset.')
+
+        tbl_result.add(self.get_tbl_cell_lft_pad(acc_desc))
+
+        # Table, padding, border color, and borders
+        tbl_result.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
+        tbl_result.set_border_color_on_all_cells(self.color_crimson)
+        tbl_result.set_borders_on_all_cells(True, False, True, False)  # top, right, left, bottom
+
+        self.add_to_layout(tbl_result)
+
 
     def get_pdf_contents(self):
         """Return the PDF contents"""
