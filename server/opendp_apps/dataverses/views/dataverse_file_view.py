@@ -6,8 +6,9 @@ from opendp_apps.dataverses.dataverse_client import DataverseClient
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.models import DataverseHandoff
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
-from opendp_apps.dataverses.serializers import DataverseFileInfoSerializer
-from opendp_apps.user.models import DataverseUser
+from opendp_apps.dataverses.serializers import DataverseFileInfoMakerSerializer
+from opendp_apps.user.models import OpenDPUser, DataverseUser
+from opendp_apps.user.dataverse_user_initializer import DataverseUserInitializer
 from opendp_apps.utils.view_helper import get_object_or_error_response
 from opendp_project.views import BaseModelViewSet
 
@@ -15,7 +16,7 @@ from opendp_project.views import BaseModelViewSet
 class DataverseFileView(BaseModelViewSet):
 
     def get_serializer(self, instance=None):
-        return DataverseFileInfoSerializer(context={'request': instance})
+        return DataverseFileInfoMakerSerializer(context={'request': instance})
 
     def list(self, request, *args, **kwargs):
         # TODO: This is to prevent errors in testing, why is test sending "AnonymousUser" in request?
@@ -23,7 +24,7 @@ class DataverseFileView(BaseModelViewSet):
             queryset = DataverseFileInfo.objects.all()
         else:
             queryset = DataverseFileInfo.objects.filter(creator=request.user)
-        serializer = DataverseFileInfoSerializer(queryset, many=True)
+        serializer = DataverseFileInfoMakerSerializer(queryset, many=True)
         return Response(data={'success': True, 'data': serializer.data}, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
@@ -33,70 +34,26 @@ class DataverseFileView(BaseModelViewSet):
         """
         # TODO: changing user_id to creator to match DB, we should standardize this naming convention
         handoff_id = request.data.get('handoff_id')
-        user_id = request.data.get('creator')
+        opendp_user_id = request.data.get('creator')
 
-        handoff = get_object_or_error_response(DataverseHandoff, object_id=handoff_id)
-        dataverse_user = get_object_or_error_response(DataverseUser, object_id=user_id)
-
+        # (1) Retrieve the OpenDPUser
+        #
         try:
-            file_info = DataverseFileInfo.objects.get(dataverse_file_id=handoff.fileId,
-                                                      dv_installation=dataverse_user.dv_installation)
-            if file_info.creator != request.user:
-                # and depositor_setup_info is step 600 "epsilon set" and analysis_plan does not exist:
-                # then user can continue to work on file
-                # else:
-                #   raise FileLockedException()
-                return Response({'success': False, 'message': 'File is locked by another user'},
-                                status=status.HTTP_423_LOCKED)
-        except DataverseFileInfo.DoesNotExist:
-            file_info = DataverseFileInfo(dv_installation=dataverse_user.dv_installation,
-                                          dataverse_file_id=handoff.fileId,
-                                          dataset_doi=handoff.datasetPid,
-                                          file_doi=handoff.filePid,
-                                          dataset_schema_info=None,
-                                          file_schema_info=None,
-                                          creator=dataverse_user.user)
+            opendp_user = OpenDPUser.objects.get(object_id=opendp_user_id)
+        except OpenDPUser.DoesNotExist:
+            return Response({'success': False,
+                             'message': f'No OpenDPUser found for id: {opendp_user_id}'},
+                             status=status.HTTP_400_BAD_REQUEST)
 
-        # If file info doesn't exist, call to Dataverse to get the data and
-        # populate the relevant fields
-        if not (file_info.dataset_schema_info or file_info.file_schema_info):
-            params = file_info.as_dict()
-            site_url = handoff.dv_installation.dataverse_url
-            params[dv_static.DV_PARAM_SITE_URL] = site_url
-            if not site_url:
-                # shouldn't happen....
-                return Response({'success': False, 'message': 'The Dataverse url has not been set.'},
-                                status=status.HTTP_400_BAD_REQUEST)
+        # (2) Create the DataverseFileInfo object
+        #
+        util = DataverseUserInitializer.create_dv_file_info(opendp_user, handoff_id)
+        if util.has_error():
+            return Response({'success': False, 'message': util.get_err_msg()},
+                            status=util.http_resp_code)
 
-            # (1) Retrieve the JSON LD info
-            client = DataverseClient(site_url, handoff.apiGeneralToken)
-            schema_org_resp = client.get_schema_org(handoff.datasetPid)
-            if schema_org_resp.status_code >= 400:
-                return Response({'success': False, 'message': schema_org_resp.message},
-                                status=status.HTTP_400_BAD_REQUEST)
+        serializer = DataverseFileInfoMakerSerializer(util.dv_file_info,
+                                                      context={'request': request})
 
-
-            # (2) Retrieve the file specific info from the JSON-LD
-            #
-            schema_org_content = schema_org_resp.json()
-            file_schema_resp = DataverseManifestParams.get_file_specific_schema_info(schema_org_content,
-                                                                                     handoff.fileId,
-                                                                                     handoff.filePid)
-            if not file_schema_resp.success:
-                return Response({'success': False, 'message': file_schema_resp.message},
-                                status=status.HTTP_400_BAD_REQUEST)
-
-            # Update the DataverseFileInfo object
-            #
-            file_info.creator = dataverse_user.user
-            file_info.dataset_schema_info = schema_org_content
-            file_info.file_schema_info = file_schema_resp.data
-            # This will fail if the dataset_schema_info is malformed, use DOI as backup just in case:
-            file_info.name = file_info.dataset_schema_info.get('name', file_info.dataset_doi)
-
-            # Save the DataverseFileInfo updates
-            file_info.save()
-
-        serializer = DataverseFileInfoSerializer(file_info, context={'request': request})
         return Response({'success': True, 'data': serializer.data},
-                        status=status.HTTP_201_CREATED)
+                        status=util.http_resp_code)

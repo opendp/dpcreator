@@ -86,9 +86,11 @@ const actions = {
   clearEditUserStatus({commit}) {
     commit(EDIT_USER_CLEAR);
   },
-  login({commit}, {username, password}) {
+  login({commit}, {username, password, handoffId}) {
     commit(LOGIN_BEGIN);
-    return auth.login(username, password)
+    console.log('auth.js - handoffId:' + handoffId)
+
+    return auth.login(username, password, handoffId)
         .then(({data}) => {
           commit(SET_TOKEN, data.key)
         })

@@ -256,6 +256,7 @@ REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'opendp_apps.user.serializers.CustomRegisterSerializer',
 }
 REST_AUTH_SERIALIZERS = {
+    'LOGIN_SERIALIZER': 'opendp_apps.user.serializers.CustomLoginSerializer',
     'USER_DETAILS_SERIALIZER': 'opendp_apps.user.serializers.OpenDPUserSerializer',
 }
 # ALLOWED_HOSTS=['*']
