@@ -35,13 +35,6 @@
           <WizardNavigationButtons
               :steps="steps"
               :stepperPosition.sync="stepperPosition"
-              class="hidden-md-and-up"
-          />
-        </v-col>
-        <v-col cols="3" lg="2" class="hidden-sm-and-down">
-          <WizardNavigationButtons
-              :steps="steps"
-              :stepperPosition.sync="stepperPosition"
           />
         </v-col>
       </v-row>
