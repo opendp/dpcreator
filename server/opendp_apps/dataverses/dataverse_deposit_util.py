@@ -105,10 +105,14 @@ class DataverseDepositUtil(BasicErrCheck):
             {
                 'dv_deposit_type': dv_static.DV_DEPOSIT_TYPE_DP_JSON,
                 'file_field': self.release_info.dp_release_json_file,
+                'TYPE': 'DP',
+                'FILETYPE': 'application/json',
             },
             {
                 'dv_deposit_type': dv_static.DV_DEPOSIT_TYPE_DP_PDF,
                 'file_field': self.release_info.dp_release_pdf_file,
+                'TYPE': 'DP',
+                'FILETYPE': 'application/pdf',
             }
         ]
 
@@ -134,9 +138,12 @@ class DataverseDepositUtil(BasicErrCheck):
                                                         dv_auxiliary_version=format_version,
                                                         dv_download_url=dv_download_url)
 
+            # Reference: https://github.com/IQSS/dataverse/issues/8241#issuecomment-988812491
+            #
             payload = dict(origin=settings.DP_CREATOR_APP_NAME,
                            isPublic=True,
-                           type=file_info["dv_deposit_type"])
+                           type=file_info["dv_deposit_type"],
+                           )
 
             # Assuming actual filepath for initial pass;
             #   For azure/s3 update: https://github.com/jschneier/django-storages/tree/master/storages/backends
@@ -154,7 +161,21 @@ class DataverseDepositUtil(BasicErrCheck):
 
             expected_num_deposits += 1
 
-            files = {'file': open(file_field.path, 'rb')}
+            # Dataverse includes an optional "filetype" parameter
+            # b/c it doesn't detect JSON directly
+            #  - The value for "file" is a tuple:
+            #    - format:   ("filename_as_str.json",
+            #                 ["file contents"],
+            #                 "filetype_as_str")
+            #
+            #    - example: ('release_01.json",
+            #                open(file_field.path, 'rb'),
+            #                "application/json")
+            #
+            files = {'file': (basename(file_field.name),
+                              open(file_field.path, 'rb'),
+                              file_info['FILETYPE'])}
+            #files = {'file': open(file_field.path, 'rb')}
 
             # print('dv_url', dv_deposit_url)
             try:
@@ -286,3 +307,7 @@ class DataverseDepositUtil(BasicErrCheck):
 
         # print('>>> deposit_info_dict', deposit_info_dict)
         self.release_info.save()
+
+"""
+
+"""

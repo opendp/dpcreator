@@ -33,13 +33,15 @@ DP_HISTOGRAM = 'histogram'
 DP_HISTOGRAM_CATEGORICAL = 'histogram_categorical'
 DP_HISTOGRAM_INTEGER = 'histogram_integer'
 DP_QUANTILE = 'quantile'
+DP_VARIANCE = 'variance'
 DP_STATS_CHOICES = [DP_MEAN,
                     DP_SUM,
                     DP_COUNT,
                     DP_HISTOGRAM,
                     # DP_HISTOGRAM_CATEGORICAL,
                     # DP_HISTOGRAM_INTEGER,
-                    DP_QUANTILE]
+                    DP_QUANTILE,
+                    DP_VARIANCE]
 
 # --------------------------------------
 # Missing value handling

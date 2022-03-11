@@ -11,13 +11,9 @@
         - Retrieve the variable type/min/max/categories from AnalysisPlan.variable_info
         - Retrieve
 """
-import json
-from io import BytesIO
 import pkg_resources
-import tempfile
 
 from django.core.files.base import ContentFile
-from django.core.files import File
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
@@ -25,6 +21,7 @@ from opendp.mod import OpenDPException
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
+from opendp_apps.analysis.tools.dp_variance_spec import DPVarianceSpec
 from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
 from opendp_apps.analysis.stat_valid_info import StatValidInfo
 from opendp_apps.analysis.tools.stat_spec import StatSpec
@@ -34,6 +31,7 @@ from opendp_apps.analysis.tools.dp_histogram_integer_spec import DPHistogramInte
 from opendp_apps.analysis.tools.dp_histogram_categorical_spec import DPHistogramCategoricalSpec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
+from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.profiler import static_vals as pstatic
 
 from opendp_apps.utils.extra_validators import \
@@ -46,7 +44,6 @@ from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
 # Temp workaround!!! See Issue #300
 # https://github.com/opendp/dpcreator/issues/300
 from opendp_apps.utils.camel_to_snake import camel_to_snake
-
 
 
 class ValidateReleaseUtil(BasicErrCheck):
@@ -87,7 +84,7 @@ class ValidateReleaseUtil(BasicErrCheck):
 
     @staticmethod
     def validate_mode(opendp_user: get_user_model(), analysis_plan_id: int,
-                      dp_statistics: list  =None):
+                      dp_statistics: list = None):
         """
         Use this method to return a ValidateReleaseUtil validates the dp_statistics
         """
@@ -286,6 +283,13 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.analysis_plan.save()
         # print('ValidateReleaseUtil - self.release_stats', json.dumps(self.release_stats, indent=4))
 
+        # (6) Delete the "source_file"
+        #
+        delete_result = DataSetInfo.delete_source_file(self.analysis_plan.dataset)
+        if not delete_result.success:
+            self.add_err_msg(delete_result.message)
+            return False
+
         return True
 
     def get_new_release_info_object(self):
@@ -384,10 +388,6 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.stat_spec_list = []
         stat_num = 0
 
-        # track total epsilon
-        #
-        running_epsilon = 0
-
         for dp_stat in self.dp_statistics:
             stat_num += 1       # not used yet...
             """
@@ -399,7 +399,7 @@ class ValidateReleaseUtil(BasicErrCheck):
             - Some sample input from the UI--e.g. contents of "dp_stat:
                 {
                     "statistic": astatic.DP_MEAN,
-                    "variable": "EyeHeight",
+                    "variable_key": "eye_height"
                     "epsilon": 1,
                     "delta": 0,
                     "error": "",
@@ -419,7 +419,7 @@ class ValidateReleaseUtil(BasicErrCheck):
             #
             variable = props.get('variable')
             statistic = props.get('statistic', 'shrug?')
-            epsilon = props.get('epsilon')
+            # epsilon = props.get('epsilon')
             var_type = None
 
             # (1) Is variable defined?
@@ -438,28 +438,21 @@ class ValidateReleaseUtil(BasicErrCheck):
                 self.add_stat_spec(DPSpecError(props))
                 continue  # to the next dp_stat specification
 
-
             # (3) Add variable_info which has min/max/categories, variable type, etc.
             #
             print('variable info 1', variable)
             variable_info = self.analysis_plan.variable_info.get(variable)
-            if not variable_info:
-                # Temp workaround!!! See Issue #300
-                # https://github.com/opendp/dpcreator/issues/300
-                print('variable info 2', camel_to_snake(variable))
-                variable_info = self.analysis_plan.variable_info.get(camel_to_snake(variable))
-
             if variable_info:
                 props['variable_info'] = variable_info
                 var_type = variable_info.get('type')
             else:
-                props['error_message'] = 'Variable info not found.'
+                props['error_message'] = 'Variable in validation info not found.'
                 self.add_stat_spec(DPSpecError(props))
                 continue  # to the next dp_stat specification
 
             # (4) Retrieve the column index
             #
-            col_idx_info = self.analysis_plan.dataset.get_variable_index(variable)
+            col_idx_info = self.analysis_plan.dataset.get_variable_index(variable_info['name'])
             if col_idx_info.success:
                 props['col_index'] = col_idx_info.data
             else:
@@ -495,6 +488,9 @@ class ValidateReleaseUtil(BasicErrCheck):
             elif statistic == astatic.DP_SUM:
                 # DP Mean!
                 self.add_stat_spec(DPSumSpec(props))
+
+            elif statistic == astatic.DP_VARIANCE:
+                self.add_stat_spec(DPVarianceSpec(props))
 
             elif statistic in astatic.DP_STATS_CHOICES:
                 # Stat not yet available or an error
@@ -558,7 +554,6 @@ class ValidateReleaseUtil(BasicErrCheck):
             user_msg = f'{astatic.ERR_MSG_BAD_TOTAL_DELTA}: {self.max_delta}'
             self.add_err_msg(user_msg)
             return False
-
 
         return True
 

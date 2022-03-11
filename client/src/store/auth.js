@@ -9,6 +9,10 @@ import {
   SET_TOKEN,
   SET_USER,
   SET_BANNER_MESSAGES,
+  EDIT_USER_BEGIN,
+  EDIT_USER_CLEAR,
+  EDIT_USER_FAILURE,
+  EDIT_USER_SUCCESS, PASSWORD_EMAIL_BEGIN, PASSWORD_EMAIL_CLEAR, PASSWORD_EMAIL_FAILURE, PASSWORD_EMAIL_SUCCESS
 } from './types';
 import terms from "@/api/terms";
 
@@ -22,8 +26,10 @@ const initialState = {
   user: null,
   currentTerms: null,
   termsOfAccessLog: null,
-  bannerMessages: null
-
+  bannerMessages: null,
+  editUserCompleted: false,
+  editUserError: false,
+  editUserLoading: false,
 };
 
 const getters = {
@@ -63,18 +69,28 @@ const getters = {
 
 const actions = {
   changeUsername({commit, state}, newUsername) {
+    commit(EDIT_USER_BEGIN)
     let newUser = null;
     newUser = Object.assign({}, state.user)
     newUser.username = newUsername
-    auth.updateAccountDetails(newUser)
+    return auth.updateAccountDetails(newUser)
         .then((data) => {
           commit(SET_USER, newUser)
+          commit(EDIT_USER_SUCCESS)
+        }).catch((data) => {
+          commit(EDIT_USER_FAILURE)
+          return Promise.reject(data)
         })
 
   },
-  login({commit}, {username, password}) {
+  clearEditUserStatus({commit}) {
+    commit(EDIT_USER_CLEAR);
+  },
+  login({commit}, {username, password, handoffId}) {
     commit(LOGIN_BEGIN);
-    return auth.login(username, password)
+    console.log('auth.js - handoffId:' + handoffId)
+
+    return auth.login(username, password, handoffId)
         .then(({data}) => {
           commit(SET_TOKEN, data.key)
         })
@@ -197,7 +213,24 @@ const mutations = {
   },
   [SET_BANNER_MESSAGES](state, bannerMessages) {
     state.bannerMessages = bannerMessages
-  }
+  },
+  [EDIT_USER_BEGIN](state) {
+    state.editUserLoading = true;
+  },
+  [EDIT_USER_CLEAR](state) {
+    state.editUserCompleted = false;
+    state.editUserError = false;
+    state.editUserLoading = false;
+  },
+  [EDIT_USER_FAILURE](state) {
+    state.editUserError = true;
+    state.editUserLoading = false;
+  },
+  [EDIT_USER_SUCCESS](state) {
+    state.editUserCompleted = true;
+    state.editUserError = false;
+    state.editUserLoading = false;
+  },
 };
 
 export default {

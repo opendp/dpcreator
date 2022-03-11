@@ -34,5 +34,10 @@ echo "| (for dev)           |"
 echo "-----------------------"
 python /code/server/manage.py loaddata opendp_apps/dataverses/fixtures/*.json \
   opendp_apps/dataset/fixtures/*.json opendp_apps/banner_messages/fixtures/*.json
+echo "------------------------------"
+echo "| Clear several test fixtures |"
+echo "| (for dev)                   |"
+echo "------------------------------"
+python /code/server/manage.py clear_test_datasets
 exec "$@"
 echo

@@ -256,6 +256,7 @@ REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'opendp_apps.user.serializers.CustomRegisterSerializer',
 }
 REST_AUTH_SERIALIZERS = {
+    'LOGIN_SERIALIZER': 'opendp_apps.user.serializers.CustomLoginSerializer',
     'USER_DETAILS_SERIALIZER': 'opendp_apps.user.serializers.OpenDPUserSerializer',
 }
 # ALLOWED_HOSTS=['*']
@@ -291,10 +292,13 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'info@opendp.org')
 # Possible settings for ACCOUNT_EMAIL_VERIFICATION: 'none' or 'mandatory';
 #   - 'mandatory' requires working settings for EMAIL_HOST, EMAIL_USER, etc.
 #
-ACCOUNT_EMAIL_VERIFICATION = os.environ.get('ACCOUNT_EMAIL_VERIFICATION', 'none') # 'mandatory'
+ACCOUNT_EMAIL_VERIFICATION = os.environ.get('ACCOUNT_EMAIL_VERIFICATION', 'none')  # 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = 'true'
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/log-in/'
 ACCOUNT_TEMPLATE_EXTENSION = 'html'
+
+# This setting is necessary to enable checking of the old password when changing the password
+OLD_PASSWORD_FIELD_ENABLED = 'true'
 
 # ---------------------------
 # Profiler - Dataset reading

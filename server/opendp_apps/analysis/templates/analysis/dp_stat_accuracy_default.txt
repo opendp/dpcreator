@@ -1,1 +1,3 @@
-There is a probability of {{ stat.get_cl_text }} that the DP {{ stat.statistic|title }} will differ from the true {{ stat.statistic|title }} by at most {{ stat.accuracy_val }} units. Here the units are the same units the variable {{ stat.variable }} has in the dataset.
+There is a probability of {{ stat.get_cl_text }} that the DP {{ stat.statistic|title }} will differ from the true
+{{ stat.statistic|title }} by at most {{ stat.accuracy_val }} units. Here the units are the same units the
+variable {{ stat.variable }} has in the dataset.

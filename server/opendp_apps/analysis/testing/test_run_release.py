@@ -236,6 +236,9 @@ class TestRunRelease(TestCase):
 
         analysis_plan = self.analysis_plan
 
+        # The source_file should exist
+        self.assertTrue(analysis_plan.dataset.source_file)
+
         # Send the dp_statistics for validation
         #
         analysis_plan.dp_statistics = self.general_stat_specs
@@ -272,6 +275,9 @@ class TestRunRelease(TestCase):
             self.assertTrue(dep_rec.http_status_code == 403 or\
                             dep_rec.http_status_code < 0)
 
+        # The source_file should be deleted
+        analysis_plan = AnalysisPlan.objects.get(id=analysis_plan.id)
+        self.assertTrue(not analysis_plan.dataset.source_file)
 
 
     def test_55_success_download_urls(self):
@@ -337,6 +343,9 @@ class TestRunRelease(TestCase):
         expected_pdf_url = drf_reverse('release-download-pdf', args=[], kwargs=dict(pk=release_info_object_id))
         self.assertEqual(expected_pdf_url, updated_plan.release_info.download_pdf_url())
 
+        # The source_file should be deleted
+        self.assertTrue(not analysis_plan.dataset.source_file)
+
 
     def test_60_analysis_plan_has_release_info(self):
         """(60) Via API, ensure that release_info is added as a field to AnalysisPlan"""
@@ -399,6 +408,9 @@ class TestRunRelease(TestCase):
         # Uncomment next line to show the AnalysisPlan output
         #   with attached ReleaseInfo object
         # print(json.dumps(analysis_plan_jresp, indent=4))
+
+        # The source_file should be deleted
+        self.assertTrue(not analysis_plan.dataset.source_file)
 
 
     def test_70_dataset_formatter_eye_fatigue_file(self):
@@ -574,3 +586,6 @@ class TestRunRelease(TestCase):
         self.assertIsNotNone(dp_sum_stat['result'])
         self.assertIsNotNone(dp_sum_stat['result']['value'])
         self.assertGreater(dp_sum_stat['result']['value'], 400_000)
+
+        # The source_file should be deleted
+        self.assertTrue(not analysis_plan.dataset.source_file)

@@ -194,14 +194,13 @@ Cypress.Commands.add('createStatistics', (demoData) => {
 
     // Create statistic for every statistics item in the fixture
     cy.get('[data-test="Add Statistic"]').should('be.visible')
-    cy.pause()
     demoData.statistics.forEach((demoStat) => {
         let demoVar = demoData.variables[demoStat.variable]
         cy.get('[data-test="Add Statistic"]').click({force: true});
         cy.get('[data-test="' + demoStat.statistic + '"]').click({force: true});
         const varDataTest = '[data-test="' + demoVar.name + '"]'
         cy.get(varDataTest).click({force: true})
-        cy.get('[data-test="Fixed value"]').type(demoVar.fixedValue)
+        cy.get('[data-test="Fixed value"]').type(demoStat.fixedValue)
         cy.get('[data-test="Create statistic"]').click({force: true})
 
         // The statistic should have been created
@@ -209,7 +208,7 @@ Cypress.Commands.add('createStatistics', (demoData) => {
         cy.get('tr').first().get('td').should('contain', demoStat.statistic)
         cy.get('table').contains('td', demoStat.statistic).should('be.visible');
         // Statistic should contain correct accuracy value
-        cy.get('table').contains('td', demoVar.accuracy).should('be.visible')
+        cy.get('table').contains('td', demoStat.roundedAccuracy).should('be.visible')
     })
 }),
 
@@ -245,15 +244,19 @@ Cypress.Commands.add('submitStatistics', (demoData) => {
 
     // Submit  Statistic
     cy.get('[data-test="Submit statistics"]').click({force: true});
+    cy.get('[data-test="generate release status"]').should('be.visible')
+
+    cy.get('[data-test="generate release status"]').should('contain', 'Release Completed')
     // Go to Details page
     cy.get('[data-test="View Data Details"]').click({force: true});
     cy.url().should('contain', 'my-data-details')
     // The Release Details should be visible
     cy.get('[data-test="status tag"]').should('contain', 'Release Completed')
-    demoData.statistics.forEach((demoStat)=> {
-        let snippet = 'A differentially private ' + demoStat.statistic + ' for variable ' + demoData.variables[demoStat.variable].name
-        cy.get('[data-test="statistic description"]').should('contain', snippet)
+    demoData.statistics.forEach((demoStat) => {
+        cy.get('[data-test="statistic description"]').should('contain', demoStat.statistic)
+        cy.get('[data-test="statistic description"]').should('contain', demoStat.accuracy)
     })
+
 })
 Cypress.Commands.add('setupStatisticsPage', (datasetFixture, analysisFixture) => {
     cy.fixture(datasetFixture).then(dataset => {

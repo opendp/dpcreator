@@ -3,9 +3,8 @@ client/node_modules
 client/src/locales/en.json
 client/cypress/screenshots
 server/db.sqlite3
-server/templates/base-vue.html
 server/static/dist/
-
+server/templates/base-vue.html
 /.idea/
 /venv/
 Pipfile
@@ -19,8 +18,8 @@ Pipfile.lock
 *.json
 *.aux
 *.fdb_latexmk
-*cypress*
 *.fls
+*.png
 
 
 # Byte-compiled / optimized / DLL files
@@ -181,6 +180,7 @@ server/scripts_dev/dv_test_creds.py
 !server/opendp_apps/profiler/fixtures/*.json
 !server/opendp_apps/content_pages/fixtures/*.json
 !server/test_data/pdfs/*.pdf
+!server/test_data/deposit/*.json
 !dev_notes/api_example_analysis_plan.json
 .env
 !deploy/dataverse/*.json
@@ -197,3 +197,5 @@ client/.idea/misc.xml
 client/.idea/inspectionProfiles/Project_Default.xml
 client/.idea/inspectionProfiles/profiles_settings.xml
 client/.idea/aws.xml
+!deploy/dataverse/*.json
+server/templates/base-vue.html
