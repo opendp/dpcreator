@@ -1,6 +1,7 @@
 """
 Create a PDF report based on a DP Release
 """
+from __future__ import annotations
 from decimal import Decimal
 from decimal import getcontext as get_dec_context
 import json
@@ -21,7 +22,6 @@ from borb.pdf.canvas.layout.layout_element import Alignment
 from borb.pdf.canvas.layout.page_layout.multi_column_layout import SingleColumnLayout
 from borb.pdf.canvas.layout.page_layout.page_layout import PageLayout
 
-from borb.pdf.canvas.layout.table.fixed_column_width_table import FixedColumnWidthTable
 from borb.pdf.document import Document
 from borb.pdf.page.page import DestinationType
 from borb.pdf.page.page import Page
@@ -33,9 +33,10 @@ from borb.pdf.canvas.layout.text.paragraph import Paragraph
 from borb.pdf.canvas.line_art.line_art_factory import LineArtFactory
 from borb.pdf.canvas.geometry.rectangle import Rectangle
 from borb.pdf.canvas.layout.shape.shape import Shape
+from borb.pdf.canvas.layout.table.fixed_column_width_table import FixedColumnWidthTable
 from borb.pdf.canvas.layout.table.flexible_column_width_table import FlexibleColumnWidthTable
 from borb.pdf.canvas.layout.table.table import TableCell
-from borb.pdf.canvas.color.color import HSVColor, HexColor, Color
+from borb.pdf.canvas.color.color import HexColor
 
 import matplotlib.pyplot as MatPlotLibPlot
 import numpy as np
@@ -60,8 +61,8 @@ class PDFReportMaker(BasicErrCheck):
     basic_font_italic = get_custom_font(OPEN_SANS_ITALIC)
     basic_font_bold = get_custom_font(OPEN_SANS_SEMI_BOLD)
 
-    def __init__(self, release_dict=None):
-        """Init w/...."""
+    def __init__(self, release_dict: dict=None):
+        """Initalize with a DP Release as Python dict"""
         self.release_dict = release_dict
         if not release_dict:
             self.release_dict = self.get_test_release()
@@ -74,16 +75,23 @@ class PDFReportMaker(BasicErrCheck):
         self.tbl_font_size = Decimal(9)
         self.tbl_border_color = HexColor("#cbcbcb")
 
+        # param table
+        self.indent1 = Decimal(10)
+        self.indent2 = Decimal(20)
+
         # PDF file
         self.pdf_output_file = join(CURRENT_DIR,
                                     'test_data',
                                     'pdf_report_01_%s.pdf' % (self.random_with_N_digits(6)))
 
-        self.pdf_doc: Document = Document()
-        self.current_page = Page(PageSize.LETTER_PORTRAIT.value[0], PageSize.LETTER_PORTRAIT.value[1])
-        self.pdf_doc.append_page(self.current_page)
+        ps: typing.Tuple[Decimal, Decimal] = PageSize.LETTER_PORTRAIT.value
+        self.page_width, self.page_height = ps  # page width, height
+        print(f'page_width/page_height: {self.page_width}/{self.page_height}')
 
-        self.layout: PageLayout = SingleColumnLayout(self.current_page)
+        self.page_cnt = 0
+        self.pdf_doc: Document = Document()
+        self.current_page = None  # Page
+        self.layout = None  # PageLayout
 
         self.creation_date = None
 
@@ -93,9 +101,14 @@ class PDFReportMaker(BasicErrCheck):
 
     def start_new_page(self):
         """Start a new page"""
+        self.page_cnt += 1
         self.current_page = Page(PageSize.LETTER_PORTRAIT.value[0], PageSize.LETTER_PORTRAIT.value[1])
         self.pdf_doc.append_page(self.current_page)
         self.layout: PageLayout = SingleColumnLayout(self.current_page)
+
+        # Add line at the top
+        #
+        self.add_header_border_logo(self.current_page)
 
     def add_to_layout(self, pdf_element):
         """Add a PDF element to the document"""
@@ -113,15 +126,13 @@ class PDFReportMaker(BasicErrCheck):
 
             print("Start a new page!")
             self.start_new_page()
-
             print('Try to add the element again')
-            self.layout.add(pdf_element)
 
     def random_with_N_digits(self, n):
+        """Get random digits"""
         range_start = 10 ** (n - 1)
         range_end = (10 ** n) - 1
         return random.randint(range_start, range_end)
-
 
     def format_release(self):
         """Update release values"""
@@ -216,10 +227,7 @@ class PDFReportMaker(BasicErrCheck):
 
     def create_pdf(self):
         """Start making the PDF"""
-
-        # Add line at the top
-        #
-        self.add_colored_artwork_bottom_right_corner(self.current_page)
+        self.start_new_page()
 
         # Add title text
         #
@@ -235,15 +243,15 @@ class PDFReportMaker(BasicErrCheck):
                                   multiplied_leading=Decimal(1.75)))
 
         self.add_to_layout(Paragraph(('Please read the report carefully, especially in'
-                                   'regard to usage of these statistics.'),
+                                   ' regard to usage of these statistics.'),
                                   font=self.basic_font,
                                   font_size=self.basic_font_size,
                                   multiplied_leading=Decimal(1.75)))
 
-        self.add_to_layout(Paragraph(('Contents'),
-                                  font=get_custom_font(OPEN_SANS_SEMI_BOLD),
-                                  font_size=self.basic_font_size,
-                                  multiplied_leading=Decimal(1.75)))
+        self.add_to_layout(Paragraph('Contents',
+                           font=get_custom_font(OPEN_SANS_SEMI_BOLD),
+                           font_size=self.basic_font_size,
+                           multiplied_leading=Decimal(1.75)))
 
         self.add_to_layout(self.txt_list_para('1. Statistics'))
         stat_cnt = 0
@@ -259,20 +267,22 @@ class PDFReportMaker(BasicErrCheck):
 
         stat_cnt = 0
         for stat_info in self.release_dict['statistics']:
+            # Put each statistic on a new page
+            self.start_new_page()
+
             stat_cnt += 1
             stat_type = stat_info['statistic']
             var_name = stat_info['variable']
 
             subtitle = f"1.{stat_cnt}. {var_name} - " + stat_type.title()
             self.add_to_layout(Paragraph(subtitle,
-                                      font=get_custom_font(OPEN_SANS_SEMI_BOLD),
-                                      font_size=self.basic_font_size + Decimal(1),
-                                      font_color=self.color_crimson,
-                                      multiplied_leading=Decimal(1.75)))
+                                         font=get_custom_font(OPEN_SANS_SEMI_BOLD),
+                                         font_size=self.basic_font_size + Decimal(1),
+                                         font_color=self.color_crimson,
+                                         multiplied_leading=Decimal(1.75)))
 
             text_chunks_01 = [
-                self.txt_bld(f'Result.'),
-                self.txt_reg(f' A '),
+                self.txt_reg(f'A '),
                 self.txt_bld(f'differentially private (DP) {stat_type}'),
                 self.txt_reg(' has been calculated for the variable'),
                 self.txt_bld(f" {var_name}."),
@@ -284,6 +294,10 @@ class PDFReportMaker(BasicErrCheck):
             self.add_to_layout(HeterogeneousParagraph(text_chunks_01,
                                                       padding_left=Decimal(10)))
 
+            self.add_to_layout(HeterogeneousParagraph([self.txt_bld_para('Result')],
+                                                      padding_left=Decimal(10)))
+            # HeterogeneousParagraph(text_chunks_01, padding_left=Decimal(10)))
+
             if stat_info['statistic'] == astatic.DP_MEAN:
 
 
@@ -294,7 +308,7 @@ class PDFReportMaker(BasicErrCheck):
                 tbl_result = FlexibleColumnWidthTable(number_of_rows=4,
                                                       number_of_columns=2,
                                                       padding_left=Decimal(40),
-                                                      padding_right=Decimal(40),
+                                                      padding_right=Decimal(60),
                                                       padding_bottom=Decimal(20),
                                                       )
 
@@ -328,13 +342,6 @@ class PDFReportMaker(BasicErrCheck):
                 self.add_to_layout(tbl_result)
 
 
-                #self.layout.add(Paragraph(stat_info['description']['text'],
-                #                          font=self.basic_font,
-                #                          font_size=self.basic_font_size,
-                #                          multiplied_leading=Decimal(1.75)))
-
-                self.start_new_page()
-
                 text_chunks_02 = [
                     self.txt_bld(f'Parameters.'),
                     self.txt_reg(f' The table below shows the parameters used when calculating the DP Mean. For reference, '),
@@ -343,7 +350,7 @@ class PDFReportMaker(BasicErrCheck):
                 ]
 
                 self.add_to_layout(HeterogeneousParagraph(text_chunks_02,
-                                                       padding_left=Decimal(10)))
+                                                          padding_left=Decimal(10)))
 
                 # self.layout.add(self.txt_bld_para(f'Parameters.'))
                 # self.layout.add(self.txt_reg_para(' The table below shows the parameters used when calculating the DP Mean. For reference, a description of each parameter may be found at the end of the document.'))
@@ -354,16 +361,16 @@ class PDFReportMaker(BasicErrCheck):
                 table_001 = FlexibleColumnWidthTable(number_of_rows=11,
                                                      number_of_columns=2,
                                                      padding_left=Decimal(40),
-                                                     padding_right=Decimal(40),
+                                                     padding_right=Decimal(60),
                                                      border_color=self.color_crimson)
 
 
                 table_001.add(self.get_tbl_cell_ital("Privacy Parameters", col_span=2))
 
-                table_001.add(self.get_tbl_cell_lft_pad("Epsilon", padding=20))
+                table_001.add(self.get_tbl_cell_lft_pad("Epsilon", padding=self.indent1))
                 table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['epsilon']}"))
 
-                table_001.add(self.get_tbl_cell_lft_pad("Delta", padding=20))
+                table_001.add(self.get_tbl_cell_lft_pad("Delta", padding=self.indent1))
                 delta_val = stat_info['delta']
                 if delta_val is None:
                     delta_val = '(not applicable)'
@@ -371,34 +378,34 @@ class PDFReportMaker(BasicErrCheck):
 
                 table_001.add(self.get_tbl_cell_ital("Metadata Parameters", col_span=2))
 
-                table_001.add(self.get_tbl_cell_ital("Bounds", col_span=2, padding=20))
+                table_001.add(self.get_tbl_cell_ital("Bounds", col_span=2, padding=self.indent1))
 
-                table_001.add(self.get_tbl_cell_lft_pad("Min", padding=40))
+                table_001.add(self.get_tbl_cell_lft_pad("Min", padding=self.indent2))
                 table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['bounds']['min']}"))
 
-                table_001.add(self.get_tbl_cell_lft_pad("Max", padding=40))
+                table_001.add(self.get_tbl_cell_lft_pad("Max", padding=self.indent2))
                 table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['bounds']['max']}"))
 
-                table_001.add(self.get_tbl_cell_lft_pad("Confidence Level", padding=20))
+                table_001.add(self.get_tbl_cell_lft_pad("Confidence Level", padding=self.indent1))
                 table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['confidence_level']}"))
 
                 # Missing Value Handling
                 table_001.add(self.get_tbl_cell_ital("Missing Value Handling", col_span=2))
 
-                table_001.add(self.get_tbl_cell_lft_pad("Type", padding=20))
+                table_001.add(self.get_tbl_cell_lft_pad("Type", padding=self.indent1))
                 missing_val_handling = stat_info['missing_value_handling']['type']
                 print('>>> missing_val_handling', missing_val_handling)
                 if missing_val_handling == astatic.MISSING_VAL_INSERT_FIXED:
                     table_001.add(self.get_tbl_cell_lft_pad(
                         astatic.missing_val_label(astatic.MISSING_VAL_INSERT_FIXED)))
 
-                    table_001.add(self.get_tbl_cell_lft_pad("Value", padding=20))
+                    table_001.add(self.get_tbl_cell_lft_pad("Value", padding=self.indent1))
                     table_001.add(self.get_tbl_cell_align_rt(
                         f"{stat_info['missing_value_handling']['fixed_value']}"))
 
-                # table_001.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
+                table_001.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
                 table_001.set_border_color_on_all_cells(self.color_crimson)
-                table_001.set_borders_on_all_cells(True, False, True, False)  # top, right, left, bottom
+                table_001.set_borders_on_all_cells(True, True, True, True)  # top, right, left, bottom
 
                 rsize = self.get_layout_box(table_001)
                 print('rsize: W x H', rsize.width, rsize.height)
@@ -462,51 +469,58 @@ class PDFReportMaker(BasicErrCheck):
         # return the current figure
         return MatPlotLibPlot.gcf()
 
-
-    def add_colored_artwork_bottom_right_corner(self, page: Page) -> None:
+    def add_header_border_logo(self, page: Page) -> None:
         """
-        This method will add a blue/purple artwork of lines
-        and squares to the bottom right corner
-        of the given Page
+        Add a top crimson/black border to each page. Add the DP Creator logo to the 1st page
         """
-        ps: typing.Tuple[Decimal, Decimal] = PageSize.LETTER_PORTRAIT.value
-
+        # --------------------------------
+        # Add top crimson border
+        # --------------------------------
         line_height = 16
+        r: Rectangle = Rectangle(Decimal(0),  # lower_left_x
+                                 self.page_height - line_height,  # lower_left_y
+                                 self.page_width,  # width
+                                 Decimal(line_height))  # height
 
-        # Line
-        print('ps[0]', ps[0], ps[1])
-        # Add logo at the top
-        #
-        logo_height = 32 # 64 / 2
-        logo_width = 72 # 144 / 2
-        rect_logo: Rectangle = Rectangle(Decimal(10), ps[1] - line_height - logo_height - Decimal(10),
-                                 Decimal(logo_width), Decimal(logo_height))
-        logo_img_obj = Image(
-            DPCREATOR_LOGO_PATH,
-            width=Decimal(logo_width),
-            height=Decimal(logo_height),
-        )
-        logo_img_obj.layout(page, rect_logo)
-
-        page.append_remote_go_to_annotation(
-            logo_img_obj.get_bounding_box(), uri="https://www.opendp.org"
-        )
-
-
-        # lower_left_x, lower_left_y, width, height
-        r: Rectangle = Rectangle(Decimal(0), ps[1] - line_height, ps[0], Decimal(line_height))
         Shape(
             points=LineArtFactory.rectangle(r),
             stroke_color=self.color_crimson,
             fill_color=self.color_crimson,
         ).layout(page, r)
 
+        # --------------------------------
+        # Add top black border
+        # --------------------------------
         line_height2 = 1
         r: Rectangle = Rectangle(Decimal(0),
-                                 ps[1] - line_height - line_height2,
-                                 ps[0], Decimal(line_height2))
+                                 self.page_height - line_height - line_height2,
+                                 self.page_width,
+                                 Decimal(line_height2))
         Shape(
             points=LineArtFactory.rectangle(r),
             stroke_color=HexColor("#000000"),
             fill_color=HexColor("#000000"),
         ).layout(page, r)
+
+        # --------------------------------
+        # Add logo to the first page
+        # --------------------------------
+        if self.page_cnt == 1:
+            logo_height = 32 # 64 / 2
+            logo_width = 72 # 144 / 2
+            rect_logo: Rectangle = Rectangle(Decimal(10),
+                                             self.page_height - line_height - logo_height - Decimal(10),
+                                             Decimal(logo_width),
+                                             Decimal(logo_height))
+            logo_img_obj = Image(
+                DPCREATOR_LOGO_PATH,
+                width=Decimal(logo_width),
+                height=Decimal(logo_height),
+            )
+
+            logo_img_obj.layout(page, rect_logo)
+
+            # Link logo to opendp.org url
+            page.append_remote_go_to_annotation(
+                logo_img_obj.get_bounding_box(), uri="https://www.opendp.org"
+            )

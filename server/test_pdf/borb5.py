@@ -16,6 +16,12 @@ from borb.pdf.canvas.layout.table.table import TableCell
 from borb.pdf.canvas.layout.text.paragraph import Paragraph
 
 
+def get_layout_box(self, p: Paragraph) -> Rectangle:
+    pg: Page = Page()
+    ZERO: Decimal = Decimal(0)
+    W: Decimal = Decimal(1000)  # max width you would allow
+    H: Decimal = Decimal(1000)  # max height you would allow
+    return p.layout(pg, Rectangle(ZERO, ZERO, W, H))
 
 def main():
     doc: Document = Document()
@@ -38,17 +44,22 @@ def main():
                      line_width=Decimal(1)
                      ))
 
-    num_rows = 44
+    num_rows = 46
     table_001 = FlexibleColumnWidthTable(number_of_rows=num_rows,
                                          number_of_columns=2,
                                          padding_left=Decimal(40),
-                                         padding_right=Decimal(40),
-                                         border_color=HexColor('006699'))
+                                         padding_right=Decimal(40))
+    table_001.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
+    table_001.set_border_color_on_all_cells(HexColor('006699'))
+    table_001.set_borders_on_all_cells(True, False, True, False)  # top, right, left, bottom
 
     table_001.add(TableCell(Paragraph("Privacy Parameters"), col_span=2))
     for cnt in range(1, num_rows):
 
         table_001.add(TableCell(Paragraph(f"{cnt}"), col_span=2))
+
+    test_rect = get_layout_box(table_001)
+    print('test_rect w x h', test_rect.width, test_rect.height)
 
     #print(dir(table_001.get_bounding_box().__sizeof__))
     #print(table_001.get_bounding_box().__sizeof__())
@@ -78,6 +89,8 @@ def main():
         PDF.dumps(pdf_file_handle, doc)
 
     os.system(f'open {pdf_fname}')
+
+
 
 def get_layout_box(p: Paragraph) -> Rectangle:
     pg: Page = Page()
