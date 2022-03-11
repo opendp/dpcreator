@@ -52,6 +52,7 @@ from opendp_apps.dp_reports.font_util import \
      OPEN_SANS_BOLD,
      OPEN_SANS_ITALIC,
      DPCREATOR_LOGO_PATH)
+from opendp_apps.utils.randname import random_with_n_digits
 
 class PDFReportMaker(BasicErrCheck):
 
@@ -61,7 +62,7 @@ class PDFReportMaker(BasicErrCheck):
     basic_font_italic = get_custom_font(OPEN_SANS_ITALIC)
     basic_font_bold = get_custom_font(OPEN_SANS_SEMI_BOLD)
 
-    def __init__(self, release_dict: dict=None):
+    def __init__(self, release_dict: dict = None):
         """Initalize with a DP Release as Python dict"""
         self.release_dict = release_dict
         if not release_dict:
@@ -82,7 +83,8 @@ class PDFReportMaker(BasicErrCheck):
         # PDF file
         self.pdf_output_file = join(CURRENT_DIR,
                                     'test_data',
-                                    'pdf_report_01_%s.pdf' % (self.random_with_N_digits(6)))
+                                    'pdfs',
+                                    'pdf_report_01_%s.pdf' % (random_with_n_digits(6)))
 
         ps: typing.Tuple[Decimal, Decimal] = PageSize.LETTER_PORTRAIT.value
         self.page_width, self.page_height = ps  # page width, height
@@ -128,12 +130,6 @@ class PDFReportMaker(BasicErrCheck):
             self.start_new_page()
             print('Try to add the element again')
 
-    def random_with_N_digits(self, n):
-        """Get random digits"""
-        range_start = 10 ** (n - 1)
-        range_end = (10 ** n) - 1
-        return random.randint(range_start, range_end)
-
     def format_release(self):
         """Update release values"""
         self.creation_date = dateutil.parser.parse(self.release_dict['created']['iso'])
@@ -158,13 +154,14 @@ class PDFReportMaker(BasicErrCheck):
     def get_tbl_cell_ital(self, content, col_span=1, padding=0):
         """Get table cell, putting the content in italics"""
         return self._get_tbl_cell(content,
-                                 self.basic_font_italic,
-                                 self.tbl_font_size,
-                                 Alignment.LEFT,
-                                 col_span=col_span,
-                                 padding_left=padding)
+                                  self.basic_font_italic,
+                                  self.tbl_font_size,
+                                  Alignment.LEFT,
+                                  col_span=col_span,
+                                  padding_left=padding)
 
     def get_tbl_cell_lft_pad(self, content, padding=10):
+        """Return a table cell aligned left with left padding"""
         return self._get_tbl_cell(content,
                                   self.basic_font,
                                   self.tbl_font_size,
@@ -173,9 +170,11 @@ class PDFReportMaker(BasicErrCheck):
                                   padding_left=padding)
 
     def get_tbl_cell_align_rt(self, content):
+        """Return a table cell aligned right"""
         return self._get_tbl_cell(content, self.basic_font, self.tbl_font_size, Alignment.RIGHT)
 
-    def _get_tbl_cell(self, content, font=None, font_size=None, text_alignment=None, col_span=1, padding_left=0) -> TableCell:
+    def _get_tbl_cell(self, content, font=None, font_size=None, text_alignment=None,
+                      col_span=1, padding_left=0) -> TableCell:
         """Return a Paragraph within a TableCell"""
         if not font:
             font = self.basic_font
@@ -238,15 +237,16 @@ class PDFReportMaker(BasicErrCheck):
         #
         intro_text = render_to_string('pdf_report/intro_text.txt', self.release_dict)
         self.add_to_layout(Paragraph(intro_text,
-                                  font=self.basic_font,
-                                  font_size=self.basic_font_size,
-                                  multiplied_leading=Decimal(1.75)))
+                                     font=self.basic_font,
+                                     font_size=self.basic_font_size,
+                                     multiplied_leading=Decimal(1.75)))
 
-        self.add_to_layout(Paragraph(('Please read the report carefully, especially in'
-                                   ' regard to usage of these statistics.'),
-                                  font=self.basic_font,
-                                  font_size=self.basic_font_size,
-                                  multiplied_leading=Decimal(1.75)))
+        para_read_carefully = ('Please read the report carefully, especially in'
+                               ' regard to usage of these statistics.')
+        self.add_to_layout(Paragraph(para_read_carefully,
+                                     font=self.basic_font,
+                                     font_size=self.basic_font_size,
+                                     multiplied_leading=Decimal(1.75)))
 
         self.add_to_layout(Paragraph('Contents',
                            font=get_custom_font(OPEN_SANS_SEMI_BOLD),
@@ -259,7 +259,7 @@ class PDFReportMaker(BasicErrCheck):
             stat_cnt += 1
             stat_type = stat_info['statistic']
             var_name = stat_info['variable']
-            self.add_to_layout(self.txt_list_para(f'1.{stat_cnt}. {var_name} - {stat_type}', 60))
+            self.add_to_layout(self.txt_list_para(f'1.{stat_cnt}. {var_name} - {stat_type}', Decimal(60)))
 
         self.add_to_layout(self.txt_list_para('2. Data source'))
         self.add_to_layout(self.txt_list_para('3. OpenDP Library / Usage'))
@@ -267,6 +267,8 @@ class PDFReportMaker(BasicErrCheck):
 
         stat_cnt = 0
         for stat_info in self.release_dict['statistics']:
+            if stat_info['statistic'] == astatic.DP_HISTOGRAM:
+                continue
             # Put each statistic on a new page
             self.start_new_page()
 
@@ -300,16 +302,14 @@ class PDFReportMaker(BasicErrCheck):
 
             if stat_info['statistic'] == astatic.DP_MEAN:
 
-
                 # -------------------------------------
                 # Result table
                 # -------------------------------------
-
                 tbl_result = FlexibleColumnWidthTable(number_of_rows=4,
                                                       number_of_columns=2,
                                                       padding_left=Decimal(40),
                                                       padding_right=Decimal(60),
-                                                      padding_bottom=Decimal(20),
+                                                      padding_bottom=Decimal(0),
                                                       )
 
                 tbl_result.add(self.get_tbl_cell_lft_pad("DP Mean", padding=0))
@@ -327,7 +327,6 @@ class PDFReportMaker(BasicErrCheck):
 
                 tbl_result.add(self.get_tbl_cell_lft_pad("Description", padding=0))
 
-
                 acc_desc = (f'There is a probability of {clevel}% that the DP {stat_type.title()} '
                             f' will differ'
                             f' from the true {stat_type.title()} by at most {acc_fmt} units.'
@@ -335,16 +334,15 @@ class PDFReportMaker(BasicErrCheck):
 
                 tbl_result.add(self.get_tbl_cell_lft_pad(acc_desc))
 
-
                 tbl_result.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
                 tbl_result.set_border_color_on_all_cells(self.color_crimson)
-                tbl_result.set_borders_on_all_cells(True, False, True, False) # top, right, left, bottom
+                tbl_result.set_borders_on_all_cells(True, False, True, False)  # top, right, left, bottom
                 self.add_to_layout(tbl_result)
-
 
                 text_chunks_02 = [
                     self.txt_bld(f'Parameters.'),
-                    self.txt_reg(f' The table below shows the parameters used when calculating the DP Mean. For reference, '),
+                    self.txt_reg((' The table below shows the parameters used when'
+                                  ' calculating the DP Mean. For reference, ')),
                     self.txt_reg(' a description of each'),
                     self.txt_reg(' parameter may be found at the end of the document.'),
                 ]
@@ -353,7 +351,9 @@ class PDFReportMaker(BasicErrCheck):
                                                           padding_left=Decimal(10)))
 
                 # self.layout.add(self.txt_bld_para(f'Parameters.'))
-                # self.layout.add(self.txt_reg_para(' The table below shows the parameters used when calculating the DP Mean. For reference, a description of each parameter may be found at the end of the document.'))
+                # self.layout.add(self.txt_reg_para(' The table below shows the parameters used
+                # when calculating the DP Mean. For reference, a description of each parameter
+                # may be found at the end of the document.'))
 
                 # --------------------------------------
                 # Create table for parameters
@@ -361,16 +361,15 @@ class PDFReportMaker(BasicErrCheck):
                 table_001 = FlexibleColumnWidthTable(number_of_rows=11,
                                                      number_of_columns=2,
                                                      padding_left=Decimal(40),
-                                                     padding_right=Decimal(60),
+                                                     padding_right=Decimal(40),
                                                      border_color=self.color_crimson)
-
 
                 table_001.add(self.get_tbl_cell_ital("Privacy Parameters", col_span=2))
 
-                table_001.add(self.get_tbl_cell_lft_pad("Epsilon", padding=self.indent1))
+                table_001.add(self.get_tbl_cell_lft_pad("Epsilon", padding=20))
                 table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['epsilon']}"))
 
-                table_001.add(self.get_tbl_cell_lft_pad("Delta", padding=self.indent1))
+                table_001.add(self.get_tbl_cell_lft_pad("Delta", padding=20))
                 delta_val = stat_info['delta']
                 if delta_val is None:
                     delta_val = '(not applicable)'
@@ -378,40 +377,40 @@ class PDFReportMaker(BasicErrCheck):
 
                 table_001.add(self.get_tbl_cell_ital("Metadata Parameters", col_span=2))
 
-                table_001.add(self.get_tbl_cell_ital("Bounds", col_span=2, padding=self.indent1))
+                table_001.add(self.get_tbl_cell_ital("Bounds", col_span=2, padding=20))
 
-                table_001.add(self.get_tbl_cell_lft_pad("Min", padding=self.indent2))
+                table_001.add(self.get_tbl_cell_lft_pad("Min", padding=40))
                 table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['bounds']['min']}"))
 
-                table_001.add(self.get_tbl_cell_lft_pad("Max", padding=self.indent2))
+                table_001.add(self.get_tbl_cell_lft_pad("Max", padding=40))
                 table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['bounds']['max']}"))
 
-                table_001.add(self.get_tbl_cell_lft_pad("Confidence Level", padding=self.indent1))
+                table_001.add(self.get_tbl_cell_lft_pad("Confidence Level", padding=20))
                 table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['confidence_level']}"))
 
                 # Missing Value Handling
                 table_001.add(self.get_tbl_cell_ital("Missing Value Handling", col_span=2))
 
-                table_001.add(self.get_tbl_cell_lft_pad("Type", padding=self.indent1))
+                table_001.add(self.get_tbl_cell_lft_pad("Type", padding=20))
                 missing_val_handling = stat_info['missing_value_handling']['type']
                 print('>>> missing_val_handling', missing_val_handling)
                 if missing_val_handling == astatic.MISSING_VAL_INSERT_FIXED:
                     table_001.add(self.get_tbl_cell_lft_pad(
                         astatic.missing_val_label(astatic.MISSING_VAL_INSERT_FIXED)))
 
-                    table_001.add(self.get_tbl_cell_lft_pad("Value", padding=self.indent1))
+                    table_001.add(self.get_tbl_cell_lft_pad("Value", padding=20))
                     table_001.add(self.get_tbl_cell_align_rt(
                         f"{stat_info['missing_value_handling']['fixed_value']}"))
 
                 table_001.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
                 table_001.set_border_color_on_all_cells(self.color_crimson)
-                table_001.set_borders_on_all_cells(True, True, True, True)  # top, right, left, bottom
+                table_001.set_borders_on_all_cells(True, False, True, False)  # top, right, bottom, left
 
                 rsize = self.get_layout_box(table_001)
                 print('rsize: W x H', rsize.width, rsize.height)
                 self.add_to_layout(table_001)
 
-        self.add_to_layout(Chart(self.create_plot(),
+        self.add_to_layout(Chart(self.create_example_plot(),
                                  width=Decimal(450),
                                  height=Decimal(256)))
 
@@ -429,11 +428,12 @@ class PDFReportMaker(BasicErrCheck):
         os.system(f'open {self.pdf_output_file}')
 
     def get_layout_box(self, p: Paragraph) -> Rectangle:
+        """From https://stackoverflow.com/questions/69318059/create-documents-with-dynamic-height-with-borb"""
         pg: Page = Page()
-        ZERO: Decimal = Decimal(0)
+        zero_dec: Decimal = Decimal(0)
         W: Decimal = Decimal(1000)  # max width you would allow
         H: Decimal = Decimal(1000)  # max height you would allow
-        return p.layout(pg, Rectangle(ZERO, ZERO, W, H))
+        return p.layout(pg, Rectangle(zero_dec, zero_dec, W, H))
 
     def get_pdf_contents(self):
         """Return the PDF contents"""
@@ -448,24 +448,19 @@ class PDFReportMaker(BasicErrCheck):
 
         return True, contents
 
-    def create_plot(self):
-
-        hist_vals = {'categories': list(range(1,13)),
-                     'values': [random.randint(1, 100) for x in range(1, 13)]}
+    @staticmethod
+    def create_example_plot():
+        """Example plot"""
+        hist_vals = {'bins': list(range(1,13)),
+                     'vals': [random.randint(1, 100) for _x in range(1, 13)],
+                     }
         print('hist_vals', hist_vals)
         fig = MatPlotLibPlot.figure()
         ax = fig.add_subplot()
-        ax.bar(x=hist_vals['categories'], height=hist_vals['values'])
+        ax.bar(x=hist_vals['bins'], height=hist_vals['vals'])
         ax.set_xlabel('Month')
-        ax.set_ylabel('Thunderstorms')
+        ax.set_ylabel('# Thunderstorms')
 
-        # orig plot
-        """
-        fig = MatPlotLibPlot.figure()
-        ax = fig.add_subplot(111, projection="3d")
-        ax.scatter(df["X"], df["Y"], df["Z"], c="skyblue", s=60)
-        ax.view_init(30, 185)
-        """
         # return the current figure
         return MatPlotLibPlot.gcf()
 
@@ -506,8 +501,8 @@ class PDFReportMaker(BasicErrCheck):
         # Add logo to the first page
         # --------------------------------
         if self.page_cnt == 1:
-            logo_height = 32 # 64 / 2
-            logo_width = 72 # 144 / 2
+            logo_height = 32  # 64 / 2
+            logo_width = 72  # 144 / 2
             rect_logo: Rectangle = Rectangle(Decimal(10),
                                              self.page_height - line_height - logo_height - Decimal(10),
                                              Decimal(logo_width),
@@ -521,6 +516,5 @@ class PDFReportMaker(BasicErrCheck):
             logo_img_obj.layout(page, rect_logo)
 
             # Link logo to opendp.org url
-            page.append_remote_go_to_annotation(
-                logo_img_obj.get_bounding_box(), uri="https://www.opendp.org"
-            )
+            page.append_remote_go_to_annotation(logo_img_obj.get_bounding_box(),
+                                                uri="https://www.opendp.org")
