@@ -18,7 +18,7 @@ class OpenDPUser(AbstractUser):
     """
     object_id = models.UUIDField(default=uuid.uuid4, editable=False)
     handoff_id = models.UUIDField(
-                    default=uuid.uuid4,
+                    default=None,
                     null=True,
                     help_text=('Temporary storage of a DataverseHandoff.object_id'
                                ' when arriving from Dataverse.'))

@@ -31,7 +31,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'name']
 
 
-class xCustomLoginSerializer(LoginSerializer):
+class CustomLoginSerializer(LoginSerializer):
     """
     Add an optional "handoff_id". If the handoff id is included, then use the
     DataverseUserInitializer to create/update related objects: DataverseUser and DataverseFileInfo
@@ -44,7 +44,6 @@ class xCustomLoginSerializer(LoginSerializer):
         """
         The handoffId may be None or an existing DataverseHandoff object
         """
-        print('CustomLoginSerializer.validate_handoffId:', handoff_id)
         if not handoff_id:
             return None
 
@@ -57,9 +56,8 @@ class xCustomLoginSerializer(LoginSerializer):
 
     def authenticate(self, **kwargs):
         """Override authenticate method"""
-        print('CustomLoginSerializer.authenticate self.initial_data:', self.initial_data)
         user = super().authenticate(**kwargs)
-        print('response', user, type(user))
+
         return user
 
 
@@ -76,7 +74,6 @@ class CustomRegisterSerializer(RegisterSerializer):
         """
         The handoffId may be None or an existing DataverseHandoff object
         """
-        print('CustomRegisterSerializer.validate_handoffId', handoff_id)
         if not handoff_id:
             return None
 
@@ -94,8 +91,6 @@ class CustomRegisterSerializer(RegisterSerializer):
         Override the save method.
         If a handoffId is included, then create/update a related DataverseUser object
         """
-        print('CustomRegisterSerializer.save self.data', self.data)
-
         user = super().save(request)
         user.save()
 
@@ -107,7 +102,6 @@ class CustomRegisterSerializer(RegisterSerializer):
             if util.has_error():
                 # Delete the DataverseHandoff object
                 DataverseHandoff.delete_handoff(handoff_id)
-
                 # Raise an error
                 raise serializers.ValidationError(detail=util.get_err_msg())
             else:
@@ -116,5 +110,6 @@ class CustomRegisterSerializer(RegisterSerializer):
                 #    when the OpenDPUser logs in
                 user.handoff_id = handoff_id
                 user.save()
+
         return user
 
