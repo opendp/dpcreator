@@ -16,16 +16,10 @@ CURRENT_DIR = dirname(abspath(__file__))
 from django.template.loader import render_to_string
 
 from borb.pdf.canvas.layout.image.image import Image
-from borb.pdf.canvas.layout.image.barcode import Barcode, BarcodeType
 from borb.pdf.canvas.layout.image.chart import Chart
-from borb.pdf.canvas.layout.list.unordered_list import UnorderedList
 from borb.pdf.canvas.layout.layout_element import Alignment
 from borb.pdf.canvas.layout.page_layout.multi_column_layout import SingleColumnLayout
 from borb.pdf.canvas.layout.page_layout.page_layout import PageLayout
-from borb.pdf.canvas.line_art.line_art_factory import LineArtFactory
-#from borb.pdf.canvas.layout.table.fixed_column_width_table import FixedColumnWidthTable as Table
-from borb.pdf.canvas.layout.table.flexible_column_width_table import FlexibleColumnWidthTable
-from borb.pdf.canvas.layout.table.table import TableCell
 
 from borb.pdf.canvas.layout.table.fixed_column_width_table import FixedColumnWidthTable
 from borb.pdf.document import Document
@@ -39,7 +33,6 @@ from borb.pdf.canvas.layout.text.paragraph import Paragraph
 from borb.pdf.canvas.line_art.line_art_factory import LineArtFactory
 from borb.pdf.canvas.geometry.rectangle import Rectangle
 from borb.pdf.canvas.layout.shape.shape import Shape
-from borb.pdf.canvas.color.color import HSVColor, HexColor, Color
 from borb.pdf.canvas.layout.table.flexible_column_width_table import FlexibleColumnWidthTable
 from borb.pdf.canvas.layout.table.table import TableCell
 from borb.pdf.canvas.color.color import HSVColor, HexColor, Color
@@ -72,22 +65,57 @@ class PDFReportMaker(BasicErrCheck):
         self.release_dict = release_dict
         if not release_dict:
             self.release_dict = self.get_test_release()
+
+        # Used to embed the JSON file contents directly to the PDF file
         self.release_json_bytes = bytes(json.dumps(self.release_dict, indent=4), encoding="latin1")
 
+        # Set font sizes
         self.basic_font_size = Decimal(9)
         self.tbl_font_size = Decimal(9)
         self.tbl_border_color = HexColor("#cbcbcb")
 
+        # PDF file
         self.pdf_output_file = join(CURRENT_DIR,
                                     'test_data',
                                     'pdf_report_01_%s.pdf' % (self.random_with_N_digits(6)))
 
-        self.layout = None
+        self.pdf_doc: Document = Document()
+        self.current_page = Page(PageSize.LETTER_PORTRAIT.value[0], PageSize.LETTER_PORTRAIT.value[1])
+        self.pdf_doc.append_page(self.current_page)
+
+        self.layout: PageLayout = SingleColumnLayout(self.current_page)
+
         self.creation_date = None
 
         self.format_release()
 
         self.create_pdf()
+
+    def start_new_page(self):
+        """Start a new page"""
+        self.current_page = Page(PageSize.LETTER_PORTRAIT.value[0], PageSize.LETTER_PORTRAIT.value[1])
+        self.pdf_doc.append_page(self.current_page)
+        self.layout: PageLayout = SingleColumnLayout(self.current_page)
+
+    def add_to_layout(self, pdf_element):
+        """Add a PDF element to the document"""
+        try:
+            self.layout.add(pdf_element)
+        except AssertionError as ex_obj:
+            print("The PDF doesn't fit!")
+            print(ex_obj)
+            assert_err1 = 'A Rectangle must have a non-negative height.'
+            assert_err2 = 'FlexibleColumnWidthTable is too tall to fit inside column / page.'
+            if str(ex_obj).find(assert_err1) > -1:
+                print('AssertionError 1')
+            elif str(ex_obj).find(assert_err2) > -1:
+                print('AssertionError 2')
+
+            print("Start a new page!")
+            self.start_new_page()
+
+            print('Try to add the element again')
+            self.layout.add(pdf_element)
 
     def random_with_N_digits(self, n):
         range_start = 10 ** (n - 1)
@@ -149,7 +177,8 @@ class PDFReportMaker(BasicErrCheck):
                       font=font,
                       font_size=font_size,
                       padding_left=Decimal(padding_left),
-                      text_alignment=text_alignment)
+                      text_alignment=text_alignment,
+                      )
         return TableCell(p,
                          # border_color=self.tbl_border_color,
                          col_span=col_span)
@@ -187,55 +216,46 @@ class PDFReportMaker(BasicErrCheck):
 
     def create_pdf(self):
         """Start making the PDF"""
-        doc: Document = Document()
-        page = Page(PageSize.LETTER_PORTRAIT.value[0], PageSize.LETTER_PORTRAIT.value[1])
-
-        doc.append_page(page)
-
-        self.layout: PageLayout = SingleColumnLayout(page)
-
-        #self.layout.add(Image(DPCREATOR_LOGO_PATH,
-        #    width=Decimal(144), height=64))
 
         # Add line at the top
         #
-        self.add_colored_artwork_bottom_right_corner(page)
+        self.add_colored_artwork_bottom_right_corner(self.current_page)
 
         # Add title text
         #
         title_text = render_to_string('pdf_report/10_title.txt', self.release_dict)
-        self.layout.add(self.get_centered_para(title_text))
+        self.add_to_layout(self.get_centered_para(title_text))
 
         # Add intro text
         #
         intro_text = render_to_string('pdf_report/intro_text.txt', self.release_dict)
-        self.layout.add(Paragraph(intro_text,
+        self.add_to_layout(Paragraph(intro_text,
                                   font=self.basic_font,
                                   font_size=self.basic_font_size,
                                   multiplied_leading=Decimal(1.75)))
 
-        self.layout.add(Paragraph(('Please read the report carefully, especially in'
+        self.add_to_layout(Paragraph(('Please read the report carefully, especially in'
                                    'regard to usage of these statistics.'),
                                   font=self.basic_font,
                                   font_size=self.basic_font_size,
                                   multiplied_leading=Decimal(1.75)))
 
-        self.layout.add(Paragraph(('Contents'),
+        self.add_to_layout(Paragraph(('Contents'),
                                   font=get_custom_font(OPEN_SANS_SEMI_BOLD),
                                   font_size=self.basic_font_size,
                                   multiplied_leading=Decimal(1.75)))
 
-        self.layout.add(self.txt_list_para('1. Statistics'))
+        self.add_to_layout(self.txt_list_para('1. Statistics'))
         stat_cnt = 0
         for stat_info in self.release_dict['statistics']:
             stat_cnt += 1
             stat_type = stat_info['statistic']
             var_name = stat_info['variable']
-            self.layout.add(self.txt_list_para(f'1.{stat_cnt}. {var_name} - {stat_type}', 60))
+            self.add_to_layout(self.txt_list_para(f'1.{stat_cnt}. {var_name} - {stat_type}', 60))
 
-        self.layout.add(self.txt_list_para('2. Data source'))
-        self.layout.add(self.txt_list_para('3. OpenDP Library / Usage'))
-        self.layout.add(self.txt_list_para('4. Parameter Definitions'))
+        self.add_to_layout(self.txt_list_para('2. Data source'))
+        self.add_to_layout(self.txt_list_para('3. OpenDP Library / Usage'))
+        self.add_to_layout(self.txt_list_para('4. Parameter Definitions'))
 
         stat_cnt = 0
         for stat_info in self.release_dict['statistics']:
@@ -244,7 +264,7 @@ class PDFReportMaker(BasicErrCheck):
             var_name = stat_info['variable']
 
             subtitle = f"1.{stat_cnt}. {var_name} - " + stat_type.title()
-            self.layout.add(Paragraph(subtitle,
+            self.add_to_layout(Paragraph(subtitle,
                                       font=get_custom_font(OPEN_SANS_SEMI_BOLD),
                                       font_size=self.basic_font_size + Decimal(1),
                                       font_color=self.color_crimson,
@@ -261,8 +281,8 @@ class PDFReportMaker(BasicErrCheck):
                 self.txt_reg(' and parameters used to create the statistic are shown below:'),
             ]
 
-            self.layout.add(HeterogeneousParagraph(text_chunks_01,
-                                                   padding_left=Decimal(10)))
+            self.add_to_layout(HeterogeneousParagraph(text_chunks_01,
+                                                      padding_left=Decimal(10)))
 
             if stat_info['statistic'] == astatic.DP_MEAN:
 
@@ -305,13 +325,15 @@ class PDFReportMaker(BasicErrCheck):
                 tbl_result.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
                 tbl_result.set_border_color_on_all_cells(self.color_crimson)
                 tbl_result.set_borders_on_all_cells(True, False, True, False) # top, right, left, bottom
-                self.layout.add(tbl_result)
+                self.add_to_layout(tbl_result)
 
 
                 #self.layout.add(Paragraph(stat_info['description']['text'],
                 #                          font=self.basic_font,
                 #                          font_size=self.basic_font_size,
                 #                          multiplied_leading=Decimal(1.75)))
+
+                self.start_new_page()
 
                 text_chunks_02 = [
                     self.txt_bld(f'Parameters.'),
@@ -320,12 +342,11 @@ class PDFReportMaker(BasicErrCheck):
                     self.txt_reg(' parameter may be found at the end of the document.'),
                 ]
 
-                self.layout.add(HeterogeneousParagraph(text_chunks_02,
+                self.add_to_layout(HeterogeneousParagraph(text_chunks_02,
                                                        padding_left=Decimal(10)))
 
                 # self.layout.add(self.txt_bld_para(f'Parameters.'))
                 # self.layout.add(self.txt_reg_para(' The table below shows the parameters used when calculating the DP Mean. For reference, a description of each parameter may be found at the end of the document.'))
-
 
                 # --------------------------------------
                 # Create table for parameters
@@ -375,37 +396,37 @@ class PDFReportMaker(BasicErrCheck):
                     table_001.add(self.get_tbl_cell_align_rt(
                         f"{stat_info['missing_value_handling']['fixed_value']}"))
 
-                table_001.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
-
-                #table_001.set_border_color_on_all_cells(self.tbl_border_color)
+                # table_001.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
                 table_001.set_border_color_on_all_cells(self.color_crimson)
-                # table_001.no_borders()
                 table_001.set_borders_on_all_cells(True, False, True, False)  # top, right, left, bottom
 
-                try:
-                    self.layout.add(table_001)
-                except AssertionError:
-                    #self.layout.switch_to_next_page()
-                    #self.layout.add(table_001)
-                    pass
-                # Add test plot
-        #
-        self.layout.add(Chart(self.create_plot(),
-                         width=Decimal(256),
-                         height=Decimal(256)))
+                rsize = self.get_layout_box(table_001)
+                print('rsize: W x H', rsize.width, rsize.height)
+                self.add_to_layout(table_001)
+
+        self.add_to_layout(Chart(self.create_plot(),
+                                 width=Decimal(450),
+                                 height=Decimal(256)))
 
         # Add label for the PDF outline
         #
-        doc.add_outline("Differentially Private Release", 0, DestinationType.FIT, page_nr=0)
+        self.pdf_doc.add_outline("Differentially Private Release", 0, DestinationType.FIT, page_nr=0)
 
         # Embed the JSON release in the PDF
         #
-        doc.append_embedded_file("release_data.json", self.release_json_bytes)
+        self.pdf_doc.append_embedded_file("release_data.json", self.release_json_bytes)
 
         with open(self.pdf_output_file, "wb") as out_file_handle:
-            PDF.dumps(out_file_handle, doc)
+            PDF.dumps(out_file_handle, self.pdf_doc)
         print(f'PDF created: {self.pdf_output_file}')
         os.system(f'open {self.pdf_output_file}')
+
+    def get_layout_box(self, p: Paragraph) -> Rectangle:
+        pg: Page = Page()
+        ZERO: Decimal = Decimal(0)
+        W: Decimal = Decimal(1000)  # max width you would allow
+        H: Decimal = Decimal(1000)  # max height you would allow
+        return p.layout(pg, Rectangle(ZERO, ZERO, W, H))
 
     def get_pdf_contents(self):
         """Return the PDF contents"""

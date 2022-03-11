@@ -38,16 +38,37 @@ def main():
                      line_width=Decimal(1)
                      ))
 
-    table_001 = FlexibleColumnWidthTable(number_of_rows=5,
+    num_rows = 44
+    table_001 = FlexibleColumnWidthTable(number_of_rows=num_rows,
                                          number_of_columns=2,
                                          padding_left=Decimal(40),
                                          padding_right=Decimal(40),
                                          border_color=HexColor('006699'))
 
     table_001.add(TableCell(Paragraph("Privacy Parameters"), col_span=2))
-    print(dir(table_001.get_bounding_box().__sizeof__))
-    print(table_001.get_bounding_box().__sizeof__())
-    layout.add(table_001)
+    for cnt in range(1, num_rows):
+
+        table_001.add(TableCell(Paragraph(f"{cnt}"), col_span=2))
+
+    #print(dir(table_001.get_bounding_box().__sizeof__))
+    #print(table_001.get_bounding_box().__sizeof__())
+    try:
+        layout.add(table_001)
+    except AssertionError as ex_obj:
+        print(ex_obj)
+        if str(ex_obj) == 'AssertionError: FlexibleColumnWidthTable is too tall to fit inside column / page.':
+            print('AssertionError 1')
+        elif str(ex_obj) == 'A Rectangle must have a non-negative height.':
+            print('AssertionError 2')
+
+        try:
+            next_page: Page = Page()
+            doc.append_page(next_page)
+            layout: PageLayout = SingleColumnLayout(next_page)
+            layout.add(table_001)
+        except AssertionError as ex_obj:
+            print(ex_obj)
+            print('uh oh! This element does not work!')
 
     print('layout._page_width 2 ', layout._page_width)
     print('layout._page_height 2', layout._page_height)
