@@ -68,15 +68,42 @@ export SENDGRID_API_KEY=your-crazy-long-hashy-looking-sendgrid-key
 export DEFAULT_FROM_EMAIL=info@opendp.org
 export ACCOUNT_EMAIL_VERIFICATION=mandatory
 ```
+--- 
 
-### Scenario 1: User Creates a Local Account  / Not coming from Dataverse
+### Note: Scenarios 1 to 8 below are also described in this google doc: 
+  - https://docs.google.com/spreadsheets/d/199ZfuqGhBVzs3FHqekZjtIaYK-imh7Ri7DM2E7_FGsU/edit#gid=0
+
+
+---
+
+## Scenarios 1 to 4: Not Coming from Dataverse (No DataverseHandoff information/id)
+
+### Scenario 1: User Creates a Local Account 
 
 - **Inputs**: username, email, password1, password2
 - **Object created**: OpenDPUser
 - **Email Confirmation**: By default, email confirmation is enabled
     - When email confirmation is _disabled_, the OpenDPUser is immediately enabled and logged in.
 
-### Scenario 2: User Creates a Local Account  / Coming from Dataverse
+### Scenario 2: User Logins into a Local Account  
+
+- **Inputs**: username, password
+- **Objects retrieved**: An existing OpenDPUser (upon successful login)
+ 
+### Scenario 3: User Creates an Account through Social Auth
+
+- **Inputs**: Google auth, etc.
+- **Object created**: OpenDPUser
+- **Email Confirmation**: Not applicable
+ 
+### Scenario 4: User Logins into a Local Account 
+
+- **Inputs**: Google auth, etc.
+- **Objects retrieved**: An existing OpenDPUser (upon successful login)
+
+## Scenarios 5 to 8: Coming from Dataverse (DataverseHandoff object saved, handoff id used)
+
+### Scenario 5: User Creates a Local Account  / Coming from Dataverse
 
 - **Inputs**: handoffId, username, email, password1, password2
   - `handoffId` - As noted earlier the `handoffId` gives access to a DataverseHandoff object stored in the database
@@ -88,43 +115,36 @@ export ACCOUNT_EMAIL_VERIFICATION=mandatory
     - Using the Dataverse API token stored in the DataverseHandoff to retrieve additional user information from Dataverse
     - If the DataverseHandoff cannot be found or the API call fails, neither the OpenDPUser nor DataverseUser is created.
     - On successful DataverseUser creation, the handoffId is stored as an attribute on the OpenDPUser object. 
-    - When the user logs in after email confirmation, if the OpenDPUser contains a `handoffId`, it is used to make a `dv-file` API call which:
-        - Retrieves the DataverseHandoff
-        - Retrieves the DataverseUser
-        - Constructs a DataverseFileInfo object
-        - The handoffId is then removed from the OpenDPUser object
 
-### Scenario 3: User Logins into a Local Account  / Not coming from Dataverse
+### Scenario 6: User Logins into a Local Account  / Coming from Dataverse 
+
+In this scenario, the OpenDPUser and DataverseUser exist and the OpenDPUser has a `handoff_id` saved on the server side.
 
 - **Inputs**: username, password
-- **Objects retrieved**: An existing OpenDPUser (upon successful login)
-- **Additional processing**: If the OpenDPUser contains a `handoffId`, it is then used to make a `dv-file` API call which will create a DataverseFileInfo object -- as described at the end of Scenario 2
-
-### Scenario 4: User Logins into a Local Account  / Coming from Dataverse 
-
-In this scenario, the OpenDPUser already exists but a DataverseUser does not.
-
-- **Inputs**: handoffId, username, password
-- **Objects retrieved**: An existing OpenDPUser 
+- **Objects retrieved**: An existing OpenDPUser that has the `handoff_id` populated  
 - **Additional processing**: The `handoffId` is saved in the Vue store and indicates the user has arrived from Dataverse. This `handoffId` is used to:
-    - If needed, make a DataverseUser object via API call and then
-    - Make a `dv-file` API call which will create a DataverseFileInfo object -- as described at the end of Scenario 2
-  - **_Possible Issue_**: The OpenDPUser object itself may contain a `handoffId` attribute that differs from the `handoffId` stored in the Vue store. In this case the `handoffId` saved in the Vue store is used to make a `dv-file` API call which will create a DataverseFileInfo object -- as described at the end of Scenario 2.
+    - Make a `dv-file` API call which will create a DataverseFileInfo object by:
+        - Retrieving the DataverseHandoff
+        - Retrieving the DataverseUser
+        - Constructing a DataverseFileInfo object
+        - The handoffId is then removed from the OpenDPUser object
+    - **_Possible Issue_**: The OpenDPUser object itself may contain a `handoffId` attribute that differs from the `handoffId` stored in the Vue store. In this case the `handoffId` saved in the Vue store is used to make a `dv-file` API call which will create a DataverseFileInfo object.
 
-### Scenario 5: User Creates an Account Through Social Auth / Not Coming from Dataverse
+### Scenario 7: User Creates an Account Through Social Auth
 
-This is every similar to Scenario #1.
+This is every similar to Scenario #3. Note, because the account is created via social auth, the user is automatically logged in, e.g. Scenario 8 is immediately triggered.
 
-- **Inputs**: Social Auth such as a Google Login
+- **Inputs**: Google auth, etc.
 - **Object created**: OpenDPUser
-- **Email Confirmation**: None. The OpenDPUser is immediately enabled and logged in.
+- **Email Confirmation**: Not applicable
 
-### Scenario 6: User Creates or Logs into an Account Through Social Auth / Coming from Dataverse
+### Scenario 8: User Logs into an Account Through Social Auth 
 
-This scenario resembles Scenario #4.
+This scenario is somewhat similar to Scenario #6, except that the DataverseUser does not yet exist.
 
 - **Objects created or retrieved**: OpenDPUser 
-- **Additional processing**: The `handoffId` is saved in the Vue store and indicates the user has arrived from Dataverse. This `handoffId` is used to:
-    - If needed, make a DataverseUser object via API call and then
-    - Make a `dv-file` API call which will create a DataverseFileInfo object -- as described at the end of Scenario 2
-  - _**Possible Issue**_: The OpenDPUser object itself may contain a `handoffId` attribute that differs from the `handoffId` stored in the Vue store. In this case the `handoffId` saved in the Vue store is used to make a `dv-file` API call which will create a DataverseFileInfo object -- as described at the end of Scenario 2.
+- **Additional processing**: The `handoffId` has been saved in the Vue store and indicates the user has arrived from Dataverse. This `handoffId` is used to:
+    - Call `/api/dv-user/` to create/update a DataverseUser object. 
+      - Inputs: `OpenDPUser.object_id`, `handoffId`
+    -  Call `/api/dv-file/` to create a DataverseFileInfo object -- as described at the end of Scenario 6
+    - _**Possible Issue**_: The OpenDPUser object itself may contain a `handoffId` attribute that differs from the `handoffId` stored in the Vue store. In this case the `handoffId` saved in the Vue store is used to make a `dv-file` API call which will create a DataverseFileInfo object.
