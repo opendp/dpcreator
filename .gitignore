@@ -182,6 +182,5 @@ server/scripts_dev/dv_test_creds.py
 !server/test_data/pdfs/*.pdf
 !server/test_data/deposit/*.json
 !dev_notes/api_example_analysis_plan.json
-.env
 !deploy/dataverse/*.json
 server/templates/base-vue.html

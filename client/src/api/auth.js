@@ -19,8 +19,8 @@ export default {
                 }
             });
     },
-    login(username, password) {
-        return session.post('/rest-auth/login/', {username, password})
+    login(username, password, handoffId) {
+        return session.post('/rest-auth/login/', {username, password, handoffId})
             .then(data => camelcaseKeys(data, {deep: true}))
             .catch(function (data) {
                 if (data.response) {
@@ -38,8 +38,8 @@ export default {
   logout() {
       return wrappedSession.post('/rest-auth/logout/', {});
   },
-  createAccount(username, password1, password2, email) {
-      return session.post('/rest-auth/registration/', {username, password1, password2, email})
+  createAccount(username, password1, password2, email, handoffId) {
+      return session.post('/rest-auth/registration/', {username, password1, password2, email, handoffId})
           .catch(function (data) {
               if (data.response) {
                   if (data.response.status == 400) {
