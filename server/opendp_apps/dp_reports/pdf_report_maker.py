@@ -136,8 +136,10 @@ class PDFReportMaker(BasicErrCheck):
         self.release_dict['creation_date'] = self.creation_date
 
     def get_test_release(self):
-        """for building"""
-        test_release_name = join(CURRENT_DIR, 'test_data', 'sample_release_01.json')
+        """for dev building"""
+        # test_release_name = join(CURRENT_DIR, 'test_data', 'sample_release_01.json')
+        test_release_name = join(CURRENT_DIR, 'test_data', 'release_f082cbc4-9cd7-4e44-a0f3-f4ad967f237c.json')
+
         return json.loads(open(test_release_name, 'r').read())
 
     def get_centered_para(self, s):
@@ -226,45 +228,33 @@ class PDFReportMaker(BasicErrCheck):
 
     def create_pdf(self):
         """Start making the PDF"""
-        self.start_new_page()
+        self.add_pdf_title_page()
 
-        # Add title text
+        self.add_statistic_pages()
+
+        self.add_to_layout(Chart(self.create_example_plot(),
+                                 width=Decimal(450),
+                                 height=Decimal(256)))
+
+        # Add label for the PDF outline
         #
-        title_text = render_to_string('pdf_report/10_title.txt', self.release_dict)
-        self.add_to_layout(self.get_centered_para(title_text))
+        self.pdf_doc.add_outline("Differentially Private Release", 0, DestinationType.FIT, page_nr=0)
+        self.pdf_doc.add_outline("Statistics", 1, DestinationType.FIT, page_nr=1)
+        self.pdf_doc.add_outline("Data Source", 1, DestinationType.FIT, page_nr=self.page_cnt - 1)
 
-        # Add intro text
-        #
-        intro_text = render_to_string('pdf_report/intro_text.txt', self.release_dict)
-        self.add_to_layout(Paragraph(intro_text,
-                                     font=self.basic_font,
-                                     font_size=self.basic_font_size,
-                                     multiplied_leading=Decimal(1.75)))
+        self.embed_json_release_in_pdf()
 
-        para_read_carefully = ('Please read the report carefully, especially in'
-                               ' regard to usage of these statistics.')
-        self.add_to_layout(Paragraph(para_read_carefully,
-                                     font=self.basic_font,
-                                     font_size=self.basic_font_size,
-                                     multiplied_leading=Decimal(1.75)))
+        with open(self.pdf_output_file, "wb") as out_file_handle:
+            PDF.dumps(out_file_handle, self.pdf_doc)
+        print(f'PDF created: {self.pdf_output_file}')
+        os.system(f'open {self.pdf_output_file}')
 
-        self.add_to_layout(Paragraph('Contents',
-                           font=get_custom_font(OPEN_SANS_SEMI_BOLD),
-                           font_size=self.basic_font_size,
-                           multiplied_leading=Decimal(1.75)))
+    def embed_json_release_in_pdf(self):
+        """Embed the JSON release in the PDF"""
+        self.pdf_doc.append_embedded_file("release_data.json", self.release_json_bytes)
 
-        self.add_to_layout(self.txt_list_para('1. Statistics'))
-        stat_cnt = 0
-        for stat_info in self.release_dict['statistics']:
-            stat_cnt += 1
-            stat_type = stat_info['statistic']
-            var_name = stat_info['variable']
-            self.add_to_layout(self.txt_list_para(f'1.{stat_cnt}. {var_name} - {stat_type}', Decimal(60)))
-
-        self.add_to_layout(self.txt_list_para('2. Data source'))
-        self.add_to_layout(self.txt_list_para('3. OpenDP Library / Usage'))
-        self.add_to_layout(self.txt_list_para('4. Parameter Definitions'))
-
+    def add_statistic_pages(self):
+        """Add a page for each DP statistic"""
         stat_cnt = 0
         for stat_info in self.release_dict['statistics']:
             if stat_info['statistic'] == astatic.DP_HISTOGRAM:
@@ -297,7 +287,7 @@ class PDFReportMaker(BasicErrCheck):
             self.add_to_layout(HeterogeneousParagraph(text_chunks_01,
                                                       padding_left=Decimal(10)))
 
-            if stat_info['statistic'] == astatic.DP_MEAN:
+            if stat_info['statistic'] in [astatic.DP_MEAN, astatic.DP_VARIANCE, astatic.DP_COUNT]:
 
                 self.add_single_stat_result_table(stat_info, stat_type, var_name)
 
@@ -315,7 +305,14 @@ class PDFReportMaker(BasicErrCheck):
                 # --------------------------------------
                 # Create table for parameters
                 # --------------------------------------
-                table_001 = FlexibleColumnWidthTable(number_of_rows=11,
+                is_dp_count = False
+                if stat_info['statistic'] == astatic.DP_COUNT:
+                    is_dp_count = True
+                    num_param_table_rows = 5
+                else:
+                    num_param_table_rows = 11
+
+                table_001 = FlexibleColumnWidthTable(number_of_rows=num_param_table_rows,
                                                      number_of_columns=2,
                                                      padding_left=Decimal(40),
                                                      padding_right=Decimal(40),
@@ -334,30 +331,32 @@ class PDFReportMaker(BasicErrCheck):
 
                 table_001.add(self.get_tbl_cell_ital("Metadata Parameters", col_span=2))
 
-                table_001.add(self.get_tbl_cell_ital("Bounds", col_span=2, padding=20))
+                if not is_dp_count:
+                    table_001.add(self.get_tbl_cell_ital("Bounds", col_span=2, padding=20))
 
-                table_001.add(self.get_tbl_cell_lft_pad("Min", padding=40))
-                table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['bounds']['min']}"))
+                    table_001.add(self.get_tbl_cell_lft_pad("Min", padding=40))
+                    table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['bounds']['min']}"))
 
-                table_001.add(self.get_tbl_cell_lft_pad("Max", padding=40))
-                table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['bounds']['max']}"))
+                    table_001.add(self.get_tbl_cell_lft_pad("Max", padding=40))
+                    table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['bounds']['max']}"))
 
                 table_001.add(self.get_tbl_cell_lft_pad("Confidence Level", padding=20))
                 table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['confidence_level']}"))
 
                 # Missing Value Handling
-                table_001.add(self.get_tbl_cell_ital("Missing Value Handling", col_span=2))
+                if not is_dp_count:
+                    table_001.add(self.get_tbl_cell_ital("Missing Value Handling", col_span=2))
 
-                table_001.add(self.get_tbl_cell_lft_pad("Type", padding=20))
-                missing_val_handling = stat_info['missing_value_handling']['type']
-                print('>>> missing_val_handling', missing_val_handling)
-                if missing_val_handling == astatic.MISSING_VAL_INSERT_FIXED:
-                    table_001.add(self.get_tbl_cell_lft_pad(
-                        astatic.missing_val_label(astatic.MISSING_VAL_INSERT_FIXED)))
+                    table_001.add(self.get_tbl_cell_lft_pad("Type", padding=20))
+                    missing_val_handling = stat_info['missing_value_handling']['type']
+                    print('>>> missing_val_handling', missing_val_handling)
+                    if missing_val_handling == astatic.MISSING_VAL_INSERT_FIXED:
+                        table_001.add(self.get_tbl_cell_lft_pad(
+                            astatic.missing_val_label(astatic.MISSING_VAL_INSERT_FIXED)))
 
-                    table_001.add(self.get_tbl_cell_lft_pad("Value", padding=20))
-                    table_001.add(self.get_tbl_cell_align_rt(
-                        f"{stat_info['missing_value_handling']['fixed_value']}"))
+                        table_001.add(self.get_tbl_cell_lft_pad("Value", padding=20))
+                        table_001.add(self.get_tbl_cell_align_rt(
+                            f"{stat_info['missing_value_handling']['fixed_value']}"))
 
                 table_001.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
                 table_001.set_border_color_on_all_cells(self.color_crimson)
@@ -367,22 +366,56 @@ class PDFReportMaker(BasicErrCheck):
                 print('rsize: W x H', rsize.width, rsize.height)
                 self.add_to_layout(table_001)
 
-        self.add_to_layout(Chart(self.create_example_plot(),
-                                 width=Decimal(450),
-                                 height=Decimal(256)))
 
-        # Add label for the PDF outline
+
+    def add_pdf_title_page(self):
+        """Add the PDF title page"""
+        self.start_new_page()
+
+        # Add title text
         #
-        self.pdf_doc.add_outline("Differentially Private Release", 0, DestinationType.FIT, page_nr=0)
+        title_text = render_to_string('pdf_report/10_title.txt', self.release_dict)
+        self.add_to_layout(self.get_centered_para(title_text))
 
-        # Embed the JSON release in the PDF
+        # Add intro text
         #
-        self.pdf_doc.append_embedded_file("release_data.json", self.release_json_bytes)
+        intro_text = render_to_string('pdf_report/intro_text.txt', self.release_dict)
+        self.add_to_layout(Paragraph(intro_text,
+                                     font=self.basic_font,
+                                     font_size=self.basic_font_size,
+                                     multiplied_leading=Decimal(1.75)))
 
-        with open(self.pdf_output_file, "wb") as out_file_handle:
-            PDF.dumps(out_file_handle, self.pdf_doc)
-        print(f'PDF created: {self.pdf_output_file}')
-        os.system(f'open {self.pdf_output_file}')
+        para_read_carefully = ('Please read the report carefully, especially in'
+                               ' regard to the usage of these statistics.')
+        self.add_to_layout(Paragraph(para_read_carefully,
+                                     font=self.basic_font,
+                                     font_size=self.basic_font_size,
+                                     multiplied_leading=Decimal(1.75)))
+
+        para_attachment = ('Note: If you are using Adobe Acrobat, a JSON version of this data'
+                           ' is attached to this PDF as a file named "release_data.json".')
+
+        self.add_to_layout(Paragraph(para_attachment,
+                                     font=self.basic_font,
+                                     font_size=self.basic_font_size,
+                                     multiplied_leading=Decimal(1.75)))
+
+        self.add_to_layout(Paragraph('Contents',
+                           font=get_custom_font(OPEN_SANS_SEMI_BOLD),
+                           font_size=self.basic_font_size,
+                           multiplied_leading=Decimal(1.75)))
+
+        self.add_to_layout(self.txt_list_para('1. Statistics'))
+        stat_cnt = 0
+        for stat_info in self.release_dict['statistics']:
+            stat_cnt += 1
+            stat_type = 'DP ' + stat_info['statistic'].title()
+            var_name = stat_info['variable']
+            self.add_to_layout(self.txt_list_para(f'1.{stat_cnt}. {var_name} - {stat_type}', Decimal(60)))
+
+        self.add_to_layout(self.txt_list_para('2. Data Source'))
+        self.add_to_layout(self.txt_list_para('3. OpenDP Library / Usage'))
+        self.add_to_layout(self.txt_list_para('4. Parameter Definitions'))
 
     def get_layout_box(self, p: Paragraph) -> Rectangle:
         """From https://stackoverflow.com/questions/69318059/create-documents-with-dynamic-height-with-borb"""
