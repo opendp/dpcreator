@@ -299,7 +299,7 @@ export default {
       return item.result.value
     },
     getParameters(item) {
-      let params = 'Epsilon: ' + item.epsilon + ',&nbsp;&nbsp;&nbsp;'
+      let params = 'Epsilon: ' + (Number(item.epsilon)).toFixed(3) + ',&nbsp;&nbsp;&nbsp;'
       if (item.delta) {
         params += 'Delta: ' + item.delta + ',&nbsp;&nbsp;&nbsp;'
       } else {
