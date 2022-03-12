@@ -71,6 +71,9 @@ class PDFReportMaker(BasicErrCheck):
         # Used to embed the JSON file contents directly to the PDF file
         self.release_json_bytes = bytes(json.dumps(self.release_dict, indent=4), encoding="latin1")
 
+        # num statistics
+        self.num_stats = len(self.release_dict['statistics'])
+
         # Set font sizes
         self.basic_font_size = Decimal(9)
         self.tbl_font_size = Decimal(9)
@@ -100,6 +103,31 @@ class PDFReportMaker(BasicErrCheck):
         self.format_release()
 
         self.create_pdf()
+
+    def create_pdf(self):
+        """Start making the PDF"""
+        self.add_pdf_title_page()
+
+        self.add_statistics_pages()
+
+        self.add_data_source_and_lib()
+
+        self.add_to_layout(Chart(self.create_example_plot(),
+                                 width=Decimal(450),
+                                 height=Decimal(256)))
+
+        # Add label for the PDF outline
+        #
+        self.pdf_doc.add_outline("Differentially Private Release", 0, DestinationType.FIT, page_nr=0)
+        self.pdf_doc.add_outline("Statistics", 1, DestinationType.FIT, page_nr=1)
+        self.pdf_doc.add_outline("Data Source", 1, DestinationType.FIT, page_nr=self.page_cnt - 1)
+
+        self.embed_json_release_in_pdf()
+
+        with open(self.pdf_output_file, "wb") as out_file_handle:
+            PDF.dumps(out_file_handle, self.pdf_doc)
+        print(f'PDF created: {self.pdf_output_file}')
+        os.system(f'open {self.pdf_output_file}')
 
     def start_new_page(self):
         """Start a new page"""
@@ -199,12 +227,23 @@ class PDFReportMaker(BasicErrCheck):
         """Return a chunk of text with a regular font"""
         return ChunkOfText(val, font=self.basic_font, font_size=self.basic_font_size)
 
+    def txt_subtitle_para(self, subtitle):
+        """Return a Paragraph with a subtitle font"""
+        return Paragraph(subtitle,
+                         font=get_custom_font(OPEN_SANS_SEMI_BOLD),
+                         font_size=self.basic_font_size + Decimal(1),
+                         font_color=self.color_crimson,
+                         multiplied_leading=Decimal(1.75))
+
     def txt_reg_para(self, val):
-        """Return a chunk of text with a regular font"""
-        return Paragraph(val, font=self.basic_font, font_size=self.basic_font_size)
+        """Return a Paragraph with a regular font"""
+        return Paragraph(val,
+                         font=self.basic_font,
+                         font_size=self.basic_font_size,
+                         multiplied_leading=Decimal(1.75))
 
     def txt_list_para(self, val, padding_left=Decimal(40)):
-        """Return a chunk of text with a regular font"""
+        """Return a paragraph for a listt"""
         return Paragraph(val,
                          # font=self.basic_font,
                          font=get_custom_font(OPEN_SANS_SEMI_BOLD),
@@ -226,34 +265,11 @@ class PDFReportMaker(BasicErrCheck):
         """Return a chunk of text with a bold font"""
         return Paragraph(val, font=self.basic_font_bold, font_size=self.basic_font_size)
 
-    def create_pdf(self):
-        """Start making the PDF"""
-        self.add_pdf_title_page()
-
-        self.add_statistic_pages()
-
-        self.add_to_layout(Chart(self.create_example_plot(),
-                                 width=Decimal(450),
-                                 height=Decimal(256)))
-
-        # Add label for the PDF outline
-        #
-        self.pdf_doc.add_outline("Differentially Private Release", 0, DestinationType.FIT, page_nr=0)
-        self.pdf_doc.add_outline("Statistics", 1, DestinationType.FIT, page_nr=1)
-        self.pdf_doc.add_outline("Data Source", 1, DestinationType.FIT, page_nr=self.page_cnt - 1)
-
-        self.embed_json_release_in_pdf()
-
-        with open(self.pdf_output_file, "wb") as out_file_handle:
-            PDF.dumps(out_file_handle, self.pdf_doc)
-        print(f'PDF created: {self.pdf_output_file}')
-        os.system(f'open {self.pdf_output_file}')
-
     def embed_json_release_in_pdf(self):
         """Embed the JSON release in the PDF"""
         self.pdf_doc.append_embedded_file("release_data.json", self.release_json_bytes)
 
-    def add_statistic_pages(self):
+    def add_statistics_pages(self):
         """Add a page for each DP statistic"""
         stat_cnt = 0
         for stat_info in self.release_dict['statistics']:
@@ -267,11 +283,8 @@ class PDFReportMaker(BasicErrCheck):
             var_name = stat_info['variable']
 
             subtitle = f"1.{stat_cnt}. {var_name} - " + stat_type
-            self.add_to_layout(Paragraph(subtitle,
-                                         font=get_custom_font(OPEN_SANS_SEMI_BOLD),
-                                         font_size=self.basic_font_size + Decimal(1),
-                                         font_color=self.color_crimson,
-                                         multiplied_leading=Decimal(1.75)))
+
+            self.add_to_layout(self.txt_subtitle_para(subtitle))
 
             text_chunks_01 = [
                 self.txt_bld('Result.'),
@@ -366,10 +379,139 @@ class PDFReportMaker(BasicErrCheck):
                 print('rsize: W x H', rsize.width, rsize.height)
                 self.add_to_layout(table_001)
 
+    def add_data_source_and_lib(self):
+        """Add the data source and library information"""
+        if self.has_error():
+            return
+
+        self.start_new_page()
+
+        subtitle = f"2. Data Source"
+        self.add_to_layout(self.txt_subtitle_para(subtitle))
+
+        basic_desc = render_to_string('pdf_report/20_data_source_desc.txt',
+                                      self.release_dict)
+
+        self.add_to_layout(self.txt_reg_para(basic_desc))
+
+        dataset_info = self.release_dict['dataset']
+
+        # Assuming a Dataverse dataset for now
+        if dataset_info['type'] != 'dataverse':
+            note = '!Not a Dataverse dataset. Add handling! (pdf_report_maker.py / add_data_source_and_lib)'
+            self.add_to_layout(self.txt_reg_para(basic_desc))
+            return
+
+        tbl_src = FlexibleColumnWidthTable(number_of_rows=11,
+                                           number_of_columns=2,
+                                           padding_left=Decimal(40),
+                                           padding_right=Decimal(60),
+                                           padding_bottom=Decimal(0))
+
+        # ------------------------------
+        # Dataverse - general info
+        # ------------------------------
+        tbl_src.add(self.get_tbl_cell_ital("Dataverse Repository", col_span=2))
+
+        tbl_src.add(self.get_tbl_cell_lft_pad(f'Name', padding=self.indent1))
+        tbl_src.add(self.get_tbl_cell_lft_pad(f"{dataset_info['installation']['name']}", padding=0))
+
+        tbl_src.add(self.get_tbl_cell_lft_pad(f'URL', padding=self.indent1))
+        tbl_src.add(self.get_tbl_cell_lft_pad(f"{dataset_info['installation']['url']}", padding=0))
+
+        # ------------------------------
+        # Dataverse Dataset information
+        # ------------------------------
+        tbl_src.add(self.get_tbl_cell_ital("Dataverse Dataset/Collection", col_span=2))
+
+        tbl_src.add(self.get_tbl_cell_lft_pad(f'Name', padding=self.indent1))
+        tbl_src.add(self.get_tbl_cell_lft_pad(f"{dataset_info['name']}", padding=0))
+        citation_str = dataset_info['citation']
+        if not citation_str:
+            citation_str = '(not available)'
+        tbl_src.add(self.get_tbl_cell_lft_pad(f'Citation', padding=self.indent1))
+        tbl_src.add(self.get_tbl_cell_lft_pad(citation_str, padding=0))
+
+        doi_str = dataset_info['doi']
+        if not doi_str:
+            doi_str = '(not available)'
+        tbl_src.add(self.get_tbl_cell_lft_pad(f'DOI', padding=self.indent1))
+        tbl_src.add(self.get_tbl_cell_lft_pad(doi_str, padding=0))
+
+        # ------------------------------
+        # File information
+        # ------------------------------
+        tbl_src.add(self.get_tbl_cell_ital("File Information", col_span=2))
+        tbl_src.add(self.get_tbl_cell_lft_pad(f'Name', padding=self.indent1))
+        tbl_src.add(self.get_tbl_cell_lft_pad(f"{dataset_info['file_information']['name']}", padding=0))
+
+        identifier_str = dataset_info['file_information']['identifier']
+        if not identifier_str:
+            identifier_str = '(not available)'
+        tbl_src.add(self.get_tbl_cell_lft_pad(f'Identifier', padding=self.indent1))
+        tbl_src.add(self.get_tbl_cell_lft_pad(identifier_str, padding=0))
+
+        format_str = dataset_info['file_information']['fileFormat']
+        if not format_str:
+            format_str = '(not available)'
+        tbl_src.add(self.get_tbl_cell_lft_pad(f'File format', padding=self.indent1))
+        tbl_src.add(self.get_tbl_cell_lft_pad(format_str, padding=0))
+
+        tbl_src.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
+        tbl_src.set_border_color_on_all_cells(self.color_crimson)
+        tbl_src.set_borders_on_all_cells(True, False, True, False)  # top, right, bottom, left
+
+        self.add_to_layout(tbl_src)
+
+        self.add_opendp_lib_info()
+
+    def add_opendp_lib_info(self):
+        """Add information about the OpenDP library (added to same page as data source info"""
+        if self.has_error():
+            return
+
+        dp_lib_info = self.release_dict['differentially_private_library']
+
+        # Subtitle and basic description
+        #
+        subtitle = f"3. OpenDP Library"
+        self.add_to_layout(self.txt_subtitle_para(subtitle))
+
+        basic_desc = render_to_string('pdf_report/30_opendp_lib_desc.txt',
+                                      self.release_dict)
+        self.add_to_layout(self.txt_reg_para(basic_desc))
+
+        # Information table
+        #
+        tbl_src = FlexibleColumnWidthTable(number_of_rows=4,
+                                           number_of_columns=2,
+                                           padding_left=Decimal(40),
+                                           padding_right=Decimal(60),
+                                           padding_bottom=Decimal(0))
+
+        tbl_src.add(self.get_tbl_cell_ital("OpenDP Library", col_span=2))
+
+        tbl_src.add(self.get_tbl_cell_lft_pad(f'Version', padding=self.indent1))
+        tbl_src.add(self.get_tbl_cell_lft_pad(f"{dp_lib_info['version']}", padding=0))
+
+        tbl_src.add(self.get_tbl_cell_lft_pad(f'Python package', padding=self.indent1))
+        tbl_src.add(self.get_tbl_cell_lft_pad('https://pypi.org/project/opendp/', padding=0))
+
+        tbl_src.add(self.get_tbl_cell_lft_pad(f'GitHub Repository', padding=self.indent1))
+        tbl_src.add(self.get_tbl_cell_lft_pad(f"{dp_lib_info['url']}", padding=0))
+
+        tbl_src.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
+        tbl_src.set_border_color_on_all_cells(self.color_crimson)
+        tbl_src.set_borders_on_all_cells(True, False, True, False)  # top, right, bottom, left
+
+        self.add_to_layout(tbl_src)
 
 
     def add_pdf_title_page(self):
         """Add the PDF title page"""
+        if self.has_error():
+            return
+
         self.start_new_page()
 
         # Add title text
@@ -414,8 +556,9 @@ class PDFReportMaker(BasicErrCheck):
             self.add_to_layout(self.txt_list_para(f'1.{stat_cnt}. {var_name} - {stat_type}', Decimal(60)))
 
         self.add_to_layout(self.txt_list_para('2. Data Source'))
-        self.add_to_layout(self.txt_list_para('3. OpenDP Library / Usage'))
-        self.add_to_layout(self.txt_list_para('4. Parameter Definitions'))
+        self.add_to_layout(self.txt_list_para('3. OpenDP Library'))
+        self.add_to_layout(self.txt_list_para('4. Usage'))
+        self.add_to_layout(self.txt_list_para('5. Parameter Definitions'))
 
     def get_layout_box(self, p: Paragraph) -> Rectangle:
         """From https://stackoverflow.com/questions/69318059/create-documents-with-dynamic-height-with-borb"""
