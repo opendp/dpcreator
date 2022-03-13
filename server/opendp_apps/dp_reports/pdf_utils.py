@@ -8,19 +8,12 @@ from borb.pdf.canvas.layout.text.paragraph import Paragraph
 from borb.pdf.canvas.layout.table.table import TableCell
 from borb.pdf.canvas.color.color import HexColor
 
-from opendp_apps.dp_reports.font_util import \
-    (get_custom_font,
-     OPEN_SANS_LIGHT,
-     OPEN_SANS_REGULAR,
-     OPEN_SANS_SEMI_BOLD,
-     OPEN_SANS_BOLD,
-     OPEN_SANS_ITALIC,
-     DPCREATOR_LOGO_PATH)
+from opendp_apps.dp_reports import font_util
 
 COLOR_CRIMSON = HexColor('#a41d30')
-BASIC_FONT = get_custom_font(OPEN_SANS_LIGHT)
-BASIC_FONT_ITALIC = get_custom_font(OPEN_SANS_ITALIC)
-BASIC_FONT_BOLD = get_custom_font(OPEN_SANS_SEMI_BOLD)
+BASIC_FONT = font_util.get_custom_font(font_util.OPEN_SANS_LIGHT)
+BASIC_FONT_ITALIC = font_util.get_custom_font(font_util.OPEN_SANS_ITALIC)
+BASIC_FONT_BOLD = font_util.get_custom_font(font_util.OPEN_SANS_SEMI_BOLD)
 
 BASIC_FONT_SIZE = Decimal(9)
 SUBTITLE_FONT_SIZE = BASIC_FONT_SIZE + Decimal(1)
@@ -29,9 +22,9 @@ TBL_BORDER_COLOR = HexColor("#cbcbcb")
 
 
 def get_centered_para(s):
-    """Add a paragrah to the layout"""
+    """Add a paragraph to the layout"""
     p = Paragraph(s,
-                  font=get_custom_font(OPEN_SANS_SEMI_BOLD),
+                  font=font_util.get_custom_font(font_util.OPEN_SANS_SEMI_BOLD),
                   font_size=Decimal(10),
                   font_color=COLOR_CRIMSON,
                   multiplied_leading=Decimal(1.25),
@@ -79,8 +72,7 @@ def _get_tbl_cell(content, font=None, font_size=None, text_alignment=None,
                   font=font,
                   font_size=font_size,
                   padding_left=Decimal(padding_left),
-                  text_alignment=text_alignment,
-                  )
+                  text_alignment=text_alignment)
     return TableCell(p,
                      # border_color=TBL_BORDER_COLOR,
                      col_span=col_span)
@@ -94,7 +86,7 @@ def txt_reg(val):
 def txt_subtitle_para(subtitle):
     """Return a Paragraph with a subtitle font"""
     return Paragraph(subtitle,
-                     font=get_custom_font(OPEN_SANS_SEMI_BOLD),
+                     font=BASIC_FONT_BOLD,
                      font_size=SUBTITLE_FONT_SIZE,
                      font_color=COLOR_CRIMSON,
                      multiplied_leading=Decimal(1.75))
@@ -112,7 +104,7 @@ def txt_list_para(val, padding_left=Decimal(40)):
     """Return a paragraph for a listt"""
     return Paragraph(val,
                      # font=BASIC_FONT,
-                     font=get_custom_font(OPEN_SANS_SEMI_BOLD),
+                     font=BASIC_FONT_BOLD,
                      font_size=BASIC_FONT_SIZE,
                      font_color=COLOR_CRIMSON,
                      padding_left=padding_left,
@@ -120,8 +112,7 @@ def txt_list_para(val, padding_left=Decimal(40)):
                      padding_top=Decimal(0),
                      margin_top=Decimal(0),
                      margin_bottom=Decimal(0),
-                     multiplied_leading=Decimal(.5),
-                     )
+                     multiplied_leading=Decimal(.5))
 
 
 def txt_bld(val):

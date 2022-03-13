@@ -1,11 +1,9 @@
 """
 Methods for retrieving custom fonts
 """
-from decimal import Decimal
 from pathlib import Path
 from os.path import abspath, dirname, join
 from borb.pdf.canvas.font.simple_font.true_type_font import TrueTypeFont
-from borb.pdf.canvas.font.font import Font
 
 FONT_DIR = join(dirname(abspath(__file__)), 'static', 'fonts')
 FONT_DIR_OPEN_SANS = join(FONT_DIR, 'Open_Sans', 'static', 'OpenSans')
@@ -55,8 +53,6 @@ def get_custom_font(font_name):
     return font_obj
 
 
-IMAGE_DIR = join(dirname(abspath(__file__)), 'static', 'images')
-DPCREATOR_LOGO_PATH = Path(join(IMAGE_DIR, 'dpcreator_logo.png'))
 
 
 # construct the Font object

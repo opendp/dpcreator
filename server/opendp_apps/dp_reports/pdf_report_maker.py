@@ -3,10 +3,9 @@ Create a PDF report based on a DP Release
 """
 from __future__ import annotations
 from decimal import Decimal
-from decimal import getcontext as get_dec_context
 import json
 
-import os
+import os, sys
 from os.path import abspath, dirname, isfile, join
 import dateutil
 import random
@@ -18,7 +17,6 @@ from django.template.loader import render_to_string
 
 from borb.pdf.canvas.layout.image.image import Image
 from borb.pdf.canvas.layout.image.chart import Chart
-from borb.pdf.canvas.layout.layout_element import Alignment
 from borb.pdf.canvas.layout.page_layout.multi_column_layout import SingleColumnLayout
 from borb.pdf.canvas.layout.page_layout.page_layout import PageLayout
 
@@ -27,15 +25,13 @@ from borb.pdf.page.page import DestinationType
 from borb.pdf.page.page import Page
 from borb.pdf.page.page_size import PageSize
 from borb.pdf.pdf import PDF
-from borb.pdf.canvas.layout.text.chunk_of_text import ChunkOfText
 from borb.pdf.canvas.layout.text.chunks_of_text import HeterogeneousParagraph
 from borb.pdf.canvas.layout.text.paragraph import Paragraph
 from borb.pdf.canvas.line_art.line_art_factory import LineArtFactory
 from borb.pdf.canvas.geometry.rectangle import Rectangle
 from borb.pdf.canvas.layout.shape.shape import Shape
-from borb.pdf.canvas.layout.table.fixed_column_width_table import FixedColumnWidthTable
 from borb.pdf.canvas.layout.table.flexible_column_width_table import FlexibleColumnWidthTable
-from borb.pdf.canvas.layout.table.table import TableCell
+from borb.pdf.canvas.layout.table.table import Table
 from borb.pdf.canvas.color.color import HexColor
 
 import matplotlib.pyplot as MatPlotLibPlot
@@ -45,14 +41,7 @@ from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.dp_reports import pdf_utils as putil
 
-from opendp_apps.dp_reports.font_util import \
-    (get_custom_font,
-     OPEN_SANS_LIGHT,
-     OPEN_SANS_REGULAR,
-     OPEN_SANS_SEMI_BOLD,
-     OPEN_SANS_BOLD,
-     OPEN_SANS_ITALIC,
-     DPCREATOR_LOGO_PATH)
+from opendp_apps.dp_reports import static_vals as pdf_static
 from opendp_apps.utils.randname import random_with_n_digits
 
 class PDFReportMaker(BasicErrCheck):
@@ -102,9 +91,8 @@ class PDFReportMaker(BasicErrCheck):
 
         self.add_data_source_and_lib()
 
-        self.add_to_layout(Chart(self.create_example_plot(),
-                                 width=Decimal(450),
-                                 height=Decimal(256)))
+        # test chart
+        # self.add_to_layout(Chart(self.create_example_plot(), width=Decimal(450), height=Decimal(256)))
 
         # Add label for the PDF outline
         #
@@ -165,115 +153,290 @@ class PDFReportMaker(BasicErrCheck):
         """Embed the JSON release in the PDF"""
         self.pdf_doc.append_embedded_file("release_data.json", self.release_json_bytes)
 
+    def get_general_stat_result_desc(self, stat_type_formatted, var_name) -> list:
+        """Return the general "Result" description"""
+        text_chunks = [
+            putil.txt_bld('Result.'),
+            putil.txt_reg(f' A '),
+            putil.txt_bld(f'DP {stat_type_formatted}'),
+            putil.txt_reg(' has been calculated for the variable'),
+            putil.txt_bld(f" {var_name}."),
+            putil.txt_reg(' The result,'),
+            putil.txt_reg(' accuracy,'),
+            putil.txt_reg(' and a description are shown below:'),
+        ]
+        return text_chunks
+
+    def get_histogram_stat_result_desc(self, stat_type_formatted: str, var_name: str) -> list:
+        """Return the general "Result" description"""
+        text_chunks = [
+            putil.txt_bld('Result.'),
+            putil.txt_reg(f' A '),
+            putil.txt_bld(f'DP {stat_type_formatted}'),
+            putil.txt_reg(' has been calculated for the variable'),
+            putil.txt_bld(f" {var_name}."),
+            putil.txt_reg(' The histogram'),
+            putil.txt_reg(' is shown below:'),
+            # putil.txt_reg(' and table are shown below:'),
+        ]
+        return text_chunks
+
+    def get_histogram_accuracy_desc(self, stat_type_formatted: str, var_name: str) -> list:
+        """Return the general "Result" description"""
+        text_chunks = [
+            putil.txt_bld('Result (continued).'),
+            putil.txt_reg(f' A '),
+            putil.txt_bld(f'DP {stat_type_formatted}'),
+            putil.txt_reg(' has been calculated for the variable'),
+            putil.txt_bld(f" {var_name}."),
+            putil.txt_reg(' The histogram'),
+            putil.txt_reg(' result and accuracy information is shown below.'),
+            # putil.txt_reg(' and table are shown below:'),
+        ]
+        return text_chunks
+
     def add_statistics_pages(self):
         """Add a page for each DP statistic"""
         stat_cnt = 0
         for stat_info in self.release_dict['statistics']:
-            if stat_info['statistic'] == astatic.DP_HISTOGRAM:
-                continue
             # Put each statistic on a new page
             self.start_new_page()
 
             stat_cnt += 1
-            stat_type = stat_info['statistic'].title()
+            stat_type = stat_info['statistic']
+            stat_type_formatted = stat_type.title()
             var_name = stat_info['variable']
 
             subtitle = f"1.{stat_cnt}. {var_name} - " + stat_type
 
             self.add_to_layout(putil.txt_subtitle_para(subtitle))
 
-            text_chunks_01 = [
-                putil.txt_bld('Result.'),
-                putil.txt_reg(f' A '),
-                putil.txt_bld(f'differentially private (DP) {stat_type}'),
-                putil.txt_reg(' has been calculated for the variable'),
-                putil.txt_bld(f" {var_name}."),
-                putil.txt_reg(' The result,'),
-                putil.txt_reg(' accuracy,'),
-                putil.txt_reg(' and a description are shown below:'),
-            ]
+            if stat_type in [astatic.DP_MEAN, astatic.DP_VARIANCE, astatic.DP_COUNT]:
 
-            self.add_to_layout(HeterogeneousParagraph(text_chunks_01,
-                                                      padding_left=Decimal(10)))
-
-            if stat_info['statistic'] in [astatic.DP_MEAN, astatic.DP_VARIANCE, astatic.DP_COUNT]:
-
-                self.add_single_stat_result_table(stat_info, stat_type, var_name)
-
-                text_chunks_02 = [
-                    putil.txt_bld(f'Parameters.'),
-                    putil.txt_reg((' The table below shows the parameters used when'
-                                  ' calculating the DP Mean. For reference, ')),
-                    putil.txt_reg(' a description of each'),
-                    putil.txt_reg(' parameter may be found at the end of the document.'),
-                ]
-
-                self.add_to_layout(HeterogeneousParagraph(text_chunks_02,
+                # add descriptive text
+                stat_desc = self.get_general_stat_result_desc(stat_type_formatted, var_name)
+                self.add_to_layout(HeterogeneousParagraph(stat_desc,
                                                           padding_left=Decimal(10)))
 
-                # --------------------------------------
-                # Create table for parameters
-                # --------------------------------------
-                is_dp_count = False
-                if stat_info['statistic'] == astatic.DP_COUNT:
-                    is_dp_count = True
-                    num_param_table_rows = 5
-                else:
-                    num_param_table_rows = 11
+                # Add result table
+                self.add_single_stat_result_table(stat_info, stat_type_formatted, var_name)
 
-                table_001 = FlexibleColumnWidthTable(number_of_rows=num_param_table_rows,
-                                                     number_of_columns=2,
-                                                     padding_left=Decimal(40),
-                                                     padding_right=Decimal(40),
-                                                     border_color=putil.COLOR_CRIMSON)
+                # Add parameter info
+                self.add_parameter_info(stat_info, stat_type_formatted)
 
-                table_001.add(putil.get_tbl_cell_ital("Privacy Parameters", col_span=2))
+            elif stat_type == astatic.DP_HISTOGRAM:
 
-                table_001.add(putil.get_tbl_cell_lft_pad("Epsilon", padding=20))
-                table_001.add(putil.get_tbl_cell_align_rt(f"{stat_info['epsilon']}"))
+                # add descriptive text
+                stat_desc = self.get_histogram_stat_result_desc(stat_type_formatted, var_name)
+                self.add_to_layout(HeterogeneousParagraph(stat_desc,
+                                                          padding_left=Decimal(10)))
 
-                table_001.add(putil.get_tbl_cell_lft_pad("Delta", padding=20))
-                delta_val = stat_info['delta']
-                if delta_val is None:
-                    delta_val = '(not applicable)'
-                table_001.add(putil.get_tbl_cell_align_rt(f'{delta_val}'))
+                # show histogram
+                self.add_histogram_plot(stat_info, var_name)
 
-                table_001.add(putil.get_tbl_cell_ital("Metadata Parameters", col_span=2))
+                # on a new page, show the metadata parameters
+                self.start_new_page()  # new page
 
-                if not is_dp_count:
-                    table_001.add(putil.get_tbl_cell_ital("Bounds", col_span=2, padding=20))
+                # page heading
+                subtitle2 = f"{subtitle} (continued)"
+                self.add_to_layout(putil.txt_subtitle_para(subtitle2))
 
-                    table_001.add(putil.get_tbl_cell_lft_pad("Min", padding=40))
-                    table_001.add(putil.get_tbl_cell_align_rt(f"{stat_info['bounds']['min']}"))
+                stat_desc = self.get_histogram_accuracy_desc(stat_type_formatted, var_name)
+                self.add_to_layout(HeterogeneousParagraph(stat_desc,
+                                                          padding_left=Decimal(10)))
 
-                    table_001.add(putil.get_tbl_cell_lft_pad("Max", padding=40))
-                    table_001.add(putil.get_tbl_cell_align_rt(f"{stat_info['bounds']['max']}"))
+                # Add result table
+                self.add_histogram_result_table(stat_info, stat_type_formatted, var_name)
 
-                table_001.add(putil.get_tbl_cell_lft_pad("Confidence Level", padding=20))
-                table_001.add(putil.get_tbl_cell_align_rt(f"{stat_info['confidence_level']}"))
+                # parameter info
+                self.add_parameter_info(stat_info, stat_type_formatted)
 
-                # Missing Value Handling
-                if not is_dp_count:
-                    table_001.add(putil.get_tbl_cell_ital("Missing Value Handling", col_span=2))
+    def add_histogram_plot(self, stat_info: dict, var_name: str):
+        """
+        Create a plot from histogram data and add it to the layout
+        ref: https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.bar.html#matplotlib.axes.Axes.bar
+        """
+        if self.has_error():
+            return
+        assert stat_info['statistic'] == astatic.DP_HISTOGRAM, \
+            f"This method should only be used for Histograms. Not statistic: \"{stat_info['statistic']}\""
 
-                    table_001.add(putil.get_tbl_cell_lft_pad("Type", padding=20))
-                    missing_val_handling = stat_info['missing_value_handling']['type']
-                    print('>>> missing_val_handling', missing_val_handling)
-                    if missing_val_handling == astatic.MISSING_VAL_INSERT_FIXED:
-                        table_001.add(putil.get_tbl_cell_lft_pad(
-                            astatic.missing_val_label(astatic.MISSING_VAL_INSERT_FIXED)))
+        # -------------------------------------
+        # Get the x/y data!
+        # -------------------------------------
+        hist_bins = stat_info['result']['value']['categories']
+        hist_vals = stat_info['result']['value']['values']
 
-                        table_001.add(putil.get_tbl_cell_lft_pad("Value", padding=20))
-                        table_001.add(putil.get_tbl_cell_align_rt(
-                            f"{stat_info['missing_value_handling']['fixed_value']}"))
+        # -------------------------------------
+        # Set the bins to string format.
+        #  e.g. the last value is "uncategorized" and errors occur if numerics/strings are mixed
+        # -------------------------------------
+        hist_bins = [str(x) for x in hist_bins]
 
-                table_001.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
-                table_001.set_border_color_on_all_cells(putil.COLOR_CRIMSON)
-                table_001.set_borders_on_all_cells(True, False, True, False)  # top, right, bottom, left
+        # -------------------------------------
+        # Make a bar lot
+        # -------------------------------------
+        fig = MatPlotLibPlot.figure(tight_layout=True, figsize=[8,6])
+        ax = fig.add_subplot()
 
-                rsize = self.get_layout_box(table_001)
-                print('rsize: W x H', rsize.width, rsize.height)
-                self.add_to_layout(table_001)
+        # -------------------------------------
+        # Check if the labels overlap
+        #   (very rough/naive!)
+        # -------------------------------------
+
+        # What's the longest bin label? (Not counting the last bin of "uncategorized")
+        max_bin_length = max([len(x) for x in hist_bins[:-1]])
+
+        # Rotate the labels so they don't overlap
+        if len(hist_vals) > 10 and max_bin_length > 2:
+            MatPlotLibPlot.xticks(rotation=90, ha='right')
+
+        # -------------------------------------
+        # Set the bar colors
+        # -------------------------------------
+        bar_container_obj = ax.bar(x=hist_bins,
+                                   height=hist_vals,
+                                   color="#6395e3",
+                                   edgecolor="#333333",
+                                   )
+
+        # Set the "uncategorized" bin/bar to a different color
+        bar_container_obj.patches[-1].set_facecolor('#C5C5C5')
+
+        # -------------------------------------
+        # Add title and x/y labels
+        # -------------------------------------
+        ax.set_title(f'DP Histogram of "{var_name}"')
+        ax.set_xlabel(var_name)
+        ax.set_ylabel('Count')
+
+        # -------------------------------------
+        # Add a threshold line if there are
+        #  values < 0 (also naive)
+        # -------------------------------------
+        # horizontal line indicating the threshold
+        if min(hist_vals) < 0:
+            ax.axhline(0, color='black', linewidth=0.8, linestyle='--')
+            #ax.plot([0., 4.5], [0, 0], "k--")
+
+            # If there are negative values--except the last "uncategorized value", change the color
+            for idx, patch in enumerate(bar_container_obj.patches[:-1]):
+                if hist_vals[idx] < 0:
+                    patch.set_facecolor('#f4d493')
+
+        # -------------------------------------
+        # Add the chart to the layout
+        # -------------------------------------
+        self.add_to_layout(Chart(MatPlotLibPlot.gcf(),
+                                 width=Decimal(450),
+                                 height=Decimal(256)))
+
+        """
+        fig = plt.figure(tight_layout=True, figsize=self.figure_size)
+        ax = fig.add_subplot()
+        ax.bar(x=statistic['result']['categories'], height=statistic['result']['value'])
+        ax.set_xlabel(statistic['variable'])
+        filename = '_'.join([statistic['variable'], statistic['statistic']])
+        fig.savefig('./images/' + filename + '.png')
+        """
+
+
+    def add_parameter_info(self, stat_info: dict, stat_type_formatted: str):
+        """Add parameter information, including epsilon, bounds, etc."""
+        if self.has_error():
+            return
+
+        # --------------------------------------
+        # Add parameter text
+        # --------------------------------------
+        text_chunks_02 = [
+            putil.txt_bld(f'Parameters.'),
+            putil.txt_reg((f' The table below shows the parameters used when'
+                           f' calculating the DP {stat_type_formatted}. For reference, ')),
+            putil.txt_reg(' a description of each'),
+            putil.txt_reg(' parameter may be found at the end of the document.'),
+        ]
+        self.add_to_layout(HeterogeneousParagraph(text_chunks_02,
+                                                  padding_left=Decimal(10)))
+
+        # --------------------------------------
+        # Create table for parameters
+        # --------------------------------------
+        is_dp_count = False
+        if stat_info['statistic'] == astatic.DP_COUNT:
+            is_dp_count = True
+            num_param_table_rows = 5
+        else:
+            num_param_table_rows = 11
+
+        # Create basic table
+        #
+        table_001 = FlexibleColumnWidthTable(number_of_rows=num_param_table_rows,
+                                             number_of_columns=2,
+                                             padding_left=Decimal(40),
+                                             padding_right=Decimal(40),
+                                             border_color=putil.COLOR_CRIMSON)
+
+        # Add Privacy Parameters
+        #
+        table_001.add(putil.get_tbl_cell_ital("Privacy Parameters", col_span=2))
+
+        table_001.add(putil.get_tbl_cell_lft_pad("Epsilon", padding=20))
+        table_001.add(putil.get_tbl_cell_align_rt(f"{stat_info['epsilon']}"))
+
+        table_001.add(putil.get_tbl_cell_lft_pad("Delta", padding=20))
+        delta_val = stat_info['delta']
+        if delta_val is None:
+            delta_val = '(not applicable)'
+        table_001.add(putil.get_tbl_cell_align_rt(f'{delta_val}'))
+
+        table_001.add(putil.get_tbl_cell_ital("Metadata Parameters", col_span=2))
+
+        if not is_dp_count:
+            table_001.add(putil.get_tbl_cell_ital("Bounds", col_span=2, padding=20))
+
+            table_001.add(putil.get_tbl_cell_lft_pad("Min", padding=40))
+            table_001.add(putil.get_tbl_cell_align_rt(f"{stat_info['bounds']['min']}"))
+
+            table_001.add(putil.get_tbl_cell_lft_pad("Max", padding=40))
+            table_001.add(putil.get_tbl_cell_align_rt(f"{stat_info['bounds']['max']}"))
+
+        table_001.add(putil.get_tbl_cell_lft_pad("Confidence Level", padding=20))
+        table_001.add(putil.get_tbl_cell_align_rt(f"{stat_info['confidence_level']}"))
+
+        # Add Missing Value Handling
+        #
+        if not is_dp_count:
+            table_001.add(putil.get_tbl_cell_ital("Missing Value Handling", col_span=2))
+
+            table_001.add(putil.get_tbl_cell_lft_pad("Type", padding=20))
+            missing_val_handling = stat_info['missing_value_handling']['type']
+
+            if missing_val_handling == astatic.MISSING_VAL_INSERT_FIXED:
+                table_001.add(putil.get_tbl_cell_lft_pad(
+                    astatic.missing_val_label(astatic.MISSING_VAL_INSERT_FIXED)))
+
+                table_001.add(putil.get_tbl_cell_lft_pad("Value", padding=20))
+                table_001.add(putil.get_tbl_cell_align_rt(
+                    f"{stat_info['missing_value_handling']['fixed_value']}"))
+            else:
+                mval_text = (f'Fix! Unhandled missing value handling. ({missing_val_handling})')
+                table_001.add(putil.get_tbl_cell_ital(mval_text, col_span=2))
+
+        self.set_table_borders_padding(table_001)
+
+        # rsize = self.get_layout_box(table_001)
+        # print('rsize: W x H', rsize.width, rsize.height)
+        self.add_to_layout(table_001)
+
+    def set_table_borders_padding(self, table_obj: Table):
+        """Add cell padding and top/bottom borders. The border color is crimson"""
+        if self.has_error():
+            return
+
+        table_obj.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
+        table_obj.set_border_color_on_all_cells(putil.COLOR_CRIMSON)
+        table_obj.set_borders_on_all_cells(True, False, True, False)  # top, right, bottom, left
 
     def add_data_source_and_lib(self):
         """Add the data source and library information"""
@@ -357,6 +520,7 @@ class PDFReportMaker(BasicErrCheck):
         tbl_src.set_border_color_on_all_cells(putil.COLOR_CRIMSON)
         tbl_src.set_borders_on_all_cells(True, False, True, False)  # top, right, bottom, left
 
+        self.set_table_borders_padding(tbl_src)
         self.add_to_layout(tbl_src)
 
         self.add_opendp_lib_info()
@@ -400,6 +564,8 @@ class PDFReportMaker(BasicErrCheck):
         tbl_src.set_border_color_on_all_cells(putil.COLOR_CRIMSON)
         tbl_src.set_borders_on_all_cells(True, False, True, False)  # top, right, bottom, left
 
+        self.set_table_borders_padding(tbl_src)
+
         self.add_to_layout(tbl_src)
 
     def add_pdf_title_page(self):
@@ -438,7 +604,7 @@ class PDFReportMaker(BasicErrCheck):
                                      multiplied_leading=Decimal(1.75)))
 
         self.add_to_layout(Paragraph('Contents',
-                           font=get_custom_font(OPEN_SANS_SEMI_BOLD),
+                           font=putil.BASIC_FONT_BOLD,
                            font_size=putil.BASIC_FONT_SIZE,
                            multiplied_leading=Decimal(1.75)))
 
@@ -463,6 +629,60 @@ class PDFReportMaker(BasicErrCheck):
         _width: Decimal = Decimal(1000)  # max width you would allow
         _height: Decimal = Decimal(1000)  # max height you would allow
         return p.layout(pg, Rectangle(zero_dec, zero_dec, _width, _height))
+
+    def add_histogram_result_table(self, stat_info: dict, stat_type: str, var_name: str):
+        """
+        Add the result table for a single stat, such as DP Mean. Example:
+            DP Mean                 2.9442
+            Accuracy                0.1964
+            Confidence Level        95.0%
+            Description             There is a probability of 95.0% that the ... (etc)
+        """
+        tbl_result = FlexibleColumnWidthTable(number_of_rows=4,
+                                              number_of_columns=2,
+                                              padding_left=Decimal(40),
+                                              padding_right=Decimal(60),
+                                              padding_bottom=Decimal(0),
+                                              )
+        # Statistic name and result
+        tbl_result.add(putil.get_tbl_cell_lft_pad(f'DP {stat_type}', padding=0))
+        categories = stat_info['result']['value']['categories']
+        result_text = 'The results, in JSON format, may accessed through the PDF attachemnt "release_data.json"'
+        if len(categories) ==  1:
+            tbl_result.add(putil.get_tbl_cell_lft_pad(f"(1 bin/category). {result_text}", padding=0))
+        else:
+            tbl_result.add(putil.get_tbl_cell_lft_pad(f"({len(categories)} bins/categories). {result_text}",
+                                                      padding=0))
+
+        # Accuracy
+        tbl_result.add(putil.get_tbl_cell_lft_pad("Accuracy", padding=0))
+        acc_fmt = round(stat_info['accuracy']['value'], 4)
+        tbl_result.add(putil.get_tbl_cell_align_rt(f"{acc_fmt}"))
+
+        # Confidence Level
+        clevel = round(stat_info['confidence_level'] * 100.0, 1)
+        tbl_result.add(putil.get_tbl_cell_lft_pad("Confidence Level", padding=0))
+        tbl_result.add(putil.get_tbl_cell_align_rt(f"{clevel}%"))
+
+        # Description
+        #
+        tbl_result.add(putil.get_tbl_cell_lft_pad("Description", padding=0))
+
+        acc_desc = (f'There is a probability of {clevel}% that a count on the DP {stat_type} '
+                    f' will differ'
+                    f' from the true {stat_type} by at most {acc_fmt} units.'
+                    f' The units are the same units the variable {var_name} has in the dataset.')
+
+        tbl_result.add(putil.get_tbl_cell_lft_pad(acc_desc))
+
+        # Table, padding, border color, and borders
+        tbl_result.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
+        tbl_result.set_border_color_on_all_cells(putil.COLOR_CRIMSON)
+        tbl_result.set_borders_on_all_cells(True, False, True, False)  # top, right, left, bottom
+
+        self.set_table_borders_padding(tbl_result)
+
+        self.add_to_layout(tbl_result)
 
     def add_single_stat_result_table(self, stat_info: dict, stat_type: str, var_name: str):
         """
@@ -508,6 +728,8 @@ class PDFReportMaker(BasicErrCheck):
         tbl_result.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
         tbl_result.set_border_color_on_all_cells(putil.COLOR_CRIMSON)
         tbl_result.set_borders_on_all_cells(True, False, True, False)  # top, right, left, bottom
+
+        self.set_table_borders_padding(tbl_result)
 
         self.add_to_layout(tbl_result)
 
@@ -583,7 +805,7 @@ class PDFReportMaker(BasicErrCheck):
                                              Decimal(logo_width),
                                              Decimal(logo_height))
             logo_img_obj = Image(
-                DPCREATOR_LOGO_PATH,
+                pdf_static.DPCREATOR_LOGO_PATH,
                 width=Decimal(logo_width),
                 height=Decimal(logo_height),
             )
