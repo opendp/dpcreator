@@ -199,3 +199,4 @@ client/.idea/inspectionProfiles/profiles_settings.xml
 client/.idea/aws.xml
 !deploy/dataverse/*.json
 server/templates/base-vue.html
+!server/opendp_apps/dp_reports/test_data/*.json
