@@ -41,9 +41,10 @@ from borb.pdf.canvas.color.color import HexColor
 import matplotlib.pyplot as MatPlotLibPlot
 import numpy as np
 import pandas as pd
-
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
+from opendp_apps.dp_reports import pdf_utils as putil
+
 from opendp_apps.dp_reports.font_util import \
     (get_custom_font,
      OPEN_SANS_LIGHT,
@@ -56,12 +57,6 @@ from opendp_apps.utils.randname import random_with_n_digits
 
 class PDFReportMaker(BasicErrCheck):
 
-    # basic_font = 'Times-roman'
-    color_crimson = HexColor('#a41d30')
-    basic_font = get_custom_font(OPEN_SANS_LIGHT)
-    basic_font_italic = get_custom_font(OPEN_SANS_ITALIC)
-    basic_font_bold = get_custom_font(OPEN_SANS_SEMI_BOLD)
-
     def __init__(self, release_dict: dict = None):
         """Initalize with a DP Release as Python dict"""
         self.release_dict = release_dict
@@ -73,11 +68,6 @@ class PDFReportMaker(BasicErrCheck):
 
         # num statistics
         self.num_stats = len(self.release_dict['statistics'])
-
-        # Set font sizes
-        self.basic_font_size = Decimal(9)
-        self.tbl_font_size = Decimal(9)
-        self.tbl_border_color = HexColor("#cbcbcb")
 
         # param table
         self.indent1 = Decimal(10)
@@ -163,107 +153,13 @@ class PDFReportMaker(BasicErrCheck):
         self.creation_date = dateutil.parser.parse(self.release_dict['created']['iso'])
         self.release_dict['creation_date'] = self.creation_date
 
-    def get_test_release(self):
-        """for dev building"""
+    @staticmethod
+    def get_test_release():
+        """for dev/building"""
         # test_release_name = join(CURRENT_DIR, 'test_data', 'sample_release_01.json')
         test_release_name = join(CURRENT_DIR, 'test_data', 'release_f082cbc4-9cd7-4e44-a0f3-f4ad967f237c.json')
 
         return json.loads(open(test_release_name, 'r').read())
-
-    def get_centered_para(self, s):
-        """Add a paragrah to the layout"""
-        p = Paragraph(s,
-                      font=get_custom_font(OPEN_SANS_SEMI_BOLD),
-                      font_size=Decimal(10),
-                      font_color=self.color_crimson,
-                      multiplied_leading=Decimal(1.25),
-                      respect_newlines_in_text=True,
-                      text_alignment=Alignment.CENTERED)
-        return p
-
-    def get_tbl_cell_ital(self, content, col_span=1, padding=0):
-        """Get table cell, putting the content in italics"""
-        return self._get_tbl_cell(content,
-                                  self.basic_font_italic,
-                                  self.tbl_font_size,
-                                  Alignment.LEFT,
-                                  col_span=col_span,
-                                  padding_left=padding)
-
-    def get_tbl_cell_lft_pad(self, content, padding=10):
-        """Return a table cell aligned left with left padding"""
-        return self._get_tbl_cell(content,
-                                  self.basic_font,
-                                  self.tbl_font_size,
-                                  Alignment.LEFT,
-                                  col_span=1,
-                                  padding_left=padding)
-
-    def get_tbl_cell_align_rt(self, content):
-        """Return a table cell aligned right"""
-        return self._get_tbl_cell(content, self.basic_font, self.tbl_font_size, Alignment.RIGHT)
-
-    def _get_tbl_cell(self, content, font=None, font_size=None, text_alignment=None,
-                      col_span=1, padding_left=0) -> TableCell:
-        """Return a Paragraph within a TableCell"""
-        if not font:
-            font = self.basic_font
-        if not font_size:
-            font = self.basic_font_size
-        if not text_alignment:
-            text_alignment = Alignment.LEFT
-
-        p = Paragraph(content,
-                      font=font,
-                      font_size=font_size,
-                      padding_left=Decimal(padding_left),
-                      text_alignment=text_alignment,
-                      )
-        return TableCell(p,
-                         # border_color=self.tbl_border_color,
-                         col_span=col_span)
-
-    def txt_reg(self, val):
-        """Return a chunk of text with a regular font"""
-        return ChunkOfText(val, font=self.basic_font, font_size=self.basic_font_size)
-
-    def txt_subtitle_para(self, subtitle):
-        """Return a Paragraph with a subtitle font"""
-        return Paragraph(subtitle,
-                         font=get_custom_font(OPEN_SANS_SEMI_BOLD),
-                         font_size=self.basic_font_size + Decimal(1),
-                         font_color=self.color_crimson,
-                         multiplied_leading=Decimal(1.75))
-
-    def txt_reg_para(self, val):
-        """Return a Paragraph with a regular font"""
-        return Paragraph(val,
-                         font=self.basic_font,
-                         font_size=self.basic_font_size,
-                         multiplied_leading=Decimal(1.75))
-
-    def txt_list_para(self, val, padding_left=Decimal(40)):
-        """Return a paragraph for a listt"""
-        return Paragraph(val,
-                         # font=self.basic_font,
-                         font=get_custom_font(OPEN_SANS_SEMI_BOLD),
-                         font_size=self.basic_font_size,
-                         font_color=self.color_crimson,
-                         padding_left=padding_left,
-                         padding_bottom=Decimal(0),
-                         padding_top=Decimal(0),
-                         margin_top=Decimal(0),
-                         margin_bottom=Decimal(0),
-                         multiplied_leading=Decimal(.5),
-                         )
-
-    def txt_bld(self, val):
-        """Return a chunk of text with a bold font"""
-        return ChunkOfText(val, font=self.basic_font_bold, font_size=self.basic_font_size)
-
-    def txt_bld_para(self, val):
-        """Return a chunk of text with a bold font"""
-        return Paragraph(val, font=self.basic_font_bold, font_size=self.basic_font_size)
 
     def embed_json_release_in_pdf(self):
         """Embed the JSON release in the PDF"""
@@ -284,17 +180,17 @@ class PDFReportMaker(BasicErrCheck):
 
             subtitle = f"1.{stat_cnt}. {var_name} - " + stat_type
 
-            self.add_to_layout(self.txt_subtitle_para(subtitle))
+            self.add_to_layout(putil.txt_subtitle_para(subtitle))
 
             text_chunks_01 = [
-                self.txt_bld('Result.'),
-                self.txt_reg(f' A '),
-                self.txt_bld(f'differentially private (DP) {stat_type}'),
-                self.txt_reg(' has been calculated for the variable'),
-                self.txt_bld(f" {var_name}."),
-                self.txt_reg(' The result,'),
-                self.txt_reg(' accuracy,'),
-                self.txt_reg(' and a description are shown below:'),
+                putil.txt_bld('Result.'),
+                putil.txt_reg(f' A '),
+                putil.txt_bld(f'differentially private (DP) {stat_type}'),
+                putil.txt_reg(' has been calculated for the variable'),
+                putil.txt_bld(f" {var_name}."),
+                putil.txt_reg(' The result,'),
+                putil.txt_reg(' accuracy,'),
+                putil.txt_reg(' and a description are shown below:'),
             ]
 
             self.add_to_layout(HeterogeneousParagraph(text_chunks_01,
@@ -305,11 +201,11 @@ class PDFReportMaker(BasicErrCheck):
                 self.add_single_stat_result_table(stat_info, stat_type, var_name)
 
                 text_chunks_02 = [
-                    self.txt_bld(f'Parameters.'),
-                    self.txt_reg((' The table below shows the parameters used when'
+                    putil.txt_bld(f'Parameters.'),
+                    putil.txt_reg((' The table below shows the parameters used when'
                                   ' calculating the DP Mean. For reference, ')),
-                    self.txt_reg(' a description of each'),
-                    self.txt_reg(' parameter may be found at the end of the document.'),
+                    putil.txt_reg(' a description of each'),
+                    putil.txt_reg(' parameter may be found at the end of the document.'),
                 ]
 
                 self.add_to_layout(HeterogeneousParagraph(text_chunks_02,
@@ -329,50 +225,50 @@ class PDFReportMaker(BasicErrCheck):
                                                      number_of_columns=2,
                                                      padding_left=Decimal(40),
                                                      padding_right=Decimal(40),
-                                                     border_color=self.color_crimson)
+                                                     border_color=putil.COLOR_CRIMSON)
 
-                table_001.add(self.get_tbl_cell_ital("Privacy Parameters", col_span=2))
+                table_001.add(putil.get_tbl_cell_ital("Privacy Parameters", col_span=2))
 
-                table_001.add(self.get_tbl_cell_lft_pad("Epsilon", padding=20))
-                table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['epsilon']}"))
+                table_001.add(putil.get_tbl_cell_lft_pad("Epsilon", padding=20))
+                table_001.add(putil.get_tbl_cell_align_rt(f"{stat_info['epsilon']}"))
 
-                table_001.add(self.get_tbl_cell_lft_pad("Delta", padding=20))
+                table_001.add(putil.get_tbl_cell_lft_pad("Delta", padding=20))
                 delta_val = stat_info['delta']
                 if delta_val is None:
                     delta_val = '(not applicable)'
-                table_001.add(self.get_tbl_cell_align_rt(f'{delta_val}'))
+                table_001.add(putil.get_tbl_cell_align_rt(f'{delta_val}'))
 
-                table_001.add(self.get_tbl_cell_ital("Metadata Parameters", col_span=2))
+                table_001.add(putil.get_tbl_cell_ital("Metadata Parameters", col_span=2))
 
                 if not is_dp_count:
-                    table_001.add(self.get_tbl_cell_ital("Bounds", col_span=2, padding=20))
+                    table_001.add(putil.get_tbl_cell_ital("Bounds", col_span=2, padding=20))
 
-                    table_001.add(self.get_tbl_cell_lft_pad("Min", padding=40))
-                    table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['bounds']['min']}"))
+                    table_001.add(putil.get_tbl_cell_lft_pad("Min", padding=40))
+                    table_001.add(putil.get_tbl_cell_align_rt(f"{stat_info['bounds']['min']}"))
 
-                    table_001.add(self.get_tbl_cell_lft_pad("Max", padding=40))
-                    table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['bounds']['max']}"))
+                    table_001.add(putil.get_tbl_cell_lft_pad("Max", padding=40))
+                    table_001.add(putil.get_tbl_cell_align_rt(f"{stat_info['bounds']['max']}"))
 
-                table_001.add(self.get_tbl_cell_lft_pad("Confidence Level", padding=20))
-                table_001.add(self.get_tbl_cell_align_rt(f"{stat_info['confidence_level']}"))
+                table_001.add(putil.get_tbl_cell_lft_pad("Confidence Level", padding=20))
+                table_001.add(putil.get_tbl_cell_align_rt(f"{stat_info['confidence_level']}"))
 
                 # Missing Value Handling
                 if not is_dp_count:
-                    table_001.add(self.get_tbl_cell_ital("Missing Value Handling", col_span=2))
+                    table_001.add(putil.get_tbl_cell_ital("Missing Value Handling", col_span=2))
 
-                    table_001.add(self.get_tbl_cell_lft_pad("Type", padding=20))
+                    table_001.add(putil.get_tbl_cell_lft_pad("Type", padding=20))
                     missing_val_handling = stat_info['missing_value_handling']['type']
                     print('>>> missing_val_handling', missing_val_handling)
                     if missing_val_handling == astatic.MISSING_VAL_INSERT_FIXED:
-                        table_001.add(self.get_tbl_cell_lft_pad(
+                        table_001.add(putil.get_tbl_cell_lft_pad(
                             astatic.missing_val_label(astatic.MISSING_VAL_INSERT_FIXED)))
 
-                        table_001.add(self.get_tbl_cell_lft_pad("Value", padding=20))
-                        table_001.add(self.get_tbl_cell_align_rt(
+                        table_001.add(putil.get_tbl_cell_lft_pad("Value", padding=20))
+                        table_001.add(putil.get_tbl_cell_align_rt(
                             f"{stat_info['missing_value_handling']['fixed_value']}"))
 
                 table_001.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
-                table_001.set_border_color_on_all_cells(self.color_crimson)
+                table_001.set_border_color_on_all_cells(putil.COLOR_CRIMSON)
                 table_001.set_borders_on_all_cells(True, False, True, False)  # top, right, bottom, left
 
                 rsize = self.get_layout_box(table_001)
@@ -387,19 +283,19 @@ class PDFReportMaker(BasicErrCheck):
         self.start_new_page()
 
         subtitle = f"2. Data Source"
-        self.add_to_layout(self.txt_subtitle_para(subtitle))
+        self.add_to_layout(putil.txt_subtitle_para(subtitle))
 
         basic_desc = render_to_string('pdf_report/20_data_source_desc.txt',
                                       self.release_dict)
 
-        self.add_to_layout(self.txt_reg_para(basic_desc))
+        self.add_to_layout(putil.txt_reg_para(basic_desc))
 
         dataset_info = self.release_dict['dataset']
 
         # Assuming a Dataverse dataset for now
         if dataset_info['type'] != 'dataverse':
             note = '!Not a Dataverse dataset. Add handling! (pdf_report_maker.py / add_data_source_and_lib)'
-            self.add_to_layout(self.txt_reg_para(basic_desc))
+            self.add_to_layout(putil.txt_reg_para(note))
             return
 
         tbl_src = FlexibleColumnWidthTable(number_of_rows=11,
@@ -411,54 +307,54 @@ class PDFReportMaker(BasicErrCheck):
         # ------------------------------
         # Dataverse - general info
         # ------------------------------
-        tbl_src.add(self.get_tbl_cell_ital("Dataverse Repository", col_span=2))
+        tbl_src.add(putil.get_tbl_cell_ital("Dataverse Repository", col_span=2))
 
-        tbl_src.add(self.get_tbl_cell_lft_pad(f'Name', padding=self.indent1))
-        tbl_src.add(self.get_tbl_cell_lft_pad(f"{dataset_info['installation']['name']}", padding=0))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f'Name', padding=self.indent1))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f"{dataset_info['installation']['name']}", padding=0))
 
-        tbl_src.add(self.get_tbl_cell_lft_pad(f'URL', padding=self.indent1))
-        tbl_src.add(self.get_tbl_cell_lft_pad(f"{dataset_info['installation']['url']}", padding=0))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f'URL', padding=self.indent1))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f"{dataset_info['installation']['url']}", padding=0))
 
         # ------------------------------
         # Dataverse Dataset information
         # ------------------------------
-        tbl_src.add(self.get_tbl_cell_ital("Dataverse Dataset/Collection", col_span=2))
+        tbl_src.add(putil.get_tbl_cell_ital("Dataverse Dataset/Collection", col_span=2))
 
-        tbl_src.add(self.get_tbl_cell_lft_pad(f'Name', padding=self.indent1))
-        tbl_src.add(self.get_tbl_cell_lft_pad(f"{dataset_info['name']}", padding=0))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f'Name', padding=self.indent1))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f"{dataset_info['name']}", padding=0))
         citation_str = dataset_info['citation']
         if not citation_str:
             citation_str = '(not available)'
-        tbl_src.add(self.get_tbl_cell_lft_pad(f'Citation', padding=self.indent1))
-        tbl_src.add(self.get_tbl_cell_lft_pad(citation_str, padding=0))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f'Citation', padding=self.indent1))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(citation_str, padding=0))
 
         doi_str = dataset_info['doi']
         if not doi_str:
             doi_str = '(not available)'
-        tbl_src.add(self.get_tbl_cell_lft_pad(f'DOI', padding=self.indent1))
-        tbl_src.add(self.get_tbl_cell_lft_pad(doi_str, padding=0))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f'DOI', padding=self.indent1))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(doi_str, padding=0))
 
         # ------------------------------
         # File information
         # ------------------------------
-        tbl_src.add(self.get_tbl_cell_ital("File Information", col_span=2))
-        tbl_src.add(self.get_tbl_cell_lft_pad(f'Name', padding=self.indent1))
-        tbl_src.add(self.get_tbl_cell_lft_pad(f"{dataset_info['file_information']['name']}", padding=0))
+        tbl_src.add(putil.get_tbl_cell_ital("File Information", col_span=2))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f'Name', padding=self.indent1))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f"{dataset_info['file_information']['name']}", padding=0))
 
         identifier_str = dataset_info['file_information']['identifier']
         if not identifier_str:
             identifier_str = '(not available)'
-        tbl_src.add(self.get_tbl_cell_lft_pad(f'Identifier', padding=self.indent1))
-        tbl_src.add(self.get_tbl_cell_lft_pad(identifier_str, padding=0))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f'Identifier', padding=self.indent1))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(identifier_str, padding=0))
 
         format_str = dataset_info['file_information']['fileFormat']
         if not format_str:
             format_str = '(not available)'
-        tbl_src.add(self.get_tbl_cell_lft_pad(f'File format', padding=self.indent1))
-        tbl_src.add(self.get_tbl_cell_lft_pad(format_str, padding=0))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f'File format', padding=self.indent1))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(format_str, padding=0))
 
         tbl_src.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
-        tbl_src.set_border_color_on_all_cells(self.color_crimson)
+        tbl_src.set_border_color_on_all_cells(putil.COLOR_CRIMSON)
         tbl_src.set_borders_on_all_cells(True, False, True, False)  # top, right, bottom, left
 
         self.add_to_layout(tbl_src)
@@ -475,11 +371,11 @@ class PDFReportMaker(BasicErrCheck):
         # Subtitle and basic description
         #
         subtitle = f"3. OpenDP Library"
-        self.add_to_layout(self.txt_subtitle_para(subtitle))
+        self.add_to_layout(putil.txt_subtitle_para(subtitle))
 
         basic_desc = render_to_string('pdf_report/30_opendp_lib_desc.txt',
                                       self.release_dict)
-        self.add_to_layout(self.txt_reg_para(basic_desc))
+        self.add_to_layout(putil.txt_reg_para(basic_desc))
 
         # Information table
         #
@@ -489,23 +385,22 @@ class PDFReportMaker(BasicErrCheck):
                                            padding_right=Decimal(60),
                                            padding_bottom=Decimal(0))
 
-        tbl_src.add(self.get_tbl_cell_ital("OpenDP Library", col_span=2))
+        tbl_src.add(putil.get_tbl_cell_ital("OpenDP Library", col_span=2))
 
-        tbl_src.add(self.get_tbl_cell_lft_pad(f'Version', padding=self.indent1))
-        tbl_src.add(self.get_tbl_cell_lft_pad(f"{dp_lib_info['version']}", padding=0))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f'Version', padding=self.indent1))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f"{dp_lib_info['version']}", padding=0))
 
-        tbl_src.add(self.get_tbl_cell_lft_pad(f'Python package', padding=self.indent1))
-        tbl_src.add(self.get_tbl_cell_lft_pad('https://pypi.org/project/opendp/', padding=0))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f'Python package', padding=self.indent1))
+        tbl_src.add(putil.get_tbl_cell_lft_pad('https://pypi.org/project/opendp/', padding=0))
 
-        tbl_src.add(self.get_tbl_cell_lft_pad(f'GitHub Repository', padding=self.indent1))
-        tbl_src.add(self.get_tbl_cell_lft_pad(f"{dp_lib_info['url']}", padding=0))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f'GitHub Repository', padding=self.indent1))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f"{dp_lib_info['url']}", padding=0))
 
         tbl_src.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
-        tbl_src.set_border_color_on_all_cells(self.color_crimson)
+        tbl_src.set_border_color_on_all_cells(putil.COLOR_CRIMSON)
         tbl_src.set_borders_on_all_cells(True, False, True, False)  # top, right, bottom, left
 
         self.add_to_layout(tbl_src)
-
 
     def add_pdf_title_page(self):
         """Add the PDF title page"""
@@ -517,56 +412,57 @@ class PDFReportMaker(BasicErrCheck):
         # Add title text
         #
         title_text = render_to_string('pdf_report/10_title.txt', self.release_dict)
-        self.add_to_layout(self.get_centered_para(title_text))
+        self.add_to_layout(putil.get_centered_para(title_text))
 
         # Add intro text
         #
         intro_text = render_to_string('pdf_report/intro_text.txt', self.release_dict)
         self.add_to_layout(Paragraph(intro_text,
-                                     font=self.basic_font,
-                                     font_size=self.basic_font_size,
+                                     font=putil.BASIC_FONT,
+                                     font_size=putil.BASIC_FONT_SIZE,
                                      multiplied_leading=Decimal(1.75)))
 
         para_read_carefully = ('Please read the report carefully, especially in'
                                ' regard to the usage of these statistics.')
         self.add_to_layout(Paragraph(para_read_carefully,
-                                     font=self.basic_font,
-                                     font_size=self.basic_font_size,
+                                     font=putil.BASIC_FONT,
+                                     font_size=putil.BASIC_FONT_SIZE,
                                      multiplied_leading=Decimal(1.75)))
 
         para_attachment = ('Note: If you are using Adobe Acrobat, a JSON version of this data'
                            ' is attached to this PDF as a file named "release_data.json".')
 
         self.add_to_layout(Paragraph(para_attachment,
-                                     font=self.basic_font,
-                                     font_size=self.basic_font_size,
+                                     font=putil.BASIC_FONT,
+                                     font_size=putil.BASIC_FONT_SIZE,
                                      multiplied_leading=Decimal(1.75)))
 
         self.add_to_layout(Paragraph('Contents',
                            font=get_custom_font(OPEN_SANS_SEMI_BOLD),
-                           font_size=self.basic_font_size,
+                           font_size=putil.BASIC_FONT_SIZE,
                            multiplied_leading=Decimal(1.75)))
 
-        self.add_to_layout(self.txt_list_para('1. Statistics'))
+        self.add_to_layout(putil.txt_list_para('1. Statistics'))
         stat_cnt = 0
         for stat_info in self.release_dict['statistics']:
             stat_cnt += 1
             stat_type = 'DP ' + stat_info['statistic'].title()
             var_name = stat_info['variable']
-            self.add_to_layout(self.txt_list_para(f'1.{stat_cnt}. {var_name} - {stat_type}', Decimal(60)))
+            self.add_to_layout(putil.txt_list_para(f'1.{stat_cnt}. {var_name} - {stat_type}', Decimal(60)))
 
-        self.add_to_layout(self.txt_list_para('2. Data Source'))
-        self.add_to_layout(self.txt_list_para('3. OpenDP Library'))
-        self.add_to_layout(self.txt_list_para('4. Usage'))
-        self.add_to_layout(self.txt_list_para('5. Parameter Definitions'))
+        self.add_to_layout(putil.txt_list_para('2. Data Source'))
+        self.add_to_layout(putil.txt_list_para('3. OpenDP Library'))
+        self.add_to_layout(putil.txt_list_para('4. Usage'))
+        self.add_to_layout(putil.txt_list_para('5. Parameter Definitions'))
 
-    def get_layout_box(self, p: Paragraph) -> Rectangle:
+    @staticmethod
+    def get_layout_box(p: Paragraph) -> Rectangle:
         """From https://stackoverflow.com/questions/69318059/create-documents-with-dynamic-height-with-borb"""
         pg: Page = Page()
         zero_dec: Decimal = Decimal(0)
-        W: Decimal = Decimal(1000)  # max width you would allow
-        H: Decimal = Decimal(1000)  # max height you would allow
-        return p.layout(pg, Rectangle(zero_dec, zero_dec, W, H))
+        _width: Decimal = Decimal(1000)  # max width you would allow
+        _height: Decimal = Decimal(1000)  # max height you would allow
+        return p.layout(pg, Rectangle(zero_dec, zero_dec, _width, _height))
 
     def add_single_stat_result_table(self, stat_info: dict, stat_type: str, var_name: str):
         """
@@ -583,38 +479,37 @@ class PDFReportMaker(BasicErrCheck):
                                               padding_bottom=Decimal(0),
                                               )
         # Statistic name and result
-        tbl_result.add(self.get_tbl_cell_lft_pad(f'DP {stat_type}', padding=0))
+        tbl_result.add(putil.get_tbl_cell_lft_pad(f'DP {stat_type}', padding=0))
         res_fmt = round(stat_info['result']['value'], 4)
-        tbl_result.add(self.get_tbl_cell_align_rt(f"{res_fmt}"))
+        tbl_result.add(putil.get_tbl_cell_align_rt(f"{res_fmt}"))
 
         # Accuracy
-        tbl_result.add(self.get_tbl_cell_lft_pad("Accuracy", padding=0))
+        tbl_result.add(putil.get_tbl_cell_lft_pad("Accuracy", padding=0))
         acc_fmt = round(stat_info['accuracy']['value'], 4)
-        tbl_result.add(self.get_tbl_cell_align_rt(f"{acc_fmt}"))
+        tbl_result.add(putil.get_tbl_cell_align_rt(f"{acc_fmt}"))
 
         # Confidence Level
         clevel = round(stat_info['confidence_level'] * 100.0, 1)
-        tbl_result.add(self.get_tbl_cell_lft_pad("Confidence Level", padding=0))
-        tbl_result.add(self.get_tbl_cell_align_rt(f"{clevel}%"))
+        tbl_result.add(putil.get_tbl_cell_lft_pad("Confidence Level", padding=0))
+        tbl_result.add(putil.get_tbl_cell_align_rt(f"{clevel}%"))
 
         # Description
         #
-        tbl_result.add(self.get_tbl_cell_lft_pad("Description", padding=0))
+        tbl_result.add(putil.get_tbl_cell_lft_pad("Description", padding=0))
 
         acc_desc = (f'There is a probability of {clevel}% that the DP {stat_type} '
                     f' will differ'
                     f' from the true {stat_type} by at most {acc_fmt} units.'
                     f' The units are the same units the variable {var_name} has in the dataset.')
 
-        tbl_result.add(self.get_tbl_cell_lft_pad(acc_desc))
+        tbl_result.add(putil.get_tbl_cell_lft_pad(acc_desc))
 
         # Table, padding, border color, and borders
         tbl_result.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
-        tbl_result.set_border_color_on_all_cells(self.color_crimson)
+        tbl_result.set_border_color_on_all_cells(putil.COLOR_CRIMSON)
         tbl_result.set_borders_on_all_cells(True, False, True, False)  # top, right, left, bottom
 
         self.add_to_layout(tbl_result)
-
 
     def get_pdf_contents(self):
         """Return the PDF contents"""
@@ -632,9 +527,8 @@ class PDFReportMaker(BasicErrCheck):
     @staticmethod
     def create_example_plot():
         """Example plot"""
-        hist_vals = {'bins': list(range(1,13)),
-                     'vals': [random.randint(1, 100) for _x in range(1, 13)],
-                     }
+        hist_vals = {'bins': list(range(1, 13)),
+                     'vals': [random.randint(1, 100) for _x in range(1, 13)]}
         print('hist_vals', hist_vals)
         fig = MatPlotLibPlot.figure()
         ax = fig.add_subplot()
@@ -660,8 +554,8 @@ class PDFReportMaker(BasicErrCheck):
 
         Shape(
             points=LineArtFactory.rectangle(r),
-            stroke_color=self.color_crimson,
-            fill_color=self.color_crimson,
+            stroke_color=putil.COLOR_CRIMSON,
+            fill_color=putil.COLOR_CRIMSON,
         ).layout(page, r)
 
         # --------------------------------

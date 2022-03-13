@@ -513,6 +513,7 @@ class StatSpec:
         final_info = OrderedDict({
                          "statistic": self.statistic,
                          "variable": self.variable,
+                         "variable_type": self.var_type,
                          "result": {
                             "value": self.value
                          },
