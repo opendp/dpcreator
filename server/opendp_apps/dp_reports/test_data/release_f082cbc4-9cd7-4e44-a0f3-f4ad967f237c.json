@@ -31,6 +31,7 @@
         {
             "statistic": "mean",
             "variable": "blinkInterval",
+            "variable_type": "Float",
             "result": {
                 "value": 5.140151797708262
             },
@@ -58,6 +59,7 @@
         {
             "statistic": "histogram",
             "variable": "trial",
+            "variable_type": "Integer",
             "result": {
                 "value": {
                     "categories": [
@@ -152,6 +154,7 @@
         {
             "statistic": "variance",
             "variable": "typingSpeed",
+            "variable_type": "Float",
             "result": {
                 "value": 9.997812722761061
             },

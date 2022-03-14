@@ -11,19 +11,18 @@
         - Retrieve the variable type/min/max/categories from AnalysisPlan.variable_info
         - Retrieve
 """
+import io
 import pkg_resources
 
 from django.core.files.base import ContentFile
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.core.serializers.json import DjangoJSONEncoder
 
-from opendp.mod import OpenDPException
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 from opendp_apps.analysis.tools.dp_variance_spec import DPVarianceSpec
 from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
-from opendp_apps.analysis.stat_valid_info import StatValidInfo
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
 from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
@@ -32,6 +31,8 @@ from opendp_apps.analysis.tools.dp_histogram_categorical_spec import DPHistogram
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
 from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
+from opendp_apps.user.models import OpenDPUser
 from opendp_apps.profiler import static_vals as pstatic
 
 from opendp_apps.utils.extra_validators import \
@@ -48,7 +49,8 @@ from opendp_apps.utils.camel_to_snake import camel_to_snake
 
 class ValidateReleaseUtil(BasicErrCheck):
 
-    def __init__(self, opendp_user: get_user_model(), analysis_plan_id: int, dp_statistics: list=None, compute_mode=False, **kwargs):
+    def __init__(self, opendp_user: OpenDPUser, analysis_plan_id: int,
+                 dp_statistics: list = None, compute_mode: bool = False, **kwargs):
         """
         In most cases, don't use this method directly.
         To initialize, use:
@@ -83,7 +85,7 @@ class ValidateReleaseUtil(BasicErrCheck):
             self.run_validation_process()
 
     @staticmethod
-    def validate_mode(opendp_user: get_user_model(), analysis_plan_id: int,
+    def validate_mode(opendp_user: OpenDPUser, analysis_plan_id: int,
                       dp_statistics: list = None):
         """
         Use this method to return a ValidateReleaseUtil validates the dp_statistics
@@ -91,7 +93,7 @@ class ValidateReleaseUtil(BasicErrCheck):
         return ValidateReleaseUtil(opendp_user, analysis_plan_id, dp_statistics)
 
     @staticmethod
-    def compute_mode(opendp_user: get_user_model(), analysis_plan_id: int,
+    def compute_mode(opendp_user: OpenDPUser, analysis_plan_id: int,
                      run_dataverse_deposit: bool = False):
         """
         Use this method to return a ValidateReleaseUtil which runs the dp_statistics
@@ -163,7 +165,6 @@ class ValidateReleaseUtil(BasicErrCheck):
             return
 
         sep_char = get_data_file_separator(filepath)
-        # print('sep_char', sep_char)
 
         # -----------------------------------
         # Iterate through the stats!
@@ -204,6 +205,13 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         # It worked! Save the Release!!
         self.make_release_info(epsilon_used)
+
+        # -------------------------------
+        # Make Async! create the release PDF
+        # -------------------------------
+        report_maker = PDFReportMaker(self.release_info.dp_release)
+        if not report_maker.has_error():
+            report_maker.save_pdf_to_release_obj(self.release_info)
 
         # Deposit release files in Dataverse
         #
@@ -307,7 +315,9 @@ class ValidateReleaseUtil(BasicErrCheck):
             self.add_err_msg(formatter.get_err_msg())
             return
 
-        return formatter.get_release_data(as_json=as_json)
+        rd = formatter.get_release_data(as_json=as_json)
+
+        return rd
 
     def get_release_stats(self):
         """Return the release stats"""
@@ -420,7 +430,7 @@ class ValidateReleaseUtil(BasicErrCheck):
             variable = props.get('variable')
             statistic = props.get('statistic', 'shrug?')
             # epsilon = props.get('epsilon')
-            var_type = None
+            # var_type = None
 
             # (1) Is variable defined?
             #
@@ -440,7 +450,6 @@ class ValidateReleaseUtil(BasicErrCheck):
 
             # (3) Add variable_info which has min/max/categories, variable type, etc.
             #
-            print('variable info 1', variable)
             variable_info = self.analysis_plan.variable_info.get(variable)
             if variable_info:
                 props['variable_info'] = variable_info
@@ -557,7 +566,8 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         return True
 
-    def is_epsilon_valid(self, val):
+    @staticmethod
+    def is_epsilon_valid(val):
         """Validate a val as epsilon"""
         try:
             validate_epsilon_not_null(val)

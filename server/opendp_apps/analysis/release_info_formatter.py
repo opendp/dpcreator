@@ -6,6 +6,7 @@ from collections import OrderedDict
 from datetime import datetime as dt
 import json
 
+from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import render_to_string
 
 from opendp_apps.analysis.models import ReleaseInfo
@@ -62,11 +63,9 @@ class ReleaseInfoFormatter(BasicErrCheck):
             "Make sure `.has_error() if False` before calling .get_release_data()"
 
         if as_json is True:
-            return json.dumps(self.release_dict, indent=4)
+            return json.dumps(self.release_dict, cls=DjangoJSONEncoder, indent=4)
 
         return self.release_dict
-
-
 
     def build_release_data(self):
         """Build the release!"""
@@ -99,7 +98,7 @@ class ReleaseInfoFormatter(BasicErrCheck):
 
         # Error check! Make sure it's serializable as JSON and encodable as bytes!!
         try:
-            release_json = json.dumps(self.release_dict)
+            release_json = json.dumps(self.release_dict, cls=DjangoJSONEncoder)
             release_json.encode()
         except TypeError as err_obj:
             user_msg = 'Failed to convert the Release informaation into JSON. ({err_obj})'

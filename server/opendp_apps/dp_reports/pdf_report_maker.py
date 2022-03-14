@@ -2,7 +2,10 @@
 Create a PDF report based on a DP Release
 """
 from __future__ import annotations
+
+import copy
 from decimal import Decimal
+import io
 import json
 
 import os, sys
@@ -10,10 +13,11 @@ from os.path import abspath, dirname, isfile, join
 import dateutil
 import random
 import typing
-
 CURRENT_DIR = dirname(abspath(__file__))
 
+from django.core.files.base import ContentFile
 from django.template.loader import render_to_string
+from django.core.serializers.json import DjangoJSONEncoder
 
 from borb.pdf.canvas.layout.image.image import Image
 from borb.pdf.canvas.layout.image.chart import Chart
@@ -39,16 +43,18 @@ import numpy as np
 import pandas as pd
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
-from opendp_apps.dp_reports import pdf_utils as putil
 
+from opendp_apps.dp_reports import pdf_utils as putil
 from opendp_apps.dp_reports import static_vals as pdf_static
+from opendp_apps.analysis.models import ReleaseInfo
+from opendp_apps.profiler.static_vals import VAR_TYPE_INTEGER, VAR_TYPE_CATEGORICAL
 from opendp_apps.utils.randname import random_with_n_digits
 
 class PDFReportMaker(BasicErrCheck):
 
     def __init__(self, release_dict: dict = None):
         """Initalize with a DP Release as Python dict"""
-        self.release_dict = release_dict
+        self.release_dict = copy.deepcopy(release_dict)
         if not release_dict:
             self.release_dict = self.get_test_release()
 
@@ -70,7 +76,7 @@ class PDFReportMaker(BasicErrCheck):
 
         ps: typing.Tuple[Decimal, Decimal] = PageSize.LETTER_PORTRAIT.value
         self.page_width, self.page_height = ps  # page width, height
-        print(f'page_width/page_height: {self.page_width}/{self.page_height}')
+        #print(f'page_width/page_height: {self.page_width}/{self.page_height}')
 
         self.page_cnt = 0
         self.pdf_doc: Document = Document()
@@ -102,7 +108,33 @@ class PDFReportMaker(BasicErrCheck):
 
         self.embed_json_release_in_pdf()
 
-        with open(self.pdf_output_file, "wb") as out_file_handle:
+    def save_pdf_to_release_obj(self, release_info_obj: ReleaseInfo):
+        """Save the PDF to the FileField: ReleaseInfo.dp_release_pdf_file"""
+        if self.has_error():
+            return
+
+        # Write PDF doc to BytesIO
+        #
+        pdf_bytes = io.BytesIO()
+        PDF.dumps(pdf_bytes, self.pdf_doc)
+        pdf_bytes.seek(0)  # rewind to the start!
+
+        # Save the PDF bytes to a Django FileField
+        #
+        pdf_fname = f'release_{release_info_obj.object_id}.pdf'
+
+        release_info_obj.dp_release_pdf_file.save(pdf_fname,
+                                                  ContentFile(pdf_bytes.read()))
+
+        release_info_obj.save()
+        print(f'File saved to release: {release_info_obj.dp_release_pdf_file}')
+
+    def save_pdf_to_file(self, pdf_output_file: str):
+        """Save the PDF to a file using the given name"""
+        if self.has_error():
+            return
+
+        with open(pdf_output_file, "wb") as out_file_handle:
             PDF.dumps(out_file_handle, self.pdf_doc)
         print(f'PDF created: {self.pdf_output_file}')
         os.system(f'open {self.pdf_output_file}')
@@ -340,7 +372,6 @@ class PDFReportMaker(BasicErrCheck):
         fig.savefig('./images/' + filename + '.png')
         """
 
-
     def add_parameter_info(self, stat_info: dict, stat_type_formatted: str):
         """Add parameter information, including epsilon, bounds, etc."""
         if self.has_error():
@@ -362,10 +393,15 @@ class PDFReportMaker(BasicErrCheck):
         # --------------------------------------
         # Create table for parameters
         # --------------------------------------
+        skip_bounds = False
         is_dp_count = False
         if stat_info['statistic'] == astatic.DP_COUNT:
-            is_dp_count = True
+            is_dp_count= True
+            skip_bounds = True
             num_param_table_rows = 5
+        elif stat_info['variable_type'] == VAR_TYPE_CATEGORICAL:
+            skip_bounds = True
+            num_param_table_rows = 8
         else:
             num_param_table_rows = 11
 
@@ -392,7 +428,7 @@ class PDFReportMaker(BasicErrCheck):
 
         table_001.add(putil.get_tbl_cell_ital("Metadata Parameters", col_span=2))
 
-        if not is_dp_count:
+        if not skip_bounds:
             table_001.add(putil.get_tbl_cell_ital("Bounds", col_span=2, padding=20))
 
             table_001.add(putil.get_tbl_cell_lft_pad("Min", padding=40))
@@ -420,7 +456,8 @@ class PDFReportMaker(BasicErrCheck):
                 table_001.add(putil.get_tbl_cell_align_rt(
                     f"{stat_info['missing_value_handling']['fixed_value']}"))
             else:
-                mval_text = (f'Fix! Unhandled missing value handling. ({missing_val_handling})')
+                mval_text = (f'Fix! Unhandled missing value handling.'
+                             f' ({missing_val_handling})')
                 table_001.add(putil.get_tbl_cell_ital(mval_text, col_span=2))
 
         self.set_table_borders_padding(table_001)
@@ -516,10 +553,6 @@ class PDFReportMaker(BasicErrCheck):
         tbl_src.add(putil.get_tbl_cell_lft_pad(f'File format', padding=self.indent1))
         tbl_src.add(putil.get_tbl_cell_lft_pad(format_str, padding=0))
 
-        tbl_src.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
-        tbl_src.set_border_color_on_all_cells(putil.COLOR_CRIMSON)
-        tbl_src.set_borders_on_all_cells(True, False, True, False)  # top, right, bottom, left
-
         self.set_table_borders_padding(tbl_src)
         self.add_to_layout(tbl_src)
 
@@ -559,10 +592,6 @@ class PDFReportMaker(BasicErrCheck):
 
         tbl_src.add(putil.get_tbl_cell_lft_pad(f'GitHub Repository', padding=self.indent1))
         tbl_src.add(putil.get_tbl_cell_lft_pad(f"{dp_lib_info['url']}", padding=0))
-
-        tbl_src.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
-        tbl_src.set_border_color_on_all_cells(putil.COLOR_CRIMSON)
-        tbl_src.set_borders_on_all_cells(True, False, True, False)  # top, right, bottom, left
 
         self.set_table_borders_padding(tbl_src)
 

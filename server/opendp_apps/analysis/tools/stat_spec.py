@@ -8,9 +8,10 @@ BaseClass for Univariate statistics for OpenDP.
 - Implementing the "get_preprocessor" method acts as validation.
 -
 """
-import abc # import ABC, ABCMeta, abstractmethod
+import abc  # import ABC, ABCMeta, abstractmethod
 from collections import OrderedDict
 import decimal
+from typing import Union
 
 from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
@@ -241,7 +242,7 @@ class StatSpec:
         Made into a separate function re: b/c of post init
         transforms such as `floatify_int_values`
         """
-        return (self.min, self.max)
+        return self.min, self.max
 
     def is_chain_valid(self):
         """Checking validity is accomplished by building the preprocessor"""
@@ -282,8 +283,7 @@ class StatSpec:
         assert isinstance(more_props_to_floatify, list), \
             '"more_props_to_floatify" must be a list, even and empty list'
 
-        props_to_floatify = ['epsilon', 'cl', 'min', 'max',] \
-                            + more_props_to_floatify
+        props_to_floatify = ['epsilon', 'cl', 'min', 'max'] + more_props_to_floatify
 
         for prop_name in props_to_floatify:
             if not self.cast_property_to_float(prop_name):
@@ -311,7 +311,7 @@ class StatSpec:
             if not self.cast_property_to_float('delta'):
                 return
 
-        if not self.var_type in pstatic.VALID_VAR_TYPES:
+        if self.var_type not in pstatic.VALID_VAR_TYPES:
             self.add_err_msg(f'Invalid variable type: "{self.var_type}"')
             return
 
@@ -368,13 +368,13 @@ class StatSpec:
     def validate_property(self, prop_name: str, validator=None) -> bool:
         """Validate a property name using a validator"""
         if self.has_error():
-            return
+            return False
 
         if validator is None:
             validator = self.prop_validators.get(prop_name)
             if validator is None:
                 self.add_err_msg(f'Validator not found for property "{prop_name}"')
-                return
+                return False
 
         # print('prop_name', prop_name)
         try:
@@ -418,7 +418,9 @@ class StatSpec:
 
         if isinstance(prop_val, float):
             if prop_val != prop_val_int:
-                self.add_err_msg(f'Failed to convert "{prop_name}" to an equivalent integer. (original: {prop_val}, converted: {prop_val_int})')
+                user_msg = (f'Failed to convert "{prop_name}" to an equivalent integer.'
+                            f'(original: {prop_val}, converted: {prop_val_int})')
+                self.add_err_msg(user_msg)
                 return False
 
         setattr(self, prop_name, prop_val_int)
@@ -526,11 +528,6 @@ class StatSpec:
         if 'min' in self.additional_required_props():
             final_info['bounds'] = OrderedDict({'min': self.min, 'max': self.max})
 
-        # Categories
-        #
-        if 'categories' in self.additional_required_props():
-            final_info['categories'] = self.categories
-
         # Missing values
         #
         final_info['missing_value_handling'] = OrderedDict({"type": self.missing_values_handling})
@@ -549,16 +546,19 @@ class StatSpec:
                 final_info['accuracy']['message'] = self.accuracy_msg
 
         final_info['description'] = OrderedDict()
+
         template_name_html = 'analysis/dp_stat_general_histogram_description.html' \
             if self.STATISTIC_TYPE == astatic.DP_HISTOGRAM else 'analysis/dp_stat_general_description.html'
+
         template_name_txt = 'analysis/dp_stat_general_histogram_description.txt' \
             if self.STATISTIC_TYPE == astatic.DP_HISTOGRAM else 'analysis/dp_stat_general_description.txt'
+
         final_info['description']['html'] = self.get_short_description_html(template_name=template_name_html)
         final_info['description']['text'] = self.get_short_description_text(template_name=template_name_txt)
 
         return final_info
 
-    def get_confidence_level_alpha(self) -> float:
+    def get_confidence_level_alpha(self) -> Union[float, None]:
         """Get the confidence level (CL) alpha. e.g. if CL coefficient is .99, return .01
         Assumes that `self.cl` has passed through the validator: `validate_confidence_level`
         """

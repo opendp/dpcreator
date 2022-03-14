@@ -1,6 +1,7 @@
 from collections import OrderedDict
 import json
 
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
@@ -317,7 +318,7 @@ class AuxiliaryFileDepositRecord(TimestampedModelWithUUID):
 
     def as_json_string(self, indent=4):
         """Return JSON string"""
-        return json.dumps(self.as_dict(), indent=indent)
+        return json.dumps(self.as_dict(), cls=DjangoJSONEncoder, indent=indent)
 
     @mark_safe
     def json_string_html(self):
@@ -413,6 +414,6 @@ class AnalysisPlan(TimestampedModelWithUUID):
             info_str = json.dumps(self.variable_info, indent=4)
             return f'<pre>{info_str}</pre>'
         except Exception as ex_obj:
-            return f'Failed to conver to JSON string {ex_obj}'
+            return f'Failed to convert to JSON string {ex_obj}'
 
 
