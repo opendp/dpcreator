@@ -47,6 +47,10 @@ class DPMeanStatSpecTest(StatSpecTestCase):
                                                     'type': 'Float', },
                                   }
 
+    def test_05_valid_noise_mechanism(self):
+        dp_mean = DPMeanSpec({})
+        self.assertEqual(dp_mean.noise_mechanism, astatic.NOISE_LAPLACE_MECHANISM)
+
     # @skip
     def test_10_debug_mean(self):
         """(10) Test DP Mean Spec"""
