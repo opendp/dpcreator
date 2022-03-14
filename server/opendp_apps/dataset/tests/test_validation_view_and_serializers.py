@@ -5,7 +5,7 @@ from unittest import skip
 
 from django.contrib.auth import get_user_model
 from django.core.files import File
-from django.test.testcases import TestCase
+from django.test import TestCase, override_settings
 from rest_framework.test import APIClient
 
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
@@ -130,6 +130,7 @@ class TestValidationViewAndSerializers(TestCase):
         self.assertFalse(response.json()['success'])
         self.assertEqual(response.json()['message'], astatic.ERR_MSG_NO_ANALYSIS_PLAN)
 
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
     def test_10_validate_stats(self):
         """(10) Test a working stat"""
         msgt(self.test_10_validate_stats.__doc__)
@@ -414,6 +415,7 @@ class TestValidationViewAndSerializers(TestCase):
         self.assertEqual(jresp['data'][0]['valid'], False)
         self.assertTrue(jresp['data'][0]['message'].find(VALIDATE_MSG_EPSILON) > -1)
 
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
     def test_50_bad_total_epsilon(self):
         """(50) Fail: Bad total epsilon"""
         msgt(self.test_50_bad_total_epsilon.__doc__)
@@ -445,6 +447,7 @@ class TestValidationViewAndSerializers(TestCase):
 
         self.assertTrue(stats_valid.message.find(astatic.ERR_MSG_BAD_TOTAL_EPSILON) > -1)
 
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
     def test_55_api_bad_total_epsilon(self):
         """(55) Fail: API, Bad total epsilon"""
         msgt(self.test_55_api_bad_total_epsilon.__doc__)

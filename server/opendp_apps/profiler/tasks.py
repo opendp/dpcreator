@@ -1,13 +1,8 @@
-from django.conf import settings
-
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
-from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.dataset import static_vals as dstatic
 
-from opendp_apps.profiler.csv_reader import CsvReader
-from opendp_apps.profiler.dataset_info_updater import DataSetInfoUpdater
 from opendp_apps.profiler.profile_runner import ProfileRunner #run_profile
 from opendp_apps.profiler import static_vals as pstatic
 from opendp_project.celery import celery_app
@@ -34,7 +29,7 @@ def run_profile_by_filefield(dataset_info_object_id, max_num_features=None, **kw
     """
     Run the profiler using the DataSetInfo object id
     :param dataset_info_object_id DataSetInfo.object_id
-    :max_num_features int or None - number of features in the dataset to use, use None for all columns
+    :param max_num_features int or None - number of features in the dataset to use, use None for all columns
     """
     try:
         ds_info = DataSetInfo.objects.get(object_id=dataset_info_object_id)
@@ -56,4 +51,3 @@ def run_profile_by_filefield(dataset_info_object_id, max_num_features=None, **kw
     prunner = ProfileRunner(filefield, max_num_features, **params)
 
     return prunner
-

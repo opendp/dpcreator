@@ -32,6 +32,9 @@ class RegisteredDataverse(TimestampedModelWithUUID):
     name = models.CharField(max_length=255, unique=True)
     dataverse_url = models.URLField(unique=True,
                                     help_text='No trailing slash.')
+    # dataverse_homepage_url = models.URLField(help_text=('Link to Dataverse installation homepage.'
+    #                                                    'Used for display.'),
+    #                                         blank=True)
     active = models.BooleanField(default=True)
     notes = models.TextField(blank=True, help_text='optional')
 

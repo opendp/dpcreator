@@ -70,6 +70,7 @@ router.registry.extend(dataverse_router.registry)
 
 urlpatterns = [
     path('async_messages/', include('opendp_apps.async_messages.urls')),
+    path('dp-reports/', include('opendp_apps.dp_reports.urls')),
 
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
