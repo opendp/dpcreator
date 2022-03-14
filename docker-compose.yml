@@ -79,16 +79,16 @@ services:
       - db
       - redis
       - server
-  latex:
-    build: "latex_service"
-    env_file:
-      - latex_service/.env
-    command: python /code/latex_service/app.py 1234
-    volumes:
-      - .:/code
-    ports:
-      - "1234:1234"
-    depends_on:
-      - db
-      - redis
-      - server
+#  latex:
+#    build: "latex_service"
+#    env_file:
+#      - latex_service/.env
+#    command: python /code/latex_service/app.py 1234
+#    volumes:
+#      - .:/code
+#    ports:
+#      - "1234:1234"
+#    depends_on:
+#      - db
+#      - redis
+#      - server
