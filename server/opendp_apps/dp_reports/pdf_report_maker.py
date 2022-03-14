@@ -129,9 +129,10 @@ class PDFReportMaker(BasicErrCheck):
         pdf_fname = f'release_{release_info_obj.object_id}.pdf'
 
         release_info_obj.dp_release_pdf_file.save(pdf_fname,
-                                                  ContentFile(pdf_bytes.read()))
+                                                  ContentFile(pdf_bytes.read()),
+                                                  save=True)
 
-        release_info_obj.save()
+        # release_info_obj.save()
         print(f'File saved to release: {release_info_obj.dp_release_pdf_file}')
 
     def save_pdf_to_file(self, pdf_output_file: str = None):
@@ -415,12 +416,16 @@ class PDFReportMaker(BasicErrCheck):
         if stat_info['statistic'] == astatic.DP_COUNT:
             is_dp_count= True
             skip_bounds = True
-            num_param_table_rows = 5
+            num_param_table_rows = 4
         elif stat_info['variable_type'] == VAR_TYPE_CATEGORICAL:
             skip_bounds = True
-            num_param_table_rows = 8
+            num_param_table_rows = 7
         else:
-            num_param_table_rows = 11
+            num_param_table_rows = 10
+
+        delta_val = stat_info['delta']
+        if not delta_val:
+            num_param_table_rows -= 1
 
         # Create basic table
         #
@@ -432,16 +437,20 @@ class PDFReportMaker(BasicErrCheck):
 
         # Add Privacy Parameters
         #
-        table_001.add(putil.get_tbl_cell_ital("Privacy Parameters", col_span=2))
+        if delta_val:
+            priv_param_title = "Privacy Parameters"
+        else:
+            priv_param_title = "Privacy Parameter"
+
+        table_001.add(putil.get_tbl_cell_ital(priv_param_title, col_span=2))
 
         table_001.add(putil.get_tbl_cell_lft_pad("Epsilon", padding=20))
         table_001.add(putil.get_tbl_cell_align_rt(f"{stat_info['epsilon']}"))
 
-        table_001.add(putil.get_tbl_cell_lft_pad("Delta", padding=20))
-        delta_val = stat_info['delta']
-        if delta_val is None:
-            delta_val = '(not applicable)'
-        table_001.add(putil.get_tbl_cell_align_rt(f'{delta_val}'))
+        # Delta
+        if delta_val:
+            table_001.add(putil.get_tbl_cell_lft_pad("Delta", padding=20))
+            table_001.add(putil.get_tbl_cell_align_rt(f'{delta_val}'))
 
         table_001.add(putil.get_tbl_cell_ital("Metadata Parameters", col_span=2))
 
@@ -454,8 +463,8 @@ class PDFReportMaker(BasicErrCheck):
             table_001.add(putil.get_tbl_cell_lft_pad("Max", padding=40))
             table_001.add(putil.get_tbl_cell_align_rt(f"{stat_info['bounds']['max']}"))
 
-        table_001.add(putil.get_tbl_cell_lft_pad("Confidence Level", padding=20))
-        table_001.add(putil.get_tbl_cell_align_rt(f"{stat_info['confidence_level']}"))
+        # table_001.add(putil.get_tbl_cell_lft_pad("Confidence Level", padding=20))
+        # table_001.add(putil.get_tbl_cell_align_rt(f"{stat_info['confidence_level']}"))
 
         # Add Missing Value Handling
         #

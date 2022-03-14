@@ -7,7 +7,7 @@ TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
 from django.contrib.auth import get_user_model
 from django.core.files import File
-from django.test.testcases import TestCase
+from django.test import TestCase, override_settings
 
 from rest_framework.test import APIClient
 from rest_framework.reverse import reverse as drf_reverse
@@ -143,6 +143,7 @@ class TestRunRelease(TestCase):
         # re-retrieve it...
         return DataSetInfo.objects.get(object_id=dataset_info.object_id)
 
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
     def test_10_compute_stats(self):
         """(10) Run compute stats"""
         msgt(self.test_10_compute_stats.__doc__)
@@ -230,8 +231,9 @@ class TestRunRelease(TestCase):
         self.assertFalse(jresp['success'])
         self.assertTrue(jresp['message'].find(astatic.ERR_MSG_BAD_TOTAL_EPSILON) > -1)
 
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
     def test_50_success(self):
-        """(50) Via API, run compute stats with error"""
+        """(50) Via API, run compute stats successfully"""
         msgt(self.test_50_success.__doc__)
 
         analysis_plan = self.analysis_plan
@@ -279,7 +281,7 @@ class TestRunRelease(TestCase):
         analysis_plan = AnalysisPlan.objects.get(id=analysis_plan.id)
         self.assertTrue(not analysis_plan.dataset.source_file)
 
-
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
     def test_55_success_download_urls(self):
         """(55) Test PDF and JSOn download Urls"""
         msgt(self.test_55_success_download_urls.__doc__)
@@ -346,7 +348,7 @@ class TestRunRelease(TestCase):
         # The source_file should be deleted
         self.assertTrue(not analysis_plan.dataset.source_file)
 
-
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
     def test_60_analysis_plan_has_release_info(self):
         """(60) Via API, ensure that release_info is added as a field to AnalysisPlan"""
         msgt(self.test_60_analysis_plan_has_release_info.__doc__)
@@ -456,7 +458,7 @@ class TestRunRelease(TestCase):
         self.assertIsNone(ds_info['file_information']['identifier'])
         self.assertEqual(ds_info['file_information']['fileFormat'], "text/tab-separated-values")
 
-
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
     def test_80_dataset_formatter_crisis_file(self):
         """(80) Test the DataSetFormatter -- dataset info formatted for inclusion in ReleaseInfo.dp_release"""
         msgt(self.test_80_dataset_formatter_crisis_file.__doc__)
@@ -507,7 +509,7 @@ class TestRunRelease(TestCase):
         self.assertEqual(ds_info['file_information']['identifier'], "https://doi.org/10.7910/DVN/OLD7MB/ZI4N3J")
         self.assertEqual(ds_info['file_information']['fileFormat'], "text/tab-separated-values")
 
-
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
     def test_90_dp_count_pums_data(self):
         """
         (90) Via API, Test DP Count with PUMS data.

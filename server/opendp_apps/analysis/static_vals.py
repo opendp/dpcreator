@@ -1,5 +1,5 @@
 
-NOISE_GEOMETRIC_MECHANISM = 'Base Geometric'
+NOISE_GEOMETRIC_MECHANISM = 'Geometric'
 NOISE_LAPLACE_MECHANISM = 'Laplace'
 
 # ---------------------------------

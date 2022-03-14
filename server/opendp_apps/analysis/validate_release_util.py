@@ -14,6 +14,7 @@
 import io
 import pkg_resources
 
+from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
@@ -209,16 +210,6 @@ class ValidateReleaseUtil(BasicErrCheck):
         # It worked! Save the Release!!
         self.make_release_info(epsilon_used)
 
-        # -------------------------------
-        # Make Async! create the release PDF
-        # -------------------------------
-        # pdf_tasks.run_pdf_report_maker.delay(self.release_info.object_id)  # async
-        pdf_tasks.run_pdf_report_maker(self.release_info.object_id)  # in the loop...
-
-        # report_maker = PDFReportMaker(self.release_info.dp_release)
-        # if not report_maker.has_error():
-        #    report_maker.save_pdf_to_release_obj(self.release_info)
-
         # Deposit release files in Dataverse
         #
         if not self.has_error():
@@ -289,6 +280,23 @@ class ValidateReleaseUtil(BasicErrCheck):
         django_file = ContentFile(formatted_release_json_str.encode())
         self.release_info.dp_release_json_file.save(json_filename, django_file)
         self.release_info.save()
+
+        # -------------------------------
+        # (4a) Save Release PDF
+        # -------------------------------
+        # Make Async! create the release PDF
+        # -------------------------------
+        print('SKIP_PDF_CREATION_FOR_TESTS', settings.SKIP_PDF_CREATION_FOR_TESTS)
+        if settings.SKIP_PDF_CREATION_FOR_TESTS:
+            # Skip PDF creation during tests to save time
+            pass
+        else:
+            # pdf_tasks.run_pdf_report_maker.delay(self.release_info.object_id)  # async
+            report_maker = PDFReportMaker(self.release_info.dp_release)
+            if not report_maker.has_error():
+                report_maker.save_pdf_to_release_obj(self.release_info)
+            # pdf_tasks.run_pdf_report_maker(self.release_info.object_id)  # in the loop...
+
 
         # (5) Attach the ReleaseInfo to the AnalysisPlan, AnalysisPlan.release_info
         #
