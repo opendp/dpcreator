@@ -699,6 +699,15 @@ class PDFReportMaker(BasicErrCheck):
         _height: Decimal = Decimal(1000)  # max height you would allow
         return p.layout(pg, Rectangle(zero_dec, zero_dec, _width, _height))
 
+    def format_stat(self, val):
+        """Format a numeric statistic. Used to be used for rounding"""
+        if val is None:
+            return '(not available)'
+        
+        # return round(val, 4)  # round to 4 decimal places
+
+        return val
+
     def add_histogram_result_table(self, stat_info: dict, stat_type: str, var_name: str):
         """
         Add the result table for a single stat, such as DP Mean. Example:
@@ -725,11 +734,11 @@ class PDFReportMaker(BasicErrCheck):
 
         # Accuracy
         tbl_result.add(putil.get_tbl_cell_lft_pad("Accuracy", padding=0))
-        acc_fmt = round(stat_info['accuracy']['value'], 4)
+        acc_fmt = self.format_stat(stat_info['accuracy']['value'])
         tbl_result.add(putil.get_tbl_cell_align_rt(f"{acc_fmt}"))
 
         # Confidence Level
-        clevel = round(stat_info['confidence_level'] * 100.0, 1)
+        clevel = self.format_stat(stat_info['confidence_level'] * 100.0)
         tbl_result.add(putil.get_tbl_cell_lft_pad("Confidence Level", padding=0))
         tbl_result.add(putil.get_tbl_cell_align_rt(f"{clevel}%"))
 
@@ -776,16 +785,16 @@ class PDFReportMaker(BasicErrCheck):
                                               )
         # Statistic name and result
         tbl_result.add(putil.get_tbl_cell_lft_pad(f'DP {stat_type}', padding=0))
-        res_fmt = round(stat_info['result']['value'], 4)
+        res_fmt = self.format_stat(stat_info['result']['value'])
         tbl_result.add(putil.get_tbl_cell_align_rt(f"{res_fmt}"))
 
         # Accuracy
         tbl_result.add(putil.get_tbl_cell_lft_pad("Accuracy", padding=0))
-        acc_fmt = round(stat_info['accuracy']['value'], 4)
+        acc_fmt = self.format_stat(stat_info['accuracy']['value'])
         tbl_result.add(putil.get_tbl_cell_align_rt(f"{acc_fmt}"))
 
         # Confidence Level
-        clevel = round(stat_info['confidence_level'] * 100.0, 1)
+        clevel = self.format_stat(stat_info['confidence_level'] * 100.0)
         tbl_result.add(putil.get_tbl_cell_lft_pad("Confidence Level", padding=0))
         tbl_result.add(putil.get_tbl_cell_align_rt(f"{clevel}%"))
 
