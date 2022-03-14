@@ -48,6 +48,7 @@ class DPMeanStatSpecTest(StatSpecTestCase):
                                   }
 
     def test_05_valid_noise_mechanism(self):
+        """Check for the correct noise_mechanism"""
         dp_mean = DPMeanSpec({})
         self.assertEqual(dp_mean.noise_mechanism, astatic.NOISE_LAPLACE_MECHANISM)
 

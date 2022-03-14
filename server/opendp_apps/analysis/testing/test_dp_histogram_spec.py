@@ -48,8 +48,13 @@ class HistogramStatSpecTest(StatSpecTestCase):
         self.assertTrue(self.dp_hist.is_chain_valid())
 
     def test_01_valid_noise_mechanism(self):
+        """Check for the correct noise_mechanism"""
         dp_hist = DPHistogramCategoricalSpec({})
         self.assertEqual(dp_hist.noise_mechanism, astatic.NOISE_GEOMETRIC_MECHANISM)
+
+        dp_hist_int = DPHistogramIntegerSpec({})
+        self.assertEqual(dp_hist_int.noise_mechanism, astatic.NOISE_GEOMETRIC_MECHANISM)
+
 
     def test_05_get_variable_order(self):
         """(05) Test get variable order"""

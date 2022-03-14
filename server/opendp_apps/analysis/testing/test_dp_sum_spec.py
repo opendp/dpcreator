@@ -15,6 +15,7 @@ class DPSumStatSpecTest(StatSpecTestCase):
     fixtures = ['test_dataset_data_001.json', ]
 
     def test_05_valid_noise_mechanism(self):
+        """Check for the correct noise_mechanism"""
         dp_sum = DPSumSpec({})
         self.assertEqual(dp_sum.noise_mechanism, astatic.NOISE_LAPLACE_MECHANISM)
 
