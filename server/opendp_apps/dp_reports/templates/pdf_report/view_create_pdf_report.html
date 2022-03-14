@@ -1,0 +1,14 @@
+
+<h3>Create Release PDF</h3>
+
+<p>Copy Release JSON into the box below.</p>
+
+<form action="{% url 'view_create_pdf_report' %}" method="post">
+{% csrf_token %}
+    <table style="padding: 20px; border: 0;">
+{{ form.as_table }}
+</table>
+</p><br/> <button type="cancel">Cancel</button> &nbsp;&nbsp;
+    <button type="submit">Make PDF</button></p>
+</form>
+

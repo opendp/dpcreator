@@ -59,7 +59,7 @@ class DataverseHandoffSerializer(serializers.ModelSerializer):
         exclude = ['dv_installation']
 
 
-class DataverseFileInfoSerializer(serializers.ModelSerializer):
+class DataverseFileInfoMakerSerializer(serializers.ModelSerializer):
 
     dv_installation = serializers.PrimaryKeyRelatedField(queryset=RegisteredDataverse.objects.all())
     creator = serializers.PrimaryKeyRelatedField(queryset=OpenDPUser.objects.all())

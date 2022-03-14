@@ -16,6 +16,11 @@ class DPCountStatSpecTest(StatSpecTestCase):
 
     fixtures = ['test_dataset_data_001.json', ]
 
+    def test_05_valid_noise_mechanism(self):
+        """Check for the correct noise_mechanism"""
+        dp_count = DPCountSpec({})
+        self.assertEqual(dp_count.noise_mechanism, astatic.NOISE_GEOMETRIC_MECHANISM)
+
     def test_10_count_valid_spec(self):
         """(10) Run DP Count valid spec, float column"""
         msgt(self.test_10_count_valid_spec.__doc__)

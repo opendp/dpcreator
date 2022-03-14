@@ -1,4 +1,5 @@
 import os
+
 from opendp_project.settings.base import *
 
 LOCAL_SETUP_DIR = os.path.join(BASE_DIR, 'test_setup', 'user_uploaded_data')

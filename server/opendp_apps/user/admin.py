@@ -6,7 +6,7 @@ from opendp_apps.user.models import OpenDPUser, DataverseUser
 class OpenDPUserAdmin(UserAdmin):
     save_on_top = True
     list_display_links = ('email', 'username',)
-    list_display = ('email', 'username', 'pk', 'first_name', 'last_name', 'object_id')
+    list_display = ('username', 'email', 'pk', 'handoff_id', 'first_name', 'last_name', 'object_id')
 
 
 # pass
@@ -20,11 +20,12 @@ class DataverseUserAdmin(admin.ModelAdmin):
     list_filter = ('dv_installation',)
     list_display = ('user',
                     'dv_installation',
-                    'persistent_id',
+                    #'persistent_id',
+                    'object_id',
                     'email',
                     'updated',
                     'created',)
-    readonly_fields = ('created', 'updated',)
+    readonly_fields = ('created', 'updated', 'object_id')
 
 
 admin.site.register(OpenDPUser, OpenDPUserAdmin)

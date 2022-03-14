@@ -32,11 +32,24 @@
       <Button
           v-else
           color="primary"
+          data-test="wizardSubmitStatistics"
           :class="{
           'mx-auto': $vuetify.breakpoint.mdAndUp
         }"
           :click="() => $root.$emit('areStatisticsSubmitted')"
           label="Submit Statistics"
+      />
+      <p></p>
+      <Button v-if="stepperPosition > 0"
+              data-test="wizardGoBackButton"
+              classes="d-block"
+              :class="{
+          'mx-auto': $vuetify.breakpoint.mdAndUp
+        }"
+              color="primary"
+              :click="handleBack"
+              label="Go Back"
+
       />
     </div>
     <div

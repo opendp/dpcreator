@@ -7,7 +7,7 @@ import sys
 def main():
     print('DJANGO_SETTINGS_MODULE', os.environ.get('DJANGO_SETTINGS_MODULE'))
 
-    # use seperate settings.py for tests
+    # use separate settings.py for tests
     if 'test' in sys.argv:
         print('Using settings/development_test.py')
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opendp_project.settings.development_test')

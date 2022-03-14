@@ -243,7 +243,9 @@ Cypress.Commands.add('submitStatistics', (demoData) => {
     cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
 
     // Submit  Statistic
-    cy.get('[data-test="Submit statistics"]').click({force: true});
+
+    cy.get('h1').should('contain', 'Generate DP Release').should('be.visible')
+    cy.get('[data-test="wizardSubmitStatistics"]').click({force: true});
     cy.get('[data-test="generate release status"]').should('be.visible')
 
     cy.get('[data-test="generate release status"]').should('contain', 'Release Completed')

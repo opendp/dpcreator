@@ -48,6 +48,11 @@ class DPVarianceStatSpecTest(StatSpecTestCase):
                                                     'type': 'Float', },
                                   }
 
+    def test_05_valid_noise_mechanism(self):
+        """Check for the correct noise_mechanism"""
+        dp_variance = DPVarianceSpec({})
+        self.assertEqual(dp_variance.noise_mechanism, astatic.NOISE_LAPLACE_MECHANISM)
+
     # @skip
     def test_10_debug_variance(self):
         """(10) Test DP Variance Spec"""
