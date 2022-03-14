@@ -31,7 +31,10 @@ from opendp_apps.analysis.tools.dp_histogram_categorical_spec import DPHistogram
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
 from opendp_apps.dataset.models import DataSetInfo
+
 from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
+from opendp_apps.dp_reports import tasks as pdf_tasks
+
 from opendp_apps.user.models import OpenDPUser
 from opendp_apps.profiler import static_vals as pstatic
 
@@ -209,9 +212,10 @@ class ValidateReleaseUtil(BasicErrCheck):
         # -------------------------------
         # Make Async! create the release PDF
         # -------------------------------
-        report_maker = PDFReportMaker(self.release_info.dp_release)
-        if not report_maker.has_error():
-            report_maker.save_pdf_to_release_obj(self.release_info)
+        pdf_tasks.run_pdf_report_maker.delay(self.release_info.object_id)
+        # report_maker = PDFReportMaker(self.release_info.dp_release)
+        # if not report_maker.has_error():
+        #    report_maker.save_pdf_to_release_obj(self.release_info)
 
         # Deposit release files in Dataverse
         #
