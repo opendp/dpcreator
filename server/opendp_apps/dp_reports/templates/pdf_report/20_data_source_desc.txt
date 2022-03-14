@@ -1,0 +1,6 @@
+The data file used to generate the DP statistic{{ statistics|length|pluralize:",s" }}
+{% if dataset.type == 'dataverse' %}
+is located in a Dataverse repostitory. Details on the repository and file may be found below:
+{% else %}
+is from {{ dataset.type }}. Details on the file may be found below:
+{% endif %}.

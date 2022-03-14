@@ -1,5 +1,8 @@
 from urllib.parse import urlencode
+from typing import Union
+import uuid
 
+from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.conf import settings
@@ -29,6 +32,9 @@ class RegisteredDataverse(TimestampedModelWithUUID):
     name = models.CharField(max_length=255, unique=True)
     dataverse_url = models.URLField(unique=True,
                                     help_text='No trailing slash.')
+    # dataverse_homepage_url = models.URLField(help_text=('Link to Dataverse installation homepage.'
+    #                                                    'Used for display.'),
+    #                                         blank=True)
     active = models.BooleanField(default=True)
     notes = models.TextField(blank=True, help_text='optional')
 
@@ -163,6 +169,21 @@ class DataverseHandoff(DataverseParams):
 
         super(DataverseHandoff, self).save(*args, **kwargs)
 
+    @staticmethod
+    def delete_handoff(dv_handoff_id: Union[uuid.uuid4, str]) -> bool:
+        """
+        Delete a DataverseHandoff object.
+        Returns True if the object is deleted or is not found
+        """
+        try:
+            dv_handoff = DataverseHandoff.objects.get(object_id=dv_handoff_id)
+            dv_handoff.delete()
+        except DataverseHandoff.DoesNotExist:
+            return True
+        except ValidationError: # str is not a UUID, etc.
+            return False
+
+        return True
 
 class ManifestTestParams(DataverseParams):
     """

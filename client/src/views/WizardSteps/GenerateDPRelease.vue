@@ -23,20 +23,6 @@
         your profile area.</span
       >
 
-      <Button
-          color="primary"
-          classes="mt-5 mr-2"
-          label="Submit Statistics"
-          data-test="Submit statistics"
-          :click="handleFormSubmit"
-      />
-      <Button
-            color="primary"
-            outlined
-            classes="font-weight-bold mt-5 xmb-5"
-            :click="returnToCreateStatisticsStep"
-            label="Go Back"
-        />
 
     </v-form>
 
