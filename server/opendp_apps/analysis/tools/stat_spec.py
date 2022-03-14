@@ -70,6 +70,7 @@ class StatSpec:
 
         self.cl = props.get('cl')      # confidence level coefficient (e.g. .95, .99, etc)
 
+        self.noise_mechanism = None
         #
         self.accuracy_val = None
         self.accuracy_msg = None
@@ -519,6 +520,7 @@ class StatSpec:
                          "result": {
                             "value": self.value
                          },
+                         "noise_mechanism": self.noise_mechanism,
                          "epsilon": self.epsilon,
                          "delta": self.delta,
                     })

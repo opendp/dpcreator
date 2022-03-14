@@ -6,6 +6,7 @@ from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
 
 def make_test_report():
     rm = PDFReportMaker()
+    rm.save_pdf_to_file()
 
 
 

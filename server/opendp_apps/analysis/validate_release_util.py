@@ -212,7 +212,9 @@ class ValidateReleaseUtil(BasicErrCheck):
         # -------------------------------
         # Make Async! create the release PDF
         # -------------------------------
-        pdf_tasks.run_pdf_report_maker.delay(self.release_info.object_id)
+        # pdf_tasks.run_pdf_report_maker.delay(self.release_info.object_id)  # async
+        pdf_tasks.run_pdf_report_maker(self.release_info.object_id)  # in the loop...
+
         # report_maker = PDFReportMaker(self.release_info.dp_release)
         # if not report_maker.has_error():
         #    report_maker.save_pdf_to_release_obj(self.release_info)

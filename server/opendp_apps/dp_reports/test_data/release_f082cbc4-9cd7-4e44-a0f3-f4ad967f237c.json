@@ -2,7 +2,8 @@
     "name": "Replication Data for: Eye-typing experiment",
     "created": {
         "iso": "2022-03-11T23:05:28.948196",
-        "human_readable": "March 11, 2022 at 23:05:28:948196"
+        "human_readable": "March 11, 2022 at 23:05:28:948196",
+        "human_readable_date_only": "11 March, 2022"
     },
     "application": "DP Creator",
     "application_url": "https://github.com/opendp/dpcreator",
@@ -37,6 +38,7 @@
             },
             "epsilon": 0.25,
             "delta": null,
+            "noise_mechanism": "Laplace",
             "bounds": {
                 "min": 0.0,
                 "max": 58.0
@@ -132,6 +134,7 @@
             },
             "epsilon": 0.25,
             "delta": null,
+            "noise_mechanism": "Geometric",
             "bounds": {
                 "min": 0,
                 "max": 8
@@ -160,6 +163,7 @@
             },
             "epsilon": 0.25,
             "delta": null,
+            "noise_mechanism": "Laplace",
             "bounds": {
                 "min": 4.0,
                 "max": 19.0
@@ -187,6 +191,7 @@
             },
             "epsilon": 0.25,
             "delta": null,
+            "noise_mechanism": "Geometric",
             "missing_value_handling": {
                 "type": "insert_fixed",
                 "fixed_value": "0"

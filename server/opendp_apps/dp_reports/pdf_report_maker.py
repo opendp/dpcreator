@@ -44,6 +44,7 @@ import pandas as pd
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 
+from opendp_apps.dp_reports import pdf_preset_text
 from opendp_apps.dp_reports import pdf_utils as putil
 from opendp_apps.dp_reports import static_vals as pdf_static
 from opendp_apps.analysis.models import ReleaseInfo
@@ -51,6 +52,8 @@ from opendp_apps.profiler.static_vals import VAR_TYPE_INTEGER, VAR_TYPE_CATEGORI
 from opendp_apps.utils.randname import random_with_n_digits
 
 class PDFReportMaker(BasicErrCheck):
+
+    USAGE_SECTION_TITLE = '4. Usage / Negative Values'
 
     def __init__(self, release_dict: dict = None):
         """Initalize with a DP Release as Python dict"""
@@ -97,6 +100,8 @@ class PDFReportMaker(BasicErrCheck):
 
         self.add_data_source_and_lib()
 
+        self.add_usage_page()
+
         # test chart
         # self.add_to_layout(Chart(self.create_example_plot(), width=Decimal(450), height=Decimal(256)))
 
@@ -129,15 +134,21 @@ class PDFReportMaker(BasicErrCheck):
         release_info_obj.save()
         print(f'File saved to release: {release_info_obj.dp_release_pdf_file}')
 
-    def save_pdf_to_file(self, pdf_output_file: str):
-        """Save the PDF to a file using the given name"""
+    def save_pdf_to_file(self, pdf_output_file: str = None):
+        """Save the PDF to a file using the given name. Used for debugging."""
         if self.has_error():
             return
 
+        if not pdf_output_file:
+            pdf_output_file = join(CURRENT_DIR,
+                                   'test_data',
+                                   'pdfs',
+                                   'pdf_report_01_%s.pdf' % (random_with_n_digits(6)))
+
         with open(pdf_output_file, "wb") as out_file_handle:
             PDF.dumps(out_file_handle, self.pdf_doc)
-        print(f'PDF created: {self.pdf_output_file}')
-        os.system(f'open {self.pdf_output_file}')
+        print(f'PDF created: {pdf_output_file}')
+        os.system(f'open {pdf_output_file}')
 
     def start_new_page(self):
         """Start a new page"""
@@ -170,8 +181,9 @@ class PDFReportMaker(BasicErrCheck):
 
     def format_release(self):
         """Update release values"""
-        self.creation_date = dateutil.parser.parse(self.release_dict['created']['iso'])
-        self.release_dict['creation_date'] = self.creation_date
+        pass
+        # self.creation_date = dateutil.parser.parse(self.release_dict['created']['iso'])
+        # self.release_dict['creation_date'] = self.creation_date
 
     @staticmethod
     def get_test_release():
@@ -347,7 +359,9 @@ class PDFReportMaker(BasicErrCheck):
         #  values < 0 (also naive)
         # -------------------------------------
         # horizontal line indicating the threshold
+        has_negative_values = False
         if min(hist_vals) < 0:
+            has_negative_values = True
             ax.axhline(0, color='black', linewidth=0.8, linestyle='--')
             #ax.plot([0., 4.5], [0, 0], "k--")
 
@@ -363,14 +377,17 @@ class PDFReportMaker(BasicErrCheck):
                                  width=Decimal(450),
                                  height=Decimal(256)))
 
-        """
-        fig = plt.figure(tight_layout=True, figsize=self.figure_size)
-        ax = fig.add_subplot()
-        ax.bar(x=statistic['result']['categories'], height=statistic['result']['value'])
-        ax.set_xlabel(statistic['variable'])
-        filename = '_'.join([statistic['variable'], statistic['statistic']])
-        fig.savefig('./images/' + filename + '.png')
-        """
+        # If applicable, add negative value note
+        if has_negative_values:
+            text_chunks = [
+                    putil.txt_bld('Negative values.'),
+                    putil.txt_reg(f' The histogram contains negative values. For more information on how to use '),
+                    putil.txt_reg(f' this data, please see the section'),
+                    putil.txt_bld(f' {self.USAGE_SECTION_TITLE}'),
+                ]
+
+            self.add_to_layout(HeterogeneousParagraph(text_chunks,
+                                                      padding_left=Decimal(10)))
 
     def add_parameter_info(self, stat_info: dict, stat_type_formatted: str):
         """Add parameter information, including epsilon, bounds, etc."""
@@ -474,6 +491,20 @@ class PDFReportMaker(BasicErrCheck):
         table_obj.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
         table_obj.set_border_color_on_all_cells(putil.COLOR_CRIMSON)
         table_obj.set_borders_on_all_cells(True, False, True, False)  # top, right, bottom, left
+
+    def add_usage_page(self):
+        """Add page(s) on usage, including negative value"""
+        if self.has_error():
+            return
+
+        self.start_new_page()
+
+        self.add_to_layout(putil.txt_subtitle_para(self.USAGE_SECTION_TITLE))
+
+        self.add_to_layout(putil.txt_bld_para('(SOME PLACEHOLDER TEXT FOR NOW)'))
+
+        for paragraph_obj in pdf_preset_text.NEGATIVE_VALUE_PARAS:
+            self.add_to_layout(paragraph_obj)
 
     def add_data_source_and_lib(self):
         """Add the data source and library information"""
@@ -647,7 +678,7 @@ class PDFReportMaker(BasicErrCheck):
 
         self.add_to_layout(putil.txt_list_para('2. Data Source'))
         self.add_to_layout(putil.txt_list_para('3. OpenDP Library'))
-        self.add_to_layout(putil.txt_list_para('4. Usage'))
+        self.add_to_layout(putil.txt_list_para(self.USAGE_SECTION_TITLE))
         self.add_to_layout(putil.txt_list_para('5. Parameter Definitions'))
 
     @staticmethod
@@ -667,7 +698,7 @@ class PDFReportMaker(BasicErrCheck):
             Confidence Level        95.0%
             Description             There is a probability of 95.0% that the ... (etc)
         """
-        tbl_result = FlexibleColumnWidthTable(number_of_rows=4,
+        tbl_result = FlexibleColumnWidthTable(number_of_rows=5,
                                               number_of_columns=2,
                                               padding_left=Decimal(40),
                                               padding_right=Decimal(60),
@@ -692,6 +723,13 @@ class PDFReportMaker(BasicErrCheck):
         clevel = round(stat_info['confidence_level'] * 100.0, 1)
         tbl_result.add(putil.get_tbl_cell_lft_pad("Confidence Level", padding=0))
         tbl_result.add(putil.get_tbl_cell_align_rt(f"{clevel}%"))
+
+        # Noise Mechanism
+        tbl_result.add(putil.get_tbl_cell_lft_pad("Noise Mechanism", padding=0))
+        noise_mechansim = stat_info['noise_mechanism']
+        if not noise_mechansim:
+            noise_mechansim = '(not available)'
+        tbl_result.add(putil.get_tbl_cell_align_rt(noise_mechansim))
 
         # Description
         #
@@ -721,7 +759,7 @@ class PDFReportMaker(BasicErrCheck):
             Confidence Level        95.0%
             Description             There is a probability of 95.0% that the ... (etc)
         """
-        tbl_result = FlexibleColumnWidthTable(number_of_rows=4,
+        tbl_result = FlexibleColumnWidthTable(number_of_rows=5,
                                               number_of_columns=2,
                                               padding_left=Decimal(40),
                                               padding_right=Decimal(60),
@@ -741,6 +779,13 @@ class PDFReportMaker(BasicErrCheck):
         clevel = round(stat_info['confidence_level'] * 100.0, 1)
         tbl_result.add(putil.get_tbl_cell_lft_pad("Confidence Level", padding=0))
         tbl_result.add(putil.get_tbl_cell_align_rt(f"{clevel}%"))
+
+        # Noise Mechanism
+        tbl_result.add(putil.get_tbl_cell_lft_pad("Noise Mechanism", padding=0))
+        noise_mechansim = stat_info['noise_mechanism']
+        if not noise_mechansim:
+            noise_mechansim = '(not available)'
+        tbl_result.add(putil.get_tbl_cell_align_rt(noise_mechansim))
 
         # Description
         #

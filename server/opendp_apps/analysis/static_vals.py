@@ -1,3 +1,7 @@
+
+NOISE_GEOMETRIC_MECHANISM = 'Base Geometric'
+NOISE_LAPLACE_MECHANISM = 'Laplace'
+
 # ---------------------------------
 # Confidence level static values
 # ---------------------------------
