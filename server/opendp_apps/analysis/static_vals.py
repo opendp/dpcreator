@@ -1,3 +1,7 @@
+
+NOISE_GEOMETRIC_MECHANISM = 'Geometric'
+NOISE_LAPLACE_MECHANISM = 'Laplace'
+
 # ---------------------------------
 # Confidence level static values
 # ---------------------------------
@@ -50,6 +54,15 @@ MISSING_VAL_DROP = 'drop'
 MISSING_VAL_INSERT_RANDOM = 'insert_random'
 MISSING_VAL_INSERT_FIXED = 'insert_fixed'
 MISSING_VAL_HANDLING_TYPES = [MISSING_VAL_DROP, MISSING_VAL_INSERT_RANDOM, MISSING_VAL_INSERT_FIXED]
+MISSING_VAL_HANDING_LABELS = {
+    MISSING_VAL_DROP: "Drop Missing Value",
+    MISSING_VAL_INSERT_RANDOM: "Insert Random Value",
+    MISSING_VAL_INSERT_FIXED: "Insert Fixed Value",
+}
+def missing_val_label(missing_val_type):
+    assert missing_val_type in MISSING_VAL_HANDING_LABELS,\
+        f"The type of missing value is unknown! {missing_val_type}"
+    return MISSING_VAL_HANDING_LABELS.get(missing_val_type)
 
 # --------------------------------------
 # Error Messages

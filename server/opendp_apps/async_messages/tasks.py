@@ -91,4 +91,3 @@ def send_test_msg(websocket_id):
     ws_msg.send_message(websocket_id)
 
     print('celery message sent...')
-

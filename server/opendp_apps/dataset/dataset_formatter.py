@@ -2,8 +2,10 @@
 Format a DataSetInfo for use in a JSON Release
 """
 import json
+
+from django.core.serializers.json import DjangoJSONEncoder
+
 from opendp_apps.dataset.models import DataSetInfo
-from opendp_apps.analysis.models import ReleaseInfo
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp, BasicResponse
 
@@ -40,7 +42,7 @@ class DataSetFormatter(BasicErrCheck):
             "Do not call this method before checking if \".has_error()\" is False"
 
         if as_json:
-            return json.dumps(self.formatted_info, indent=4)
+            return json.dumps(self.formatted_info, cls=DjangoJSONEncoder, indent=4)
 
         return self.formatted_info
 

@@ -21,6 +21,7 @@ class DPHistogramCategoricalSpec(StatSpec):
     def __init__(self, props: dict):
         """Set the internals using the props dict"""
         super().__init__(props)
+        self.noise_mechanism = astatic.NOISE_GEOMETRIC_MECHANISM
 
     def additional_required_props(self):
         """

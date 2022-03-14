@@ -66,7 +66,7 @@ INSTALLED_APPS = [
     'opendp_apps.banner_messages',
     'opendp_apps.communication',
     'opendp_apps.profiler',
-
+    'opendp_apps.dp_reports',
 ]
 
 MIDDLEWARE = [
@@ -337,6 +337,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = bool(strtobool(os.environ.get('SESSION_EXPIRE_
 SESSION_DEFAULT_COOKIE_AGE = (60 * 60) * 2  # 2 hour sessions, in seconds
 SESSION_COOKIE_AGE = int(os.getenv('SESSION_COOKIE_AGE', SESSION_DEFAULT_COOKIE_AGE))
 
+SKIP_PDF_CREATION_FOR_TESTS = bool(strtobool(os.environ.get('SKIP_PDF_CREATION_FOR_TESTS', 'False')))
 
 # SESSION_COOKIE_NAME = os.environ.get('SESSION_COOKIE_NAME', 'dpcreator')
 # CSRF_COOKIE_NAME = os.environ.get('CSRF_COOKIE_NAME', 'dpcreator_csrf')
