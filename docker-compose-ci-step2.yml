@@ -33,7 +33,7 @@ services:
       - .env
     environment:
       - DJANGO_SETTINGS_MODULE=opendp_project.settings.cypress_settings
-      #- DJANGO_SETTINGS_MODULE=opendp_project.settings.development
+      - SKIP_PDF_CREATION_FOR_TESTS=True
     command: sh -c "./migrate.sh && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
