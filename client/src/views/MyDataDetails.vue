@@ -43,15 +43,9 @@
             </template>
           </ColoredBorderAlert>
           <div class="mb-5" v-if="status === COMPLETED">
-            <ReleasePDF></ReleasePDF>
             <p><b>DP Release</b></p>
-            <p>This section contains details for the differentially private
-              <span v-if="analysisPlan.releaseInfo.dpRelease.statistics.length == 1">statistic</span><span
-                  v-if="analysisPlan.releaseInfo.dpRelease.statistics.length> 1">statistics</span>, including the
-              privacy parameters used to generate them.
-
-            </p>
-            <p>(Usage/Appropriateness Text goes here)</p>
+            <ReleasePDF></ReleasePDF>
+            <p></p>
             <p> This information can also be downloaded in other formats:</p>
             <Button v-if="hasPDF"
                     data-test="pdfDownload"
@@ -71,115 +65,8 @@
               <v-icon left>mdi-download</v-icon>
               <span>DP Release JSON File</span>
             </Button>
-            <p></p>
-            <p><b>DP Release Details</b></p>
-            <template v-for="(item,index) in statsItems">
-              <a @click="$vuetify.goTo('#'+getAnchor(item)) ">{{ index + 1 }}. {{ item.variable }} - {{
-                  item.statistic
-                }}</a>
-              <br/>
-            </template>
 
-            <div v-for="(item,index) in statsItems" class="pt-5 pb-10">
-              <div :id="getAnchor(item)"><p><b>{{ index + 1 }}. {{ item.variable }} - {{ item.statistic }} </b></p>
-              </div>
 
-              <div v-for="(detail, index) in getStatsDetails(item)" :key="index">
-                <v-row class="py-3">
-                  <v-col
-                      cols="12"
-                      class="grey--text text--darken-2 d-flex"
-                      :class="{
-                    'py-0': $vuetify.breakpoint.xsOnly
-                  }"
-                  >
-
-                    <div :data-test="'statistic '+detail.id" v-html="getDetailText(detail.label,detail.value)"></div>
-
-                  </v-col>
-
-                </v-row>
-
-              </div>
-              <div v-if="item.statistic === 'histogram'" class="pt-5 pb-10">
-                <Chart
-                    :axisData="getAxisData(item)"
-                    :title="item.variable + ' Values'"
-                    :index="index"
-                    :variable="item.variable"
-
-                />
-
-              </div>
-              <v-divider class="hidden-xs-only"/>
-            </div>
-
-            <div :v-if="analysisPlan.releaseInfo.dataverseDepositInfo">
-              <p>&nbsp;</p>
-              <p v-if="analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
-                 style="padding-left:20px; padding-right:40px;">
-                <span v-html="analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.userMsgHtml"></span>
-              </p>
-
-            </div>
-            <div class="pt-5 pb-10">
-              <p><b>Library Details</b></p>
-              <div v-for="(detail, index) in libraryDetails" :key="index">
-                <v-row v-if="status!==COMPLETED || detail.id!=='timeRemaining'" class="py-3">
-                  <v-col
-                      cols="12"
-                      sm="4"
-                      class="grey--text text--darken-2 d-flex"
-                      :class="{
-                    'py-0': $vuetify.breakpoint.xsOnly
-                  }"
-                  >
-                  <span>
-                    {{ detail.label }}
-                  </span>
-
-                  </v-col>
-                  <v-col
-                      cols="12"
-                      sm="8"
-                      :class="{
-                    'pt-0 pb-5': $vuetify.breakpoint.xsOnly
-                  }"
-                  >{{ detail.value }}
-                  </v-col
-                  >
-                </v-row>
-                <v-divider class="hidden-xs-only"/>
-              </div>
-              <p style="padding-top:20px;"><b>Dataset Details</b></p>
-              <div v-for="(detail, index) in datasetDetails" :key="index">
-                <v-row v-if="status!==COMPLETED || detail.id!=='timeRemaining'" class="py-3">
-                  <v-col
-                      cols="12"
-                      sm="4"
-                      class="grey--text text--darken-2 d-flex"
-                      :class="{
-                    'py-0': $vuetify.breakpoint.xsOnly
-                  }"
-                  >
-                  <span>
-                    {{ detail.label }}
-                  </span>
-
-                  </v-col>
-                  <v-col
-                      cols="12"
-                      sm="8"
-                      :class="{
-                    'pt-0 pb-5': $vuetify.breakpoint.xsOnly
-                  }"
-                  >{{ detail.value }}
-                  </v-col
-                  >
-                </v-row>
-                <v-divider class="hidden-xs-only"/>
-              </div>
-            </div>
 
 
           </div>

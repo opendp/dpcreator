@@ -1,8 +1,5 @@
 <template>
   <div class="home">
-    pdfAPIReady: {{ pdfAPIReady }}
-    <div id="adobe-dc-view" style="height: 360px; width: 500px;"></div>
-
 
     <EventSuccessAlert text="Done! You are out." queryParam="logout"/>
     <BadRequestAlert
@@ -37,28 +34,7 @@ export default {
     AccountButtonsWaypointActivator
   },
   created() {
-    /*
-  document.addEventListener("adobe_dc_view_sdk.ready", () => { this.pdfAPIReady = true; });
-	//credit: https://community.adobe.com/t5/document-services-apis/adobe-dc-view-sdk-ready/m-p/11648022#M948
-	if(window.AdobeDC) {
-	  console.log('READY!')
-	  this.pdfAPIReady = true;
-  }
-*/
-    document.addEventListener("adobe_dc_view_sdk.ready", () => {
-      console.log('adobe ready')
-      var adobeDCView = new AdobeDC.View({clientId: this.ADOBE_KEY, divId: "adobe-dc-view"});
-      adobeDCView.previewFile({
-            content: {
-              location:
-                  {url: "https://documentcloud.adobe.com/view-sdk-demo/PDFs/Bodea%20Brochure.pdf"}
-            },
-            metaData: {fileName: "Bodea Brochure.pdf"}
-          },
-          {
-            embedMode: "SIZED_CONTAINER"
-          });
-    });
+
     const handoffId = this.$route.query.id
 
     if (handoffId) {
@@ -67,31 +43,8 @@ export default {
       console.log('no handoffId')
     }
   },
-  watch: {
-    pdfAPIReady(val) {
-      // should only be called when true, but be sure
-      if (val) {
-        console.log('WATCH READY!')
-        this.adobeDCView = new AdobeDC.View({
-          clientId: this.ADOBE_KEY,
-          divId: "pdf-view"
-        });
-      }
-    },
-    showFile() {
-      this.adobeDCView.previewFile({
-        content: {
-          location: {url: "https://documentcloud.adobe.com/view-sdk-demo/PDFs/Bodea Brochure.pdf"}
-        },
-        metaData: {fileName: "Bodea Brochure.pdf"}
-      });
-    }
-  },
+
   data: () => ({
-    ADOBE_KEY: '13c79907c6144590b17e8ef044324444',
-    pdfAPIReady: false,
-    adobeDCView: null,
-    pdfSelected: false,
     showAlert: false,
     alertText: 'here is some text',
   })

@@ -1,37 +1,68 @@
 <template>
   <div>
-    <h3>Release Component</h3>
-    <div id="pdf-view"></div>
-    <button @click="handleClick">show pdf</button>
+    <div id="pdf-view" :style=style></div>
+    <Button v-if="!viewResults" :click="() => handleView()">View Results</Button>
   </div>
 </template>
 
 <script>
 
 
+import {mapState} from "vuex";
+import Button from "../../components/DesignSystem/Button.vue";
+
 export default {
   name: 'ReleasePDF',
+  components: {Button},
   props: ['pdfUrl'],
   data: () => ({
     pdfAPIReady: false,
     adobeDCView: null,
-    pdfSelected: false,
+    viewResults: false,
     ADOBE_KEY: '13c79907c6144590b17e8ef044324444',
   }),
-  computed: {},
+  computed: {
+    ...mapState('dataset', ['analysisPlan']),
+    style() {
+      if (this.viewResults) {
+        return "height: 1200px; width: 1000px;"
+      } else {
+        return ""
+      }
+    }
+  },
   methods: {
-    handleClick() {
-
+    handleView() {
+      console.log('handle view')
       this.adobeDCView = new AdobeDC.View({
         clientId: this.ADOBE_KEY,
         divId: "pdf-view"
       });
       this.adobeDCView.previewFile(
           {
-            content: {location: {url: "https://documentcloud.adobe.com/view-sdk-demo/PDFs/Bodea Brochure.pdf"}},
-            metaData: {fileName: "Bodea Brochure.pdf"}
-          });
+            content: {location: {url: this.analysisPlan.releaseInfo.downloadPdfUrl}},
+            metaData: {fileName: "DP Creator Release"}
+          }, {embedMode: "SIZED_CONTAINER"});
+      this.viewResults = true
+    },
+    handleHide() {
+      this.viewResults = false
     }
+  },
+
+  /*
+
+	document.addEventListener("adobe_dc_view_sdk.ready", function(){
+		var adobeDCView = new AdobeDC.View({clientId: "<YOUR_CLIENT_ID>", divId: "adobe-dc-view"});
+		adobeDCView.previewFile({
+			content:{location: {url: "https://documentcloud.adobe.com/view-sdk-demo/PDFs/Bodea Brochure.pdf"}},
+			metaData:{fileName: "Bodea Brochure.pdf"}
+		}, {embedMode: "IN_LINE"});
+	});
+
+   */
+  created() {
+    console.log("releasePDF created")
   },
   mounted() {
     document.addEventListener("adobe_dc_view_sdk.ready", () => {
