@@ -43,6 +43,7 @@
             </template>
           </ColoredBorderAlert>
           <div class="mb-5" v-if="status === COMPLETED">
+            <ReleasePDF></ReleasePDF>
             <p><b>DP Release</b></p>
             <p>This section contains details for the differentially private
               <span v-if="analysisPlan.releaseInfo.dpRelease.statistics.length == 1">statistic</span><span
@@ -228,6 +229,7 @@ import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
 import {mapGetters, mapState} from "vuex";
 import stepInformation from "@/data/stepInformation";
 import Chart from "../components/MyData/Chart.vue";
+import ReleasePDF from "@/components/MyData/ReleasePDF";
 
 const {
   IN_PROGRESS,
@@ -245,6 +247,7 @@ const {
 export default {
   name: "MyDataDetails",
   components: {
+    ReleasePDF,
     QuestionIconTooltip,
     ColoredBorderAlert,
     StatusTag,
