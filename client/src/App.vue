@@ -72,6 +72,7 @@
           </v-row>
         </v-container>
       </template>
+        <div id="pdf-view"></div>
       <router-view v-if="!(error || errorObject)"/>
     </v-main>
     <Footer/>
@@ -94,6 +95,10 @@ export default {
   title: 'DP Creator',
   components: {Footer, Header, ColoredBorderAlert, Button},
   data: () => ({
+    pdfAPIReady: false,
+    adobeDCView: null,
+    pdfSelected: false,
+    ADOBE_KEY: '13c79907c6144590b17e8ef044324444',
     error: false,
     errMsg: null,
     errorObject: null,
@@ -101,26 +106,50 @@ export default {
     appErrMsg: null,
     fontUrl: settings.google_fonts_url
   }),
+  mounted() {
+    document.addEventListener("adobe_dc_view_sdk.ready", () => {
+      console.log('eventhandler triggered');
+      this.pdfAPIReady = true;
+    });
+  },
   created() {
+    console.log("App created")
+    //credit: https://community.adobe.com/t5/document-services-apis/adobe-dc-view-sdk-ready/m-p/11648022#M948
+    if (window.AdobeDC) {
+      console.log('ready!!!')
+      this.pdfAPIReady = true;
+    }
     window.addEventListener('unhandledrejection', (event) => {
       this.error = true
       console.log("unhandled rejection")
       console.log('event.promise: ' + event.promise)
       console.log('event.reason: ' + JSON.stringify(event.reason))
       // if the reason has a request object, display it separately
-      if (event.reason.request){
+      if (event.reason.request) {
         this.errorRequest = event.reason.request
         delete event.reason.request
       }
 
       this.errorObject = event.reason
-      if (('data' in this.errorObject) && ('message' in this.errorObject.data)){
+      if (('data' in this.errorObject) && ('message' in this.errorObject.data)) {
         this.appErrMsg = this.errorObject.data.message;
       }
 
 
-
     });
+  },
+  watch: {
+    pdfAPIReady(val) {
+      console.log('in watch')
+      // should only be called when true, but be sure
+      if (val) {
+        console.log('creating view')
+        this.adobeDCView = new AdobeDC.View({
+          clientId: this.ADOBE_KEY,
+          divId: "pdf-view"
+        });
+      }
+    }
   },
   computed: {
     ...mapState('auth', ['errorMessage']),
