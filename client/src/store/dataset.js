@@ -242,7 +242,7 @@ const actions = {
     runProfiler({commit, state}, {userId}) {
         dataset.runProfiler(state.datasetInfo.objectId)
 
-        const prefix = 'wss://'
+        const prefix = 'ws://'  // Use variable VUE_APP_WEBSOCKET_PREFIX. e.g. to toggle between ws:// and wss://
         const websocketId = 'ws_' + userId
         const chatSocket = new WebSocket(
             prefix + window.location.host + '/async_messages/ws/profile/' + websocketId + '/'
