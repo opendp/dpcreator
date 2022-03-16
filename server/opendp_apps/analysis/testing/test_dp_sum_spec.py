@@ -14,6 +14,11 @@ from opendp_apps.utils.extra_validators import *
 class DPSumStatSpecTest(StatSpecTestCase):
     fixtures = ['test_dataset_data_001.json', ]
 
+    def test_05_valid_noise_mechanism(self):
+        """Check for the correct noise_mechanism"""
+        dp_sum = DPSumSpec({})
+        self.assertEqual(dp_sum.noise_mechanism, astatic.NOISE_LAPLACE_MECHANISM)
+
     def test_10_sum_valid_spec(self):
         """(10) Run DP Sum valid spec, float column"""
         msgt(self.test_10_sum_valid_spec.__doc__)
@@ -60,7 +65,7 @@ class DPSumStatSpecTest(StatSpecTestCase):
         self.assertFalse(dp_sum.has_error())
 
         # Actual sum -173.920535743
-        self.assertTrue(dp_sum.value > -250) # should be well within range
+        self.assertTrue(dp_sum.value > -250)  # should be well within range
 
         # import json
         # print(json.dumps(dp_sum.get_release_dict(), indent=4))

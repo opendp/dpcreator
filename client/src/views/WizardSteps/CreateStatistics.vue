@@ -168,9 +168,9 @@ export default {
         this.statistics = []
       }
       this.statistics.forEach((stat) => {
-        stat.epsilon = Number(stat.epsilon).toPrecision(2)
+        stat.epsilon = Number(stat.epsilon).toFixed(3)
         if (stat.error !== null) {
-          stat.error = (Number(stat.error)).toPrecision(2)
+          stat.error = (Number(stat.error)).toPrecision(3)
         }
       })
       if (this.getDepositorSetupInfo.epsilon == null) {
