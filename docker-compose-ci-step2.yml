@@ -34,6 +34,8 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=opendp_project.settings.cypress_settings
       - SKIP_PDF_CREATION_FOR_TESTS=True
+      - VUE_APP_GOOGLE_CLIENT_ID=TEST. Set in docker-compose-ci-step2.yml
+      - VUE_APP_ADOBE_PDF_CLIENT_ID=TEST. Set in docker-compose-ci-step2.yml
     command: sh -c "./migrate.sh && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
@@ -51,8 +53,6 @@ services:
     build: "./server"
     environment:
       - DJANGO_SETTINGS_MODULE=opendp_project.settings.development
-      - VUE_APP_GOOGLE_CLIENT_ID=TEST. Set in docker-compose-ci-step2.yml
-      - VUE_APP_ADOBE_PDF_CLIENT_ID=TEST. Set in docker-compose-ci-step2.yml
     env_file:
       - .env
     command: celery -A opendp_project worker -l info -n worker_dpcreator
