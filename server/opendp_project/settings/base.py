@@ -307,14 +307,6 @@ OLD_PASSWORD_FIELD_ENABLED = 'true'
 PROFILER_COLUMN_LIMIT = int(os.environ.get('PROFILER_COLUMN_LIMIT', 20))
 assert PROFILER_COLUMN_LIMIT >= 1, 'PROFILER_COLUMN_LIMIT must be at least 1'
 
-# -----------------------------------------------
-# Websocket prefix.
-# When using https, set it to 'wss://'
-# -----------------------------------------------
-WEBSOCKET_PREFIX = os.environ.get('WEBSOCKET_PREFIX', 'ws://')
-assert WEBSOCKET_PREFIX in ('ws://', 'wss://'), \
-    "Django settings error: 'WEBSOCKET_PREFIX' must be set to 'ws://' or 'wss://'"
-
 # ---------------------------
 # Celery Configuration Options
 # ---------------------------
@@ -335,6 +327,13 @@ DP_CREATOR_APP_NAME = os.environ.get('DP_CREATOR_APP_NAME', 'DP Creator (test)')
 # ------------------------------------------------------
 VUE_APP_GOOGLE_CLIENT_ID = os.environ.get('VUE_APP_GOOGLE_CLIENT_ID', '(not set)')
 VUE_APP_ADOBE_PDF_CLIENT_ID = os.environ.get('VUE_APP_ADOBE_PDF_CLIENT_ID', '(not set)')
+VUE_APP_WEBSOCKET_PREFIX =
+# Websocket prefix.
+# When using https, set it to 'wss://'
+VUE_APP_WEBSOCKET_PREFIX = os.environ.get('VUE_APP_WEBSOCKET_PREFIX', 'ws://')
+assert VUE_APP_WEBSOCKET_PREFIX in ('ws://', 'wss://'), \
+    "Django settings error: 'VUE_APP_WEBSOCKET_PREFIX' must be set to 'ws://' or 'wss://'"
+
 
 # ---------------------------
 # Cookies

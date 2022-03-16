@@ -3,7 +3,7 @@ Environment variables used in the k8s deployment files
 """
 
 base_specs = dict(
-                bird='song',
+                deploy_name="!add-deploy-name!",
                 #
                 dpcreator_app_container="ghcr.io/opendp/dpcreator/app",     # app image (server + compiled Vue.js)
                 dpcreator_nginx_container="ghcr.io/opendp/dpcreator/nginx",  # Nginx image

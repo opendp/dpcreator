@@ -46,7 +46,7 @@ spec:
         #    diskName: dpcreator-postgres-02
         #    diskURI: /subscriptions/14d2f886-16d9-4a5b-87f0-7aa1c4608026/resourceGroups/MC_DPCreatorResourceGroup_DPCreatorCluster01_eastus/providers/Microsoft.Compute/disks/dpcreator-postgres-02
       containers:
-        - name: dpcreator-postgres
+        - name: dpcreator-postgres-dev
           image: postgres:13
           imagePullPolicy: Always
           ports:
