@@ -19,8 +19,7 @@ const getters = {
 const actions = {
     fetchVueSettings({commit, state}) {
         settings.getVueSettings().then((resp) => {
-            console.log("setting data " + JSON.stringify(resp.data) + "," + typeof resp.data)
-            commit('SET_VUE_SETTINGS', resp.data)
+             commit('SET_VUE_SETTINGS', resp.data)
         })
     }
 
