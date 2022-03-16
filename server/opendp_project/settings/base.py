@@ -327,7 +327,7 @@ DP_CREATOR_APP_NAME = os.environ.get('DP_CREATOR_APP_NAME', 'DP Creator (test)')
 # ------------------------------------------------------
 VUE_APP_GOOGLE_CLIENT_ID = os.environ.get('VUE_APP_GOOGLE_CLIENT_ID', '(not set)')
 VUE_APP_ADOBE_PDF_CLIENT_ID = os.environ.get('VUE_APP_ADOBE_PDF_CLIENT_ID', '(not set)')
-VUE_APP_WEBSOCKET_PREFIX =
+
 # Websocket prefix.
 # When using https, set it to 'wss://'
 VUE_APP_WEBSOCKET_PREFIX = os.environ.get('VUE_APP_WEBSOCKET_PREFIX', 'ws://')

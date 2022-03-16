@@ -6,6 +6,8 @@ This API endpoint is used to pass **Non-private** variable to the Vue frontend.
     into a Docker image, this API endpoint allows server side environment variables
     to be passed to the UI--variables that differ depending on deployment and may
     be changed in kubernetes config files.
+- ref: https://stackoverflow.com/questions/13603027/django-rest-framework-non-model-serializer
+
 """
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -17,8 +19,7 @@ from opendp_apps.content_pages import static_vals as cstatic
 
 class VueSettingsView(viewsets.ViewSet):
     """
-    Simple API call returning environment varaibles
-    ref: https://stackoverflow.com/questions/13603027/django-rest-framework-non-model-serializer
+    Simple API call returning non-sensitive environment varaibles
     """
     http_method_names = ['get']
 
@@ -27,7 +28,8 @@ class VueSettingsView(viewsets.ViewSet):
         settings_info = {
                             cstatic.KEY_VUE_APP_GOOGLE_CLIENT_ID: settings.VUE_APP_GOOGLE_CLIENT_ID,
                             cstatic.KEY_VUE_APP_ADOBE_PDF_CLIENT_ID: settings.VUE_APP_ADOBE_PDF_CLIENT_ID,
-                        }
+                            cstatic.KEY_VUE_APP_WEBSOCKET_PREFIX: settings.VUE_APP_WEBSOCKET_PREFIX,
+        }
 
         response = Response(settings_info, status=status.HTTP_200_OK)
 

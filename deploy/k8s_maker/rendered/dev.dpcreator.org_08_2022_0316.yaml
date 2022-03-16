@@ -122,6 +122,7 @@ data:
   #
   VUE_APP_GOOGLE_CLIENT_ID: "750757442540-4bg3aulcrm802i8pguo851lq8kikf5ge.apps.googleusercontent.com"
   VUE_APP_ADOBE_PDF_CLIENT_ID: "Needs to be set! (See: specs_dev_dpcreator_org)"
+  VUE_APP_WEBSOCKET_PREFIX: "wss://"
   #
 ---
 apiVersion: apps/v1

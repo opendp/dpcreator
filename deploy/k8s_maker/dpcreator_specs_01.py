@@ -22,7 +22,7 @@ base_specs = dict(
                 ALLOWED_HOSTS="Needs to be set! (See: base_specs)",  # Django setting
                 #
                 # This loadBalancerIP should also appear in ALLOWED_HOSTS
-                loadBalancerIP="Needs to be set! (See: base_specs)", # k8s LoadBalancer.
+                loadBalancerIP="Needs to be set! (See: base_specs)",  # k8s LoadBalancer.
                 )
 
 # dev.dpcreator.org
@@ -38,6 +38,7 @@ specs_dev_dpcreator_org = dict(base_specs, **dict(
                 loadBalancerIP="40.85.170.176",  # k8s LoadBalancer.
                 #
                 VUE_APP_ADOBE_PDF_CLIENT_ID="Needs to be set! (See: specs_dev_dpcreator_org)",
+                VUE_APP_WEBSOCKET_PREFIX='wss://',
                 ))
 
 # demo.dpcreator.org
@@ -53,4 +54,5 @@ specs_demo_dpcreator_org = dict(base_specs, **dict(
                 loadBalancerIP="13.82.125.69",   # k8s LoadBalancer.
                 #
                 VUE_APP_ADOBE_PDF_CLIENT_ID="Needs to be set! (See: specs_demo_dpcreator_org)",
-                ))
+                VUE_APP_WEBSOCKET_PREFIX='wss://',
+))

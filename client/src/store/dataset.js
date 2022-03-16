@@ -242,7 +242,7 @@ const actions = {
     runProfiler({commit, state}, {userId}) {
         dataset.runProfiler(state.datasetInfo.objectId)
 
-        const prefix = 'ws://'
+        const prefix = 'wss://'
         const websocketId = 'ws_' + userId
         const chatSocket = new WebSocket(
             prefix + window.location.host + '/async_messages/ws/profile/' + websocketId + '/'
