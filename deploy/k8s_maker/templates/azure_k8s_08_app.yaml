@@ -6,7 +6,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: dpcreator-app-configmap
+  name: dpcreator-app-configmap-{{ deploy_name }}
 data:
   #
   STATIC_ROOT: "/dpcreator_volume/static/dist"
@@ -36,22 +36,22 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dpcreator-app
+  name: dpcreator-app-{{ deploy_name }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dpcreator
+      app: dpcreator-{{ deploy_name }}
       tier: app
   template:
     metadata:
       labels:
-        app: dpcreator
+        app: dpcreator-{{ deploy_name }}
         tier: app
     spec:
       #restartPolicy: Always
       volumes:
-        - name: dpcreator-volume
+        - name: dpcreator-volume-{{ deploy_name }}
           emptyDir: {}
           # azureDisk:
           #  kind: Managed
@@ -72,7 +72,7 @@ spec:
             # ----------------------------------
             # shared between containers
             # ----------------------------------
-            - name: dpcreator-volume
+            - name: dpcreator-volume-{{ deploy_name }}
               mountPath: /dpcreator_volume
               #subPath: 2ravens_org-apricot
               #readOnly: true
@@ -104,15 +104,15 @@ spec:
             # ----------------------------------
             # shared between containers
             # ----------------------------------
-            - name: dpcreator-volume
+            - name: dpcreator-volume-{{ deploy_name }}
               mountPath: /dpcreator_volume
               #subPath: 2ravens_org-apricot
               #readOnly: false
           envFrom:
           - configMapRef:
-              name: dpcreator-db-data-configmap
+              name: dpcreator-db-data-configmap-{{ deploy_name }}
           - configMapRef:
-              name: dpcreator-app-configmap
+              name: dpcreator-app-configmap-{{ deploy_name }}
           env:
             # Same storage roots on dpcreator-app and celery-worker
             #
@@ -165,15 +165,15 @@ spec:
             # ----------------------------------
             # shared between containers
             # ----------------------------------
-            - name: dpcreator-volume
+            - name: dpcreator-volume-{{ deploy_name }}
               mountPath: /dpcreator_volume
               #subPath: 2ravens_org-apricot
               #readOnly: false
           envFrom:
           - configMapRef:
-              name: dpcreator-db-data-configmap
+              name: dpcreator-db-data-configmap-{{ deploy_name }}
           - configMapRef:
-              name: dpcreator-app-configmap
+              name: dpcreator-app-configmap-{{ deploy_name }}
           env:
             # Same storage roots on dpcreator-app and celery-worker
             #
@@ -218,16 +218,16 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: dpcreator-load-balancer
+  name: dpcreator-load-balancer-{{ deploy_name }}
   labels:
-    app: dpcreator
+    app: dpcreator-{{ deploy_name }}
     tier: load-balancer
 spec:
   type: LoadBalancer
   # IP mapped to dpcreator.2ravens.org
   loadBalancerIP: {{ loadBalancerIP }}
   selector:
-    app: dpcreator
+    app: dpcreator-{{ deploy_name }}
     tier: app
   ports:
   - port: 80

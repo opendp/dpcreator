@@ -29,6 +29,8 @@ base_specs = dict(
 #
 specs_dev_dpcreator_org = dict(base_specs, **dict(
                 # DEPLOYMENT SPECIFIC VARIABLES:
+                deploy_name="dev",
+                #
                 dpcreator_startup_script_filename="azure_dev.dpcreator.org.sh",
                 #
                 ALLOWED_HOSTS="40.85.170.176,dev.dpcreator.org,127.0.0.1,0.0.0.0",  # Django setting
@@ -42,6 +44,8 @@ specs_dev_dpcreator_org = dict(base_specs, **dict(
 #
 specs_demo_dpcreator_org = dict(base_specs, **dict(
                 # DEPLOYMENT SPECIFIC VARIABLES:
+                deploy_name="demo",
+                #
                 dpcreator_startup_script_filename="azure_demo.dpcreator.org.sh",
                 #
                 ALLOWED_HOSTS="13.82.125.69,demo.dpcreator.org,127.0.0.1,0.0.0.0",  # Django setting

@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: dpcreator-db-data-configmap
+  name: dpcreator-db-data-configmap-{{ deploy_name }}
 data:
   #
   # Database settings for postgres and Django
@@ -22,17 +22,17 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dpcreator-database
+  name: dpcreator-database-{{ deploy_name }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dpcreator
+      app: dpcreator-{{ deploy_name }}
       tier: postgres
   template:
     metadata:
       labels:
-        app: dpcreator
+        app: dpcreator-{{ deploy_name }}
         tier: postgres
     spec:
       volumes:
@@ -57,7 +57,7 @@ spec:
           #  mountPath: /var/lib/postgresql/data
           envFrom:
           - configMapRef:
-              name: dpcreator-db-data-configmap
+              name: dpcreator-db-data-configmap-{{ deploy_name }}
           env:
             - name: POSTGRES_USER
               valueFrom:
@@ -76,14 +76,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: dpcreator-postgres-service
+  name: dpcreator-postgres-service-{{ deploy_name }}
   labels:
-    app: dpcreator
+    app: dpcreator-{{ deploy_name }}
     tier: postgres
 spec:
   clusterIP: None
   ports:
     - port: 5432
   selector:
-    app: dpcreator
+    app: dpcreator-{{ deploy_name }}
     tier: postgres

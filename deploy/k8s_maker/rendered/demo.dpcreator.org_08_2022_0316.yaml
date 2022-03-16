@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: dpcreator-db-data-configmap
+  name: dpcreator-db-data-configmap-demo
 data:
   #
   # Database settings for postgres and Django
@@ -22,17 +22,17 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dpcreator-database
+  name: dpcreator-database-demo
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dpcreator
+      app: dpcreator-demo
       tier: postgres
   template:
     metadata:
       labels:
-        app: dpcreator
+        app: dpcreator-demo
         tier: postgres
     spec:
       volumes:
@@ -57,7 +57,7 @@ spec:
           #  mountPath: /var/lib/postgresql/data
           envFrom:
           - configMapRef:
-              name: dpcreator-db-data-configmap
+              name: dpcreator-db-data-configmap-demo
           env:
             - name: POSTGRES_USER
               valueFrom:
@@ -76,16 +76,16 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: dpcreator-postgres-service
+  name: dpcreator-postgres-service-demo
   labels:
-    app: dpcreator
+    app: dpcreator-demo
     tier: postgres
 spec:
   clusterIP: None
   ports:
     - port: 5432
   selector:
-    app: dpcreator
+    app: dpcreator-demo
     tier: postgres
 ---
 # ----------------------------------------
@@ -95,7 +95,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: dpcreator-app-configmap
+  name: dpcreator-app-configmap-demo
 data:
   #
   STATIC_ROOT: "/dpcreator_volume/static/dist"
@@ -125,22 +125,22 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dpcreator-app
+  name: dpcreator-app-demo
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dpcreator
+      app: dpcreator-demo
       tier: app
   template:
     metadata:
       labels:
-        app: dpcreator
+        app: dpcreator-demo
         tier: app
     spec:
       #restartPolicy: Always
       volumes:
-        - name: dpcreator-volume
+        - name: dpcreator-volume-demo
           emptyDir: {}
           # azureDisk:
           #  kind: Managed
@@ -161,7 +161,7 @@ spec:
             # ----------------------------------
             # shared between containers
             # ----------------------------------
-            - name: dpcreator-volume
+            - name: dpcreator-volume-demo
               mountPath: /dpcreator_volume
               #subPath: 2ravens_org-apricot
               #readOnly: true
@@ -193,15 +193,15 @@ spec:
             # ----------------------------------
             # shared between containers
             # ----------------------------------
-            - name: dpcreator-volume
+            - name: dpcreator-volume-demo
               mountPath: /dpcreator_volume
               #subPath: 2ravens_org-apricot
               #readOnly: false
           envFrom:
           - configMapRef:
-              name: dpcreator-db-data-configmap
+              name: dpcreator-db-data-configmap-demo
           - configMapRef:
-              name: dpcreator-app-configmap
+              name: dpcreator-app-configmap-demo
           env:
             # Same storage roots on dpcreator-app and celery-worker
             #
@@ -254,15 +254,15 @@ spec:
             # ----------------------------------
             # shared between containers
             # ----------------------------------
-            - name: dpcreator-volume
+            - name: dpcreator-volume-demo
               mountPath: /dpcreator_volume
               #subPath: 2ravens_org-apricot
               #readOnly: false
           envFrom:
           - configMapRef:
-              name: dpcreator-db-data-configmap
+              name: dpcreator-db-data-configmap-demo
           - configMapRef:
-              name: dpcreator-app-configmap
+              name: dpcreator-app-configmap-demo
           env:
             # Same storage roots on dpcreator-app and celery-worker
             #
@@ -307,16 +307,16 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: dpcreator-load-balancer
+  name: dpcreator-load-balancer-demo
   labels:
-    app: dpcreator
+    app: dpcreator-demo
     tier: load-balancer
 spec:
   type: LoadBalancer
   # IP mapped to dpcreator.2ravens.org
   loadBalancerIP: 13.82.125.69
   selector:
-    app: dpcreator
+    app: dpcreator-demo
     tier: app
   ports:
   - port: 80
