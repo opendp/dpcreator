@@ -1,39 +1,52 @@
+"""
+Environment variables used in the k8s deployment files
+"""
 
-
+base_specs = dict(
+                bird='song',
+                #
+                dpcreator_app_container="ghcr.io/opendp/dpcreator/app",     # app image (server + compiled Vue.js)
+                dpcreator_nginx_container="ghcr.io/opendp/dpcreator/nginx",  # Nginx image
+                dpcreator_container_tag="latest",  # Tag for Images
+                #
+                DEFAULT_FROM_EMAIL='info@opendp.org',  # Related to the Sendgrid API call
+                #
+                ACCOUNT_EMAIL_VERIFICATION="mandatory",  # Django allauth. See server/opendp_apps/user/README.md
+                #
+                # relates to info@opendp.org account
+                VUE_APP_GOOGLE_CLIENT_ID="750757442540-4bg3aulcrm802i8pguo851lq8kikf5ge.apps.googleusercontent.com",
+                VUE_APP_ADOBE_PDF_CLIENT_ID="(Needs to be set!)",
+                #
+                # DEPLOYMENT SPECIFIC VARIABLES:
+                dpcreator_startup_script_filename="Needs to be set! (See: base_specs)",
+                ALLOWED_HOSTS="Needs to be set! (See: base_specs)",  # Django setting
+                #
+                # This loadBalancerIP should also appear in ALLOWED_HOSTS
+                loadBalancerIP="Needs to be set! (See: base_specs)", # k8s LoadBalancer.
+                )
 
 # dev.dpcreator.org
 #
-specs_01 = dict(bird='song',
-                # tag used for dpcreator app and nginx
-                dpcreator_app_container="ghcr.io/opendp/dpcreator/app",
-                dpcreator_nginx_container="ghcr.io/opendp/dpcreator/nginx",
-                dpcreator_container_tag="latest", # "latest", "2021-1203"
+specs_dev_dpcreator_org = dict(base_specs, **dict(
+                # DEPLOYMENT SPECIFIC VARIABLES:
                 dpcreator_startup_script_filename="azure_dev.dpcreator.org.sh",
-                # dpcreator_container_tag="2022-0104", # "latest", "2021-1203"
-                #                #
-                DEFAULT_FROM_EMAIL='info@opendp.org',
-                # Make these two the same!!!
-                ALLOWED_HOSTS="40.85.170.176,dev.dpcreator.org,127.0.0.1,0.0.0.0",
-                loadBalancerIP="40.85.170.176",
                 #
-                ACCOUNT_EMAIL_VERIFICATION="mandatory",  # "none"
-                )
+                ALLOWED_HOSTS="40.85.170.176,dev.dpcreator.org,127.0.0.1,0.0.0.0",  # Django setting
+                # This loadBalancerIP should also appear in ALLOWED_HOSTS
+                loadBalancerIP="40.85.170.176",  # k8s LoadBalancer.
+                #
+                VUE_APP_ADOBE_PDF_CLIENT_ID="Needs to be set! (See: specs_dev_dpcreator_org)",
+                ))
 
-# test.dpcreator.org
+# demo.dpcreator.org
 #
-specs_01_test = dict(bird='song',
-                # tag used for dpcreator app and nginx
-                dpcreator_app_container="ghcr.io/opendp/dpcreator/app",
-                dpcreator_nginx_container="ghcr.io/opendp/dpcreator/nginx",
-                # dpcreator_container_tag="2022-0104", # "latest", "2021-1203"
-                dpcreator_container_tag="latest", # "latest", "2021-1203"
+specs_demo_dpcreator_org = dict(base_specs, **dict(
+                # DEPLOYMENT SPECIFIC VARIABLES:
                 dpcreator_startup_script_filename="azure_demo.dpcreator.org.sh",
                 #
-                DEFAULT_FROM_EMAIL='info@opendp.org',
-                # Make these two the same!!!
-                ALLOWED_HOSTS="13.82.125.69,test.dpcreator.org,127.0.0.1,0.0.0.0",
-                loadBalancerIP="13.82.125.69",
+                ALLOWED_HOSTS="13.82.125.69,demo.dpcreator.org,127.0.0.1,0.0.0.0",  # Django setting
+                # This loadBalancerIP should also appear in ALLOWED_HOSTS
+                loadBalancerIP="13.82.125.69",   # k8s LoadBalancer.
                 #
-                ACCOUNT_EMAIL_VERIFICATION="mandatory",  # "none"
-                #
-                )
+                VUE_APP_ADOBE_PDF_CLIENT_ID="Needs to be set! (See: specs_demo_dpcreator_org)",
+                ))

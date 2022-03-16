@@ -1,0 +1,326 @@
+---
+# reference: https://github.com/kubernetes-operators-book/chapters/blob/master/ch05/database.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dpcreator-db-data-configmap
+data:
+  #
+  # Database settings for postgres and Django
+  #
+  DB_HOST: "dpcreator-postgres-service"
+  DB_PORT: "5432"
+  DB_ENGINE: "django.db.backends.postgresql_psycopg2"
+  #
+  # These two variables should have the same value (kludge):
+  POSTGRES_DB: "db_dpcreator"
+  DB_NAME: "db_dpcreator"
+---
+# ---------------------------
+# DPCreator - Postgres Deployment
+# ---------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dpcreator-database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dpcreator
+      tier: postgres
+  template:
+    metadata:
+      labels:
+        app: dpcreator
+        tier: postgres
+    spec:
+      volumes:
+        # Persistent Disk space to store Postgres files
+        #  Used by dpcreator-postgres container
+        #- name: postgres-persistent-volume
+        #  azureDisk:
+        #    kind: Managed
+        #    diskName: dpcreator-postgres-02
+        #    diskURI: /subscriptions/14d2f886-16d9-4a5b-87f0-7aa1c4608026/resourceGroups/MC_DPCreatorResourceGroup_DPCreatorCluster01_eastus/providers/Microsoft.Compute/disks/dpcreator-postgres-02
+      containers:
+        - name: dpcreator-postgres
+          image: postgres:13
+          imagePullPolicy: Always
+          ports:
+            - name: postgres-port
+              containerPort: 5432
+              protocol: TCP
+          # Persistent Disk space to store Postgres files
+          #volumeMounts:
+          #- name: postgres-persistent-volume
+          #  mountPath: /var/lib/postgresql/data
+          envFrom:
+          - configMapRef:
+              name: dpcreator-db-data-configmap
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-auth-secret
+                  key: db_username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-auth-secret
+                  key: db_password
+---
+# ---------------------------
+# DPCreator - Postgres Service
+# ---------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: dpcreator-postgres-service
+  labels:
+    app: dpcreator
+    tier: postgres
+spec:
+  clusterIP: None
+  ports:
+    - port: 5432
+  selector:
+    app: dpcreator
+    tier: postgres
+---
+# ----------------------------------------
+# Configmap used for:
+#  dpcreator-app, dpcreator-celery
+# ----------------------------------------
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dpcreator-app-configmap
+data:
+  #
+  STATIC_ROOT: "/dpcreator_volume/static/dist"
+  STATIC_URL: "/static/dist/"
+  UPLOADED_FILE_STORAGE_ROOT: "/dpcreator_user_data"
+  RELEASE_FILE_STORAGE_ROOT: "/dpcreator_release_data"
+  #
+  # Should match the NGINX_MAX_UPLOAD_SIZE
+  # ref: https://docs.djangoproject.com/en/3.2/ref/settings/#std:setting-DATA_UPLOAD_MAX_MEMORY_SIZE
+  #  20971520 bytes = 20MB
+  DATA_UPLOAD_MAX_MEMORY_SIZE: "20971520"
+  #
+  # Set to default of 2.5MB
+  # ref: https://docs.djangoproject.com/en/3.2/ref/settings/#std:setting-FILE_UPLOAD_MAX_MEMORY_SIZE
+  FILE_UPLOAD_MAX_MEMORY_SIZE: "2621440"
+  #
+  # Require email verification for account creation
+  ACCOUNT_EMAIL_VERIFICATION: "mandatory"
+  #
+  DEFAULT_FROM_EMAIL: "info@opendp.org"
+  #
+  #
+  VUE_APP_GOOGLE_CLIENT_ID: "750757442540-4bg3aulcrm802i8pguo851lq8kikf5ge.apps.googleusercontent.com"
+  VUE_APP_ADOBE_PDF_CLIENT_ID: "Needs to be set! (See: specs_dev_dpcreator_org)"
+  #
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dpcreator-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dpcreator
+      tier: app
+  template:
+    metadata:
+      labels:
+        app: dpcreator
+        tier: app
+    spec:
+      #restartPolicy: Always
+      volumes:
+        - name: dpcreator-volume
+          emptyDir: {}
+          # azureDisk:
+          #  kind: Managed
+          #  diskName: storage-dpcreator-files
+          #  diskURI:
+      containers:
+        # -------------------------------------------------
+        # (1) Nginx frontend: Separate requests to static files vs. Django app
+        # -------------------------------------------------
+        - name: dpcreator-nginx
+          image: ghcr.io/opendp/dpcreator/nginx:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          volumeMounts:
+            # ----------------------------------
+            # shared between containers
+            # ----------------------------------
+            - name: dpcreator-volume
+              mountPath: /dpcreator_volume
+              #subPath: 2ravens_org-apricot
+              #readOnly: true
+          #envFrom:
+          #  - configMapRef:
+          #      name: ravens-django-config-apricot
+        # -------------------------------------------------
+        # (2) Redis
+        # -------------------------------------------------
+        - name: redis
+          image: redis:6
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 6379
+        # -------------------------------------------------
+        # (3) Core application: Django + bundled static files
+        # -------------------------------------------------
+        - name: dpcreator-app
+          image: ghcr.io/opendp/dpcreator/app:latest
+          imagePullPolicy: Always
+          command: [ "azure_dev.dpcreator.org.sh" ]
+          #command: [ "/bin/sh" ]
+          # args: [ "-c", "./migrate.sh && python manage.py runserver 0.0.0.0:8000"]
+          ports:
+            - name: dpcreator
+              containerPort: 8000
+              protocol: TCP
+          volumeMounts:
+            # ----------------------------------
+            # shared between containers
+            # ----------------------------------
+            - name: dpcreator-volume
+              mountPath: /dpcreator_volume
+              #subPath: 2ravens_org-apricot
+              #readOnly: false
+          envFrom:
+          - configMapRef:
+              name: dpcreator-db-data-configmap
+          - configMapRef:
+              name: dpcreator-app-configmap
+          env:
+            # Same storage roots on dpcreator-app and celery-worker
+            #
+            - name: UPLOADED_FILE_STORAGE_ROOT
+              value: /dpcreator_volume/private/user_uploaded_data
+            - name: RELEASE_FILE_STORAGE_ROOT
+              value: /dpcreator_volume/public/release_files
+            # ----------------------------------------------------
+            - name: DJANGO_SETTINGS_MODULE
+              value: opendp_project.settings.azure_test_01
+            - name: ALLOWED_HOSTS
+              value: "40.85.170.176,dev.dpcreator.org,127.0.0.1,0.0.0.0"
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-auth-secret
+                  key: db_username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-auth-secret
+                  key: db_password
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: dpcreator-app-secrets
+                  key: SECRET_KEY
+            - name: CRYPTOGRAPHY_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: dpcreator-app-secrets
+                  key: CRYPTOGRAPHY_KEY
+            - name: SENDGRID_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: dpcreator-app-secrets
+                  key: SENDGRID_API_KEY
+        # -------------------------------------------------
+        # (4) Celery Queue - same image/settings as except for "command"
+        # -------------------------------------------------
+        - name: celery-worker
+          image: ghcr.io/opendp/dpcreator/app:latest
+          imagePullPolicy: Always
+          command: ['celery', '-A', 'opendp_project', 'worker', '-l', 'info', '-n', 'worker_dpcreator']
+          ports:
+            - name: dpcreator
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            # ----------------------------------
+            # shared between containers
+            # ----------------------------------
+            - name: dpcreator-volume
+              mountPath: /dpcreator_volume
+              #subPath: 2ravens_org-apricot
+              #readOnly: false
+          envFrom:
+          - configMapRef:
+              name: dpcreator-db-data-configmap
+          - configMapRef:
+              name: dpcreator-app-configmap
+          env:
+            # Same storage roots on dpcreator-app and celery-worker
+            #
+            - name: UPLOADED_FILE_STORAGE_ROOT
+              value: /dpcreator_volume/private/user_uploaded_data
+            - name: RELEASE_FILE_STORAGE_ROOT
+              value: /dpcreator_volume/public/release_files
+            - name: DJANGO_SETTINGS_MODULE
+              value: opendp_project.settings.azure_test_01
+            # ----------------------------------------------------
+            - name: ALLOWED_HOSTS
+              value: "40.85.170.176,dev.dpcreator.org,127.0.0.1,0.0.0.0"
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-auth-secret
+                  key: db_username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-auth-secret
+                  key: db_password
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: dpcreator-app-secrets
+                  key: SECRET_KEY
+            - name: CRYPTOGRAPHY_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: dpcreator-app-secrets
+                  key: CRYPTOGRAPHY_KEY
+            - name: SENDGRID_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: dpcreator-app-secrets
+                  key: SENDGRID_API_KEY
+---
+# ---------------------------
+# DPCreator - Service
+# ---------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: dpcreator-load-balancer
+  labels:
+    app: dpcreator
+    tier: load-balancer
+spec:
+  type: LoadBalancer
+  # IP mapped to dpcreator.2ravens.org
+  loadBalancerIP: 40.85.170.176
+  selector:
+    app: dpcreator
+    tier: app
+  ports:
+  - port: 80
+    # nginx port ->
+    targetPort: 80
+    # test - right to dpcreator-app port
+    #targetPort: 8000
