@@ -72,7 +72,7 @@ services:
   celery-queue:
     build: "./server"
     environment:
-      - DJANGO_SETTINGS_MODULE=opendp_project.settings.development
+      - DJANGO_SETTINGS_MODULE=opendp_project.settings.cypress_settings
     env_file:
       - .env
     command: celery -A opendp_project worker -l info -n worker_dpcreator
