@@ -8,7 +8,9 @@ data:
   #
   # Database settings for postgres and Django
   #
-  DB_HOST: "dpcreator-postgres-service"
+  #
+  # DB_HOST Should be the same as the service name at the end of this file:
+  DB_HOST: "dpcreator-postgres-service-dev"
   DB_PORT: "5432"
   DB_ENGINE: "django.db.backends.postgresql_psycopg2"
   #
