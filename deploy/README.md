@@ -23,6 +23,13 @@ In terms of software, you'll need:
 - A local DPCreator development environment installed including Node and Python.
 - Docker
 
+## Github Token Setup
+
+The first time you deploy, you will need to set up a Github auth token so that you can communicate with the container service.
+- Go to https://github.com/settings/tokens
+- Setup new token with permissions
+- echo $CR_PAT | docker login ghcr.io -u <username> --password-stdin
+
 ## Building of Docker Images
 
 (Note: In the future this could be a GitHub action.)
@@ -31,7 +38,15 @@ Deployment currently requires the building of two Docker images:
 - (A) DPCreator app 
 - (B) DPCreator nginx 
 
+Set an environment variable called "today" of the form YYYY-MMDD. We will use this throughout the deploy:
+```
+# Example: (use today's date)
+export today=2022-0316
+```
+
 ### (A) DPCreator app
+
+0. Double check that you are on the *develop* or *main* branch, depending on what kind of deploy you are doing.
 
 1. Build node/vue app files
     ```
@@ -63,17 +78,17 @@ Deployment currently requires the building of two Docker images:
     
     # Build/Push DPCreator app  
     #  -- change YYYY-MMDD to the current date
-    docker build -t ghcr.io/opendp/dpcreator/app:YYYY-MMDD .
-    docker push ghcr.io/opendp/dpcreator/app:YYYY-MMDD   
+    docker build -t ghcr.io/opendp/dpcreator/app:$today .
+    docker push ghcr.io/opendp/dpcreator/app:$today   
     #
-    docker tag ghcr.io/opendp/dpcreator/app:YYYY-MMDD ghcr.io/opendp/dpcreator/app:latest
+    docker tag ghcr.io/opendp/dpcreator/app:$today ghcr.io/opendp/dpcreator/app:latest
     docker push ghcr.io/opendp/dpcreator/app:latest
    
     # Example:
-    docker build -t ghcr.io/opendp/dpcreator/app:2022-0214 .
-    docker push ghcr.io/opendp/dpcreator/app:2022-0214  
-    docker tag ghcr.io/opendp/dpcreator/app:2022-0214 ghcr.io/opendp/dpcreator/app:latest
-    docker push ghcr.io/opendp/dpcreator/app:latest    
+    # docker build -t ghcr.io/opendp/dpcreator/app:2022-0214 .
+    # docker push ghcr.io/opendp/dpcreator/app:2022-0214  
+    # docker tag ghcr.io/opendp/dpcreator/app:2022-0214 ghcr.io/opendp/dpcreator/app:latest
+    # docker push ghcr.io/opendp/dpcreator/app:latest    
    ```
    
 
@@ -88,16 +103,16 @@ Deployment currently requires the building of two Docker images:
       
     # Build/Push DPCreator nginx
     #  -- change YYYY-MMDD to the current date
-    docker build -t ghcr.io/opendp/dpcreator/nginx:YYYY-MMDD .
-    docker push ghcr.io/opendp/dpcreator/nginx:YYYY-MMDD
-    docker tag ghcr.io/opendp/dpcreator/nginx:YYYY-MMDD ghcr.io/opendp/dpcreator/nginx:latest
+    docker build -t ghcr.io/opendp/dpcreator/nginx:$today .
+    docker push ghcr.io/opendp/dpcreator/nginx:$today
+    docker tag ghcr.io/opendp/dpcreator/nginx:$today ghcr.io/opendp/dpcreator/nginx:latest
     docker push ghcr.io/opendp/dpcreator/nginx:latest
   
     # Example:
-    docker build -t ghcr.io/opendp/dpcreator/nginx:2022-0214 .
-    docker push ghcr.io/opendp/dpcreator/nginx:2022-0214
-    docker tag ghcr.io/opendp/dpcreator/nginx:2022-0214 ghcr.io/opendp/dpcreator/nginx:latest
-    docker push ghcr.io/opendp/dpcreator/nginx:latest  
+    # docker build -t ghcr.io/opendp/dpcreator/nginx:$today .
+    # docker push ghcr.io/opendp/dpcreator/nginx:$today
+    # docker tag ghcr.io/opendp/dpcreator/nginx:2022-0214 ghcr.io/opendp/dpcreator/nginx:latest
+    # docker push ghcr.io/opendp/dpcreator/nginx:latest  
     ```
 
 ## Creating the K8s deployment file(s)

@@ -6,3 +6,4 @@ test_setup/
 .env
 __pycache__/
 .DS_Store
+opendp_apps/dp_reports/test_data/pdfs
