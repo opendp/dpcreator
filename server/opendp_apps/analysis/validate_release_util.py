@@ -368,9 +368,6 @@ class ValidateReleaseUtil(BasicErrCheck):
             else:
                 # Looks good but check single stat epsilon and cumulative epsilon
                 #
-                print((f'run_validation_process. stat_spec.epsilon: {stat_spec.variable}'
-                       f' {stat_spec.epsilon}'))
-
                 running_epsilon += stat_spec.epsilon
 
                 if stat_spec.epsilon > self.max_epsilon:
