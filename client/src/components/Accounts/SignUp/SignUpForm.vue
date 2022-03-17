@@ -229,10 +229,6 @@ export default {
     showPassword: false,
     showConfirmPassword: false,
     errorMessage: null,
-    googleSignInParams: {
-      client_id: process.env.VUE_APP_GOOGLE_CLIENT,
-    },
-
     username: "",
     email: "",
     password: "",
