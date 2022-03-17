@@ -2,6 +2,10 @@
 NOISE_GEOMETRIC_MECHANISM = 'Geometric'
 NOISE_LAPLACE_MECHANISM = 'Laplace'
 
+# When checking max_epsilon, offset it by 10**-14 to avoid
+#   floating point addition issues. e.g. exceeding an espilon of 1 by: 0.0000000000000001
+MAX_EPSILON_OFFSET = 10**-14
+
 # ---------------------------------
 # Confidence level static values
 # ---------------------------------
@@ -9,7 +13,7 @@ CL_90 = 0.90    # just to look at
 CL_95 = 0.95
 CL_99 = 0.99
 
-CL_90test_30_bad_confidence_levels = 0.10
+CL_90_ALPHA = 0.10
 CL_95_ALPHA = 0.05
 CL_99_ALPHA = 0.01
 
