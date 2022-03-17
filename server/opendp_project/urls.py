@@ -19,12 +19,13 @@ from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import path, include
 from django.views.generic import TemplateView, RedirectView
-from rest_framework import routers, serializers
+from rest_framework import routers
 
 from opendp_apps.analysis.views.release_view import ReleaseView, ReleaseFileDownloadView
 from opendp_apps.analysis.views.validation_view import ValidationView
 from opendp_apps.banner_messages.views import BannerMessageViewSet
 
+from opendp_apps.content_pages.view_vue_settings import VueSettingsView
 from opendp_apps.dataset.views import DepositorSetupViewSet, DataSetInfoViewSet
 from opendp_apps.dataset.views_profile import ProfilingViewSet
 from opendp_apps.dataverses.urls import router as dataverse_router
@@ -42,13 +43,11 @@ from opendp_apps.user.views import UserViewSet
 admin.site.site_header = 'DP Creator Admin Panel'
 admin.site.site_title = 'DP Creator Admin Panel'
 
-
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 
 router.register(r'analyze', AnalysisPlanViewSet, basename='analyze')
 router.register(r'banner-messages', BannerMessageViewSet, basename='banner-messages')
-
 
 router.register(r'dataset-info', DataSetInfoViewSet)
 router.register(r'dv-user', DataverseUserView, basename='dv-user')
@@ -61,6 +60,8 @@ router.register(r'profile', ProfilingViewSet, basename='profile')
 router.register(r'registered-dvs', RegisteredDataverseView, basename='registered-dvs')
 router.register(r'release', ReleaseView, basename='release')
 router.register(r'release-download', ReleaseFileDownloadView, basename='release-download')
+
+router.register(r'vue-settings', VueSettingsView, basename='vue-settings')
 
 router.register(r'terms-of-access', TermsOfAccessViewSet)
 router.register(r'terms-of-access-agreement', TermsOfAccessAgreementViewSet)
@@ -79,22 +80,21 @@ urlpatterns = [
     path('dv-mock-api/', include('opendp_apps.dataverses.mock_urls')),
 
     url(r'^user-details/$',
-      TemplateView.as_view(template_name="user_details.html"),
-      name='user-details'),
+        TemplateView.as_view(template_name="user_details.html"),
+        name='user-details'),
     url(r'^rest-auth/', include('dj_rest_auth.urls')),
-    # url(r'^rest-auth/registration/', OpenDPRegister.as_view(), name='opendp-register'),
     url(r'^rest-auth/registration/', include('dj_rest_auth.registration.urls')),
     url(r'^account/', include('allauth.urls')),
     url(r'^accounts/profile/$', RedirectView.as_view(url='/', permanent=True), name='profile-redirect'),
     url(r'^rest-auth/google/$', GoogleLogin.as_view(), name='google-login'),
+
     # Putting all vue-related views under "ui/" for now to separate from the api.
     url(r'^.*$', TemplateView.as_view(template_name="index.html"), name='vue-home'),
-    ]
+]
 
 if settings.USE_DEV_STATIC_SERVER:
-    #print('Adding static url!!')
     print(f'Serving directory "{settings.STATIC_ROOT}" from url "{settings.STATIC_URL}"')
     urlpatterns += staticfiles_urlpatterns()
-    #urlpatterns += static(settings.STATIC_URL,
+    # urlpatterns += static(settings.STATIC_URL,
     #                      document_root=settings.STATIC_ROOT,
     #                      kwargs={'show_indexes': True})

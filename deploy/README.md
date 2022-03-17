@@ -40,7 +40,8 @@ Deployment currently requires the building of two Docker images:
 
 Set an environment variable called "today" of the form YYYY-MMDD. We will use this throughout the deploy:
 ```
-export today=2022-0314
+# Example: (use today's date)
+export today=2022-0316
 ```
 
 ### (A) DPCreator app
