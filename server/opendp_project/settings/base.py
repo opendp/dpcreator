@@ -334,6 +334,11 @@ VUE_APP_WEBSOCKET_PREFIX = os.environ.get('VUE_APP_WEBSOCKET_PREFIX', 'ws://')
 assert VUE_APP_WEBSOCKET_PREFIX in ('ws://', 'wss://'), \
     "Django settings error: 'VUE_APP_WEBSOCKET_PREFIX' must be set to 'ws://' or 'wss://'"
 
+# This is for use with CloudFlare and forming the PDF/JSON download urls
+#
+DPCREATOR_USING_HTTPS = False
+if VUE_APP_WEBSOCKET_PREFIX == 'wss://':
+    DPCREATOR_USING_HTTPS = True
 
 # ---------------------------
 # Cookies
