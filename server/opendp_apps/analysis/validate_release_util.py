@@ -19,6 +19,7 @@ from django.core.files.base import ContentFile
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 
+from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
@@ -42,7 +43,6 @@ from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.utils.extra_validators import \
     (validate_epsilon_not_null,
      validate_not_negative)
-from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
 
@@ -368,7 +368,11 @@ class ValidateReleaseUtil(BasicErrCheck):
             else:
                 # Looks good but check single stat epsilon and cumulative epsilon
                 #
+                print((f'run_validation_process. stat_spec.epsilon: {stat_spec.variable}'
+                       f' {stat_spec.epsilon}'))
+
                 running_epsilon += stat_spec.epsilon
+
                 if stat_spec.epsilon > self.max_epsilon:
                     # Error one stat uses more than all the epsilon!
                     #
@@ -377,7 +381,7 @@ class ValidateReleaseUtil(BasicErrCheck):
                     stat_spec.add_err_msg(user_msg)
                     self.validation_info.append(stat_spec.get_error_msg_dict())
 
-                elif running_epsilon > self.max_epsilon:
+                elif (running_epsilon - astatic.MAX_EPSILON_OFFSET) > self.max_epsilon:
                     # Error: Too much epsilon used!
                     #
                     user_msg = (f'The running epsilon ({running_epsilon}) exceeds'
