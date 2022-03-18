@@ -52,6 +52,9 @@ services:
     #
     environment:
       - DJANGO_SETTINGS_MODULE=opendp_project.settings.cypress_settings
+      - VUE_APP_GOOGLE_CLIENT_ID=TEST. Set in docker-compose-cypressdev.yml
+      - VUE_APP_ADOBE_PDF_CLIENT_ID=TEST. Set in docker-compose-cypressdev.yml
+      - VUE_APP_WEBSOCKET_PREFIX=ws://
     env_file:
       - .env
     command: sh -c "python manage.py show_debug_params && python manage.py runserver 0.0.0.0:8000"
@@ -62,8 +65,6 @@ services:
     depends_on:
       - client
       - db
-
-
   # ---------------------------------
   # Celery Task Queue
   # - Used for profiling, other longer
@@ -72,7 +73,7 @@ services:
   celery-queue:
     build: "./server"
     environment:
-      - DJANGO_SETTINGS_MODULE=opendp_project.settings.development
+      - DJANGO_SETTINGS_MODULE=opendp_project.settings.cypress_settings
     env_file:
       - .env
     command: celery -A opendp_project worker -l info -n worker_dpcreator
@@ -85,16 +86,4 @@ services:
       - db
       - redis
       - server
-#  latex:
-#    build: "latex_service"
-#    env_file:
-#      - latex_service/.env
-#    command: python /code/latex_service/app.py 1234
-#    volumes:
-#      - .:/code
-#    ports:
-#      - "1234:1234"
-#    depends_on:
-#      - db
-#      - redis
-#      - server
+

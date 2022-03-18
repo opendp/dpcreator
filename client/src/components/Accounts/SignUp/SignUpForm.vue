@@ -229,11 +229,6 @@ export default {
     showPassword: false,
     showConfirmPassword: false,
     errorMessage: null,
-    googleSignInParams: {
-      // TODO:get from a shared location, instead of hard-coded
-      client_id: '725082195083-1srivl3ra9mpc1q5ogi7aur17vkjuabg.apps.googleusercontent.com',
-    },
-
     username: "",
     email: "",
     password: "",

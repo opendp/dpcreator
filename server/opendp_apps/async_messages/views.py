@@ -29,7 +29,7 @@ def view_profile_test(request):
 
     info = dict(websocket_id=websocket_id,
                 ds_info_objects=ds_info_objects,
-                WEBSOCKET_PREFIX=settings.WEBSOCKET_PREFIX)
+                VUE_APP_WEBSOCKET_PREFIX=settings.VUE_APP_WEBSOCKET_PREFIX)
 
     return render(request, 'async_messages/view_profile_test.html', info)
 

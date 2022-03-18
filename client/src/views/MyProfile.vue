@@ -32,21 +32,18 @@
                   label="Username"
                   :rules="requiredRule"
               ></v-text-field>
-              <!-- For now, don't allow editing of the email, because it would require a new endpoint
-              and another email verification
-              <v-text-field
-                  v-model="email"
-                  label="Email"
-                  required
-                  :rules="emailRules"
-                  type="email"
-              ></v-text-field> -->
-              <div class="mt-5 mb-10">
-                {{ email }}
-              </div>
+                <v-text-field
+                    v-model="email"
+                    label="Email"
+                    data-test="myProfileEmail"
+                    required
+                    :rules="emailRules"
+                    type="email"
+                ></v-text-field>
               <div class="mt-5 mb-10">
                 <Button
                     type="submit"
+                    data-test="myProfileSaveChanges"
                     color="primary"
                     label="Save Changes"
                     :disabled="!validUserForm"
@@ -70,12 +67,13 @@
           </template>
           <template v-else>
             <p></p>
-            <ColoredBorderAlert type="info" icon="mdi-check">
+            <ColoredBorderAlert data-test="MyProfileChangeSuccess" type="info" icon="mdi-check">
               <template v-slot:content>
-                Username has been changed
+                Profile has been changed
               </template>
             </ColoredBorderAlert>
-            <p><b>Username:</b> {{ username }}</p>
+            <p data-test="changedUserName"><b>Username:</b> {{ username }}</p>
+            <p data-test="changedEmail"><b>Email:</b> {{ email }}</p>
             <Button
                 color="primary"
                 outlined
@@ -228,7 +226,8 @@ export default {
       );
     },
     handleEditAccountInformation() {
-      this.$store.dispatch('auth/changeUsername', this.username)
+      const payload = {newUsername: this.username, newEmail: this.email}
+      this.$store.dispatch('auth/updateProfile', payload)
           .catch((error) => {
             let msg = []
             Object.keys(error).forEach(function (k) {

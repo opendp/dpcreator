@@ -72,7 +72,6 @@
           </v-row>
         </v-container>
       </template>
-
       <router-view v-if="!(error || errorObject)"/>
     </v-main>
     <Footer/>
@@ -88,7 +87,7 @@ import settings from "./settings";
 import Footer from "./components/Structure/Footer.vue";
 import Header from "./components/Structure/Header.vue";
 import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
-import {mapState} from "vuex";
+import {mapState, mapActions} from "vuex";
 import NETWORK_CONSTANTS from "@/router/NETWORK_CONSTANTS";
 import Button from "@/components/DesignSystem/Button";
 export default {
@@ -102,14 +101,10 @@ export default {
     appErrMsg: null,
     fontUrl: settings.google_fonts_url
   }),
-
+  mounted() {
+    this.$store.dispatch('settings/fetchVueSettings')
+  },
   created() {
-    console.log("App created")
-    //credit: https://community.adobe.com/t5/document-services-apis/adobe-dc-view-sdk-ready/m-p/11648022#M948
-    if (window.AdobeDC) {
-      console.log('ready!!!')
-      this.pdfAPIReady = true;
-    }
     window.addEventListener('unhandledrejection', (event) => {
       this.error = true
       console.log("unhandled rejection")
@@ -122,14 +117,14 @@ export default {
       }
 
       this.errorObject = event.reason
-      if (('data' in this.errorObject) && ('message' in this.errorObject.data)) {
+      if (('data' in this.errorObject) && ('message' in this.errorObject.data)){
         this.appErrMsg = this.errorObject.data.message;
       }
 
 
+
     });
   },
-
   computed: {
     ...mapState('auth', ['errorMessage']),
     theme() {
