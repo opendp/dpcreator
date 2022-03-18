@@ -312,6 +312,14 @@ assert PROFILER_COLUMN_LIMIT >= 1, 'PROFILER_COLUMN_LIMIT must be at least 1'
 # ---------------------------
 TOTAL_EPSILON_MIN = float(os.environ.get('TOTAL_EPSILON_MIN', '0.001'))
 TOTAL_EPSILON_MAX = float(os.environ.get('TOTAL_EPSILON_MIN', '1.0'))
+assert TOTAL_EPSILON_MIN > 0, \
+    f"The TOTAL_EPSILON_MIN must be greater than 0.0. Found: {TOTAL_EPSILON_MIN}"
+assert TOTAL_EPSILON_MAX > 0, \
+    f"The TOTAL_EPSILON_MAX must be greater than 0.0. Found: {TOTAL_EPSILON_MAX}"
+assert TOTAL_EPSILON_MAX > TOTAL_EPSILON_MIN, \
+    f"The TOTAL_EPSILON_MAX must be greater than the TOTAL_EPSILON_MIN. Found min: {TOTAL_EPSILON_MIN} / max: {TOTAL_EPSILON_MAX}"
+
+
 
 # ---------------------------
 # Celery Configuration Options
