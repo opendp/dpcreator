@@ -260,7 +260,7 @@ Cypress.Commands.add('submitStatistics', (demoData) => {
             const releaseInfo = sessionObj.dataset.analysisPlan.releaseInfo
 
 //dataset.analysisPlan.releaseInfo
-
+/*
             const testData = {
                 "downloadJsonUrl": "http://localhost:8000/api/release-download/7449bc72-9858-462b-b2da-52c31ec27728/json/",
                 "downloadPdfUrl": "http://localhost:8000/api/release-download/7449bc72-9858-462b-b2da-52c31ec27728/pdf/",
@@ -369,12 +369,10 @@ Cypress.Commands.add('submitStatistics', (demoData) => {
                 "dvJsonDepositComplete": false,
                 "dvPdfDepositComplete": false
             }
-
+*/
             demoData.statistics.forEach((demoStat) => {
                 expect(releaseInfo.dpRelease.statistics[0].statistic).to.equal(demoStat.statistic.toLowerCase())
                 expect(releaseInfo.dpRelease.statistics[0].accuracy.value).to.equal(demoStat.accuracy)
-                //  cy.get('[data-test="statistic description"]').should('contain', demoStat.statistic)
-                //   cy.get('[data-test="statistic description"]').should('contain', demoStat.accuracy)
             })
         })
 })
