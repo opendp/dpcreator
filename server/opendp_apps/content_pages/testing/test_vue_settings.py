@@ -6,6 +6,7 @@ from django.test import TestCase, override_settings
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
+from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.content_pages import static_vals as cstatic
 from opendp_apps.model_helpers.msg_util import msgt
 
