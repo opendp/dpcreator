@@ -11,11 +11,12 @@ BaseClass for Univariate statistics for OpenDP.
 import abc  # import ABC, ABCMeta, abstractmethod
 from collections import OrderedDict
 import decimal
+import json
 from typing import Union
 
+from django.core.serializers.json import DjangoJSONEncoder
 from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
-
 
 from opendp.mod import OpenDPException
 
@@ -453,8 +454,10 @@ class StatSpec:
     def print_debug(self):
         """show params"""
         print('-' * 40)
-        import json
-        print(json.dumps(self.__dict__, indent=4))
+        try:
+            print(json.dumps(self.__dict__, indent=4, cls=DjangoJSONEncoder))
+        except TypeError as err_obj:
+            print(f'stat_spec.print_debug() failed with {err_obj}')
         # for key, val in self.__dict__.items():
         #    print(f'{key}: {val}')
 

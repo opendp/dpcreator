@@ -1,6 +1,6 @@
 <template>
   <g-signin-button
-      :params="googleSignInParams"
+      :params="googleParams"
       @success="onGoogleSignInSuccess"
       @error="onGoogleSignInError"
   >
@@ -44,6 +44,9 @@
 </style>
 
 <script>
+
+import {mapState} from "vuex";
+
 export default {
   name: "SocialLoginButton",
   props: ["handler", "mdiIcon", "iconBgColor", "label", "labelBgColor"],
@@ -62,11 +65,16 @@ export default {
     },
 
   },
-  data: () => ({
-    googleSignInParams: {
-      client_id: '725082195083-1srivl3ra9mpc1q5ogi7aur17vkjuabg.apps.googleusercontent.com',
+
+  computed: {
+    ...mapState('settings', ['vueSettings']),
+    googleParams() {
+      const googleParams = {
+        client_id: this.vueSettings['VUE_APP_GOOGLE_CLIENT_ID'],
+      }
+      return googleParams
     }
-  })
+  }
 }
 
 </script>

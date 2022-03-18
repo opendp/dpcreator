@@ -1,10 +1,12 @@
 from django.core.exceptions import ValidationError
 
+from django.conf import settings
 from opendp_apps.analysis import static_vals as astatic
 
 VALIDATE_MSG_ZERO_OR_GREATER = 'The value must be a number, zero or greater.'
 VALIDATE_MSG_ONE_OR_GREATER = 'The value must be a number, 1 or greater.'
-VALIDATE_MSG_EPSILON = 'As a rule of thumb, epsilon should not be less than 0.001 nor greater than 1.'
+VALIDATE_MSG_EPSILON = (f'As a rule of thumb, epsilon should not be less than'
+                        f' {settings.TOTAL_EPSILON_MIN} nor greater than {settings.TOTAL_EPSILON_MAX}.')
 VALIDATE_MSG_NOT_FLOAT = 'The value must be a float.'
 VALIDATE_MSG_NOT_INT = 'The value must be an integer.'
 VALIDATE_MSG_NOT_VALID_CL_VALUE = 'Valid confidence level values:'
@@ -99,7 +101,7 @@ def validate_epsilon_not_null(value):
     """
     validate_float(value)
 
-    if value > 1 or value < 0.01:
+    if value > settings.TOTAL_EPSILON_MAX or value < settings.TOTAL_EPSILON_MIN:
         raise ValidationError(VALIDATE_MSG_EPSILON)
 
 

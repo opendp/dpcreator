@@ -87,7 +87,7 @@ import settings from "./settings";
 import Footer from "./components/Structure/Footer.vue";
 import Header from "./components/Structure/Header.vue";
 import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
-import {mapState} from "vuex";
+import {mapState, mapActions} from "vuex";
 import NETWORK_CONSTANTS from "@/router/NETWORK_CONSTANTS";
 import Button from "@/components/DesignSystem/Button";
 export default {
@@ -101,6 +101,9 @@ export default {
     appErrMsg: null,
     fontUrl: settings.google_fonts_url
   }),
+  mounted() {
+    this.$store.dispatch('settings/fetchVueSettings')
+  },
   created() {
     window.addEventListener('unhandledrejection', (event) => {
       this.error = true
@@ -108,7 +111,7 @@ export default {
       console.log('event.promise: ' + event.promise)
       console.log('event.reason: ' + JSON.stringify(event.reason))
       // if the reason has a request object, display it separately
-      if (event.reason.request){
+      if (event.reason.request) {
         this.errorRequest = event.reason.request
         delete event.reason.request
       }
@@ -124,6 +127,7 @@ export default {
   },
   computed: {
     ...mapState('auth', ['errorMessage']),
+
     theme() {
       return this.$vuetify.theme.dark ? "dark" : "light";
     },

@@ -307,13 +307,19 @@ OLD_PASSWORD_FIELD_ENABLED = 'true'
 PROFILER_COLUMN_LIMIT = int(os.environ.get('PROFILER_COLUMN_LIMIT', 20))
 assert PROFILER_COLUMN_LIMIT >= 1, 'PROFILER_COLUMN_LIMIT must be at least 1'
 
-# -----------------------------------------------
-# Websocket prefix.
-# When using https, set it to 'wss://'
-# -----------------------------------------------
-WEBSOCKET_PREFIX = os.environ.get('WEBSOCKET_PREFIX', 'ws://')
-assert WEBSOCKET_PREFIX in ('ws://', 'wss://'), \
-    "Django settings error: 'WEBSOCKET_PREFIX' must be set to 'ws://' or 'wss://'"
+# ---------------------------
+# Epsilon Parameters
+# ---------------------------
+TOTAL_EPSILON_MIN = float(os.environ.get('TOTAL_EPSILON_MIN', '0.001'))
+TOTAL_EPSILON_MAX = float(os.environ.get('TOTAL_EPSILON_MIN', '1.0'))
+assert TOTAL_EPSILON_MIN > 0, \
+    f"The TOTAL_EPSILON_MIN must be greater than 0.0. Found: {TOTAL_EPSILON_MIN}"
+assert TOTAL_EPSILON_MAX > 0, \
+    f"The TOTAL_EPSILON_MAX must be greater than 0.0. Found: {TOTAL_EPSILON_MAX}"
+assert TOTAL_EPSILON_MAX > TOTAL_EPSILON_MIN, \
+    f"The TOTAL_EPSILON_MAX must be greater than the TOTAL_EPSILON_MIN. Found min: {TOTAL_EPSILON_MIN} / max: {TOTAL_EPSILON_MAX}"
+
+
 
 # ---------------------------
 # Celery Configuration Options
@@ -330,6 +336,24 @@ CELERY_RESULT_BACKEND = REDIS_URL
 # ------------------------------------------------------
 DP_CREATOR_APP_NAME = os.environ.get('DP_CREATOR_APP_NAME', 'DP Creator (test)')
 
+# ------------------------------------------------------
+# Application name for deposit use
+# ------------------------------------------------------
+VUE_APP_GOOGLE_CLIENT_ID = os.environ.get('VUE_APP_GOOGLE_CLIENT_ID', '(not set)')
+VUE_APP_ADOBE_PDF_CLIENT_ID = os.environ.get('VUE_APP_ADOBE_PDF_CLIENT_ID', '(not set)')
+
+# Websocket prefix.
+# When using https, set it to 'wss://'
+VUE_APP_WEBSOCKET_PREFIX = os.environ.get('VUE_APP_WEBSOCKET_PREFIX', 'ws://')
+assert VUE_APP_WEBSOCKET_PREFIX in ('ws://', 'wss://'), \
+    "Django settings error: 'VUE_APP_WEBSOCKET_PREFIX' must be set to 'ws://' or 'wss://'"
+
+# This is for use with CloudFlare and forming the PDF/JSON download urls
+#
+DPCREATOR_USING_HTTPS = False
+if VUE_APP_WEBSOCKET_PREFIX == 'wss://':
+    DPCREATOR_USING_HTTPS = True
+
 # ---------------------------
 # Cookies
 # ---------------------------
@@ -337,7 +361,13 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = bool(strtobool(os.environ.get('SESSION_EXPIRE_
 SESSION_DEFAULT_COOKIE_AGE = (60 * 60) * 2  # 2 hour sessions, in seconds
 SESSION_COOKIE_AGE = int(os.getenv('SESSION_COOKIE_AGE', SESSION_DEFAULT_COOKIE_AGE))
 
+# ---------------------------------------
+# When running tests, skip PDF creation
+#  - slows down GitHub actions
+# ---------------------------------------
 SKIP_PDF_CREATION_FOR_TESTS = bool(strtobool(os.environ.get('SKIP_PDF_CREATION_FOR_TESTS', 'False')))
+
+
 
 # SESSION_COOKIE_NAME = os.environ.get('SESSION_COOKIE_NAME', 'dpcreator')
 # CSRF_COOKIE_NAME = os.environ.get('CSRF_COOKIE_NAME', 'dpcreator_csrf')

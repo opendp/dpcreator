@@ -9,6 +9,7 @@ import password from './password';
 import signup from './signup';
 import dataverse from './dataverse'
 import dataset from './dataset'
+import settings from './settings'
 const debug = process.env.NODE_ENV !== 'production';
 
 Vue.use(Vuex);
@@ -19,7 +20,8 @@ export default new Vuex.Store({
     password,
     signup,
     dataverse,
-    dataset
+    dataset,
+    settings
   },
   strict: debug,
   plugins: debug ? [createMultiTabState({statesPaths: ['auth']}), createLogger(), createMultiTabState({statesPaths: ['auth']}), createPersistedState({storage: window.sessionStorage})] : [createPersistedState({storage: window.sessionStorage})],

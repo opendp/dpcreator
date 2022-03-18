@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from rest_framework.relations import PrimaryKeyRelatedField
+
 from django.contrib.auth import get_user_model
+from django.conf import settings
 
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis import static_vals as astatic
@@ -25,12 +27,20 @@ class ReleaseInfoSerializer(serializers.ModelSerializer):
     def get_download_json_url(self, obj):
         if not obj.dp_release_json_file:
             return None
-        return self.context['request'].build_absolute_uri(obj.download_json_url())
+
+        download_url = self.context['request'].build_absolute_uri(obj.download_json_url())
+        if settings.DPCREATOR_USING_HTTPS:
+            download_url = download_url.replace('http://', 'https://')
+        return download_url
 
     def get_download_pdf_url(self, obj):
         if not obj.dp_release_pdf_file:
             return None
-        return self.context['request'].build_absolute_uri(obj.download_pdf_url())
+
+        download_url = self.context['request'].build_absolute_uri(obj.download_pdf_url())
+        if settings.DPCREATOR_USING_HTTPS:
+            download_url = download_url.replace('http://', 'https://')
+        return download_url
 
     class Meta:
         model = ReleaseInfo
