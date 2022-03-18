@@ -308,6 +308,20 @@ PROFILER_COLUMN_LIMIT = int(os.environ.get('PROFILER_COLUMN_LIMIT', 20))
 assert PROFILER_COLUMN_LIMIT >= 1, 'PROFILER_COLUMN_LIMIT must be at least 1'
 
 # ---------------------------
+# Epsilon Parameters
+# ---------------------------
+TOTAL_EPSILON_MIN = float(os.environ.get('TOTAL_EPSILON_MIN', '0.001'))
+TOTAL_EPSILON_MAX = float(os.environ.get('TOTAL_EPSILON_MIN', '1.0'))
+assert TOTAL_EPSILON_MIN > 0, \
+    f"The TOTAL_EPSILON_MIN must be greater than 0.0. Found: {TOTAL_EPSILON_MIN}"
+assert TOTAL_EPSILON_MAX > 0, \
+    f"The TOTAL_EPSILON_MAX must be greater than 0.0. Found: {TOTAL_EPSILON_MAX}"
+assert TOTAL_EPSILON_MAX > TOTAL_EPSILON_MIN, \
+    f"The TOTAL_EPSILON_MAX must be greater than the TOTAL_EPSILON_MIN. Found min: {TOTAL_EPSILON_MIN} / max: {TOTAL_EPSILON_MAX}"
+
+
+
+# ---------------------------
 # Celery Configuration Options
 # ---------------------------
 #CELERY_TIMEZONE = os.environ.get('America/New_York', 'CELERY_TIMEZONE')
@@ -347,6 +361,10 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = bool(strtobool(os.environ.get('SESSION_EXPIRE_
 SESSION_DEFAULT_COOKIE_AGE = (60 * 60) * 2  # 2 hour sessions, in seconds
 SESSION_COOKIE_AGE = int(os.getenv('SESSION_COOKIE_AGE', SESSION_DEFAULT_COOKIE_AGE))
 
+# ---------------------------------------
+# When running tests, skip PDF creation
+#  - slows down GitHub actions
+# ---------------------------------------
 SKIP_PDF_CREATION_FOR_TESTS = bool(strtobool(os.environ.get('SKIP_PDF_CREATION_FOR_TESTS', 'False')))
 
 

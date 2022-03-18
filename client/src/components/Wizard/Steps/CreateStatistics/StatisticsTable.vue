@@ -4,6 +4,7 @@
         :headers="headers"
         :items="statistics"
         no-data-text="Create statistic"
+        :items-per-page="-1"
         hide-default-footer
     >
       <template v-slot:[`header.error`]="{ header }">

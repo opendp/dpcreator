@@ -27,51 +27,58 @@
             university if disclosed”</span
           >)<br/>
         </span>
-        <div
-            class="borderBottom soft_primary grey--text text--darken-2 pa-3 my-5 top-borders-radius noise-params d-flex justify-space-between width50"
-        >
-          <span>Epsilon (&epsilon;)</span>
-          <v-text-field
-              class="text-right font-weight-bold"
-              type="number"
-              data-test="editEpsilonInput"
-              v-model="editEpsilon"
-          />
-        </div>
-        <small class="mr-16 grey--text text--darken-2">
-          <div v-html="$t('create statistics.confirm 2')"></div>
-        </small>
-        <div
-            class="borderBottom soft_primary grey--text text--darken-2 pa-3 my-5 top-borders-radius noise-params d-flex justify-space-between width50"
-        >
-          <span>Delta (δ)</span>
-          <v-text-field
-              class="text-right font-weight-bold"
-              type="number"
-              v-model="editDelta"
-          />
-        </div>
-        <small class="mr-16 mb-5 d-block grey--text text--darken-2">
-          <div v-html="$t('create statistics.confirm 3')"></div>
-        </small>
-        <div
-            class="soft_primary grey--text text--darken-2 top-borders-radius width50 pl-3 mb-5 borderBottom"
-        >
-          <span class="d-inline-block width50">Confidence Level</span>
-          <v-autocomplete
-              v-model="editConfidenceLevel"
-              :items="confidenceLevelOptions"
-              class="d-inline-block confidenceLevel pl-5 pt-2 font-weight-bold width50 text-right"
-              placeholder="Select..."
-          ></v-autocomplete>
-        </div>
+        <v-form
+            v-model="validParamsForm"
+            ref="paramsForm"
+            @submit.prevent="handleSaveEditNoiseParamsDialog">
+          <div
+              class="borderBottom soft_primary grey--text text--darken-2 pa-3 my-5 top-borders-radius noise-params d-flex justify-space-between width50"
+          >
 
+            <span>Epsilon (&epsilon;)</span>
+            <v-text-field
+                class="text-right font-weight-bold"
+                type="number"
+                data-test="editEpsilonInput"
+                v-model="editEpsilon"
+                :rules="epsilonRules"
+            />
+          </div>
+          <small class="mr-16 grey--text text--darken-2">
+            <div v-html="$t('create statistics.confirm 2')"></div>
+          </small>
+          <div
+              class="borderBottom soft_primary grey--text text--darken-2 pa-3 my-5 top-borders-radius noise-params d-flex justify-space-between width50"
+          >
+            <span>Delta (δ)</span>
+            <v-text-field
+                class="text-right font-weight-bold"
+                type="number"
+                v-model="editDelta"
+            />
+          </div>
+          <small class="mr-16 mb-5 d-block grey--text text--darken-2">
+            <div v-html="$t('create statistics.confirm 3')"></div>
+          </small>
+          <div
+              class="soft_primary grey--text text--darken-2 top-borders-radius width50 pl-3 mb-5 borderBottom"
+          >
+            <span class="d-inline-block width50">Confidence Level</span>
+            <v-autocomplete
+                v-model="editConfidenceLevel"
+                :items="confidenceLevelOptions"
+                class="d-inline-block confidenceLevel pl-5 pt-2 font-weight-bold width50 text-right"
+                placeholder="Select..."
+            ></v-autocomplete>
+          </div>
+        </v-form>
       </v-card-text>
       <v-card-actions>
         <Button
             color="primary"
             classes="mr-2 px-5"
             :click="handleSaveEditNoiseParamsDialog"
+            :disabled="!validParamsForm"
             label="Confirm"
         />
         <Button
@@ -118,18 +125,26 @@ import Button from "../../../DesignSystem/Button.vue";
 import AdditionalInformationAlert from "../../../DynamicHelpResources/AdditionalInformationAlert";
 import {confLevelOptions} from "@/shared/createStatsUtils";
 
+const MAX_TOTAL_EPSILON = 1
+const MIN_TOTAL_EPSILON = .001
 export default {
   name: "EditNoiseParamsDialog",
   components: {
     AdditionalInformationAlert,
     Button
   },
+  mounted() {
+
+  },
   data: function () {
     return {
+      validParamsForm: false,
       editEpsilon: this.epsilon,
       editDelta: this.delta,
       editConfidenceLevel: this.confidenceLevel,
-      confidenceLevelOptions: confLevelOptions
+      confidenceLevelOptions: confLevelOptions,
+      epsilonRules: [v => (v >= MIN_TOTAL_EPSILON && v <= MAX_TOTAL_EPSILON)
+          || "Epsilon must be between " + MIN_TOTAL_EPSILON + " and " + MAX_TOTAL_EPSILON],
     };
   },
   props: ["dialogEditNoiseParams", "epsilon", "delta", "confidenceLevel"],
@@ -155,13 +170,15 @@ export default {
       this.$emit("update:dialogEditNoiseParams", false);
     },
     handleSaveEditNoiseParamsDialog() {
-      this.$emit(
-          "noiseParamsUpdated",
-          this.editEpsilon,
-          this.editDelta,
-          this.editConfidenceLevel
-      );
-      this.$emit("update:dialogEditNoiseParams", false);
+      if (this.$refs.paramsForm.validate()) {
+        this.$emit(
+            "noiseParamsUpdated",
+            this.editEpsilon,
+            this.editDelta,
+            this.editConfidenceLevel
+        );
+        this.$emit("update:dialogEditNoiseParams", false);
+      }
     }
   }
 };

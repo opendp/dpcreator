@@ -15,6 +15,7 @@ from rest_framework import status, viewsets
 
 from django.conf import settings
 
+from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.content_pages import static_vals as cstatic
 
 class VueSettingsView(viewsets.ViewSet):
@@ -26,9 +27,13 @@ class VueSettingsView(viewsets.ViewSet):
     def list(self, request, *args, **kwargs):
         """Return selected environment variables that may differ depending on deployment"""
         settings_info = {
-                            cstatic.KEY_VUE_APP_GOOGLE_CLIENT_ID: settings.VUE_APP_GOOGLE_CLIENT_ID,
-                            cstatic.KEY_VUE_APP_ADOBE_PDF_CLIENT_ID: settings.VUE_APP_ADOBE_PDF_CLIENT_ID,
-                            cstatic.KEY_VUE_APP_WEBSOCKET_PREFIX: settings.VUE_APP_WEBSOCKET_PREFIX,
+            cstatic.KEY_VUE_APP_GOOGLE_CLIENT_ID: settings.VUE_APP_GOOGLE_CLIENT_ID,
+            cstatic.KEY_VUE_APP_ADOBE_PDF_CLIENT_ID: settings.VUE_APP_ADOBE_PDF_CLIENT_ID,
+            cstatic.KEY_VUE_APP_WEBSOCKET_PREFIX: settings.VUE_APP_WEBSOCKET_PREFIX,
+            'TOTAL_EPSILON_MIN': settings.TOTAL_EPSILON_MIN,  # 1/1000
+            'TOTAL_EPSILON_MAX': settings.TOTAL_EPSILON_MAX,  # 1.0
+            'MAX_EPSILON_OFFSET': astatic.MAX_EPSILON_OFFSET, # 10**-14
+            # 'MAX_EPSILON_OFFSET': format(astatic.MAX_EPSILON_OFFSET, '.14f') # 10**-14
         }
 
         response = Response(settings_info, status=status.HTTP_200_OK)

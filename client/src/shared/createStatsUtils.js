@@ -4,12 +4,11 @@ import release from "@/api/release";
 export const deltaStats = ['Histogram']
 export const CL_99 = "99"
 export const CL_95 = "95"
-export const CL_90 = "90"
+
 
 export const confLevelOptions = [
     {text: "99%", value: .99},
     {text: "95%", value: .95},
-    {text: "90%", value: .90}
 ]
 
 
@@ -79,7 +78,6 @@ export default {
                         item[property] = item[property].toNumber()
                     }
                 }
-
             } else {
                 item[property] = 0
             }
