@@ -258,8 +258,9 @@ export default {
             .then((validateResults) => {
               for (let i = 0; i < this.statistics.length; i++) {
                 const accuracy = validateResults.data[i].accuracy
-                this.statistics[i].accuracy.value = (Number(accuracy.value)).toPrecision(3)
+                this.statistics[i].accuracy.value = Number(accuracy.value).toPrecision(3)
                 this.statistics[i].accuracy.message = accuracy.message
+                this.statistics[i].epsilon = Number(this.statistics[i].epsilon).toFixed(3)
                 // this assigment below didn't work!  Can't change the object reference, need to change the values
                 //  this.statistics[i] = Object.assign({}, this.statistics[i], { accuracy })
               }
@@ -312,7 +313,7 @@ export default {
     },
     deleteItemConfirm() {
       this.statistics.splice(this.editedIndex, 1);
-      createStatsUtils.redistributeValues()
+      createStatsUtils.redistributeValues(this.statistics, this.delta, this.epsilon, this.getDepositorSetupInfo.defaultDelta)
       this.setAccuracyAndSaveUserInput()
       this.closeDelete();
     },
