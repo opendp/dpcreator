@@ -2,8 +2,15 @@
 NOISE_GEOMETRIC_MECHANISM = 'Geometric'
 NOISE_LAPLACE_MECHANISM = 'Laplace'
 
-# When checking max_epsilon, offset it by 10**-14 to avoid
-#   floating point addition issues. e.g. exceeding an espilon of 1 by: 0.0000000000000001
+
+"""
+Epsilon related values
+As a rule of thumb, Epsilon should be thought of as a small number, between approximately 1/1000
+and 1.
+
+When checking max_epsilon, offset it by 10**-14 to avoid
+  floating point addition issues. e.g. exceeding an espilon of 1 by: 0.0000000000000001
+"""
 MAX_EPSILON_OFFSET = 10**-14
 
 # ---------------------------------
