@@ -85,7 +85,7 @@ const actions = {
           .then((resp) => {
               const dvUser = resp.data.data['dv_user']
               commit('SET_DATAVERSE_USER', dvUser)
-              dataverse.updateFileInfo(dvUser, handoffId)
+              dataverse.updateFileInfo(OpenDPUserId, handoffId)
                   .then((resp) => {
                       commit('SET_DATAVERSE_FILE_INFO', resp.data.data)
                       commit('REMOVE_DV_HANDOFF')

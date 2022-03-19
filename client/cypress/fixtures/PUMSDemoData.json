@@ -6,7 +6,7 @@
       "variable": "age",
       "fixedValue": "45",
       "roundedAccuracy": "0.0300",
-      "accuracy": "0.029957332877164806"
+      "accuracy": 0.029957332877164806
     }
     ],
   "variables": {

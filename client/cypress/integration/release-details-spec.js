@@ -42,7 +42,6 @@
                 cy.visit('my-data')
                 cy.get('[data-test="viewDetails"]').click({force: true});
                 cy.url().should('contains', 'my-data-details')
-                cy.get('p').should('contain', "The dpJSON release file, version v1, has been deposited to Dataverse as an auxiliary file.")
                 cy.get('[data-test="jsonDownload"]').should('be.visible')
                 cy.get('[data-test="pdfDownload"]').should('not.exist')
             })
