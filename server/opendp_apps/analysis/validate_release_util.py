@@ -25,6 +25,7 @@ from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 from opendp_apps.analysis.tools.dp_variance_spec import DPVarianceSpec
 from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
+from opendp_apps.analysis.release_email_util import ReleaseEmailUtil
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
 from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
@@ -311,6 +312,16 @@ class ValidateReleaseUtil(BasicErrCheck):
         if not delete_result.success:
             self.add_err_msg(delete_result.message)
             return False
+
+        # (7) Send the release email
+        #
+        if settings.SKIP_PDF_CREATION_FOR_TESTS:
+            pass
+        else:
+            email_util = ReleaseEmailUtil(self.release_info)
+            if email_util.has_error():
+                self.add_err_msg(email_util.get_err_msg())
+                return
 
         return True
 
