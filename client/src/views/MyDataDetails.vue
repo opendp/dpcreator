@@ -4,22 +4,26 @@
       <v-sheet rounded="lg">
         <v-container>
           <h1 class="title-size-2" style="line-height:150%"><b>DP Release</b>
-            <br />{{ datasetInfo.datasetSchemaInfo.name }}</h1>
+            <br/>{{ datasetInfo.datasetSchemaInfo.name }}</h1>
+          Current Status:
           <StatusTag class="my-5" :status="status"/>
-           <v-row>
-             <v-col cols="6">
-               <p>
-               Created: {{ analysisPlan.releaseInfo.dpRelease.created.humanReadable }}
-               </p>
-             </v-col>
-             <v-col cols="6">
-               <a v-if="analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
-                  data-test="dataverseLink"
-                  class="text-decoration-none" :href="fileUrl"
-               >Check DP release in Dataverse
-                 <v-icon small color="primary">mdi-open-in-new</v-icon>
-              </a>
-            </v-col>
+          <p></p>
+          <v-row>
+            <template v-if="status === COMPLETED">
+              <v-col cols="6">
+                <p>
+                  Created: {{ analysisPlan.releaseInfo.dpRelease.created.humanReadable }}
+                </p>
+              </v-col>
+              <v-col cols="6">
+                <a v-if="analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
+                   data-test="dataverseLink"
+                   class="text-decoration-none" :href="fileUrl"
+                >Check DP release in Dataverse
+                  <v-icon small color="primary">mdi-open-in-new</v-icon>
+                </a>
+              </v-col>
+            </template>
           </v-row>
 
           <ColoredBorderAlert type="warning" v-if="$vuetify.breakpoint.xsOnly">
@@ -277,61 +281,7 @@ export default {
       return host + '/file.xhtml?fileId=' + this.datasetInfo.dataverseFileId
 
     },
-    libraryDetails: function () {
-      let libraryDetails = [
-        {
-          id: "libraryName",
-          label: "Name",
-          tooltip: "Name of DP Library",
-          value: this.analysisPlan.releaseInfo.dpRelease.differentiallyPrivateLibrary.name
-        },
-        {
-          id: "libraryVersion",
-          label: "Version",
-          tooltip: "Version of DP Library",
-          value: this.analysisPlan.releaseInfo.dpRelease.differentiallyPrivateLibrary.version
-        }
-      ]
-      return libraryDetails
-    },
 
-    datasetDetails: function () {
-      let datasetDetails = [
-
-        {
-          id: "installation",
-          label: "Dataverse Installation",
-          tooltip: "The Dataverse Installation where dataset originated",
-          value: this.datasetInfo.installationName
-        },
-
-        {
-          id: "timeRemaining",
-          label: "Remaining time to complete release",
-          tooltip: "3 Days from start of the process",
-          value: this.getTimeRemaining
-        },
-        {
-          id: "doi",
-          label: "DV File ID / DOI",
-          tooltip: "Persistent Identifier",
-          value: this.datasetInfo.fileDoi
-        },
-        {
-          id: "step",
-          label: "Last state in Workflow",
-          tooltip: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-          value: stepInformation[this.userStep].label
-        },
-        {
-          id: "citation",
-          label: "Citation",
-          tooltip: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-          value: this.datasetInfo.datasetDoi + ' | ' + this.datasetInfo.datasetSchemaInfo.name + ' | ' + this.datasetInfo.fileSchemaInfo.name
-        },
-      ]
-      return datasetDetails;
-    },
     status: function () {
       return stepInformation[this.userStep].workflowStatus
     },
@@ -342,29 +292,6 @@ export default {
       return false;
     },
 
-    getExpanded: function () {
-      if (this.analysisPlan !== undefined) {
-        return this.analysisPlan.releaseInfo.dpRelease.statistics
-      } else {
-        return []
-      }
-    },
-
-  },
-  created() {
-    if (this.analysisPlan !== undefined) {
-      let index = 0;
-      this.analysisPlan.releaseInfo.dpRelease.statistics.forEach((stat) => {
-        let statsItem = stat
-        statsItem.id = index
-        this.statsItems.push(statsItem)
-        // Make only the first statistic expanded
-        if (index === 0) {
-          this.expanded.push(statsItem)
-        }
-        index++
-      })
-    }
 
   },
   data: () => ({
@@ -380,7 +307,6 @@ export default {
     datasetTitle: "",
     expandedPanels: [],
     expanded: [],
-    statsItems: [],
     maxResults: 10,
     generalErrorSummary: "Error summary: lorem ipsum dolor sit amet.",
     statsHeaders: [

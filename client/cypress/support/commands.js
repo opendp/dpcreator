@@ -248,7 +248,7 @@ Cypress.Commands.add('submitStatistics', (demoData) => {
     cy.get('[data-test="wizardSubmitStatistics"]').click({force: true});
     cy.get('[data-test="generate release status"]').should('be.visible')
 
-    cy.get('[data-test="generate release status"]').should('contain', 'Release Completed')
+    cy.get('[data-test="generate release status"]').should('contain', 'In Progress')
     // Go to Details page
     cy.get('[data-test="View Data Details"]').click({force: true});
     cy.url().should('contain', 'my-data-details')
