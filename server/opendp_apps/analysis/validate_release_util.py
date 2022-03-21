@@ -316,7 +316,10 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         # (7) Send release email to the user
         #   (On error, continue the process)
-        _email_util = ReleaseEmailUtil(self.release_info)
+        if settings.SKIP_EMAIL_RELEASE_FOR_TESTS:
+            pass
+        else:
+            _email_util = ReleaseEmailUtil(self.release_info)
         # if email_util.has_error():
         #    self.add_err_msg(email_util.get_err_msg())
         #    return

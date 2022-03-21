@@ -606,7 +606,7 @@ class TestRunRelease(TestCase):
         self.assertTrue(not analysis_plan.dataset.source_file)
 
 
-    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True, SKIP_EMAIL_RELEASE_FOR_TESTS=False)
     def test_100_release_email(self):
         """(100) Run stats and test email"""
         msgt(self.test_100_release_email.__doc__)
