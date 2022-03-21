@@ -19,7 +19,9 @@ export default {
     pdfAPIReady: false,
     adobeDCView: null,
     viewResults: false,
-    ADOBE_KEY: '13c79907c6144590b17e8ef044324444',
+    // ADOBE_KEY: '34a0c926740d4ddb9758dbc6da2a4f39', // dev.dpcreator.org
+    ADOBE_KEY: '44937032e26b4033a840626ed0cd8e79', // demo.dpcreator.org
+    // ADOBE_KEY: '13c79907c6144590b17e8ef044324444', // localhost
   }),
   computed: {
     ...mapState('dataset', ['analysisPlan']),

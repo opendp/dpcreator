@@ -30,8 +30,12 @@ jobs:
     #    # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
     #    flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
+      env:
+        SKIP_PDF_CREATION_FOR_TESTS: True
+        SKIP_EMAIL_RELEASE_FOR_TESTS: True
       run: |
         cd server
+        export
         python manage.py test
         # python manage.py test opendp_apps.analysis opendp_apps.communication opendp_apps.content_pages
         # python manage.py test opendp_apps.dataset

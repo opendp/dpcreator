@@ -4,7 +4,7 @@
    "toolName":"DP Creator",
    "scope":"file",
    "type":"configure",
-   "toolUrl":"http://demo.dpcreator.org/api/dv-handoff/dv_orig_create/",
+   "toolUrl":"https://demo.dpcreator.org/api/dv-handoff/dv_orig_create/",
    "contentType":"text/tab-separated-values",
    "toolParameters":{
       "queryParameters":[

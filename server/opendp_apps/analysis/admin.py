@@ -1,6 +1,10 @@
 from django.contrib import admin
 from .models import \
-    (DepositorSetupInfo, AnalysisPlan, ReleaseInfo, AuxiliaryFileDepositRecord)
+    (DepositorSetupInfo,
+     AnalysisPlan,
+     ReleaseEmailRecord,
+     ReleaseInfo,
+     AuxiliaryFileDepositRecord)
 
 
 class DepositorSetupInfoAdmin(admin.ModelAdmin):
@@ -29,7 +33,6 @@ class AnalysisPlanAdmin(admin.ModelAdmin):
                     'analyst',
                     'is_complete',
                     'user_step',
-                    #'epsilon',
                     'updated',
                     'created',)
     readonly_fields = ('id',
@@ -80,8 +83,31 @@ class AuxiliaryFileDepositRecordAdmin(admin.ModelAdmin):
                        'created', 'updated',)
 
 
+class ReleaseEmailRecordAdmin(admin.ModelAdmin):
+    save_on_top = True
+    list_filter = ('success',)
+    list_display = ('release_info',
+                    'success',
+                    'to_email',
+                    'from_email',
+                    'updated',
+                    'created',)
+    readonly_fields = ('release_info',
+                       'success',
+                       'note',
+                       'pdf_attached',
+                       'json_attached',
+                       'subject',
+                       'to_email',
+                       'from_email',
+                       'email_content',
+                       'id',
+                       'object_id',
+                       'created', 'updated',)
+
+
 admin.site.register(DepositorSetupInfo, DepositorSetupInfoAdmin)
 admin.site.register(AnalysisPlan, AnalysisPlanAdmin)
 admin.site.register(ReleaseInfo, ReleaseInfoAdmin)
 admin.site.register(AuxiliaryFileDepositRecord, AuxiliaryFileDepositRecordAdmin)
-
+admin.site.register(ReleaseEmailRecord, ReleaseEmailRecordAdmin)

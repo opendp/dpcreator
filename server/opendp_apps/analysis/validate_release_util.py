@@ -24,7 +24,7 @@ from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 from opendp_apps.analysis.tools.dp_variance_spec import DPVarianceSpec
-from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
+from opendp_apps.analysis.release_email_util import ReleaseEmailUtil
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
 from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
@@ -32,7 +32,9 @@ from opendp_apps.analysis.tools.dp_histogram_integer_spec import DPHistogramInte
 from opendp_apps.analysis.tools.dp_histogram_categorical_spec import DPHistogramCategoricalSpec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
+
 from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
 
 from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
 from opendp_apps.dp_reports import tasks as pdf_tasks
@@ -311,6 +313,16 @@ class ValidateReleaseUtil(BasicErrCheck):
         if not delete_result.success:
             self.add_err_msg(delete_result.message)
             return False
+
+        # (7) Send release email to the user
+        #   (On error, continue the process)
+        if settings.SKIP_EMAIL_RELEASE_FOR_TESTS:
+            pass
+        else:
+            _email_util = ReleaseEmailUtil(self.release_info)
+        # if email_util.has_error():
+        #    self.add_err_msg(email_util.get_err_msg())
+        #    return
 
         return True
 
