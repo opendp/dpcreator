@@ -92,9 +92,17 @@ class ReleaseEmailRecordAdmin(admin.ModelAdmin):
                     'from_email',
                     'updated',
                     'created',)
-    readonly_fields = ('id',
+    readonly_fields = ('release_info',
+                       'success',
+                       'note',
+                       'pdf_attached',
+                       'json_attached',
+                       'subject',
+                       'to_email',
+                       'from_email',
+                       'email_content',
+                       'id',
                        'object_id',
-                       'release_info',
                        'created', 'updated',)
 
 

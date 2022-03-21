@@ -257,7 +257,7 @@ class ReleaseEmailRecord(TimestampedModelWithUUID):
                             help_text='Populated if mail not sent successfully')
 
     def __str__(self):
-        return self.release_info
+        return f'{self.release_info}'
 
 
 class AuxiliaryFileDepositRecord(TimestampedModelWithUUID):
