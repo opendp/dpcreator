@@ -37,7 +37,7 @@ specs_dev_dpcreator_org = dict(base_specs, **dict(
                 # This loadBalancerIP should also appear in ALLOWED_HOSTS
                 loadBalancerIP="40.85.170.176",  # k8s LoadBalancer.
                 #
-                VUE_APP_ADOBE_PDF_CLIENT_ID="Needs to be set! (See: specs_dev_dpcreator_org)",
+                VUE_APP_ADOBE_PDF_CLIENT_ID="34a0c926740d4ddb9758dbc6da2a4f39",
                 VUE_APP_WEBSOCKET_PREFIX='wss://',
                 ))
 
@@ -55,6 +55,6 @@ specs_demo_dpcreator_org = dict(base_specs, **dict(
                 # This loadBalancerIP should also appear in ALLOWED_HOSTS
                 loadBalancerIP="13.82.125.69",   # k8s LoadBalancer.
                 #
-                VUE_APP_ADOBE_PDF_CLIENT_ID="Needs to be set! (See: specs_demo_dpcreator_org)",
+                VUE_APP_ADOBE_PDF_CLIENT_ID="44937032e26b4033a840626ed0cd8e79",
                 VUE_APP_WEBSOCKET_PREFIX='wss://',
 ))
