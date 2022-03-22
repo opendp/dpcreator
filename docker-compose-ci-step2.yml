@@ -35,7 +35,7 @@ services:
       - DJANGO_SETTINGS_MODULE=opendp_project.settings.cypress_settings
       - VUE_APP_GOOGLE_CLIENT_ID=TEST. Set in docker-compose-ci-step2.yml
       - VUE_APP_ADOBE_PDF_CLIENT_ID=TEST. Set in docker-compose-ci-step2.yml
-      - SKIP_PDF_CREATION_FOR_TESTS=True
+      - SKIP_PDF_CREATION_FOR_TESTS=False
       - SKIP_EMAIL_RELEASE_FOR_TESTS=True
     command: sh -c "./migrate.sh && python manage.py runserver 0.0.0.0:8000"
     volumes:
