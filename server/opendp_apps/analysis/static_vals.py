@@ -108,3 +108,36 @@ ERR_MSG_DEPOSIT_NO_JSON_FILE = 'A JSON file is not avilable for deposit.'
 ERR_MSG_DEPOSIT_NO_PDF_FILE = 'A PDF file is not avilable for deposit.'
 ERR_MSG_DEPOSIT_NOT_DATAVERSE = 'Deposit functionality is not available for a non-Dataverse file'
 ERR_MSG_DEPOSIT_NO_DV_USER = 'The Datavese user could not be for this release.'
+
+# Setup Questions
+
+SETUP_Q_01_ATTR = 'radio_depend_on_private_information'
+SETUP_Q_01_TEXT = 'Does your data file depend on private information of subjects?'
+
+SETUP_Q_02_ATTR = 'radio_best_describes'
+SETUP_Q_02_TEXT = 'Which of the following best describes your data file?'
+
+SETUP_Q_03_ATTR = 'radio_only_one_individual_per_row'
+SETUP_Q_03_TEXT = 'Does each individual appear in only one row?'
+
+SETUP_Q_04_ATTR = 'secret_sample'
+SETUP_Q_04_TEXT = 'Is your data a secret and simple random sample from a larger population?'
+
+SETUP_Q_04a_ATTR = 'population_size'    # if SETUP_Q_04_ATTR answer is "yes"
+SETUP_Q_04a_TEXT = 'Population size'
+
+SETUP_Q_05_ATTR = 'observations_number_can_be_public'
+SETUP_Q_05_TEXT = 'Can the number of observations in your data file be made public knowledge?'
+
+SETUP_QUESTION_LOOKUP = {
+                         SETUP_Q_01_ATTR: SETUP_Q_01_TEXT,
+                         SETUP_Q_02_ATTR: SETUP_Q_02_TEXT,
+                         SETUP_Q_03_ATTR: SETUP_Q_03_TEXT,
+                         SETUP_Q_04_ATTR: SETUP_Q_04_TEXT,
+                         SETUP_Q_05_ATTR: SETUP_Q_05_TEXT,
+                         }
+SETUP_QUESTION_LIST = [SETUP_Q_01_ATTR,
+                       SETUP_Q_02_ATTR,
+                       SETUP_Q_03_ATTR,
+                       SETUP_Q_04_ATTR,
+                       SETUP_Q_05_ATTR]

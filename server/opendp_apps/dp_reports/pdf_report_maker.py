@@ -7,25 +7,29 @@ import copy
 from decimal import Decimal
 import io
 import json
-
 import os, sys
 from os.path import abspath, dirname, isfile, join
-import dateutil
 import random
 import typing
+import uuid
+
 CURRENT_DIR = dirname(abspath(__file__))
 
 from django.core.files.base import ContentFile
 from django.template.loader import render_to_string
 from django.core.serializers.json import DjangoJSONEncoder
 
+from borb.pdf.canvas.layout.annotation.link_annotation import (
+    LinkAnnotation,
+    DestinationType,
+)
+from borb.pdf.canvas.layout.annotation.remote_go_to_annotation import RemoteGoToAnnotation
 from borb.pdf.canvas.layout.image.image import Image
 from borb.pdf.canvas.layout.image.chart import Chart
 from borb.pdf.canvas.layout.page_layout.multi_column_layout import SingleColumnLayout
 from borb.pdf.canvas.layout.page_layout.page_layout import PageLayout
 
-from borb.pdf.document import Document
-from borb.pdf.page.page import DestinationType
+from borb.pdf.document.document import Document
 from borb.pdf.page.page import Page
 from borb.pdf.page.page_size import PageSize
 from borb.pdf.pdf import PDF
@@ -53,13 +57,19 @@ from opendp_apps.utils.randname import random_with_n_digits
 
 class PDFReportMaker(BasicErrCheck):
 
-    USAGE_SECTION_TITLE = '4. Usage / Negative Values'
+    SECTION_TITLE_01_STATISTICS = '1. Statistics'
+    SECTION_TITLE_02_DATA_SOURCE ='2. Data Source'
+    SECTION_TITLE_03_OPENDP_LIB = '3. OpenDP Library'
+    SECTION_TITLE_04_USAGE = '4. Usage / Negative Values'
 
-    def __init__(self, release_dict: dict = None):
+    def __init__(self, release_dict: dict = None, release_object_id: typing.Union[uuid.uuid4, str] = None):
         """Initalize with a DP Release as Python dict"""
-        self.release_dict = copy.deepcopy(release_dict)
         if not release_dict:
             self.release_dict = self.get_test_release()
+        else:
+            self.release_dict = copy.deepcopy(release_dict)
+
+        self.release_object_id = release_object_id
 
         # Used to embed the JSON file contents directly to the PDF file
         self.release_json_bytes = bytes(json.dumps(self.release_dict, indent=4), encoding="latin1")
@@ -83,10 +93,12 @@ class PDFReportMaker(BasicErrCheck):
 
         self.page_cnt = 0
         self.pdf_doc: Document = Document()
+        self.first_page = None
         self.current_page = None  # Page
         self.layout = None  # PageLayout
 
         self.creation_date = None
+        self.intrapage_link_info = []  # [[text to link, pdf_object_ref, pdf_page_num, indent], etc.]
 
         self.format_release()
 
@@ -111,6 +123,7 @@ class PDFReportMaker(BasicErrCheck):
         self.pdf_doc.add_outline("Statistics", 1, DestinationType.FIT, page_nr=1)
         self.pdf_doc.add_outline("Data Source", 1, DestinationType.FIT, page_nr=self.page_cnt - 1)
 
+        self.add_intra_page_links()  # links within the document
         self.embed_json_release_in_pdf()
 
     def save_pdf_to_release_obj(self, release_info_obj: ReleaseInfo):
@@ -134,6 +147,24 @@ class PDFReportMaker(BasicErrCheck):
 
         # release_info_obj.save()
         print(f'File saved to release: {release_info_obj.dp_release_pdf_file}')
+
+    def get_embed_json_fname(self):
+        """Get the name of the JSON file embedded in the PDF"""
+        if self.release_object_id:
+            return f'release_data_{self.release_object_id}.json'
+
+        return 'release_data.json'
+
+    def save_intrapage_link(self, _txt_to_link: str, pdf_object_ref,
+                            pdf_page_num: int, indent: int = pdf_static.TOC_L2_LINK_OFFSET):
+        """
+        Collect in-page links to hook up at the end of the process
+        Note: pdf_page_num input should be 1-indexed. 
+        """
+        if self.has_error():
+            return
+                
+        self.intrapage_link_info.append([_txt_to_link, pdf_object_ref, pdf_page_num, indent])
 
     def save_pdf_to_file(self, pdf_output_file: str = None):
         """Save the PDF to a file using the given name. Used for debugging."""
@@ -161,6 +192,10 @@ class PDFReportMaker(BasicErrCheck):
         # Add line at the top
         #
         self.add_header_border_logo(self.current_page)
+
+        # Keep a pointer to the first page
+        if self.page_cnt == 1:
+            self.first_page = self.current_page
 
     def add_to_layout(self, pdf_element):
         """Add a PDF element to the document"""
@@ -196,7 +231,8 @@ class PDFReportMaker(BasicErrCheck):
 
     def embed_json_release_in_pdf(self):
         """Embed the JSON release in the PDF"""
-        self.pdf_doc.append_embedded_file("release_data.json", self.release_json_bytes)
+        self.pdf_doc.append_embedded_file(self.get_embed_json_fname(),
+                                          self.release_json_bytes)
 
     def get_general_stat_result_desc(self, stat_type_formatted, var_name) -> list:
         """Return the general "Result" description"""
@@ -226,7 +262,8 @@ class PDFReportMaker(BasicErrCheck):
         ]
         return text_chunks
 
-    def get_histogram_accuracy_desc(self, stat_type_formatted: str, var_name: str) -> list:
+    @staticmethod
+    def get_histogram_accuracy_desc(stat_type_formatted: str, var_name: str) -> list:
         """Return the general "Result" description"""
         text_chunks = [
             putil.txt_bld('Result (continued).'),
@@ -321,7 +358,7 @@ class PDFReportMaker(BasicErrCheck):
         # -------------------------------------
         # Make a bar lot
         # -------------------------------------
-        fig = MatPlotLibPlot.figure(tight_layout=True, figsize=[8,6])
+        fig = MatPlotLibPlot.figure(tight_layout=True, figsize=[8, 6])
         ax = fig.add_subplot()
 
         # -------------------------------------
@@ -364,7 +401,7 @@ class PDFReportMaker(BasicErrCheck):
         if min(hist_vals) < 0:
             has_negative_values = True
             ax.axhline(0, color='black', linewidth=0.8, linestyle='--')
-            #ax.plot([0., 4.5], [0, 0], "k--")
+            # ax.plot([0., 4.5], [0, 0], "k--")
 
             # If there are negative values--except the last "uncategorized value", change the color
             for idx, patch in enumerate(bar_container_obj.patches[:-1]):
@@ -384,7 +421,7 @@ class PDFReportMaker(BasicErrCheck):
                     putil.txt_bld('Negative values.'),
                     putil.txt_reg(f' The histogram contains negative values. For more information on how to use '),
                     putil.txt_reg(f' this data, please see the section'),
-                    putil.txt_bld(f' {self.USAGE_SECTION_TITLE}'),
+                    putil.txt_bld(f' {self.SECTION_TITLE_04_USAGE}'),
                 ]
 
             self.add_to_layout(HeterogeneousParagraph(text_chunks,
@@ -414,7 +451,7 @@ class PDFReportMaker(BasicErrCheck):
         skip_bounds = False
         is_dp_count = False
         if stat_info['statistic'] == astatic.DP_COUNT:
-            is_dp_count= True
+            is_dp_count = True
             skip_bounds = True
             num_param_table_rows = 4
         elif stat_info['variable_type'] == VAR_TYPE_CATEGORICAL:
@@ -508,7 +545,7 @@ class PDFReportMaker(BasicErrCheck):
 
         self.start_new_page()
 
-        self.add_to_layout(putil.txt_subtitle_para(self.USAGE_SECTION_TITLE))
+        self.add_to_layout(putil.txt_subtitle_para(self.SECTION_TITLE_04_USAGE))
 
         self.add_to_layout(putil.txt_bld_para('(SOME PLACEHOLDER TEXT FOR NOW)'))
 
@@ -552,8 +589,10 @@ class PDFReportMaker(BasicErrCheck):
         tbl_src.add(putil.get_tbl_cell_lft_pad(f'Name', padding=self.indent1))
         tbl_src.add(putil.get_tbl_cell_lft_pad(f"{dataset_info['installation']['name']}", padding=0))
 
+        dataverse_url = f"{dataset_info['installation']['url']}"
         tbl_src.add(putil.get_tbl_cell_lft_pad(f'URL', padding=self.indent1))
-        tbl_src.add(putil.get_tbl_cell_lft_pad(f"{dataset_info['installation']['url']}", padding=0))
+        dv_url_tbl_cell = putil.get_tbl_cell_lft_pad(dataverse_url, padding=0)
+        tbl_src.add(dv_url_tbl_cell)
 
         # ------------------------------
         # Dataverse Dataset information
@@ -596,6 +635,11 @@ class PDFReportMaker(BasicErrCheck):
         self.set_table_borders_padding(tbl_src)
         self.add_to_layout(tbl_src)
 
+        # Add links
+        self.current_page.append_annotation(RemoteGoToAnnotation(
+                                        dv_url_tbl_cell.get_bounding_box(),
+                                        uri=dataverse_url))
+
         self.add_opendp_lib_info()
 
     def add_opendp_lib_info(self):
@@ -627,15 +671,29 @@ class PDFReportMaker(BasicErrCheck):
         tbl_src.add(putil.get_tbl_cell_lft_pad(f'Version', padding=self.indent1))
         tbl_src.add(putil.get_tbl_cell_lft_pad(f"{dp_lib_info['version']}", padding=0))
 
+        # Add PyPI info and reference to add link
         tbl_src.add(putil.get_tbl_cell_lft_pad(f'Python package', padding=self.indent1))
-        tbl_src.add(putil.get_tbl_cell_lft_pad('https://pypi.org/project/opendp/', padding=0))
+        pypi_tbl_cell = putil.get_tbl_cell_lft_pad(pdf_static.PYPI_OPENDP_URL, padding=0)
+        tbl_src.add(pypi_tbl_cell)
 
+        # Add GitHub repo info and reference to add link
+        github_repo_url = f"{dp_lib_info['url']}"
         tbl_src.add(putil.get_tbl_cell_lft_pad(f'GitHub Repository', padding=self.indent1))
-        tbl_src.add(putil.get_tbl_cell_lft_pad(f"{dp_lib_info['url']}", padding=0))
+        github_tbl_cell = putil.get_tbl_cell_lft_pad(github_repo_url, padding=0)
+        tbl_src.add(github_tbl_cell)
 
         self.set_table_borders_padding(tbl_src)
 
         self.add_to_layout(tbl_src)
+
+        # Add links
+        self.current_page.append_annotation(RemoteGoToAnnotation(
+                                        pypi_tbl_cell.get_bounding_box(),
+                                        uri=pdf_static.PYPI_OPENDP_URL))
+
+        self.current_page.append_annotation(RemoteGoToAnnotation(
+                                        github_tbl_cell.get_bounding_box(),
+                                        uri=github_repo_url))
 
     def add_pdf_title_page(self):
         """Add the PDF title page"""
@@ -664,8 +722,8 @@ class PDFReportMaker(BasicErrCheck):
                                      font_size=putil.BASIC_FONT_SIZE,
                                      multiplied_leading=Decimal(1.75)))
 
-        para_attachment = ('Note: If you are using Adobe Acrobat, a JSON version of this data'
-                           ' is attached to this PDF as a file named "release_data.json".')
+        para_attachment = (f'Note: If you are using Adobe Acrobat, a JSON version of this data'
+                           f' is attached to this PDF as a file named "{self.get_embed_json_fname()}".')
 
         self.add_to_layout(Paragraph(para_attachment,
                                      font=putil.BASIC_FONT,
@@ -677,18 +735,99 @@ class PDFReportMaker(BasicErrCheck):
                            font_size=putil.BASIC_FONT_SIZE,
                            multiplied_leading=Decimal(1.75)))
 
-        self.add_to_layout(putil.txt_list_para('1. Statistics'))
+        para_section1_obj = putil.txt_list_para(self.SECTION_TITLE_01_STATISTICS)
+        self.add_to_layout(para_section1_obj)
         stat_cnt = 0
+        predicted_page_num = 1  # assumes stat-specific info starts on page 2
+
         for stat_info in self.release_dict['statistics']:
-            stat_cnt += 1
+            stat_cnt += 1            
             stat_type = 'DP ' + stat_info['statistic'].title()
             var_name = stat_info['variable']
-            self.add_to_layout(putil.txt_list_para(f'1.{stat_cnt}. {var_name} - {stat_type}', Decimal(60)))
 
-        self.add_to_layout(putil.txt_list_para('2. Data Source'))
-        self.add_to_layout(putil.txt_list_para('3. OpenDP Library'))
-        self.add_to_layout(putil.txt_list_para(self.USAGE_SECTION_TITLE))
-        self.add_to_layout(putil.txt_list_para('5. Parameter Definitions'))
+            toc_text = f'1.{stat_cnt}. {var_name} - {stat_type}'
+            pdf_para_obj = putil.txt_list_para(toc_text,
+                                               pdf_static.TOC_L2_LINK_OFFSET)
+            self.add_to_layout(pdf_para_obj)
+
+            # for adding links later--when the stats pages exist!
+            predicted_page_num += 1
+
+            # add link for "1. Statistics" -- link it to the 1st stat
+            if predicted_page_num == 2:
+                self.save_intrapage_link(self.SECTION_TITLE_01_STATISTICS,
+                                         para_section1_obj,
+                                         predicted_page_num, pdf_static.TOC_L1_LINK_OFFSET)
+
+            # add link for sub statistic. 1.1, 1.2, etc.
+            #
+            self.save_intrapage_link(toc_text, pdf_para_obj, predicted_page_num)
+            if stat_info['statistic'] == astatic.DP_HISTOGRAM:
+                predicted_page_num += 1  # histograms take two pages
+
+        # Add other TOC links for sections 2 onward
+        sections_to_add = [self.SECTION_TITLE_02_DATA_SOURCE,
+                           self.SECTION_TITLE_03_OPENDP_LIB,
+                           self.SECTION_TITLE_04_USAGE,
+                           #'5. Parameter Definitions'
+                            ]
+
+        for sec_text in sections_to_add:
+            pdf_para_obj = putil.txt_list_para(sec_text)
+            self.add_to_layout(pdf_para_obj)
+            if sec_text != self.SECTION_TITLE_03_OPENDP_LIB:  # Sections 2 and 3 are on the same page
+                predicted_page_num += 1
+            self.save_intrapage_link(sec_text, pdf_para_obj,
+                                     predicted_page_num, pdf_static.TOC_L1_LINK_OFFSET)
+
+    def add_intra_page_links(self):
+        """
+        Add links from the PDF's first page TOC the other pages. TOC example:
+            1. Statistics
+                1.1. blinkInterval - DP Mean
+                1.2. trial - DP Histogram
+                1.3. typingSpeed - DP Variance
+            2. Data Source
+            3. OpenDP Library
+            4. Usage / Negative Values
+        """
+        if self.has_error():
+            return
+
+        # Interate through the intra page link info and
+        #   add the links within the PDF
+        #
+        for _txt_to_link, pdf_object, page_num, indent in self.intrapage_link_info:
+            """
+            _txt_to_link - used for debugging, it's not needed to make the actual PDF link
+            pdf_object - the source object to add the link to
+            page_num - the destination page when the pdf_object is clicked
+            indent - resize the bounding box used for the link source to better fit the text
+            """
+            # print(f'adding link: {_txt_to_link} {pdf_object}, {page_num}, {indent}')
+            pdf_page_idx = Decimal(page_num) - Decimal(1)  # PDF pages within the doc start with 0
+            if pdf_page_idx < 0:  # shouldn't happen!
+                self.add_err_msg((f'pdf_report_maker. Error adding TOC links.'
+                                  f'pdf_page_idx was less than 0 {pdf_page_idx}'))
+                return
+            bounding_box = pdf_object.get_bounding_box()  # return a Rectangle object which will be  clickable
+
+            # Move the x value and width closer to the text within the pdf_object
+            bounding_box.x = bounding_box.x + Decimal(indent)
+            bounding_box.width = bounding_box.width - Decimal(indent - 10)
+
+            # Move the y value and height to better align with the pdf_object text
+            bounding_box.y = bounding_box.y - Decimal(3)
+            bounding_box.height = bounding_box.height + Decimal(8)
+
+            # Add the link to the PDF!
+            link_annotation =  LinkAnnotation(
+                    bounding_box,
+                    page=pdf_page_idx,
+                    destination_type=DestinationType.FIT,
+                    color=HexColor("#ffffff"),  # Without this, a black border is placed around the clickable area
+                )
+            self.first_page.append_annotation(link_annotation)
 
     @staticmethod
     def get_layout_box(p: Paragraph) -> Rectangle:
@@ -725,8 +864,9 @@ class PDFReportMaker(BasicErrCheck):
         # Statistic name and result
         tbl_result.add(putil.get_tbl_cell_lft_pad(f'DP {stat_type}', padding=0))
         categories = stat_info['result']['value']['categories']
-        result_text = 'The results, in JSON format, may accessed through the PDF attachemnt "release_data.json"'
-        if len(categories) ==  1:
+        result_text = (f'The results, in JSON format, may accessed'
+                       f' through the PDF attachment "{self.get_embed_json_fname()}"')
+        if len(categories) == 1:
             tbl_result.add(putil.get_tbl_cell_lft_pad(f"(1 bin/category). {result_text}", padding=0))
         else:
             tbl_result.add(putil.get_tbl_cell_lft_pad(f"({len(categories)} bins/categories). {result_text}",
@@ -905,5 +1045,5 @@ class PDFReportMaker(BasicErrCheck):
             logo_img_obj.layout(page, rect_logo)
 
             # Link logo to opendp.org url
-            page.append_remote_go_to_annotation(logo_img_obj.get_bounding_box(),
-                                                uri="https://www.opendp.org")
+            page.append_annotation(RemoteGoToAnnotation(logo_img_obj.get_bounding_box(),
+                                                        uri="https://www.opendp.org"))
