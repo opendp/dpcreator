@@ -46,6 +46,8 @@ import matplotlib.pyplot as MatPlotLibPlot
 import numpy as np
 import pandas as pd
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.analysis.setup_question_formatter import SetupQuestionFormatter
+
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 
 from opendp_apps.dp_reports import pdf_preset_text
