@@ -48,11 +48,26 @@ class SetupQuestionFormatter(BasicErrCheck):
             else:
                 val = '(not answered)'
 
-            info = dict(text=astatic.SETUP_QUESTION_LOOKUP.get(qattr),
+            qinfo = astatic.SETUP_QUESTION_LOOKUP.get(qattr)
+            if qinfo:
+                qtext, qcontext = astatic.SETUP_QUESTION_LOOKUP.get(qattr)
+            else:
+                qtext = None
+                qcontext = None
+
+            info = dict(question_num=qnum,
+                        text=qtext,
                         attribute=qattr,
-                        answer=val)
+                        answer=val,
+                        context=qcontext
+                        )
 
             # Population size also given, add it to the info dict
+            if qattr == astatic.SETUP_Q_02_ATTR:
+                setup_answer = astatic.SETUP_Q_02_ANSWERS.get(val)
+                if setup_answer and len(setup_answer) == 2:
+                    info['longAnswer'], info['privacy_params'] = setup_answer
+
             if qattr == astatic.SETUP_Q_04_ATTR and val == 'yes':
                 info[astatic.SETUP_Q_04a_ATTR] = setup_questions.get(astatic.SETUP_Q_04a_ATTR)
 
@@ -60,6 +75,24 @@ class SetupQuestionFormatter(BasicErrCheck):
 
     def as_json(self):
         if self.has_error():
-            return
+            return None
 
         return json.dumps(self.formatted_questions, cls=DjangoJSONEncoder, indent=4)
+
+    def as_dict(self):
+        if self.has_error():
+            return None
+
+        return self.formatted_questions
+
+"""
+docker-compose run server python manage.py shell
+
+from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.analysis.setup_question_formatter import SetupQuestionFormatter
+
+d = DepositorSetupInfo.objects.first()
+setup = SetupQuestionFormatter(d)
+print(setup.as_json())
+
+"""
