@@ -19,12 +19,10 @@ export default {
     pdfAPIReady: false,
     adobeDCView: null,
     viewResults: false,
-    // ADOBE_KEY: '34a0c926740d4ddb9758dbc6da2a4f39', // dev.dpcreator.org
-    ADOBE_KEY: '44937032e26b4033a840626ed0cd8e79', // demo.dpcreator.org
-    // ADOBE_KEY: '13c79907c6144590b17e8ef044324444', // localhost
   }),
   computed: {
     ...mapState('dataset', ['analysisPlan']),
+    ...mapState('settings', ['vueSettings']),
     style() {
       if (this.viewResults) {
         return "height: 1200px; width: 1000px;"
@@ -35,9 +33,9 @@ export default {
   },
   methods: {
     handleView() {
-      console.log('handle view')
+      console.log('handle view' + this.vueSettings['VUE_APP_ADOBE_PDF_CLIENT_ID'])
       this.adobeDCView = new AdobeDC.View({
-        clientId: this.ADOBE_KEY,
+        clientId: this.vueSettings['VUE_APP_ADOBE_PDF_CLIENT_ID'],
         divId: "pdf-view"
       });
       this.adobeDCView.previewFile(
