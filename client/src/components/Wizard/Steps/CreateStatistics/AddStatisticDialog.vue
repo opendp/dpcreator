@@ -89,7 +89,6 @@
           <div class="width50">
             <v-text-field
                 v-model="editedItemDialog.fixedValue"
-                placeholder="E.g. Lorem ipsum"
                 background-color="soft_primary"
                 class="top-borders-radius width50"
                 data-test="Fixed value"
@@ -282,7 +281,7 @@ export default {
       error: "",
       missingValuesHandling: "insert_fixed",
       handleAsFixed: true,
-      fixedValue: 0,
+      fixedValue: "",
       locked: false,
       accuracy: {value: null, message: null}
     },
