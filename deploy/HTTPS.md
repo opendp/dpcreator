@@ -22,3 +22,7 @@ For any subdomains which should not be routed through CloudFlare, they should be
 | Type      | Name    | Content        | Proxy Status | TTL     |
 |-----------|---------|----------------|--------------|---------|
 | A         |   demo  |  (ip address)  | DNS only     |   auto  |
+
+The final DNS configuration should look like this:
+
+![dns_record](dns.png)
