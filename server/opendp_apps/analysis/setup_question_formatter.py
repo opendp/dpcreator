@@ -13,6 +13,7 @@ Example output:
     "population_size": "1000000",
    "observations_number_can_be_public": "yes"}
 """
+from __future__ import annotations
 import json
 from django.core.serializers.json import DjangoJSONEncoder
 
