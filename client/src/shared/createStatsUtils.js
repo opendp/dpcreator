@@ -64,7 +64,8 @@ export default {
         const remaining = new Decimal(totalValue).minus(lockedValue)
         let valueShare = new Decimal('0')
         if (unlockedCount > 0) {
-            valueShare = remaining.div(unlockedCount)
+            valueShare = this.safeSplit(remaining, unlockedCount) //remaining.div(unlockedCount)
+            console.log('valueShare: ' + valueShare + "," + typeof (valueShare))
         }
 
         // Assign value shares and convert everything back from Decimal to Number
@@ -72,7 +73,7 @@ export default {
         statistics.forEach((item) => {
             if (this.statisticUsesValue(property, item.statistic)) {
                 if (!item.locked) {
-                    item[property] = valueShare.toNumber()
+                    item[property] = valueShare
                 } else {
                     if (typeof (item[property]) == Decimal) {
                         item[property] = item[property].toNumber()
@@ -85,6 +86,23 @@ export default {
 
 
     },
+    safeSplit(budget, k) {
+        // algorithm from Micheal Shoemate to ensure we don't exceed the total budget
+        let is_x_gte_kv = (x, k, v) =>
+            x >= Array(k).fill().reduce((s, _) => s + v, 0)
+        let split_budget = (x, k) => {
+            // preserve symmetry if possible
+            if (is_x_gte_kv(x, k, x / k)) return x / k
+
+            // try increasingly large offsets until passes
+            for (pow of Array(20).keys()) {
+                // candidate value v
+                let v = (x - Math.pow(10, pow - 20)) / k
+                if (is_x_gte_kv(x, k, v)) return v
+            }
+        }
+        return split_budget(budget, k)
+    },
 
     // Returns Promise json object:
     // valid: true/false
@@ -93,7 +111,7 @@ export default {
         let returnObj = {valid: true, data: null}
         return release.validate(analysisPlanId, tempStats)
             .then((resp) => {
-           //     console.log('releaseValidation, validate response: ' + JSON.stringify(resp))
+                //     console.log('releaseValidation, validate response: ' + JSON.stringify(resp))
                 returnObj.data = resp.data
                 resp.data.forEach((item, index) => {
                     if (item.valid !== true) {
