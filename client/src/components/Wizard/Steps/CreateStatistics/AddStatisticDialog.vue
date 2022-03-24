@@ -10,7 +10,7 @@
       </v-icon
       >
       <v-card-title>
-        <h2 class="title-size-2 mb-5">{{ formTitle }}</h2>
+        <h2 data-test='AddStatisticDialog' class="title-size-2 mb-5">{{ formTitle }}</h2>
       </v-card-title>
       <v-card-text class="text--primary">
         <div>
