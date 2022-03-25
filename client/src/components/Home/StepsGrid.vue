@@ -13,7 +13,7 @@
           class="text-center mx-auto px-5"
           md="7"
       >
-        <h2 class="title-size-1 home-title mx-auto mb-7">
+        <h2 data-test="stepsTitle" class="title-size-1 home-title mx-auto mb-7">
           {{ $t("home.stepsTitle") }}
         </h2>
         <p v-html="$t('home.stepsDescription')"
