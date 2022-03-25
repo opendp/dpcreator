@@ -1,18 +1,17 @@
-import json
 import decimal
 
 from os.path import abspath, dirname, isfile, join
 from unittest import skip
 
+from opendp_apps.analysis.tools.dp_histogram_spec import DPHistogramSpec
+
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
 from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
-# from opendp_apps.analysis.tools.dp_histogram_spec import DPHistogramSpec
 from opendp_apps.analysis.tools.dp_histogram_categorical_spec import DPHistogramCategoricalSpec
 from opendp_apps.analysis.tools.dp_histogram_integer_spec import DPHistogramIntegerSpec
 from opendp_apps.model_helpers.msg_util import msgt
-from opendp_apps.utils.extra_validators import *
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.profiler import static_vals as pstatic
 
@@ -48,6 +47,13 @@ class HistogramStatSpecTest(StatSpecTestCase):
         self.assertFalse(self.dp_hist.has_error())
         self.assertTrue(self.dp_hist.is_chain_valid())
 
+    def test_01_valid_noise_mechanism(self):
+        """Check for the correct noise_mechanism"""
+        dp_hist = DPHistogramCategoricalSpec({})
+        self.assertEqual(dp_hist.noise_mechanism, astatic.NOISE_GEOMETRIC_MECHANISM)
+
+        dp_hist_int = DPHistogramIntegerSpec({})
+        self.assertEqual(dp_hist_int.noise_mechanism, astatic.NOISE_GEOMETRIC_MECHANISM)
 
 
     def test_05_get_variable_order(self):
@@ -98,12 +104,15 @@ class HistogramStatSpecTest(StatSpecTestCase):
                 yield float(start)
                 start += decimal.Decimal(step)
 
-        for cl_val in list(float_range(-1, 3, '0.1')) + ['alphabet', 'soup']:
+        for cl_val in list(float_range(-1, 0, '0.1')) + ['alphabet', 'soup']:
             # print(f'> Invalid ci val: {ci_val}')
             spec_props['cl'] = cl_val
             dp_hist = DPHistogramCategoricalSpec(spec_props)
             # print(dp_hist.is_chain_valid())
-            self.assertTrue(dp_hist.is_chain_valid())
+            valid = dp_hist.is_chain_valid()
+            print(dp_hist.error_messages)
+            print(cl_val)
+            self.assertFalse(valid)
 
     @skip
     # Not clear that this test should pass anymore, since min/max was referring to

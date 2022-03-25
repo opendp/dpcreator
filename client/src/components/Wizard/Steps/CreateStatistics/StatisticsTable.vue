@@ -4,6 +4,7 @@
         :headers="headers"
         :items="statistics"
         no-data-text="Create statistic"
+        :items-per-page="-1"
         hide-default-footer
     >
       <template v-slot:[`header.error`]="{ header }">
@@ -21,15 +22,17 @@
         <div data-test="statistic">{{ item.statistic.label }}</div>
       </template>
       <template v-slot:[`item.epsilon`]="{ item }">
-        <v-text-field
-            v-model="item.epsilon"
-            type="number"
-            :rules="[validateEpsilon]"
-            v-on:click="currentItem=item"
-            :disabled="!item.locked"
-            v-on:change="$emit('editEpsilon', item)"
+        <v-text-field v-if="item.locked"
+                      v-model="item.epsilon"
+                      type="number"
+                      :rules="[validateEpsilon]"
+                      v-on:click="currentItem=item"
+                      v-on:change="$emit('editEpsilon', item)"
         >
         </v-text-field>
+        <div v-else>
+          {{ Number(item.epsilon).toFixed(3) }}
+        </div>
       </template>
       <template v-slot:[`item.delta`]="{ item }">
         <div v-if="isDeltaStat(item)">
@@ -49,7 +52,7 @@
       </template>
       <template v-slot:[`item.error`]="{ item }">
         <div v-if="item.accuracy">
-          {{ item.accuracy.value }}
+          {{ Number(item.accuracy.value).toPrecision(3) }}
         </div>
 
       </template>

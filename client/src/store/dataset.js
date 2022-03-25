@@ -1,7 +1,7 @@
 import dataset from "@/api/dataset";
 import analysis from "@/api/analysis";
 const camelcaseKeys = require('camelcase-keys');
-
+import {snakeCase} from "snake-case";
 import {
     SET_DATASET_LIST,
     SET_DATASET_INFO,
@@ -239,10 +239,10 @@ const actions = {
      * @param state
      * @param userId used for websocket URL
      */
-    runProfiler({commit, state}, {userId}) {
+    runProfiler({commit, state, rootState}, {userId}) {
         dataset.runProfiler(state.datasetInfo.objectId)
 
-        const prefix = 'ws://'
+        const prefix = rootState.settings.vueSettings['VUE_APP_WEBSOCKET_PREFIX']
         const websocketId = 'ws_' + userId
         const chatSocket = new WebSocket(
             prefix + window.location.host + '/async_messages/ws/profile/' + websocketId + '/'

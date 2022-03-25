@@ -9,7 +9,69 @@
             })
             cy.clearData()
 
+        })/*
+        it('distributes epsilon correctly ',()=> {
+            cy.on('uncaught:exception', (e, runnable) => {
+                console.log('error', e)
+                console.log('runnable', runnable)
+                return false
+            })
+            const mockDVfile = 'EyeDemoMockDV.json'
+            const demoDatafile = 'createStats.json'
+
+            cy.createMockDataset(mockDVfile)
+            cy.fixture(demoDatafile).then((demoData) => {
+                cy.url().should('contain', 'welcome')
+                cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
+                    demoData['datasetName'])
+                cy.goToConfirmVariables(demoData.variables)
+                // select the variables we will use
+                cy.selectVariable(demoData.variables)
+
+                // Continue to Set Epsilon Step
+                cy.epsilonStep()
+                // Add all the statistics in the Create Statistics Step
+                cy.createStatistics(demoData).then(()=>{
+
+
+                // sum of individual epsilons should be < total epsilon
+                const sessionObj = JSON.parse(sessionStorage.getItem('vuex'))
+                const dpStatistics = sessionObj.dataset.analysisPlan.dpStatistics
+                const totalEpsilon = sessionObj.dataset.datasetInfo.depositorSetupInfo.epsilon
+                let sumEpsilon = 0;
+                dpStatistics.forEach(stat => { sumEpsilon += stat.epsilon})
+                    console.log('sumEpsilon')
+                expect(sumEpsilon <= -1)
+                cy.pause()
+
+                })
+
+
+
+            })
+
         })
+*/
+        it('Displays correct precision', () => {
+            const mockDVfile = 'EyeDemoMockDV.json'
+            const demoDatafile = 'EyeDemoData.json'
+
+            cy.createMockDataset(mockDVfile)
+            cy.fixture(demoDatafile).then((demoData) => {
+                cy.url().should('contain', 'welcome')
+                cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
+                    demoData['datasetName'])
+                cy.goToConfirmVariables(demoData.variables)
+                // select the variables we will use
+                cy.selectVariable(demoData.variables)
+
+                // Continue to Set Epsilon Step
+                cy.epsilonStep()
+                // Add all the statistics in the Create Statistics Step
+                cy.createStatistics(demoData)
+            })
+        })
+
         it('Goes back to the Confirm Variables Page', () => {
             const mockDVfile = 'EyeDemoMockDV.json'
             const demoDatafile = 'EyeDemoData.json'
@@ -54,6 +116,7 @@
             cy.get('[data-test="editParamsCancel"]').click({force: true});
 
         })
+
 
         it('Goes to the correct wizard step', () => {
             cy.on('uncaught:exception', (e, runnable) => {

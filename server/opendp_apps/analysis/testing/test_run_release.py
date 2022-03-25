@@ -7,13 +7,14 @@ TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
 from django.contrib.auth import get_user_model
 from django.core.files import File
-from django.test.testcases import TestCase
+from django.core import mail
+from django.test import TestCase, override_settings
 
 from rest_framework.test import APIClient
 from rest_framework.reverse import reverse as drf_reverse
 
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
-from opendp_apps.analysis.models import AnalysisPlan, AuxiliaryFileDepositRecord
+from opendp_apps.analysis.models import AnalysisPlan, AuxiliaryFileDepositRecord, ReleaseEmailRecord
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
 from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
@@ -143,6 +144,7 @@ class TestRunRelease(TestCase):
         # re-retrieve it...
         return DataSetInfo.objects.get(object_id=dataset_info.object_id)
 
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
     def test_10_compute_stats(self):
         """(10) Run compute stats"""
         msgt(self.test_10_compute_stats.__doc__)
@@ -156,7 +158,7 @@ class TestRunRelease(TestCase):
 
         # Check the basics
         #
-        release_util = ValidateReleaseUtil.compute_mode(\
+        release_util = ValidateReleaseUtil.compute_mode(
             self.user_obj,
             analysis_plan.object_id,
             run_dataverse_deposit=False)
@@ -230,11 +232,15 @@ class TestRunRelease(TestCase):
         self.assertFalse(jresp['success'])
         self.assertTrue(jresp['message'].find(astatic.ERR_MSG_BAD_TOTAL_EPSILON) > -1)
 
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
     def test_50_success(self):
-        """(50) Via API, run compute stats with error"""
+        """(50) Via API, run compute stats successfully"""
         msgt(self.test_50_success.__doc__)
 
         analysis_plan = self.analysis_plan
+
+        # The source_file should exist
+        self.assertTrue(analysis_plan.dataset.source_file)
 
         # Send the dp_statistics for validation
         #
@@ -272,8 +278,11 @@ class TestRunRelease(TestCase):
             self.assertTrue(dep_rec.http_status_code == 403 or\
                             dep_rec.http_status_code < 0)
 
+        # The source_file should be deleted
+        analysis_plan = AnalysisPlan.objects.get(id=analysis_plan.id)
+        self.assertTrue(not analysis_plan.dataset.source_file)
 
-
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
     def test_55_success_download_urls(self):
         """(55) Test PDF and JSOn download Urls"""
         msgt(self.test_55_success_download_urls.__doc__)
@@ -316,7 +325,7 @@ class TestRunRelease(TestCase):
         # ------------------------------------
 
         # (2a) The PDF file url is not generated in this test and should be None
-        self.assertIsNone(updated_plan.release_info.download_pdf_url())
+        # self.assertIsNotNone(updated_plan.release_info.download_pdf_url())
 
         # ------------------------------------------------------
         # (2b) Artificially add a PDF file to the ReleaseInfo object
@@ -337,7 +346,10 @@ class TestRunRelease(TestCase):
         expected_pdf_url = drf_reverse('release-download-pdf', args=[], kwargs=dict(pk=release_info_object_id))
         self.assertEqual(expected_pdf_url, updated_plan.release_info.download_pdf_url())
 
+        # The source_file should be deleted
+        self.assertTrue(not analysis_plan.dataset.source_file)
 
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
     def test_60_analysis_plan_has_release_info(self):
         """(60) Via API, ensure that release_info is added as a field to AnalysisPlan"""
         msgt(self.test_60_analysis_plan_has_release_info.__doc__)
@@ -400,6 +412,9 @@ class TestRunRelease(TestCase):
         #   with attached ReleaseInfo object
         # print(json.dumps(analysis_plan_jresp, indent=4))
 
+        # The source_file should be deleted
+        self.assertTrue(not analysis_plan.dataset.source_file)
+
 
     def test_70_dataset_formatter_eye_fatigue_file(self):
         """(70) Test the DataSetFormatter -- dataset info formatted for inclusion in ReleaseInfo.dp_release"""
@@ -444,7 +459,7 @@ class TestRunRelease(TestCase):
         self.assertIsNone(ds_info['file_information']['identifier'])
         self.assertEqual(ds_info['file_information']['fileFormat'], "text/tab-separated-values")
 
-
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
     def test_80_dataset_formatter_crisis_file(self):
         """(80) Test the DataSetFormatter -- dataset info formatted for inclusion in ReleaseInfo.dp_release"""
         msgt(self.test_80_dataset_formatter_crisis_file.__doc__)
@@ -453,7 +468,10 @@ class TestRunRelease(TestCase):
         {
             "type": "dataverse",
             "name": "crisis.tab",
-            "citation": "Epstein, Lee, Daniel E Ho, Gary King, and Jeffrey A Segal. 2005. The Supreme Court During Crisis: How War Affects only Non-War Cases. New York University Law Review 80: 1\u2013116: \n<a href=\"http://j.mp/kh2NV8\" target=\"_blank\" rel=\"nofollow\">Link to article</a>. DASH",
+            "citation": "Epstein, Lee, Daniel E Ho, Gary King, and Jeffrey A Segal. 2005. The 
+            Supreme Court During Crisis: How War Affects only Non-War Cases. New York University
+             Law Review 80: 1\u2013116: \n<a href=\"http://j.mp/kh2NV8\" target=\"_blank\" 
+             rel=\"nofollow\">Link to article</a>. DASH",
             "doi": "doi:10.7910/DVN/OLD7MB",
             "identifier": null,
             "release_deposit_info": {
@@ -470,7 +488,6 @@ class TestRunRelease(TestCase):
             }
         }
         """
-
         dataset_info = DataSetInfo.objects.get(id=3)
 
         formatter = DataSetFormatter(dataset_info)
@@ -495,7 +512,7 @@ class TestRunRelease(TestCase):
         self.assertEqual(ds_info['file_information']['identifier'], "https://doi.org/10.7910/DVN/OLD7MB/ZI4N3J")
         self.assertEqual(ds_info['file_information']['fileFormat'], "text/tab-separated-values")
 
-
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
     def test_90_dp_count_pums_data(self):
         """
         (90) Via API, Test DP Count with PUMS data.
@@ -509,19 +526,29 @@ class TestRunRelease(TestCase):
         dataset_info.data_profile = {"self": {"created_at": "2021-10-04 15:20:00", "description": "TwoRavens metadata generated by https://github.com/TwoRavens/raven-metadata-service"}, "$schema": "https://github.com/TwoRavens/raven-metadata-service/schema/jsonschema/1-2-0.json#", "dataset": {"rowCount": 10000, "variableCount": 11, "variableOrder": [[0, "X"], [1, "state"], [2, "puma"], [3, "sex"], [4, "age"], [5, "educ"], [6, "income"], [7, "latino"], [8, "black"], [9, "asian"], [10, "married"]]}, "variables": {"X": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "X"}, "age": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "age"}, "sex": {"binary": True, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "sex"}, "educ": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "educ"}, "puma": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "puma"}, "asian": {"binary": True, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "asian"}, "black": {"binary": True, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "black"}, "state": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "state"}, "income": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "income"}, "latino": {"binary": True, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "latino"}, "married": {"binary": True, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "married"}}}
 
         # Hack 2: Update to the PUMS data profile_variables
-        dataset_info.profile_variables = {"dataset": {"rowCount": 10000, "variableCount": 11,
-             "variableOrder": [[0, "X"], [1, "state"], [2, "puma"], [3, "sex"], [4, "age"], [5, "educ"], [6, "income"], [7, "latino"], [8, "black"], [9, "asian"], [10, "married"]]},
- "variables": {"X": {"max": None, "min": None, "name": "X", "type": "Numerical", "label": ""},
-               "age": {"max": None, "min": None, "name": "age", "type": "Numerical", "label": ""},
-               "sex": {"name": "sex", "type": "Boolean", "label": ""},
-               "educ": {"max": None, "min": None, "name": "educ", "type": "Numerical", "label": ""},
-               "puma": {"max": None, "min": None, "name": "puma", "type": "Numerical", "label": ""},
-               "asian": {"name": "asian", "type": "Boolean", "label": ""},
-               "black": {"name": "black", "type": "Boolean", "label": ""},
-               "state": {"max": None, "min": None, "name": "state", "type": "Numerical", "label": ""},
-               "income": {"max": None, "min": None, "name": "income", "type": "Numerical", "label": ""},
-               "latino": {"name": "latino", "type": "Boolean", "label": ""},
-               "married": {"name": "married", "type": "Boolean", "label": ""}}}
+        dataset_info.profile_variables = {"dataset":
+                  {"rowCount": 10000,
+                   "variableCount": 11,
+                   "variableOrder": [[0, "X"], [1, "state"], [2, "puma"], [3, "sex"],
+                                     [4, "age"], [5, "educ"], [6, "income"], [7, "latino"],
+                                     [8, "black"], [9, "asian"], [10, "married"]]},
+                   "variables": {"X": {"max": None, "min": None, "name": "X",
+                                       "type": "Numerical", "label": ""},
+                                 "age": {"max": None, "min": None, "name": "age",
+                                         "type": "Numerical", "label": ""},
+                                 "sex": {"name": "sex", "type": "Boolean", "label": ""},
+                                 "educ": {"max": None, "min": None, "name": "educ",
+                                            "type": "Numerical", "label": ""},
+                                 "puma": {"max": None, "min": None, "name": "puma",
+                                            "type": "Numerical", "label": ""},
+                                 "asian": {"name": "asian", "type": "Boolean", "label": ""},
+                                 "black": {"name": "black", "type": "Boolean", "label": ""},
+                                 "state": {"max": None, "min": None, "name": "state",
+                                           "type": "Numerical", "label": ""},
+                                 "income": {"max": None, "min": None, "name": "income",
+                                            "type": "Numerical", "label": ""},
+                                 "latino": {"name": "latino", "type": "Boolean", "label": ""},
+                                 "married": {"name": "married", "type": "Boolean", "label": ""}}}
 
         self.add_source_file(dataset_info, 'PUMS5extract10000.csv', True)
 
@@ -574,3 +601,52 @@ class TestRunRelease(TestCase):
         self.assertIsNotNone(dp_sum_stat['result'])
         self.assertIsNotNone(dp_sum_stat['result']['value'])
         self.assertGreater(dp_sum_stat['result']['value'], 400_000)
+
+        # The source_file should be deleted
+        self.assertTrue(not analysis_plan.dataset.source_file)
+
+
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True, SKIP_EMAIL_RELEASE_FOR_TESTS=False)
+    def test_100_release_email(self):
+        """(100) Run stats and test email"""
+        msgt(self.test_100_release_email.__doc__)
+
+        analysis_plan = self.analysis_plan
+
+        # Send the dp_statistics for validation
+        #
+        analysis_plan.dp_statistics = self.general_stat_specs
+        analysis_plan.save()
+
+        # Check the basics
+        #
+        release_util = ValidateReleaseUtil.compute_mode(\
+            self.user_obj,
+            analysis_plan.object_id,
+            run_dataverse_deposit=False)
+
+        if release_util.has_error():
+            print('release_util:', release_util.get_err_msg())
+        self.assertFalse(release_util.has_error())
+
+        release_info_object = release_util.get_new_release_info_object()
+        dp_release = release_info_object.dp_release
+
+        stats_list = dp_release['statistics']
+
+        self.assertEqual(len(stats_list), 3)
+
+        # Check the email record
+        email_rec = ReleaseEmailRecord.objects.first()
+        # print('email_rec.email_content', email_rec.email_content)
+        self.assertTrue(email_rec.success)
+        self.assertTrue(email_rec.email_content.find(f'Dear {self.user_obj.username}') > -1)
+        # self.assertTrue(email_rec.pdf_attached)
+        self.assertTrue(email_rec.json_attached)
+        self.assertEqual(email_rec.note, '')
+
+       # Test that one message has been sent.
+        self.assertEqual(len(mail.outbox), 1)
+
+        # Verify that the subject of the first message is correct.
+        self.assertTrue(mail.outbox[0].subject.startswith('DP Release ready'))

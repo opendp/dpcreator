@@ -1,14 +1,11 @@
-from os.path import abspath, dirname, isdir, isfile, join
+import json
 
-CURRENT_DIR = dirname(abspath(__file__))
-TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
+from os.path import abspath, dirname, isfile, join
 from unittest import skip
 
-import json
 from django.contrib.auth import get_user_model
 from django.core.files import File
-from django.test.testcases import TestCase
-
+from django.test import TestCase, override_settings
 from rest_framework.test import APIClient
 
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
@@ -20,6 +17,9 @@ from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
 from opendp_apps.utils.extra_validators import VALIDATE_MSG_EPSILON
 
+
+CURRENT_DIR = dirname(abspath(__file__))
+TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
 
 class TestValidationViewAndSerializers(TestCase):
@@ -45,20 +45,19 @@ class TestValidationViewAndSerializers(TestCase):
         self.assertEqual(orig_plan.object_id, self.analysis_plan.object_id)
 
         self.general_stat_spec = {"statistic": astatic.DP_MEAN,
-                "variable": "EyeHeight",
-                "epsilon": 1,
-                "delta": 0,
-                "cl": astatic.CL_95,
-                "error": "",
-                "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
-                "handle_as_fixed": False,
-                "fixed_value": "5.0",
-                "locked": False,
-                "label": "EyeHeight"
-                }
-    
+                                  "variable": "EyeHeight",
+                                  "epsilon": 1,
+                                  "delta": 0,
+                                  "cl": astatic.CL_95,
+                                  "error": "",
+                                  "missing_values_handling": astatic.MISSING_VAL_INSERT_FIXED,
+                                  "handle_as_fixed": False,
+                                  "fixed_value": "5.0",
+                                  "locked": False,
+                                  "label": "EyeHeight"
+                                  }
 
-    def add_source_file(self, dataset_info: DataSetInfo, filename: str, add_profile: bool=False) -> DataSetInfo:
+    def add_source_file(self, dataset_info: DataSetInfo, filename: str, add_profile: bool = False) -> DataSetInfo:
         """Add a source file -- example...
         - filepath - file under dpcreator/test_data
         """
@@ -104,11 +103,9 @@ class TestValidationViewAndSerializers(TestCase):
                             dp_statistics=[self.general_stat_spec])
 
         response = client.post('/api/validation/', data=request_plan, format='json')
-        #print('response.status_code', response.status_code)
-        #print('json', response.json())
+        # print('response.status_code', response.status_code)
+        # print('json', response.json())
         self.assertEqual(response.status_code, 403)
-
-
 
     def test_08_api_fail_wrong_user(self):
         """(8) Test API fail, logged in as different user"""
@@ -133,7 +130,7 @@ class TestValidationViewAndSerializers(TestCase):
         self.assertFalse(response.json()['success'])
         self.assertEqual(response.json()['message'], astatic.ERR_MSG_NO_ANALYSIS_PLAN)
 
-
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
     def test_10_validate_stats(self):
         """(10) Test a working stat"""
         msgt(self.test_10_validate_stats.__doc__)
@@ -155,14 +152,17 @@ class TestValidationViewAndSerializers(TestCase):
         # Now run the validator
         #
         stats_info = serializer.save(**dict(opendp_user=self.user_obj))
-        #print('stats_info.success', stats_info.success)
+        # print('stats_info.success', stats_info.success)
         self.assertTrue(stats_info.success)
 
         expected_result = [{'variable': 'EyeHeight', 'statistic': 'mean', 'valid': True,
                             'message': None,
                             'accuracy': {
                                 'value': 1.6370121873967791,
-                                'message': 'Releasing mean for the variable EyeHeight. With at least probability 0.95 the output mean will differ from the true mean by at most 1.6370121873967791 units. Here the units are the same units the variable has in the dataset.'}}]
+                                'message': 'Releasing mean for the variable EyeHeight. With at least probability 0.95 '
+                                           'the output mean will differ from the true mean by at most '
+                                           '1.6370121873967791 units. Here the units are the same units the variable '
+                                           'has in the dataset.'}}]
 
         # print('stats_info.data', stats_info.data)
         self.assertEqual(stats_info.data[0]['valid'], True)
@@ -172,8 +172,9 @@ class TestValidationViewAndSerializers(TestCase):
         self.assertTrue('message' in stats_info.data[0]['accuracy'])
 
         accuracy_msg = f'DP {astatic.DP_MEAN.title()} will differ from the true {astatic.DP_MEAN.title()} by at'
-        self.assertTrue(stats_info.data[0]['accuracy']['message'].find(accuracy_msg) > -1)
-
+        print(accuracy_msg)
+        print(stats_info.data[0]['accuracy']['message'].replace('\n', ' '))
+        self.assertTrue(stats_info.data[0]['accuracy']['message'].replace('\n', ' ').find(accuracy_msg) > -1)
 
     def test_15_api_validate_stats(self):
         """(15) Test a working stat via API"""
@@ -205,7 +206,7 @@ class TestValidationViewAndSerializers(TestCase):
 
         # Send the dp_statistics for validation
         #
-        stat_spec =  self.general_stat_spec
+        stat_spec = self.general_stat_spec
         stat_spec['statistic'] = astatic.DP_QUANTILE
 
         request_plan = dict(analysis_plan_id=analysis_plan.object_id,
@@ -221,7 +222,7 @@ class TestValidationViewAndSerializers(TestCase):
         # Now run the validator
         #
         stats_info = serializer.save(**dict(opendp_user=self.user_obj))
-        #print('stats_info.success', stats_info.success)
+        # print('stats_info.success', stats_info.success)
         self.assertTrue(stats_info.success)
 
         self.assertEqual(stats_info.data[0]['valid'], False)
@@ -237,9 +238,8 @@ class TestValidationViewAndSerializers(TestCase):
 
         # Send the dp_statistics for validation
         #
-        stat_spec =  self.general_stat_spec
+        stat_spec = self.general_stat_spec
         stat_spec['statistic'] = astatic.DP_QUANTILE
-
 
         request_plan = dict(analysis_plan_id=str(analysis_plan.object_id),
                             dp_statistics=[stat_spec])
@@ -257,7 +257,6 @@ class TestValidationViewAndSerializers(TestCase):
         self.assertEqual(jresp['data'][0]['statistic'], astatic.DP_QUANTILE)
         self.assertEqual(jresp['data'][0]['variable'], 'EyeHeight')
         self.assertEqual(jresp['data'][0]['message'], f'Statistic "{astatic.DP_QUANTILE}" will be supported soon!')
-
 
     def test_30_fail_bad_min_max(self):
         """(30) Fail: Add bad min/max values"""
@@ -290,18 +289,16 @@ class TestValidationViewAndSerializers(TestCase):
         # Now run the validator
         #
         stats_valid = serializer.save(**dict(opendp_user=self.user_obj))
-        #print('stats_valid.success', stats_valid.success)
+        # print('stats_valid.success', stats_valid.success)
         self.assertTrue(stats_valid.success)
 
-
-        expected_result = [ {'variable': 'TypingSpeed', 'statistic': astatic.DP_MEAN,
-                             'valid': False,
-                             'message': astatic.ERR_MSG_INVALID_MIN_MAX}]
+        expected_result = [{'variable': 'TypingSpeed', 'statistic': astatic.DP_MEAN,
+                            'valid': False,
+                            'message': astatic.ERR_MSG_INVALID_MIN_MAX}]
 
         # self.assertEqual(expected_result, stats_valid.data)
         self.assertEqual(stats_valid.data[0]['valid'], False)
         self.assertTrue(stats_valid.data[0]['message'].find('must be less than the max') > -1)
-
 
     def test_35_api_fail_bad_min_max(self):
         """(35) Fail: API, Add bad min/max values"""
@@ -386,7 +383,7 @@ class TestValidationViewAndSerializers(TestCase):
         # valid min/max
         analysis_plan.variable_info['BlinkDuration']['min'] = 1.0
         analysis_plan.variable_info['BlinkDuration']['max'] = 400.0
-        #analysis_plan.variable_info = variable_info_mod
+        # analysis_plan.variable_info = variable_info_mod
         analysis_plan.save()
 
         # Send the dp_statistics for validation
@@ -418,7 +415,7 @@ class TestValidationViewAndSerializers(TestCase):
         self.assertEqual(jresp['data'][0]['valid'], False)
         self.assertTrue(jresp['data'][0]['message'].find(VALIDATE_MSG_EPSILON) > -1)
 
-
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
     def test_50_bad_total_epsilon(self):
         """(50) Fail: Bad total epsilon"""
         msgt(self.test_50_bad_total_epsilon.__doc__)
@@ -450,8 +447,7 @@ class TestValidationViewAndSerializers(TestCase):
 
         self.assertTrue(stats_valid.message.find(astatic.ERR_MSG_BAD_TOTAL_EPSILON) > -1)
 
-
-
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
     def test_55_api_bad_total_epsilon(self):
         """(55) Fail: API, Bad total epsilon"""
         msgt(self.test_55_api_bad_total_epsilon.__doc__)
@@ -526,9 +522,9 @@ class TestValidationViewAndSerializers(TestCase):
         self.assertTrue(stats_valid.success)
 
         _sample_result_data = [{'variable': 'EyeHeight', 'statistic': 'mean', 'valid': False,
-                            'message': 'constant must be a member of DA'},
-                           {'variable': 'BlinkDuration', 'statistic': 'mean', 'valid': False,
-                            'message': 'The running epsilon (1.05) exceeds the max epsilon (1.0)'}]
+                                'message': 'constant must be a member of DA'},
+                               {'variable': 'BlinkDuration', 'statistic': 'mean', 'valid': False,
+                                'message': 'The running epsilon (1.05) exceeds the max epsilon (1.0)'}]
 
         self.assertTrue(stats_valid.data[0]['valid'] is True)
         self.assertTrue(stats_valid.data[1]['valid'] is False)
@@ -562,14 +558,13 @@ class TestValidationViewAndSerializers(TestCase):
         # print(json.dumps(jresp, indent=4))
 
         _sample_result_data = [{'variable': 'EyeHeight', 'statistic': 'mean', 'valid': False,
-                               'message': 'constant must be a member of DA'},
-                              {'variable': 'BlinkDuration', 'statistic': 'mean', 'valid': False,
-                               'message': 'The running epsilon (1.05) exceeds the max epsilon (1.0)'}]
+                                'message': 'constant must be a member of DA'},
+                               {'variable': 'BlinkDuration', 'statistic': 'mean', 'valid': False,
+                                'message': 'The running epsilon (1.05) exceeds the max epsilon (1.0)'}]
 
         self.assertTrue(jresp['data'][0]['valid'] is True)
         self.assertTrue(jresp['data'][1]['valid'] is False)
         self.assertTrue(jresp['data'][1]['message'].find('exceeds the max epsilon') > -1)
-
 
     def test_70_fail_impute_too_high(self):
         """(70) Fail: Impute higher than max"""
@@ -605,7 +600,6 @@ class TestValidationViewAndSerializers(TestCase):
         user_msg2 = 'The "fixed value" (40.0) cannot be more than the "max" (5.0)'
         self.assertEqual(stats_valid.data[0]['message'], user_msg2)
 
-
     def test_80_fail_impute_too_low(self):
         """(80) Fail: Impute lower than min"""
         msgt(self.test_80_fail_impute_too_low.__doc__)
@@ -616,7 +610,6 @@ class TestValidationViewAndSerializers(TestCase):
         analysis_plan.variable_info['EyeHeight']['min'] = -8
         analysis_plan.variable_info['EyeHeight']['max'] = 5
         analysis_plan.save()
-
 
         # Send the dp_statistics for validation
         #
@@ -656,7 +649,6 @@ class TestValidationViewAndSerializers(TestCase):
 
         self.assertEqual(stats_valid2.data[0]['message'], user_msg3)
 
-
     def test_90_ok_impute_equals_min(self):
         """(90) Fail: Impute equals min"""
         msgt(self.test_90_ok_impute_equals_min.__doc__)
@@ -671,7 +663,7 @@ class TestValidationViewAndSerializers(TestCase):
         # Send the dp_statistics for validation
         #
         stat_spec = self.general_stat_spec
-        stat_spec["variable"] ="TypingSpeed"
+        stat_spec["variable"] = "TypingSpeed"
         stat_spec["fixed_value"] = -8
 
         request_plan = dict(analysis_plan_id=analysis_plan.object_id,
@@ -698,7 +690,7 @@ class TestValidationViewAndSerializers(TestCase):
         stat_spec2["fixed_value"] = 5
 
         request_plan2 = dict(analysis_plan_id=analysis_plan.object_id,
-                            dp_statistics=[stat_spec])
+                             dp_statistics=[stat_spec])
 
         # Check the basics
         #
@@ -734,7 +726,6 @@ class TestValidationViewAndSerializers(TestCase):
 
         # print(json.dumps(dataset_info_2.data_profile, indent=4))
         # print(json.dumps(dataset_info_2.profile_variables, indent=4))
-
 
 
 """

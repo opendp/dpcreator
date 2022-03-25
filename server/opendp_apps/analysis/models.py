@@ -1,6 +1,7 @@
 from collections import OrderedDict
 import json
 
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
@@ -97,7 +98,6 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
                               help_text=('Used for OpenDP operations, starts as the "default_delta"'
                                          ' value but may be overridden by the user.'))
 
-
     class Meta:
         verbose_name = 'Depositor Setup Data'
         verbose_name_plural = 'Depositor Setup Data'
@@ -122,7 +122,6 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
             return self.uploadfileinfo
 
         raise AttributeError('DepositorSetupInfo does not have access to a DataSetInfo instance')
-
 
     def set_user_step(self, new_step:DepositorSteps) -> bool:
         """Set a new user step. Does *not* save the object."""
@@ -200,14 +199,11 @@ class ReleaseInfo(TimestampedModelWithUUID):
         verbose_name_plural = 'Release Information'
         ordering = ('dataset', '-created')
 
+    def __str__(self):
+        return f'{self.dataset}'
 
     def save(self, *args, **kwargs):
         """Error check the dataverse_deposit_complete flag"""
-        #if not self.dataset.is_dataverse_dataset(): # can never be True
-        #    self.dv_json_deposit_complete = False
-        #    self.dv_pdf_deposit_complete = False
-        #    self.dataverse_deposit_info = None
-
         super(ReleaseInfo, self).save(*args, **kwargs)
 
     @mark_safe
@@ -217,7 +213,6 @@ class ReleaseInfo(TimestampedModelWithUUID):
             return '<pre>' + json.dumps(self.dataverse_deposit_info, indent=4) + '</pre>'
         return ''
 
-    #@mark_safe
     def download_pdf_url(self):
         """
         URL to download the PDF file
@@ -230,7 +225,6 @@ class ReleaseInfo(TimestampedModelWithUUID):
         download_url = drf_reverse('release-download-pdf', args=[], kwargs={'pk': str(self.object_id)})
         return download_url
 
-    #@mark_safe
     def download_json_url(self):
         """
         URL to download the PDF file
@@ -242,6 +236,28 @@ class ReleaseInfo(TimestampedModelWithUUID):
         #
         download_url = drf_reverse('release-download-json', args=[], kwargs={'pk': str(self.object_id)})
         return download_url
+
+
+class ReleaseEmailRecord(TimestampedModelWithUUID):
+    """Record the sending of release emails"""
+    release_info = models.ForeignKey(ReleaseInfo, on_delete=models.CASCADE)
+
+    success = models.BooleanField(help_text='Did the mail go through?')
+
+    subject = models.CharField(max_length=255)
+    to_email = models.CharField(max_length=255)
+    from_email = models.CharField(max_length=255)
+
+    email_content = models.TextField(blank=True)
+
+    pdf_attached = models.BooleanField()
+    json_attached = models.BooleanField()
+
+    note = models.TextField(blank=True,
+                            help_text='Populated if mail not sent successfully')
+
+    def __str__(self):
+        return f'{self.release_info}'
 
 
 class AuxiliaryFileDepositRecord(TimestampedModelWithUUID):
@@ -268,7 +284,6 @@ class AuxiliaryFileDepositRecord(TimestampedModelWithUUID):
             return self.name
         else:
             return f'{self.release_info} - {self.dv_auxiliary_version} ({self.dv_auxiliary_type})'
-            #return AuxiliaryFileDepositRecord.format_name(self)
 
     def save(self, *args, **kwargs):
         self.name = AuxiliaryFileDepositRecord.format_name(self)
@@ -317,13 +332,12 @@ class AuxiliaryFileDepositRecord(TimestampedModelWithUUID):
 
     def as_json_string(self, indent=4):
         """Return JSON string"""
-        return json.dumps(self.as_dict(), indent=indent)
+        return json.dumps(self.as_dict(), cls=DjangoJSONEncoder, indent=indent)
 
     @mark_safe
     def json_string_html(self):
         """Return JSON string"""
         return '<pre>' + self.as_json_string() + '</pre>'
-
 
     @staticmethod
     def format_name(deposit_rec) -> str:
@@ -332,7 +346,8 @@ class AuxiliaryFileDepositRecord(TimestampedModelWithUUID):
 
         :param deposit_rec AuxiliaryFileDepositRecord
         """
-        return f'{deposit_rec.release_info} - {deposit_rec.dv_auxiliary_version} ({deposit_rec.dv_auxiliary_type})'
+        return (f'{deposit_rec.release_info} - {deposit_rec.dv_auxiliary_version}'
+                f' ({deposit_rec.dv_auxiliary_type})')
 
 
 class AnalysisPlan(TimestampedModelWithUUID):
@@ -368,7 +383,6 @@ class AnalysisPlan(TimestampedModelWithUUID):
     # Includes variable ranges and categories
     variable_info = models.JSONField(null=True, blank=True)
 
-    #custom_variables = models.JSONField(null=True)
     dp_statistics = models.JSONField(null=True)
 
     release_info = models.ForeignKey(ReleaseInfo,
@@ -389,7 +403,6 @@ class AnalysisPlan(TimestampedModelWithUUID):
         editable_steps = [self.AnalystSteps.STEP_0700_VARIABLES_CONFIRMED,
                           self.AnalystSteps.STEP_0800_STATISTICS_CREATED]
         return self.user_step in editable_steps
-
 
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the user_step
@@ -413,6 +426,4 @@ class AnalysisPlan(TimestampedModelWithUUID):
             info_str = json.dumps(self.variable_info, indent=4)
             return f'<pre>{info_str}</pre>'
         except Exception as ex_obj:
-            return f'Failed to conver to JSON string {ex_obj}'
-
-
+            return f'Failed to convert to JSON string {ex_obj}'

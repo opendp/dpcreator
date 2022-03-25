@@ -1,0 +1,24 @@
+Dear {{ username }},
+
+The differentially private (DP) statistic{{ num_stats|pluralize:",s"}} you have requested {{ num_stats|pluralize:"is,are"}} now ready.
+
+{{ num_stats|pluralize:"It,They"}} may be seen by: {{ release_page_link }}
+
+(1) Going to the My Data page: {{ site_scheme }}{{ current_site.domain }}/my-data
+(2) Clicking "View Details" for Data File: {{ dataset.name }}
+
+{% spaceless %}
+{% if has_pdf_file and has_json_file %}
+In addition, PDF and JSON versions of the DP release are attached to this email.
+{% elif has_pdf_file %}
+In addition, a PDF version of the DP release is attached to this email.
+{% elif has_json_file %}
+In addition, a JSON version of the DP release is attached to this email.
+{% endif %}
+{% endspaceless %}
+
+If you have any questions or need assistance, please contact us at info@opendp.org.
+
+Thank you for using DP Creator at {{ current_site.domain }}!
+
+DP Creator is an OpenDP project (opendp.org).

@@ -24,5 +24,6 @@ WORKDIR /code/server
 # Copy startup script
 # (Used for deployment)
 # -------------------------------------
-COPY scripts_startup/azure_dev.dpcreator.org.sh /usr/bin/azure_start_01.sh
-RUN chmod u+x /usr/bin/azure_start_01.sh
+COPY scripts_startup/azure_dev.dpcreator.org.sh /usr/bin/azure_dev.dpcreator.org.sh
+COPY scripts_startup/azure_demo.dpcreator.org.sh /usr/bin/azure_demo.dpcreator.org.sh
+RUN chmod u+x /usr/bin/*.sh

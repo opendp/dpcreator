@@ -3,8 +3,29 @@
     <v-container>
       <v-sheet rounded="lg">
         <v-container>
-          <h1 class="title-size-2">{{ datasetInfo.datasetSchemaInfo.name }}</h1>
+          <h1 class="title-size-2" style="line-height:150%"><b>DP Release</b>
+            <br/>{{ datasetInfo.datasetSchemaInfo.name }}</h1>
+          Current Status:
           <StatusTag class="my-5" :status="status"/>
+          <p></p>
+          <v-row>
+            <template v-if="status === COMPLETED">
+              <v-col cols="6">
+                <p>
+                  Created: {{ analysisPlan.releaseInfo.dpRelease.created.humanReadable }}
+                </p>
+              </v-col>
+              <v-col cols="6">
+                <a v-if="analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
+                   data-test="dataverseLink"
+                   class="text-decoration-none" :href="fileUrl"
+                >Check DP release in Dataverse
+                  <v-icon small color="primary">mdi-open-in-new</v-icon>
+                </a>
+              </v-col>
+            </template>
+          </v-row>
+
           <ColoredBorderAlert type="warning" v-if="$vuetify.breakpoint.xsOnly">
             <template v-slot:content>
               If you want to start or continue the process you have to
@@ -23,126 +44,48 @@
               {{ generalErrorSummary }}
             </template>
           </ColoredBorderAlert>
-
           <div class="mb-5" v-if="status === COMPLETED">
-            <p class="primary--text">DP Release Information:</p>
-
-            <p>This release contains {{ analysisPlan.releaseInfo.dpRelease.statistics.length }} statistic<span
-                v-if="analysisPlan.releaseInfo.dpRelease.statistics.length > 1">s</span>:</p>
-            <p>&nbsp;</p>
-            <div v-for="(statistic, index) in analysisPlan.releaseInfo.dpRelease.statistics"
-                 style="padding-left:20px; padding-right:40px;">
-              <p data-test="statistic description" style="">
-                ({{ index + 1 }}) <span v-html="statistic.description.html"></span></p>
-
-            </div>
-            <p style="padding-left:20px; padding-right:40px;">Created:
-              {{ analysisPlan.releaseInfo.dpRelease.created.humanReadable }}</p>
-            <div :v-if="analysisPlan.releaseInfo.dataverseDepositInfo">
-              <p>&nbsp;</p>
-              <p v-if="analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
-                 style="padding-left:20px; padding-right:40px;">
-                <span v-html="analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.userMsgHtml"></span>
-              </p>
-              <p v-if="!analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
-                 style="padding-left:20px; padding-right:40px;">
-                <b>Dataverse Deposit Error : </b><span
-                  v-html="'JSON ' + analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.dvErrMsg"></span>
-              </p>
-            </div>
-            <div class="pt-5 pb-10">
-              <div v-for="(detail, index) in datasetDetails" :key="index">
-                <v-row v-if="status!==COMPLETED || detail.id!=='timeRemaining'" class="py-3">
-                  <v-col
-                      cols="12"
-                      sm="4"
-                      class="grey--text text--darken-2 d-flex"
-                      :class="{
-                    'py-0': $vuetify.breakpoint.xsOnly
-                  }"
-                  >
-                  <span>
-                    {{ detail.label }}
-                  </span>
-                    <QuestionIconTooltip :text="detail.tooltip"/>
-                  </v-col>
-                  <v-col
-                      cols="12"
-                      sm="8"
-                      :class="{
-                    'pt-0 pb-5': $vuetify.breakpoint.xsOnly
-                  }"
-                  >{{ detail.value }}
-                  </v-col
-                  >
-                </v-row>
-                <v-divider class="hidden-xs-only"/>
-              </div>
-            </div>
-
-            <p>Please see the panels below for details on the
-              <span v-if="analysisPlan.releaseInfo.dpRelease.statistics.length == 1">statistic</span><span
-                  v-if="analysisPlan.releaseInfo.dpRelease.statistics.length> 1">statistics</span>, including the
-              privacy parameters used to generate them.
-            </p>
-          </div>
-          <div class="mb-5" v-if="status === COMPLETED">
-            <v-expansion-panels multiple v-model="expandedPanels">
-              <v-expansion-panel data-test="DP Statistics Panel">
-                <v-expansion-panel-header>DP Statistics</v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <json-viewer :expand-depth="5" :expanded="false"
-                               :value="analysisPlan.releaseInfo.dpRelease.statistics">
-                  </json-viewer>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-              <v-expansion-panel>
-                <v-expansion-panel-header>Dataset</v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <json-viewer :expand-depth="5" expanded="false"
-                               :value="analysisPlan.releaseInfo.dpRelease.dataset">
-                  </json-viewer>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-              <v-expansion-panel>
-                <v-expansion-panel-header>DP Library</v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <json-viewer :expand-depth="5" expanded="false"
-                               :value="analysisPlan.releaseInfo.dpRelease.differentiallyPrivateLibrary">
-                  </json-viewer>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-            </v-expansion-panels>
-          </div>
-          <div class="mb-5" v-if="status === COMPLETED">
-            <p class="primary--text">Download DP Release:</p>
-            <Button v-if="analysisPlan.releaseInfo.downloadPdfUrl"
+            <ReleasePDF></ReleasePDF>
+            <p></p>
+            <p> This information can also be downloaded in other formats:</p>
+            <Button v-if="hasPDF"
                     data-test="pdfDownload"
                     :click="handlePDFDownload"
                     color="primary"
                     classes="d-block mb-2"
             >
               <v-icon left>mdi-download</v-icon>
-              <span>PDF File</span>
+              <span>DP Release PDF File</span>
             </Button>
-            <Button v-if="analysisPlan.releaseInfo.downloadJsonUrl"
+            <Button v-if="hasJSON"
                     data-test="jsonDownload"
                     :click="handleJSONDownload"
                     color="primary"
                     classes="d-block mb-2"
             >
               <v-icon left>mdi-download</v-icon>
-              <span>JSON File</span>
+              <span>DP Release JSON File</span>
             </Button>
-
-            <div v-if="analysisPlan.releaseInfo.dataverseDepositInfo" data-test="dataverseLink">
-              <a class="text-decoration-none d-block mt-10" :href="fileUrl"
-              >Check DP release in Dataverse
-                <v-icon small color="primary">mdi-open-in-new</v-icon>
-              </a
-              >
-            </div>
+          <div style="padding-top:20px;">
+            <hr /><br />
+            <h3 class="title-size-3">Dataverse deposits</h3>
+            <p v-if="!analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess" style="padding-bottom:20px; padding-top: 10px;">
+            <b>JSON file: </b><span
+              v-html="'' + analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.dvErrMsg"></span>
+            </p>
+            <p v-if="analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess" style="padding-bottom:20px; padding-top: 10px;">
+            <a
+                  data-test="dataverseLink"
+                  class="text-decoration-none" :href="fileUrl"
+               >Check DP release in Dataverse
+                 <v-icon small color="primary">mdi-open-in-new</v-icon>
+              </a>
+            </p>
           </div>
+
+
+          </div>
+
 
           <Button
               v-for="(action, index) in statusInformation[
@@ -187,6 +130,8 @@ import SupportBanner from "../components/SupportBanner.vue";
 import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
 import {mapGetters, mapState} from "vuex";
 import stepInformation from "@/data/stepInformation";
+import Chart from "../components/MyData/Chart.vue";
+import ReleasePDF from "@/components/MyData/ReleasePDF";
 
 const {
   IN_PROGRESS,
@@ -204,11 +149,13 @@ const {
 export default {
   name: "MyDataDetails",
   components: {
+    ReleasePDF,
     QuestionIconTooltip,
     ColoredBorderAlert,
     StatusTag,
     Button,
-    SupportBanner
+    SupportBanner,
+    Chart
   },
 
   methods: {
@@ -223,60 +170,118 @@ export default {
       alert("cancel execution " + item);
     },
     handlePDFDownload() {
-       window.location.href = this.analysisPlan.releaseInfo.downloadPdfUrl;
+      window.location.href = this.analysisPlan.releaseInfo.downloadPdfUrl;
     },
     handleJSONDownload() {
       window.location.href = this.analysisPlan.releaseInfo.downloadJsonUrl;
     },
+    toggleExpand(item) {
+      const indexRow = item.index;
+      const indexExpanded = this.expanded.findIndex(i => i === item);
+      if (indexExpanded > -1) {
+        this.expanded.splice(indexExpanded, 1)
+      } else {
+        this.expanded.push(item);
+      }
+    },
+    expandedText: function (item) {
+      return item.epsilon
+    },
+    displayExpandLink(item) {
+      return (typeof (item.result.value) === 'object' &&
+          item.result.value.values.length > this.maxResults)
+    },
+    getResult: function (item) {
 
+      if (typeof (item.result.value) === 'object') {
+        if (false) {
+          let arrayString = JSON.stringify(item.result.value.values.slice(0, this.maxResults))
+          return arrayString.substr(0, arrayString.length - 1) + '...'
+        } else {
+          return JSON.stringify(item.result.value.values)
+        }
+      }
+      return item.result.value
+    },
+    getParameters(item) {
+      let params = 'Epsilon: ' + (Number(item.epsilon)).toFixed(3) + ',&nbsp;&nbsp;&nbsp;'
+      if (item.delta) {
+        params += 'Delta: ' + item.delta + ',&nbsp;&nbsp;&nbsp;'
+      } else {
+        params += 'Delta: n/a,&nbsp;&nbsp;&nbsp;'
+      }
+      if (item.bounds) {
+        params += 'Bounds: [' + item.bounds.min + ',' + item.bounds.max + '],&nbsp;&nbsp;&nbsp;'
+      }
+      if (item.result.value.categories) {
+        params += 'Categories: ' + JSON.stringify(item.result.value.categories)
+        params += ',&nbsp;&nbsp;&nbsp;'
+        params += 'Category value pairs: ' + JSON.stringify(item.result.value.categoryValuePairs)
+        params += ',&nbsp;&nbsp;&nbsp;'
+      }
+      params += 'Missing value type: ' + item.missingValueHandling.type + ',&nbsp;&nbsp;&nbsp;'
+      params += 'Missing value: ' + item.missingValueHandling.fixedValue + ',&nbsp;&nbsp;&nbsp;'
+      return params
+    },
+    getConfidenceLevel(item) {
+      return 'There is a probability of ' + (Number(item.confidenceLevel) * 100) +
+          '% that the DP ' + item.statistic + ' will differ from the true ' +
+          item.statistic + ' by at most ' + (Number(item.accuracy.value)).toPrecision(2) + ' units. '
+
+    },
+    getDetailText(label, value) {
+      return label + ': ' + value
+    },
+    getStatsDetails(statsItem) {
+      let statsDetails = [
+        {
+          id: "result",
+          label: "Result",
+          value: this.getResult(statsItem)
+        },
+        {
+          id: "params",
+          label: "Parameters",
+          value: this.getParameters(statsItem)
+        },
+        {
+          id: "description",
+          label: "Description",
+          value: statsItem.description.html
+        }
+      ]
+      return statsDetails
+    },
+    getAnchor(item) {
+      return item.statistic + item.variable
+    }
   },
   computed: {
 
 
     ...mapState('dataset', ['datasetInfo', 'analysisPlan']),
     ...mapGetters('dataset', ['userStep', "getTimeRemaining"]),
+    hasJSON() {
+      return !!this.analysisPlan.releaseInfo.downloadJsonUrl
+    },
+    hasPDF() {
+      return !!this.analysisPlan.releaseInfo.downloadPdfUrl
+    },
+    hasJSONOnly() {
+      return (this.analysisPlan.releaseInfo.downloadJsonUrl && !this.analysisPlan.releaseInfo.downloadPdfUrl) ? true : false
+    },
+    hasPDFOnly() {
+      return (this.analysisPlan.releaseInfo.downloadPdfUrl && !this.analysisPlan.releaseInfo.downloadJsonUrl) ? true : false
+    },
+    hasJSONandPDF() {
+      return (this.analysisPlan.releaseInfo.downloadPdfUrl && this.analysisPlan.releaseInfo.downloadJsonUrl) ? true : false
+    },
     fileUrl: function () {
       const host = this.datasetInfo.datasetSchemaInfo.includedInDataCatalog.url
       return host + '/file.xhtml?fileId=' + this.datasetInfo.dataverseFileId
 
     },
-    datasetDetails: function () {
 
-      let datasetDetails = [
-        {
-          id: "installation",
-          label: "Dataverse Installation",
-          tooltip: "The Dataverse Installation where dataset originated",
-          value: this.datasetInfo.installationName
-        },
-
-        {
-          id: "timeRemaining",
-          label: "Remaining time to complete release",
-          tooltip: "3 Days from start of the process",
-          value: this.getTimeRemaining
-        },
-        {
-          id: "doi",
-          label: "DV File ID / DOI",
-          tooltip: "Persistent Identifier",
-          value: this.datasetInfo.fileDoi
-        },
-        {
-          id: "step",
-          label: "Last state in Workflow",
-          tooltip: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-          value: stepInformation[this.userStep].label
-        },
-        {
-          id: "citation",
-          label: "Citation",
-          tooltip: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-          value: this.datasetInfo.datasetDoi + ' | ' + this.datasetInfo.datasetSchemaInfo.name + ' | ' + this.datasetInfo.fileSchemaInfo.name
-        },
-      ]
-      return datasetDetails;
-    },
     status: function () {
       return stepInformation[this.userStep].workflowStatus
     },
@@ -285,7 +290,9 @@ export default {
     },
     permissionsError: function () {
       return false;
-    }
+    },
+
+
   },
   data: () => ({
     IN_PROGRESS,
@@ -299,9 +306,23 @@ export default {
     actionsInformation,
     datasetTitle: "",
     expandedPanels: [],
+    expanded: [],
+    maxResults: 10,
     generalErrorSummary: "Error summary: lorem ipsum dolor sit amet.",
+    statsHeaders: [
+      {text: 'Variable', value: 'variable', sortable: false},
+      {text: 'Statistic', value: 'statistic', sortable: false},
+      {text: 'Result', value: 'result', sortable: false},
+      {text: 'Confidence Level', value: 'description', sortable: false}
+    ],
+    NETWORK_CONSTANTS,
 
-    NETWORK_CONSTANTS
+    getAxisData(item) {
+
+      return item.result.value.categoryValuePairs.map(el => ({x: el[0], y: el[1]}))
+    }
+
+
   })
 };
 </script>

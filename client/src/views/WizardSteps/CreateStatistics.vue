@@ -1,6 +1,6 @@
 <template>
   <div id="create-statistics-page">
-    <h1 class="title-size-1">Create Statistics</h1>
+    <h1 data-test="Create Statistics Title" class="title-size-1">Create Statistics</h1>
     <p>
       {{
         $t('create statistics.statistics intro')
@@ -137,7 +137,7 @@ export default {
     editedIndex: -1,
     editedItem: {
       statistic: "",
-      variable: [],
+      variable: "",
       epsilon: "",
       error: "",
       missingValuesHandling: "",
@@ -148,7 +148,7 @@ export default {
     },
     defaultItem: {
       statistic: "",
-      variable: [],
+      variable: "",
       epsilon: "",
       error: "",
       missingValuesHandling: "",
@@ -172,7 +172,6 @@ export default {
       } else {
         this.epsilon = this.getDepositorSetupInfo.epsilon
       }
-      console.log("initialize form, epsilon = " + this.epsilon)
       if (this.getDepositorSetupInfo.confidenceLevel == null) {
         this.confidenceLevel = .99
       } else {
@@ -253,7 +252,7 @@ export default {
             .then((validateResults) => {
               for (let i = 0; i < this.statistics.length; i++) {
                 const accuracy = validateResults.data[i].accuracy
-                this.statistics[i].accuracy.value = accuracy.value
+                this.statistics[i].accuracy.value = Number(accuracy.value).toPrecision(3)
                 this.statistics[i].accuracy.message = accuracy.message
                 // this assigment below didn't work!  Can't change the object reference, need to change the values
                 //  this.statistics[i] = Object.assign({}, this.statistics[i], { accuracy })
@@ -307,7 +306,7 @@ export default {
     },
     deleteItemConfirm() {
       this.statistics.splice(this.editedIndex, 1);
-      createStatsUtils.redistributeValues()
+      createStatsUtils.redistributeValues(this.statistics, this.delta, this.epsilon, this.getDepositorSetupInfo.defaultDelta)
       this.setAccuracyAndSaveUserInput()
       this.closeDelete();
     },

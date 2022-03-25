@@ -2,7 +2,7 @@ from load_django_settings import CURRENT_DIR, TEST_DATA_DIR, load_local_settings
 load_local_settings()
 
 import json, time
-from os.path import isfile, join
+from os.path import basename, isfile, join
 
 from opendp_project.celery import hello_task
 from django.core.serializers.json import DjangoJSONEncoder
@@ -56,14 +56,10 @@ def run_deposit_api():
     export SERVER_URL=https://demo.dataverse.org
     """
 
-    #curl -H X-Dataverse-key:$API_TOKEN -X POST -F "file=@$FILENAME" -F 'origin=myApp' -F 'isPublic=true' -F "type=$TYPE" "$SERVER_URL/api/access/datafile/$FILE_ID/auxiliary/$FORMAT_TAG/$FORMAT_VERSION"
-    """
-    """
-    #curl
 
     headers = {'X-Dataverse-key': dv_cred.API_TOKEN}
 
-    FORMAT_TAG = 'dpJSON' #dpPDF'  # 'dp-c-JSON', 'dpJSON
+    FORMAT_TAG = 'dpJson' #dpPDF'  # 'dp-c-JSON', 'dpJSON
     FORMAT_VERSION = 'v11'  # '.json'
 
     dv_url = dv_cred.SERVER_URL
@@ -87,7 +83,10 @@ def run_deposit_api():
         print(f'file not found: {full_fname}')
         return
 
-    files = {'file': open(full_fname, 'rb')}
+    #files = {'file': open(full_fname, 'rb')}
+    files = {'file': (basename(full_fname),
+                      open(full_fname, 'rb'),
+                      'application/json')}
 
     # print('dv_url', dv_url)
     response = requests.post(dv_url,

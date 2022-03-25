@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+
     <EventSuccessAlert text="Done! You are out." queryParam="logout"/>
     <BadRequestAlert
         :show-alert=showAlert
@@ -33,6 +34,7 @@ export default {
     AccountButtonsWaypointActivator
   },
   created() {
+
     const handoffId = this.$route.query.id
 
     if (handoffId) {
@@ -41,9 +43,11 @@ export default {
       console.log('no handoffId')
     }
   },
+
   data: () => ({
     showAlert: false,
     alertText: 'here is some text',
   })
 };
+
 </script>

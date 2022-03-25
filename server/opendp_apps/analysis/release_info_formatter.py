@@ -6,9 +6,11 @@ from collections import OrderedDict
 from datetime import datetime as dt
 import json
 
+from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import render_to_string
 
 from opendp_apps.analysis.models import ReleaseInfo
+from opendp_apps.analysis.setup_question_formatter import SetupQuestionFormatter
 from opendp_apps.dataset.dataset_formatter import DataSetFormatter
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 
@@ -62,11 +64,9 @@ class ReleaseInfoFormatter(BasicErrCheck):
             "Make sure `.has_error() if False` before calling .get_release_data()"
 
         if as_json is True:
-            return json.dumps(self.release_dict, indent=4)
+            return json.dumps(self.release_dict, cls=DjangoJSONEncoder, indent=4)
 
         return self.release_dict
-
-
 
     def build_release_data(self):
         """Build the release!"""
@@ -79,12 +79,21 @@ class ReleaseInfoFormatter(BasicErrCheck):
         else:
             dataset_dict = ds_formatter.get_formatted_info()
 
+        # depositor setup questions
+        setup_questions = None
+        depositor_info = self.dataset.depositor_setup_info
+        if depositor_info:
+            setup_formatter = SetupQuestionFormatter(depositor_info)
+            if not setup_formatter.has_error():
+                setup_questions = setup_formatter.as_dict()
+
         self.release_dict = OrderedDict({
             "name": str(self.release_util.analysis_plan),
             # "release_url": None,    # via with https://github.com/opendp/dpcreator/issues/34
             "created": {
                 "iso": current_dt.isoformat(),
-                "human_readable": self.get_readable_datetime(current_dt)
+                "human_readable": self.get_readable_datetime(current_dt),
+                "human_readable_date_only": current_dt.strftime('%w %B, %Y'),
             },
             "application": "DP Creator",
             "application_url": "https://github.com/opendp/dpcreator",
@@ -94,12 +103,13 @@ class ReleaseInfoFormatter(BasicErrCheck):
                 "version": self.release_util.opendp_version,
             },
             "dataset": dataset_dict,
+            "setup_questions": setup_questions,
             "statistics": self.release_util.get_release_stats()
         })
 
         # Error check! Make sure it's serializable as JSON and encodable as bytes!!
         try:
-            release_json = json.dumps(self.release_dict)
+            release_json = json.dumps(self.release_dict, cls=DjangoJSONEncoder)
             release_json.encode()
         except TypeError as err_obj:
             user_msg = 'Failed to convert the Release informaation into JSON. ({err_obj})'

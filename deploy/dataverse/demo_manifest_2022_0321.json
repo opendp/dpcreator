@@ -1,10 +1,10 @@
 {
-   "displayName":"Open Differential Privacy Application",
+   "displayName":"DP Creator",
    "description":"Create differentially private (DP) statistics on a sensitive data file using the OpenDP library created as part of the OpenDP Project. https://opendp.org",
    "toolName":"DP Creator",
    "scope":"file",
    "type":"configure",
-   "toolUrl":"http://dev.dpcreator.org/api/dv-handoff/dv_orig_create/",
+   "toolUrl":"https://demo.dpcreator.org/api/dv-handoff/dv_orig_create/",
    "contentType":"text/tab-separated-values",
    "toolParameters":{
       "queryParameters":[

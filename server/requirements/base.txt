@@ -13,7 +13,7 @@ django-rest-polymorphic==0.1.9
 django-cors-headers==3.6.0
 idna==2.10
 jsonschema==4.2.1
-lxml==4.6.3
+lxml==4.6.5
 numpy==1.21.4
 opendp==0.3.0
 packaging==20.4
@@ -45,9 +45,11 @@ celery==5.2.2
 channels==3.0.3
 channels-redis==3.2.0
 
+# for PDF creation
+borb==2.0.21
+matplotlib==3.4.3
 
 # for testing, mocks requests
 requests-mock==1.8.0
 responses==0.13.3
-
 

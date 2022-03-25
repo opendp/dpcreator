@@ -11,10 +11,8 @@
         This action cannot be undone.
       </template>
     </ColoredBorderAlert>
-    <span> (Need to add or edit the statistics?
-            <a data-test="addStatisticsLink" v-on:click="addStatistic">Go back to the Create Statistics step. </a>
-            ) </span>
-    <v-form class="my-5" ref="form" @submit.prevent="handleFormSubmit">
+
+    <v-form class="my-5" ref="form" v-on:submit.prevent="onSubmit">
       <p class="mb-2">
         <strong>Confirm the email to send notifications to:</strong>
       </p>
@@ -25,14 +23,9 @@
         your profile area.</span
       >
 
-      <Button
-          color="primary"
-          type="submit"
-          classes="mt-5"
-          label="Submit Statistics"
-          data-test="Submit statistics"
-      />
+
     </v-form>
+
     <v-overlay :value="areStatisticsSubmitted">
       <div class="d-flex flex-column align-center">
         <v-progress-circular indeterminate size="64"></v-progress-circular>
@@ -52,16 +45,19 @@
         </v-icon
         >
         <v-card-title>
-          <h2 class="title-size-2 mb-5">Statistics are being processed</h2>
+          <h2 v-if="areStatisticsGenerated" class="title-size-2 mb-5">DP Release Complete</h2>
+          <h2 v-else class="title-size-2 mb-5">Statistics are being processed</h2>
         </v-card-title>
         <v-card-text class="text--primary">
-          <p>
-            <strong>You will receive an email </strong>to confirm the submission
-            and another one <strong>when the release is ready </strong>
+          <p v-if="areStatisticsGenerated">
+            (An email has also been sent with a link to the release.)
+          </p>
+          <p v-else>
+            You will receive an email <strong>when the release is ready </strong>.
           </p>
           <p>
             Your statistics are now on
-            <StatusTag :status="status"/>
+            <StatusTag data-test="generate release status" :status="status"/>
             status, you can view more details in the
             <router-link
                 :to="releaseLink"
@@ -129,13 +125,18 @@ export default {
     }
   },
   methods: {
-    addStatistic() {
-      this.$emit("addStatistic")
+    /**
+     * Return to the "Create Statistics" page
+     */
+    returnToCreateStatisticsStep() {
+      this.$emit("addStatistic");
     },
+    /**
+     * Handle the form submission
+    */
     handleFormSubmit: function () {
       if (this.$refs.form.validate()) {
         this.areStatisticsSubmitted = true;
-        //TODO: make call to Release API to submit statistics
         const completedStepProp = {
           userStep: STEP_0900_STATISTICS_SUBMITTED
         }

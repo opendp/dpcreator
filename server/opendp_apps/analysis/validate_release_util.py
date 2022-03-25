@@ -11,22 +11,20 @@
         - Retrieve the variable type/min/max/categories from AnalysisPlan.variable_info
         - Retrieve
 """
-import json
-from io import BytesIO
+import io
 import pkg_resources
-import tempfile
 
+from django.conf import settings
 from django.core.files.base import ContentFile
-from django.core.files import File
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.core.serializers.json import DjangoJSONEncoder
 
-from opendp.mod import OpenDPException
+from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
-from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
-from opendp_apps.analysis.stat_valid_info import StatValidInfo
+from opendp_apps.analysis.tools.dp_variance_spec import DPVarianceSpec
+from opendp_apps.analysis.release_email_util import ReleaseEmailUtil
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
 from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
@@ -34,12 +32,19 @@ from opendp_apps.analysis.tools.dp_histogram_integer_spec import DPHistogramInte
 from opendp_apps.analysis.tools.dp_histogram_categorical_spec import DPHistogramCategoricalSpec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
+
+from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
+
+from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
+from opendp_apps.dp_reports import tasks as pdf_tasks
+
+from opendp_apps.user.models import OpenDPUser
 from opendp_apps.profiler import static_vals as pstatic
 
 from opendp_apps.utils.extra_validators import \
     (validate_epsilon_not_null,
      validate_not_negative)
-from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
 
@@ -48,10 +53,10 @@ from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
 from opendp_apps.utils.camel_to_snake import camel_to_snake
 
 
-
 class ValidateReleaseUtil(BasicErrCheck):
 
-    def __init__(self, opendp_user: get_user_model(), analysis_plan_id: int, dp_statistics: list=None, compute_mode=False, **kwargs):
+    def __init__(self, opendp_user: OpenDPUser, analysis_plan_id: int,
+                 dp_statistics: list = None, compute_mode: bool = False, **kwargs):
         """
         In most cases, don't use this method directly.
         To initialize, use:
@@ -86,15 +91,15 @@ class ValidateReleaseUtil(BasicErrCheck):
             self.run_validation_process()
 
     @staticmethod
-    def validate_mode(opendp_user: get_user_model(), analysis_plan_id: int,
-                      dp_statistics: list  =None):
+    def validate_mode(opendp_user: OpenDPUser, analysis_plan_id: int,
+                      dp_statistics: list = None):
         """
         Use this method to return a ValidateReleaseUtil validates the dp_statistics
         """
         return ValidateReleaseUtil(opendp_user, analysis_plan_id, dp_statistics)
 
     @staticmethod
-    def compute_mode(opendp_user: get_user_model(), analysis_plan_id: int,
+    def compute_mode(opendp_user: OpenDPUser, analysis_plan_id: int,
                      run_dataverse_deposit: bool = False):
         """
         Use this method to return a ValidateReleaseUtil which runs the dp_statistics
@@ -157,9 +162,15 @@ class ValidateReleaseUtil(BasicErrCheck):
         # -----------------------------------
         # Get the file/dataset pointer -- needs adjusting for blob/S3 type objects
         # -----------------------------------
-        filepath = self.analysis_plan.dataset.source_file.path
+        try:
+            filepath = self.analysis_plan.dataset.source_file.path
+        except ValueError as err_obj:
+            user_msg = (f'Failed to calculate statistics. Unable to access the data file. '
+                        f' ({err_obj})')
+            self.add_err_msg(user_msg)
+            return
+
         sep_char = get_data_file_separator(filepath)
-        # print('sep_char', sep_char)
 
         # -----------------------------------
         # Iterate through the stats!
@@ -272,12 +283,46 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.release_info.dp_release_json_file.save(json_filename, django_file)
         self.release_info.save()
 
+        # -------------------------------
+        # (4a) Save Release PDF
+        # -------------------------------
+        # Make Async! create the release PDF
+        # -------------------------------
+        print('SKIP_PDF_CREATION_FOR_TESTS', settings.SKIP_PDF_CREATION_FOR_TESTS)
+        if settings.SKIP_PDF_CREATION_FOR_TESTS:
+            # Skip PDF creation during tests to save time
+            pass
+        else:
+            # pdf_tasks.run_pdf_report_maker.delay(self.release_info.object_id)  # async
+            report_maker = PDFReportMaker(self.release_info.dp_release, self.release_info.object_id)
+            if not report_maker.has_error():
+                report_maker.save_pdf_to_release_obj(self.release_info)
+            # pdf_tasks.run_pdf_report_maker(self.release_info.object_id)  # in the loop...
+
+
         # (5) Attach the ReleaseInfo to the AnalysisPlan, AnalysisPlan.release_info
         #
         self.analysis_plan.release_info = self.release_info
         self.analysis_plan.user_step = AnalysisPlan.AnalystSteps.STEP_1000_RELEASE_COMPLETE
         self.analysis_plan.save()
         # print('ValidateReleaseUtil - self.release_stats', json.dumps(self.release_stats, indent=4))
+
+        # (6) Delete the "source_file"
+        #
+        delete_result = DataSetInfo.delete_source_file(self.analysis_plan.dataset)
+        if not delete_result.success:
+            self.add_err_msg(delete_result.message)
+            return False
+
+        # (7) Send release email to the user
+        #   (On error, continue the process)
+        if settings.SKIP_EMAIL_RELEASE_FOR_TESTS:
+            pass
+        else:
+            _email_util = ReleaseEmailUtil(self.release_info)
+        # if email_util.has_error():
+        #    self.add_err_msg(email_util.get_err_msg())
+        #    return
 
         return True
 
@@ -296,7 +341,9 @@ class ValidateReleaseUtil(BasicErrCheck):
             self.add_err_msg(formatter.get_err_msg())
             return
 
-        return formatter.get_release_data(as_json=as_json)
+        rd = formatter.get_release_data(as_json=as_json)
+
+        return rd
 
     def get_release_stats(self):
         """Return the release stats"""
@@ -334,6 +381,7 @@ class ValidateReleaseUtil(BasicErrCheck):
                 # Looks good but check single stat epsilon and cumulative epsilon
                 #
                 running_epsilon += stat_spec.epsilon
+
                 if stat_spec.epsilon > self.max_epsilon:
                     # Error one stat uses more than all the epsilon!
                     #
@@ -342,7 +390,7 @@ class ValidateReleaseUtil(BasicErrCheck):
                     stat_spec.add_err_msg(user_msg)
                     self.validation_info.append(stat_spec.get_error_msg_dict())
 
-                elif running_epsilon > self.max_epsilon:
+                elif (running_epsilon - astatic.MAX_EPSILON_OFFSET) > self.max_epsilon:
                     # Error: Too much epsilon used!
                     #
                     user_msg = (f'The running epsilon ({running_epsilon}) exceeds'
@@ -377,10 +425,6 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.stat_spec_list = []
         stat_num = 0
 
-        # track total epsilon
-        #
-        running_epsilon = 0
-
         for dp_stat in self.dp_statistics:
             stat_num += 1       # not used yet...
             """
@@ -392,7 +436,7 @@ class ValidateReleaseUtil(BasicErrCheck):
             - Some sample input from the UI--e.g. contents of "dp_stat:
                 {
                     "statistic": astatic.DP_MEAN,
-                    "variable": "EyeHeight",
+                    "variable_key": "eye_height"
                     "epsilon": 1,
                     "delta": 0,
                     "error": "",
@@ -412,8 +456,8 @@ class ValidateReleaseUtil(BasicErrCheck):
             #
             variable = props.get('variable')
             statistic = props.get('statistic', 'shrug?')
-            epsilon = props.get('epsilon')
-            var_type = None
+            # epsilon = props.get('epsilon')
+            # var_type = None
 
             # (1) Is variable defined?
             #
@@ -431,26 +475,20 @@ class ValidateReleaseUtil(BasicErrCheck):
                 self.add_stat_spec(DPSpecError(props))
                 continue  # to the next dp_stat specification
 
-
             # (3) Add variable_info which has min/max/categories, variable type, etc.
             #
             variable_info = self.analysis_plan.variable_info.get(variable)
-            if not variable_info:
-                # Temp workaround!!! See Issue #300
-                # https://github.com/opendp/dpcreator/issues/300
-                variable_info = self.analysis_plan.variable_info.get(camel_to_snake(variable))
-
             if variable_info:
                 props['variable_info'] = variable_info
                 var_type = variable_info.get('type')
             else:
-                props['error_message'] = 'Variable info not found.'
+                props['error_message'] = 'Variable in validation info not found.'
                 self.add_stat_spec(DPSpecError(props))
                 continue  # to the next dp_stat specification
 
             # (4) Retrieve the column index
             #
-            col_idx_info = self.analysis_plan.dataset.get_variable_index(variable)
+            col_idx_info = self.analysis_plan.dataset.get_variable_index(variable_info['name'])
             if col_idx_info.success:
                 props['col_index'] = col_idx_info.data
             else:
@@ -486,6 +524,9 @@ class ValidateReleaseUtil(BasicErrCheck):
             elif statistic == astatic.DP_SUM:
                 # DP Mean!
                 self.add_stat_spec(DPSumSpec(props))
+
+            elif statistic == astatic.DP_VARIANCE:
+                self.add_stat_spec(DPVarianceSpec(props))
 
             elif statistic in astatic.DP_STATS_CHOICES:
                 # Stat not yet available or an error
@@ -550,10 +591,10 @@ class ValidateReleaseUtil(BasicErrCheck):
             self.add_err_msg(user_msg)
             return False
 
-
         return True
 
-    def is_epsilon_valid(self, val):
+    @staticmethod
+    def is_epsilon_valid(val):
         """Validate a val as epsilon"""
         try:
             validate_epsilon_not_null(val)

@@ -1,3 +1,4 @@
+from opendp.accuracy import laplacian_scale_to_accuracy
 from opendp.trans import *
 from opendp.meas import *
 from opendp.mod import enable_features, binary_search_param, OpenDPException
@@ -19,6 +20,7 @@ class DPHistogramIntegerSpec(StatSpec):
     def __init__(self, props: dict):
         """Set the internals using the props dict"""
         super().__init__(props)
+        self.noise_mechanism = astatic.NOISE_GEOMETRIC_MECHANISM
 
     def additional_required_props(self):
         """
@@ -74,7 +76,6 @@ class DPHistogramIntegerSpec(StatSpec):
         if self.has_error():
             return
 
-
     def check_scale(self, scale, preprocessor):
         """
         Return T/F
@@ -118,13 +119,22 @@ class DPHistogramIntegerSpec(StatSpec):
         return preprocessor
 
     def set_accuracy(self):
-        """Return the accuracy measure using Laplace and the confidence interval as alpha"""
+        """Return the accuracy measure using Laplace and the confidence level alpha"""
         if self.has_error():
             return False
 
-        # TODO: These are placeholders to make the frontend process finish
-        self.accuracy_val = 100.0  # Future: self.geometric_scale_to_accuracy()
-        self.accuracy_msg = "Test - Accuracy Not Available!"
+        if not self.preprocessor:
+            self.preprocessor = self.get_preprocessor()
+
+        # This is for histograms, so divide alpha by the number of counts
+        cl_alpha = self.get_confidence_level_alpha() / len(self.categories)
+        if cl_alpha is None:
+            # Error already saved
+            return False
+        self.accuracy_val = laplacian_scale_to_accuracy(self.scale, cl_alpha)
+
+        # Note `self.accuracy_val` must bet set before using `self.get_accuracy_text()
+        self.accuracy_msg = self.get_accuracy_text(template_name='analysis/dp_histogram_accuracy_default.html')
 
         return True
 

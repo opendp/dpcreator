@@ -98,7 +98,7 @@ Example of using async/websockets.
     /* Start a new websocket upon page load           */
     /* ---------------------------------------------- */
     const chatSocket = new WebSocket(
-        '{{ WEBSOCKET_PREFIX }}' + window.location.host + '/async_messages/ws/profile/{{ websocket_id }}' + '/'
+        '{{ VUE_APP_WEBSOCKET_PREFIX }}' + window.location.host + '/async_messages/ws/profile/{{ websocket_id }}' + '/'
     );
 
     /* ---------------------------------------------- */

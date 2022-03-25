@@ -8,13 +8,15 @@ BaseClass for Univariate statistics for OpenDP.
 - Implementing the "get_preprocessor" method acts as validation.
 -
 """
-import abc # import ABC, ABCMeta, abstractmethod
+import abc  # import ABC, ABCMeta, abstractmethod
 from collections import OrderedDict
 import decimal
+import json
+from typing import Union
 
+from django.core.serializers.json import DjangoJSONEncoder
 from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
-
 
 from opendp.mod import OpenDPException
 
@@ -35,6 +37,8 @@ from opendp_apps.analysis.stat_valid_info import StatValidInfo
 
 class StatSpec:
     __metaclass__ = abc.ABCMeta
+
+    STATISTIC_TYPE = None
 
     prop_validators = dict(statistic=validate_statistic,
                            dataset_size=validate_int_greater_than_zero,
@@ -67,6 +71,7 @@ class StatSpec:
 
         self.cl = props.get('cl')      # confidence level coefficient (e.g. .95, .99, etc)
 
+        self.noise_mechanism = None
         #
         self.accuracy_val = None
         self.accuracy_msg = None
@@ -239,7 +244,7 @@ class StatSpec:
         Made into a separate function re: b/c of post init
         transforms such as `floatify_int_values`
         """
-        return (self.min, self.max)
+        return self.min, self.max
 
     def is_chain_valid(self):
         """Checking validity is accomplished by building the preprocessor"""
@@ -280,8 +285,7 @@ class StatSpec:
         assert isinstance(more_props_to_floatify, list), \
             '"more_props_to_floatify" must be a list, even and empty list'
 
-        props_to_floatify = ['epsilon', 'cl', 'min', 'max',] \
-                            + more_props_to_floatify
+        props_to_floatify = ['epsilon', 'cl', 'min', 'max'] + more_props_to_floatify
 
         for prop_name in props_to_floatify:
             if not self.cast_property_to_float(prop_name):
@@ -309,7 +313,7 @@ class StatSpec:
             if not self.cast_property_to_float('delta'):
                 return
 
-        if not self.var_type in pstatic.VALID_VAR_TYPES:
+        if self.var_type not in pstatic.VALID_VAR_TYPES:
             self.add_err_msg(f'Invalid variable type: "{self.var_type}"')
             return
 
@@ -366,13 +370,13 @@ class StatSpec:
     def validate_property(self, prop_name: str, validator=None) -> bool:
         """Validate a property name using a validator"""
         if self.has_error():
-            return
+            return False
 
         if validator is None:
             validator = self.prop_validators.get(prop_name)
             if validator is None:
                 self.add_err_msg(f'Validator not found for property "{prop_name}"')
-                return
+                return False
 
         # print('prop_name', prop_name)
         try:
@@ -416,7 +420,9 @@ class StatSpec:
 
         if isinstance(prop_val, float):
             if prop_val != prop_val_int:
-                self.add_err_msg(f'Failed to convert "{prop_name}" to an equivalent integer. (original: {prop_val}, converted: {prop_val_int})')
+                user_msg = (f'Failed to convert "{prop_name}" to an equivalent integer.'
+                            f'(original: {prop_val}, converted: {prop_val_int})')
+                self.add_err_msg(user_msg)
                 return False
 
         setattr(self, prop_name, prop_val_int)
@@ -448,22 +454,31 @@ class StatSpec:
     def print_debug(self):
         """show params"""
         print('-' * 40)
-        import json
-        print(json.dumps(self.__dict__, indent=4))
+        try:
+            print(json.dumps(self.__dict__, indent=4, cls=DjangoJSONEncoder))
+        except TypeError as err_obj:
+            print(f'stat_spec.print_debug() failed with {err_obj}')
         # for key, val in self.__dict__.items():
         #    print(f'{key}: {val}')
 
-    def get_short_description_text(self):
+    def get_short_description_text(self, template_name=None):
         """Get description in plain text"""
-        template_name = 'analysis/dp_stat_general_description.txt'
+        template_name = template_name if template_name else 'analysis/dp_stat_general_description.txt'
         return self.get_short_description_html(template_name)
 
     def get_short_description_html(self, template_name=None):
         """
         Create an HTML description using a ReleaseInfo object
         """
+        slice_length = 10
+        value = {}
+        # For histogram specs, we need to limit the number of categories and values we display in the front end
+        if self.STATISTIC_TYPE == astatic.DP_HISTOGRAM:
+            for k, v in self.value.items():
+                value[k] = v[:slice_length]
         info_dict = {
             'stat': self,
+            'histogram_values': value,
             'use_min_max': 'min' in self.additional_required_props(),
             'MISSING_VAL_INSERT_FIXED': astatic.MISSING_VAL_INSERT_FIXED,
             'MISSING_VAL_INSERT_RANDOM': astatic.MISSING_VAL_INSERT_RANDOM
@@ -477,7 +492,6 @@ class StatSpec:
 
         # print(desc)
         return desc
-
 
     def get_accuracy_text(self, template_name=None):
         """
@@ -505,9 +519,11 @@ class StatSpec:
         final_info = OrderedDict({
                          "statistic": self.statistic,
                          "variable": self.variable,
+                         "variable_type": self.var_type,
                          "result": {
                             "value": self.value
                          },
+                         "noise_mechanism": self.noise_mechanism,
                          "epsilon": self.epsilon,
                          "delta": self.delta,
                     })
@@ -516,11 +532,6 @@ class StatSpec:
         #
         if 'min' in self.additional_required_props():
             final_info['bounds'] = OrderedDict({'min': self.min, 'max': self.max})
-
-        # Categories
-        #
-        if 'categories' in self.additional_required_props():
-            final_info['categories'] = self.categories
 
         # Missing values
         #
@@ -540,12 +551,19 @@ class StatSpec:
                 final_info['accuracy']['message'] = self.accuracy_msg
 
         final_info['description'] = OrderedDict()
-        final_info['description']['html'] = self.get_short_description_html()
-        final_info['description']['text'] = self.get_short_description_text()
+
+        template_name_html = 'analysis/dp_stat_general_histogram_description.html' \
+            if self.STATISTIC_TYPE == astatic.DP_HISTOGRAM else 'analysis/dp_stat_general_description.html'
+
+        template_name_txt = 'analysis/dp_stat_general_histogram_description.txt' \
+            if self.STATISTIC_TYPE == astatic.DP_HISTOGRAM else 'analysis/dp_stat_general_description.txt'
+
+        final_info['description']['html'] = self.get_short_description_html(template_name=template_name_html)
+        final_info['description']['text'] = self.get_short_description_text(template_name=template_name_txt)
 
         return final_info
 
-    def get_confidence_level_alpha(self) -> float:
+    def get_confidence_level_alpha(self) -> Union[float, None]:
         """Get the confidence level (CL) alpha. e.g. if CL coefficient is .99, return .01
         Assumes that `self.cl` has passed through the validator: `validate_confidence_level`
         """
