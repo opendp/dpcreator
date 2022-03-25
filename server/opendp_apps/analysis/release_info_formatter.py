@@ -10,6 +10,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import render_to_string
 
 from opendp_apps.analysis.models import ReleaseInfo
+from opendp_apps.analysis.setup_question_formatter import SetupQuestionFormatter
 from opendp_apps.dataset.dataset_formatter import DataSetFormatter
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 
@@ -78,6 +79,14 @@ class ReleaseInfoFormatter(BasicErrCheck):
         else:
             dataset_dict = ds_formatter.get_formatted_info()
 
+        # depositor setup questions
+        setup_questions = None
+        depositor_info = self.dataset.depositor_setup_info
+        if depositor_info:
+            setup_formatter = SetupQuestionFormatter(depositor_info)
+            if not setup_formatter.has_error():
+                setup_questions = setup_formatter.as_dict()
+
         self.release_dict = OrderedDict({
             "name": str(self.release_util.analysis_plan),
             # "release_url": None,    # via with https://github.com/opendp/dpcreator/issues/34
@@ -94,6 +103,7 @@ class ReleaseInfoFormatter(BasicErrCheck):
                 "version": self.release_util.opendp_version,
             },
             "dataset": dataset_dict,
+            "setup_questions": setup_questions,
             "statistics": self.release_util.get_release_stats()
         })
 
