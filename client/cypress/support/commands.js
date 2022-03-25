@@ -45,7 +45,7 @@ Cypress.Commands.add('epsilonStep', () => {
     cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
     cy.wait('@datasetInfo', {timeout: 5000})
 
-    cy.get('h1').should('contain', 'Set Accuracy Level').should('be.visible')
+    cy.get('h1').should('contain', 'Sampling Frame').should('be.visible')
     cy.get('[data-test="Larger Population - no"]').check({force: true})
     //  cy.get('[data-test="Public Observations - yes"]').should('be.visible')
     cy.get('[data-test="Public Observations - yes"]').check({force: true})

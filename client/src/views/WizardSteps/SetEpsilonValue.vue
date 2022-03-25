@@ -1,6 +1,6 @@
 <template>
   <div class="set-epsilon-page">
-    <h1 class="title-size-1">Set Accuracy Level</h1>
+    <h1 class="title-size-1">Sampling Frame</h1>
     <p>
       {{
         $t('set epsilon.epsilon intro')

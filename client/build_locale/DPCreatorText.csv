@@ -8,7 +8,7 @@ home,step1 text,"Make sure your data is ready and appropriate to be processed wi
 home,step2 title,Connect a dataset,Connect a dataset
 home,step2 text,"DP Creator works with a temporary copy of a dataset file you send from a registered Dataverse data repository. This allows you to create differentially private summary statistics from variables you choose.",DP Creator works with a temporary copy of the first 20 variables of a file you send from a registered Dataverse data repository to create differentially private summary statistics from the variables you choose.
 home,step3 title,Work on a release,Work on release
-home,step3 text,"DP Creator guides you through several steps: Confirm Variables, Set Accuracy Level, Create Statistics, and Generate DP Release. You can save along the way, and have 72 hours to complete the release.","You can work with your data in 4 steps: Confirm variables, Set epsilon value, Create statistics, Generate DP Release. You'll see more information about the steps during the process. <strong>You have 72 hours to finish your release or the data will be deleted from the tool.</strong>"
+home,step3 text,"DP Creator guides you through several steps: Confirm Variables, Sampling Frame, Create Statistics, and Generate DP Release. You can save along the way, and have 72 hours to complete the release.","You can work with your data in 4 steps: Confirm variables, Set epsilon value, Create statistics, Generate DP Release. You'll see more information about the steps during the process. <strong>You have 72 hours to finish your release or the data will be deleted from the tool.</strong>"
 home,step4 title,Review and submit,Check the release
 home,step4 text,"After processing, review the DP Release in DP Creator. If you choose, DP Creator will deposit the DP release back in the referring Dataverse repository dataset for sharing and publication.","After processing, review the release in DP Creator. When you're ready, submit the release to the referring Dataverse repository dataset for sharing and publication."
 home,service section title,Tips for Use,Tips for Use
@@ -48,8 +48,7 @@ the differential privacy release. To adjust the necessary parameters to complete
 range depending on the variable's type in the table below."
 confirm variables,help variable,"Examples. Numerical variable ""age"": min: 0, max: 100. Categorical variable ""eye color"": brown, blue, black, green","E.g. Numerical: minX - max: Y; Categorical: cat1,cat2,cat3"
 confirm variables,help type,"Type is inferred when data is imported. If it is not inferred correctly, cancel the release, and edit the original file.",Type is inferred. Edit it in the original file
-set epsilon,epsilon intro,"The questions below will help determine what algorithms to use when creating differentially private statistics from your data file.","To determine the epsilon value, we need to confirm your dataset's characteristics with some questions about
-the sample."
+set epsilon,epsilon intro,"The questions below will help determine the appropriate variant of differential privacy to use for your dataset and possible adjustments to the privacy parameters.","The questions below will help determine the appropriate variant of differential privacy to use for your dataset and possible adjustments to the privacy parameters."
 set epsilon,help epsilon,"Epsilon is a metric of privacy loss at a differentially change in data (adding, removing 1 entry). The smaller the value is, the better
 privacy protection.","Epsilon is a metric of privacy loss at a differentially change in data (adding, removing 1 entry). The smaller the value is, the better
 privacy protection."
