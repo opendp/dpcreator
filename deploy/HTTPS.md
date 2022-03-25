@@ -2,7 +2,8 @@
 
 - Login to [Cloudflare](https://www.cloudflare.com/) and click "+ Add Site"
 - Enter the domain name that will be used to host the site. (e.g. dpcreator.org)
-- Choose a plan
+- Choose a plan 
+  - (Note: Currently using the "Free" plan for demo/dev sites)
 - You will see a set of DNS records taken from the current registrar. Check these records against the registrar and make sure all the entries are there. Add any that are missing. 
 - Click continue
 - Select "Full encryption"
