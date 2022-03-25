@@ -127,7 +127,6 @@ export default {
   },
   computed: {
     ...mapState('auth', ['errorMessage']),
-
     theme() {
       return this.$vuetify.theme.dark ? "dark" : "light";
     },

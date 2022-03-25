@@ -193,50 +193,60 @@ Cypress.Commands.add('createStatistics', (demoData) => {
 
 
     // Create statistic for every statistics item in the fixture
+    cy.enterStatsInPopup(demoData)
+})
+
+Cypress.Commands.add('enterStatsInPopup', (demoData) => {
     cy.get('[data-test="Add Statistic"]').should('be.visible')
+    let count = 0
     demoData.statistics.forEach((demoStat) => {
-        let demoVar = demoData.variables[demoStat.variable]
+        count++
+        let demoVar = demoStat.variable
         cy.get('[data-test="Add Statistic"]').click({force: true});
+        cy.get('[data-test="AddStatisticDialog"]').should('be.visible')
+
         cy.get('[data-test="' + demoStat.statistic + '"]').click({force: true});
-        const varDataTest = '[data-test="' + demoVar.name + '"]'
+        const varDataTest = '[data-test="' + demoVar + '"]'
         cy.get(varDataTest).click({force: true})
         cy.get('[data-test="Fixed value"]').type(demoStat.fixedValue)
         cy.get('[data-test="Create statistic"]').click({force: true})
-
+        cy.get('[data-test="Create Statistics Title').should('be.visible')
+        cy.get('[data-test="Add Statistic"]').should('be.visible')
         // The statistic should have been created
         // cy.get('[data-test="statistic"]').should('contain', 'Mean')
         cy.get('tr').first().get('td').should('contain', demoStat.statistic)
+        //  cy.get('tr').children().should('be.at.least',count)
         cy.get('table').contains('td', demoStat.statistic).should('be.visible');
         // Statistic should contain correct accuracy value
+
+    })
+    demoData.statistics.forEach((demoStat) => {
         cy.get('table').contains('td', demoStat.roundedAccuracy).should('be.visible')
     })
 }),
 
 
-Cypress.Commands.add('createMeanStatistic', (numericVar) => {
-    cy.intercept('PATCH', '/api/deposit/**',).as(
-        'patchDeposit'
-    )
-    cy.intercept('GET', '/api/dataset-info/**',).as(
-        'datasetInfo'
-    )
-    const minDataTest = '[data-test="' + numericVar.name + ':min"]'
-    const maxDataTest = '[data-test="' + numericVar.name + ':max"]'
-    // Enter min and max for one numericVar so we can validate
-    cy.contains('td', numericVar.name).parent('tr').children().first().click()
-    cy.get(minDataTest).should('be.visible')
-    cy.get(maxDataTest).should('be.visible')
-    cy.get(minDataTest).type(numericVar.min, {force: true})
-    cy.wait(500)
-    cy.get(maxDataTest).type(numericVar.max, {force: true})
-    // click back into min input, to trigger change event on max input
-    cy.get(minDataTest).click()
-    //  cy.wait('@patchDeposit', {timeout: 5000})
+    Cypress.Commands.add('createMeanStatistic', (numericVar) => {
+        cy.intercept('PATCH', '/api/deposit/**',).as(
+            'patchDeposit'
+        )
+        cy.intercept('GET', '/api/dataset-info/**',).as(
+            'datasetInfo'
+        )
+        const minDataTest = '[data-test="' + numericVar.name + ':min"]'
+        const maxDataTest = '[data-test="' + numericVar.name + ':max"]'
+        // Enter min and max for one numericVar so we can validate
+        cy.contains('td', numericVar.name).parent('tr').children().first().click()
+        cy.get(minDataTest).should('be.visible')
+        cy.get(maxDataTest).should('be.visible')
+        cy.get(minDataTest).type(numericVar.min, {force: true})
+        cy.wait(500)
+        cy.get(maxDataTest).type(numericVar.max, {force: true})
+        // click back into min input, to trigger change event on max input
+        cy.get(minDataTest).click()
+        //  cy.wait('@patchDeposit', {timeout: 5000})
+    })
 
-
-
-
-})
 Cypress.Commands.add('submitStatistics', (demoData) => {
     // Click Continue to go from Create Statistic to Generate DP Release Step
     cy.scrollTo('top')
@@ -248,17 +258,22 @@ Cypress.Commands.add('submitStatistics', (demoData) => {
     cy.get('[data-test="wizardSubmitStatistics"]').click({force: true});
     cy.get('[data-test="generate release status"]').should('be.visible')
 
-    cy.get('[data-test="generate release status"]').should('contain', 'Release Completed')
+    cy.get('[data-test="generate release status"]').should('contain', 'In Progress')
     // Go to Details page
     cy.get('[data-test="View Data Details"]').click({force: true});
     cy.url().should('contain', 'my-data-details')
     // The Release Details should be visible
     cy.get('[data-test="status tag"]').should('contain', 'Release Completed')
-    demoData.statistics.forEach((demoStat) => {
-        cy.get('[data-test="statistic description"]').should('contain', demoStat.statistic)
-        cy.get('[data-test="statistic description"]').should('contain', demoStat.accuracy)
-    })
+        .then(() => {
+            //    expect($p).to.contain('Release Completed')
+            const sessionObj = JSON.parse(sessionStorage.getItem('vuex'))
+            const releaseInfo = sessionObj.dataset.analysisPlan.releaseInfo
 
+            demoData.statistics.forEach((demoStat) => {
+                expect(releaseInfo.dpRelease.statistics[0].statistic).to.equal(demoStat.statistic.toLowerCase())
+                expect(releaseInfo.dpRelease.statistics[0].accuracy.value).to.equal(demoStat.accuracy)
+            })
+        })
 })
 Cypress.Commands.add('setupStatisticsPage', (datasetFixture, analysisFixture) => {
     cy.fixture(datasetFixture).then(dataset => {

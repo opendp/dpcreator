@@ -3,14 +3,14 @@
   "statistics":  [
     {
       "statistic": "Histogram",
-      "variable": "trial",
+      "variable": "Trial",
       "roundedAccuracy": "5.39",
-      "accuracy": "5.393627586538017",
+      "accuracy": 5.393627586538017,
       "fixedValue": "5"
     }
     ],
   "variables": {
-    "trial": {
+    "Trial": {
       "name": "Trial",
       "label": "",
       "type": "Integer",

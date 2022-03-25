@@ -18,6 +18,7 @@ class RegisteredDataverseAdmin(admin.ModelAdmin):
     list_display = ('name', 'dataverse_url', 'active', 'notes')
     save_on_top = True
     list_filter = ('active', )
+    readonly_fields = ('object_id',)
 
 
 class ManifestTestParamsAdmin(admin.ModelAdmin):
