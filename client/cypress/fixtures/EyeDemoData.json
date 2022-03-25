@@ -3,14 +3,14 @@
   "statistics":  [
     {
       "statistic": "Mean",
-      "variable": "eyeHeight",
+      "variable": "EyeHeight",
       "roundedAccuracy": "1.64",
       "accuracy": 1.6370121873967791,
       "fixedValue": "10"
     }
     ],
   "variables": {
-    "eyeHeight": {
+    "EyeHeight": {
       "name": "EyeHeight",
       "label": "",
       "type": "Float",
