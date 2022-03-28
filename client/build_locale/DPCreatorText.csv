@@ -37,7 +37,7 @@ new account,TOU Creating DP,"(add a link to the most recent terms of use doc, or
 new account,TOU Dataverse,"<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. "
 confirm variables,confirm variables intro,"<p><b>Select the variables</b> you want to use to generate your differentially private statistics. For each selected variable, please do the following:</p>
 <ul><li>Update the <b>Variable Label</b> (optional)
-</li><li>Check that the <b>Type</b> is correct. An incorrect <b>Type</b> can result in privacy violation.
+</li><li>Check that the <b>Type</b> is correct. <a href='/more-information#more-info-inferred-types'>An incorrect <b>Type</b> can result in a privacy violation.</a>
 </li><li>For <b>Float</b> and <b>Integer</b> variables,  please enter upper and lower bounds that a knowledgeable person might estimate without looking at the data.
 <ul><li>Ranges that are too broad may add too much noise.
 </li><li>Ranges that art too narrow may censor values and introduce bias.
@@ -48,8 +48,8 @@ confirm variables,confirm variables intro,"<p><b>Select the variables</b> you wa
 </li></ul>","First, you have to review, adjust and confirm the variables of your dataset. These will be considered in the generation of
 the differential privacy release. To adjust the necessary parameters to complete the process, you will need to set a valid
 range depending on the variable's type in the table below."
-confirm variables,help variable,"Examples. Numerical variable ""age"": min: 0, max: 100. Categorical variable ""eye color"": brown, blue, black, green","E.g. Numerical: minX - max: Y; Categorical: cat1,cat2,cat3"
-confirm variables,help type,"Type is inferred when data is imported. If it is not inferred correctly, cancel the release, and edit the original file.",Type is inferred. Edit it in the original file
+confirm variables,help variable,"Examples. Numerical variable ""age"": min: 0, max: 100. Categorical variable ""eye color"": brown, blue, black, green",
+confirm variables,help type,"Type is inferred when data is imported. If it is not inferred correctly, cancel the release, and edit the original file.",
 set epsilon,epsilon intro,"The questions below will help determine the appropriate variant of differential privacy to use for your dataset and possible adjustments to the privacy parameters.","The questions below will help determine the appropriate variant of differential privacy to use for your dataset and possible adjustments to the privacy parameters."
 set epsilon,help epsilon,"Epsilon is a metric of privacy loss at a differentially change in data (adding, removing 1 entry). The smaller the value is, the better
 privacy protection.","Epsilon is a metric of privacy loss at a differentially change in data (adding, removing 1 entry). The smaller the value is, the better
@@ -58,7 +58,7 @@ set epsilon,help data secret,"<b>If the data is a simple random sample, we can u
 the data file would not want publicly shared in their name and should be marked “yes”. Information that is solely about institutions,
 corporations, natural phenomena, etc., that are public record and can be publicly distributed, does not depend on private
 information.","For example, information about persons, their behavior, beliefs and attributes is generally private information that individuals in
-the dataset would not want publicly shared in their name and should be marked “yes”. Information that is solely about instituons,
+the dataset would not want publicly shared in their name and should be marked “yes”. Information that is solely about institutions,
 corporations, natural phenomena, etc., that are public record and can be publicly distributed, does not depend on private
 information."
 set epsilon,help data public,"<b>If the data file size can be made public, we don't need to spend a portion of your privacy budget to estimate it.</b> For example, the number of observations in a data file containing a 5% sample of California voters is public, but the number of observations in a data file containing all cancer patients in a particular hospital may not be public, as it could be combined with auxiliary information to reveal whether or not a patient has cancer.","For example, the number of observations in a dataset containing a 5% sample of California voters is public, but the number of observations in a dataset containing all cancer patients in a particular hospital may not be public, as it could be combined with auxiliary information to reveal whether or not a patient has cancer."
@@ -181,5 +181,24 @@ more information,delta text,"<p>Delta (&delta;) is a second privacy-loss paramet
 
 <p>This parameter  controls the probability that a privacy breach event would happen, and hence should be kept
 very small (e.g., one in a billion).</p>  ",
+more information,inferred-types title,Variable Types,
+more information,inferred-types text,"<p>When DP Creator first reads a data file, it attempts to infer each variable type, distinguishing between: Boolean, Categorical, Float, and Integer.</p>
+<p>However, this inference may not be correct and needs to be double-checked by the user! Without checking, a privacy violation may occur.</p>
+<p>For example, a dataset variable may be inferred to be <b>Boolean</b> because only two values for that variable appear in the data file. However, there may be more possible values that are not present in the data. The <i>absence</i> of those values may result in a privacy violation.</p>
+<p>For example:</p>
+<ul>
+<li>Pretend all people can one have one of three possible shape biomarkers: circle, square, and trapezoid--and trapezoid is associated with a fatal disease.</li>
+<li>A dataset on people living in Sunrise Beach, Los Angeles is loaded into DP Creator and the ShapeBiomarker variable includes the values circle and trapezoid (the fatal shape) but not square.
+    <br />&nbsp; &nbsp;<b>All possible values:</b> circle, square, and trapezoid
+    <br />&nbsp; &nbsp;<b>Values in the dataset</b>: circle, trapezoid
+    <br />&nbsp; &nbsp;<b>Incorrect Type inference</b>: Boolean
+    <br />&nbsp; &nbsp;<b>Actual Type</b>: Categorical
+</li>
+<li>Finding only two values in the dataset, DP Creator infers it to be type <b>Boolean</b></li>
+<li>If the type is not corrected to <b>Categorical</b> and a histogram is run on the ShapeBiomarker variable, someone with knowledge of shape biomarkers will be able to learn that no one in Sunrise Beach has the ShapeBiomarker ""square.""</li>
+<li>Depending on the histogram values, the size of Sunrise Beach, and available adjacent data someone may be able to identify people who have the fatal trapezoid biomarker.</li>
+<li>A serious privacy violation has occurred!</li>
+</ul><br />
+<p><i>Remember to check that the Variable Type is correct!</i></p>",
 more information,confidence title,What is a confidence level?,
 more information,confidence text,CI is,

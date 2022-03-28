@@ -266,7 +266,7 @@ export default {
       "Mean": ["Integer", "Float"],
       "Count": ["Integer", "Float", "Categorical", "Boolean"],
       "Variance": ["Integer", "Float"],
-      "Histogram": ["Categorical", "Integer"],
+      "Histogram": ["Categorical", "Integer", "Boolean"],
       "Quantile": ["Integer", "Float"] // not yet available
     },
     selectedStatistic: null,
