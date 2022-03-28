@@ -9,7 +9,7 @@
             cy.visit('more-information')
             cy.get('h2').should('contain', 'DP Creator Concepts')
             cy.get('h2').should('contain', 'What is a registered Dataverse?')
-            cy.get('h2').should('contain', 'What is epsilon')
+            cy.get('h2').should('contain', 'Privacy Budgeting and Epsilon')
             cy.get('h2').should('contain', 'What is delta')
 
         })

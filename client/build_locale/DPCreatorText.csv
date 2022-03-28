@@ -17,7 +17,7 @@ home,service1 text,"<p>If you have deposited restricted data files in a register
 <p>For more information on data security levels, please <a href=""mailto:info@opendp.org"" >contact us</a>.</p>","<p>If you have deposited restricted datasets in a registerd Dataverse repository, DP Creator allows you to create differentially private statistics. While your datasets remain restricted, the differentially private statistics are open to anyone. You should not use DP Creator if sharing the data could cause severe harm.</p>
 "
 home,service2 title,What statistics can be released using this tool?,What statistics can be released using this tool?
-home,service2 text,"<p>DP Creator generates statistics using the <a href=""https://github.com/opendp/opendp"" target=""_blank"">OpenDP library</a>. (Note: Currently, DP Creator allows you to work with the first 20 variables in your data file.) You may create differentially private versions of Count, Sum, Mean, Variance, and Histogram. We plan to add more statistics regularly.</p>","Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi iusto in, voluptas quia fugiat soluta labore consectetur harum repellendus accusamus quisquam quasi velit vero totam, optio assumenda atque obcaecati eum!"
+home,service2 text,"<p>DP Creator generates statistics using the <a href=""https://github.com/opendp/opendp"" target=""_blank"">OpenDP Library</a>. (Note: Currently, DP Creator allows you to work with the first 20 variables in your data file.) You may create differentially private versions of Count, Sum, Mean, Variance, and Histogram. We plan to add more statistics regularly.</p>","Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi iusto in, voluptas quia fugiat soluta labore consectetur harum repellendus accusamus quisquam quasi velit vero totam, optio assumenda atque obcaecati eum!"
 home,service3 title,How does it work?,What type of files are appropriate?
 home,service3 text,"[This section needs input] Types of files... First 20 variables... Gaussian, Laplace, and Geometric algorithms applied to common statistics...
 epsilon and delta...variables you select will be released with noise for privacy protection. Link to find out more","Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi iusto in, voluptas quia fugiat soluta labore consectetur harum repellendus accusamus quisquam quasi velit vero totam, optio assumenda atque obcaecati eum!"
@@ -26,7 +26,9 @@ home,service4 text,"<p>A differentially private (DP) Release includes the statis
 <ul>
 <li>PDF report for easy reading</li>
 <li>A machine readable JSON file</li>
-<p>Both files include the resulting statistics and how they were calculated.</p> ","Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi iusto in, voluptas quia fugiat soluta labore consectetur harum repellendus accusamus quisquam quasi velit vero totam, optio assumenda atque obcaecati eum!"
+<p>Both files include the resulting statistics and how they were calculated.</p>","Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi iusto in, voluptas quia fugiat soluta labore consectetur harum repellendus accusamus quisquam quasi velit vero totam, optio assumenda atque obcaecati eum!"
+home,service5 title,What features are coming in future versions of DP Creator?,""
+home,service5 text,"Features we are working on include incorporating new algorithms from the OpenDP library, multivariate statistics, and interactive queries by analysts. Please see the <a href='https://opendp.org/roadmap' target='_blank'>OpenDP RoadMap</a> for more details.",""
 home,checkbox,I have read the tips for use,
 home,footer title,This is a sentence about Open DP,This is a sentence <br/> about Open DP
 home,footer text,"OpenDP is a community effort to build trustworthy, open-source software tools for the statistical analysis of sensitive private data. These tools offer the rigorous protections of differential privacy for the individuals who may be represented in confidential data and statistically valid methods of analysis for researchers who study the data.","Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi iusto in, voluptas quia fugiat soluta labore consectetur harum repellendus accusamus quisquam quasi velit vero totam, optio assumenda atque obcaecati eum!"
@@ -63,7 +65,7 @@ set epsilon,help data public,"<b>If the data file size can be made public, we do
 create statistics,statistics intro,Create the statistics you would like to release. Confirm the default levels or edit them to change the degree of noise or interference you'd like to add. The default values distribute epsilon evenly across variables.,"Create the statistics you would like to release. Please edit and confirm the degree of noise or interference you'd like to
 add to the statistics."
 create statistics,more info 1-3,"Where should these links go? (or one link in the epsilon warning, below?)",Where should these links go?
-create statistics,epsilon warning,"Changing the epsilon, delta, or significance level will directly impact the privacy settings. Every DP statistic has a different tradeoff between epsilon value and accuracy. Splitting the budget evenly can diminish the usefulness of statistics. More complex statistics will generally require more budget. ( <a href='/more-information'>More Information about Epsilon</a>)",
+create statistics,epsilon warning,"Changing the epsilon, delta, or significance level will directly impact the privacy settings. Every DP statistic has a different tradeoff between epsilon value and accuracy. Splitting the budget evenly can diminish the usefulness of statistics. More complex statistics will generally require more budget. (<a href='/more-information#more-info-epsilon'>More Information about Privacy Budgeting and Epsilon (&epsilon;)</a>)",
 create statistics,statistics help,"You can apply differentially private statistics to single or multiples variables. Then, you can edit these statistics, lock them or delete them so that changes...","You can apply different statistics to single or multiples variables. Then, you can edit these statistics, lock them or delete
 them."
 create statistics,help epsilon,(Not in the AM files but needed?),
@@ -111,18 +113,68 @@ more information,registered dataverses text,"<p><a href=""https://dataverse.org/
 <p>The registration process uses Dataverse's <a href=""https://guides.dataverse.org/en/latest/admin/external-tools.html"">external tools framework</a>. Alternately, DP Creator may be installed for a specific Dataverse's installation to conform with an organization's security requirements.</p>
 
 <p>For more information, please <a href=""https://docs.opendp.org/en/stable/contact/index.html"">contact us</a>.</p>",
-more information,epsilon title,What is epsilon (&epsilon;)?,
-more information,epsilon text,"<p>An essential component of a differentially private computation is the privacy loss parameter, usually denoted by the Greek letter <b>&epsilon;</b> (epsilon). This parameter determines how much noise is added to the computation. Choosing a value for the privacy loss parameter can be thought of as a tuning knob for balancing privacy and accuracy.</p>
-
-<p>A lower <b>&epsilon;</b> value for corresponds to stronger privacy protection and also a larger decrease in accuracy, whereas a higher value for <b>&epsilon;</b> corresponds to weaker privacy protection and also a smaller decrease in accuracy.</p> 
-
+more information,epsilon title,Privacy Budgeting and Epsilon (&epsilon;)?,
+more information,epsilon text,"<p>If you are not familiar with differential privacy, one analogy for privacy budgeting is going clothes shopping with a fixed budget. With a fixed budget you can only purchase so many items and have to prioritize which pieces are most important for your wardrobe.</p>
+<p>Within differential privacy, the privacy budget is known as epsilon, denoted by the Greek letter <b>&epsilon;</b>.</p>
+<p>As an example, let's say your epsilon, or privacy budget, is 1.0. When you are at the stage of selecting DP statistics to calculate, you can decide how much epsilon to ""spend."" For example, suppose your data file contains the variable ""Age"" and you want to ""buy"", or calculate, the DP mean of Age. You could start by ""spending,"" or budgeting, 0.5 epsilon for that statistic.</p>
 <ul>
-<li>Lower <b>&epsilon;</b> value --> stronger privacy, less accuracy</li>
-<li>Higher <b>&epsilon;</b>; value --> weaker privacy, more accuracy</li>
+<li><b>Statistic:</b> DP Mean of Age</li>
+<li><b>Budget/Epsilon &epsilon;:</b> 0.5 </li>
+</ul><br />
+<p>At this point, <i>before</i> running an actual calculation or touching the source data file, DP Creator can determine an error measure for the calculation. In the example below, with a Confidence Level set to 95%, the error is 0.479:</p>
+<ul>
+<li><b>Statistic:</b> DP Mean of Age</li>
+<li><b>Budget/Epsilon &epsilon;:</b> 0.5 </li>
+<li><b>Error:</b> 0.479</li>
+<li><b>What it means:</b><br />
+There is 95% confidence that the DP Mean will be within 0.479 years of the actual mean age.</p></li>
+</li>
 </ul>
-
-<p> As a rule of thumb, however, <b>&epsilon;</b> should be thought of as a small number, between approximately 1/100 and 1.</p>
-
+<p>As may be seen above, with an &epsilon; of <b>0.5</b>, the error is <b>0.479</b>. Now, what if you used less &epsilon;, say 0.25?</p>
+<ul>
+<li><b>Statistic:</b> DP Mean of Age</li>
+<li><b>Budget/Epsilon &epsilon;:</b> 0.25 </li>
+<li><b>Error:</b> 0.959 </li>
+<li><b>What it means:</b><br />
+There is 95% confidence that the DP Mean will be within 0.959 years of the actual mean age.</p></li>
+</li>
+</ul>
+<p>In this case, using less &epsilon; <i>increases</i> the error, giving stronger privacy protection but less accuracy.</p>
+<p>In contrast, what happens when more &epsilon; is allocated for the same statistic? Say 0.75:</p>
+<ul>
+<li><b>Statistic:</b> DP Mean of Age</li>
+<li><b>Budget/Epsilon &epsilon;:</b> 0.75 </li>
+<li><b>Error:</b> 0.320 </li>
+<li><b>What it means:</b><br />
+There is 95% confidence that the DP Mean will be within 0.320 years of the actual mean age.</p></li>
+</li>
+</ul>
+<p>Looking through this example, using more &epsilon; <i>decreases</i> the error, giving less privacy protection but more accuracy.</p>
+<p>These examples show how increasing or decreasing the epsilon, or privacy budget, changes the error, impacting the privacy/accuracy of the statistic. </p>
+<table style=""border: 1px solid #1658a3;text-align:center;"" cellspacing=""15"" cellpadding=""10"">
+<tr>
+<th>epsilon</th>
+<th>error/accuracy</th>
+</tr>
+<tr>
+<td>0.25</td>
+<td>0.959</td>
+</tr>
+<tr>
+<td>0.50</td>
+<td>0.479</td>
+</tr>
+<td>0.75</td>
+<td>0.320</td>
+</tr>
+</table><br />
+<p>The relationship between epsilon and error/accuracy may be described as:</p>
+<ul>
+<li>Lower <b>&epsilon;</b> value --> higher error --> stronger privacy, less accuracy</li>
+<li>Higher <b>&epsilon;</b> value --> lower error --> weaker privacy, more accuracy</li>
+</ul><br />
+<p>Again, this accuracy/error measure may be determined <i>before</i> running the actual calculation. This allows you to experiment with different statistics and epsilon allocations before calculating the DP statistics. It is simillar to adding/removing/editing items in an online shopping cart before committing to a purchase.</p>
+<p>As a rule of thumb, <b>&epsilon;</b> should be thought of as a small number, between approximately 1/100 and 1.</p>
 <p><i>(Note: This information has been excerpted from the book chapter <a href=""https://admindatahandbook.mit.edu/book/v1.0/diffpriv.html"" target=""_blank"">Designing Access with Differential Privacy</a>, which also contains illustrative examples.)</i></p>",
 more information,delta title,What is delta (&delta;)?,
 more information,delta text,"<p>Delta (&delta;) is a second privacy-loss parameter used when calculating some differentially private statistics.</p>  
