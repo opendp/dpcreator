@@ -151,7 +151,6 @@ const actions = {
             })
     },
     updateDepositorSetupInfo({commit, state}, {objectId, props}) {
-        //  console.log("props: " + JSON.stringify(props))
         if (props.hasOwnProperty('userStep')) {
             console.log('new step: ' + props.userStep)
         }
@@ -177,7 +176,6 @@ const actions = {
      */
     updateVariableInfo({commit, state}, variableInput) {
         //  Get a local copy of variableInfo, for editing
-        console.log('variableInput: ' + JSON.stringify(variableInput))
         let variableInfo = JSON.parse(JSON.stringify(state.datasetInfo.depositorSetupInfo.variableInfo))
         let targetVar = variableInfo[variableInput.key]
         targetVar.name = variableInput.name
@@ -286,14 +284,10 @@ const actions = {
                     const profileData = JSON.parse(wsMsg.data.profileStr)
                     const profileStr = JSON.stringify(profileData.variables, null, 2);
                     console.log(typeof wsMsg.data);
-                    ////    Object.keys(profileData.variables).forEach((key)=> {
-                    //        profileData.variables[key].selected = false
-                    //    })
-                    // update depositorSetupInfo with variableInfo contained in the message
-                    var props = {
-                        variableInfo: profileData.variables,
-                        userStep: STEP_0400_PROFILING_COMPLETE
-                    }
+                      var props = {
+                          variableInfo: profileData.variables,
+                          userStep: STEP_0400_PROFILING_COMPLETE
+                      }
                     props = camelcaseKeys(props, {deep: true})
                     const payload = {objectId: state.datasetInfo.depositorSetupInfo.objectId, props: props}
                     this.dispatch('dataset/updateDepositorSetupInfo', payload)
@@ -384,7 +378,6 @@ const mutations = {
     },
     [PATCH_DEPOSITOR_INFO](state, props) {
         Object.keys(props).forEach((key) => {
-            console.log("key " + key + "setting prop: " + JSON.stringify(props[key]))
             state.datasetInfo.depositorSetupInfo[key] = props[key]
         })
 
