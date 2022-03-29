@@ -238,7 +238,6 @@ export default {
   methods: {
     logoutHandler() {
       this.$store.dispatch('auth/logout')
-      this.$store.dispatch('dataset/clearDatasetStorage')
       if (this.$router.currentRoute.path != NETWORK_CONSTANTS.HOME.PATH) {
         this.$router.push(NETWORK_CONSTANTS.HOME.PATH);
       }
