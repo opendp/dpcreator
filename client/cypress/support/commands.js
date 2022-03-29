@@ -43,7 +43,6 @@ Cypress.Commands.add('vuex', () =>
 Cypress.Commands.add('epsilonStep', () => {
     cy.scrollTo('top')
     cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
-    cy.wait('@datasetInfo', {timeout: 5000})
 
     cy.get('h1').should('contain', 'Sampling Frame').should('be.visible')
     cy.get('[data-test="Larger Population - no"]').check({force: true})
@@ -128,9 +127,7 @@ Cypress.Commands.add('storeExample', (email, password) => {
 Cypress.Commands.add('goToConfirmVariables', (variableData) => {
     // click on the start Process button on the welcome page,
     // to navigate to the Validate Dataset step of the Wizard
-    cy.intercept('GET', '/api/dataset-info/**',).as(
-        'datasetInfo'
-    )
+
     cy.get('[data-test="Start Process"]').click();
     cy.url().should('contain', 'wizard')
     cy.get('[data-test="radioPrivateInformationYes"]').check({force: true})
@@ -139,7 +136,6 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
 
     // click on continue to go to trigger the profiler and go to the Confirm Variables Page
     cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
-    cy.wait('@datasetInfo')
     cy.get('h1').should('contain', 'Confirm Variables')
     for (const key in variableData) {
         const val = variableData[key]
@@ -164,15 +160,14 @@ Cypress.Commands.add('selectVariable',(demoVariables)=> {
             cy.get(minDataTest).should('be.visible')
             cy.get(maxDataTest).should('be.visible')
             cy.get(minDataTest).type(demoVar.min, {force: true})
-            cy.wait(500)
             cy.get(maxDataTest).type(demoVar.max, {force: true})
             // click back into min input, to trigger change event on max input
             cy.get(minDataTest).click()
-            cy.wait(500)
             cy.get(maxDataTest).should('have.value', demoVar.max)
         }
-    // TODO: add handling of Categorical vars
+        // TODO: add handling of Categorical vars
     })
+    cy.wait(500)
 
 })
 
@@ -180,7 +175,6 @@ Cypress.Commands.add('createStatistics', (demoData) => {
     // Continue to Create  Statistics Step
     cy.scrollTo('top')
     cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
-    cy.wait('@datasetInfo', {timeout: 5000})
 
     // On the statistics page, test edit statistics Params
     cy.get('h1').should('contain', 'Create Statistics').should('be.visible')
