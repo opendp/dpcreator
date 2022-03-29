@@ -8,7 +8,8 @@ import {
     SET_PROFILER_MSG,
     SET_PROFILER_STATUS,
     SET_ANALYSIS_PLAN,
-    SET_MYDATA_LIST
+    SET_MYDATA_LIST,
+    PATCH_DEPOSITOR_INFO
 } from './types';
 import dataverse from "@/api/dataverse";
 import stepInformation, {
@@ -156,21 +157,14 @@ const actions = {
         }
         analysis.patchDepositorSetup(objectId, props)
             .then((resp) => {
-                dataset.getDatasetInfo(state.datasetInfo.objectId)
-                    .then((resp) => {
-                        commit(SET_DATASET_INFO, resp.data)
-                    }).then(() => {
-
-                    if (props.hasOwnProperty('userStep')
-                        && props.userStep === STEP_0600_EPSILON_SET) {
-                        this.dispatch('dataset/createAnalysisPlan', state.datasetInfo.objectId)
-                    }
-
-                })
-
+                var patched = {}
+                commit(PATCH_DEPOSITOR_INFO, props)
+                if (props.hasOwnProperty('userStep')
+                    && props.userStep === STEP_0600_EPSILON_SET) {
+                    this.dispatch('dataset/createAnalysisPlan', state.datasetInfo.objectId)
+                }
             })
             .catch((data) => {
-                commit(REMOVE_UPDATING, objectId)
                 return Promise.reject(data)
             })
 
@@ -292,12 +286,15 @@ const actions = {
                     const profileData = JSON.parse(wsMsg.data.profileStr)
                     const profileStr = JSON.stringify(profileData.variables, null, 2);
                     console.log(typeof wsMsg.data);
-
+                    ////    Object.keys(profileData.variables).forEach((key)=> {
+                    //        profileData.variables[key].selected = false
+                    //    })
                     // update depositorSetupInfo with variableInfo contained in the message
-                    const props = {
+                    var props = {
                         variableInfo: profileData.variables,
                         userStep: STEP_0400_PROFILING_COMPLETE
                     }
+                    props = camelcaseKeys(props, {deep: true})
                     const payload = {objectId: state.datasetInfo.depositorSetupInfo.objectId, props: props}
                     this.dispatch('dataset/updateDepositorSetupInfo', payload)
                     return (wsMsg.userMessage)
@@ -384,6 +381,13 @@ const mutations = {
     },
     [SET_DATASET_INFO](state, datasetInfo) {
         state.datasetInfo = datasetInfo
+    },
+    [PATCH_DEPOSITOR_INFO](state, props) {
+        Object.keys(props).forEach((key) => {
+            console.log("key " + key + "setting prop: " + JSON.stringify(props[key]))
+            state.datasetInfo.depositorSetupInfo[key] = props[key]
+        })
+
     },
 };
 // Functions that are used for Vuex state and also
