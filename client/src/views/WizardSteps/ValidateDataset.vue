@@ -75,7 +75,7 @@
               <div>
                 Information that, if disclosed,
                 <strong>would not cause material harm</strong>, but which the
-                university has chosen to <strong>keep confidential</strong>.
+                organization has chosen to <strong>keep confidential</strong>.
               </div>
             </template>
           </RadioItem>
@@ -90,7 +90,7 @@
               <div>
                 Information that
                 <strong>could cause risk of material harm </strong>to
-                individuals or the university if disclosed.
+                individuals or the organization if disclosed.
               </div>
             </template>
           </RadioItem>
@@ -105,7 +105,7 @@
               <div>
                 Information that
                 <strong>would likely cause serious harm </strong>to individuals
-                or the university if disclosed.
+                or the organization if disclosed.
               </div>
             </template>
           </RadioItem>
@@ -120,7 +120,7 @@
               <div>
                 Information that
                 <strong>would cause severe harm </strong>to individuals or the
-                university if disclosed. Use of this application is not recommended.
+                organization if disclosed. Use of this application is not recommended.
               </div>
             </template>
           </RadioItem>
@@ -128,13 +128,18 @@
         <AdditionalInformationAlert>
           <template v-slot:content>
             If you are unsure, please reference our
-            <a href="https://policy.security.harvard.edu/view-data-security-level"
-               class="primary--text font-weight-bold d-inline-flex">
+            <a href="https://policy.security.harvard.edu/view-data-security-level" target="_blank" class="primary--text font-weight-bold d-inline-flex">
               data classification examples.
               <v-icon small color="blue darken-1" class="px-2">
                 mdi-open-in-new
               </v-icon>
             </a>
+            <br /><i>These examples are based on Harvard University information security policy and <b>not a legal standard</b></i>.
+          </template>
+        </AdditionalInformationAlert>
+      <AdditionalInformationAlert>
+          <template v-slot:content>
+            Note: The data security examples and levels are to help give context. In a production deployment, the answers to this question and examples will be customized to an individual organization's data privacy standards.
           </template>
         </AdditionalInformationAlert>
       </div>

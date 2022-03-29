@@ -44,7 +44,7 @@ Cypress.Commands.add('epsilonStep', () => {
     cy.scrollTo('top')
     cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
 
-    cy.get('h1').should('contain', 'Set Accuracy Level').should('be.visible')
+    cy.get('h1').should('contain', 'Sampling Frame').should('be.visible')
     cy.get('[data-test="Larger Population - no"]').check({force: true})
     //  cy.get('[data-test="Public Observations - yes"]').should('be.visible')
     cy.get('[data-test="Public Observations - yes"]').check({force: true})
