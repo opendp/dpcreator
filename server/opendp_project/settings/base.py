@@ -9,14 +9,13 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
-import json
 import os
+import sys
 
 from distutils.util import strtobool
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -27,14 +26,13 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'SECRET_KEY!-ADD-REAL-KEY-HERE!--ADD-REAL-K
 # For field level encryption: https://django-cryptography.readthedocs.io/en/latest/settings.html
 CRYPTOGRAPHY_KEY = os.getenv('CRYPTOGRAPHY_KEY', 'CRYPTOGRAPHY_KEY!-ADD-REAL-KEY!1234!')
 
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 # Application definition
 
 INSTALLED_APPS = [
-    'channels', # Django channels..
+    'channels',  # Django channels..
     'opendp_apps.async_messages',
     #
     'django.contrib.admin',
@@ -67,6 +65,7 @@ INSTALLED_APPS = [
     'opendp_apps.communication',
     'opendp_apps.profiler',
     'opendp_apps.dp_reports',
+    'opendp_apps.logging_metrics',
 ]
 
 MIDDLEWARE = [
@@ -77,6 +76,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'opencensus.ext.django.middleware.OpencensusMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -98,7 +98,6 @@ TEMPLATES = [
     },
 ]
 
-
 # -----------------------------------------------
 # REDIS settings
 # -----------------------------------------------
@@ -112,11 +111,10 @@ if REDIS_PASSWORD:
 else:
     REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}'
 
-
 # -----------------------------------------------
 # ASGI, Channels settings
 # -----------------------------------------------
-#WSGI_APPLICATION = 'opendp_project.wsgi.application'
+# WSGI_APPLICATION = 'opendp_project.wsgi.application'
 
 ASGI_APPLICATION = "opendp_project.asgi.application"
 CHANNEL_LAYERS = {
@@ -142,7 +140,6 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -161,7 +158,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -174,7 +170,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
@@ -197,7 +192,6 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination', 'PAGE_SIZE': 10
 }
-
 
 # -----------------------------------
 # Handling uploaded files
@@ -231,9 +225,9 @@ if not os.path.isdir(RELEASE_FILE_STORAGE_ROOT):
 
 # -------------------------------------
 AUTHENTICATION_BACKENDS = (
- 'django.contrib.auth.backends.ModelBackend',
- 'allauth.account.auth_backends.AuthenticationBackend',
- )
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
 
 SITE_ID = 3
 
@@ -269,11 +263,10 @@ CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOWED_ORIGINS = (
     # 'http://localhost:8000',
     # 'http://127.0.0.1:8000',
-    #'http://0.0.0.0:8000',
+    # 'http://0.0.0.0:8000',
     # 8080
     'http://127.0.0.1:8080',
 )
-
 
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.sendgrid.net')
@@ -319,12 +312,10 @@ assert TOTAL_EPSILON_MAX > 0, \
 assert TOTAL_EPSILON_MAX > TOTAL_EPSILON_MIN, \
     f"The TOTAL_EPSILON_MAX must be greater than the TOTAL_EPSILON_MIN. Found min: {TOTAL_EPSILON_MIN} / max: {TOTAL_EPSILON_MAX}"
 
-
-
 # ---------------------------
 # Celery Configuration Options
 # ---------------------------
-#CELERY_TIMEZONE = os.environ.get('America/New_York', 'CELERY_TIMEZONE')
+# CELERY_TIMEZONE = os.environ.get('America/New_York', 'CELERY_TIMEZONE')
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 
@@ -395,3 +386,41 @@ SKIP_EMAIL_RELEASE_FOR_TESTS = bool(strtobool(os.environ.get('SKIP_PDF_CREATION_
 #         }
 #     }
 # }
+
+LOGGING = {
+    "version": 1,
+    "handlers": {
+        "azure_log": {
+            "class": "opencensus.ext.azure.log_exporter.AzureLogHandler",
+            "instrumentation_key": os.environ.get("AZURE_INSTRUMENTATION_KEY"),
+        },
+        "azure_event": {
+            "class": "opencensus.ext.azure.log_exporter.AzureEventHandler",
+            "instrumentation_key": os.environ.get("AZURE_INSTRUMENTATION_KEY"),
+        },
+        "console": {
+            "class": "logging.StreamHandler",
+            "stream": sys.stdout,
+        },
+    },
+    "loggers": {
+        "azure": {
+            "handlers": ["azure_log", "console"],
+            "level": "INFO"
+        },
+        "azure_event": {
+            "handlers": ["azure_event"],
+            "level": "INFO"
+        }
+    },
+}
+
+
+OPENCENSUS = {
+    'TRACE': {
+        'SAMPLER': 'opencensus.trace.samplers.ProbabilitySampler(rate=1)',
+        'EXPORTER': f'''opencensus.ext.azure.trace_exporter.AzureExporter(
+            connection_string="InstrumentationKey={os.environ.get('AZURE_INSTRUMENTATION_KEY')}"
+        )''',
+    }
+}

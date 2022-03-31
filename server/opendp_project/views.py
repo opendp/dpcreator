@@ -1,3 +1,5 @@
+import logging
+
 from django.http import HttpResponse
 from rest_framework import permissions, viewsets
 
@@ -22,3 +24,5 @@ class BaseModelViewSet(viewsets.ModelViewSet):
     """
     lookup_field = 'object_id'
     permission_classes = [permissions.IsAuthenticated]
+    logger = logging.getLogger('azure')
+    event_logger = logging.getLogger()

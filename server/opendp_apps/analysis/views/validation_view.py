@@ -1,3 +1,5 @@
+import logging
+
 from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 
@@ -5,6 +7,9 @@ from opendp_apps.utils.view_helper import get_json_error, get_json_success
 
 from opendp_apps.analysis.serializers import AnalysisPlanSerializer, \
     ReleaseValidationSerializer
+
+
+logger = logging.getLogger("azure")
 
 
 class ValidationView(viewsets.ViewSet):
@@ -102,10 +107,10 @@ class ValidationView(viewsets.ViewSet):
             }
 
         """
-        #print('>> ReleaseView.create >>>', request.data)
+
         release_info_serializer = ReleaseValidationSerializer(data=request.data)
         if not release_info_serializer.is_valid():
-            print('release_info_serializer.errors', release_info_serializer.errors)
+            logger.error('ValidationView: release_info_serializer.errors %s', release_info_serializer.errors)
             return Response(get_json_error('Field validation failed',
                                            errors=release_info_serializer.errors),
                             status=status.HTTP_200_OK)
@@ -113,14 +118,13 @@ class ValidationView(viewsets.ViewSet):
 
 
         save_result = release_info_serializer.save(**dict(opendp_user=request.user))
-        #print(save_result.success)
-        if not save_result.success:
-            #print(save_result.message)
 
+        if not save_result.success:
+            logger.error(save_result.message)
             return Response(get_json_error(save_result.message),
                             status=status.HTTP_400_BAD_REQUEST)
 
-        #print(save_result.data)
+        logger.info('Validation succeeded: %s', save_result.data)
         return Response(get_json_success('validation results returned',
                                          data=save_result.data),
                         status=status.HTTP_200_OK)
