@@ -76,7 +76,6 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'opencensus.ext.django.middleware.OpencensusMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -390,39 +389,48 @@ SKIP_EMAIL_RELEASE_FOR_TESTS = bool(strtobool(os.environ.get('SKIP_PDF_CREATION_
 LOGGING = {
     "version": 1,
     "handlers": {
-        "azure_log": {
-            "class": "opencensus.ext.azure.log_exporter.AzureLogHandler",
-            "instrumentation_key": os.environ.get("AZURE_INSTRUMENTATION_KEY"),
-        },
-        "azure_event": {
-            "class": "opencensus.ext.azure.log_exporter.AzureEventHandler",
-            "instrumentation_key": os.environ.get("AZURE_INSTRUMENTATION_KEY"),
-        },
         "console": {
             "class": "logging.StreamHandler",
             "stream": sys.stdout,
-        },
-    },
-    "loggers": {
-        "azure": {
-            "handlers": ["azure_log", "console"],
-            "level": "INFO"
-        },
-        "azure_event": {
-            "handlers": ["azure_event"],
-            "level": "INFO"
         }
     },
-}
-
-DEFAULT_LOGGER = 'azure'
-
-
-OPENCENSUS = {
-    'TRACE': {
-        'SAMPLER': 'opencensus.trace.samplers.ProbabilitySampler(rate=1)',
-        'EXPORTER': f'''opencensus.ext.azure.trace_exporter.AzureExporter(
-            connection_string="InstrumentationKey={os.environ.get('AZURE_INSTRUMENTATION_KEY')}"
-        )''',
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO"
+        }
     }
 }
+
+if DEBUG is False:
+    LOGGING["handlers"]["azure_log"] = {
+        "class": "opencensus.ext.azure.log_exporter.AzureLogHandler",
+        "instrumentation_key": os.environ.get("AZURE_INSTRUMENTATION_KEY"),
+    }
+    LOGGING["handlers"]["azure_event"] = {
+        "class": "opencensus.ext.azure.log_exporter.AzureEventHandler",
+        "instrumentation_key": os.environ.get("AZURE_INSTRUMENTATION_KEY"),
+    }
+    LOGGING["loggers"]["azure"] = {
+        "handlers": ["azure_log", "console"],
+        "level": "INFO"
+    }
+    LOGGING["loggers"]["azure_event"] = {
+        "handlers": ["azure_event"],
+        "level": "INFO"
+    }
+    OPENCENSUS = {
+        'TRACE': {
+            'SAMPLER': 'opencensus.trace.samplers.ProbabilitySampler(rate=1)',
+            'EXPORTER': f'''opencensus.ext.azure.trace_exporter.AzureExporter(
+            connection_string="InstrumentationKey={os.environ.get('AZURE_INSTRUMENTATION_KEY')}"
+        )''',
+        }
+    }
+    MIDDLEWARE.append('opencensus.ext.django.middleware.OpencensusMiddleware')
+    DEFAULT_LOGGER = 'azure'
+else:
+    DEFAULT_LOGGER = 'console'
+
+
+
