@@ -171,6 +171,7 @@ router.beforeEach((to, from, next) => {
     }
   }).catch((data) => {
     store.commit('auth/LOGOUT')
+    store.dispatch('dataset/clearDatasetStorage', null, {root: true})
     if (to.matched.some(record => record.meta.requiresAuth) && store.state.auth.user == null) {
       sessionStorage.setItem('redirectPath', to.path);
       next({name: NETWORK_CONSTANTS.LOGIN.NAME})

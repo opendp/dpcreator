@@ -1,6 +1,6 @@
 <template>
   <div id="create-statistics-page">
-    <h1 class="title-size-1">Create Statistics</h1>
+    <h1 data-test="Create Statistics Title" class="title-size-1">Create Statistics</h1>
     <p>
       {{
         $t('create statistics.statistics intro')
@@ -167,12 +167,6 @@ export default {
       } else {
         this.statistics = []
       }
-      this.statistics.forEach((stat) => {
-        stat.epsilon = Number(stat.epsilon).toFixed(3)
-        if (stat.error !== null) {
-          stat.error = (Number(stat.error)).toPrecision(3)
-        }
-      })
       if (this.getDepositorSetupInfo.epsilon == null) {
         this.epsilon = this.getDepositorSetupInfo.defaultEpsilon
       } else {
@@ -260,7 +254,6 @@ export default {
                 const accuracy = validateResults.data[i].accuracy
                 this.statistics[i].accuracy.value = Number(accuracy.value).toPrecision(3)
                 this.statistics[i].accuracy.message = accuracy.message
-                this.statistics[i].epsilon = Number(this.statistics[i].epsilon).toFixed(3)
                 // this assigment below didn't work!  Can't change the object reference, need to change the values
                 //  this.statistics[i] = Object.assign({}, this.statistics[i], { accuracy })
               }
