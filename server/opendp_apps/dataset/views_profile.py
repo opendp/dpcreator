@@ -12,6 +12,7 @@ from opendp_apps.dataset.serializers import DatasetObjectIdSerializer
 from opendp_apps.utils.view_helper import get_json_error, get_json_success
 from opendp_apps.async_messages.tasks import profile_dataset_info
 
+
 class ProfilingViewSet(viewsets.ViewSet):
     """
     A viewset that provides custom profiling actions
@@ -28,7 +29,6 @@ class ProfilingViewSet(viewsets.ViewSet):
                         status=status.HTTP_501_NOT_IMPLEMENTED)
 
         return Response(get_json_success())
-
 
     @csrf_exempt
     @action(methods=['post'], detail=False, url_path='retrieve-profile')
@@ -74,8 +74,6 @@ class ProfilingViewSet(viewsets.ViewSet):
         #
         return Response(get_json_success('Profile found', data=dsi_object.get_profile_variables()))
 
-
-    #@csrf_exempt
     @action(methods=['post'], detail=False, url_path='run-async-profile')
     def run_async_profile(self, request, *args, **kwargs):
         """Asynchronously profile a DataSetInfo object, returning the DataSetInfo.profile_variables in JSON format.
@@ -116,9 +114,6 @@ class ProfilingViewSet(viewsets.ViewSet):
                     f' messages to websocket: {websocket_id}')
         return Response(get_json_success(user_msg))
 
-
-
-    #@csrf_exempt
     @action(methods=['post'], detail=False, url_path='run-direct-profile')
     def run_direct_profile(self, request, *args, **kwargs):
         """TEST ONLY - Profile a DataSetInfo object, returning the DataSetInfo.profile_variables in JSON format.

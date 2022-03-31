@@ -1,3 +1,6 @@
+import logging
+
+from django.conf import settings
 from django.db import transaction
 from rest_framework import permissions, status
 from rest_framework.response import Response
@@ -9,6 +12,9 @@ from opendp_apps.dataset.serializers import DataSetInfoPolymorphicSerializer, De
 from opendp_project.views import BaseModelViewSet
 
 
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
+
+
 class DataSetInfoViewSet(BaseModelViewSet):
     queryset = DataSetInfo.objects.all().order_by('-created')
     serializer_class = DataSetInfoPolymorphicSerializer
@@ -18,14 +24,8 @@ class DataSetInfoViewSet(BaseModelViewSet):
         """
         This restricts the view to show only the DatasetInfo for the OpenDPUser
         """
+        logger.info(f"Getting DataSetInfo for user {self.request.user.object_id}")
         return self.queryset.filter(creator=self.request.user)
-
-"""
-{
-  "object_id": "b962d2c0-c3cd-4d5b-8a25-309a3b997cb9",
-  "delta": 9.9
-}
-"""
 
 
 class DepositorSetupViewSet(BaseModelViewSet):
@@ -38,6 +38,7 @@ class DepositorSetupViewSet(BaseModelViewSet):
         This restricts the queryset to the DepositorSetupInfo objects where the
             creator is the logged in user
         """
+        logger.info(f"Getting DepositorSetupInfo for user {self.request.user.object_id}")
         return self.queryset.filter(creator=self.request.user)
 
     @transaction.atomic()
@@ -56,6 +57,7 @@ class DepositorSetupViewSet(BaseModelViewSet):
             if field not in acceptable_fields:
                 problem_fields.append(field)
         if problem_fields:
+            logger.error(f"Failed to update DepositorSetupInfo with fields {problem_fields}")
             return Response({'message': 'These fields are not updatable', 'fields': problem_fields},
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -79,8 +81,7 @@ class DepositorSetupViewSet(BaseModelViewSet):
                 if analysis_plan and analysis_plan.is_editable():
                     analysis_plan.variable_info = request.data['variable_info']
                     analysis_plan.save()
-
-
-
+                    logger.info(f"DepositorSetupViewSet: AnalysisPlan updated with variable info "
+                                f"{request.data['variable_info']}")
 
         return super(DepositorSetupViewSet, self).partial_update(request, *args, **kwargs)
