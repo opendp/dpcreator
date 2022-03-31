@@ -415,6 +415,8 @@ LOGGING = {
     },
 }
 
+DEFAULT_LOGGER = 'azure'
+
 
 OPENCENSUS = {
     'TRACE': {

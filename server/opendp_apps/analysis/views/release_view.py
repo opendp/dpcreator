@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.http import FileResponse
 
 from rest_framework import permissions, viewsets, renderers, status
@@ -18,7 +19,7 @@ from opendp_apps.analysis.serializers import \
      ReleaseValidationSerializer)
 
 
-logger = logging.getLogger('azure')
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class PassthroughRenderer(renderers.BaseRenderer):

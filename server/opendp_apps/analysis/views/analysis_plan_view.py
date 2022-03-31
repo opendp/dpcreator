@@ -1,5 +1,7 @@
 import json
+import logging
 
+from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import status
@@ -14,6 +16,9 @@ from opendp_apps.analysis.serializers import \
 from opendp_apps.dataset.serializers import DatasetObjectIdSerializer
 
 from opendp_apps.utils.view_helper import get_json_error
+
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class AnalysisPlanViewSet(BaseModelViewSet):
@@ -35,7 +40,7 @@ class AnalysisPlanViewSet(BaseModelViewSet):
         """
         AnalysisPlans for the currently authenticated user.
         """
-        self.logger.info(f"Getting AnalysisPlans for user {self.request.user.object_id}")
+        logger.info(f"Getting AnalysisPlans for user {self.request.user.object_id}")
         return AnalysisPlan.objects.filter(analyst=self.request.user)
 
     @csrf_exempt
@@ -52,7 +57,7 @@ class AnalysisPlanViewSet(BaseModelViewSet):
                 user_msg = '"object_id" error: %s' % (ois.errors['object_id'][0])
             else:
                 user_msg = 'Not a valid "object_id"'
-            self.logger.error(user_msg + " " + ois.object_id)
+            logger.error(user_msg + " " + ois.data['object_id'])
             return Response(get_json_error(user_msg),
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -61,7 +66,7 @@ class AnalysisPlanViewSet(BaseModelViewSet):
         #
         dsi_info = ois.get_dataset_info_with_user_check(request.user)
         if not dsi_info.success:
-            self.logger.error(dsi_info.message)
+            logger.error(dsi_info.message)
             return Response(get_json_error(dsi_info.message),
                             status=status.HTTP_404_NOT_FOUND)
 
@@ -75,13 +80,13 @@ class AnalysisPlanViewSet(BaseModelViewSet):
             # Yes, it worked!
             new_plan = plan_util.data                       # "data" holds the AnalysisPlan object
             serializer = AnalysisPlanSerializer(new_plan)  # serialize the data
-            self.logger.info(f"AnalysisPlan created: {serializer.data}")
+            logger.info(f"AnalysisPlan created: {serializer.data}")
 
             # Return it
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         # Nope! Error encountered!
-        self.logger.error(plan_util.message)
+        logger.error(plan_util.message)
         return Response(get_json_error(plan_util.message),
                         status=plan_util.data)
 
@@ -107,6 +112,6 @@ class AnalysisPlanViewSet(BaseModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
 
         partial_update_result = super(AnalysisPlanViewSet, self).partial_update(request, *args, **kwargs)
-        self.logger.info("Analysis update with request " + json.dumps(request.data))
+        logger.info("Analysis update with request " + json.dumps(request.data))
 
         return partial_update_result
