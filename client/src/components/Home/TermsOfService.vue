@@ -2,7 +2,10 @@
   <v-container>
     <v-row>
       <v-col offset-sm="1" sm="10" md="12" offset-md="0">
+        <!-- What can be done with the DP Release? -->
         <h2 class="title-size-1 text-center mb-10">{{ $t('home.service section title') }}</h2>
+
+        <!-- Box 1: What can be done with the DP Release? -->
         <LinearBox
             :class="{
             'mb-6': $vuetify.breakpoint.xsOnly,
@@ -17,6 +20,7 @@
 
           </template>
         </LinearBox>
+        <!-- Box 2: What statistics can be released using this tool? -->
         <LinearBox
             :class="{
             'mb-6': $vuetify.breakpoint.xsOnly,
@@ -41,6 +45,7 @@
           </template>
         </LinearBox>
         -->
+        <!-- Box 4: What can be done with the DP Release? -->
         <LinearBox
             :class="{
             'mb-6': $vuetify.breakpoint.xsOnly,
@@ -52,6 +57,20 @@
             <p class="grey--text text--darken-2" v-html="$t('home.service4 text')"></p>
           </template>
         </LinearBox>
+
+        <!-- Box 5: What features are coming in future versions of DP Creator? -->
+        <LinearBox
+            :class="{
+            'mb-6': $vuetify.breakpoint.xsOnly,
+            'mb-12': $vuetify.breakpoint.smAndUp
+          }"
+        >
+          <template v-slot:content>
+            <h2 class="title-size-1">{{ $t('home.service5 title') }}</h2>
+            <p class="grey--text text--darken-2" v-html="$t('home.service5 text')"></p>
+          </template>
+        </LinearBox>
+
       </v-col>
     </v-row>
     <v-row>

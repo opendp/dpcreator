@@ -1,21 +1,78 @@
 {
   "datasetName": "Eye-typing experiment",
-  "statistics":  [
+  "statistics": [
     {
       "statistic": "Mean",
-      "variable": "eyeHeight",
+      "variable": "EyeHeight",
       "roundedAccuracy": "1.64",
       "accuracy": 1.6370121873967791,
       "fixedValue": "10"
     }
-    ],
+  ],
   "variables": {
-    "eyeHeight": {
+    "typingSpeed": {
+      "max": 25,
+      "min": 10,
+      "name": "TypingSpeed",
+      "type": "Float",
+      "label": "TypingSpeed",
+      "selected": true,
+      "sortOrder": 5
+    },
+    "blinkDuration": {
+      "max": 35,
+      "min": 10,
+      "name": "BlinkDuration",
+      "type": "Float",
+      "label": "",
+      "sortOrder": 12
+    },
+    "blinkInterval": {
+      "max": 55,
+      "min": 5,
+      "name": "BlinkInterval",
+      "type": "Float",
+      "label": "",
+      "sortOrder": 13
+    },
+    "language": {
+      "name": "Language",
+      "type": "Boolean",
+      "label": "Language",
+      "selected": true,
+      "categories": [],
+      "sortOrder": 1
+    },
+    "EyeHeight": {
       "name": "EyeHeight",
       "label": "",
       "type": "Float",
       "min": "0.0",
       "max": "100.0"
+    },
+    "objectiveTaskDifficulty": {
+      "name": "ObjectiveTaskDifficulty",
+      "type": "Boolean",
+      "label": "",
+      "categories": [],
+      "sortOrder": 3
+    },
+    "blinkFrequency": {
+      "max": 65,
+      "min": 2,
+      "name": "BlinkFrequency",
+      "type": "Float",
+      "label": "",
+      "sortOrder": 11
+    },
+    "correctedError": {
+      "max": 38,
+      "min": 5,
+      "name": "CorrectedError",
+      "type": "Float",
+      "label": "CorrectedError",
+      "selected": true,
+      "sortOrder": 6
     }
   }
 }

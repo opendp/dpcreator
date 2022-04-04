@@ -557,7 +557,7 @@ export default {
    * When it is populated, create a local variableList for the data table
    */
   watch: {
-    '$store.state.dataset.datasetInfo': function () {
+    '$store.state.dataset.datasetInfo.depositorSetupInfo.variableInfo': function () {
       if (this.datasetInfo.depositorSetupInfo.variableInfo !== null) {
         // the watch will be triggered multiple times,
         // so check if we have already created the variableList

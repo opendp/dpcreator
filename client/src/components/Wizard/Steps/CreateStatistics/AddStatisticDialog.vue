@@ -10,7 +10,7 @@
       </v-icon
       >
       <v-card-title>
-        <h2 class="title-size-2 mb-5">{{ formTitle }}</h2>
+        <h2 data-test='AddStatisticDialog' class="title-size-2 mb-5">{{ formTitle }}</h2>
       </v-card-title>
       <v-card-text class="text--primary">
         <div>
@@ -89,7 +89,6 @@
           <div class="width50">
             <v-text-field
                 v-model="editedItemDialog.fixedValue"
-                placeholder="E.g. Lorem ipsum"
                 background-color="soft_primary"
                 class="top-borders-radius width50"
                 data-test="Fixed value"
@@ -267,7 +266,7 @@ export default {
       "Mean": ["Integer", "Float"],
       "Count": ["Integer", "Float", "Categorical", "Boolean"],
       "Variance": ["Integer", "Float"],
-      "Histogram": ["Categorical", "Integer"],
+      "Histogram": ["Categorical", "Integer", "Boolean"],
       "Quantile": ["Integer", "Float"] // not yet available
     },
     selectedStatistic: null,
@@ -282,7 +281,7 @@ export default {
       error: "",
       missingValuesHandling: "insert_fixed",
       handleAsFixed: true,
-      fixedValue: 0,
+      fixedValue: "",
       locked: false,
       accuracy: {value: null, message: null}
     },

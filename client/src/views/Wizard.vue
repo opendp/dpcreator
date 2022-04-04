@@ -146,7 +146,7 @@ export default {
         completed: false
       },
       {
-        title: "Set Accuracy Level",
+        title: "Sampling Frame",
         completed: false
       },
       {
