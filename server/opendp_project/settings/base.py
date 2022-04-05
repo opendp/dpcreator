@@ -402,7 +402,7 @@ LOGGING = {
 }
 
 # In .env, set to False or leave empty to keep all logs local, else put True
-if os.environ.get('AZURE_LOGGING').lower() in ('true', '1', 't'):
+if os.environ.get('AZURE_LOGGING', 'False').lower() in ('true', '1', 't'):
     LOGGING["handlers"]["azure_log"] = {
         "class": "opencensus.ext.azure.log_exporter.AzureLogHandler",
         "instrumentation_key": os.environ.get("AZURE_INSTRUMENTATION_KEY"),
