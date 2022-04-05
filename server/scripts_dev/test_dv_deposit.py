@@ -1,16 +1,12 @@
-from load_django_settings import CURRENT_DIR, TEST_DATA_DIR, load_local_settings
+from load_django_settings import TEST_DATA_DIR, load_local_settings
+
 load_local_settings()
 
-import json, time
 from os.path import basename, isfile, join
 
-from opendp_project.celery import hello_task
-from django.core.serializers.json import DjangoJSONEncoder
 from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
 from opendp_apps.analysis.models import ReleaseInfo
-from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.dataset.models import DataverseFileInfo
-from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadHandler
 
 
 def build_test_data():
@@ -38,6 +34,7 @@ def test_dv_depositor(release_id):
     else:
         print('looks good!')
 
+
 def run_deposit_api():
     """
     Run direct API
@@ -56,10 +53,9 @@ def run_deposit_api():
     export SERVER_URL=https://demo.dataverse.org
     """
 
-
     headers = {'X-Dataverse-key': dv_cred.API_TOKEN}
 
-    FORMAT_TAG = 'dpJson' #dpPDF'  # 'dp-c-JSON', 'dpJSON
+    FORMAT_TAG = 'dpJson'  # dpPDF'  # 'dp-c-JSON', 'dpJSON
     FORMAT_VERSION = 'v11'  # '.json'
 
     dv_url = dv_cred.SERVER_URL
@@ -71,7 +67,7 @@ def run_deposit_api():
     #    FORMAT_TAG = 'dp-c-JSON'
     #   FORMAT_VERSION = '.json'
 
-    #fname = 'report_mean_income.pdf'    \
+    # fname = 'report_mean_income.pdf'    \
     fname = 'deposit_01.json'
     full_fname = join(TEST_DATA_DIR, 'deposit', fname)
 
@@ -83,7 +79,7 @@ def run_deposit_api():
         print(f'file not found: {full_fname}')
         return
 
-    #files = {'file': open(full_fname, 'rb')}
+    # files = {'file': open(full_fname, 'rb')}
     files = {'file': (basename(full_fname),
                       open(full_fname, 'rb'),
                       'application/json')}
@@ -104,8 +100,6 @@ def run_deposit_api():
         print('could not convert to JSON')
 
 
-
-
-if __name__=='__main__':
+if __name__ == '__main__':
     # test_dv_depositor(release_id=5)
     run_deposit_api()

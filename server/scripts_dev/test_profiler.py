@@ -1,12 +1,12 @@
-from load_django_settings import CURRENT_DIR, TEST_DATA_DIR, load_local_settings
+from load_django_settings import TEST_DATA_DIR, load_local_settings
+
 load_local_settings()
 
 import json, time
-from os.path import isfile, join
+from os.path import join
 
 from opendp_project.celery import hello_task
 from django.core.serializers.json import DjangoJSONEncoder
-from opendp_apps.profiler.tasks import ProfileHandler
 from opendp_apps.profiler import tasks as profiler_tasks
 from opendp_apps.dataset.models import DataSetInfo
 
@@ -31,13 +31,12 @@ def test_profiler_with_file():
     info = dsi.data_profile_as_dict()
 
     print('testing....')
-    assert(json.dumps(info, cls=DjangoJSONEncoder) == \
-           json.dumps(profiler.data_profile, cls=DjangoJSONEncoder))
+    assert (json.dumps(info, cls=DjangoJSONEncoder) == \
+            json.dumps(profiler.data_profile, cls=DjangoJSONEncoder))
     print('Looks good!!!')
 
 
 def test_profiler_with_dv_file(object_id):
-
     if not object_id:
         object_id = 'b7634453-4ae1-48aa-81fb-1dd9ee3f4b64'
 
@@ -50,8 +49,8 @@ def test_profiler_with_dv_file(object_id):
     profiler = profiler_tasks.run_profile_by_filefield(ds_info.object_id)
     # profiler = profiler_tasks.run_profile_by_filefield.delay(ds_info.object_id)
 
-    #print('Pause 3 seconds...')
-    #time.sleep(3)
+    # print('Pause 3 seconds...')
+    # time.sleep(3)
 
     if profiler.has_error():
         print(profiler.get_err_msg())
@@ -78,16 +77,15 @@ def test_profiler_with_file_celery():
     time.sleep(3)
 
     dsi = DataSetInfo.objects.first()
-    #dsi = DataSetInfo.objects.get(object_id=dsi.object_id)
+    # dsi = DataSetInfo.objects.get(object_id=dsi.object_id)
     info = dsi.data_profile_as_dict()
     print(info)
 
 
 def lookat():
     dsi = DataSetInfo.objects.first()
-    #print(dsi.data_profile)
+    # print(dsi.data_profile)
     print(type(dsi.data_profile))
-
 
     info = dsi.data_profile_as_dict()
     print(info)
@@ -97,15 +95,17 @@ def lookat():
     jstr = dsi.data_profile_as_json_str()
     print(type(jstr))
 
+
 def basic_celery():
     hello_task.delay()
 
-if __name__=='__main__':
-    #test_profiler_with_file()
-    #test_profiler_with_file_celery()
+
+if __name__ == '__main__':
+    # test_profiler_with_file()
+    # test_profiler_with_file_celery()
     test_profiler_with_dv_file('9255c067-e435-43bd-8af1-33a6987ffc9b')
     # lookat()
-    #basic_celery()
+    # basic_celery()
 
 """
 docker-compose run server python scripts_dev/test_profiler.py
