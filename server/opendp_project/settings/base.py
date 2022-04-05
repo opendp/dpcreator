@@ -387,10 +387,16 @@ SKIP_EMAIL_RELEASE_FOR_TESTS = bool(strtobool(os.environ.get('SKIP_PDF_CREATION_
 
 LOGGING = {
     "version": 1,
+    "formatters": {
+        "default": {
+            "format": "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+        }
+    },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
             "stream": sys.stdout,
+            "formatter": "default"
         }
     },
     "loggers": {
@@ -406,19 +412,20 @@ if os.environ.get('AZURE_LOGGING', 'False').lower() in ('true', '1', 't'):
     LOGGING["handlers"]["azure_log"] = {
         "class": "opencensus.ext.azure.log_exporter.AzureLogHandler",
         "instrumentation_key": os.environ.get("AZURE_INSTRUMENTATION_KEY"),
+        "formatter": "default"
     }
-    LOGGING["handlers"]["azure_event"] = {
-        "class": "opencensus.ext.azure.log_exporter.AzureEventHandler",
-        "instrumentation_key": os.environ.get("AZURE_INSTRUMENTATION_KEY"),
-    }
+    # LOGGING["handlers"]["azure_event"] = {
+    #     "class": "opencensus.ext.azure.log_exporter.AzureEventHandler",
+    #     "instrumentation_key": os.environ.get("AZURE_INSTRUMENTATION_KEY"),
+    # }
     LOGGING["loggers"]["azure"] = {
         "handlers": ["azure_log", "console"],
         "level": "INFO"
     }
-    LOGGING["loggers"]["azure_event"] = {
-        "handlers": ["azure_event"],
-        "level": "INFO"
-    }
+    # LOGGING["loggers"]["azure_event"] = {
+    #     "handlers": ["azure_event"],
+    #     "level": "INFO"
+    # }
     OPENCENSUS = {
         'TRACE': {
             'SAMPLER': 'opencensus.trace.samplers.ProbabilitySampler(rate=1)',

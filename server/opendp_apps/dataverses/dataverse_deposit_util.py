@@ -1,24 +1,30 @@
 """
 Utility for depositing Dataverse auxiliary files related to a ReleaseInfo object
 """
+import logging
+
 from collections import OrderedDict
 from os.path import basename
-import requests
-from rest_framework import status
 
+import requests
 from django.conf import settings
 from django.template.loader import render_to_string
+from rest_framework import status
 
-from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
-from opendp_apps.analysis.models import ReleaseInfo, AuxiliaryFileDepositRecord
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.analysis.models import ReleaseInfo, AuxiliaryFileDepositRecord
 from opendp_apps.dataverses import static_vals as dv_static
+from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
+
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class DataverseDepositUtil(BasicErrCheck):
     """
     Given a ReleaseInfo, deposit any files to Dataverse
     """
+
     def __init__(self, release_info: ReleaseInfo, **kwargs):
         """
         Initiate with a ReleaseInfo object
@@ -116,7 +122,7 @@ class DataverseDepositUtil(BasicErrCheck):
             }
         ]
 
-        format_version = 'v1'   # hardcoded for now..
+        format_version = 'v1'  # hardcoded for now..
 
         num_deposits = 0
         expected_num_deposits = 0
@@ -175,7 +181,7 @@ class DataverseDepositUtil(BasicErrCheck):
             files = {'file': (basename(file_field.name),
                               open(file_field.path, 'rb'),
                               file_info['FILETYPE'])}
-            #files = {'file': open(file_field.path, 'rb')}
+            # files = {'file': open(file_field.path, 'rb')}
 
             # print('dv_url', dv_deposit_url)
             try:
@@ -199,11 +205,11 @@ class DataverseDepositUtil(BasicErrCheck):
                 continue
 
             # debug start
-            print('status_code: ', response.status_code)
+            logger.info('Dataverse status_code: ', response.status_code)
             # print('response.text', response.text)
-            print('-' * 40)
+            # print('-' * 40)
             if response.status_code == status.HTTP_200_OK:
-                print('response json', response.json())
+                logger.info('Dataverse response json', response.json())
             # (debug end)
 
             # Record the HTTP status code and response text
@@ -223,6 +229,7 @@ class DataverseDepositUtil(BasicErrCheck):
                 user_msg = (f'The deposit failed. Dataverse returned a "Forbidden" error.'
                             f' (Dataverse url: {self.dv_dataset.dv_installation.dataverse_url}).')
                 deposit_record.dv_err_msg = user_msg
+                logger.error(user_msg)
             else:
                 # Deposit failed
                 try:
@@ -231,15 +238,15 @@ class DataverseDepositUtil(BasicErrCheck):
                     #
                     deposit_record.http_resp_json = response.json()
                     if 'status' in deposit_record.http_resp_json and \
-                        deposit_record.http_resp_json['status'] == 'ERROR' and \
-                        'message' in deposit_record.http_resp_json:
-
+                            deposit_record.http_resp_json['status'] == 'ERROR' and \
+                            'message' in deposit_record.http_resp_json:
                         deposit_record.dv_err_msg = deposit_record.http_resp_json['message']
                     # self.add_err_msg(dv_static.ERR_MSG_JSON_DEPOSIT_FAILED)
                 except Exception as _ex_obj:
                     # could not convert response to JSON
                     deposit_record.dv_err_msg = (f'Could not convert response to JSON.'
                                                  f' Status code: {response.status_code}')
+                    logger.error(deposit_record.dv_err_msg)
 
             self.set_deposit_record_user_messages_and_save(deposit_record)
 
@@ -268,9 +275,9 @@ class DataverseDepositUtil(BasicErrCheck):
         # Get the latest JSON record--assumes there are no records earlier than a success record!
         #
         json_rec = AuxiliaryFileDepositRecord.objects.filter(
-                        release_info=self.release_info,
-                        dv_auxiliary_type=dv_static.DV_DEPOSIT_TYPE_DP_JSON,
-                    ).order_by('-created').first()
+            release_info=self.release_info,
+            dv_auxiliary_type=dv_static.DV_DEPOSIT_TYPE_DP_JSON,
+        ).order_by('-created').first()
 
         if json_rec:
             json_rec_dict = json_rec.as_dict()
@@ -281,13 +288,14 @@ class DataverseDepositUtil(BasicErrCheck):
             json_rec_dict = dict(deposit_success=False,
                                  user_msg_text=no_rec_err_msg,
                                  user_msg_html=no_rec_err_msg)
+            logger.error(no_rec_err_msg)
 
         # Get the latest PDF record--assumes there are no records earlier than a success record!
         #
         pdf_rec = AuxiliaryFileDepositRecord.objects.filter(
-                        release_info=self.release_info,
-                        dv_auxiliary_type=dv_static.DV_DEPOSIT_TYPE_DP_PDF,
-                    ).order_by('-created').first()
+            release_info=self.release_info,
+            dv_auxiliary_type=dv_static.DV_DEPOSIT_TYPE_DP_PDF,
+        ).order_by('-created').first()
         if pdf_rec:
             pdf_rec_dict = pdf_rec.as_dict()
             self.release_info.dv_pdf_deposit_complete = pdf_rec.deposit_success
@@ -297,16 +305,18 @@ class DataverseDepositUtil(BasicErrCheck):
             pdf_rec_dict = dict(deposit_success=False,
                                 user_msg_text=no_rec_err_msg,
                                 user_msg_html=no_rec_err_msg)
+            logger.error(no_rec_err_msg)
 
         deposit_info_dict = OrderedDict({
             'json_deposit_record': json_rec_dict,
-            'pdf_deposit_record':  pdf_rec_dict,
+            'pdf_deposit_record': pdf_rec_dict,
         })
 
         self.release_info.dataverse_deposit_info = deposit_info_dict
 
         # print('>>> deposit_info_dict', deposit_info_dict)
         self.release_info.save()
+
 
 """
 

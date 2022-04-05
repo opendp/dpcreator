@@ -83,20 +83,17 @@ def send_test_msg(websocket_id):
     profiler = profiler_tasks.run_profile_by_filepath(filepath)  # , dsi.object_id)
     if profiler.has_error():
         user_msg = f'error: {profiler.get_err_msg()}'
-        print(user_msg)
+        logger.error(user_msg)
         ws_msg = WebsocketMessage.get_fail_message( \
             async_static.WS_MSG_TYPE_PROFILER,
             user_msg)
     else:
         profile_str = json.dumps(profiler.data_profile, cls=DjangoJSONEncoder, indent=4)
-        # print('-' * 40)
-        # print(profile_str)
         ws_msg = WebsocketMessage.get_success_message( \
             async_static.WS_MSG_TYPE_PROFILER,
             f'Profile worked {datetime.now()}',
             data=dict(profile_str=profile_str))
-        # print('profiled!')
 
     ws_msg.send_message(websocket_id)
 
-    print('celery message sent...')
+    logger.info('celery message sent...')

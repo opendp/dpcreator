@@ -44,8 +44,8 @@ class DataverseHandoffView(BaseModelViewSet):
         """
         Access Create via a GET. This is temporary and insecure. Exists until the Dataverse signed urls are available.
         """
-        print('--- createbyget ---')
         request_data = request.query_params.copy()
+        logger.info(request_data)
         return self.process_dataverse_data(request_data)
 
         #return Response({"From Hello": "Got it"})
@@ -55,16 +55,14 @@ class DataverseHandoffView(BaseModelViewSet):
         Temporarily save the Dataverse paramemeters +
         redirect to the Vue page
         """
-        print('--- create! ---')
         request_data = request.data.copy()
+        logger.info(request_data)
         return self.process_dataverse_data(request_data)
 
     def process_dataverse_data(self, request_data):
         """Process incoming Dataverse data
         - Used by both the GET and POST endpoints
         """
-        print('--- process_dataverse_data ---')
-
         if dv_static.DV_PARAM_SITE_URL in request_data:
             init_site_url = request_data[dv_static.DV_PARAM_SITE_URL]
             init_site_url = RegisteredDataverse.hack_format_dv_url_http(init_site_url)
@@ -89,5 +87,5 @@ class DataverseHandoffView(BaseModelViewSet):
                         error_code += ','.join([k, ''])
             # Remove trailing comma
             error_code = quote(error_code[:-1])
-            logger.error(f'DataverseHandoffView: invalid DataverseHandoffSerializer. Error_code: {error_code}')
+            logger.error(f'Invalid DataverseHandoffSerializer. Error_code: {error_code}')
             return HttpResponseRedirect(reverse('vue-home') + f'?error_code={error_code}')

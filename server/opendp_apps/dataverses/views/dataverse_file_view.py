@@ -58,6 +58,6 @@ class DataverseFileView(BaseModelViewSet):
         serializer = DataverseFileInfoMakerSerializer(util.dv_file_info,
                                                       context={'request': request})
 
-        logger.error(f'DataverseFileView: DataverseFileInfo created with request: {request}')
+        logger.info(f'DataverseFileView: DataverseFileInfo created with request: {request.__dict__}')
         return Response({'success': True, 'data': serializer.data},
                         status=util.http_resp_code)

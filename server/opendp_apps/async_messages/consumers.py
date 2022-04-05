@@ -1,9 +1,17 @@
 # chat/consumers.py
-from datetime import datetime
 import json
+import logging
+from datetime import datetime
+
+from django.conf import settings
+
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
+
 from opendp_apps.async_messages import static_vals as mstatic
+
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class ChatConsumer(WebsocketConsumer):
@@ -16,7 +24,7 @@ class ChatConsumer(WebsocketConsumer):
     def connect(self):
         self.ws_identifier = self.scope['url_route']['kwargs']['ws_identifier']
         self.room_group_name = ChatConsumer.get_group_name(self.ws_identifier)
-        print('connect', self.room_group_name)
+        logger.info('connect', self.room_group_name)
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,
@@ -24,9 +32,9 @@ class ChatConsumer(WebsocketConsumer):
         )
         self.accept()
 
-
     def disconnect(self, close_code):
         # Leave room group
+        logger.info('disconnect', self.room_group_name)
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name,
             self.channel_name

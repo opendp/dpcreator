@@ -33,4 +33,5 @@ ACCOUNT_EMAIL_VERIFICATION = os.environ.get('ACCOUNT_EMAIL_VERIFICATION', 'none'
 
 # SKIP_PDF_CREATION_FOR_TESTS = True
 
-DEFAULT_LOGGER = 'console'
+# Logger should come from base.py, but can be overridden here
+# DEFAULT_LOGGER = 'console'
