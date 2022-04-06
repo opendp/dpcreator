@@ -45,7 +45,6 @@ class DPHistogramSpec(StatSpec):
         if self.var_type == VAR_TYPE_INTEGER:
             self.categories = [int(i) for i in range(self.min, self.max)]
             self.fixed_value = int(self.fixed_value)
-            # print(self.categories, self.fixed_value)
 
         # Using integers
         #

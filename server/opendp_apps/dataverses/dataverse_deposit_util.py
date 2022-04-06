@@ -181,9 +181,7 @@ class DataverseDepositUtil(BasicErrCheck):
             files = {'file': (basename(file_field.name),
                               open(file_field.path, 'rb'),
                               file_info['FILETYPE'])}
-            # files = {'file': open(file_field.path, 'rb')}
 
-            # print('dv_url', dv_deposit_url)
             try:
                 response = requests.post(dv_deposit_url,
                                          headers=headers,
@@ -204,13 +202,10 @@ class DataverseDepositUtil(BasicErrCheck):
                 self.set_deposit_record_user_messages_and_save(deposit_record)
                 continue
 
-            # debug start
             logger.info('Dataverse status_code: ', response.status_code)
-            # print('response.text', response.text)
-            # print('-' * 40)
+
             if response.status_code == status.HTTP_200_OK:
                 logger.info('Dataverse response json', response.json())
-            # (debug end)
 
             # Record the HTTP status code and response text
             #
@@ -314,7 +309,6 @@ class DataverseDepositUtil(BasicErrCheck):
 
         self.release_info.dataverse_deposit_info = deposit_info_dict
 
-        # print('>>> deposit_info_dict', deposit_info_dict)
         self.release_info.save()
 
 

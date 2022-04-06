@@ -91,8 +91,7 @@ class PDFReportMaker(BasicErrCheck):
                                     'pdf_report_01_%s.pdf' % (random_with_n_digits(6)))
 
         ps: typing.Tuple[Decimal, Decimal] = PageSize.LETTER_PORTRAIT.value
-        self.page_width, self.page_height = ps  # page width, height
-        # print(f'page_width/page_height: {self.page_width}/{self.page_height}')
+        self.page_width, self.page_height = ps
 
         self.page_cnt = 0
         self.pdf_doc: Document = Document()
@@ -527,8 +526,6 @@ class PDFReportMaker(BasicErrCheck):
 
         self.set_table_borders_padding(table_001)
 
-        # rsize = self.get_layout_box(table_001)
-        # print('rsize: W x H', rsize.width, rsize.height)
         self.add_to_layout(table_001)
 
     def set_table_borders_padding(self, table_obj: Table):
@@ -806,7 +803,6 @@ class PDFReportMaker(BasicErrCheck):
             page_num - the destination page when the pdf_object is clicked
             indent - resize the bounding box used for the link source to better fit the text
             """
-            # print(f'adding link: {_txt_to_link} {pdf_object}, {page_num}, {indent}')
             pdf_page_idx = Decimal(page_num) - Decimal(1)  # PDF pages within the doc start with 0
             if pdf_page_idx < 0:  # shouldn't happen!
                 self.add_err_msg((f'pdf_report_maker. Error adding TOC links.'

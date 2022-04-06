@@ -47,10 +47,6 @@ def test_profiler_with_dv_file(object_id):
         return
 
     profiler = profiler_tasks.run_profile_by_filefield(ds_info.object_id)
-    # profiler = profiler_tasks.run_profile_by_filefield.delay(ds_info.object_id)
-
-    # print('Pause 3 seconds...')
-    # time.sleep(3)
 
     if profiler.has_error():
         print(profiler.get_err_msg())
@@ -84,7 +80,6 @@ def test_profiler_with_file_celery():
 
 def lookat():
     dsi = DataSetInfo.objects.first()
-    # print(dsi.data_profile)
     print(type(dsi.data_profile))
 
     info = dsi.data_profile_as_dict()

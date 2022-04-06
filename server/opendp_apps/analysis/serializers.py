@@ -1,26 +1,22 @@
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.relations import PrimaryKeyRelatedField
 
-from django.contrib.auth import get_user_model
-from django.conf import settings
-
-from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 
 
 class ReleaseInfoFileDownloadSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = ReleaseInfo
         fields = ('object_id',)
 
 
 class ReleaseInfoSerializer(serializers.ModelSerializer):
-
     # Add custom fields to allow download of files directly from DP Creator
-    #
     download_json_url = serializers.SerializerMethodField('get_download_json_url')
     download_pdf_url = serializers.SerializerMethodField('get_download_pdf_url')
 
@@ -131,7 +127,7 @@ class ReleaseValidationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ReleaseInfo
-        fields = ('dp_statistics', 'analysis_plan_id', )
+        fields = ('dp_statistics', 'analysis_plan_id',)
         # read_only_fields = ('dp_release', )
 
     def save(self, **kwargs):
@@ -177,23 +173,14 @@ class ReleaseValidationSerializer(serializers.ModelSerializer):
         analysis_plan_id = self.validated_data['analysis_plan_id']
 
         dp_statistics = self.validated_data['dp_statistics']
-        # import json; print('dp_statistics', json.dumps(dp_statistics, indent=4))
 
         validate_util = ValidateReleaseUtil.validate_mode(opendp_user, analysis_plan_id, dp_statistics)
 
         if validate_util.has_error():
             # This is a big error, check for it before evaluating individual statistics
-            #
             user_msg = validate_util.get_err_msg()
             # Can you return a 400 / raise an Exception here with the error message?
             # How should this be used?
-            return err_resp(user_msg)   #dict(success=False, message=user_msg)
+            return err_resp(user_msg)
 
-        #print('(validate_util.validation_info)', validate_util.validation_info)
         return ok_resp(validate_util.validation_info)
-        #return validate_util.validation_info
-
-
-"""
-Releasing Mean for the variable age. With at least probability 0.95 the output mean will differ from the true mean by at most 0.8328 units. Here the units are the same units the variable has in the dataset.
-"""

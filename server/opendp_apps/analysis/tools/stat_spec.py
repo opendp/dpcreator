@@ -60,7 +60,6 @@ class StatSpec:
 
     def __init__(self, props: dict):
         """Set the internals using the props dict"""
-        # print('stat_spec.initial props', props)
         self.variable = props.get('variable')
         self.col_index = props.get('col_index')
         self.statistic = props.get('statistic')
@@ -330,9 +329,6 @@ class StatSpec:
         #
         if 'min' in self.additional_required_props() and \
                 'max' in self.additional_required_props():
-            # print('checking min/max!')
-            # print('min', self.min, type(self.min))
-            # print('max', self.max, type(self.max))
             if self.max > self.min:
                 pass
             else:
@@ -340,7 +336,6 @@ class StatSpec:
                 self.add_err_msg(user_msg)
                 # self.add_err_msg(astatic.ERR_MSG_INVALID_MIN_MAX)
                 return
-            # print('looks okay!')
 
         # If this is numeric variable, check the impute constant
         #   (If impute constant isn't used, this check will simply exit)
@@ -378,7 +373,6 @@ class StatSpec:
                 self.add_err_msg(f'Validator not found for property "{prop_name}"')
                 return False
 
-        # print('prop_name', prop_name)
         try:
             validator(getattr(self, prop_name))
         except ValidationError as err_obj:
@@ -490,7 +484,6 @@ class StatSpec:
 
         desc = render_to_string(template_name, info_dict)
 
-        # print(desc)
         return desc
 
     def get_accuracy_text(self, template_name=None):
@@ -506,7 +499,6 @@ class StatSpec:
 
         desc = render_to_string(template_name, info_dict)
 
-        # print(desc)
         return desc
 
     def get_release_dict(self) -> OrderedDict:
@@ -615,8 +607,6 @@ class StatSpec:
 
     def add_err_msg(self, err_msg: str):
         """Add an error message"""
-        # print('add_err_msg. type', type(err_msg))
-
         self.error_found = True
         self.error_messages.append(err_msg)
 
