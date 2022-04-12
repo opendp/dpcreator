@@ -155,7 +155,7 @@ class DataverseUserInitializer(BasicErrCheck):
         try:
             self.dv_handoff = DataverseHandoff.objects.get(object_id=self.dv_handoff_id)
         except DataverseHandoff.DoesNotExist:
-            user_msg = f'Failed to retieve the DataverseHandoff object (id: {self.dv_handoff_id})'
+            user_msg = f'Failed to retrieve the DataverseHandoff object (id: {self.dv_handoff_id})'
             logger.error(user_msg)
             self.add_err_msg(user_msg)
             self.http_resp_code = http_status.HTTP_400_BAD_REQUEST

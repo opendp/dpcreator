@@ -357,33 +357,6 @@ SESSION_COOKIE_AGE = int(os.getenv('SESSION_COOKIE_AGE', SESSION_DEFAULT_COOKIE_
 SKIP_PDF_CREATION_FOR_TESTS = bool(strtobool(os.environ.get('SKIP_PDF_CREATION_FOR_TESTS', 'False')))
 SKIP_EMAIL_RELEASE_FOR_TESTS = bool(strtobool(os.environ.get('SKIP_PDF_CREATION_FOR_TESTS', 'False')))
 
-# SESSION_COOKIE_NAME = os.environ.get('SESSION_COOKIE_NAME', 'dpcreator')
-# CSRF_COOKIE_NAME = os.environ.get('CSRF_COOKIE_NAME', 'dpcreator_csrf')
-# discard a process after executing task, because automl solvers are incredibly leaky
-# CELERY_WORKER_MAX_TASKS_PER_CHILD = 1
-
-# Uncomment this out to see raw SQL in logs
-# LOGGING = {
-#     'version': 1,
-#     'filters': {
-#         'require_debug_true': {
-#             '()': 'django.utils.log.RequireDebugTrue',
-#         }
-#     },
-#     'handlers': {
-#         'console': {
-#             'level': 'DEBUG',
-#             'filters': ['require_debug_true'],
-#             'class': 'logging.StreamHandler',
-#         }
-#     },
-#     'loggers': {
-#         'django.db.backends': {
-#             'level': 'DEBUG',
-#             'handlers': ['console'],
-#         }
-#     }
-# }
 
 LOGGING = {
     "version": 1,
@@ -414,18 +387,12 @@ if os.environ.get('AZURE_LOGGING', 'False').lower() in ('true', '1', 't'):
         "instrumentation_key": os.environ.get("AZURE_INSTRUMENTATION_KEY"),
         "formatter": "default"
     }
-    # LOGGING["handlers"]["azure_event"] = {
-    #     "class": "opencensus.ext.azure.log_exporter.AzureEventHandler",
-    #     "instrumentation_key": os.environ.get("AZURE_INSTRUMENTATION_KEY"),
-    # }
+
     LOGGING["loggers"]["azure"] = {
         "handlers": ["azure_log", "console"],
         "level": "INFO"
     }
-    # LOGGING["loggers"]["azure_event"] = {
-    #     "handlers": ["azure_event"],
-    #     "level": "INFO"
-    # }
+
     OPENCENSUS = {
         'TRACE': {
             'SAMPLER': 'opencensus.trace.samplers.ProbabilitySampler(rate=1)',
