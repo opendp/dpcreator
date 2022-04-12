@@ -223,7 +223,7 @@ export default {
       this.$emit("addVariable")
     },
     save(editedItemFromDialog) {
-      this.editedItem = Object.assign({}, editedItemFromDialog);
+      this.editedItem = JSON.parse(JSON.stringify(editedItemFromDialog))
       if (this.isEditionMode) {
         Object.assign(this.statistics[this.editedIndex], this.editedItem);
       } else {
@@ -254,8 +254,6 @@ export default {
                 const accuracy = validateResults.data[i].accuracy
                 this.statistics[i].accuracy.value = Number(accuracy.value).toPrecision(3)
                 this.statistics[i].accuracy.message = accuracy.message
-                // this assigment below didn't work!  Can't change the object reference, need to change the values
-                //  this.statistics[i] = Object.assign({}, this.statistics[i], { accuracy })
               }
               this.saveUserInput()
             })

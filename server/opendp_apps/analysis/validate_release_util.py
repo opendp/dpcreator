@@ -354,6 +354,7 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         # Iterate through the stat specs and validate them!
         #
+        self.validation_info = []  # reset validation info
         running_epsilon = 0.0
         for stat_spec in self.stat_spec_list:
             # Check each stat_spec
