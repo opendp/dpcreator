@@ -1,0 +1,35 @@
+{
+  "datasetName": "Eye-typing experiment",
+  "statistics": [
+    {
+      "statistic": "Mean",
+      "variable": "Trial",
+      "roundedAccuracy": "0.491",
+      "accuracy": 0.4911036518596695,
+      "fixedValue": "5"
+    },
+    {
+      "statistic": "Histogram",
+      "variable": "Trial",
+      "roundedAccuracy": "16.2",
+      "accuracy": 16.18088267924274,
+      "fixedValue": "5"
+    },
+    {
+      "statistic": "Mean",
+      "variable": "Trial",
+      "roundedAccuracy": "0.491",
+      "accuracy": 0.49110365185966957,
+      "fixedValue": "6"
+    }
+  ],
+  "variables": {
+    "Trial": {
+      "name": "Trial",
+      "label": "",
+      "type": "Integer",
+      "min": "0",
+      "max": "10"
+    }
+  }
+}

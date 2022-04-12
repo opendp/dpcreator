@@ -9,15 +9,10 @@
             })
             cy.clearData()
 
-        })/*
-        it('distributes epsilon correctly ',()=> {
-            cy.on('uncaught:exception', (e, runnable) => {
-                console.log('error', e)
-                console.log('runnable', runnable)
-                return false
-            })
+        })
+        it('Updated dpStatistics Correctly', () => {
             const mockDVfile = 'EyeDemoMockDV.json'
-            const demoDatafile = 'createStats.json'
+            const demoDatafile = 'EyeDemoStatsTest.json'
 
             cy.createMockDataset(mockDVfile)
             cy.fixture(demoDatafile).then((demoData) => {
@@ -31,27 +26,10 @@
                 // Continue to Set Epsilon Step
                 cy.epsilonStep()
                 // Add all the statistics in the Create Statistics Step
-                cy.createStatistics(demoData).then(()=>{
-
-
-                // sum of individual epsilons should be < total epsilon
-                const sessionObj = JSON.parse(sessionStorage.getItem('vuex'))
-                const dpStatistics = sessionObj.dataset.analysisPlan.dpStatistics
-                const totalEpsilon = sessionObj.dataset.datasetInfo.depositorSetupInfo.epsilon
-                let sumEpsilon = 0;
-                dpStatistics.forEach(stat => { sumEpsilon += stat.epsilon})
-                    console.log('sumEpsilon')
-                expect(sumEpsilon <= -1)
-                cy.pause()
-
-                })
-
-
-
+                cy.createStatistics(demoData)
             })
-
         })
-*/
+
         it('Displays correct precision', () => {
             const mockDVfile = 'EyeDemoMockDV.json'
             const demoDatafile = 'EyeDemoData.json'
@@ -71,7 +49,6 @@
                 cy.createStatistics(demoData)
             })
         })
-
         it('Goes back to the Confirm Variables Page', () => {
             const mockDVfile = 'EyeDemoMockDV.json'
             const demoDatafile = 'EyeDemoData.json'
