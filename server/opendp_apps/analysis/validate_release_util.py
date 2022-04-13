@@ -11,9 +11,7 @@
         - Retrieve the variable type/min/max/categories from AnalysisPlan.variable_info
         - Retrieve
 """
-import io
 import copy
-
 import logging
 import pkg_resources
 
