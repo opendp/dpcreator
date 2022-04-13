@@ -204,7 +204,7 @@ class PDFReportMaker(BasicErrCheck):
         try:
             self.layout.add(pdf_element)
         except AssertionError as ex_obj:
-            logger.exception("The PDF doesn't fit!", ex_obj)
+            logger.exception("The PDF doesn't fit! %s", ex_obj)
             assert_err1 = 'A Rectangle must have a non-negative height.'
             assert_err2 = 'FlexibleColumnWidthTable is too tall to fit inside column / page.'
             if str(ex_obj).find(assert_err1) > -1:

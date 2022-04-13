@@ -39,29 +39,29 @@ def ajax_profile_by_dataset_object_id(request):
     In a POST, send 'dataset_object_id'
     """
     json_data = json.loads(request.body)
-    logger.info('ajax_profile_by_dataset_object_id: json_data = ', json_data)
+    logger.info(f'ajax_profile_by_dataset_object_id: json_data = {json_data}')
 
     # if not request.user.is_superuser:
     #     return JsonResponse(dict(success=False, message='nope'),
     #                        status=status.HTTP_403_FORBIDDEN)
 
     websocket_id = get_websocket_id(request)
-    logger.info('ajax_profile_by_dataset_object_id: websocket_id =', websocket_id)
+    logger.info(f'ajax_profile_by_dataset_object_id: websocket_id = {websocket_id}')
 
     if not 'dataset_object_id' in json_data:
-        logger.info('ajax_profile_by_dataset_object_id: dataset_object_id not in json_data: ', json_data)
+        logger.info(f'ajax_profile_by_dataset_object_id: dataset_object_id not in json_data: {json_data}')
         ws_msg = WebsocketMessage.get_fail_message(
             async_static.WS_MSG_TYPE_PROFILER,
             f'({datetime.now()}) The dataset has been materialized {datetime.now()}')
     else:
-        logger.info('ajax_profile_by_dataset_object_id: Success with json_data: ', json_data)
+        logger.info(f'ajax_profile_by_dataset_object_id: Success with json_data: {json_data}')
         ws_msg = WebsocketMessage.get_success_message(
             async_static.WS_MSG_TYPE_PROFILER,
             f'({datetime.now()}) Looking good, ready for the next step')
 
     ws_msg.send_message(websocket_id)
     #send_test_msg.delay(websocket_id)
-    logger.info("ajax_profile_by_dataset_object_id: json_data['dataset_object_id'] = ", json_data['dataset_object_id'])
+    logger.info("ajax_profile_by_dataset_object_id: json_data['dataset_object_id'] = %s", json_data['dataset_object_id'])
     profile_dataset_info.delay(json_data['dataset_object_id'], websocket_id=websocket_id)
 
     return JsonResponse(dict(success=True, message='should be sending a websocket message...'))

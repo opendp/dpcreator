@@ -357,7 +357,10 @@ SESSION_COOKIE_AGE = int(os.getenv('SESSION_COOKIE_AGE', SESSION_DEFAULT_COOKIE_
 SKIP_PDF_CREATION_FOR_TESTS = bool(strtobool(os.environ.get('SKIP_PDF_CREATION_FOR_TESTS', 'False')))
 SKIP_EMAIL_RELEASE_FOR_TESTS = bool(strtobool(os.environ.get('SKIP_PDF_CREATION_FOR_TESTS', 'False')))
 
-
+# ---------------------------------------
+# Logging
+#  - default is to log to the console
+# ---------------------------------------
 LOGGING = {
     "version": 1,
     "formatters": {
@@ -380,11 +383,22 @@ LOGGING = {
     }
 }
 
-# In .env, set to False or leave empty to keep all logs local, else put True
-if os.environ.get('AZURE_LOGGING', 'False').lower() in ('true', '1', 't'):
+# ------------------------------------------------------------
+# Settings for Azure Logging. May be set via .env variables
+#
+#  - AZURE_LOGGING - True/False value. If "False", logging will be sent to the console
+#  - AZURE_INSTRUMENTATION_KEY - Taken from the Azure "Application Insights" service
+#    - reference: https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview
+#
+# -------------------------------------------------------
+AZURE_LOGGING = bool(strtobool(os.environ.get('AZURE_LOGGING', 'False')))
+AZURE_INSTRUMENTATION_KEY = os.environ.get('AZURE_INSTRUMENTATION_KEY', '')
+
+if AZURE_LOGGING is True:
+
     LOGGING["handlers"]["azure_log"] = {
         "class": "opencensus.ext.azure.log_exporter.AzureLogHandler",
-        "instrumentation_key": os.environ.get("AZURE_INSTRUMENTATION_KEY"),
+        "instrumentation_key": AZURE_INSTRUMENTATION_KEY,
         "formatter": "default"
     }
 
@@ -397,14 +411,14 @@ if os.environ.get('AZURE_LOGGING', 'False').lower() in ('true', '1', 't'):
         'TRACE': {
             'SAMPLER': 'opencensus.trace.samplers.ProbabilitySampler(rate=1)',
             'EXPORTER': f'''opencensus.ext.azure.trace_exporter.AzureExporter(
-            connection_string="InstrumentationKey={os.environ.get('AZURE_INSTRUMENTATION_KEY')}"
+            connection_string="InstrumentationKey={AZURE_INSTRUMENTATION_KEY}"
         )''',
         }
     }
     MIDDLEWARE.append('opencensus.ext.django.middleware.OpencensusMiddleware')
     DEFAULT_LOGGER = 'azure'
 else:
-    DEFAULT_LOGGER = 'console'
+    DEFAULT_LOGGER = 'django'
 
 
 

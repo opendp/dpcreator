@@ -198,7 +198,7 @@ class ReleaseView(viewsets.ViewSet):
             # This is a big error, check for it before evaluating individual statistics
             #
             user_msg = validate_util.get_err_msg()
-            logger.error('release_view.create(...) user_msg', user_msg)
+            logger.error(f'release_view.create(...) user_msg: {user_msg}')
 
             # Can you return a 400 / raise an Exception here with the error message?
             # How should this be used?

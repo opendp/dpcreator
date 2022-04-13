@@ -202,10 +202,10 @@ class DataverseDepositUtil(BasicErrCheck):
                 self.set_deposit_record_user_messages_and_save(deposit_record)
                 continue
 
-            logger.info('Dataverse status_code: ', response.status_code)
+            logger.info('Dataverse status_code: %s', response.status_code)
 
             if response.status_code == status.HTTP_200_OK:
-                logger.info('Dataverse response json', response.json())
+                logger.info('Dataverse response json: %s', response.json())
 
             # Record the HTTP status code and response text
             #
