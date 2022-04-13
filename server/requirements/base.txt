@@ -15,7 +15,7 @@ idna==2.10
 jsonschema==4.2.1
 lxml==4.6.5
 numpy==1.21.4
-opendp==0.3.0
+opendp==0.4.0
 packaging==20.4
 pandas==1.3.4
 psycopg2-binary==2.8.6
