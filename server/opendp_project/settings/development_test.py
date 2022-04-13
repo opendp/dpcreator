@@ -13,3 +13,4 @@ DATABASES = {
     }
 }
 
+DEFAULT_LOGGER = 'console'

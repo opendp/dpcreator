@@ -71,7 +71,6 @@ class BasicErrCheckList():
 
     def add_err_msg(self, err_msg):
         """Add an error message"""
-        # print('add err:', err_msg)
         self.error_found = True
         self.error_messages.append(err_msg)
 

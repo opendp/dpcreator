@@ -1,3 +1,7 @@
+import logging
+
+from django.conf import settings
+
 from opendp.accuracy import laplacian_scale_to_accuracy
 from opendp.meas import make_base_laplace
 from opendp.mod import binary_search, enable_features
@@ -14,6 +18,8 @@ enable_features("floating-point", "contrib")
 
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis import static_vals as astatic
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class DPSumSpec(StatSpec):
@@ -41,7 +47,7 @@ class DPSumSpec(StatSpec):
         Add a list of required properties
         example: ['min', 'max']
         """
-        return ['min', 'max', 'cl',]    # 'fixed_value']
+        return ['min', 'max', 'cl', ]  # 'fixed_value']
 
     def run_01_initial_handling(self):
         """
@@ -138,7 +144,6 @@ class DPSumSpec(StatSpec):
 
         return True
 
-
     def run_chain(self, column_names, file_obj, sep_char=","):
         """
         Calculate the DP Sum!
@@ -178,21 +183,22 @@ class DPSumSpec(StatSpec):
             self.value = computation_chain(file_obj.read())
 
         except OpenDPException as ex_obj:
+            logger.exception(ex_obj)
             self.add_err_msg(f'{ex_obj.message} (OpenDPException)')
             return False
         except Exception as ex_obj:
+            logger.exception(ex_obj)
             if hasattr(ex_obj, 'message'):
                 self.add_err_msg(f'{ex_obj.message} (Exception)')
             else:
                 self.add_err_msg(f'{ex_obj} (Exception)')
             return False
 
-        if False:
-            print((f"Epsilon: {self.epsilon}"
-                   f"\nColumn name: {self.variable}"
-                   f"\nColumn index: {self.col_index}"
-                   f"\nColumn accuracy_val: {self.accuracy_val}"
-                   f"\nColumn accuracy_msg: {self.accuracy_msg}"
-                   f"\n\nDP Sum: {self.value}" ))
+        logger.info((f"Epsilon: {self.epsilon}"
+                     f"\nColumn name: {self.variable}"
+                     f"\nColumn index: {self.col_index}"
+                     f"\nColumn accuracy_val: {self.accuracy_val}"
+                     f"\nColumn accuracy_msg: {self.accuracy_msg}"
+                     f"\n\nDP Sum: {self.value}"))
 
         return True
