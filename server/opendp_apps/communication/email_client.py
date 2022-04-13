@@ -1,8 +1,7 @@
 import os
 
-from sendgrid import sendgrid, Email, Content, Mail, To
-
 from django.conf import settings
+from sendgrid import sendgrid, Email, Content, Mail, To
 
 
 class SendGridAPIError(Exception):
@@ -35,15 +34,15 @@ class EmailClient(object):
 
 
 if __name__ == '__main__':
-   # apikey_message = "Current API Key: " + os.environ.get('SENDGRID_API_KEY')
-   # print("-"*(len(apikey_message)+1))
+    # apikey_message = "Current API Key: " + os.environ.get('SENDGRID_API_KEY')
+    # print("-"*(len(apikey_message)+1))
 
-  #  print("Current API Key: ", os.environ.get('SENDGRID_API_KEY'))
+    #  print("Current API Key: ", os.environ.get('SENDGRID_API_KEY'))
     c = EmailClient()
     print("From Email: ", c.from_email)
- #   print("-"*(len(apikey_message)+1))
+    #   print("-"*(len(apikey_message)+1))
     result = c.send(to_email='ellen.kraffmiller@gmail.com', subject='test test',
                     content='hi', content_type='text/plain')
     print("Message Sent")
     print("Status Code: ", result.status_code)
-  #  print("-"*(len(apikey_message)+1))
+    #  print("-"*(len(apikey_message)+1))

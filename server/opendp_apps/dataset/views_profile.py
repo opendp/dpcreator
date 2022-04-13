@@ -1,4 +1,8 @@
+import logging
+
 from collections import OrderedDict
+
+from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
@@ -11,6 +15,10 @@ from opendp_apps.async_messages.utils import get_websocket_id
 from opendp_apps.dataset.serializers import DatasetObjectIdSerializer
 from opendp_apps.utils.view_helper import get_json_error, get_json_success
 from opendp_apps.async_messages.tasks import profile_dataset_info
+
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
+
 
 class ProfilingViewSet(viewsets.ViewSet):
     """
@@ -29,7 +37,6 @@ class ProfilingViewSet(viewsets.ViewSet):
 
         return Response(get_json_success())
 
-
     @csrf_exempt
     @action(methods=['post'], detail=False, url_path='retrieve-profile')
     def retrieve_profile(self, request, *args, **kwargs):
@@ -39,14 +46,11 @@ class ProfilingViewSet(viewsets.ViewSet):
         NOTES:
         - The logged in user must match the DataSetInfo.creator
         """
-        print('\n>>request', request)
-        print('\n>>request.data', request.data, type(request.data))
-
         # Is this a object_id a valid UUID?
         #
         ois = DatasetObjectIdSerializer(data=request.data)
         if not ois.is_valid():
-            print(ois.errors)
+            logger.error(ois.errors)
             if 'object_id' in ois.errors:
                 user_msg = '"object_id" error: %s' % (ois.errors['object_id'][0])
             else:
@@ -74,8 +78,6 @@ class ProfilingViewSet(viewsets.ViewSet):
         #
         return Response(get_json_success('Profile found', data=dsi_object.get_profile_variables()))
 
-
-    #@csrf_exempt
     @action(methods=['post'], detail=False, url_path='run-async-profile')
     def run_async_profile(self, request, *args, **kwargs):
         """Asynchronously profile a DataSetInfo object, returning the DataSetInfo.profile_variables in JSON format.
@@ -91,7 +93,7 @@ class ProfilingViewSet(viewsets.ViewSet):
         #
         ois = DatasetObjectIdSerializer(data=request.data)
         if not ois.is_valid():
-            print(ois.errors)
+            logger.error(ois.errors)
             if 'object_id' in ois.errors:
                 user_msg = '"object_id" error: %s' % (ois.errors['object_id'][0])
             else:
@@ -116,9 +118,6 @@ class ProfilingViewSet(viewsets.ViewSet):
                     f' messages to websocket: {websocket_id}')
         return Response(get_json_success(user_msg))
 
-
-
-    #@csrf_exempt
     @action(methods=['post'], detail=False, url_path='run-direct-profile')
     def run_direct_profile(self, request, *args, **kwargs):
         """TEST ONLY - Profile a DataSetInfo object, returning the DataSetInfo.profile_variables in JSON format.
@@ -135,7 +134,7 @@ class ProfilingViewSet(viewsets.ViewSet):
         #
         ois = DatasetObjectIdSerializer(data=request.data)
         if not ois.is_valid():
-            #print(ois.errors)
+            logger.error(ois.errors)
             if 'object_id' in ois.errors:
                 user_msg = '"object_id" error: %s' % (ois.errors['object_id'][0])
             else:

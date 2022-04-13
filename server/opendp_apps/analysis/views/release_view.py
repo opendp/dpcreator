@@ -1,3 +1,6 @@
+import logging
+
+from django.conf import settings
 from django.http import FileResponse
 
 from rest_framework import permissions, viewsets, renderers, status
@@ -14,6 +17,9 @@ from opendp_apps.analysis.serializers import \
      ReleaseInfoFileDownloadSerializer,
      ReleaseInfoSerializer,
      ReleaseValidationSerializer)
+
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class PassthroughRenderer(renderers.BaseRenderer):
@@ -48,6 +54,7 @@ class ReleaseFileDownloadView(viewsets.ReadOnlyModelViewSet):
 
         if not release_info.dp_release_pdf_file:
             user_msg = 'The Release does not include a PDF file.'
+            logger.error(user_msg + ' ReleaseInfo: ' + release_info.object_id)
             return Response(get_json_error(user_msg),
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -56,10 +63,12 @@ class ReleaseFileDownloadView(viewsets.ReadOnlyModelViewSet):
             file_handle = release_info.dp_release_pdf_file.open()
         except ValueError as err_obj:
             user_msg = f'Not able to read the PDF Release file. (1) ({err_obj})'
+            logger.error(user_msg + ' ReleaseInfo: ' + release_info.object_id)
             return Response(get_json_error(user_msg),
                             status=status.HTTP_400_BAD_REQUEST)
         except Exception as err_obj:
             user_msg = f'Not able to read the PDF Release file. (2) ({err_obj})'
+            logger.error(user_msg + ' ReleaseInfo: ' + release_info.object_id)
             return Response(get_json_error(user_msg),
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -90,6 +99,7 @@ class ReleaseFileDownloadView(viewsets.ReadOnlyModelViewSet):
 
         if not release_info.dp_release_json_file:
             user_msg = 'The Release does not include a JSON file.'
+            logger.error(user_msg + ' ReleaseInfo: ' + release_info.object_id)
             return Response(get_json_error(user_msg),
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -98,10 +108,12 @@ class ReleaseFileDownloadView(viewsets.ReadOnlyModelViewSet):
             file_handle = release_info.dp_release_json_file.open()
         except ValueError as err_obj:
             user_msg = f'Not able to read the JSON Release file. (1) ({err_obj})'
+            logger.error(user_msg + ' ReleaseInfo: ' + release_info.object_id)
             return Response(get_json_error(user_msg),
                             status=status.HTTP_400_BAD_REQUEST)
         except Exception as err_obj:
             user_msg = f'Not able to read the JSON Release file. (2) ({err_obj})'
+            logger.error(user_msg + ' ReleaseInfo: ' + release_info.object_id)
             return Response(get_json_error(user_msg),
                             status=status.HTTP_400_BAD_REQUEST)
             
@@ -129,6 +141,7 @@ class ReleaseView(viewsets.ViewSet):
     def retrieve(self, request, pk=None):
         release_info = get_object_or_404(ReleaseInfo, object_id=pk)
         serializer = ReleaseValidationSerializer(release_info, context={'request': request})
+        logger.info("Getting ReleaseInfo with request %s", request.__dict__)
         return Response(data=serializer)
 
     def create(self, request, *args, **kwargs):
@@ -164,11 +177,11 @@ class ReleaseView(viewsets.ViewSet):
         #
         serializer = AnalysisPlanObjectIdSerializer(data=request.data)
         if not serializer.is_valid():
-            print(serializer.errors)
             if 'object_id' in serializer.errors:
                 user_msg = '"object_id" error: %s' % (serializer.errors['object_id'][0])
             else:
                 user_msg = 'Not a valid AnalysisPlan "object_id"'
+            logger.error(user_msg + ' : %s', serializer.errors)
             return Response(get_json_error(user_msg),
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -185,7 +198,7 @@ class ReleaseView(viewsets.ViewSet):
             # This is a big error, check for it before evaluating individual statistics
             #
             user_msg = validate_util.get_err_msg()
-            print('release_view.create(...) user_msg', user_msg)
+            logger.error(f'release_view.create(...) user_msg: {user_msg}')
 
             # Can you return a 400 / raise an Exception here with the error message?
             # How should this be used?
@@ -194,5 +207,6 @@ class ReleaseView(viewsets.ViewSet):
         # It worked! Return the release!
         release_info_obj = validate_util.get_new_release_info_object()
         serializer = ReleaseInfoSerializer(release_info_obj, context={'request': request})
+        logger.info(f"Created ReleaseInfo {release_info_obj.object_id} with request %s", request.__dict__)
         return Response(data=serializer.data,
                         status=status.HTTP_201_CREATED)

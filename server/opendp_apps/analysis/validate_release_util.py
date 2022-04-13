@@ -13,12 +13,13 @@
 """
 import io
 import copy
+
+import logging
 import pkg_resources
 
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.exceptions import ValidationError
-from django.core.serializers.json import DjangoJSONEncoder
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
@@ -38,7 +39,6 @@ from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
 
 from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
-from opendp_apps.dp_reports import tasks as pdf_tasks
 
 from opendp_apps.user.models import OpenDPUser
 from opendp_apps.profiler import static_vals as pstatic
@@ -49,9 +49,8 @@ from opendp_apps.utils.extra_validators import \
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
 
-# Temp workaround!!! See Issue #300
-# https://github.com/opendp/dpcreator/issues/300
-from opendp_apps.utils.camel_to_snake import camel_to_snake
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class ValidateReleaseUtil(BasicErrCheck):
@@ -139,13 +138,9 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         # Any stat specific validation errors?
         #   - Fail on 1st error found
-        # print('validate_release_util. release; show validation errors (if any)')
         for stat_spec in self.stat_spec_list:
-            # print(stat_spec)
             if stat_spec.has_error():
                 stat_spec.print_debug()
-                # print(stat_spec.get_error_msg_dict())
-            #    print(stat_spec.get_single_err_msg())
             if stat_spec.has_error():
                 user_msg = (f'Validation error found for variable "{stat_spec.variable}"'
                             f' and statistic "{stat_spec.statistic}":'
@@ -181,15 +176,11 @@ class ValidateReleaseUtil(BasicErrCheck):
         for stat_spec in self.stat_spec_list:
 
             # Okay! -> run_chain(...)!
-            #
             file_handle = open(filepath, 'r')
             stat_spec.run_chain(col_indices, file_handle, sep_char=sep_char)
             file_handle.close()
 
-            # print(stat_spec.get_error_msg_dict())
-
             # Any errors?
-            #
             if not stat_spec.has_error():
                 # Looks good! Save the stat
                 self.release_stats.append(stat_spec.get_release_dict())
@@ -197,8 +188,9 @@ class ValidateReleaseUtil(BasicErrCheck):
             else:
                 user_msg = (f'Validation error found for {stat_spec.statistic}:'
                             f' {stat_spec.get_single_err_msg()}')
+                logger.error(f'Validation error found for {stat_spec.statistic}:'
+                             f' {stat_spec.get_single_err_msg()}')
                 self.add_err_msg(user_msg)
-                #
                 # Delete any previous stats
                 del self.release_stats
                 return
@@ -207,6 +199,8 @@ class ValidateReleaseUtil(BasicErrCheck):
         if not self.release_stats:
             user_msg = ("ValidateReleaseUtil.run_release_process.'"
                         "No release_stats! shouldn't see this error!")
+            logger.error("ValidateReleaseUtil.run_release_process.'"
+                         "No release_stats! shouldn't see this error!")
             self.add_err_msg(user_msg)
             return
 
@@ -214,7 +208,6 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.make_release_info(epsilon_used)
 
         # Deposit release files in Dataverse
-        #
         if not self.has_error():
             self.deposit_to_dataverse()
 
@@ -234,18 +227,18 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         if not self.release_info:
             # Shouldn't happen!
+            logger.error('ValidateReleaseUtil.deposit_to_dataverse: ReleaseInfo not available for Dataverse deposit')
             self.add_err_msg('ReleaseInfo not available for Dataverse deposit')
 
         self.analysis_plan.user_step = AnalysisPlan.AnalystSteps.STEP_1200_PROCESS_COMPLETE
         self.analysis_plan.save()
-        print('ValidateReleaseUtil: Deposit complete!')
+        logger.info('ValidateReleaseUtil: Deposit complete!')
 
         # If the ReleaseInfo object was crated and deposit fails,
         # the error for the deposit will be sent to the user
-        #
         deposit_util = DataverseDepositUtil(self.release_info)
         if deposit_util.has_error():
-            # self.add_err_msg(deposit_util.get_err_msg())
+            logger.error(deposit_util.get_err_msg())
             return
 
     def make_release_info(self, epsilon_used: float):
@@ -256,19 +249,18 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.release_info = None
 
         # (1) Format the release JSON as a Python dict as well as JSON string
-        #
         formatted_release = self.get_final_release_data()
         if self.has_error():
             del self.release_stats
             return False
 
+        # (2)
         formatted_release_json_str = self.get_final_release_data(as_json=True)
         if self.has_error():
             del self.release_stats
             return False
 
         # (3) Save the ReleaseInfo object
-        #
         params = dict(dataset=self.analysis_plan.dataset,
                       epsilon_used=epsilon_used,
                       dp_release=formatted_release)
@@ -289,28 +281,24 @@ class ValidateReleaseUtil(BasicErrCheck):
         # -------------------------------
         # Make Async! create the release PDF
         # -------------------------------
-        print('SKIP_PDF_CREATION_FOR_TESTS', settings.SKIP_PDF_CREATION_FOR_TESTS)
+        logger.info(f'SKIP_PDF_CREATION_FOR_TESTS: {settings.SKIP_PDF_CREATION_FOR_TESTS}')
         if settings.SKIP_PDF_CREATION_FOR_TESTS:
             # Skip PDF creation during tests to save time
             pass
         else:
-            # pdf_tasks.run_pdf_report_maker.delay(self.release_info.object_id)  # async
             report_maker = PDFReportMaker(self.release_info.dp_release, self.release_info.object_id)
             if not report_maker.has_error():
                 report_maker.save_pdf_to_release_obj(self.release_info)
-            # pdf_tasks.run_pdf_report_maker(self.release_info.object_id)  # in the loop...
 
         # (5) Attach the ReleaseInfo to the AnalysisPlan, AnalysisPlan.release_info
-        #
         self.analysis_plan.release_info = self.release_info
         self.analysis_plan.user_step = AnalysisPlan.AnalystSteps.STEP_1000_RELEASE_COMPLETE
         self.analysis_plan.save()
-        # print('ValidateReleaseUtil - self.release_stats', json.dumps(self.release_stats, indent=4))
 
         # (6) Delete the "source_file"
-        #
         delete_result = DataSetInfo.delete_source_file(self.analysis_plan.dataset)
         if not delete_result.success:
+            logger.error(f"ValidateReleaseUtil.make_release_info: {delete_result.message}")
             self.add_err_msg(delete_result.message)
             return False
 
@@ -320,9 +308,6 @@ class ValidateReleaseUtil(BasicErrCheck):
             pass
         else:
             _email_util = ReleaseEmailUtil(self.release_info)
-        # if email_util.has_error():
-        #    self.add_err_msg(email_util.get_err_msg())
-        #    return
 
         return True
 
@@ -338,6 +323,7 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         if formatter.has_error():
             # shouldn't happen, but over time...
+            logger.error(f'ValidateReleaseUtil.get_final_release_data: {formatter.get_err_msg()}')
             self.add_err_msg(formatter.get_err_msg())
             return
 
@@ -359,13 +345,13 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         # Make sure the variable indices are available!
         # Not needed in this step but required for computation
-        #
         if self.get_variable_indices() is None:
             # error already set
             return
 
         self.build_stat_specs()
         if not self.stat_spec_list:
+            logger.error('ValidateReleaseUtil.run_validation_process: No statistics were built!')
             self.add_err_msg('No statistics were built!')
             return
 
@@ -380,23 +366,22 @@ class ValidateReleaseUtil(BasicErrCheck):
                 self.validation_info.append(stat_spec.get_error_msg_dict())
             else:
                 # Looks good but check single stat epsilon and cumulative epsilon
-                #
                 running_epsilon += stat_spec.epsilon
 
                 if stat_spec.epsilon > self.max_epsilon:
                     # Error one stat uses more than all the epsilon!
-                    #
                     user_msg = (f'The epsilon ({stat_spec.epsilon}) exceeds'
                                 f' max epsilon ({self.max_epsilon})')
                     stat_spec.add_err_msg(user_msg)
+                    logger.error(f'ValidateReleaseUtil.run_validation_process: {user_msg}')
                     self.validation_info.append(stat_spec.get_error_msg_dict())
 
                 elif (running_epsilon - astatic.MAX_EPSILON_OFFSET) > self.max_epsilon:
                     # Error: Too much epsilon used!
-                    #
                     user_msg = (f'The running epsilon ({running_epsilon}) exceeds'
                                 f' the max epsilon ({self.max_epsilon})')
                     stat_spec.add_err_msg(user_msg)
+                    logger.error(f'ValidateReleaseUtil.run_validation_process: {user_msg}')
                     self.validation_info.append(stat_spec.get_error_msg_dict())
                 else:
                     # Looks good!
@@ -412,7 +397,7 @@ class ValidateReleaseUtil(BasicErrCheck):
         variable_indices_info = self.analysis_plan.dataset.get_variable_order(as_indices=True)
         if variable_indices_info.success:
             return variable_indices_info.data
-
+        logger.error(f'ValidateReleaseUtil.get_variable_indices: {variable_indices_info.message}')
         self.add_err_msg(variable_indices_info.message)
         return None
 
@@ -422,7 +407,6 @@ class ValidateReleaseUtil(BasicErrCheck):
         chain validation or running computations
         """
         # Iterate through the stats!
-        #
         self.stat_spec_list = []
         stat_num = 0
 
@@ -454,14 +438,12 @@ class ValidateReleaseUtil(BasicErrCheck):
             props['dataset_size'] = self.dataset_size   # add dataset size
 
             #  Some high-level error checks, before making the StatSpec
-            #
             variable = props.get('variable')
             statistic = props.get('statistic', 'shrug?')
             # epsilon = props.get('epsilon')
             # var_type = None
 
             # (1) Is variable defined?
-            #
             if not props.get('variable'):
                 props['error_message'] = (f'"variable" is missing from this'
                                           f'DP Stat specification.')
@@ -469,15 +451,13 @@ class ValidateReleaseUtil(BasicErrCheck):
                 continue  # to the next dp_stat specification
 
             # (2) Is this a known statistic? If not stop here.
-            #
             if statistic not in astatic.DP_STATS_CHOICES:
-                # also checked in the DPStatisticSerializer
                 props['error_message'] = f'Statistic "{statistic}" is not supported'
                 self.add_stat_spec(DPSpecError(props))
+                logger.error(f'ValidateReleaseUtil.build_stat_specs: Statistic "{statistic}" is not supported')
                 continue  # to the next dp_stat specification
 
             # (3) Add variable_info which has min/max/categories, variable type, etc.
-            #
             variable_info = self.analysis_plan.variable_info.get(variable)
             if variable_info:
                 props['variable_info'] = variable_info
@@ -485,20 +465,20 @@ class ValidateReleaseUtil(BasicErrCheck):
             else:
                 props['error_message'] = 'Variable in validation info not found.'
                 self.add_stat_spec(DPSpecError(props))
+                logger.error(f'ValidateReleaseUtil.build_stat_specs: Variable in validation info not found.')
                 continue  # to the next dp_stat specification
 
             # (4) Retrieve the column index
-            #
             col_idx_info = self.analysis_plan.dataset.get_variable_index(variable_info['name'])
             if col_idx_info.success:
                 props['col_index'] = col_idx_info.data
             else:
                 props['error_message'] = col_idx_info.message
                 self.add_stat_spec(DPSpecError(props))
+                logger.error(f'ValidateReleaseUtil.build_stat_specs: {col_idx_info.message}')
                 continue  # to the next dp_stat specification
 
             # Okay, "props" are built! Let's see if they work!
-            #
             if statistic == astatic.DP_COUNT:
                 # DP Count!
                 self.add_stat_spec(DPCountSpec(props))
@@ -529,6 +509,8 @@ class ValidateReleaseUtil(BasicErrCheck):
                     props['error_message'] = (f'Statistic is "{astatic.DP_HISTOGRAM}" but '
                                               f' variable type is unsupported: "{var_type}"')
                     self.add_stat_spec(DPSpecError(props))
+                    logger.error(f'ValidateReleaseUtil.build_stat_specs: Statistic is "{astatic.DP_HISTOGRAM}" but '
+                                 f'variable type is unsupported: "{var_type}"')
                     continue  # to the next dp_stat specification
 
             elif statistic == astatic.DP_MEAN:
@@ -546,6 +528,7 @@ class ValidateReleaseUtil(BasicErrCheck):
                 # Stat not yet available or an error
                 props['error_message'] = (f'Statistic "{statistic}" will be supported'
                                           f' soon!')
+                logger.error('ValidateReleaseUtil.build_stat_specs: Statistic "{statistic}" will be supported soon!')
                 self.add_stat_spec(DPSpecError(props))
             else:
                 # Shouldn't reach here, unknown stats are captured up above
@@ -586,40 +569,39 @@ class ValidateReleaseUtil(BasicErrCheck):
         """Run preliminary steps before validation"""
 
         # Retrieve the Analysis Plan
-        #
         ap_info = AnalysisPlanUtil.retrieve_analysis(self.analysis_plan_id, self.opendp_user)
         if not ap_info.success:
             self.add_err_msg(ap_info.message)
+            logger.error(f'ValidateReleaseUtil.run_preliminary_steps: {ap_info.message}')
             return False
 
         self.analysis_plan = ap_info.data
 
         # Check the dp_statistics spec
-        #
         if self.compute_mode:
             # In compute mode, run the stats saved in the plan!
-            #
             self.dp_statistics = self.analysis_plan.dp_statistics
             if not self.dp_statistics:
                 user_msg = 'The AnalysisPlan does not contain "dp_statistics"'
                 self.add_err_msg(user_msg)
+                logger.error(f'ValidateReleaseUtil.run_preliminary_steps: {user_msg}')
                 return False
-            #
         elif not self.dp_statistics:
-            #
             user_msg = 'There are no statistics to validate'
             self.add_err_msg(user_msg)
+            logger.error(f'ValidateReleaseUtil.run_preliminary_steps: {user_msg}')
             return False
 
         dataset_size_info = self.analysis_plan.dataset.get_dataset_size()
         if dataset_size_info.success:
             self.dataset_size = dataset_size_info.data
         else:
-            self.add_err_msg('Dataset size is not available')
+            user_msg = 'Dataset size is not available'
+            self.add_err_msg(user_msg)
+            logger.error(f'ValidateReleaseUtil.run_preliminary_steps: {user_msg}')
             return False
 
         # Make sure the total epsilon is valid
-        #
         self.max_epsilon = self.analysis_plan.dataset.get_depositor_setup_info().epsilon
         self.max_delta = self.analysis_plan.dataset.get_depositor_setup_info().delta
 
@@ -627,6 +609,7 @@ class ValidateReleaseUtil(BasicErrCheck):
         if not epsilon_ok:
             user_msg = f'{astatic.ERR_MSG_BAD_TOTAL_EPSILON}: {self.max_epsilon}'
             self.add_err_msg(user_msg)
+            logger.error(f'ValidateReleaseUtil.run_preliminary_steps: {user_msg}')
             return False
 
         try:
@@ -634,6 +617,7 @@ class ValidateReleaseUtil(BasicErrCheck):
         except ValidationError as _err_obj:
             user_msg = f'{astatic.ERR_MSG_BAD_TOTAL_DELTA}: {self.max_delta}'
             self.add_err_msg(user_msg)
+            logger.error(f'ValidateReleaseUtil.run_preliminary_steps: {user_msg}')
             return False
 
         return True
@@ -644,6 +628,7 @@ class ValidateReleaseUtil(BasicErrCheck):
         try:
             validate_epsilon_not_null(val)
         except ValidationError as err_obj:
+            logger.error(f'ValidateReleaseUtil.is_epsilon_valid: {err_obj}')
             return False, str(err_obj)
 
         return True, None

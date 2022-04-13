@@ -1,11 +1,8 @@
-from load_django_settings import CURRENT_DIR, TEST_DATA_DIR, load_local_settings
+from load_django_settings import load_local_settings
+
 load_local_settings()
 
-import json, time
-from os.path import isfile, join
-
-from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
-from opendp_apps.dataset.models import *
+from opendp_apps.analysis.models import ReleaseInfo
 
 
 def examine_release():
@@ -21,7 +18,6 @@ def examine_release():
     print('dp_release_json_file.name', ri.dp_release_json_file.name)
     print('dp_release_json_file.url', ri.dp_release_json_file.url)
 
-
     fh = ri.dp_release_json_file.open()
 
     print('dp_release_json_file.open()', fh.read()[:400])
@@ -30,9 +26,9 @@ def examine_release():
     print('source_file.path', ri.dataset.source_file.path)
     print('source_file.url', ri.dataset.source_file.url)
 
+
 def ticket_414():
     import os
-    from pprint import pprint
     from django.conf import settings
     from opendp_apps.profiler.csv_reader import CsvReader
     from opendp_apps.profiler.variable_info import VariableInfoHandler
@@ -47,7 +43,7 @@ def ticket_414():
     print(json.dumps(profile_dict, indent=4))
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     # examine_release()
     ticket_414()
 

@@ -1,14 +1,11 @@
-from load_django_settings import CURRENT_DIR, TEST_DATA_DIR, load_local_settings
+from load_django_settings import load_local_settings
+
 load_local_settings()
 
-import json, time
-from os.path import isfile, join
+import json
 
-from opendp_project.celery import hello_task
 from django.core.serializers.json import DjangoJSONEncoder
-from opendp_apps.profiler.tasks import ProfileHandler
 from opendp_apps.profiler import tasks as profiler_tasks
-from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadHandler
 
@@ -49,8 +46,7 @@ def test_downloader(dataverse_file_id=3):
         print('profiled!')
 
 
-
-if __name__=='__main__':
+if __name__ == '__main__':
     test_downloader(dataverse_file_id=5)
 
 """
