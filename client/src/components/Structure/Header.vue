@@ -114,7 +114,7 @@
           <v-list-item-content>
             <v-list-item-title
                 :data-test="item.title"
-                @click="$router.push(item.link)"
+                @click="itemClickHandler(item.link)"
                 class="grey--text"
             >{{ item.title }}
             </v-list-item-title
@@ -236,6 +236,15 @@ export default {
     NETWORK_CONSTANTS
   }),
   methods: {
+    itemClickHandler(link) {
+      // if current location is not item link, navigate to item link
+      // (needed to avoid Navigation Duplication Error)
+      if (this.$router.currentRoute.path != link) {
+        this.$router.push(link)
+      } else {
+        this.isDrawerActive = false
+      }
+    },
     logoutHandler() {
       this.$store.dispatch('auth/logout')
       if (this.$router.currentRoute.path != NETWORK_CONSTANTS.HOME.PATH) {
