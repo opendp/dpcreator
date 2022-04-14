@@ -11,6 +11,24 @@
         This action cannot be undone.
       </template>
     </ColoredBorderAlert>
+    <div v-if="analysisPlan!==null">
+      <v-card>
+        <v-card-title>DP Statistics</v-card-title>
+        <v-list-item
+            v-for="(item, index) in analysisPlan.dpStatistics"
+        >
+          <v-list-item-content>
+            <v-list-item-title>{{ index + 1 }}. <b>{{ item.variable }}</b> - <b>DP {{ item.statistic }}</b>
+            </v-list-item-title>
+            <v-list-item-subtitle>Epsilon: {{ Number(item.epsilon).toFixed(3) }}, Delta: {{ item.delta }}, Error:
+              {{ Number(item.accuracy.value).toPrecision(3) }}, Fixed Value: {{ item.fixedValue }}
+            </v-list-item-subtitle>
+
+          </v-list-item-content>
+        </v-list-item>
+      </v-card>
+    </div>
+    <p></p>
 
     <v-form class="my-5" ref="form" v-on:submit.prevent="onSubmit">
       <p class="mb-2">
