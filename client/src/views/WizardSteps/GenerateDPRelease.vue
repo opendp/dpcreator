@@ -2,18 +2,17 @@
   <div>
     <h1 class="title-size-1">Generate DP Release</h1>
     <p>
-      {{
+      The final step is to submit your statistics to generate a differential privacy release.
+      <!-- {{
         $t('generate DP.generate text')
-      }}
+      }} -->
     </p>
-    <ColoredBorderAlert type="warning">
-      <template v-slot:content>
-        This action cannot be undone.
-      </template>
-    </ColoredBorderAlert>
+  <p>Please review your list of statistics below:</p>
+
+
     <div v-if="analysisPlan!==null">
       <v-card>
-        <v-card-title>DP Statistics</v-card-title>
+        <v-card-title>DP Statistics to Generate</v-card-title>
         <v-list-item
             v-for="(item, index) in analysisPlan.dpStatistics"
         >
@@ -26,13 +25,19 @@
 
           </v-list-item-content>
         </v-list-item>
+
+        <v-card-text>
+          <p style="color:#000000">If you would like to change this list,
+          <a data-test="createStatisticsLink" v-on:click="returnToCreateStatisticsStep">please edit the statistics</a>.
+          </p>
+        </v-card-text>
       </v-card>
     </div>
     <p></p>
 
     <v-form class="my-5" ref="form" v-on:submit.prevent="onSubmit">
       <p class="mb-2">
-        <strong>Confirm the email to send notifications to:</strong>
+        <strong>Confirm your email to send notifications to:</strong>
       </p>
       <p>{{ user.email }}*</p>
 
@@ -40,9 +45,15 @@
       >* If you would like to change your email address, you can edit it in
         your profile area.</span
       >
-
-
     </v-form>
+
+    <ColoredBorderAlert type="warning">
+      <template v-slot:content>
+        Note: Once you submit the statistics, the action cannot be undone.
+        <p>(If needed,
+        <a data-test="createStatisticsLink" v-on:click="returnToCreateStatisticsStep">go back and edit your statistics.</a>)</p>
+      </template>
+    </ColoredBorderAlert>
 
     <v-overlay :value="areStatisticsSubmitted">
       <div class="d-flex flex-column align-center">
