@@ -11,4 +11,4 @@ dir_names = [TEMPLATES_DIR, OUTPUT_DIR]
 for dname in dir_names:
     if not isdir(dname):
         os.makedirs(dname)
-        print(f'creatd directory: {dname}')
+        print(f'created directory: {dname}')

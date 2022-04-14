@@ -9,36 +9,37 @@ from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp, BasicResponse
 
+
 class DataSetFormatter(BasicErrCheck):
-    
+
     def __init__(self, dataset_info: DataSetInfo):
         """Init with a DataSetInfo object"""
         assert isinstance(dataset_info, DataSetInfo), '"dataset_info" must be a DataSetInfo instance.'
-        
+
         self.dataset = dataset_info
         self.formatted_info = {}
-        
+
         self.run_formatter()
-        
+
     def run_formatter(self):
         """
         Format the dataset info
         """
         if self.dataset.source == DataSetInfo.SourceChoices.UserUpload:
-            self.dataset = self.dataset.uploadfileinfo      # Get the UploadFileInfo object
+            self.dataset = self.dataset.uploadfileinfo  # Get the UploadFileInfo object
             self.format_user_upload()
         elif self.dataset.source == DataSetInfo.SourceChoices.Dataverse:
-            self.dataset = self.dataset.dataversefileinfo   # Get the DataverseFileInfo object
+            self.dataset = self.dataset.dataversefileinfo  # Get the DataverseFileInfo object
             self.format_dataverse_dataset()
         else:
             self.add_err_msg('Unknown dataset type: {self.dataset.source}')
-            return 
+            return
 
     def get_formatted_info(self, as_json=False):
         """
         Return the formatted data
         """
-        assert self.has_error() is False,\
+        assert self.has_error() is False, \
             "Do not call this method before checking if \".has_error()\" is False"
 
         if as_json:
@@ -50,7 +51,7 @@ class DataSetFormatter(BasicErrCheck):
         """Format UserUpload dataset"""
         if self.has_error():
             return
-        
+
         ds_dict = {
             'type': self.dataset.source,
             'name': self.dataset.name,
@@ -59,7 +60,6 @@ class DataSetFormatter(BasicErrCheck):
         }
 
         self.formatted_info = ds_dict
-
 
     def format_dataverse_dataset(self):
         """Format UserUpload dataset"""
@@ -93,7 +93,6 @@ class DataSetFormatter(BasicErrCheck):
             self.add_err_msg(file_info.message)
             return
 
-
         ds_dict = {
             'type': self.dataset.source,
             'name': self.dataset.name,
@@ -109,7 +108,6 @@ class DataSetFormatter(BasicErrCheck):
 
         self.formatted_info = ds_dict
 
-
     def get_name_from_dataset_schema(self) -> BasicResponse:
         """
         Return the "name" text from self.dataset_schema_info (a bit ugly...)
@@ -118,10 +116,10 @@ class DataSetFormatter(BasicErrCheck):
         if self.has_error():
             # Shouldn't happen...
             return err_resp(self.get_err_msg())
-    
+
         if not self.dataset.dataset_schema_info:
             return err_resp('".dataset_schema_info" is empty')
-    
+
         if not 'name' in self.dataset.dataset_schema_info:
             return err_resp('"name" not found in ".dataset_schema_info" not found')
 
@@ -134,10 +132,9 @@ class DataSetFormatter(BasicErrCheck):
     def get_dataset_identifier_or_none(self):
         """Return the identifer within dataset_schema_info['identifer']"""
         if '@id' in self.dataset.dataset_schema_info['@id']:
-            return elf.dataset.dataset_schema_info['@id']
+            return self.dataset.dataset_schema_info['@id']
 
         return None
-
 
     def get_citation_from_dataset_schema_or_None(self):
         """
@@ -163,7 +160,6 @@ class DataSetFormatter(BasicErrCheck):
             return err_resp('"[\'citation\'][0][\'text\']" not found in ".dataset_schema_info"')
 
         return ok_resp(self.dataset.dataset_schema_info['citation'][0]['text'])
-
 
     def get_file_info(self):
         """
@@ -200,4 +196,3 @@ class DataSetFormatter(BasicErrCheck):
             file_dict['fileFormat'] = None
 
         return ok_resp(file_dict)
-

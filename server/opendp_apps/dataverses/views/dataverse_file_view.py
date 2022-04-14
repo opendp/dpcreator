@@ -1,16 +1,17 @@
-from rest_framework import viewsets, status
+import logging
+
+from django.conf import settings
+from rest_framework import status
 from rest_framework.response import Response
 
 from opendp_apps.dataset.models import DataverseFileInfo
-from opendp_apps.dataverses.dataverse_client import DataverseClient
-from opendp_apps.dataverses import static_vals as dv_static
-from opendp_apps.dataverses.models import DataverseHandoff
-from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
 from opendp_apps.dataverses.serializers import DataverseFileInfoMakerSerializer
-from opendp_apps.user.models import OpenDPUser, DataverseUser
+from opendp_apps.user.models import OpenDPUser
 from opendp_apps.user.dataverse_user_initializer import DataverseUserInitializer
-from opendp_apps.utils.view_helper import get_object_or_error_response
 from opendp_project.views import BaseModelViewSet
+
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class DataverseFileView(BaseModelViewSet):
@@ -41,6 +42,7 @@ class DataverseFileView(BaseModelViewSet):
         try:
             opendp_user = OpenDPUser.objects.get(object_id=opendp_user_id)
         except OpenDPUser.DoesNotExist:
+            logger.error(f'DataverseFileView: No OpenDPUser found for id: {opendp_user_id}')
             return Response({'success': False,
                              'message': f'No OpenDPUser found for id: {opendp_user_id}'},
                              status=status.HTTP_400_BAD_REQUEST)
@@ -49,11 +51,13 @@ class DataverseFileView(BaseModelViewSet):
         #
         util = DataverseUserInitializer.create_dv_file_info(opendp_user, handoff_id)
         if util.has_error():
+            logger.error(f'DataverseFileView: {util.get_err_msg()}')
             return Response({'success': False, 'message': util.get_err_msg()},
                             status=util.http_resp_code)
 
         serializer = DataverseFileInfoMakerSerializer(util.dv_file_info,
                                                       context={'request': request})
 
+        logger.info(f'DataverseFileView: DataverseFileInfo created with request: {request.__dict__}')
         return Response({'success': True, 'data': serializer.data},
                         status=util.http_resp_code)

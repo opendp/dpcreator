@@ -28,14 +28,12 @@ class DataverseUserSerializer(serializers.ModelSerializer):
         fields = ['object_id', 'user', 'dv_handoff']
 
     def save(self, **kwargs):
-        # print(f"(serializer) validated data: {self.validated_data}")
         dataverse_handoff = self.validated_data.pop('dv_handoff')
         self.validated_data['dv_installation'] = dataverse_handoff.dv_installation
         self.validated_data['dv_general_token'] = dataverse_handoff.apiGeneralToken
         return super().save()
 
     def update(self, instance, validated_data):
-        # print(f"instance: {instance}, validated_data: {validated_data}")
         opendp_user = OpenDPUser.objects.get(object_id=validated_data.get('user'))
         instance.email = opendp_user.email
         instance.first_name = opendp_user.first_name

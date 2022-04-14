@@ -4,20 +4,21 @@ Create a PDF report based on a DP Release
 from __future__ import annotations
 
 import copy
-from decimal import Decimal
 import io
 import json
-import os, sys
-from os.path import abspath, dirname, isfile, join
+import logging
+import os
 import random
 import typing
 import uuid
+from decimal import Decimal
+from os.path import abspath, dirname, isfile, join
 
 CURRENT_DIR = dirname(abspath(__file__))
 
+from django.conf import settings
 from django.core.files.base import ContentFile
 from django.template.loader import render_to_string
-from django.core.serializers.json import DjangoJSONEncoder
 
 from borb.pdf.canvas.layout.annotation.link_annotation import (
     LinkAnnotation,
@@ -43,10 +44,7 @@ from borb.pdf.canvas.layout.table.table import Table
 from borb.pdf.canvas.color.color import HexColor
 
 import matplotlib.pyplot as MatPlotLibPlot
-import numpy as np
-import pandas as pd
 from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.analysis.setup_question_formatter import SetupQuestionFormatter
 
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 
@@ -54,13 +52,16 @@ from opendp_apps.dp_reports import pdf_preset_text
 from opendp_apps.dp_reports import pdf_utils as putil
 from opendp_apps.dp_reports import static_vals as pdf_static
 from opendp_apps.analysis.models import ReleaseInfo
-from opendp_apps.profiler.static_vals import VAR_TYPE_INTEGER, VAR_TYPE_CATEGORICAL
+from opendp_apps.profiler.static_vals import VAR_TYPE_CATEGORICAL
 from opendp_apps.utils.randname import random_with_n_digits
 
-class PDFReportMaker(BasicErrCheck):
 
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
+
+
+class PDFReportMaker(BasicErrCheck):
     SECTION_TITLE_01_STATISTICS = '1. Statistics'
-    SECTION_TITLE_02_DATA_SOURCE ='2. Data Source'
+    SECTION_TITLE_02_DATA_SOURCE = '2. Data Source'
     SECTION_TITLE_03_OPENDP_LIB = '3. OpenDP Library'
     SECTION_TITLE_04_USAGE = '4. Usage / Negative Values'
 
@@ -90,8 +91,7 @@ class PDFReportMaker(BasicErrCheck):
                                     'pdf_report_01_%s.pdf' % (random_with_n_digits(6)))
 
         ps: typing.Tuple[Decimal, Decimal] = PageSize.LETTER_PORTRAIT.value
-        self.page_width, self.page_height = ps  # page width, height
-        #print(f'page_width/page_height: {self.page_width}/{self.page_height}')
+        self.page_width, self.page_height = ps
 
         self.page_cnt = 0
         self.pdf_doc: Document = Document()
@@ -148,7 +148,7 @@ class PDFReportMaker(BasicErrCheck):
                                                   save=True)
 
         # release_info_obj.save()
-        print(f'File saved to release: {release_info_obj.dp_release_pdf_file}')
+        logger.info(f'File saved to release: {release_info_obj.dp_release_pdf_file}')
 
     def get_embed_json_fname(self):
         """Get the name of the JSON file embedded in the PDF"""
@@ -165,7 +165,7 @@ class PDFReportMaker(BasicErrCheck):
         """
         if self.has_error():
             return
-                
+
         self.intrapage_link_info.append([_txt_to_link, pdf_object_ref, pdf_page_num, indent])
 
     def save_pdf_to_file(self, pdf_output_file: str = None):
@@ -181,7 +181,7 @@ class PDFReportMaker(BasicErrCheck):
 
         with open(pdf_output_file, "wb") as out_file_handle:
             PDF.dumps(out_file_handle, self.pdf_doc)
-        print(f'PDF created: {pdf_output_file}')
+        logger.info(f'PDF created: {pdf_output_file}')
         os.system(f'open {pdf_output_file}')
 
     def start_new_page(self):
@@ -204,18 +204,17 @@ class PDFReportMaker(BasicErrCheck):
         try:
             self.layout.add(pdf_element)
         except AssertionError as ex_obj:
-            print("The PDF doesn't fit!")
-            print(ex_obj)
+            logger.exception("The PDF doesn't fit! %s", ex_obj)
             assert_err1 = 'A Rectangle must have a non-negative height.'
             assert_err2 = 'FlexibleColumnWidthTable is too tall to fit inside column / page.'
             if str(ex_obj).find(assert_err1) > -1:
-                print('AssertionError 1')
+                logger.exception('AssertionError 1')
             elif str(ex_obj).find(assert_err2) > -1:
-                print('AssertionError 2')
+                logger.exception('AssertionError 2')
 
-            print("Start a new page!")
+            logger.info("Start a new page!")
             self.start_new_page()
-            print('Try to add the element again')
+            logger.info('Try to add the element again')
 
     def format_release(self):
         """Update release values"""
@@ -420,11 +419,11 @@ class PDFReportMaker(BasicErrCheck):
         # If applicable, add negative value note
         if has_negative_values:
             text_chunks = [
-                    putil.txt_bld('Negative values.'),
-                    putil.txt_reg(f' The histogram contains negative values. For more information on how to use '),
-                    putil.txt_reg(f' this data, please see the section'),
-                    putil.txt_bld(f' {self.SECTION_TITLE_04_USAGE}'),
-                ]
+                putil.txt_bld('Negative values.'),
+                putil.txt_reg(f' The histogram contains negative values. For more information on how to use '),
+                putil.txt_reg(f' this data, please see the section'),
+                putil.txt_bld(f' {self.SECTION_TITLE_04_USAGE}'),
+            ]
 
             self.add_to_layout(HeterogeneousParagraph(text_chunks,
                                                       padding_left=Decimal(10)))
@@ -527,8 +526,6 @@ class PDFReportMaker(BasicErrCheck):
 
         self.set_table_borders_padding(table_001)
 
-        # rsize = self.get_layout_box(table_001)
-        # print('rsize: W x H', rsize.width, rsize.height)
         self.add_to_layout(table_001)
 
     def set_table_borders_padding(self, table_obj: Table):
@@ -639,8 +636,8 @@ class PDFReportMaker(BasicErrCheck):
 
         # Add links
         self.current_page.append_annotation(RemoteGoToAnnotation(
-                                        dv_url_tbl_cell.get_bounding_box(),
-                                        uri=dataverse_url))
+            dv_url_tbl_cell.get_bounding_box(),
+            uri=dataverse_url))
 
         self.add_opendp_lib_info()
 
@@ -690,12 +687,12 @@ class PDFReportMaker(BasicErrCheck):
 
         # Add links
         self.current_page.append_annotation(RemoteGoToAnnotation(
-                                        pypi_tbl_cell.get_bounding_box(),
-                                        uri=pdf_static.PYPI_OPENDP_URL))
+            pypi_tbl_cell.get_bounding_box(),
+            uri=pdf_static.PYPI_OPENDP_URL))
 
         self.current_page.append_annotation(RemoteGoToAnnotation(
-                                        github_tbl_cell.get_bounding_box(),
-                                        uri=github_repo_url))
+            github_tbl_cell.get_bounding_box(),
+            uri=github_repo_url))
 
     def add_pdf_title_page(self):
         """Add the PDF title page"""
@@ -733,9 +730,9 @@ class PDFReportMaker(BasicErrCheck):
                                      multiplied_leading=Decimal(1.75)))
 
         self.add_to_layout(Paragraph('Contents',
-                           font=putil.BASIC_FONT_BOLD,
-                           font_size=putil.BASIC_FONT_SIZE,
-                           multiplied_leading=Decimal(1.75)))
+                                     font=putil.BASIC_FONT_BOLD,
+                                     font_size=putil.BASIC_FONT_SIZE,
+                                     multiplied_leading=Decimal(1.75)))
 
         para_section1_obj = putil.txt_list_para(self.SECTION_TITLE_01_STATISTICS)
         self.add_to_layout(para_section1_obj)
@@ -743,7 +740,7 @@ class PDFReportMaker(BasicErrCheck):
         predicted_page_num = 1  # assumes stat-specific info starts on page 2
 
         for stat_info in self.release_dict['statistics']:
-            stat_cnt += 1            
+            stat_cnt += 1
             stat_type = 'DP ' + stat_info['statistic'].title()
             var_name = stat_info['variable']
 
@@ -771,8 +768,8 @@ class PDFReportMaker(BasicErrCheck):
         sections_to_add = [self.SECTION_TITLE_02_DATA_SOURCE,
                            self.SECTION_TITLE_03_OPENDP_LIB,
                            self.SECTION_TITLE_04_USAGE,
-                           #'5. Parameter Definitions'
-                            ]
+                           # '5. Parameter Definitions'
+                           ]
 
         for sec_text in sections_to_add:
             pdf_para_obj = putil.txt_list_para(sec_text)
@@ -806,7 +803,6 @@ class PDFReportMaker(BasicErrCheck):
             page_num - the destination page when the pdf_object is clicked
             indent - resize the bounding box used for the link source to better fit the text
             """
-            # print(f'adding link: {_txt_to_link} {pdf_object}, {page_num}, {indent}')
             pdf_page_idx = Decimal(page_num) - Decimal(1)  # PDF pages within the doc start with 0
             if pdf_page_idx < 0:  # shouldn't happen!
                 self.add_err_msg((f'pdf_report_maker. Error adding TOC links.'
@@ -823,12 +819,12 @@ class PDFReportMaker(BasicErrCheck):
             bounding_box.height = bounding_box.height + Decimal(8)
 
             # Add the link to the PDF!
-            link_annotation =  LinkAnnotation(
-                    bounding_box,
-                    page=pdf_page_idx,
-                    destination_type=DestinationType.FIT,
-                    color=HexColor("#ffffff"),  # Without this, a black border is placed around the clickable area
-                )
+            link_annotation = LinkAnnotation(
+                bounding_box,
+                page=pdf_page_idx,
+                destination_type=DestinationType.FIT,
+                color=HexColor("#ffffff"),  # Without this, a black border is placed around the clickable area
+            )
             self.first_page.append_annotation(link_annotation)
 
     @staticmethod
@@ -844,7 +840,7 @@ class PDFReportMaker(BasicErrCheck):
         """Format a numeric statistic. Used to be used for rounding"""
         if val is None:
             return '(not available)'
-        
+
         # return round(val, 4)  # round to 4 decimal places
 
         return val
@@ -985,7 +981,7 @@ class PDFReportMaker(BasicErrCheck):
         """Example plot"""
         hist_vals = {'bins': list(range(1, 13)),
                      'vals': [random.randint(1, 100) for _x in range(1, 13)]}
-        print('hist_vals', hist_vals)
+        logger.debug('hist_vals', hist_vals)
         fig = MatPlotLibPlot.figure()
         ax = fig.add_subplot()
         ax.bar(x=hist_vals['bins'], height=hist_vals['vals'])

@@ -29,6 +29,8 @@ ALLOW_CYPRESS_ENDPOINT = 'cypress-in-ci-endpoint'
 
 
 ACCOUNT_EMAIL_VERIFICATION = os.environ.get('ACCOUNT_EMAIL_VERIFICATION', 'none')  # 'mandatory'
-# print('ACCOUNT_EMAIL_VERIFICATION', ACCOUNT_EMAIL_VERIFICATION)
 
 # SKIP_PDF_CREATION_FOR_TESTS = True
+
+# Logger should come from base.py, but can be overridden here
+# DEFAULT_LOGGER = 'console'

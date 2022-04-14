@@ -1,3 +1,6 @@
+import logging
+
+from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
@@ -11,6 +14,9 @@ from opendp_apps.dataverses.models import DataverseHandoff, RegisteredDataverse
 from opendp_apps.dataverses.serializers import DataverseHandoffSerializer
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_project.views import BaseModelViewSet
+
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class DataverseHandoffView(BaseModelViewSet):
@@ -38,8 +44,8 @@ class DataverseHandoffView(BaseModelViewSet):
         """
         Access Create via a GET. This is temporary and insecure. Exists until the Dataverse signed urls are available.
         """
-        print('--- createbyget ---')
         request_data = request.query_params.copy()
+        logger.info(request_data)
         return self.process_dataverse_data(request_data)
 
         #return Response({"From Hello": "Got it"})
@@ -49,17 +55,14 @@ class DataverseHandoffView(BaseModelViewSet):
         Temporarily save the Dataverse paramemeters +
         redirect to the Vue page
         """
-        print('--- create! ---')
         request_data = request.data.copy()
+        logger.info(request_data)
         return self.process_dataverse_data(request_data)
-
 
     def process_dataverse_data(self, request_data):
         """Process incoming Dataverse data
         - Used by both the GET and POST endpoints
         """
-        print('--- process_dataverse_data ---')
-
         if dv_static.DV_PARAM_SITE_URL in request_data:
             init_site_url = request_data[dv_static.DV_PARAM_SITE_URL]
             init_site_url = RegisteredDataverse.hack_format_dv_url_http(init_site_url)
@@ -73,7 +76,7 @@ class DataverseHandoffView(BaseModelViewSet):
             new_dv_handoff.save()
 
             client_url = reverse('vue-home') + f'?id={str(new_dv_handoff.object_id)}'
-            # return Response({'id': new_obj.object_id}, status=status.HTTP_201_CREATED)
+            logger.info(f'DataverseHandoff successfully saved. Redirecting to {client_url}')
             return HttpResponseRedirect(client_url)
         else:
             error_code = ''
@@ -84,5 +87,5 @@ class DataverseHandoffView(BaseModelViewSet):
                         error_code += ','.join([k, ''])
             # Remove trailing comma
             error_code = quote(error_code[:-1])
-            print('error_code', error_code)
+            logger.error(f'Invalid DataverseHandoffSerializer. Error_code: {error_code}')
             return HttpResponseRedirect(reverse('vue-home') + f'?error_code={error_code}')
