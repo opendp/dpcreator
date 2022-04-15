@@ -21,6 +21,11 @@
       <template :data-test="'statistic'+index" v-slot:[`item.Statistic`]="{ item }">
         <div data-test="statistic">{{ item.statistic.label }}</div>
       </template>
+      <template v-slot:[`item.missingValuesHandling`]="{ item }">
+        <div v-if="item.missingValuesHandling === 'insert_fixed' ">
+          Insert Fixed Value: {{ item.fixedValue }}
+        </div>
+      </template>
       <template v-slot:[`item.epsilon`]="{ item }">
         <v-text-field v-if="item.locked"
                       v-model="item.epsilon"
@@ -135,6 +140,7 @@ export default {
       {value: "num"},
       {text: "Statistic", value: "label"},
       {text: "Variable", value: "variable"},
+      {text: "Handle Missing Values", value: "missingValuesHandling"},
       {text: "Epsilon", value: "epsilon"},
       {text: "Delta", value: "delta"},
       {text: "Error", value: "error"},
