@@ -146,6 +146,20 @@
         </div>
       </template>
     </v-data-table>
+    <div v-if="selected.length == 0">
+      <ColoredBorderAlert type="warning">
+        <template v-slot:content>
+          Please select at least one variable to continue.
+        </template>
+      </ColoredBorderAlert>
+    </div>
+    <div v-if="!formCompleted()">
+      <ColoredBorderAlert type="warning">
+        <template v-slot:content>
+          Please fix missing or invalid input to continue.
+        </template>
+      </ColoredBorderAlert>
+    </div>
   </div>
 </template>
 
