@@ -35,20 +35,21 @@ class DataverseHandoffView(BaseModelViewSet):
         """Not allowed"""
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-        #queryset = DataverseHandoff.objects.all()
-        #serializer = DataverseHandoffSerializer(queryset, many=True, context={'request': request})
-        #return Response(serializer.data)
+        # queryset = DataverseHandoff.objects.all()
+        # serializer = DataverseHandoffSerializer(queryset, many=True, context={'request': request})
+        # return Response(serializer.data)
 
-    @action(methods=['get'], detail=False)   #,  url_path='dv-orig-create')
+    @action(methods=['get'], detail=False)
     def dv_orig_create(self, request):
         """
-        Access Create via a GET. This is temporary and insecure. Exists until the Dataverse signed urls are available.
+        Access Create via a GET. This is temporary and insecure.
+        Exists until the Dataverse signed urls are available.
         """
         request_data = request.query_params.copy()
         logger.info(request_data)
         return self.process_dataverse_data(request_data)
 
-        #return Response({"From Hello": "Got it"})
+        # return Response({"From Hello": "Got it"})
 
     def create(self, request, *args, **kwargs):
         """
@@ -82,7 +83,7 @@ class DataverseHandoffView(BaseModelViewSet):
             error_code = ''
             for k, v in handoff_serializer.errors.items():
                 for error_detail in v:
-                    #if error_detail.code in ['does_not_exist', 'required'] and k is not None:
+                    # if error_detail.code in ['does_not_exist', 'required'] and k is not None:
                     if error_detail.code and k is not None:
                         error_code += ','.join([k, ''])
             # Remove trailing comma
