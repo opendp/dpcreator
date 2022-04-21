@@ -7,7 +7,6 @@ Mimic the Dataverse urls for testing
 from django.urls import path, re_path
 from opendp_apps.dataverses.views import manifest_test_params_view
 
-
 from opendp_apps.dataverses import mock_dv_views
 
 MOCK_API_PREFIX = 'api'
@@ -18,6 +17,10 @@ urlpatterns = [
     re_path(f'dv-info/as-dict/(?P<object_id>[0-9a-f-]+)',
             manifest_test_params_view,
             name='view_as_dict'),
+
+    path(f'test-dv-post',
+         mock_dv_views.view_test_dv_post,
+         name='view_test_dv_post'),
 
     path(f'dataverse/incoming-test-1',
          mock_dv_views.view_dataverse_incoming_1,
