@@ -124,7 +124,6 @@
         <div v-if="isNumerical(variable.type)" class="range-input-wrapper">
           <v-text-field
               background-color="soft_primary mb-0"
-              type="number"
               label="Add min"
               v-model="variable.additional_information['min']"
               class="text-center py-0"
@@ -132,22 +131,35 @@
               :data-test="variable.label+':min'"
 
               v-on:click="currentRow=variable.index"
-              v-on:change="saveUserInput(variable)"
+              v-on:keyup="saveUserInput(variable)"
           ></v-text-field>
           <v-text-field
               background-color="soft_primary mb-0"
-              type="number"
               label="Add max"
               :rules="[checkMax]"
               :data-test="variable.label+':max'"
               v-model="variable.additional_information['max']"
               class="text-center py-0"
               v-on:click="currentRow=variable.index"
-              v-on:change="saveUserInput(variable)"
+              v-on:keyup="saveUserInput(variable)"
           ></v-text-field>
         </div>
       </template>
     </v-data-table>
+    <div v-if="selected.length == 0">
+      <ColoredBorderAlert type="warning">
+        <template v-slot:content>
+          Please select at least one variable to continue.
+        </template>
+      </ColoredBorderAlert>
+    </div>
+    <div v-if="!formCompleted()">
+      <ColoredBorderAlert type="warning">
+        <template v-slot:content>
+          Please fix missing or invalid input to continue.
+        </template>
+      </ColoredBorderAlert>
+    </div>
   </div>
 </template>
 
@@ -389,6 +401,9 @@ export default {
     },
 
     checkMin(value) {
+      if (isNaN(value)) {
+        return false
+      }
       if (this.currentRow !== null) {
         if (this.variables[this.currentRow].additional_information !== undefined) {
           const currentMax = this.variables[this.currentRow].additional_information.max
@@ -400,6 +415,9 @@ export default {
       return true
     },
     checkMax(value) {
+      if (isNaN(value)) {
+        return false
+      }
       if (this.currentRow !== null) {
         if (this.variables[this.currentRow].additional_information !== undefined) {
           const currentMin = this.variables[this.currentRow].additional_information.min
@@ -535,7 +553,9 @@ export default {
       this.saveUserInput(elem)
     },
     saveUserInput(elem) {
-      this.$store.dispatch('dataset/updateVariableInfo', elem)
+      // make a deep copy so that the form doesn't share object references with the Vuex data
+      const elemCopy = JSON.parse(JSON.stringify(elem))
+      this.$store.dispatch('dataset/updateVariableInfo', elemCopy)
       if (this.formCompleted() && this.isValidRow(elem) && this.atLeastOneSelected(elem)) {
         this.$emit("stepCompleted", 1, true);
       } else {

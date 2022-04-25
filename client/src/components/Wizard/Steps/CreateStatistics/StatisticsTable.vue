@@ -7,27 +7,25 @@
         :items-per-page="-1"
         hide-default-footer
     >
-      <template v-slot:[`header.error`]="{ header }">
-        <span>
-          {{ header.text }}
-          <QuestionIconTooltip
-              text="Calculated error to be added to your statistic."
-          />
-        </span>
-      </template>
+
       <template v-slot:[`item.num`]="{ index }">
         <span class="index-td">{{ index + 1 }}</span>
       </template>
       <template :data-test="'statistic'+index" v-slot:[`item.Statistic`]="{ item }">
         <div data-test="statistic">{{ item.statistic.label }}</div>
       </template>
+      <template v-slot:[`item.missingValuesHandling`]="{ item }">
+        <div v-if="item.missingValuesHandling === 'insert_fixed' ">
+          Insert Fixed Value: {{ item.fixedValue }}
+        </div>
+      </template>
       <template v-slot:[`item.epsilon`]="{ item }">
         <v-text-field v-if="item.locked"
                       v-model="item.epsilon"
                       type="number"
-                      :rules="[validateEpsilon]"
+                      :rules="[validateEpsilon(item)]"
                       v-on:click="currentItem=item"
-                      v-on:change="$emit('editEpsilon', item)"
+                      v-on:keyup="$emit('editEpsilon', item)"
         >
         </v-text-field>
         <div v-else>
@@ -51,9 +49,17 @@
         </div>
       </template>
       <template v-slot:[`item.error`]="{ item }">
-        <div v-if="item.accuracy">
-          {{ Number(item.accuracy.value).toPrecision(3) }}
-        </div>
+
+
+        <v-row v-if="item.accuracy">
+         <span class="d-flex justify-center">
+          {{ getAccuracy(item) }}
+         <QuestionIconTooltip
+             :text="errorHelpText(item)"
+         />
+           </span>
+        </v-row>
+
 
       </template>
       <template v-slot:[`item.actions`]="{ item }">
@@ -118,6 +124,13 @@
 .v-data-table__empty-wrapper {
   font-style: italic;
 }
+
+.v-data-table-header th {
+
+  vertical-align: top;
+
+}
+
 </style>
 
 <script>
@@ -135,9 +148,10 @@ export default {
       {value: "num"},
       {text: "Statistic", value: "label"},
       {text: "Variable", value: "variable"},
+      {text: "Handle Missing Values", value: "missingValuesHandling"},
       {text: "Epsilon", value: "epsilon"},
       {text: "Delta", value: "delta"},
-      {text: "Error", value: "error"},
+      {text: "Error", value: "error", width: "15%"},
       {text: "", value: "actions"}
     ],
     currentItem: null
@@ -152,9 +166,20 @@ export default {
     isDeltaStat(item) {
       return createStatsUtils.isDeltaStat(item.statistic)
     },
-
-    validateEpsilon(value) {
-      if (this.currentItem !== null) {
+    errorHelpText(item) {
+      return "We are " + (item.cl * 100) + "% confident that the magnitude of the noise will"
+          + " be less than " + this.getAccuracy(item)
+    },
+    getAccuracy(item) {
+      return Number(item.accuracy.value).toPrecision(3)
+    },
+    validateEpsilon(item) {
+      item.valid = true
+      if (isNaN(item.epsilon)) {
+        item.valid = false
+      } else if (item.epsilon <= 0) {
+        item.valid = false
+      } else {
         let lockedEpsilon = new Decimal('0.0');
         this.statistics.forEach(function (item) {
           if (item.locked) {
@@ -162,22 +187,34 @@ export default {
           }
         })
         if (lockedEpsilon > this.totalEpsilon)
-          return false
+          item.valid = false
       }
-      return true
+      this.updateCompleteStatus()
+      return item.valid
+
+    },
+    updateCompleteStatus() {
+      let allValid = true
+      this.statistics.forEach((item) => {
+        if (item.valid == false) {
+          allValid = false
+        }
+      })
+      this.$emit("stepCompleted", 3, allValid);
     },
     validateDelta(value) {
-      if (this.currentItem !== null) {
-        let lockedDelta = new Decimal('0.0');
-        this.statistics.forEach(function (item) {
-          if (item.locked && createStatsUtils.isDeltaStat(item.statistic)) {
-            lockedDelta = lockedDelta.plus(item.delta)
-          }
-        })
-        if (lockedDelta > this.totalDelta)
-          return false
+      let lockedDelta = new Decimal('0.0');
+      this.statistics.forEach(function (item) {
+        if (item.locked && createStatsUtils.isDeltaStat(item.statistic)) {
+          lockedDelta = lockedDelta.plus(item.delta)
+        }
+      })
+      if (lockedDelta > this.totalDelta)
+        item.valid = false
+      else {
+        item.valid = true
       }
-      return true
+      return item.valid
     }
   }
 

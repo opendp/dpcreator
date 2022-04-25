@@ -120,7 +120,7 @@
             :click="save"
             :disabled="isButtonDisabled"
             data-test="Create statistic"
-            label="Create Statistic"
+            :label="getButtonLabel"
         />
 
         <Button
@@ -214,6 +214,9 @@ export default {
       }
       return count
     },
+    getButtonLabel: function () {
+      return this.formTitle === 'Edit Statistic' ? 'Save' : 'Create statistic'
+    },
     isButtonDisabled: function () {
       let disabled = false
       if (this.editedItemDialog.statistic == ""
@@ -247,8 +250,24 @@ export default {
   },
   watch: {
     editedItem: function (newEditedItem) {
+      /*
+       Check the value of statistic coming from the CreateStatistics page.
+       If it exists, that means we are in edit mode, in which case we need
+       to initialize the value of selectedStatistic to the current value to be edited.
+       */
+      if (newEditedItem.statistic) {
+        this.singleVariableStatistics.forEach(item => {
+          if (item.value === newEditedItem.statistic) {
+            this.selectedStatistic = item
+          }
+        })
+        if (this.selectedStatistic === null) {
+          throw 'Error: statistic ' + newEditedItem.statistic + ' not found in singleVariableStatistices'
+        }
+      }
       this.editedItemDialog = Object.assign({}, newEditedItem);
-      // automatic assignments added here because we removed the option from the popup
+      // automatic assignments added here because we removed the Missing Values option from the popup.
+      // All stats are created with type = insert_fixed, only the fixed value is editable.
       this.editedItemDialog.handleAsFixed = true
       this.editedItemDialog.missingValuesHandling = "insert_fixed"
     },
