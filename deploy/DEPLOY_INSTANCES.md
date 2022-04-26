@@ -1,4 +1,4 @@
-Domain Naming/Setup
+## Domain Naming/Setup
 
 Checklist for Domain setup for instance + connected `RegisteredDataverse`
 
@@ -35,3 +35,9 @@ Checklist for Domain setup for instance + connected `RegisteredDataverse`
         - **toolUrl**: `http://dev.dpcreator.org/api/dv-handoff/dv_orig_create/`
     - [x] Make sure the name of the tool in Dataverse is `DP Creator`
 
+## Language for Banner
+
+- Example from HVD Curators
+```
+For demonstration purposes only. Please do not use sensitive or confidential data. <br />For more information, please <a href="https://docs.google.com/document/d/1Vdig1XH0vH9H96ZF-NWbLzrQkZEd_ncUD8Dm5NuKIPE/edit#heading=h.qs7dsqoouasg" target="_blank">read the DP Creator Quickstart</a> or <a href="mailto:info@opendp.org">contact us</a>.
+```

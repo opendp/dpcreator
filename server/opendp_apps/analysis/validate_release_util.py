@@ -11,6 +11,7 @@
         - Retrieve the variable type/min/max/categories from AnalysisPlan.variable_info
         - Retrieve
 """
+import copy
 import logging
 import pkg_resources
 
@@ -482,12 +483,25 @@ class ValidateReleaseUtil(BasicErrCheck):
 
             elif statistic in astatic.DP_HISTOGRAM:
                 if var_type == pstatic.VAR_TYPE_CATEGORICAL:
-                    # DP Histogram (Categorical)!
-                    self.add_stat_spec(DPHistogramCategoricalSpec(props))
+                    # 4/12/2022 - temp hack to distinguish numeric categories
+                    #   - need updated UI, etc.
+                    #
+                    has_int_cats, _min_max = self.has_integer_categories(props)
+
+                    if has_int_cats:
+                        # Artificially set the min/max
+                        #
+                        props['variable_info']['type'] = pstatic.VAR_TYPE_INTEGER
+                        props['variable_info']['min'] = _min_max[0]
+                        props['variable_info']['max'] = _min_max[1]
+                        self.add_stat_spec(DPHistogramIntegerSpec(props))
+                    else:
+                        self.add_stat_spec(DPHistogramCategoricalSpec(props))
 
                 elif var_type == pstatic.VAR_TYPE_INTEGER:
                     # DP Histogram (Integer)!
                     self.add_stat_spec(DPHistogramIntegerSpec(props))
+
                 else:
                     # DP Histogram - unsupported type
                     props['error_message'] = (f'Statistic is "{astatic.DP_HISTOGRAM}" but '
@@ -517,6 +531,37 @@ class ValidateReleaseUtil(BasicErrCheck):
             else:
                 # Shouldn't reach here, unknown stats are captured up above
                 pass
+
+    @staticmethod
+    def has_integer_categories(props: dict):
+        """
+        # 4/12/2022 - temporary hack for histograms
+        Check if the props['variable_info']['categories'] list consists of continuous integers
+
+        False: return False, None
+        True:  return True, (min, max)
+        """
+        if not props:
+            return False, None
+
+        # Are there categories?
+        if ('variable_info' in props) and ('categories' in props['variable_info']):
+
+            # Get the categories
+            cats = copy.deepcopy(props['variable_info']['categories'])
+
+            # Are all the values integers?
+            all_int_check = [isinstance(x, int) for x in cats]
+
+            # Nope, return
+            if False in all_int_check:
+                return False, None
+
+            # All integers, are they continuous?
+            if sorted(cats) == list(range(min(cats), max(cats) + 1)):
+                return True, (min(cats), max(cats))
+
+        return False, None
 
     def run_preliminary_steps(self):
         """Run preliminary steps before validation"""
