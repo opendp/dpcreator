@@ -1,9 +1,10 @@
 """
 Views meant to mimic calls by PyDataverse
 """
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 
 from django.http import HttpResponse, JsonResponse
 from opendp_apps.dataverses.models import ManifestTestParams
@@ -11,6 +12,29 @@ from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestPa
 from opendp_apps.dataverses.dataverse_request_handler import DataverseRequestHandler
 from opendp_apps.dataverses import static_vals as dv_static
 
+
+@csrf_exempt
+def view_test_dv_post(request):
+    """Test: Reflect back the POST request"""
+    print('>> request', request)
+    resp = dict(page_title='DP Creator',
+                title='',
+                subtitle='Test Incoming POST request')
+
+    if request.method == 'POST':
+        print('request.POST', request.POST.dict())
+        print('is post')
+        resp['incoming_params'] = request.POST.dict()
+        resp['IS_POST'] = True
+    else:
+        print('not post')
+        resp['IS_POST'] = False
+
+    print(resp)
+
+    return render(request,
+                  'dataverses/view_test_dv_post.html',
+                  resp)
 
 @login_required
 def view_dataverse_incoming_1(request):
