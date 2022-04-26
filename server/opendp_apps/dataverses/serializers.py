@@ -47,7 +47,7 @@ class DataverseUserSerializer(serializers.ModelSerializer):
 
 class DataverseHandoffSerializer(serializers.ModelSerializer):
 
-    site_url = serializers.SlugRelatedField(queryset=RegisteredDataverse.objects.all(),
+    site_url = serializers.SlugRelatedField(queryset=RegisteredDataverse.objects.filter(active=True),
                                             slug_field='dataverse_url',
                                             read_only=False,
                                             source='dv_installation')

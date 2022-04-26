@@ -39,14 +39,22 @@ class DataverseHandoffView(BaseModelViewSet):
         # serializer = DataverseHandoffSerializer(queryset, many=True, context={'request': request})
         # return Response(serializer.data)
 
-    @action(methods=['get'], detail=False)
+    @action(methods=['get', 'post'], detail=False)
     def dv_orig_create(self, request):
         """
         Access Create via a GET. This is temporary and insecure.
         Exists until the Dataverse signed urls are available.
         """
-        request_data = request.query_params.copy()
-        logger.info(request_data)
+        if request.method == 'POST':
+            request_data = request.data.copy()
+            for k, v in request.META.items():
+                if k.lower().find('signed') > -1:
+                    logger.info(f'header with "signed": {k}={v}')
+        else:
+            request_data = request.query_params.copy()
+
+        logger.info('request_data: %s', request_data)
+
         return self.process_dataverse_data(request_data)
 
         # return Response({"From Hello": "Got it"})
@@ -80,6 +88,7 @@ class DataverseHandoffView(BaseModelViewSet):
             logger.info(f'DataverseHandoff successfully saved. Redirecting to {client_url}')
             return HttpResponseRedirect(client_url)
         else:
+            logger.info('handoff_serializer.errors: %s', handoff_serializer.errors.items())
             error_code = ''
             for k, v in handoff_serializer.errors.items():
                 for error_detail in v:
