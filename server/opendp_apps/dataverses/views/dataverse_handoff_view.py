@@ -49,7 +49,7 @@ class DataverseHandoffView(BaseModelViewSet):
             request_data = request.data.copy()
             for k, v in request.META.items():
                 if k.lower().find('signed') > -1:
-                    logger.info(f'header with "signed": {k}={v}')
+                    logger.info(f'header key containing "signed": {k}={v}')
         else:
             request_data = request.query_params.copy()
 
