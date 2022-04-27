@@ -76,7 +76,6 @@
                 :data-test="item.label+':selectToolTip'"
                 standard
                 v-tooltip="'Changing type will clear additional info.'"
-                hide-selected
                 class="d-inline-block select"
                 v-on:click="currentRow=item.index"
                 v-on:hover="currentRow=item.index"
@@ -89,7 +88,6 @@
             :items="['Float', 'Integer', 'Categorical', 'Boolean']"
             :data-test="item.label+':select'"
             standard
-            hide-selected
             class="d-inline-block select"
             v-on:click="currentRow=item.index"
             v-on:hover="currentRow=item.index"
