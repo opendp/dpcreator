@@ -62,6 +62,13 @@
 </template>
 
 <style lang="scss">
+// Remove up an down error from text field when type == number
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .info-banner {
   .v-banner__content {
     align-items: unset;
