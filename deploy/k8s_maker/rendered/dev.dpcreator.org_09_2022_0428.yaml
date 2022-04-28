@@ -120,7 +120,7 @@ data:
   DEFAULT_FROM_EMAIL: "info@opendp.org"
   #
   SECURE_SSL_REDIRECT: "True"
-  SECURE_PROXY_SSL_HEADER: ""
+  USE_SSL_PROXY: "False"
   #
   VUE_APP_GOOGLE_CLIENT_ID: "750757442540-4bg3aulcrm802i8pguo851lq8kikf5ge.apps.googleusercontent.com"
   VUE_APP_ADOBE_PDF_CLIENT_ID: "34a0c926740d4ddb9758dbc6da2a4f39"

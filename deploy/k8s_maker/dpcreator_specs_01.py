@@ -38,7 +38,7 @@ specs_dev_dpcreator_org = dict(base_specs, **dict(
                 loadBalancerIP="40.85.170.176",  # k8s LoadBalancer.
                 #
                 SECURE_SSL_REDIRECT="True",
-                USE_SSL_PROXY="True",
+                USE_SSL_PROXY="False",
                 #
                 VUE_APP_ADOBE_PDF_CLIENT_ID="34a0c926740d4ddb9758dbc6da2a4f39",
                 VUE_APP_WEBSOCKET_PREFIX='wss://',
@@ -59,7 +59,7 @@ specs_demo_dpcreator_org = dict(base_specs, **dict(
                 loadBalancerIP="13.82.125.69",   # k8s LoadBalancer.
                 #
                 SECURE_SSL_REDIRECT="True",
-                USE_SSL_PROXY="True",
+                USE_SSL_PROXY="False",
                 #
                 VUE_APP_ADOBE_PDF_CLIENT_ID="44937032e26b4033a840626ed0cd8e79",
                 VUE_APP_WEBSOCKET_PREFIX='wss://',
