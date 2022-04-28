@@ -6,13 +6,13 @@ import dpcreator_specs_01 as dpcreator_specs
 def make_k8s_template(specs, output_prefix=''):
 
     # Database
-    db_template_name = 'azure_k8s_08_database.yaml'
+    db_template_name = 'azure_k8s_09_database.yaml'
     tf = TemplateFormatter(specs, db_template_name)
     db_content = tf.formatted_output
 
     # App
-    app_template_name = 'azure_k8s_08_app.yaml'
-    output_file = f'{output_prefix}dpcreator.org_08_{get_yyyy_mmdd()}.yaml'
+    app_template_name = 'azure_k8s_09_app.yaml'
+    output_file = f'{output_prefix}dpcreator.org_09_{get_yyyy_mmdd()}.yaml'
 
     tf2 = TemplateFormatter(specs, app_template_name)
     app_content = tf2.formatted_output

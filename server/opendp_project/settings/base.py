@@ -332,17 +332,24 @@ DP_CREATOR_APP_NAME = os.environ.get('DP_CREATOR_APP_NAME', 'DP Creator (test)')
 VUE_APP_GOOGLE_CLIENT_ID = os.environ.get('VUE_APP_GOOGLE_CLIENT_ID', '(not set)')
 VUE_APP_ADOBE_PDF_CLIENT_ID = os.environ.get('VUE_APP_ADOBE_PDF_CLIENT_ID', '(not set)')
 
+# ------------------------------------------------------
+# This is for use with CloudFlare and
+#  forming the PDF/JSON download urls
+# ------------------------------------------------------
+SECURE_SSL_REDIRECT = bool(strtobool(os.environ.get('SECURE_SSL_REDIRECT', 'False')))
+SECURE_PROXY_SSL_HEADER = os.environ.get('HTTP_X_FORWARDED_PROTO', 'http')
+
 # Websocket prefix.
 # When using https, set it to 'wss://'
-VUE_APP_WEBSOCKET_PREFIX = os.environ.get('VUE_APP_WEBSOCKET_PREFIX', 'ws://')
+if SECURE_SSL_REDIRECT is True:
+    VUE_APP_WEBSOCKET_PREFIX = 'wss://'
+    DPCREATOR_USING_HTTPS = True
+else:
+    VUE_APP_WEBSOCKET_PREFIX = 'ws://'
+    DPCREATOR_USING_HTTPS = False
+
 assert VUE_APP_WEBSOCKET_PREFIX in ('ws://', 'wss://'), \
     "Django settings error: 'VUE_APP_WEBSOCKET_PREFIX' must be set to 'ws://' or 'wss://'"
-
-# This is for use with CloudFlare and forming the PDF/JSON download urls
-#
-DPCREATOR_USING_HTTPS = False
-if VUE_APP_WEBSOCKET_PREFIX == 'wss://':
-    DPCREATOR_USING_HTTPS = True
 
 # ---------------------------
 # Cookies
