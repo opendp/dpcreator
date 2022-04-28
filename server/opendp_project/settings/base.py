@@ -336,8 +336,10 @@ VUE_APP_ADOBE_PDF_CLIENT_ID = os.environ.get('VUE_APP_ADOBE_PDF_CLIENT_ID', '(no
 # This is for use with CloudFlare and
 #  forming the PDF/JSON download urls
 # ------------------------------------------------------
-SECURE_SSL_REDIRECT = bool(strtobool(os.environ.get('SECURE_SSL_REDIRECT', 'False')))
-SECURE_PROXY_SSL_HEADER = os.environ.get('HTTP_X_FORWARDED_PROTO', 'http')
+SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'False')
+USE_SSL_PROXY = bool(strtobool(os.environ.get('USE_SSL_PROXY', 'False')))
+if USE_SSL_PROXY is True:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Websocket prefix.
 # When using https, set it to 'wss://'
