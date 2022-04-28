@@ -11,8 +11,15 @@
 
 
     <div v-if="analysisPlan!==null">
-      <v-card>
-        <v-card-title>DP Statistics to Generate</v-card-title>
+      <v-card
+          class="soft_primary mb-5 pt-5 pb-2 rounded-lg shadow-card"
+          elevation="4"
+          :class="{
+      'px-3': $vuetify.breakpoint.xsOnly,
+      'px-7': $vuetify.breakpoint.smAndUp
+    }"
+          outlined>
+        <v-card-title><b>DP Statistics</b></v-card-title>
         <v-list-item
             v-for="(item, index) in analysisPlan.dpStatistics"
         >
