@@ -26,7 +26,7 @@ printf "\n(20) Run sites script for dev.dpcreator.org"
 python /code/server/manage.py loaddata opendp_apps/content_pages/fixtures/sites-dev.dpcreator.org.json
 
 printf "\n(30) Keep only one registered dataverse"
-python /code/server/manage.py set_registered_dataverse https://dev-dataverse.dpcreator.org "Dev Dataverse"
+python /code/server/manage.py set_registered_dataverse http://dev-dataverse.dpcreator.org "Dev Dataverse"
 
 # -----------------------------------------
 # Collect static files to a shared volume
