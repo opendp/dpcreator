@@ -164,6 +164,10 @@ Cypress.Commands.add('selectVariable',(demoVariables)=> {
             // click back into min input, to trigger change event on max input
             cy.get(minDataTest).click()
             cy.get(maxDataTest).should('have.value', demoVar.max)
+        } else if (demoVar.type === 'Categorical') {
+            const catDataTest = '[data-test="' + demoVar.name + ':categories"]'
+            cy.get(catDataTest).type(demoVar.categories, {force: true})
+            cy.pause()
         }
         // TODO: add handling of Categorical vars
     })

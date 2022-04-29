@@ -1,5 +1,31 @@
 {
     describe('Confirm Variables Page', () => {
+        it('saves categories correctly', () => {
+            cy.on('uncaught:exception', (e, runnable) => {
+                console.log('error', e)
+                console.log('runnable', runnable)
+                return false
+            })
+            cy.clearData()
+            cy.createMockDataset('EyeDemoMockDV.json')
+            cy.fixture('variables').then((varsFixture) => {
+                cy.goToConfirmVariables(varsFixture)
+
+                for (const key in varsFixture) {
+                    cy.get('table').contains('td', varsFixture[key].name).should('be.visible')
+                    cy.get('table').contains('tr', varsFixture[key].name).should('contain', varsFixture[key].type)
+                }
+                const label = 'Subject'
+                const name = 'subject'
+                const catInput = label + ':categories'
+                const catDataTest = '[data-test="' + catInput + '"]'
+                cy.get(catDataTest).type(varsFixture[name].categories, {force: true})
+                varsFixture[name].categoryChips.forEach(category => {
+                    cy.get('[data-test="categoryChip"]').should('contain', category)
+                })
+
+            })
+        })
         it('displays the variables correctly', () => {
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
@@ -44,5 +70,6 @@
 
             })
         })
+
     })
 }
