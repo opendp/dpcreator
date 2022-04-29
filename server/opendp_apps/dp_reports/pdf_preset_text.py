@@ -8,6 +8,44 @@ NEGATIVE_VALUE_PARAS = [
     putil.txt_reg("If a count is small, and the noise is negative, then the output may also be negative."),
     putil.txt_reg_para(""),  # spacer
 ]
+
+PARAMETERS_AND_BOUNDS = [
+    putil.txt_bld_para('Parameters, Bounds, and other Definitions'),
+    putil.txt_reg_para(f'This section briefly describes the parameters and bounds used within this report.'),
+
+    # Differentially Private (DP) Statistics
+    putil.txt_bld_para(f'Differentially Private (DP) Statistics'),
+    putil.txt_reg_para_pl40(f'To make a DP release, we replace traditional methods to estimate statistics, or estimators, with randomized estimators that have a calibrated noise distribution.'),
+
+    # Min and Max
+    putil.txt_bld_para(f'Bounds: Min and Max'),
+    putil.txt_reg_para_pl40(f'The data is clamped to be within minimum and maximum bounds in order to limit the influence any one individual has on the query. If these bounds are too tight, the release may be biased, because values outside these bounds are replaced with the nearest bound. On the other hand, if these bounds are too wide, the respective release will have greater variance.'),
+
+    # Scale
+    putil.txt_bld_para(f'Scale and Accuracy'),
+    putil.txt_reg_para_pl40(f'Scale is amount of noise added to the query. If using the Laplace mechanism, Laplacian noise with variance 2 * scale^2 is added. Accuracy estimates are derived from this noise parameter.'),
+
+    # Error
+    putil.txt_bld_para(f'Accuracy/Error'),
+    putil.txt_reg_para_pl40(f'The accuracy or error is the greatest a released, noisy value may differ from the input to the noise mechanism, at a given confidence level. A key observation is that this is not the greatest the DP release may differ from the respective non-DP statistic.'),
+    putil.txt_reg_para_pl40(f'For example, suppose that when calculating a DP Mean for age (in years) using a 95% confidence interval, the accuracy/error is 0.959. This means that here is 95% confidence that the DP Mean will be within 0.959 years of the actual mean age. However as mentioned above, there is a approximately 5% chance that the error will be greater than 0.959 years.'),
+
+    # Confidence Level
+    putil.txt_bld_para(f'Confidence Level'),
+    putil.txt_reg_para_pl40(f'The actual error of the released values is within the error estimate this percentage of the time. It is necessary to specify this confidence level because the noise distribution is unbounded in magnitude (and yet, still preserves utility, because the likelihood of sampling large noise deviates decreases exponentially in the magnitude).'),
+
+    putil.txt_bld_para(f'Privacy Parameters: Epsilon and Delta'),
+    putil.txt_reg_para_pl40(
+        f'These quantify the privacy loss incurred by individuals in the dataset. Larger values indicate less privacy.'),
+
+    putil.txt_bld_para(f'Epsilon'),
+    putil.txt_reg_para_pl40(f'Bounds the greatest multiplicative distance between the probability density on your dataset and the probability density on any neighboring dataset. For example, if a potential output has a probability of .01 of being released on your dataset, that same potential output must have a probability within .01 * exp(+/- epsilon) on any neighboring dataset.'),
+
+    putil.txt_bld_para(f'Delta'),
+    putil.txt_reg_para_pl40(f'The probability that the epsilon bound fails. This is usually chosen to be very small, on the order of 1e-10. Some statistics and noise addition mechanisms require a delta parameter.'),
+]
+
+
 """
 # Why it happens
 The noise we add comes from a symmetric distribution about zero (discrete laplace).

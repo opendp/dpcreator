@@ -63,7 +63,7 @@ class PDFReportMaker(BasicErrCheck):
     SECTION_TITLE_01_STATISTICS = '1. Statistics'
     SECTION_TITLE_02_DATA_SOURCE = '2. Data Source'
     SECTION_TITLE_03_OPENDP_LIB = '3. OpenDP Library'
-    SECTION_TITLE_04_USAGE = '4. Usage / Negative Values'
+    SECTION_TITLE_04_USAGE = '4. Parameter Definitions and Negative Values'
 
     def __init__(self, release_dict: dict = None, release_object_id: typing.Union[uuid.uuid4, str] = None):
         """Initalize with a DP Release as Python dict"""
@@ -179,6 +179,7 @@ class PDFReportMaker(BasicErrCheck):
                                    'pdfs',
                                    'pdf_report_01_%s.pdf' % (random_with_n_digits(6)))
 
+        print('pdf_output_file', pdf_output_file)
         with open(pdf_output_file, "wb") as out_file_handle:
             PDF.dumps(out_file_handle, self.pdf_doc)
         logger.info(f'PDF created: {pdf_output_file}')
@@ -535,10 +536,11 @@ class PDFReportMaker(BasicErrCheck):
 
         table_obj.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
         table_obj.set_border_color_on_all_cells(putil.COLOR_CRIMSON)
-        table_obj.set_borders_on_all_cells(True, False, True, False)  # top, right, bottom, left
+        table_obj.set_borders_on_all_cells(True, False, True, False)  # t, r, b, l
 
     def add_usage_page(self):
         """Add page(s) on usage, including negative value"""
+        print('add_usage_page 1')
         if self.has_error():
             return
 
@@ -546,10 +548,12 @@ class PDFReportMaker(BasicErrCheck):
 
         self.add_to_layout(putil.txt_subtitle_para(self.SECTION_TITLE_04_USAGE))
 
-        self.add_to_layout(putil.txt_bld_para('(SOME PLACEHOLDER TEXT FOR NOW)'))
+        print('add_usage_page 2')
 
-        for paragraph_obj in pdf_preset_text.NEGATIVE_VALUE_PARAS:
+        for paragraph_obj in pdf_preset_text.PARAMETERS_AND_BOUNDS:
             self.add_to_layout(paragraph_obj)
+
+        print('add_usage_page 3')
 
     def add_data_source_and_lib(self):
         """Add the data source and library information"""

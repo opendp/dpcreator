@@ -91,13 +91,18 @@ def txt_subtitle_para(subtitle):
                      font_color=COLOR_CRIMSON,
                      multiplied_leading=Decimal(1.75))
 
+def txt_reg_para_pl40(val):
+    """Create a paragraph with a left padding of 40"""
+    return txt_reg_para(val, padding_left=Decimal(40))
 
-def txt_reg_para(val):
+def txt_reg_para(val, padding_left=Decimal(0)):
     """Return a Paragraph with a regular font"""
     return Paragraph(val,
                      font=BASIC_FONT,
                      font_size=BASIC_FONT_SIZE,
-                     multiplied_leading=Decimal(1.75))
+                     multiplied_leading=Decimal(1.75),
+                     padding_left=padding_left,
+                     )
 
 
 def txt_list_para(val, padding_left=Decimal(40)):
@@ -120,6 +125,19 @@ def txt_bld(val):
     return ChunkOfText(val, font=BASIC_FONT_BOLD, font_size=BASIC_FONT_SIZE)
 
 
-def txt_bld_para(val):
+def txt_bld_para(val, padding_left=Decimal(0)):
     """Return a chunk of text with a bold font"""
-    return Paragraph(val, font=BASIC_FONT_BOLD, font_size=BASIC_FONT_SIZE)
+    return Paragraph(val,
+                     font=BASIC_FONT_BOLD,
+                     font_size=BASIC_FONT_SIZE,
+                     padding_left=padding_left,
+                     )
+
+
+def txt_ital_para(val, padding_left=Decimal(0)):
+    """Return a chunk of text with a bold font"""
+    return Paragraph(val,
+                     font=BASIC_FONT_ITALIC,
+                     font_size=BASIC_FONT_SIZE,
+                     padding_left=padding_left,
+                     )
