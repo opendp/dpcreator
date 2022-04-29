@@ -2,4 +2,5 @@ from django.apps import AppConfig
 
 
 class BannerMessagesConfig(AppConfig):
-    name = 'banner_messages'
+    default_auto_field = 'django.db.models.AutoField'
+    name = 'opendp_apps.banner_messages'

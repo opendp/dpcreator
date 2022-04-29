@@ -2,4 +2,5 @@ from django.apps import AppConfig
 
 
 class DpReportsConfig(AppConfig):
-    name = 'dp_reports'
+    default_auto_field = 'django.db.models.AutoField'
+    name = 'opendp_apps.dp_reports'
