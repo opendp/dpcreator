@@ -24,4 +24,3 @@ if __name__ == '__main__':
     # make_k8s_template()
     make_k8s_template(dpcreator_specs.specs_dev_dpcreator_org, output_prefix='dev.')
     make_k8s_template(dpcreator_specs.specs_demo_dpcreator_org, output_prefix='demo.')
-
