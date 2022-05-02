@@ -107,8 +107,8 @@
               background-color="soft_primary my-0"
               :data-test="variable.label+':categories'"
               v-on:click="currentRow=variable.index"
-              v-on:change="delimit(variable)"
-              :delimiters="[',',' ']"
+              v-on:change="saveUserInput(variable)"
+              :delimiters="[',']"
 
           >
             <template v-slot:selection="{ attrs, item, select, selected }">
@@ -387,13 +387,6 @@ export default {
     selected: []
   }),
   methods: {
-    delimit(variable) {
-      const reducer = (a, e) => [...a, ...e.split(/[, ]+/)]
-      const v = variable.additional_information.categories
-      const categories = [...new Set(v.reduce(reducer, []))]
-      variable.additional_information.categories = JSON.parse(JSON.stringify(categories))
-      this.saveUserInput(variable)
-    },
     formCompleted() {
       let completed = true
       this.selected.forEach(row => {
