@@ -42,7 +42,7 @@ For any subdomains which should not be routed through CloudFlare, they should be
 
 The final DNS configuration should look like this:
 
-[<img src="images/cloudflare_dns.png" width="500" alt="cloudflare_dns.png">](images/cloudflare_dns.png)
+[<img src="images/cloudflare_dns.png" width="600" alt="cloudflare_dns.png">](images/cloudflare_dns.png)
 
 ## Page Rules
 
@@ -59,4 +59,4 @@ For the DP Creator application instances, add "Page Rules" so that requests to "
     - Rule: `Always Use HTTPS`
 4. The final DNS configuration should look like this:
 
-[<img src="images/cloudflare_page_rules.png" width="500" alt="cloudflare_dns.png">](images/cloudflare_page_rules.png)
+[<img src="images/cloudflare_page_rules.png" width="600" alt="cloudflare_dns.png">](images/cloudflare_page_rules.png)
