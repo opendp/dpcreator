@@ -729,7 +729,8 @@ class PDFReportMaker(BasicErrCheck):
                                      multiplied_leading=Decimal(1.75)))
 
         para_read_carefully = ('Please read the report carefully, especially in'
-                               ' regard to the usage of these statistics.')
+                               ' regard to the usage of these statistics. If you have'
+                               ' any questions, please email us info@opendp.org.')
         self.add_to_layout(Paragraph(para_read_carefully,
                                      font=putil.BASIC_FONT,
                                      font_size=putil.BASIC_FONT_SIZE,
