@@ -63,7 +63,8 @@ class PDFReportMaker(BasicErrCheck):
     SECTION_TITLE_01_STATISTICS = '1. Statistics'
     SECTION_TITLE_02_DATA_SOURCE = '2. Data Source'
     SECTION_TITLE_03_OPENDP_LIB = '3. OpenDP Library'
-    SECTION_TITLE_04_USAGE = '4. Parameter Definitions and Negative Values'
+    SECTION_TITLE_04_USAGE = '4. Parameter Definitions'
+    SECTION_TITLE_05_NEGATIVE_VALUES = '5. Negative Values'
 
     def __init__(self, release_dict: dict = None, release_object_id: typing.Union[uuid.uuid4, str] = None):
         """Initalize with a DP Release as Python dict"""
@@ -115,6 +116,8 @@ class PDFReportMaker(BasicErrCheck):
         self.add_data_source_and_lib()
 
         self.add_usage_page()
+
+        self.add_negative_values()
 
         # test chart
         # self.add_to_layout(Chart(self.create_example_plot(), width=Decimal(450), height=Decimal(256)))
@@ -423,7 +426,7 @@ class PDFReportMaker(BasicErrCheck):
                 putil.txt_bld('Negative values.'),
                 putil.txt_reg(f' The histogram contains negative values. For more information on how to use '),
                 putil.txt_reg(f' this data, please see the section'),
-                putil.txt_bld(f' {self.SECTION_TITLE_04_USAGE}'),
+                putil.txt_bld(f' {self.SECTION_TITLE_05_NEGATIVE_VALUES}'),
             ]
 
             self.add_to_layout(HeterogeneousParagraph(text_chunks,
@@ -539,8 +542,7 @@ class PDFReportMaker(BasicErrCheck):
         table_obj.set_borders_on_all_cells(True, False, True, False)  # t, r, b, l
 
     def add_usage_page(self):
-        """Add page(s) on usage, including negative value"""
-        print('add_usage_page 1')
+        """Add page(s) on usage"""
         if self.has_error():
             return
 
@@ -548,12 +550,20 @@ class PDFReportMaker(BasicErrCheck):
 
         self.add_to_layout(putil.txt_subtitle_para(self.SECTION_TITLE_04_USAGE))
 
-        print('add_usage_page 2')
-
         for paragraph_obj in pdf_preset_text.PARAMETERS_AND_BOUNDS:
             self.add_to_layout(paragraph_obj)
 
-        print('add_usage_page 3')
+    def add_negative_values(self):
+        """Add page(s) on negative values"""
+        if self.has_error():
+            return
+
+        self.start_new_page()
+
+        self.add_to_layout(putil.txt_subtitle_para(self.SECTION_TITLE_05_NEGATIVE_VALUES))
+
+        for paragraph_obj in pdf_preset_text.NEGATIVE_VALUES:
+            self.add_to_layout(paragraph_obj)
 
     def add_data_source_and_lib(self):
         """Add the data source and library information"""
@@ -772,7 +782,7 @@ class PDFReportMaker(BasicErrCheck):
         sections_to_add = [self.SECTION_TITLE_02_DATA_SOURCE,
                            self.SECTION_TITLE_03_OPENDP_LIB,
                            self.SECTION_TITLE_04_USAGE,
-                           # '5. Parameter Definitions'
+                           self.SECTION_TITLE_05_NEGATIVE_VALUES,
                            ]
 
         for sec_text in sections_to_add:
@@ -780,6 +790,10 @@ class PDFReportMaker(BasicErrCheck):
             self.add_to_layout(pdf_para_obj)
             if sec_text != self.SECTION_TITLE_03_OPENDP_LIB:  # Sections 2 and 3 are on the same page
                 predicted_page_num += 1
+            if sec_text == self.SECTION_TITLE_05_NEGATIVE_VALUES:
+                # The previous section takes two pages
+                predicted_page_num += 1
+
             self.save_intrapage_link(sec_text, pdf_para_obj,
                                      predicted_page_num, pdf_static.TOC_L1_LINK_OFFSET)
 

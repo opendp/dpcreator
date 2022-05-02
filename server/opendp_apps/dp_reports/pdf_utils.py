@@ -125,11 +125,19 @@ def txt_bld(val):
     return ChunkOfText(val, font=BASIC_FONT_BOLD, font_size=BASIC_FONT_SIZE)
 
 
-def txt_bld_para(val, padding_left=Decimal(0)):
+def txt_bld_para_pl40(val, **kwargs):
+    """Create a paragraph, fon tweight bold, with a left padding of 40"""
+    return txt_bld_para(val, padding_left=Decimal(40))
+
+
+def txt_bld_para(val, padding_left=Decimal(0), **kwargs):
     """Return a chunk of text with a bold font"""
+    padding_top = kwargs.get('padding_top', Decimal(0))
+
     return Paragraph(val,
                      font=BASIC_FONT_BOLD,
                      font_size=BASIC_FONT_SIZE,
+                     padding_top=padding_top,
                      padding_left=padding_left,
                      )
 

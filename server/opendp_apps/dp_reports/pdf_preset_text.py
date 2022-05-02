@@ -1,20 +1,18 @@
+"""
+Text for fixed pages of the DP Release PDF
+
+https://docs.google.com/document/d/1l7PUHxb7gTt395PUCz2PU2sUH4WgvarkfS-YiVQ7uio/edit#heading=h.bl11r5eigoxz
+"""
+from decimal import Decimal
 from opendp_apps.dp_reports import pdf_utils as putil
 
-# Reference: https://docs.google.com/document/d/1vY7qP23mmfL672l4BJr8m0k2pZ1DmCLF7tXI_CH0agg/edit#
-NEGATIVE_VALUE_PARAS = [
-    putil.txt_bld_para('Why it happens'),
-    putil.txt_reg_para(f'The noise we add comes from a symmetric distribution about zero (discrete laplace).'),
-    putil.txt_reg_para(f"This means it's just as likely to draw a noise value that is greater than zero than it is to draw a noise value less than zero."),
-    putil.txt_reg("If a count is small, and the noise is negative, then the output may also be negative."),
-    putil.txt_reg_para(""),  # spacer
-]
 
 PARAMETERS_AND_BOUNDS = [
-    putil.txt_bld_para('Parameters, Bounds, and other Definitions'),
-    putil.txt_reg_para(f'This section briefly describes the parameters and bounds used within this report.'),
+    # putil.txt_bld_para('Parameters, Bounds, and other Definitions'),
+    putil.txt_reg_para(f'This section briefly describes the parameters and bounds used within this report. For more in-depth information, please see https://opendp.org/about.'),
 
     # Differentially Private (DP) Statistics
-    putil.txt_bld_para(f'Differentially Private (DP) Statistics'),
+    putil.txt_bld_para(f'Differentially Private (DP) Statistics', padding_top=10),
     putil.txt_reg_para_pl40(f'To make a DP release, we replace traditional methods to estimate statistics, or estimators, with randomized estimators that have a calibrated noise distribution.'),
 
     # Min and Max
@@ -38,42 +36,31 @@ PARAMETERS_AND_BOUNDS = [
     putil.txt_reg_para_pl40(
         f'These quantify the privacy loss incurred by individuals in the dataset. Larger values indicate less privacy.'),
 
-    putil.txt_bld_para(f'Epsilon'),
+    putil.txt_reg_para(' '),
+
+    putil.txt_bld_para_pl40(f'Epsilon'),
     putil.txt_reg_para_pl40(f'Bounds the greatest multiplicative distance between the probability density on your dataset and the probability density on any neighboring dataset. For example, if a potential output has a probability of .01 of being released on your dataset, that same potential output must have a probability within .01 * exp(+/- epsilon) on any neighboring dataset.'),
 
-    putil.txt_bld_para(f'Delta'),
+    putil.txt_bld_para_pl40(f'Delta'),
     putil.txt_reg_para_pl40(f'The probability that the epsilon bound fails. This is usually chosen to be very small, on the order of 1e-10. Some statistics and noise addition mechanisms require a delta parameter.'),
 ]
 
+NEGATIVE_VALUES = [
+    # Why it happens
+    putil.txt_bld_para(f'Why they happen', padding_top=Decimal(10)),
+    putil.txt_reg_para(f'The noise we add comes from a symmetric distribution about zero (discrete Laplace). This means it\'s just as likely to draw a noise value that is greater than zero than it is to draw a noise value less than zero.'),
+    putil.txt_reg_para(f'If a count is small, and the noise is negative, then the output may also be negative.'),
 
-"""
-# Why it happens
-The noise we add comes from a symmetric distribution about zero (discrete laplace).
-This means it's just as likely to draw a noise value that is greater than zero than it is to draw a noise value less than zero.
-If a count is small, and the noise is negative, then the output may also be negative.
-# Why we do it this way
-Adding symmetric noise doesn't introduce bias to the output.
-This simple approach also gives the most efficient estimator for counts (lowest budget with highest accuracy).
-# Level-setting expectations
-We want queries on low-count, highly distinctive bins to be inaccurate.
-The purpose of the histogram is to get a sense of the magnitude of each bin.
-The same noise scale is used on every bin, so the analyst actually gains just as much information when the bin count is low as when the bin count is high.
-People tend to consider error in proportion to the bin magnitude,
-which makes bins with smaller counts seem more noisy.
-It's also easier to see the noise component on zero queries.
-# Interpreting negative values
-The magnitude of negative counts can give you additional information as to how near to zero or how likely a count is actually zero.
-For example, if a released count has large negative magnitude,
-then it is relatively more likely to be zero than a count with a small negative magnitude
-(you can actually quantify this by integrating the tail of the pdf of the noise distribution, and it's the same thing we do for accuracies).
-# What can I do about it?
-If negative magnitudes are not useful information to you (they aren't for many people),
-then you can replace negative counts with zero.
-Keep in mind that this introduces bias.
-In the context of the census, this kind of postprocessing would inflate the population counts of rural areas.
-A second approach is to simply remove all counts below a given threshold.
-Counts with small magnitude should be more inconsequential to the big picture anyways.
-In the context of the census, this kind of postprocessing biases the result towards areas with greater populations.
-There is a related algorithm, the stability histogram, that does something similar in a principled way,
-but it has an additional delta parameter for releasing the category set. (
-"""
+    putil.txt_bld_para(f'Why we do it this way'),
+    putil.txt_reg_para('Adding symmetric noise doesn\'t introduce bias to the output. This simple approach also gives the most efficient estimator for counts (lowest budget with highest accuracy).'),
+
+    putil.txt_bld_para(f'Level-setting expectations'),
+    putil.txt_reg_para('We want queries on low-count, highly distinctive bins to be inaccurate. The purpose of the histogram is to get a sense of the magnitude of each bin. The same noise scale is used on every bin, so the analyst actually gains just as much information when the bin count is low as when the bin count is high. People tend to consider error in proportion to the bin magnitude, which makes bins with smaller counts seem more noisy. It\'s also easier to see the noise component on zero queries.'),
+
+    putil.txt_bld_para(f'Interpreting negative values'),
+    putil.txt_reg_para('The magnitude of negative counts can give you additional information as to how near to zero or how likely a count is actually zero. For example, if a released count has large negative magnitude, then it is relatively more likely to be zero than a count with a small negative magnitude. (You can actually quantify this by integrating the tail of the pdf of the noise distribution, and it\'s the same thing we do for accuracies.)'),
+
+    putil.txt_bld_para(f'What can I do about it?'),
+    putil.txt_reg_para('If negative magnitudes are not useful information to you (they aren\'t for many people), then you can replace negative counts with zero. Keep in mind that this introduces bias. In the context of the census, this kind of postprocessing would inflate the population counts of rural areas.'),
+    putil.txt_reg_para('A second approach is to simply remove all counts below a given threshold. In theory, counts with small magnitude should be less consequential to the big picture. In the context of the census, this kind of postprocessing biases the result towards areas with greater populations. There is a related algorithm, the stability histogram, that does something similar in a principled way, but it has an additional delta parameter for releasing the category set.')
+    ]
