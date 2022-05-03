@@ -129,7 +129,7 @@ def txt_bld(val):
 
 def txt_bld_para_t10(val, **kwargs):
     """Bold paragraph with top padding of 10"""
-    return txt_bld_para(val, padding_top=Decimal(10))
+    return txt_bld_para(val, padding_top=Decimal(10), **kwargs)
 
 
 def txt_bld_para_pl40(val, **kwargs):

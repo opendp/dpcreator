@@ -546,12 +546,15 @@ class PDFReportMaker(BasicErrCheck):
         if self.has_error():
             return
 
-        self.start_new_page()
-
+        self.start_new_page()  # 1st page of Parameter definitions
         self.add_to_layout(putil.txt_subtitle_para(self.SECTION_TITLE_04_USAGE))
-
-        for paragraph_obj in pdf_preset_text.PARAMETERS_AND_BOUNDS:
+        for paragraph_obj in pdf_preset_text.PARAMETERS_AND_BOUNDS_01:
             self.add_to_layout(paragraph_obj)
+
+        self.start_new_page()  # 2nd page of Parameter definitions
+        for paragraph_obj in pdf_preset_text.PARAMETERS_AND_BOUNDS_02:
+            self.add_to_layout(paragraph_obj)
+
 
     def add_negative_values(self):
         """Add page(s) on negative values"""
@@ -723,26 +726,19 @@ class PDFReportMaker(BasicErrCheck):
         # Add intro text
         #
         intro_text = render_to_string('pdf_report/intro_text.txt', self.release_dict)
-        self.add_to_layout(Paragraph(intro_text,
-                                     font=putil.BASIC_FONT,
-                                     font_size=putil.BASIC_FONT_SIZE,
-                                     multiplied_leading=Decimal(1.75)))
 
         para_read_carefully = ('Please read the report carefully, especially in'
                                ' regard to the usage of these statistics. If you have'
                                ' any questions, please email us info@opendp.org.')
-        self.add_to_layout(Paragraph(para_read_carefully,
-                                     font=putil.BASIC_FONT,
-                                     font_size=putil.BASIC_FONT_SIZE,
-                                     multiplied_leading=Decimal(1.75)))
 
         para_attachment = (f'Note: If you are using Adobe Acrobat, a JSON version of this data'
-                           f' is attached to this PDF as a file named "{self.get_embed_json_fname()}".')
+                           f' is attached to this PDF as a file named'
+                           f' "{self.get_embed_json_fname()}".')
 
-        self.add_to_layout(Paragraph(para_attachment,
-                                     font=putil.BASIC_FONT,
-                                     font_size=putil.BASIC_FONT_SIZE,
-                                     multiplied_leading=Decimal(1.75)))
+        intro_page_paras = [intro_text, para_read_carefully, para_attachment]
+        for para_text in intro_page_paras:
+            para_obj = putil.txt_reg_para(para_text)
+            self.add_to_layout(para_obj)
 
         self.add_to_layout(Paragraph('Contents',
                                      font=putil.BASIC_FONT_BOLD,

@@ -7,7 +7,7 @@ from decimal import Decimal
 from opendp_apps.dp_reports import pdf_utils as putil
 
 
-PARAMETERS_AND_BOUNDS = [
+PARAMETERS_AND_BOUNDS_01 = [
     # putil.txt_bld_para('Parameters, Bounds, and other Definitions'),
     putil.txt_reg_para(f'This section briefly describes the parameters and bounds used within this report. For more in-depth information, please see the OpenDP website at https://opendp.org/about as well as documentation for the OpenDP library, https://docs.opendp.org.'),
 
@@ -26,22 +26,24 @@ PARAMETERS_AND_BOUNDS = [
     # Error
     putil.txt_bld_para_t10(f'Accuracy/Error'),
     putil.txt_reg_para_pl40(f'The accuracy or error is the greatest a released, noisy value may differ from the input to the noise mechanism, at a given confidence level. A key observation is that this is not the greatest the DP release may differ from the respective non-DP statistic.'),
-    putil.txt_reg_para_pl40(f'For example, suppose that when calculating a DP Mean for age (in years) using a 95% confidence interval, the accuracy/error is 0.959. This means that here is 95% confidence that the DP Mean will be within 0.959 years of the actual mean age. However as mentioned above, there is a approximately 5% chance that the error will be greater than 0.959 years.'),
+    # putil.txt_reg_para_pl40(f'For example, suppose that when calculating a DP Mean for age (in years) using a 95% confidence interval, the accuracy/error is 0.959. This means that here is 95% confidence that the DP Mean will be within 0.959 years of the actual mean age. However as mentioned above, there is a approximately 5% chance that the error will be greater than 0.959 years.'),
 
     # Confidence Level
     putil.txt_bld_para_t10(f'Confidence Level'),
     putil.txt_reg_para_pl40(f'The actual error of the released values is within the error estimate this percentage of the time. It is necessary to specify this confidence level because the noise distribution is unbounded in magnitude (and yet, still preserves utility, because the likelihood of sampling large noise deviates decreases exponentially in the magnitude).'),
 
-    putil.txt_reg_para(' '),
+    putil.txt_reg_para_pl40('(Continued on next page)'),
+    ]
 
-    putil.txt_bld_para_t10(f'Privacy Parameters: Epsilon and Delta'),
+PARAMETERS_AND_BOUNDS_02 = [
+    putil.txt_bld_para(f'Privacy Parameters: Epsilon and Delta'),
     putil.txt_reg_para_pl40(
         f'These quantify the privacy loss incurred by individuals in the dataset. Larger values indicate less privacy.'),
 
-    putil.txt_bld_para_pl40(f'Epsilon'),
+    putil.txt_bld_para_pl40(f'Epsilon', padding_top=Decimal(10)),
     putil.txt_reg_para_pl40(f'Bounds the greatest multiplicative distance between the probability density on your dataset and the probability density on any neighboring dataset. For example, if a potential output has a probability of .01 of being released on your dataset, that same potential output must have a probability within .01 * exp(+/- epsilon) on any neighboring dataset.'),
 
-    putil.txt_bld_para_pl40(f'Delta'),
+    putil.txt_bld_para_pl40(f'Delta', padding_top=Decimal(10)),
     putil.txt_reg_para_pl40(f'The probability that the epsilon bound fails. This is usually chosen to be very small, on the order of 1e-10. Some statistics and noise addition mechanisms require a delta parameter.'),
 ]
 
