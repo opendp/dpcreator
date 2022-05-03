@@ -1,7 +1,7 @@
 <template>
   <div class="confirmVariablesPage">
     <h1 class="title-size-1">Confirm Variables</h1>
-    <p v-html="$t('confirm variables.confirm variables intro')"></p>
+    <!--p v-html="$t('confirm variables.confirm variables intro')"></p-->
     <ColoredBorderAlert type="warning">
       <template v-slot:content>
         Currently, the DP Creator takes the first 20 variables of the data file.
@@ -107,18 +107,26 @@
               background-color="soft_primary my-0"
               :data-test="variable.label+':categories'"
               v-on:click="currentRow=variable.index"
-              v-on:change="saveUserInput(variable)"
+              :search-input.sync="categoryInput"
+              @update:search-input="delimitInput(variable)"
               :delimiters="[',']"
-
           >
             <template v-slot:selection="{ attrs, item, select, selected }">
-              <ChipSelectItem
-                  :v_bind="attrs"
-                  :input_value="selected"
+              <v-chip
+                  :v-bind="attrs"
+                  :input-value="selected"
+                  close
+                  color="blue darken-2"
+                  text-color="white"
                   :click="select"
-                  :click_close="() => removeCategoryFromVariable(item, variable)"
                   :item="item"
-              />
+
+                  @click:close="removeCategoryFromVariable(item, variable)"
+              >
+                <div data-test="categoryChip"><strong>{{ item }}
+                  <!--{{ 'attrs:'+ JSON.stringify(attrs) }}{{ 'select:' +select }}{{ 'selected'+selected }}-->
+                </strong></div>
+              </v-chip>
             </template>
           </v-combobox>
         </div>
@@ -373,6 +381,7 @@ export default {
   data: () => ({
     currentRow: null,
     loadingVariables: true,
+    categoryInput: "",
     headers: [
       {value: "index"},
       {text: "Variable Name", value: "name"},
@@ -387,6 +396,43 @@ export default {
     selected: []
   }),
   methods: {
+    getCategories(variable) {
+      console.log('getting categories for: ' + variable.label)
+      if (variable.additional_information) {
+        return variable.additional_information['categories']
+      }
+      return ""
+      //  return this.datasetInfo.depositorSetupInfo.variableInfo[variable].categories
+
+    },
+
+    delimit(variable) {
+      const reducer = (a, e) => [...a, ...e.split(/[, ]+/)]
+      const v = variable.additional_information.categories
+      console.log("delimiter: v= " + JSON.stringify(v))
+      const categories = [...new Set(v.reduce(reducer, []))]
+      console.log("delimiter: categories = " + JSON.stringify(categories))
+      variable.additional_information.categories = JSON.parse(JSON.stringify(categories))
+      this.saveUserInput(variable)
+    },
+
+    delimitInput(variable) {
+      console.log("delimitInput: variable= " + JSON.stringify(variable))
+      console.log("delimitInput: this.categoryInput = " + this.categoryInput)
+      if (this.categoryInput && this.categoryInput.split(",").length > 1) {
+        let v = JSON.parse(JSON.stringify(variable.additional_information.categories))
+        v.push(this.categoryInput)
+        const reducer = (a, e) => [...a, ...e.split(',')]
+        console.log("delimiter: v= " + JSON.stringify(v))
+        let categories = [...new Set(v.reduce(reducer, []))]
+        categories = categories.filter(word => word.length > 0);
+
+        console.log("delimiter: categories = " + JSON.stringify(categories))
+        variable.additional_information.categories = JSON.parse(JSON.stringify(categories))
+        this.saveUserInput(variable)
+        this.categoryInput = ""
+      }
+    },
     formCompleted() {
       let completed = true
       this.selected.forEach(row => {
@@ -485,6 +531,7 @@ export default {
       }
     },
     removeCategoryFromVariable(category, variable) {
+      //   console.log('removing category '+ category+','+ JSON.stringify(variable))
       variable.additional_information["categories"].splice(
           variable.additional_information["categories"].indexOf(category),
           1
