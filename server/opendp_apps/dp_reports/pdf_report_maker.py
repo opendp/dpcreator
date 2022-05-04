@@ -63,7 +63,8 @@ class PDFReportMaker(BasicErrCheck):
     SECTION_TITLE_01_STATISTICS = '1. Statistics'
     SECTION_TITLE_02_DATA_SOURCE = '2. Data Source'
     SECTION_TITLE_03_OPENDP_LIB = '3. OpenDP Library'
-    SECTION_TITLE_04_USAGE = '4. Usage / Negative Values'
+    SECTION_TITLE_04_USAGE = '4. Parameter Definitions'
+    SECTION_TITLE_05_NEGATIVE_VALUES = '5. Negative Values'
 
     def __init__(self, release_dict: dict = None, release_object_id: typing.Union[uuid.uuid4, str] = None):
         """Initalize with a DP Release as Python dict"""
@@ -115,6 +116,8 @@ class PDFReportMaker(BasicErrCheck):
         self.add_data_source_and_lib()
 
         self.add_usage_page()
+
+        self.add_negative_values()
 
         # test chart
         # self.add_to_layout(Chart(self.create_example_plot(), width=Decimal(450), height=Decimal(256)))
@@ -179,6 +182,7 @@ class PDFReportMaker(BasicErrCheck):
                                    'pdfs',
                                    'pdf_report_01_%s.pdf' % (random_with_n_digits(6)))
 
+        print('pdf_output_file', pdf_output_file)
         with open(pdf_output_file, "wb") as out_file_handle:
             PDF.dumps(out_file_handle, self.pdf_doc)
         logger.info(f'PDF created: {pdf_output_file}')
@@ -422,7 +426,7 @@ class PDFReportMaker(BasicErrCheck):
                 putil.txt_bld('Negative values.'),
                 putil.txt_reg(f' The histogram contains negative values. For more information on how to use '),
                 putil.txt_reg(f' this data, please see the section'),
-                putil.txt_bld(f' {self.SECTION_TITLE_04_USAGE}'),
+                putil.txt_bld(f' {self.SECTION_TITLE_05_NEGATIVE_VALUES}'),
             ]
 
             self.add_to_layout(HeterogeneousParagraph(text_chunks,
@@ -535,20 +539,33 @@ class PDFReportMaker(BasicErrCheck):
 
         table_obj.set_padding_on_all_cells(Decimal(5), Decimal(5), Decimal(5), Decimal(5))
         table_obj.set_border_color_on_all_cells(putil.COLOR_CRIMSON)
-        table_obj.set_borders_on_all_cells(True, False, True, False)  # top, right, bottom, left
+        table_obj.set_borders_on_all_cells(True, False, True, False)  # t, r, b, l
 
     def add_usage_page(self):
-        """Add page(s) on usage, including negative value"""
+        """Add page(s) on usage"""
+        if self.has_error():
+            return
+
+        self.start_new_page()  # 1st page of Parameter definitions
+        self.add_to_layout(putil.txt_subtitle_para(self.SECTION_TITLE_04_USAGE))
+        for paragraph_obj in pdf_preset_text.PARAMETERS_AND_BOUNDS_01:
+            self.add_to_layout(paragraph_obj)
+
+        self.start_new_page()  # 2nd page of Parameter definitions
+        for paragraph_obj in pdf_preset_text.PARAMETERS_AND_BOUNDS_02:
+            self.add_to_layout(paragraph_obj)
+
+
+    def add_negative_values(self):
+        """Add page(s) on negative values"""
         if self.has_error():
             return
 
         self.start_new_page()
 
-        self.add_to_layout(putil.txt_subtitle_para(self.SECTION_TITLE_04_USAGE))
+        self.add_to_layout(putil.txt_subtitle_para(self.SECTION_TITLE_05_NEGATIVE_VALUES))
 
-        self.add_to_layout(putil.txt_bld_para('(SOME PLACEHOLDER TEXT FOR NOW)'))
-
-        for paragraph_obj in pdf_preset_text.NEGATIVE_VALUE_PARAS:
+        for paragraph_obj in pdf_preset_text.NEGATIVE_VALUES:
             self.add_to_layout(paragraph_obj)
 
     def add_data_source_and_lib(self):
@@ -709,25 +726,19 @@ class PDFReportMaker(BasicErrCheck):
         # Add intro text
         #
         intro_text = render_to_string('pdf_report/intro_text.txt', self.release_dict)
-        self.add_to_layout(Paragraph(intro_text,
-                                     font=putil.BASIC_FONT,
-                                     font_size=putil.BASIC_FONT_SIZE,
-                                     multiplied_leading=Decimal(1.75)))
 
         para_read_carefully = ('Please read the report carefully, especially in'
-                               ' regard to the usage of these statistics.')
-        self.add_to_layout(Paragraph(para_read_carefully,
-                                     font=putil.BASIC_FONT,
-                                     font_size=putil.BASIC_FONT_SIZE,
-                                     multiplied_leading=Decimal(1.75)))
+                               ' regard to the usage of these statistics. If you have'
+                               ' any questions, please email us info@opendp.org.')
 
         para_attachment = (f'Note: If you are using Adobe Acrobat, a JSON version of this data'
-                           f' is attached to this PDF as a file named "{self.get_embed_json_fname()}".')
+                           f' is attached to this PDF as a file named'
+                           f' "{self.get_embed_json_fname()}".')
 
-        self.add_to_layout(Paragraph(para_attachment,
-                                     font=putil.BASIC_FONT,
-                                     font_size=putil.BASIC_FONT_SIZE,
-                                     multiplied_leading=Decimal(1.75)))
+        intro_page_paras = [intro_text, para_read_carefully, para_attachment]
+        for para_text in intro_page_paras:
+            para_obj = putil.txt_reg_para(para_text)
+            self.add_to_layout(para_obj)
 
         self.add_to_layout(Paragraph('Contents',
                                      font=putil.BASIC_FONT_BOLD,
@@ -768,7 +779,7 @@ class PDFReportMaker(BasicErrCheck):
         sections_to_add = [self.SECTION_TITLE_02_DATA_SOURCE,
                            self.SECTION_TITLE_03_OPENDP_LIB,
                            self.SECTION_TITLE_04_USAGE,
-                           # '5. Parameter Definitions'
+                           self.SECTION_TITLE_05_NEGATIVE_VALUES,
                            ]
 
         for sec_text in sections_to_add:
@@ -776,6 +787,10 @@ class PDFReportMaker(BasicErrCheck):
             self.add_to_layout(pdf_para_obj)
             if sec_text != self.SECTION_TITLE_03_OPENDP_LIB:  # Sections 2 and 3 are on the same page
                 predicted_page_num += 1
+            if sec_text == self.SECTION_TITLE_05_NEGATIVE_VALUES:
+                # The previous section takes two pages
+                predicted_page_num += 1
+
             self.save_intrapage_link(sec_text, pdf_para_obj,
                                      predicted_page_num, pdf_static.TOC_L1_LINK_OFFSET)
 
