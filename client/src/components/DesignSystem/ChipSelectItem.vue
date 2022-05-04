@@ -5,9 +5,9 @@
       close
       color="blue darken-2"
       text-color="white"
-      @click="click"
       @click:close="click_close"
-  ><strong>{{ item }}</strong>
+  >
+    <div data-test="categoryChip"><strong>{{ item }}</strong></div>
   </v-chip>
 </template>
 

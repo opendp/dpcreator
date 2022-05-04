@@ -16,7 +16,12 @@
         "name": "Subject",
         "type": "Categorical",
         "label": "",
-        "categories": [],
+        "categories": "one,two,three,",
+        "categoryChips": [
+            "one",
+            "two",
+            "three"
+        ],
         "sortOrder": 0
     },
     "language": {
