@@ -192,7 +192,7 @@ In this example, the cluster name is **DPCreatorCluster01**
    kc delete -f dpcreator_nn_YYYY_MMDD.yaml  
    
    # To stop it immediately:
-   kc delete -f dpcreator_nn_YYYY_MMDD.yaml -grace-period=0 --force
+   kc delete -f dpcreator_nn_YYYY_MMDD.yaml --now
    
    
    ```

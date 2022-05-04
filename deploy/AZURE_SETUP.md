@@ -22,10 +22,11 @@ Through the Azure admin:
 # Add deploy key to GitHub if needed.
 # Assumes a key already exists
 more .ssh/id_ed25519.pub
+#
+# Make a key if non exists: https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key
 # Add deploy key setup: 
 #   - https://docs.github.com/en/developers/overview/managing-deploy-keys#deploy-keys
 #   - https://github.com/opendp/dpcreator/settings/keys
-
 
 
 # Clone repository (using SSH)

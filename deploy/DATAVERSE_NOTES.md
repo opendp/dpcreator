@@ -15,8 +15,7 @@
         ```
      - **Description**: 
         ```html
-          <b>DO NOT upload sensitive data to this Dataverse.</b>
-          <p>For more information, please read the <a href="https://docs.google.com/document/d/1cjogg37M069Y5JwOJ5FC6w_BAqhyUmgag6eXXpJmegA/edit#heading=h.qs7dsqoouasg" target="_blank">DP Creator Tutorial</a>.</p>
+         This site is for demonstration purposes only. Please DO NOT use sensitive or confidential data. For more information, please <a href="https://docs.google.com/document/d/e/2PACX-1vRlZ2IgigIhl4oz_uOakQPxovzlrmFkbD-x_9RUO31dC0eRq2wCt_vN2Go0_9LTRd67srjgy04CfPVk/pub" target="_blank">read the tutorial</a> or <a href="mailto:info@opendp.org?subject=DP%20Creator">contact us</a>.
         ```
        - In the future, the link should go to the user guide on the GitHub page
   - Save the changes
