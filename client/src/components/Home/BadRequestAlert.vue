@@ -16,7 +16,7 @@
         <v-alert
             border="right"
             colored-border
-            type="info"
+            type="warning"
             elevation="2"
             v-show=showAlert>
           {{ alertText }}
