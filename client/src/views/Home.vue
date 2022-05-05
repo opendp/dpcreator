@@ -36,17 +36,19 @@ export default {
   created() {
 
     const handoffId = this.$route.query.id
-
+    const error = this.$route.query.error_code
     if (handoffId) {
       this.$store.dispatch('dataverse/setHandoffId', handoffId)
-    } else {
-      console.log('no handoffId')
+    } else if (error) {
+      this.showAlert = true
+      this.alertText = "Error handing off from Dataverse, error code = " + error
+
     }
   },
 
   data: () => ({
     showAlert: false,
-    alertText: 'here is some text',
+    alertText: '',
   })
 };
 
