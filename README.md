@@ -5,7 +5,9 @@ A demo version of DP Creator is available which shows how it integrates with a [
     - Estimated time: 15 to 25 minutes
     - These instructions go through the entire process, beginning with creating a Dataverse account and depositing data there and finishing with using DP Creator to produce a a release of differentially private statistics.
   - Coming soon: Updated demo option where test data may be uploaded directly to DP Creator
+Please feel free to [contact us](#contact--getting-help) with any questions or feedback.
 
+---
 # DP Creator
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
