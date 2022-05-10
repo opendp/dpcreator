@@ -77,6 +77,9 @@ class DataverseHandoffView(BaseModelViewSet):
             init_site_url = RegisteredDataverse.hack_format_dv_url_http(init_site_url)
             request_data[dv_static.DV_PARAM_SITE_URL] = RegisteredDataverse.format_dv_url(init_site_url)
 
+        # used for error handling
+        reg_dv_site_url = request_data[dv_static.DV_PARAM_SITE_URL]
+
         handoff_serializer = DataverseHandoffSerializer(data=request_data)
 
         if handoff_serializer.is_valid():
@@ -97,5 +100,12 @@ class DataverseHandoffView(BaseModelViewSet):
                         error_code += ','.join([k, ''])
             # Remove trailing comma
             error_code = quote(error_code[:-1])
+
             logger.error(f'Invalid DataverseHandoffSerializer. Error_code: {error_code}')
-            return HttpResponseRedirect(reverse('vue-home') + f'?error_code={error_code}')
+
+            get_str = f'?error_code={error_code}'
+            if error_code == dv_static.DV_PARAM_SITE_URL:
+                logger.error(f'Not a Registered Dataverse: {reg_dv_site_url}')
+
+                get_str = f'{get_str}&unreg_dv_url={reg_dv_site_url}'
+            return HttpResponseRedirect(reverse('vue-home') + get_str)
