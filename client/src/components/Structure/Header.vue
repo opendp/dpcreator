@@ -19,6 +19,7 @@
                 :src="require('../../assets/DPCreator_from_OpenDP.svg')"
                 data-test="homeLogo"
                 contain
+                v-on:click="$emit('logoClicked')"
                 aspect-ratio="4"
             ></v-img>
           </router-link
