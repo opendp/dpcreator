@@ -2,7 +2,7 @@
 
 A demo version of DP Creator is available which shows how it integrates with a [Dataverse repository](https://dataverse.org/). To try it, including uploading your own (non-sensitive) test data to Dataverse, please follow these instructions:
   - [DP Creator tutorial instructions](https://docs.google.com/document/d/e/2PACX-1vRlZ2IgigIhl4oz_uOakQPxovzlrmFkbD-x_9RUO31dC0eRq2wCt_vN2Go0_9LTRd67srjgy04CfPVk/pub)
-    - Estimated time: 15 to 25 minutes
+    - Estimated time: 15 to 30 minutes
     - These instructions go through the entire process, beginning with creating a Dataverse account and depositing data there and finishing with using DP Creator to produce a a release of differentially private statistics.
   - Coming soon: Updated demo option where test data may be uploaded directly to DP Creator
 Please feel free to [contact us](#contact--getting-help) with any questions or feedback.
