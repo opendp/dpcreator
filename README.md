@@ -1,4 +1,10 @@
-### DP Creator is under development and we expect to have a test version, connected to a example Dataverse installation publicly available this spring. Please see the [OpenDP project Roadmap](https://opendp.org/roadmap) for more details.
+### Demo version!
+
+A demo version of DP Creator is available which shows how it integrates with a [Dataverse repository](https://dataverse.org/). To try it, including uploading your own (non-sensitive) test data to Dataverse, please follow these instructions:
+  - [DP Creator tutorial instructions](https://docs.google.com/document/d/e/2PACX-1vRlZ2IgigIhl4oz_uOakQPxovzlrmFkbD-x_9RUO31dC0eRq2wCt_vN2Go0_9LTRd67srjgy04CfPVk/pub)
+    - Estimated time: 15 to 25 minutes
+    - These instructions go through the entire process, beginning with creating a Dataverse account and depositing data there and finishing with using DP Creator to produce a a release of differentially private statistics.
+  - Coming soon: Updated demo option where test data may be uploaded directly to DP Creator
 
 # DP Creator
 
@@ -27,6 +33,7 @@ Several screenshots of DP Creator appear below (click for a larger image):
 
 If you would like to learn more or want to submit feedback, please reach out! Here are some ways to contact us:
 
+* Joining the [dpcreator-dev channel](https://join.slack.com/t/opendp/shared_invite/zt-zw7o1k2s-dHg8NQE8WTfAGFnN_cwomA) in our Slack workspace
 * Ask questions on our [discussions forum](https://github.com/opendp/opendp/discussions)
   * This forum is used for all of the OpenDP projects, including the [OpenDP library](https://github.com/opendp/opendp) and DP Creator. 
 * Open issues on our [issue tracker](https://github.com/opendp/dpcreator/issues)
