@@ -48,7 +48,6 @@ export default {
       }else{
         this.alertText = "Sorry! There was a problem with the Dataverse information."
         + "<br /><br />Please contact the <a href='mailto:info@opendp.org?subject=Dataverse handoff error: " + error + "'>administrator</a>.  (error code: " + error + "). "
-
       }
     }
   },

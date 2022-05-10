@@ -106,6 +106,6 @@ class DataverseHandoffView(BaseModelViewSet):
             get_str = f'?error_code={error_code}'
             if error_code == dv_static.DV_PARAM_SITE_URL:
                 logger.error(f'Not a Registered Dataverse: {reg_dv_site_url}')
-
                 get_str = f'{get_str}&unreg_dv_url={reg_dv_site_url}'
+
             return HttpResponseRedirect(reverse('vue-home') + get_str)
