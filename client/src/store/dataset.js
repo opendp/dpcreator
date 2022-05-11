@@ -1,24 +1,25 @@
 import dataset from "@/api/dataset";
 import analysis from "@/api/analysis";
-const camelcaseKeys = require('camelcase-keys');
-import {snakeCase} from "snake-case";
 import {
-    SET_DATASET_LIST,
-    SET_DATASET_INFO,
-    SET_PROFILER_MSG,
-    SET_PROFILER_STATUS,
+    PATCH_DEPOSITOR_INFO,
     SET_ANALYSIS_PLAN,
+    SET_DATASET_INFO,
+    SET_DATASET_LIST,
     SET_MYDATA_LIST,
-    PATCH_DEPOSITOR_INFO
+    SET_PROFILER_MSG,
+    SET_PROFILER_STATUS
 } from './types';
-import dataverse from "@/api/dataverse";
-import stepInformation, {
+import {
     depositorSteps,
-    STEP_0400_PROFILING_COMPLETE, STEP_0600_EPSILON_SET,
-
-    STEP_1200_PROCESS_COMPLETE, wizardNextSteps, wizardUserSteps
+    STEP_0400_PROFILING_COMPLETE,
+    STEP_0600_EPSILON_SET,
+    STEP_1200_PROCESS_COMPLETE,
+    wizardNextSteps,
+    wizardUserSteps
 } from "@/data/stepInformation";
 import release from "@/api/release";
+
+const camelcaseKeys = require('camelcase-keys');
 
 const initialState = {
     datasetList: null,
@@ -169,39 +170,39 @@ const actions = {
 
     },
     /**
+     * Update all variables from the Confirm Variables page.
+     * This is needed when the user toggles the "select all" checkbox
+     * @param commit
+     * @param state
+     * @param variableInput - all the variables from the Confirm Variables page
+     */
+    updateAllVariables({commit, state}, allVariableInput) {
+        //  Get a local copy of variableInfo, for editing
+        let variableInfo = JSON.parse(JSON.stringify(state.datasetInfo.depositorSetupInfo.variableInfo))
+        // For each var in allVariableInput, update the corresponding variableInfo variable
+        allVariableInput.forEach(varInput => {
+            let targetVar = variableInfo[varInput.key]
+            helperMethods.convertVariableInput(varInput, targetVar)
+        })
+
+        const patch = {
+            variableInfo: variableInfo
+        }
+        const payload = {objectId: state.datasetInfo.depositorSetupInfo.objectId, props: patch}
+        this.dispatch('dataset/updateDepositorSetupInfo', payload)
+    },
+    /**
      * Save user edits to the variables in the Confirm Variables page
      * @param commit
      * @param state
-     * @param variableInput
+     * @param variableInput - single variable to be updated
      */
     updateVariableInfo({commit, state}, variableInput) {
         //  Get a local copy of variableInfo, for editing
         let variableInfo = JSON.parse(JSON.stringify(state.datasetInfo.depositorSetupInfo.variableInfo))
         let targetVar = variableInfo[variableInput.key]
-        targetVar.name = variableInput.name
-        targetVar.label = variableInput.label
-        targetVar.type = variableInput.type
-        targetVar.selected = variableInput.selected
-        if (variableInput.type === 'Integer' || variableInput.type === 'Float') {
-            targetVar.min = Number(variableInput.additional_information.min)
-            targetVar.max = Number(variableInput.additional_information.max)
-        }
-        if (variableInput.type === 'Categorical') {
-            targetVar.categories = variableInput.additional_information.categories
-            let numericValues = [];
-            if (variableInput.additional_information.categories !== null) {
-                variableInput.additional_information.categories.forEach(item => {
-                    if (!isNaN(item)) {
-                        numericValues.push(Number(item))
-                    }
-                })
-            }
-            if (numericValues !== null) {
-                if (numericValues.length === variableInput.additional_information.categories.length) {
-                    targetVar.categories = numericValues
-                }
-            }
-        }
+        helperMethods.convertVariableInput(variableInput, targetVar)
+
         const patch = {
             variableInfo: variableInfo
         }
@@ -330,7 +331,38 @@ const actions = {
     }
 
 };
+const helperMethods = {
+    convertVariableInput(variableInput, targetVar) {
 
+        targetVar.name = variableInput.name
+        targetVar.label = variableInput.label
+        targetVar.type = variableInput.type
+        targetVar.selected = variableInput.selected
+
+        if (variableInput.type === 'Integer' || variableInput.type === 'Float') {
+            targetVar.min = Number(variableInput.additional_information.min)
+            targetVar.max = Number(variableInput.additional_information.max)
+        }
+        if (variableInput.type === 'Categorical') {
+            targetVar.categories = variableInput.additional_information.categories
+            // if every category entered can be converted to a number, then save
+            // the categories as numeric values, else save them as strings.
+            let numericValues = [];
+            if (variableInput.additional_information.categories !== null) {
+                variableInput.additional_information.categories.forEach(item => {
+                    if (!isNaN(item)) {
+                        numericValues.push(Number(item))
+                    }
+                })
+            }
+            if (numericValues !== null) {
+                if (numericValues.length === variableInput.additional_information.categories.length) {
+                    targetVar.categories = numericValues
+                }
+            }
+        }
+    }
+}
 const mutations = {
     // List of items for the MyData table, which flattens the nested AnalysisPlan array.
     // If a Dataset contains multiple AnalysisPlan objects,

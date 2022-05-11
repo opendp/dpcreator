@@ -14,11 +14,26 @@
         data file.
       </template>
     </ColoredBorderAlert>
+    <v-text-field
+        v-model="search"
+        append-icon="mdi-magnify"
+        label="Search Variables"
+        single-line
+        hide-details
+    ></v-text-field>
+
+    <Checkbox
+        data-test="filterCheckBox"
+        :class="{ 'width80 mx-auto': $vuetify.breakpoint.xsOnly }"
+        :value.sync="filterSelected"
+        text='Show Only Selected Variables'
+    />
 
     <v-data-table
         :headers="headers"
+        :search="search"
         v-model="selected"
-        :items="variables"
+        :items="items"
         class="my-10"
         :items-per-page="20"
         :loading="loadingVariables"
@@ -26,6 +41,7 @@
         :single-select="false"
         item-key="name"
         show-select
+        v-on:toggle-select-all="handleSelectAll"
         v-on:item-selected="handleItemSelected"
     >
       <template v-slot:loading>
@@ -69,19 +85,19 @@
         ></v-text-field>
       </template>
       <template v-slot:[`item.type`]="{ item }">
-            <v-select
-                v-if="showToolTip(item)"
-                v-model="item.type"
-                :items="['Float', 'Integer', 'Categorical', 'Boolean']"
-                :data-test="item.label+':selectToolTip'"
-                standard
-                v-tooltip="'Changing type will clear additional info.'"
-                class="d-inline-block select"
-                v-on:click="currentRow=item.index"
-                v-on:hover="currentRow=item.index"
-                dense
-                v-on:change="changeVariableType(item)"
-            ></v-select>
+        <v-select
+            v-if="showToolTip(item)"
+            v-model="item.type"
+            :items="['Float', 'Integer', 'Categorical', 'Boolean']"
+            :data-test="item.label+':selectToolTip'"
+            standard
+            v-tooltip="'Changing type will clear additional info.'"
+            class="d-inline-block select"
+            v-on:click="currentRow=item.index"
+            v-on:hover="currentRow=item.index"
+            dense
+            v-on:change="changeVariableType(item)"
+        ></v-select>
         <v-select
             v-else
             v-model="item.type"
@@ -162,7 +178,7 @@
         </template>
       </ColoredBorderAlert>
     </div>
-    <div v-if="!formCompleted()">
+    <div v-if="!formCompleted(variables)">
       <ColoredBorderAlert type="warning">
         <template v-slot:content>
           Please fix missing or invalid input to continue.
@@ -353,8 +369,8 @@ import LoadingBar from "../../components/LoadingBar.vue";
 import ChipSelectItem from "../../components/DesignSystem/ChipSelectItem.vue";
 import Checkbox from "../../components/DesignSystem/Checkbox.vue";
 import DynamicQuestionIconTooltip from "@/components/DynamicHelpResources/DynamicQuestionIconTooltip";
-import {mapState, mapGetters} from 'vuex';
-import {snakeCase} from 'snake-case'
+import {mapGetters, mapState} from 'vuex';
+
 export default {
   name: "ConfirmVariables",
   components: {
@@ -381,6 +397,7 @@ export default {
   data: () => ({
     currentRow: null,
     loadingVariables: true,
+    search: "",
     categoryInput: "",
     headers: [
       {value: "index"},
@@ -392,50 +409,38 @@ export default {
         value: "additional_information"
       }
     ],
+    items: [],
     variables: [],
-    selected: []
+    selected: [],
+    filterSelected: false
   }),
+
   methods: {
-    getCategories(variable) {
-      console.log('getting categories for: ' + variable.label)
-      if (variable.additional_information) {
-        return variable.additional_information['categories']
+    getItems() {
+      if (this.filterSelected) {
+        return this.variables.filter(obj => {
+          return obj.selected === true;
+        });
+      } else {
+        return this.variables
       }
-      return ""
-      //  return this.datasetInfo.depositorSetupInfo.variableInfo[variable].categories
-
     },
-
-    delimit(variable) {
-      const reducer = (a, e) => [...a, ...e.split(/[, ]+/)]
-      const v = variable.additional_information.categories
-      console.log("delimiter: v= " + JSON.stringify(v))
-      const categories = [...new Set(v.reduce(reducer, []))]
-      console.log("delimiter: categories = " + JSON.stringify(categories))
-      variable.additional_information.categories = JSON.parse(JSON.stringify(categories))
-      this.saveUserInput(variable)
-    },
-
     delimitInput(variable) {
-      console.log("delimitInput: variable= " + JSON.stringify(variable))
-      console.log("delimitInput: this.categoryInput = " + this.categoryInput)
       if (this.categoryInput && this.categoryInput.split(",").length > 1) {
         let v = JSON.parse(JSON.stringify(variable.additional_information.categories))
         v.push(this.categoryInput)
         const reducer = (a, e) => [...a, ...e.split(',')]
-        console.log("delimiter: v= " + JSON.stringify(v))
         let categories = [...new Set(v.reduce(reducer, []))]
         categories = categories.filter(word => word.length > 0);
 
-        console.log("delimiter: categories = " + JSON.stringify(categories))
         variable.additional_information.categories = JSON.parse(JSON.stringify(categories))
         this.saveUserInput(variable)
         this.categoryInput = ""
       }
     },
-    formCompleted() {
+    formCompleted(varList) {
       let completed = true
-      this.selected.forEach(row => {
+      varList.forEach(row => {
         if (!this.isValidRow(row)) {
           completed = false
         }
@@ -444,9 +449,15 @@ export default {
     },
     handleItemSelected(event) {
       this.variables[event.item.sortOrder].selected = event.value
+      this.items = this.getItems()
       this.saveUserInput(this.variables[event.item.sortOrder])
     },
-
+    handleSelectAll(event) {
+      const selectAllValue = event.value
+      this.variables.forEach(obj => obj.selected = selectAllValue)
+      this.items = this.getItems()
+      this.saveAllVariables(selectAllValue)
+    },
     checkMin(value) {
       if (isNaN(value)) {
         return false
@@ -492,7 +503,6 @@ export default {
       let selectable = true
       if (this.analysisPlan && this.analysisPlan.dpStatistics) {
         this.analysisPlan.dpStatistics.forEach(statistic => {
-          // console.log( statistic.variable + '===' + variable.name + '?')
           if (statistic.variable === variable.key) {
             selectable = false
           }
@@ -531,7 +541,6 @@ export default {
       }
     },
     removeCategoryFromVariable(category, variable) {
-      //   console.log('removing category '+ category+','+ JSON.stringify(variable))
       variable.additional_information["categories"].splice(
           variable.additional_information["categories"].indexOf(category),
           1
@@ -540,9 +549,7 @@ export default {
     },
     // This is run so that as statistics are added, variables are set to unselectable
     updateSelectable() {
-      //  console.log('update selectable')
       this.variables.forEach(variable => {
-        //      console.log('updateSelectable + '+ variable.name)
         variable.isSelectable = this.isSelectable(variable)
       })
     },
@@ -592,8 +599,11 @@ export default {
       for (let i = 0; i < this.variables.length; i++) {
         this.variables[i].index = i
       }
+      this.items = this.getItems()
       this.loadingVariables = false
+      this.updateStepCompleted(this.variables, this.selected.length > 0)
     },
+
     changeVariableType(elem) {
       elem.additional_information.categories = []
       elem.additional_information.max = null
@@ -604,14 +614,26 @@ export default {
       // make a deep copy so that the form doesn't share object references with the Vuex data
       const elemCopy = JSON.parse(JSON.stringify(elem))
       this.$store.dispatch('dataset/updateVariableInfo', elemCopy)
-      if (this.formCompleted() && this.isValidRow(elem) && this.atLeastOneSelected(elem)) {
+      if (this.formCompleted(this.variables) && this.isValidRow(elem) && this.atLeastOneSelected(elem)) {
         this.$emit("stepCompleted", 1, true);
       } else {
         this.$emit("stepCompleted", 1, false);
       }
     },
+    updateStepCompleted(varList, anySelected) {
+      if (this.formCompleted(varList) && anySelected) {
+        this.$emit("stepCompleted", 1, true);
+      } else {
+        this.$emit("stepCompleted", 1, false);
+      }
+    },
+    saveAllVariables(selectAllValue) {
+      const varsCopy = JSON.parse(JSON.stringify(this.variables))
+      this.$store.dispatch('dataset/updateAllVariables', varsCopy)
+      this.updateStepCompleted(this.variables, selectAllValue)
+    },
     atLeastOneSelected(elem) {
-       let othersSelected = false
+      let othersSelected = false
       this.selected.forEach(row => {
         if (row.index !== elem.index) {
           othersSelected = true
@@ -625,6 +647,10 @@ export default {
    * When it is populated, create a local variableList for the data table
    */
   watch: {
+    filterSelected: function (newFilterValue) {
+      this.items = this.getItems()
+      this.filterSelected = newFilterValue
+    },
     '$store.state.dataset.datasetInfo.depositorSetupInfo.variableInfo': function () {
       if (this.datasetInfo.depositorSetupInfo.variableInfo !== null) {
         // the watch will be triggered multiple times,
@@ -637,9 +663,7 @@ export default {
       }
     },
     '$store.state.dataset.analysisPlan': function () {
-      console.log('updateSelectable watch triggered')
       if (this.datasetInfo.depositorSetupInfo.variableInfo !== null) {
-        console.log('calling updateSelectable')
         this.updateSelectable()
 
       }
