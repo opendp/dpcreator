@@ -127,4 +127,6 @@ class TestDataverseHandoffView(TestCase):
         # Ensure redirect
         self.assertEqual(response.status_code, 302)
         # Other params are present and valid, so we should just see dv_installation here
-        self.assertEqual(response.url, '/?error_code=site_url')
+
+        expected_url = '/?error_code=site_url&unreg_dv_url=https://invalidsite.com'
+        self.assertEqual(response.url, expected_url) #'/?error_code=site_url')

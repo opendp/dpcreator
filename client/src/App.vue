@@ -2,7 +2,7 @@
   <v-app id="app" :style="generalCss">
     <link rel="preconnect" href="https://fonts.gstatic.com"/>
     <link :href="fontUrl" rel="stylesheet"/>
-    <Header/>
+   <Header v-on:logoClicked="clearError"/>
     <v-main class="">
       <template v-if="error || errorObject">
         <v-container>
@@ -87,9 +87,9 @@ import settings from "./settings";
 import Footer from "./components/Structure/Footer.vue";
 import Header from "./components/Structure/Header.vue";
 import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
-import {mapState, mapActions} from "vuex";
-import NETWORK_CONSTANTS from "@/router/NETWORK_CONSTANTS";
+import {mapState} from "vuex";
 import Button from "@/components/DesignSystem/Button";
+
 export default {
   title: 'DP Creator',
   components: {Footer, Header, ColoredBorderAlert, Button},
@@ -148,6 +148,9 @@ export default {
   methods: {
     continueAction() {
       window.location.replace('/')
+      this.clearError()
+    },
+    clearError() {
       this.error = false
       this.errorObject = null
       this.errMsg = null
