@@ -4,7 +4,7 @@ Utility script for clearing data from a Demo Dataverse
 To use this script:
 (1) Set an environment variable with an API key from a Dataverse administrator
     export DV_API_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-(2) to do: add list of datset exceptions
+(2) (Optional) Edit "datasets_to_keep.py" and add datasets to NOT delete
 (3) Run "python delete_datasets.py"
     Note: this starts from the "root" dataverse and continues on down
 
@@ -207,10 +207,5 @@ class DataverseDeleteUtil:
             print('Error encountered!')
             print(delete_util.err_msg)
 
-
-
-
 if __name__ == '__main__':
     DataverseDeleteUtil.run_delete_util(sys.argv)
-
-
