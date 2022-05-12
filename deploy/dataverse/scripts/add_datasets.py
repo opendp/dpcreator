@@ -164,14 +164,16 @@ class DataverseAddDataset:
     @staticmethod
     def show_instructions():
         """Print show start instructions"""
-        instructions = ('Create a dataset with a file, and publish it'
+        instructions = ('\nCreate a dataset with a file, and publish it'
                         '\nDefault values: '
                         '\n  - server_url: https://demo-dataverse.dpcreator.org'
                         '\n  - dataverse_id: root'
-                        '\n\n(1) >> python delete_datasets.py [server_url] [dataverse_id]'
-                        ' [dataset_spec_file_path] [dataset_file_file_path]'
-                        '\n\n(2) >> python delete_datasets.py [dataset_spec_file_path] [dataset_file_file_path]'
-                        '\n\n(3) >> python delete_datasets.py'
+                        '\n  - dataset_spec_file_path: dataset_specs/pums_fulton.json'
+                        '\n  - dataset_file_path: dataset_specs/pums_1000.csv'
+                        '\n\n(1) >> python delete_datasets.py'
+                        '\n\n(2) >> python delete_datasets.py [dataset_spec_file_path] [dataset_file_path]'
+                        '\n\n(3) >> python delete_datasets.py [server_url] [dataverse_id]'
+                        ' [dataset_spec_file_path] [dataset_file_path]'
                         '\n')
 
         print(instructions)
@@ -180,7 +182,6 @@ class DataverseAddDataset:
     def run_add_util(cmdline_args):
         """Run the delete process"""
         num_args = len(cmdline_args)
-        print('cmdline_args', cmdline_args)
         if num_args == 1:
             server_url = 'https://demo-dataverse.dpcreator.org'
             dataverse_id = 'root'
