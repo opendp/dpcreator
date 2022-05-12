@@ -32,6 +32,7 @@
     <v-data-table
         :headers="headers"
         :search="search"
+        data-test="variableTable"
         v-model="selected"
         :items="items"
         class="my-10"
@@ -64,7 +65,7 @@
         <v-simple-checkbox color="green" v-bind="props" v-on="on"></v-simple-checkbox>
       </template>-->
       <template v-slot:[`item.index`]="{ index }">
-        <span class="index-td grey--text">{{ index + 1 }}</span>
+        <span data-test="variableRow" class="index-td grey--text">{{ index + 1 }}</span>
       </template>
 
       <template v-slot:[`item.label`]="{ item }">
