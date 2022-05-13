@@ -137,8 +137,8 @@ class DataverseAddDataset:
 
         print('File added!')
 
-        # Attempt to publish the dataset 3x
-        for x in range(1, 4):
+        # Attempt to publish the dataset 5x
+        for x in range(1, 6):
             print(f'Publish dataset, attempt #{x}')
             is_published = self.publish_dataset()
             if is_published:
