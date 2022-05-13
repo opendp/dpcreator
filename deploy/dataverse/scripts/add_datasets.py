@@ -14,6 +14,7 @@ from http import HTTPStatus
 import os
 import requests
 import sys
+import time
 from typing import Union
 
 _DV_API_KEY = os.environ.get('DV_API_KEY', 'DV_API_KEY not set.')
@@ -113,7 +114,7 @@ class DataverseAddDataset:
 
         return True
 
-    def add_file_and_publish(self):
+    def add_file_and_publish(self) -> bool:
         """Add a file to the dataset"""
         if self.has_err():
             return False
@@ -136,7 +137,21 @@ class DataverseAddDataset:
 
         print('File added!')
 
+        # Attempt to publish the dataset 3x
+        for x in range(1, 4):
+            print(f'Publish dataset, attempt #{x}')
+            is_published = self.publish_dataset()
+            if is_published:
+                return is_published
+
+        return False
+
+    def publish_dataset(self, secs_pause: int=2) -> bool:
+        """Publish the dataset. Try 3 times with pauses"""
         self.msg_title('Publish Dataset')
+
+        print(f'Pausing for {secs_pause} second(s)...')
+        time.sleep(secs_pause)
 
         publish_url = (f'{self.server_url}/api/datasets/:persistentId/actions/:publish?'
                        f'persistentId={self.new_persistent_id}&type=major')
@@ -153,6 +168,7 @@ class DataverseAddDataset:
             return False
 
         print('Dataset published!')
+        return True
 
     @staticmethod
     def get_dataverse_headers():
