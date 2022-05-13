@@ -17,4 +17,5 @@ Note: It doesn't matter if the url resolves. For example, this is an example JSO
 """
 
 # Add "persistentUrl" objects to NOT delete
-DATASETS_TO_KEEP = ['https://doi.org/10.5072/FK2/FAKE',]
+DATASETS_TO_KEEP = ['https://doi.org/10.5072/FK2/FAKE',
+                    'https://doi:10.5072/FK2/J9BZ8P']

@@ -15,6 +15,7 @@ from http import HTTPStatus
 import json
 import os
 import requests
+import simplejson
 import sys
 from typing import Union
 
@@ -87,7 +88,8 @@ class DataverseDeleteUtil:
         self.err_found = True
         self.err_msg = m
 
-    def msg_title(self, m):
+    @staticmethod
+    def msg_title(m):
         print('-' * 40)
         print(m)
         print('-' * 40)
@@ -108,7 +110,7 @@ class DataverseDeleteUtil:
 
         if not r.status_code == HTTPStatus.OK:
             print(json.dumps(jresp, indent=4))
-            self.add_err_msg('Failed to list datasets. status_code: {r.status_code}')
+            self.add_err_msg(f'Failed to list datasets. status_code: {r.status_code}')
             return
 
         for item in jresp['data']:
@@ -150,10 +152,10 @@ class DataverseDeleteUtil:
 
             # Published dataset, use the "destroy" API and persistentId
             #
-            persistent_id = (f"{ds_info['protocol']}:{ds_info['authority']}"
+            dataset_id = (f"{ds_info['protocol']}:{ds_info['authority']}"
                              f"/{ds_info['identifier']}")
             delete_url = (f'{self.server_url}/api/datasets/:persistentId/destroy/'
-                          f'?persistentId={persistent_id}')
+                          f'?persistentId={dataset_id}')
         else:
             # Unpublished dataset, use the id
             #
@@ -163,11 +165,23 @@ class DataverseDeleteUtil:
         r = requests.delete(delete_url,
                             headers=self.get_dataverse_headers())
 
-        print('delete result', r.text)
+        # print('delete result', r.text)
         print('status code', r.status_code)
 
         if r.status_code == 200:
-            self.datasets_deleted.append(ds_info)
+            try:
+                # To account for a DV error where status code was 200
+                # but was returning an HTML page instead of JSON
+                r.json()
+                self.datasets_deleted.append(ds_info)
+                print(f'dataset deleted: {dataset_id}')
+            except simplejson.errors.JSONDecodeError as err_obj:
+                self.failed_deletes.append(ds_info)
+                print(f'\n({len(self.failed_deletes)}) Delete failure w/ HTTP 200: ')
+                print('delete_url', delete_url)
+                print(('Failed to convert response to JSON. Does your API'
+                       ' token have administrative privileges to delete a dataset?'))
+
         else:
             self.failed_deletes.append(ds_info)
             print(f'\n({len(self.failed_deletes)}) Delete failure: ')
@@ -192,7 +206,7 @@ class DataverseDeleteUtil:
     def run_delete_util(cmdline_args):
         """Run the delete process"""
         num_args = len(cmdline_args)
-        print('cmdline_args', cmdline_args)
+        # print('cmdline_args', cmdline_args)
         if num_args == 1:
             server_url = 'https://demo-dataverse.dpcreator.org'
             dataverse_id = 'root'
@@ -209,6 +223,7 @@ class DataverseDeleteUtil:
         if delete_util.has_err():
             print('Error encountered!')
             print(delete_util.err_msg)
+
 
 if __name__ == '__main__':
     DataverseDeleteUtil.run_delete_util(sys.argv)
