@@ -163,6 +163,9 @@ class DataverseDeleteUtil:
         r = requests.delete(delete_url,
                             headers=self.get_dataverse_headers())
 
+        print('delete result', r.text)
+        print('status code', r.status_code)
+
         if r.status_code == 200:
             self.datasets_deleted.append(ds_info)
         else:
