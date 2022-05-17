@@ -15,7 +15,6 @@ from http import HTTPStatus
 import json
 import os
 import requests
-import simplejson
 import sys
 from typing import Union
 
@@ -153,7 +152,7 @@ class DataverseDeleteUtil:
             # Published dataset, use the "destroy" API and persistentId
             #
             dataset_id = (f"{ds_info['protocol']}:{ds_info['authority']}"
-                             f"/{ds_info['identifier']}")
+                          f"/{ds_info['identifier']}")
             delete_url = (f'{self.server_url}/api/datasets/:persistentId/destroy/'
                           f'?persistentId={dataset_id}')
         else:
@@ -175,13 +174,13 @@ class DataverseDeleteUtil:
                 r.json()
                 self.datasets_deleted.append(ds_info)
                 print(f'dataset deleted: {dataset_id}')
-            except simplejson.errors.JSONDecodeError as err_obj:
+            except Exception as err_obj:  # simplejson.errors.JSONDecodeError as err_obj:
+                # print(type(err_obj).__name__)
                 self.failed_deletes.append(ds_info)
-                print(f'\n({len(self.failed_deletes)}) Delete failure w/ HTTP 200: ')
+                print(f'\n({len(self.failed_deletes)}) Delete failure w/ HTTP 200: {err_obj}')
                 print('delete_url', delete_url)
                 print(('Failed to convert response to JSON. Does your API'
                        ' token have administrative privileges to delete a dataset?'))
-
         else:
             self.failed_deletes.append(ds_info)
             print(f'\n({len(self.failed_deletes)}) Delete failure: ')
@@ -208,7 +207,8 @@ class DataverseDeleteUtil:
         num_args = len(cmdline_args)
         # print('cmdline_args', cmdline_args)
         if num_args == 1:
-            server_url = 'https://demo-dataverse.dpcreator.org'
+            # server_url = 'https://demo-dataverse.dpcreator.org'
+            server_url = 'http://dev-dataverse.dpcreator.org'
             dataverse_id = 'root'
         elif num_args == 3:
             server_url = sys.argv[1]
