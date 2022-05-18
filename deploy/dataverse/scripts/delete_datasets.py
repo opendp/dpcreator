@@ -25,6 +25,7 @@ _DV_API_KEY = os.environ.get('DV_API_KEY', 'DV_API_KEY not set.')
 
 class DataverseDeleteUtil:
     """Convenience class for deleting Datasets"""
+    _DV_LOCK_MESSAGE = 'Dataset cannot be edited due to dataset lock.'
 
     def __init__(self, dv_server_url, dataverse_id='root'):
 
@@ -116,6 +117,8 @@ class DataverseDeleteUtil:
             if item['type'] == 'dataset':
                 self.num_datasets_checked += 1
                 if self.is_dataset_to_keep(item):
+                    print((f'Keeping this dataset: {item["id"]}'
+                           f'/{item["persistentUrl"]}'))
                     self.num_datasets_kept += 1
                 else:
                     self.delete_dataset(item)
@@ -142,8 +145,41 @@ class DataverseDeleteUtil:
 
         return headers
 
-    def delete_dataset(self, ds_info):
+    def delete_dataset_lock(self, ds_info):
+        """
+        Delete dataset lock and then try to re-delete the dataset
+        reference: https://guides.dataverse.org/en/5.2/api/native-api.html#id69
+        curl -H "X-Dataverse-key: $API_TOKEN" -X DELETE $SERVER_URL/api/datasets/$ID/locks
+        """
+        print('Attempt to remove lock')
+        dataset_id = ds_info.get('id')
+        if not dataset_id:
+            self.add_err_msg(f'Dataset "id" not found in: {ds_info}')
+            return
+
+        delete_url = f'{self.server_url}/api/datasets/{dataset_id}/locks/'
+
+        r = requests.delete(delete_url,
+                            headers=self.get_dataverse_headers())
+
+        if r.status_code == HTTPStatus.OK:
+            print('Lock removed.')
+            # Try to delete again!
+            self.delete_dataset(ds_info, skip_lock_check=True)
+        else:
+            print('Failed to remove lock')
+            self.failed_deletes.append(ds_info)
+            print((f'\n({len(self.failed_deletes)}) Delete failure'
+                   ' (couldn\'t delete lock): '))
+            print('delete_url', delete_url)
+            print(r.text)
+            print(f'status_code: {r.status_code}')
+            return
+
+    def delete_dataset(self, ds_info, skip_lock_check=False):
         """List and delete the DV datasets"""
+        if self.has_err():
+            return
 
         # Determine whether this is a published or unpublished dataset
         #
@@ -167,7 +203,7 @@ class DataverseDeleteUtil:
         # print('delete result', r.text)
         print('status code', r.status_code)
 
-        if r.status_code == 200:
+        if r.status_code == HTTPStatus.OK:
             try:
                 # To account for a DV error where status code was 200
                 # but was returning an HTML page instead of JSON
@@ -181,6 +217,17 @@ class DataverseDeleteUtil:
                 print('delete_url', delete_url)
                 print(('Failed to convert response to JSON. Does your API'
                        ' token have administrative privileges to delete a dataset?'))
+        elif r.status_code == HTTPStatus.FORBIDDEN:
+            if (skip_lock_check is False) and \
+              r.text.find(self._DV_LOCK_MESSAGE) > -1:
+                self.delete_dataset_lock(ds_info)
+            else:
+                self.failed_deletes.append(ds_info)
+                print(f'\n({len(self.failed_deletes)}) Delete failure: ')
+                print('delete_url', delete_url)
+                print(r.text)
+                print(f'status_code: {r.status_code}')
+
         else:
             self.failed_deletes.append(ds_info)
             print(f'\n({len(self.failed_deletes)}) Delete failure: ')
@@ -207,8 +254,8 @@ class DataverseDeleteUtil:
         num_args = len(cmdline_args)
         # print('cmdline_args', cmdline_args)
         if num_args == 1:
-            # server_url = 'https://demo-dataverse.dpcreator.org'
-            server_url = 'http://dev-dataverse.dpcreator.org'
+            server_url = 'https://demo-dataverse.dpcreator.org'
+            # server_url = 'http://dev-dataverse.dpcreator.org'
             dataverse_id = 'root'
         elif num_args == 3:
             server_url = sys.argv[1]
