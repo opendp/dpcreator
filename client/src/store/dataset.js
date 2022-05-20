@@ -8,7 +8,8 @@ import {
     SET_PROFILER_MSG,
     SET_PROFILER_STATUS,
     SET_ANALYSIS_PLAN,
-    SET_MYDATA_LIST
+    SET_MYDATA_LIST,
+    PATCH_DEPOSITOR_INFO
 } from './types';
 import dataverse from "@/api/dataverse";
 import stepInformation, {
@@ -150,27 +151,19 @@ const actions = {
             })
     },
     updateDepositorSetupInfo({commit, state}, {objectId, props}) {
-        //  console.log("props: " + JSON.stringify(props))
         if (props.hasOwnProperty('userStep')) {
             console.log('new step: ' + props.userStep)
         }
         analysis.patchDepositorSetup(objectId, props)
             .then((resp) => {
-                dataset.getDatasetInfo(state.datasetInfo.objectId)
-                    .then((resp) => {
-                        commit(SET_DATASET_INFO, resp.data)
-                    }).then(() => {
-
-                    if (props.hasOwnProperty('userStep')
-                        && props.userStep === STEP_0600_EPSILON_SET) {
-                        this.dispatch('dataset/createAnalysisPlan', state.datasetInfo.objectId)
-                    }
-
-                })
-
+                var patched = {}
+                commit(PATCH_DEPOSITOR_INFO, props)
+                if (props.hasOwnProperty('userStep')
+                    && props.userStep === STEP_0600_EPSILON_SET) {
+                    this.dispatch('dataset/createAnalysisPlan', state.datasetInfo.objectId)
+                }
             })
             .catch((data) => {
-                commit(REMOVE_UPDATING, objectId)
                 return Promise.reject(data)
             })
 
@@ -183,7 +176,6 @@ const actions = {
      */
     updateVariableInfo({commit, state}, variableInput) {
         //  Get a local copy of variableInfo, for editing
-        console.log('variableInput: ' + JSON.stringify(variableInput))
         let variableInfo = JSON.parse(JSON.stringify(state.datasetInfo.depositorSetupInfo.variableInfo))
         let targetVar = variableInfo[variableInput.key]
         targetVar.name = variableInput.name
@@ -292,12 +284,11 @@ const actions = {
                     const profileData = JSON.parse(wsMsg.data.profileStr)
                     const profileStr = JSON.stringify(profileData.variables, null, 2);
                     console.log(typeof wsMsg.data);
-
-                    // update depositorSetupInfo with variableInfo contained in the message
-                    const props = {
-                        variableInfo: profileData.variables,
-                        userStep: STEP_0400_PROFILING_COMPLETE
-                    }
+                      var props = {
+                          variableInfo: profileData.variables,
+                          userStep: STEP_0400_PROFILING_COMPLETE
+                      }
+                    props = camelcaseKeys(props, {deep: true})
                     const payload = {objectId: state.datasetInfo.depositorSetupInfo.objectId, props: props}
                     this.dispatch('dataset/updateDepositorSetupInfo', payload)
                     return (wsMsg.userMessage)
@@ -384,6 +375,12 @@ const mutations = {
     },
     [SET_DATASET_INFO](state, datasetInfo) {
         state.datasetInfo = datasetInfo
+    },
+    [PATCH_DEPOSITOR_INFO](state, props) {
+        Object.keys(props).forEach((key) => {
+            state.datasetInfo.depositorSetupInfo[key] = props[key]
+        })
+
     },
 };
 // Functions that are used for Vuex state and also

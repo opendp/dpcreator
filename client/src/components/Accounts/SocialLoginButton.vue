@@ -70,7 +70,7 @@ export default {
     ...mapState('settings', ['vueSettings']),
     googleParams() {
       const googleParams = {
-        client_id: this.vueSettings['VUE_APP_GOOGLE_CLIENT_ID'],
+        client_id: this.vueSettings ? this.vueSettings['VUE_APP_GOOGLE_CLIENT_ID'] : 'vueSettings not initialized',
       }
       return googleParams
     }

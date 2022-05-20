@@ -9,14 +9,13 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
-import json
 import os
+import sys
 
 from distutils.util import strtobool
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -27,14 +26,13 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'SECRET_KEY!-ADD-REAL-KEY-HERE!--ADD-REAL-K
 # For field level encryption: https://django-cryptography.readthedocs.io/en/latest/settings.html
 CRYPTOGRAPHY_KEY = os.getenv('CRYPTOGRAPHY_KEY', 'CRYPTOGRAPHY_KEY!-ADD-REAL-KEY!1234!')
 
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 # Application definition
 
 INSTALLED_APPS = [
-    'channels', # Django channels..
+    'channels',  # Django channels..
     'opendp_apps.async_messages',
     #
     'django.contrib.admin',
@@ -98,7 +96,6 @@ TEMPLATES = [
     },
 ]
 
-
 # -----------------------------------------------
 # REDIS settings
 # -----------------------------------------------
@@ -112,11 +109,10 @@ if REDIS_PASSWORD:
 else:
     REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}'
 
-
 # -----------------------------------------------
 # ASGI, Channels settings
 # -----------------------------------------------
-#WSGI_APPLICATION = 'opendp_project.wsgi.application'
+# WSGI_APPLICATION = 'opendp_project.wsgi.application'
 
 ASGI_APPLICATION = "opendp_project.asgi.application"
 CHANNEL_LAYERS = {
@@ -142,7 +138,6 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -161,7 +156,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -174,7 +168,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
@@ -197,7 +190,6 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination', 'PAGE_SIZE': 10
 }
-
 
 # -----------------------------------
 # Handling uploaded files
@@ -231,9 +223,9 @@ if not os.path.isdir(RELEASE_FILE_STORAGE_ROOT):
 
 # -------------------------------------
 AUTHENTICATION_BACKENDS = (
- 'django.contrib.auth.backends.ModelBackend',
- 'allauth.account.auth_backends.AuthenticationBackend',
- )
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
 
 SITE_ID = 3
 
@@ -269,11 +261,10 @@ CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOWED_ORIGINS = (
     # 'http://localhost:8000',
     # 'http://127.0.0.1:8000',
-    #'http://0.0.0.0:8000',
+    # 'http://0.0.0.0:8000',
     # 8080
     'http://127.0.0.1:8080',
 )
-
 
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.sendgrid.net')
@@ -317,14 +308,13 @@ assert TOTAL_EPSILON_MIN > 0, \
 assert TOTAL_EPSILON_MAX > 0, \
     f"The TOTAL_EPSILON_MAX must be greater than 0.0. Found: {TOTAL_EPSILON_MAX}"
 assert TOTAL_EPSILON_MAX > TOTAL_EPSILON_MIN, \
-    f"The TOTAL_EPSILON_MAX must be greater than the TOTAL_EPSILON_MIN. Found min: {TOTAL_EPSILON_MIN} / max: {TOTAL_EPSILON_MAX}"
-
-
+    (f"The TOTAL_EPSILON_MAX must be greater than the TOTAL_EPSILON_MIN. " 
+     f" Found min: {TOTAL_EPSILON_MIN} / max: {TOTAL_EPSILON_MAX}")
 
 # ---------------------------
 # Celery Configuration Options
 # ---------------------------
-#CELERY_TIMEZONE = os.environ.get('America/New_York', 'CELERY_TIMEZONE')
+# CELERY_TIMEZONE = os.environ.get('America/New_York', 'CELERY_TIMEZONE')
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
 
@@ -368,30 +358,65 @@ SESSION_COOKIE_AGE = int(os.getenv('SESSION_COOKIE_AGE', SESSION_DEFAULT_COOKIE_
 SKIP_PDF_CREATION_FOR_TESTS = bool(strtobool(os.environ.get('SKIP_PDF_CREATION_FOR_TESTS', 'False')))
 SKIP_EMAIL_RELEASE_FOR_TESTS = bool(strtobool(os.environ.get('SKIP_PDF_CREATION_FOR_TESTS', 'False')))
 
-# SESSION_COOKIE_NAME = os.environ.get('SESSION_COOKIE_NAME', 'dpcreator')
-# CSRF_COOKIE_NAME = os.environ.get('CSRF_COOKIE_NAME', 'dpcreator_csrf')
-# discard a process after executing task, because automl solvers are incredibly leaky
-# CELERY_WORKER_MAX_TASKS_PER_CHILD = 1
+# ---------------------------------------
+# Logging
+#  - default is to log to the console
+# ---------------------------------------
+LOGGING = {
+    "version": 1,
+    "formatters": {
+        "default": {
+            "format": "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "stream": sys.stdout,
+            "formatter": "default"
+        }
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO"
+        }
+    }
+}
 
-# Uncomment this out to see raw SQL in logs
-# LOGGING = {
-#     'version': 1,
-#     'filters': {
-#         'require_debug_true': {
-#             '()': 'django.utils.log.RequireDebugTrue',
-#         }
-#     },
-#     'handlers': {
-#         'console': {
-#             'level': 'DEBUG',
-#             'filters': ['require_debug_true'],
-#             'class': 'logging.StreamHandler',
-#         }
-#     },
-#     'loggers': {
-#         'django.db.backends': {
-#             'level': 'DEBUG',
-#             'handlers': ['console'],
-#         }
-#     }
-# }
+# ------------------------------------------------------------
+# Settings for Azure Logging. May be set via .env variables
+#
+#  - AZURE_LOGGING - True/False value. If "False", logging will be sent to the console
+#  - AZURE_INSTRUMENTATION_KEY - Taken from the Azure "Application Insights" service
+#    - reference: https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview
+#
+# -------------------------------------------------------
+AZURE_LOGGING = bool(strtobool(os.environ.get('AZURE_LOGGING', 'False')))
+AZURE_INSTRUMENTATION_KEY = os.environ.get('AZURE_INSTRUMENTATION_KEY', '')
+
+if AZURE_LOGGING is True:
+
+    LOGGING["handlers"]["azure_log"] = {
+        "class": "opencensus.ext.azure.log_exporter.AzureLogHandler",
+        "instrumentation_key": AZURE_INSTRUMENTATION_KEY,
+        "formatter": "default"
+    }
+
+    LOGGING["loggers"]["azure"] = {
+        "handlers": ["azure_log", "console"],
+        "level": "INFO"
+    }
+
+    OPENCENSUS = {
+        'TRACE': {
+            'SAMPLER': 'opencensus.trace.samplers.ProbabilitySampler(rate=1)',
+            'EXPORTER': f'''opencensus.ext.azure.trace_exporter.AzureExporter(
+            connection_string="InstrumentationKey={AZURE_INSTRUMENTATION_KEY}"
+        )''',
+        }
+    }
+    MIDDLEWARE.append('opencensus.ext.django.middleware.OpencensusMiddleware')
+    DEFAULT_LOGGER = 'azure'
+else:
+    DEFAULT_LOGGER = 'django'

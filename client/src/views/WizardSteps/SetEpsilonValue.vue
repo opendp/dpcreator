@@ -1,6 +1,6 @@
 <template>
   <div class="set-epsilon-page">
-    <h1 class="title-size-1">Set Accuracy Level</h1>
+    <h1 class="title-size-1">Sampling Frame</h1>
     <p>
       {{
         $t('set epsilon.epsilon intro')
@@ -62,6 +62,13 @@
 </template>
 
 <style lang="scss">
+// Remove up an down error from text field when type == number
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .info-banner {
   .v-banner__content {
     align-items: unset;

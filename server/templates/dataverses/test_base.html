@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Jekyll v4.1.1">
-    <title>Pricing example · Bootstrap</title>
+    <title>{% if page_title %}{{ page_title }}{% else %}DP Creator - Test Page{% endif %}</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/4.5/examples/pricing/">
 
@@ -51,8 +51,8 @@
 </div>
 
 <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-  <h1 class="display-5">{% if title %}{{ title }}{% else %}(title){% endif %}</h1>
-  <p class="lead">{% if subtitle %}{{ subtitle }}{% else %}(subtitle){% endif %}</p>
+  <h1 class="display-5">{% if title %}{{ title }}{% else %}{% endif %}</h1>
+  <p class="lead">{% if subtitle %}{{ subtitle }}{% else %}{% endif %}</p>
 </div>
 
 <div class="container">
@@ -61,14 +61,7 @@
     {% endblock %}
 
   <footer class="pt-4 my-md-5 pt-md-5 border-top">
-    <div class="row">
 
-      <div class="col-6 col-md">
-        <h5>Features</h5>
-        <ul class="list-unstyled text-small">
-          <li><a class="text-muted" href="#">Cool stuff</a></li>
-      </div>
-    </div>
   </footer>
 </div>
 </body>

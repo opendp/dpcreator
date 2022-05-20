@@ -28,6 +28,7 @@
         v-on:editDelta="editDelta"
         v-on:changeLockStatus="changeLockStatus"
         v-on:deleteStatistic="deleteItem"
+        v-on:stepCompleted="handleStepCompleted"
         class="mb-10"
     />
 
@@ -160,7 +161,6 @@ export default {
   }),
   methods: {
     initializeForm() {
-      console.log('begin initialize form')
       if (this.analysisPlan !== null && this.analysisPlan.dpStatistics !== null) {
         // make a deep copy of the Vuex state so it can be edited locally
         this.statistics = JSON.parse(JSON.stringify(this.analysisPlan.dpStatistics))
@@ -185,7 +185,6 @@ export default {
       } else {
         this.delta = this.getDepositorSetupInfo.delta
       }
-      console.log('end initialize form')
     },
 
     handleOpenEditNoiseParamsDialog() {
@@ -223,12 +222,11 @@ export default {
       this.$emit("addVariable")
     },
     save(editedItemFromDialog) {
-      this.editedItem = Object.assign({}, editedItemFromDialog);
+      this.editedItem = JSON.parse(JSON.stringify(editedItemFromDialog))
       if (this.isEditionMode) {
         Object.assign(this.statistics[this.editedIndex], this.editedItem);
       } else {
         const variable = this.editedItem.variable
-        console.log("saving cl: " + this.getDepositorSetupInfo.confidenceLevel)
         let cl = this.getDepositorSetupInfo.confidenceLevel
         if (!createStatsUtils.isDeltaStat(this.editedItem.statistic)) {
           this.editedItem.delta = ""
@@ -254,8 +252,6 @@ export default {
                 const accuracy = validateResults.data[i].accuracy
                 this.statistics[i].accuracy.value = Number(accuracy.value).toPrecision(3)
                 this.statistics[i].accuracy.message = accuracy.message
-                // this assigment below didn't work!  Can't change the object reference, need to change the values
-                //  this.statistics[i] = Object.assign({}, this.statistics[i], { accuracy })
               }
               this.saveUserInput()
             })
@@ -281,14 +277,20 @@ export default {
       this.$store.dispatch('dataset/updateDPStatistics', this.statistics)
 
     },
-
+    handleStepCompleted: function (stepNumber, completedStatus) {
+      this.$emit("stepCompleted", stepNumber, completedStatus)
+    },
     editEpsilon(item) {
-      createStatsUtils.redistributeValue(this.epsilon, 'epsilon', this.statistics)
-      this.setAccuracyAndSaveUserInput()
+      if (item.valid) {
+        createStatsUtils.redistributeValue(this.epsilon, 'epsilon', this.statistics)
+        this.setAccuracyAndSaveUserInput()
+      }
     },
     editDelta(item) {
-      createStatsUtils.redistributeValue(this.delta, 'delta', this.statistics)
-      this.setAccuracyAndSaveUserInput()
+      if (item.valid) {
+        createStatsUtils.redistributeValue(this.delta, 'delta', this.statistics)
+        this.setAccuracyAndSaveUserInput()
+      }
     },
     editItem(item) {
 

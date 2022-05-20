@@ -19,6 +19,7 @@
                 :src="require('../../assets/DPCreator_from_OpenDP.svg')"
                 data-test="homeLogo"
                 contain
+                v-on:click="$emit('logoClicked')"
                 aspect-ratio="4"
             ></v-img>
           </router-link
@@ -114,7 +115,7 @@
           <v-list-item-content>
             <v-list-item-title
                 :data-test="item.title"
-                @click="$router.push(item.link)"
+                @click="itemClickHandler(item.link)"
                 class="grey--text"
             >{{ item.title }}
             </v-list-item-title
@@ -236,9 +237,17 @@ export default {
     NETWORK_CONSTANTS
   }),
   methods: {
+    itemClickHandler(link) {
+      // if current location is not item link, navigate to item link
+      // (needed to avoid Navigation Duplication Error)
+      if (this.$router.currentRoute.path != link) {
+        this.$router.push(link)
+      } else {
+        this.isDrawerActive = false
+      }
+    },
     logoutHandler() {
       this.$store.dispatch('auth/logout')
-      this.$store.dispatch('dataset/clearDatasetStorage')
       if (this.$router.currentRoute.path != NETWORK_CONSTANTS.HOME.PATH) {
         this.$router.push(NETWORK_CONSTANTS.HOME.PATH);
       }

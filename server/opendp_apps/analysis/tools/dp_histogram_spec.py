@@ -1,3 +1,7 @@
+import logging
+
+from django.conf import settings
+
 from opendp.accuracy import laplacian_scale_to_accuracy
 from opendp.trans import *
 from opendp.meas import *
@@ -9,6 +13,9 @@ from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.profiler.static_vals import VAR_TYPE_INTEGER, VAR_TYPE_CATEGORICAL
 
 enable_features("floating-point", "contrib")
+
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class DPHistogramSpec(StatSpec):
@@ -38,7 +45,6 @@ class DPHistogramSpec(StatSpec):
         if self.var_type == VAR_TYPE_INTEGER:
             self.categories = [int(i) for i in range(self.min, self.max)]
             self.fixed_value = int(self.fixed_value)
-            # print(self.categories, self.fixed_value)
 
         # Using integers
         #
@@ -184,7 +190,7 @@ class DPHistogramSpec(StatSpec):
             self.value = computation_chain(file_obj.read())
 
         except OpenDPException as ex_obj:
-            print(ex_obj)
+            logger.exception(ex_obj)
             self.add_err_msg(f'{ex_obj.message} (OpenDPException)')
             return False
         except Exception as ex_obj:
@@ -194,18 +200,17 @@ class DPHistogramSpec(StatSpec):
                 self.add_err_msg(f'{ex_obj} (Exception)')
             return False
 
-        print((f"Epsilon: {self.epsilon}"
-               f"\nColumn name: {self.variable}"
-               f"\nColumn index: {self.col_index}"
-               f"\nAccuracy value: {self.accuracy_val}"
-               f"\nAccuracy message: {self.accuracy_msg}"
-               f"\n\nDP Histogram (n={len(self.value)}): {self.value}" ))
+        logger.info((f"Epsilon: {self.epsilon}"
+                     f"\nColumn name: {self.variable}"
+                     f"\nColumn index: {self.col_index}"
+                     f"\nAccuracy value: {self.accuracy_val}"
+                     f"\nAccuracy message: {self.accuracy_msg}"
+                     f"\n\nDP Histogram (n={len(self.value)}): {self.value}" ))
 
         if self.var_type == VAR_TYPE_CATEGORICAL:
-            print(f"Categories (n={len(self.categories)}): {self.categories}")
+            logger.info(f"Categories (n={len(self.categories)}): {self.categories}")
         elif self.var_type == VAR_TYPE_INTEGER:
             int_cats = [x for x in range(self.min, self.max)] + [self.max]
-            print(f"Categories (integers) (n={len(int_cats)}): {int_cats}")
-
+            logger.info(f"Categories (integers) (n={len(int_cats)}): {int_cats}")
 
         return True

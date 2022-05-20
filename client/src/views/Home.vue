@@ -36,17 +36,25 @@ export default {
   created() {
 
     const handoffId = this.$route.query.id
-
+    const error = this.$route.query.error_code
+    const unregistered_dv_url = this.$route.query.unreg_dv_url
     if (handoffId) {
       this.$store.dispatch('dataverse/setHandoffId', handoffId)
-    } else {
-      console.log('no handoffId')
+    } else if (error) {
+      this.showAlert = true
+      if (unregistered_dv_url) {
+        this.alertText = "Sorry! This Dataverse was not recognized: <br /><br /><b>" + unregistered_dv_url + "</b>"
+         + "<br /><br />Please contact the <a href='mailto:info@opendp.org?subject=Unregistered Dataverse: " + unregistered_dv_url + "'>administrator</a>."
+      }else{
+        this.alertText = "Sorry! There was a problem with the Dataverse information."
+        + "<br /><br />Please contact the <a href='mailto:info@opendp.org?subject=Dataverse handoff error: " + error + "'>administrator</a>.  (error code: " + error + "). "
+      }
     }
   },
 
   data: () => ({
     showAlert: false,
-    alertText: 'here is some text',
+    alertText: '',
   })
 };
 

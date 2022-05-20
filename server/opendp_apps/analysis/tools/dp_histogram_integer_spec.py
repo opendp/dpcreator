@@ -1,3 +1,7 @@
+import logging
+
+from django.conf import settings
+
 from opendp.accuracy import laplacian_scale_to_accuracy
 from opendp.trans import *
 from opendp.meas import *
@@ -9,6 +13,9 @@ from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.profiler.static_vals import VAR_TYPE_INTEGER, VAR_TYPE_CATEGORICAL
 
 enable_features("floating-point", "contrib")
+
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class DPHistogramIntegerSpec(StatSpec):
@@ -134,7 +141,7 @@ class DPHistogramIntegerSpec(StatSpec):
         self.accuracy_val = laplacian_scale_to_accuracy(self.scale, cl_alpha)
 
         # Note `self.accuracy_val` must bet set before using `self.get_accuracy_text()
-        self.accuracy_msg = self.get_accuracy_text(template_name='analysis/dp_histogram_accuracy_default.html')
+        self.accuracy_msg = self.get_accuracy_text(template_name='analysis/dp_histogram_accuracy_default.txt')
 
         return True
 
@@ -177,7 +184,7 @@ class DPHistogramIntegerSpec(StatSpec):
             self.value = computation_chain(file_obj.read())
 
         except OpenDPException as ex_obj:
-            print(ex_obj)
+            logger.exception(ex_obj)
             self.add_err_msg(f'{ex_obj.message} (OpenDPException)')
             return False
         except Exception as ex_obj:
@@ -196,9 +203,9 @@ class DPHistogramIntegerSpec(StatSpec):
                         f' than values (n={len(self.value)})')
             self.add_err_msg(user_msg)
 
-            print(user_msg)
-            print(f'Categories (n={len(self.categories)}): {self.categories}')
-            print(f'Values (n={len(self.value)}): {self.value}')
+            logger.warning(user_msg)
+            logger.warning(f'Categories (n={len(self.categories)}): {self.categories}')
+            logger.warning(f'Values (n={len(self.value)}): {self.value}')
             return
 
 
@@ -207,11 +214,11 @@ class DPHistogramIntegerSpec(StatSpec):
                           category_value_pairs=list(zip(fmt_categories, self.value)))
 
 
-        print((f"Epsilon: {self.epsilon}"
-               f"\nColumn name: {self.variable}"
-               f"\nColumn index: {self.col_index}"
-               f"\nAccuracy value: {self.accuracy_val}"
-               f"\nAccuracy message: {self.accuracy_msg}"
-               f"\n\nDP Histogram: {self.value}" ))
+        logger.info((f"Epsilon: {self.epsilon}"
+                     f"\nColumn name: {self.variable}"
+                     f"\nColumn index: {self.col_index}"
+                     f"\nAccuracy value: {self.accuracy_val}"
+                     f"\nAccuracy message: {self.accuracy_msg}"
+                     f"\n\nDP Histogram: {self.value}" ))
 
         return True

@@ -1,7 +1,7 @@
 <template>
   <div class="confirmVariablesPage">
     <h1 class="title-size-1">Confirm Variables</h1>
-    <p v-html="$t('confirm variables.confirm variables intro')"></p>
+    <!--p v-html="$t('confirm variables.confirm variables intro')"></p-->
     <ColoredBorderAlert type="warning">
       <template v-slot:content>
         Currently, the DP Creator takes the first 20 variables of the data file.
@@ -76,7 +76,6 @@
                 :data-test="item.label+':selectToolTip'"
                 standard
                 v-tooltip="'Changing type will clear additional info.'"
-                hide-selected
                 class="d-inline-block select"
                 v-on:click="currentRow=item.index"
                 v-on:hover="currentRow=item.index"
@@ -89,7 +88,6 @@
             :items="['Float', 'Integer', 'Categorical', 'Boolean']"
             :data-test="item.label+':select'"
             standard
-            hide-selected
             class="d-inline-block select"
             v-on:click="currentRow=item.index"
             v-on:hover="currentRow=item.index"
@@ -107,24 +105,34 @@
               multiple
               class="my-0 py-0"
               background-color="soft_primary my-0"
+              :data-test="variable.label+':categories'"
               v-on:click="currentRow=variable.index"
-              v-on:change="saveUserInput(variable)"
+              :search-input.sync="categoryInput"
+              @update:search-input="delimitInput(variable)"
+              :delimiters="[',']"
           >
             <template v-slot:selection="{ attrs, item, select, selected }">
-              <ChipSelectItem
-                  :v_bind="attrs"
-                  :input_value="selected"
+              <v-chip
+                  :v-bind="attrs"
+                  :input-value="selected"
+                  close
+                  color="blue darken-2"
+                  text-color="white"
                   :click="select"
-                  :click_close="() => removeCategoryFromVariable(item, variable)"
                   :item="item"
-              />
+
+                  @click:close="removeCategoryFromVariable(item, variable)"
+              >
+                <div data-test="categoryChip"><strong>{{ item }}
+                  <!--{{ 'attrs:'+ JSON.stringify(attrs) }}{{ 'select:' +select }}{{ 'selected'+selected }}-->
+                </strong></div>
+              </v-chip>
             </template>
           </v-combobox>
         </div>
         <div v-if="isNumerical(variable.type)" class="range-input-wrapper">
           <v-text-field
               background-color="soft_primary mb-0"
-              type="number"
               label="Add min"
               v-model="variable.additional_information['min']"
               class="text-center py-0"
@@ -132,22 +140,35 @@
               :data-test="variable.label+':min'"
 
               v-on:click="currentRow=variable.index"
-              v-on:change="saveUserInput(variable)"
+              v-on:keyup="saveUserInput(variable)"
           ></v-text-field>
           <v-text-field
               background-color="soft_primary mb-0"
-              type="number"
               label="Add max"
               :rules="[checkMax]"
               :data-test="variable.label+':max'"
               v-model="variable.additional_information['max']"
               class="text-center py-0"
               v-on:click="currentRow=variable.index"
-              v-on:change="saveUserInput(variable)"
+              v-on:keyup="saveUserInput(variable)"
           ></v-text-field>
         </div>
       </template>
     </v-data-table>
+    <div v-if="selected.length == 0">
+      <ColoredBorderAlert type="warning">
+        <template v-slot:content>
+          Please select at least one variable to continue.
+        </template>
+      </ColoredBorderAlert>
+    </div>
+    <div v-if="!formCompleted()">
+      <ColoredBorderAlert type="warning">
+        <template v-slot:content>
+          Please fix missing or invalid input to continue.
+        </template>
+      </ColoredBorderAlert>
+    </div>
   </div>
 </template>
 
@@ -360,6 +381,7 @@ export default {
   data: () => ({
     currentRow: null,
     loadingVariables: true,
+    categoryInput: "",
     headers: [
       {value: "index"},
       {text: "Variable Name", value: "name"},
@@ -374,6 +396,43 @@ export default {
     selected: []
   }),
   methods: {
+    getCategories(variable) {
+      console.log('getting categories for: ' + variable.label)
+      if (variable.additional_information) {
+        return variable.additional_information['categories']
+      }
+      return ""
+      //  return this.datasetInfo.depositorSetupInfo.variableInfo[variable].categories
+
+    },
+
+    delimit(variable) {
+      const reducer = (a, e) => [...a, ...e.split(/[, ]+/)]
+      const v = variable.additional_information.categories
+      console.log("delimiter: v= " + JSON.stringify(v))
+      const categories = [...new Set(v.reduce(reducer, []))]
+      console.log("delimiter: categories = " + JSON.stringify(categories))
+      variable.additional_information.categories = JSON.parse(JSON.stringify(categories))
+      this.saveUserInput(variable)
+    },
+
+    delimitInput(variable) {
+      console.log("delimitInput: variable= " + JSON.stringify(variable))
+      console.log("delimitInput: this.categoryInput = " + this.categoryInput)
+      if (this.categoryInput && this.categoryInput.split(",").length > 1) {
+        let v = JSON.parse(JSON.stringify(variable.additional_information.categories))
+        v.push(this.categoryInput)
+        const reducer = (a, e) => [...a, ...e.split(',')]
+        console.log("delimiter: v= " + JSON.stringify(v))
+        let categories = [...new Set(v.reduce(reducer, []))]
+        categories = categories.filter(word => word.length > 0);
+
+        console.log("delimiter: categories = " + JSON.stringify(categories))
+        variable.additional_information.categories = JSON.parse(JSON.stringify(categories))
+        this.saveUserInput(variable)
+        this.categoryInput = ""
+      }
+    },
     formCompleted() {
       let completed = true
       this.selected.forEach(row => {
@@ -389,6 +448,9 @@ export default {
     },
 
     checkMin(value) {
+      if (isNaN(value)) {
+        return false
+      }
       if (this.currentRow !== null) {
         if (this.variables[this.currentRow].additional_information !== undefined) {
           const currentMax = this.variables[this.currentRow].additional_information.max
@@ -400,6 +462,9 @@ export default {
       return true
     },
     checkMax(value) {
+      if (isNaN(value)) {
+        return false
+      }
       if (this.currentRow !== null) {
         if (this.variables[this.currentRow].additional_information !== undefined) {
           const currentMin = this.variables[this.currentRow].additional_information.min
@@ -466,6 +531,7 @@ export default {
       }
     },
     removeCategoryFromVariable(category, variable) {
+      //   console.log('removing category '+ category+','+ JSON.stringify(variable))
       variable.additional_information["categories"].splice(
           variable.additional_information["categories"].indexOf(category),
           1
@@ -535,7 +601,9 @@ export default {
       this.saveUserInput(elem)
     },
     saveUserInput(elem) {
-      this.$store.dispatch('dataset/updateVariableInfo', elem)
+      // make a deep copy so that the form doesn't share object references with the Vuex data
+      const elemCopy = JSON.parse(JSON.stringify(elem))
+      this.$store.dispatch('dataset/updateVariableInfo', elemCopy)
       if (this.formCompleted() && this.isValidRow(elem) && this.atLeastOneSelected(elem)) {
         this.$emit("stepCompleted", 1, true);
       } else {
@@ -557,7 +625,7 @@ export default {
    * When it is populated, create a local variableList for the data table
    */
   watch: {
-    '$store.state.dataset.datasetInfo': function () {
+    '$store.state.dataset.datasetInfo.depositorSetupInfo.variableInfo': function () {
       if (this.datasetInfo.depositorSetupInfo.variableInfo !== null) {
         // the watch will be triggered multiple times,
         // so check if we have already created the variableList

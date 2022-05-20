@@ -41,7 +41,7 @@ Deployment currently requires the building of two Docker images:
 Set an environment variable called "today" of the form YYYY-MMDD. We will use this throughout the deploy:
 ```
 # Example: (use today's date)
-export today=2022-0316
+export today=2022-0428
 ```
 
 ### (A) DPCreator app
@@ -192,7 +192,7 @@ In this example, the cluster name is **DPCreatorCluster01**
    kc delete -f dpcreator_nn_YYYY_MMDD.yaml  
    
    # To stop it immediately:
-   kc delete -f dpcreator_nn_YYYY_MMDD.yaml -grace-period=0 --force
+   kc delete -f dpcreator_nn_YYYY_MMDD.yaml --now
    
    
    ```

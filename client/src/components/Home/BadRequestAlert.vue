@@ -16,10 +16,10 @@
         <v-alert
             border="right"
             colored-border
-            type="info"
+            type="warning"
             elevation="2"
             v-show=showAlert>
-          {{ alertText }}
+          <span v-html="alertText"></span>
         </v-alert>
       </v-col>
     </v-row>

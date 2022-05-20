@@ -15,6 +15,8 @@
             <p class="grey--text text--darken-2" v-html="$t('more information.differential privacy text')"></p>
           </template>
         </LinearBox>
+
+        <!-- Registered Dataverses -->
         <LinearBox
             :class="{
             'mb-6': $vuetify.breakpoint.xsOnly,
@@ -42,6 +44,8 @@
 
           </template>
         </LinearBox>
+
+        <!-- Privacy Budget and Epsilon -->
         <LinearBox
             :class="{
             'mb-6': $vuetify.breakpoint.xsOnly,
@@ -53,6 +57,7 @@
             <p class="grey--text text--darken-2" v-html="$t('more information.epsilon text')"></p>
           </template>
         </LinearBox>
+        <!-- Delta -->
         <LinearBox
             :class="{
             'mb-6': $vuetify.breakpoint.xsOnly,
@@ -64,7 +69,19 @@
             <p class="grey--text text--darken-2" v-html="$t('more information.delta text')"></p>
           </template>
         </LinearBox>
-<!--
+        <!-- Inferred Types -->
+        <LinearBox
+            :class="{
+            'mb-6': $vuetify.breakpoint.xsOnly,
+            'mb-12': $vuetify.breakpoint.smAndUp
+          }"
+        >
+          <template v-slot:content>
+            <h2 class="title-size-1" id="more-info-inferred-types" v-html="$t('more information.inferred-types title')"></h2>
+            <p class="grey--text text--darken-2" v-html="$t('more information.inferred-types text')"></p>
+          </template>
+        </LinearBox>
+        <!--
         <LinearBox
 
             :class="{
