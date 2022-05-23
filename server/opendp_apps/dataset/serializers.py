@@ -168,6 +168,35 @@ class UploadFileInfoSerializer(serializers.ModelSerializer):
         }
 
 
+class UploadFileInfoSerializer(serializers.ModelSerializer):
+    creator = serializers.SlugRelatedField(queryset=OpenDPUser.objects.all(),
+                                           slug_field='username',
+                                           read_only=False)
+
+    analysis_plans = AnalysisPlanSerializer(many=True,
+                                            read_only=True,
+                                            source='analysisplan_set')
+
+    class Meta:
+        model = UploadFileInfo
+        fields = ['object_id', 'name', 'created', 'creator',
+                  #'data_file',
+                  'status', 'status_name', 'analysis_plans']
+        extra_kwargs = {
+            'url': {'view_name': 'dataset-info-list'},
+        }
+
+
+class UploadFileInfoCreationSerializer(serializers.ModelSerializer):
+
+    # source_file = serializers.PrimaryKeyRelatedField(queryset=RegisteredDataverse.objects.all())
+    # creator = serializers.PrimaryKeyRelatedField(queryset=OpenDPUser.objects.all())
+
+    class Meta:
+        model = UploadFileInfo
+        exclude = ['data_profile', 'depositor_setup_info']  # 'polymorphic_ctype']
+
+
 class DataSetInfoPolymorphicSerializer(PolymorphicSerializer):
 
     model_serializer_mapping = {

@@ -6,9 +6,12 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 
 from opendp_apps.analysis.models import AnalysisPlan, DepositorSetupInfo
-from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dataset.models import DataSetInfo, UploadFileInfo
 from opendp_apps.dataset.permissions import IsOwnerOrBlocked
-from opendp_apps.dataset.serializers import DataSetInfoPolymorphicSerializer, DepositorSetupInfoSerializer
+from opendp_apps.dataset.serializers import \
+    (DataSetInfoPolymorphicSerializer,
+     DepositorSetupInfoSerializer,
+     UploadFileInfoCreationSerializer)
 from opendp_project.views import BaseModelViewSet
 
 
@@ -85,3 +88,33 @@ class DepositorSetupViewSet(BaseModelViewSet):
                                 f"{request.data['variable_info']}")
 
         return super(DepositorSetupViewSet, self).partial_update(request, *args, **kwargs)
+
+
+class UploadFileSetupViewSet(BaseModelViewSet):
+    queryset = UploadFileInfo.objects.all()
+    serializer_class = UploadFileInfoCreationSerializer
+    # permission_classes = [IsOwnerOrBlocked]
+
+    def get_queryset(self):
+        """
+        This restricts the queryset to the DepositorSetupInfo objects where the
+            creator is the logged in user
+        """
+        logger.info(f"Getting UploadFileInfo for user {self.request.user.object_id}")
+        print('self.queryset', self.queryset)
+        for ds in self.queryset:
+            print(ds.creator, ds)
+        print('-' * 40)
+        qs = self.queryset.filter(creator=self.request.user)
+        print('self.request.user', self.request.user)
+        print('qs: ', qs)
+
+    def list(self, request, *args, **kwargs):
+
+        print('*' * 40)
+        print('self.get_queryset()', self.get_queryset())
+        print('*' * 40)
+        serializer = UploadFileSetupViewSet(data=self.get_queryset()) #, many=True)
+
+        return Response(data={'success': True, 'data': serializer.data}, status=status.HTTP_200_OK)
+
