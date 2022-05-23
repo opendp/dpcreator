@@ -213,6 +213,8 @@ class DataverseDeleteUtil:
             except Exception as err_obj:  # simplejson.errors.JSONDecodeError as err_obj:
                 # print(type(err_obj).__name__)
                 self.failed_deletes.append(ds_info)
+                # open('bad_delete.html', 'w').write(r.text)
+                # sys.exit(0)
                 print(f'\n({len(self.failed_deletes)}) Delete failure w/ HTTP 200: {err_obj}')
                 print('delete_url', delete_url)
                 print(('Failed to convert response to JSON. Does your API'

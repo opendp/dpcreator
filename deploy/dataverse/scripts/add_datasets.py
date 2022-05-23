@@ -200,6 +200,7 @@ class DataverseAddDataset:
         num_args = len(cmdline_args)
         if num_args == 1:
             server_url = 'https://demo-dataverse.dpcreator.org'
+            # server_url = 'http://dev-dataverse.dpcreator.org'
             dataverse_id = 'root'
             dataset_spec_fpath = 'dataset_specs/pums_fulton.json'
             dataset_file_fpath = 'dataset_specs/pums_1000.csv'
