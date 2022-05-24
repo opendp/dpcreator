@@ -5,8 +5,8 @@ To use this script:
 (1) Set an environment variable with an API key from a Dataverse administrator
     export DV_API_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 (2) (Optional) Edit "datasets_to_keep.py" and add datasets to NOT delete
-(3) Run "python delete_datasets.py"
-    Note: this starts from the "root" dataverse and continues on down
+(3) Run "python delete_datasets.py --help" for options
+    Note: The default starts from the "root" dataverse and continues on down
 
 API reference: https://dataverse.scholarsportal.info/guides/en/latest/api/native-api.html#
 
@@ -38,8 +38,9 @@ class DataverseDeleteUtil:
         self.num_datasets_checked = 0
         self.num_datasets_kept = 0
         self.datasets_deleted = []
-        self.failed_deletes = []
-        # self.dvs_deleted = []
+        self.dvs_deleted = []
+        self.failed_dataset_deletes = []
+        self.failed_dv_deletes = []
 
         self.run_delete_process(self.dv_id)
 
@@ -53,18 +54,20 @@ class DataverseDeleteUtil:
                 print(json.dumps(fd, indent=4))
             print('-' * 40)
 
-        if self.failed_deletes:
+        if self.failed_dataset_deletes:
             print('-' * 40)
             print('Failed deletes')
             print('-' * 40)
-            for fd in self.failed_deletes:
+            for fd in self.failed_dataset_deletes:
                 print(json.dumps(fd, indent=4))
         print('-' * 40)
 
         self.msg_title(f'Datasets checked: {self.num_datasets_checked}')
         print((f'\n# kept: {self.num_datasets_kept}'
-               f'\n# deleted: {len(self.datasets_deleted)}'
-               f'\n# failed deletes: {len(self.failed_deletes)}'
+               f'\n# Datasets deleted: {len(self.datasets_deleted)}'
+               f'\n   # failed dataset deletes: {len(self.failed_dataset_deletes)}'
+               f'\n# Dataverses deleted: {len(self.dvs_deleted)}'
+               f'\n  # failed Dataverse deletes: {len(self.failed_dv_deletes)}'
                f'\n'
                ))
 
@@ -94,37 +97,59 @@ class DataverseDeleteUtil:
         print(m)
         print('-' * 40)
 
-    def run_delete_process(self, dataverse_id):
-        """List and delete the DV datasets"""
-        self.msg_title('Starting Delete Process')
+    def run_delete_process(self, dataverse_id, dv_title=''):
+        """
+        List and delete the DV datasets as well as sub Dataverses
+        API reference: https://guides.dataverse.org/en/latest/api/native-api.html#id26
+        """
+        self.msg_title(f'Starting Delete Process for Dataverse ID: {dataverse_id} {dv_title}')
         print((f'server_url: {self.server_url}'
               f'\ndataverse_id: {dataverse_id}\n'))
 
+        # Use the Dataverse API to list the Datasets and sub Dataverses
+        #  with the Dataverse w/ ID dataverse_id
+        #
         list_url = f'{self.server_url}/api/dataverses/{dataverse_id}/contents'
 
         r = requests.get(list_url, headers=self.get_dataverse_headers())
 
-        # print(r.text)
+        # print(r.text); print(json.dumps(r.json(), indent=4))
         jresp = r.json()
-        # print(json.dumps(jresp, indent=4))
 
         if not r.status_code == HTTPStatus.OK:
+            # Failed request, exit...
             print(json.dumps(jresp, indent=4))
             self.add_err_msg(f'Failed to list datasets. status_code: {r.status_code}')
             return
 
+        # Iterate through the response, either deleting datasets
+        #   or sub Dataverses and their contents
+        #
         for item in jresp['data']:
             if item['type'] == 'dataset':
+                # It's a dataset
                 self.num_datasets_checked += 1
+
+                # Should we keep this dataset?
                 if self.is_dataset_to_keep(item):
+                    # Yes, it's in our "keep" list
                     print((f'Keeping this dataset: {item["id"]}'
                            f'/{item["persistentUrl"]}'))
                     self.num_datasets_kept += 1
                 else:
+                    # Nope, delete the dataset!
                     self.delete_dataset(item)
             elif item['type'] == 'dataverse':
-                # slightly recursive...
-                self.run_delete_process(item['id'])
+                # It's a sub dataverse, let's delete it's contents
+                #
+                self.run_delete_process(item['id'], item['title'])  # empty the dataverse
+
+                # If it's not the overarching Dataverse sent to
+                #  the script (often the root), then delete it.
+                #
+                if item['id'] != self.dv_id:
+                    # delete the dataverse, if it's not the overarching one
+                    self.delete_dataverse(item['id'], item['title'])
 
     @staticmethod
     def is_dataset_to_keep(ds_info: dict) -> bool:
@@ -144,6 +169,38 @@ class DataverseDeleteUtil:
         headers = {'X-Dataverse-key': _DV_API_KEY}
 
         return headers
+
+    def delete_dataverse(self, dataverse_id, dataverse_title=''):
+        """
+        Delete a Dataverse. (Called after the datasets are deleted)
+        reference: https://guides.dataverse.org/en/latest/api/native-api.html#id25
+curl -H X-Dataverse-key:$API_TOKEN -X DELETE $SERVER_URL/api/dataverses/$ID
+        """
+        print(f'Delete the (assumedly empty) Dataverse: {dataverse_id} {dataverse_title}')
+        if dataverse_id == self.dv_id:
+            self.add_err_msg(('Attempt to delete the root dataverse'
+                              ' (self.div_id). Canceling attempt.'))
+            return
+
+        delete_url = f'{self.server_url}/api/dataverses/{dataverse_id}/'
+
+        r = requests.delete(delete_url,
+                            headers=self.get_dataverse_headers())
+
+        dv_info = dict(id=dataverse_id, title=dataverse_title)
+
+        if r.status_code == HTTPStatus.OK:
+            print('Dataverse deleted!')
+            # Try to delete again!
+            self.dvs_deleted.append(dv_info)
+        else:
+            print('Failed to delete Dataverse!')
+            self.failed_dv_deletes.append(dv_info)
+            print((f'\n({len(self.failed_dv_deletes)}) Dataverse Delete failure'))
+            print('delete_url', delete_url)
+            print(r.text)
+            print(f'status_code: {r.status_code}')
+            return
 
     def delete_dataset_lock(self, ds_info):
         """
@@ -168,8 +225,8 @@ class DataverseDeleteUtil:
             self.delete_dataset(ds_info, skip_lock_check=True)
         else:
             print('Failed to remove lock')
-            self.failed_deletes.append(ds_info)
-            print((f'\n({len(self.failed_deletes)}) Delete failure'
+            self.failed_dataset_deletes.append(ds_info)
+            print((f'\n({len(self.failed_dataset_deletes)}) Delete failure'
                    ' (couldn\'t delete lock): '))
             print('delete_url', delete_url)
             print(r.text)
@@ -203,6 +260,8 @@ class DataverseDeleteUtil:
         # print('delete result', r.text)
         print('status code', r.status_code)
 
+        print('delete_url', delete_url)
+
         if r.status_code == HTTPStatus.OK:
             try:
                 # To account for a DV error where status code was 200
@@ -212,27 +271,26 @@ class DataverseDeleteUtil:
                 print(f'dataset deleted: {dataset_id}')
             except Exception as err_obj:  # simplejson.errors.JSONDecodeError as err_obj:
                 # print(type(err_obj).__name__)
-                self.failed_deletes.append(ds_info)
-                # open('bad_delete.html', 'w').write(r.text)
-                # sys.exit(0)
-                print(f'\n({len(self.failed_deletes)}) Delete failure w/ HTTP 200: {err_obj}')
-                print('delete_url', delete_url)
+                print(f'\n({len(self.failed_dataset_deletes)}) Delete failure w/ HTTP 200: {err_obj}')
                 print(('Failed to convert response to JSON. Does your API'
                        ' token have administrative privileges to delete a dataset?'))
+                self.failed_dataset_deletes.append(ds_info)
+                open('failed_delete_resp.html', 'w').write(r.text)
+                sys.exit(0)
         elif r.status_code == HTTPStatus.FORBIDDEN:
             if (skip_lock_check is False) and \
               r.text.find(self._DV_LOCK_MESSAGE) > -1:
                 self.delete_dataset_lock(ds_info)
             else:
-                self.failed_deletes.append(ds_info)
-                print(f'\n({len(self.failed_deletes)}) Delete failure: ')
+                self.failed_dataset_deletes.append(ds_info)
+                print(f'\n({len(self.failed_dataset_deletes)}) Delete failure: ')
                 print('delete_url', delete_url)
                 print(r.text)
                 print(f'status_code: {r.status_code}')
 
         else:
-            self.failed_deletes.append(ds_info)
-            print(f'\n({len(self.failed_deletes)}) Delete failure: ')
+            self.failed_dataset_deletes.append(ds_info)
+            print(f'\n({len(self.failed_dataset_deletes)}) Delete failure: ')
             print('delete_url', delete_url)
             print(r.text)
             print(f'status_code: {r.status_code}')
@@ -245,7 +303,8 @@ class DataverseDeleteUtil:
                         '\nDefault values: '
                         '\n  - server_url: https://demo-dataverse.dpcreator.org'
                         '\n  - dataverse_id: root'
-                        '\n\n>>python delete_datasets.py [server_url] [dataverse_id]'
+                        '\n\n>> (1) python delete_datasets.py [server_url] [dataverse_id]'
+                        '\n\n>> (2) python delete_datasets.py  # uses defaults'
                         '\n')
 
         print(instructions)

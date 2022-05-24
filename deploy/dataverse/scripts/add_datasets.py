@@ -4,11 +4,9 @@ Utility script for clearing data from a Demo Dataverse
 To use this script:
 (1) Set an environment variable with an API key from a Dataverse administrator
     export DV_API_KEY=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-(2) Run "python add_datasets.py"
-    Note: this starts from the "root" dataverse and continues on down
+(2) Run "python add_datasets.py --help" for options
 
 API reference: https://dataverse.scholarsportal.info/guides/en/latest/api/native-api.html#
-
 """
 from http import HTTPStatus
 import os
@@ -23,7 +21,7 @@ _DV_API_KEY = os.environ.get('DV_API_KEY', 'DV_API_KEY not set.')
 class DataverseAddDataset:
     """Convenience class for deleting Datasets"""
 
-    def __init__(self, dv_server_url, dataverse_id, dataset_spec_fpath, file_fpath, ):
+    def __init__(self, dv_server_url, dataverse_id, dataset_spec_fpath, file_fpath):
 
         assert os.path.isfile(dataset_spec_fpath), \
             f"dataset_spec_fpath not found/not a valid file: {dataset_spec_fpath}"
@@ -146,7 +144,7 @@ class DataverseAddDataset:
 
         return False
 
-    def publish_dataset(self, secs_pause: int=2) -> bool:
+    def publish_dataset(self, secs_pause: int = 2) -> bool:
         """Publish the dataset. Try 3 times with pauses"""
         self.msg_title('Publish Dataset')
 
@@ -186,10 +184,10 @@ class DataverseAddDataset:
                         '\n  - dataverse_id: root'
                         '\n  - dataset_spec_file_path: dataset_specs/pums_fulton.json'
                         '\n  - dataset_file_path: dataset_specs/pums_1000.csv'
-                        '\n\n(1) >> python delete_datasets.py'
-                        '\n\n(2) >> python delete_datasets.py [dataset_spec_file_path] [dataset_file_path]'
-                        '\n\n(3) >> python delete_datasets.py [server_url] [dataverse_id]'
+                        '\n\n(1) >> python delete_datasets.py [server_url] [dataverse_id]'
                         ' [dataset_spec_file_path] [dataset_file_path]'
+                        '\n\n(2) >> python delete_datasets.py [dataset_spec_file_path] [dataset_file_path]  # uses server_url and dataverse_id defaults'
+                        '\n\n(3) >> python delete_datasets.py  # uses all defaults'
                         '\n')
 
         print(instructions)
@@ -199,8 +197,8 @@ class DataverseAddDataset:
         """Run the delete process"""
         num_args = len(cmdline_args)
         if num_args == 1:
-            server_url = 'https://demo-dataverse.dpcreator.org'
-            # server_url = 'http://dev-dataverse.dpcreator.org'
+            # server_url = 'https://demo-dataverse.dpcreator.org'
+            server_url = 'http://dev-dataverse.dpcreator.org'
             dataverse_id = 'root'
             dataset_spec_fpath = 'dataset_specs/pums_fulton.json'
             dataset_file_fpath = 'dataset_specs/pums_1000.csv'
@@ -227,9 +225,6 @@ class DataverseAddDataset:
 
         add_util.show_result()
 
-if __name__ == '__main__':
-   DataverseAddDataset.run_add_util(sys.argv)
 
-"""
-python add_datasets.py dataset_specs/pums_fulton.json dataset_specs/pums_1000.csv
-"""
+if __name__ == '__main__':
+    DataverseAddDataset.run_add_util(sys.argv)
