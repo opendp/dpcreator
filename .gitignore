@@ -184,6 +184,7 @@ server/scripts_dev/dv_test_creds.py
 !dev_notes/api_example_analysis_plan.json
 .env
 !deploy/dataverse/*.json
+!deploy/dataverse/scripts/dataset_specs/*
 !deploy/images/*
 client/.idea/*.*
 latex_service/images/SomeVariable3_histogram.png
@@ -201,3 +202,6 @@ client/.idea/aws.xml
 !deploy/dataverse/*.json
 server/templates/base-vue.html
 !server/opendp_apps/dp_reports/test_data/*.json
+.python-version
+deploy/dataverse/scripts/bad_delete.html
+deploy/dataverse/scripts/failed_delete_resp.html
