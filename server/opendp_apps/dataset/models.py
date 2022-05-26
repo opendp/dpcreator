@@ -316,6 +316,7 @@ class DataverseFileInfo(DataSetInfo):
 
         if not self.name:
             self.name = f'{self.dataset_doi} ({self.dv_installation})'
+
         self.source = DataSetInfo.SourceChoices.Dataverse
 
         super(DataverseFileInfo, self).save(*args, **kwargs)
@@ -382,6 +383,12 @@ class UploadFileInfo(DataSetInfo):
         #       depending on the data
         #
         self.source = DataSetInfo.SourceChoices.UserUpload
+
+        if not self.depositor_setup_info:
+            # Set default DepositorSetupInfo object
+            dsi = DepositorSetupInfo.objects.create(creator=self.creator)
+            self.depositor_setup_info = dsi
+
         super(UploadFileInfo, self).save(*args, **kwargs)
 
     class Meta:
@@ -405,3 +412,24 @@ class UploadFileInfo(DataSetInfo):
                     object_id=self.object_id.hex)
 
         return info
+
+
+    @property
+    def status(self):
+        """
+        Return the user_step object
+        """
+        try:
+            return self.depositor_setup_info.user_step
+        except DepositorSetupInfo.DoesNotExist:
+            return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED
+
+    @property
+    def status_name(self):
+        """
+        Return the user_step label
+        """
+        try:
+            return self.depositor_setup_info.user_step.label
+        except DepositorSetupInfo.DoesNotExist:
+            return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED.label

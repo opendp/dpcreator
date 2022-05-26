@@ -13,6 +13,7 @@ from opendp_apps.dataset.serializers import \
      DepositorSetupInfoSerializer,
      UploadFileInfoCreationSerializer)
 from opendp_project.views import BaseModelViewSet
+from opendp_apps.utils.view_helper import get_json_error, get_json_success
 
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
@@ -91,9 +92,10 @@ class DepositorSetupViewSet(BaseModelViewSet):
 
 
 class UploadFileSetupViewSet(BaseModelViewSet):
-    queryset = UploadFileInfo.objects.all()
+    """Used only for creating an initial UploadFile"""
     serializer_class = UploadFileInfoCreationSerializer
-    # permission_classes = [IsOwnerOrBlocked]
+    permission_classes = [IsOwnerOrBlocked]
+    # http_method_names = ['post']    # 'patch']
 
     def get_queryset(self):
         """
@@ -101,20 +103,14 @@ class UploadFileSetupViewSet(BaseModelViewSet):
             creator is the logged in user
         """
         logger.info(f"Getting UploadFileInfo for user {self.request.user.object_id}")
-        print('self.queryset', self.queryset)
-        for ds in self.queryset:
-            print(ds.creator, ds)
-        print('-' * 40)
-        qs = self.queryset.filter(creator=self.request.user)
-        print('self.request.user', self.request.user)
-        print('qs: ', qs)
+        qs = UploadFileInfo.objects.filter(creator=self.request.user)
+        return qs
 
     def list(self, request, *args, **kwargs):
-
-        print('*' * 40)
-        print('self.get_queryset()', self.get_queryset())
-        print('*' * 40)
-        serializer = UploadFileSetupViewSet(data=self.get_queryset()) #, many=True)
-
-        return Response(data={'success': True, 'data': serializer.data}, status=status.HTTP_200_OK)
-
+        """
+        List the UploadFileInfo for the logged in user
+        Note: this is a minimal listing for debugging.
+            See "UploadFileInfoSerializer" in opendp_apps/dataset/serializers for full output
+        """
+        serializer = UploadFileInfoCreationSerializer(self.get_queryset(), many=True)
+        return Response(serializer.data)
