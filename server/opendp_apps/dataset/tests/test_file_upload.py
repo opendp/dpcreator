@@ -70,7 +70,7 @@ class TestFileUpload(BaseEndpointTest):
                        creator=bad_user_id,
                        source_file=self.test_file_obj)
 
-        upload_url = '/api/direct-upload/' # reverse("direct-upload-create")
+        upload_url = reverse("direct-upload-list")
 
         resp = self.client.post(upload_url,
                                 data=payload)
