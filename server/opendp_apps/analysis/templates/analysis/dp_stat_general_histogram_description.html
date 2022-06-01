@@ -1,3 +1,1 @@
-A differentially private <b>{{ stat.statistic|title }}</b> for variable <b>{{ stat.variable }}</b> was calculated with
-the result <b>{{ histogram_values }}</b>.
-{% if stat.accuracy_val %}{% include "analysis/dp_histogram_accuracy_default.html" %}{% endif %}
+{# KEEP THIS TEXT ON A SINGLE LINE TO AVOID LINE BREAKS IN JSON #}A differentially private <b>{{ stat.statistic|title }}</b> for variable <b>{{ stat.variable }}</b> was calculated with the result <b>{{ histogram_values }}</b>. {% if stat.accuracy_val %}{% include "analysis/dp_histogram_accuracy_default.html" %}{% endif %}

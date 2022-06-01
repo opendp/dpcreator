@@ -5,6 +5,7 @@ import json
 
 from django.core.serializers.json import DjangoJSONEncoder
 
+from opendp_apps.analysis.misc_formatters import get_readable_datetime
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp, BasicResponse
@@ -55,8 +56,12 @@ class DataSetFormatter(BasicErrCheck):
         ds_dict = {
             'type': self.dataset.source,
             'name': self.dataset.name,
-            'creator': self.dataset.creator,
-            'created': self.dataset.created,
+            'creator': self.dataset.creator.as_json(),  # OpenDP User object
+            "upload_date": {
+                "iso": self.dataset.created.isoformat(),
+                "human_readable": get_readable_datetime(self.dataset.created),
+                "human_readable_date_only": self.dataset.created.strftime('%w %B, %Y'),
+            },
         }
 
         self.formatted_info = ds_dict
@@ -68,7 +73,7 @@ class DataSetFormatter(BasicErrCheck):
 
         # Pull citation from self.dataset.dataset_schema_info
         #
-        citation_info = self.get_citation_from_dataset_schema_or_None()
+        citation_info = self.get_citation_from_dataset_schema_or_none()
         if citation_info.success:
             citation = citation_info.data
         else:
@@ -120,7 +125,7 @@ class DataSetFormatter(BasicErrCheck):
         if not self.dataset.dataset_schema_info:
             return err_resp('".dataset_schema_info" is empty')
 
-        if not 'name' in self.dataset.dataset_schema_info:
+        if 'name' not in self.dataset.dataset_schema_info:
             return err_resp('"name" not found in ".dataset_schema_info" not found')
 
         ds_name = self.dataset.dataset_schema_info['name']
@@ -136,7 +141,7 @@ class DataSetFormatter(BasicErrCheck):
 
         return None
 
-    def get_citation_from_dataset_schema_or_None(self):
+    def get_citation_from_dataset_schema_or_none(self):
         """
         Return the citation text from self.dataset_schema_info (a bit ugly...)
         Trying to return string from: self.dataset.dataset_schema_info['citation'][0]
@@ -148,7 +153,7 @@ class DataSetFormatter(BasicErrCheck):
         if not self.dataset.dataset_schema_info:
             return err_resp('".dataset_schema_info" is empty')
 
-        if not 'citation' in self.dataset.dataset_schema_info:
+        if 'citation' not in self.dataset.dataset_schema_info:
             return ok_resp(None)
 
         # If the citation key is found, then do error checking....
@@ -156,7 +161,7 @@ class DataSetFormatter(BasicErrCheck):
                 (not isinstance(self.dataset.dataset_schema_info['citation'], list)):
             return err_resp('"citation" within ".dataset_schema_info" is empty or not a list')
 
-        if not 'text' in self.dataset.dataset_schema_info['citation'][0]:
+        if 'text' not in self.dataset.dataset_schema_info['citation'][0]:
             return err_resp('"[\'citation\'][0][\'text\']" not found in ".dataset_schema_info"')
 
         return ok_resp(self.dataset.dataset_schema_info['citation'][0]['text'])

@@ -60,7 +60,7 @@ class ReleaseInfoAdmin(admin.ModelAdmin):
     readonly_fields = ('id',
                        'object_id',
                        'dataset',
-                       'dp_release', 'epsilon_used',
+                       'dp_release_json', 'epsilon_used',
                        'dataverse_deposit_info_json',
                        'download_json_url',
                        'download_pdf_url',

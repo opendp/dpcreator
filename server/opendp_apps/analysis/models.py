@@ -207,6 +207,13 @@ class ReleaseInfo(TimestampedModelWithUUID):
         super(ReleaseInfo, self).save(*args, **kwargs)
 
     @mark_safe
+    def dp_release_json(self):
+        """Return JSON string"""
+        if self.dp_release:
+            return '<pre>' + json.dumps(self.dp_release, indent=4) + '</pre>'
+        return ''
+
+    @mark_safe
     def dataverse_deposit_info_json(self):
         """Return JSON string"""
         if self.dataverse_deposit_info:
