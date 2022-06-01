@@ -112,7 +112,7 @@ class ReleaseInfoFormatter(BasicErrCheck):
             release_json = json.dumps(self.release_dict, cls=DjangoJSONEncoder)
             release_json.encode()
         except TypeError as err_obj:
-            user_msg = 'Failed to convert the Release informaation into JSON. ({err_obj})'
+            user_msg = f'Failed to convert the Release information into JSON. ({err_obj})'
             self.add_err_msg(user_msg)
 
 

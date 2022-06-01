@@ -1,5 +1,6 @@
 from collections import OrderedDict
 import json
+import logging
 
 from django.apps import apps
 from django.conf import settings
@@ -18,8 +19,9 @@ from opendp_apps.model_helpers.basic_response import ok_resp, err_resp, BasicRes
 # https://github.com/opendp/dpcreator/issues/300
 from opendp_apps.utils.camel_to_snake import camel_to_snake
 
-UPLOADED_FILE_STORAGE = FileSystemStorage(location=settings.UPLOADED_FILE_STORAGE_ROOT)
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
+UPLOADED_FILE_STORAGE = FileSystemStorage(location=settings.UPLOADED_FILE_STORAGE_ROOT)
 
 class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     """
@@ -105,14 +107,30 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         """shortcut to access the DepositorSetupInfo"""
         return self.get_depositor_setup_info()
 
+    def is_dataverse_file_info(self):
+        """Is this an instance of a DataverseFileInfo object?"""
+        if hasattr(self, 'get_real_instance') is False:
+            return False
+
+        return isinstance(self.get_real_instance(), DataverseFileInfo)
+
+    def is_upload_file_info(self):
+        """Is this an instance of an UploadFileInfo object?"""
+        if hasattr(self, 'get_real_instance') is False:
+            return False
+
+        return isinstance(self.get_real_instance(), UploadFileInfo)
+
     def get_depositor_setup_info(self):
         """Hack; need to address https://github.com/opendp/dpcreator/issues/257"""
-        if hasattr(self, 'dataversefileinfo'):
-            return self.dataversefileinfo.depositor_setup_info
-        elif hasattr(self, 'uploadfileinfo'):
-            return self.uploadfileinfo.depositor_setup_info
-
-        raise AttributeError('Unknown DataSetinfo type. No access to depositor_setup_info')
+        try:
+            return self.get_real_instance().depositor_setup_info
+        except AttributeError as err_obj:
+            user_msg = (f'Unknown DataSetinfo type. No access to depositor_setup_info.'
+                        f' depositor_setup_info. class:'
+                        f' {self.get_real_instance().__class__}. err: {err_obj}')
+            logger.error(user_msg)
+            raise AttributeError(user_msg)
 
     def get_dataset_size(self) -> BasicResponse:
         """Retrieve the rowCount index from the data_profile -- not always avaiable"""
@@ -412,7 +430,6 @@ class UploadFileInfo(DataSetInfo):
                     object_id=self.object_id.hex)
 
         return info
-
 
     @property
     def status(self):
