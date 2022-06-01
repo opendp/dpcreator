@@ -9,7 +9,7 @@
               <span class="d-block mt-5"
               >Used data file:
                 <a href="http://" class="text-decoration-none"
-                >{{ datasetInfo.fileSchemaInfo.name }}
+                >{{ datasetInfo.name }}
                   <v-icon small color="primary">mdi-open-in-new</v-icon></a
                 ></span
               >
@@ -69,7 +69,7 @@ import ValidateDataset from "./WizardSteps/ValidateDataset.vue";
 import stepInformation from "@/data/stepInformation";
 
 
-import {mapState, mapGetters} from "vuex";
+import {mapGetters, mapState} from "vuex";
 
 export default {
   name: "Wizard",
