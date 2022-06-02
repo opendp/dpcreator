@@ -1,5 +1,6 @@
 import dataset from "@/api/dataset";
 import analysis from "@/api/analysis";
+
 import {
     PATCH_DEPOSITOR_INFO,
     SET_ANALYSIS_PLAN,
@@ -7,7 +8,8 @@ import {
     SET_DATASET_LIST,
     SET_MYDATA_LIST,
     SET_PROFILER_MSG,
-    SET_PROFILER_STATUS
+    SET_PROFILER_STATUS,
+    SET_UPLOAD_PROGRESS
 } from './types';
 import {
     depositorSteps,
@@ -18,6 +20,7 @@ import {
     wizardUserSteps
 } from "@/data/stepInformation";
 import release from "@/api/release";
+import {session} from "@/api/session";
 
 const camelcaseKeys = require('camelcase-keys');
 
@@ -28,6 +31,7 @@ const initialState = {
     profilerMsg: null,
     analysisPlan: null,
     myDataList: null,
+    uploadProgress: 0
 };
 const getters = {
     getDatasetList: state => {
@@ -83,6 +87,39 @@ const actions = {
         commit('SET_PROFILER_STATUS', null)
         commit('SET_MYDATA_LIST', null)
     },
+    uploadDataset({commit, state}, {file, creatorId}) {
+        let formData = new FormData();
+
+
+        formData.append('source_file', file)
+        formData.append('name', file.name)
+        formData.append('creator', creatorId)
+
+        commit(SET_UPLOAD_PROGRESS, 0)
+        return session.post('/api/direct-upload/',
+            formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }, onUploadProgress: progressEvent => {
+                    console.log('progressEvent:' + progressEvent.loaded)
+                    let progress = Math.round((100 * progressEvent.loaded) / progressEvent.total);
+                    commit(SET_UPLOAD_PROGRESS, progress)
+                }
+            }
+        ).then(function () {
+            console.log('SUCCESS!!')
+            return dataset.getUserDatasets()
+                .then((resp) => {
+                    commit(SET_DATASET_LIST, resp.data.results)
+                    commit(SET_MYDATA_LIST, resp.data.results)
+                })
+        })
+            .catch(function () {
+                console.log('FAILURE!!')
+            });
+    },
+
+
     /**
      *   This method is called when the user clicks "Continue" in the Wizard navigation.
      *   We only update the userStep if this is the first time the user is completing this step.
@@ -392,6 +429,9 @@ const mutations = {
             })
             state.myDataList = myData
         }
+    },
+    [SET_UPLOAD_PROGRESS](state, uploadProgress) {
+        state.uploadProgress = uploadProgress
     },
     [SET_ANALYSIS_PLAN](state, analysisPlan) {
         state.analysisPlan = analysisPlan

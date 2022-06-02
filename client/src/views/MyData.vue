@@ -45,6 +45,12 @@
               ></v-text-field>
             </v-col>
           </v-row>
+          <v-row justify="end">
+            <v-spacer/>
+            <v-col class="text-right">
+              <upload-files></upload-files>
+            </v-col>
+          </v-row>
           <MyDataTable
               v-if="!loading"
               :class="{ 'my-5': $vuetify.breakpoint.smAndUp }"
@@ -61,12 +67,15 @@
 
 <script>
 import ColoredBorderAlert from "../components/DynamicHelpResources/ColoredBorderAlert.vue";
+import UploadFiles from "../components/DesignSystem/UploadFiles";
+
 import MyDataTable from "../components/MyData/MyDataTable.vue";
 import SupportBanner from "../components/SupportBanner.vue";
-import {mapGetters, mapState} from "vuex";
+import {mapGetters} from "vuex";
+
 export default {
   name: "MyData",
-  components: {MyDataTable, ColoredBorderAlert, SupportBanner},
+  components: {MyDataTable, ColoredBorderAlert, SupportBanner, UploadFiles},
   created() {
     this.$store.dispatch('dataset/setDatasetList')
         .then(() => {

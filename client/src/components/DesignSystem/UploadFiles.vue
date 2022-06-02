@@ -1,0 +1,86 @@
+<template>
+  <div>
+    <Button v-if="!uploadClicked"
+            :click="onUploadClick"
+            data-test="myDataUpload"
+            color="primary"
+            label="Upload a File"
+
+            :class="{
+                  'width80 mx-auto d-block mb-2': $vuetify.breakpoint.xsOnly,
+                  'mr-2 mb-2': $vuetify.breakpoint.smAndUp
+                }"
+    />
+    <div v-if="currentFile && uploadProgress < 100">
+      <div>
+        <v-progress-linear
+            v-model="progress"
+            color="light-blue"
+            height="25"
+            reactive
+        >
+          <strong>{{ uploadProgress }} %</strong>
+        </v-progress-linear>
+      </div>
+    </div>
+    <div v-if="uploadClicked">
+      <v-row no-gutters justify="center" align="center">
+        <v-col>
+          <v-file-input
+              show-size
+              label="Select a file to upload"
+              @change="selectFile"
+          ></v-file-input>
+        </v-col>
+      </v-row>
+    </div>
+    <v-alert v-if="message" border="left" color="blue-grey" dark>
+      {{ message }}
+    </v-alert>
+
+  </div>
+</template>
+
+<script>
+import Button from "@/components/DesignSystem/Button";
+import {mapState} from "vuex";
+
+export default {
+  name: "upload-files",
+  components: {Button},
+  data() {
+    return {
+      currentFile: undefined,
+      message: "",
+      uploadClicked: false
+    };
+  },
+  computed: {
+    ...mapState('auth', ['user']),
+    ...mapState('dataset', ["uploadProgress"])
+  },
+  methods: {
+    onUploadClick() {
+      this.uploadClicked = true
+    },
+    selectFile(file) {
+      this.progress = 0;
+      this.currentFile = file;
+      this.uploadDataset(file)
+    },
+    uploadDataset(file) {
+      const payload = {file: file, creatorId: this.user.objectId}
+      this.$store.dispatch('dataset/uploadDataset', payload)
+    },
+
+  },
+  watch: {
+    uploadProgress: function (val, oldVal) {
+      if (val == 100) {
+        this.currentFile = null
+        this.uploadClicked = false
+      }
+    }
+  },
+};
+</script>
