@@ -1,0 +1,77 @@
+{
+  "datasetVersion": {
+    "metadataBlocks": {
+      "citation": {
+        "fields": [
+          {
+            "value": "PUMS Fulton",
+            "typeClass": "primitive",
+            "multiple": false,
+            "typeName": "title"
+          },
+          {
+            "value": [
+              {
+                "authorName": {
+                  "value": "Welch, Gillian",
+                  "typeClass": "primitive",
+                  "multiple": false,
+                  "typeName": "authorName"
+                },
+                "authorAffiliation": {
+                  "value": "Dry Town",
+                  "typeClass": "primitive",
+                  "multiple": false,
+                  "typeName": "authorAffiliation"
+                }
+              }
+            ],
+            "typeClass": "compound",
+            "multiple": true,
+            "typeName": "author"
+          },
+          {
+            "value": [ 
+                { "datasetContactEmail" : {
+                    "typeClass": "primitive",
+                    "multiple": false,
+                    "typeName": "datasetContactEmail",
+                    "value" : "flyaway@scarlet-town.com"
+                },
+                "datasetContactName" : {
+                    "typeClass": "primitive",
+                    "multiple": false,
+                    "typeName": "datasetContactName",
+                    "value": "Welch, Gillian"
+                }
+            }],
+            "typeClass": "compound",
+            "multiple": true,
+            "typeName": "datasetContact"
+          },
+          {
+            "value": [ {
+               "dsDescriptionValue":{
+                "value":   "Transformed 2005 PUMS file from Fulton County, Georgia. The modified codebook may be found here: https://docs.google.com/document/d/11BpPxMm7CNmyNuSm6ODVePvtT9trde_BhE5nnJ_keG8/edit",
+                "multiple":false,
+               "typeClass": "primitive",
+               "typeName": "dsDescriptionValue"
+            }}],
+            "typeClass": "compound",
+            "multiple": true,
+            "typeName": "dsDescription"
+          },
+          {
+            "value": [
+              "Social Sciences"
+            ],
+            "typeClass": "controlledVocabulary",
+            "multiple": true,
+            "typeName": "subject"
+          }
+        ],
+        "displayName": "Citation Metadata"
+      }
+    }
+  }
+}

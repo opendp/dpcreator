@@ -1,9 +1,9 @@
 {
-  "siteUrl": "http://ec2-35-171-244-178.compute-1.amazonaws.com",
-  "fileId": "128",
-  "datasetPid": "doi:10.5072/FK2/8UKFA0",
+  "siteUrl": "http://dev-dataverse.dpcreator.org",
+  "fileId": "176",
+  "datasetPid": "doi:10.5072/FK2/GTENIC",
   "token": "fbadd596-2957-4381-9e87-235d97380157",
-  "filePid": "doi:10.5072/FK2/8UKFA0",
+  "filePid": "doi:10.5072/FK2/GTENIC",
   "user": "oscar",
   "password": "oscar123!",
   "email": "oscar@thegrouch.com"

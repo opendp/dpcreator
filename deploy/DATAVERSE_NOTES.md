@@ -44,5 +44,10 @@
    - `+ Add Data`
    - Test the button to see if the user can upload a file.
   
-  
-  
+## Removing locks
+
+- API reference: https://guides.dataverse.org/en/5.2/api/native-api.html#id69
+- Example curl command
+```
+curl -H "X-Dataverse-key: $DV_API_KEY" -X DELETE https://demo-dataverse.dpcreator.org/api/datasets/124/locks/
+```
