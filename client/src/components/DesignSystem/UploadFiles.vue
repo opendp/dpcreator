@@ -26,17 +26,13 @@
     <div v-if="uploadClicked">
       <v-row no-gutters justify="center" align="center">
         <v-col>
-          <v-file-input
-              show-size
-              label="Select a file to upload"
-              @change="selectFile"
-          ></v-file-input>
-          <div style="border-style:solid;" @dragover.prevent @drop.prevent>
-            <input type="file" @change="selectFile"/>
-            <div @drop="dragFile" style="background-color:green;margin-bottom:10px;padding:10px;">
-              Or drag the file here
+          <div @dragover.prevent @drop.prevent @drop="dragFile">
+            <v-file-input
+                show-size
+                label="Click to select a file, or drag file here"
+                @change="selectFile"
+            ></v-file-input>
 
-            </div>
           </div>
         </v-col>
       </v-row>
