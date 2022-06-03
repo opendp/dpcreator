@@ -31,6 +31,13 @@
               label="Select a file to upload"
               @change="selectFile"
           ></v-file-input>
+          <div style="border-style:solid;" @dragover.prevent @drop.prevent>
+            <input type="file" @change="selectFile"/>
+            <div @drop="dragFile" style="background-color:green;margin-bottom:10px;padding:10px;">
+              Or drag the file here
+
+            </div>
+          </div>
         </v-col>
       </v-row>
     </div>
@@ -67,6 +74,10 @@ export default {
       this.progress = 0;
       this.currentFile = file;
       this.uploadDataset(file)
+    },
+    dragFile(e) {
+      this.currentFile = e.dataTransfer.files[0]
+      this.uploadDataset(this.currentFile)
     },
     uploadDataset(file) {
       const payload = {file: file, creatorId: this.user.objectId}
