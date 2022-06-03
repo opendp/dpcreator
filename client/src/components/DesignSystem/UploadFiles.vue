@@ -2,7 +2,7 @@
   <div>
     <Button v-if="!uploadClicked"
             :click="onUploadClick"
-            data-test="myDataUpload"
+            data-test="myDataUploadButton"
             color="primary"
             label="Upload a File"
 
@@ -26,8 +26,9 @@
     <div v-if="uploadClicked">
       <v-row no-gutters justify="center" align="center">
         <v-col>
-          <div @dragover.prevent @drop.prevent @drop="dragFile">
+          <div data-test="dragArea" @dragover.prevent @drop.prevent @drop="dragFile">
             <v-file-input
+                data-test="fileInput"
                 show-size
                 label="Click to select a file, or drag file here"
                 @change="selectFile"
