@@ -167,6 +167,9 @@ const actions = {
                 console.log(error.response.status);
             })
     },
+    clearAnalysisPlan({commit}) {
+        commit('SET_ANALYSIS_PLAN', null)
+    },
     updateAnalysisPlan({commit, state}, {objectId, props}) {
         return analysis.patchAnalysisPlan(objectId, props)
             .then(() => this.dispatch('dataset/setAnalysisPlan', state.analysisPlan.objectId)
