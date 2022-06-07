@@ -29,18 +29,20 @@
           <div data-test="dragArea" @dragover.prevent @drop.prevent @drop="dragFile">
             <v-file-input
                 data-test="fileInput"
+                accept=".csv,.tsv"
                 show-size
                 label="Click to select a file, or drag file here"
                 @change="selectFile"
             ></v-file-input>
 
           </div>
+          <v-alert type="error" dismissible v-if="message" color="blue-grey" dark>
+            {{ message }}
+          </v-alert>
         </v-col>
       </v-row>
     </div>
-    <v-alert v-if="message" border="left" color="blue-grey" dark>
-      {{ message }}
-    </v-alert>
+
 
   </div>
 </template>
@@ -54,6 +56,7 @@ export default {
   components: {Button},
   data() {
     return {
+      fileTypeError: false,
       currentFile: undefined,
       message: "",
       uploadClicked: false
@@ -74,7 +77,13 @@ export default {
     },
     dragFile(e) {
       this.currentFile = e.dataTransfer.files[0]
-      this.uploadDataset(this.currentFile)
+      const extension = this.currentFile.name.split(".").pop();
+      const isSupported = ["csv"].includes(extension);
+      if (isSupported) {
+        this.uploadDataset(this.currentFile)
+      } else {
+        this.message = 'file type ' + extension + "is not supported."
+      }
     },
     uploadDataset(file) {
       const payload = {file: file, creatorId: this.user.objectId}
