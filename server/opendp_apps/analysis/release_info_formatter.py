@@ -77,7 +77,7 @@ class ReleaseInfoFormatter(BasicErrCheck):
             "created": {
                 "iso": current_dt.isoformat(),
                 "human_readable": get_readable_datetime(current_dt),
-                "human_readable_date_only": current_dt.strftime('%w %B, %Y'),
+                "human_readable_date_only": current_dt.strftime('%-d %B, %Y'),
             },
             "application": "DP Creator",
             "application_url": "https://github.com/opendp/dpcreator",

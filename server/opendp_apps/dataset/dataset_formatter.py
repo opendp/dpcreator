@@ -60,7 +60,7 @@ class DataSetFormatter(BasicErrCheck):
             "upload_date": {
                 "iso": self.dataset.created.isoformat(),
                 "human_readable": get_readable_datetime(self.dataset.created),
-                "human_readable_date_only": self.dataset.created.strftime('%w %B, %Y'),
+                "human_readable_date_only": self.dataset.created.strftime('%-d %B, %Y'),
             },
         }
 

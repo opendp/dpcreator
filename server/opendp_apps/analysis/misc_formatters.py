@@ -10,7 +10,7 @@ def get_readable_datetime(dt_obj: dt) -> str:
     if tz_str:
         tz_str = f'{tz_str}'
 
-    readable_str = (f'{dt_obj.strftime("%B")} {dt_obj.strftime("%d")}, {dt_obj.strftime("%Y")}'
+    readable_str = (f'{dt_obj.strftime("%B")} {dt_obj.strftime("%-d")}, {dt_obj.strftime("%Y")}'
                     f' at {dt_obj.strftime("%H:%M:%S:%f")} {tz_str}')
 
     return readable_str
