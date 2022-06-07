@@ -1,6 +1,7 @@
 import json
 from .forms import ReportForm
 from .pdf_report_maker import PDFReportMaker
+from opendp_apps.utils.randname import random_with_n_digits
 
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -16,8 +17,10 @@ def view_create_pdf_report(request):
             json_release = form.cleaned_data['json_release']
 
             pdf_maker = PDFReportMaker(json_release)
-            if not pdf_maker.has_error():
-                pass
+            if pdf_maker.has_error() is True:
+                return HttpResponse(f'Error: {pdf_maker.get_err_msg()}')
+
+            pdf_maker.save_pdf_to_file(pdf_output_file=f'/tmp/pdf_test_{random_with_n_digits(5)}.pdf')
 
             retrieved, pdf_contents_or_err = pdf_maker.get_pdf_contents()
             if not retrieved:

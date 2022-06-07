@@ -111,6 +111,10 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         else:
             return f'{self.object_id} - {self.user_step}'
 
+    @mark_safe
+    def name(self):
+        return str(self)
+
     def get_dataset_info(self):
         """
         Access a DataSetInfo object, either dataversefileinfo or uploadfileinfo

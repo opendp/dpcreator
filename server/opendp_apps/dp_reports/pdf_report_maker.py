@@ -176,17 +176,19 @@ class PDFReportMaker(BasicErrCheck):
         if self.has_error():
             return
 
-        if not pdf_output_file:
-            pdf_output_file = join(CURRENT_DIR,
+        self.pdf_output_file = pdf_output_file
+
+        if not self.pdf_output_file:
+            self.pdf_output_file = join(CURRENT_DIR,
                                    'test_data',
                                    'pdfs',
                                    'pdf_report_01_%s.pdf' % (random_with_n_digits(6)))
 
-        print('pdf_output_file', pdf_output_file)
-        with open(pdf_output_file, "wb") as out_file_handle:
+        print('pdf_output_file', self.pdf_output_file)
+        with open(self.pdf_output_file, "wb") as out_file_handle:
             PDF.dumps(out_file_handle, self.pdf_doc)
-        logger.info(f'PDF created: {pdf_output_file}')
-        os.system(f'open {pdf_output_file}')
+        logger.info(f'PDF created: {self.pdf_output_file}')
+        os.system(f'open {self.pdf_output_file}')
 
     def start_new_page(self):
         """Start a new page"""
@@ -216,7 +218,7 @@ class PDFReportMaker(BasicErrCheck):
             elif str(ex_obj).find(assert_err2) > -1:
                 logger.exception('AssertionError 2')
 
-            logger.info("Start a new page!")
+            logger.info("(Recovering from error) Start a new page!")
             self.start_new_page()
             logger.info('Try to add the element again')
 
@@ -277,7 +279,7 @@ class PDFReportMaker(BasicErrCheck):
             putil.txt_reg(' has been calculated for the variable'),
             putil.txt_bld(f" {var_name}."),
             putil.txt_reg(' The histogram'),
-            putil.txt_reg(' result and accuracy information is shown below.'),
+            putil.txt_reg(' result and accuracy information are shown below.'),
             # putil.txt_reg(' and table are shown below:'),
         ]
         return text_chunks
@@ -733,7 +735,7 @@ class PDFReportMaker(BasicErrCheck):
 
         para_attachment = (f'Note: If you are using Adobe Acrobat, a JSON version of this data'
                            f' is attached to this PDF as a file named'
-                           f' "{self.get_embed_json_fname()}".')
+                           f' "{self.get_embed_json_fname()}."')
 
         intro_page_paras = [intro_text, para_read_carefully, para_attachment]
         for para_text in intro_page_paras:

@@ -11,12 +11,13 @@ class DepositorSetupInfoAdmin(admin.ModelAdmin):
     save_on_top = True
     search_fields = ('dataset__name',)
     list_filter = ('is_complete', )
-    list_display = ('dataversefileinfo',
+    list_display = ('name',
                     'user_step',
                     'epsilon',
                     'updated',
                     'created',)
     readonly_fields = ('id',
+                       'name',
                        'object_id',
                        'is_complete',
                        'variable_info_display',
