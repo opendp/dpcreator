@@ -56,6 +56,7 @@ class DataSetFormatter(BasicErrCheck):
         ds_dict = {
             'type': self.dataset.source,
             'name': self.dataset.name,
+            'fileFormat': self.dataset.get_file_type(),
             'creator': self.dataset.creator.as_json(),  # OpenDP User object
             "upload_date": {
                 "iso": self.dataset.created.isoformat(),

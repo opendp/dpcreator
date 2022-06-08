@@ -34,12 +34,18 @@ class OpenDPUser(AbstractUser):
         user_info = {}
         if self.first_name:
             user_info['first_name'] = self.first_name
+        else:
+            user_info['first_name'] = None
 
         if self.last_name:
             user_info['last_name'] = self.last_name
+        else:
+            user_info['last_name'] = None
 
         if self.email:
             user_info['email'] = self.email
+        else:
+            user_info['email'] = None
 
         return user_info
 

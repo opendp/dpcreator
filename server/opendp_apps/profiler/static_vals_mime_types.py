@@ -25,11 +25,13 @@ MIME_TYPE_PAIRS = (\
 
 MIME_TYPE_LOOKUP = {x:y for x, y in MIME_TYPE_PAIRS}
 
-def get_mime_type(file_ext):
+def get_mime_type(file_ext, unknown_text=None):
     """Return a mimetype based on an extension."""
+    if not unknown_text:
+        unknown_text = "Unknown mime type for extension: %s" % file_ext
     return MIME_TYPE_LOOKUP.get(\
                 file_ext.lower(),
-                "Unknown mime type for extension: %s" % file_ext)
+                unknown_text)
 
 def get_data_file_separator(fname):
     """Based on the extension, get the correct separator, default to ',' """

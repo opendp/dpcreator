@@ -1,6 +1,10 @@
+{% spaceless %}
 The data file used to generate the DP statistic{{ statistics|length|pluralize:",s" }}
 {% if dataset.type == 'dataverse' %}
-is located in a Dataverse repostitory. Details on the repository and file may be found below:
+    is located in a Dataverse repository. Details on the repository and file may be found below:
+{% elif dataset.type == 'upload' %}
+    was uploaded directly to DP Creator. Details on the file may be found below:
 {% else %}
-is from {{ dataset.type }}. Details on the file may be found below:
-{% endif %}.
+    is from {{ dataset.type }}. Details on the file may be found below:
+{% endif %}
+{% endspaceless %}

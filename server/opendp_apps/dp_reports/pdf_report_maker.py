@@ -48,6 +48,7 @@ from opendp_apps.analysis import static_vals as astatic
 
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 
+from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.dp_reports import pdf_preset_text
 from opendp_apps.dp_reports import pdf_utils as putil
 from opendp_apps.dp_reports import static_vals as pdf_static
@@ -570,6 +571,54 @@ class PDFReportMaker(BasicErrCheck):
         for paragraph_obj in pdf_preset_text.NEGATIVE_VALUES:
             self.add_to_layout(paragraph_obj)
 
+    def add_dataset_upload_info(self, dataset_info):
+        """Data Source section, add UploadFile table"""
+        if self.has_error():
+            return
+
+        tbl_src = FlexibleColumnWidthTable(number_of_rows=6,
+                                           number_of_columns=2,
+                                           padding_left=Decimal(40),
+                                           padding_right=Decimal(60),
+                                           padding_bottom=Decimal(0))
+
+        # ------------------------------
+        # File information
+        # ------------------------------
+        tbl_src.add(putil.get_tbl_cell_ital("File Information", col_span=2))
+
+        # Name
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f'Name', padding=self.indent1))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f"{dataset_info['name']}", padding=0))
+
+        # File format
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f'File format', padding=self.indent1))
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f"{dataset_info['fileFormat']}", padding=0))
+
+        # Upload date
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f'Upload Date', padding=self.indent1))
+        date_str = dataset_info['upload_date']['human_readable']
+        tbl_src.add(putil.get_tbl_cell_lft_pad(date_str, padding=0))
+
+        # ------------------------------
+        # User information
+        # ------------------------------
+        tbl_src.add(putil.get_tbl_cell_ital("User Information", col_span=2))
+
+        # Name
+        tbl_src.add(putil.get_tbl_cell_lft_pad(f'Name', padding=self.indent1))
+        name_fmt = '(Not Available)'
+        if dataset_info['creator']['first_name'] and dataset_info['creator']['last_name']:
+            name_fmt = dataset_info['creator']['first_name'] + ' ' + dataset_info['creator']['last_name']
+
+        tbl_src.add(putil.get_tbl_cell_lft_pad(name_fmt, padding=0))
+
+        # Add borders padding
+        self.set_table_borders_padding(tbl_src)
+
+        # Add to overall doc
+        self.add_to_layout(tbl_src)
+
     def add_data_source_and_lib(self):
         """Add the data source and library information"""
         if self.has_error():
@@ -587,12 +636,15 @@ class PDFReportMaker(BasicErrCheck):
 
         dataset_info = self.release_dict['dataset']
 
-        # Assuming a Dataverse dataset for now
-        if dataset_info['type'] != 'dataverse':
-            note = '!Not a Dataverse dataset. Add handling! (pdf_report_maker.py / add_data_source_and_lib)'
-            self.add_to_layout(putil.txt_reg_para(note))
+        # Dataset is a UserUpload
+        if dataset_info['type'] == DataSetInfo.SourceChoices.UserUpload:
+            #note = '!Not a Dataverse dataset. Add handling! (pdf_report_maker.py / add_data_source_and_lib)'
+            #self.add_to_layout(putil.txt_reg_para(note))
+            self.add_dataset_upload_info(dataset_info)
+            self.add_opendp_lib_info()
             return
 
+        # Dataset is from Dataverse
         tbl_src = FlexibleColumnWidthTable(number_of_rows=11,
                                            number_of_columns=2,
                                            padding_left=Decimal(40),

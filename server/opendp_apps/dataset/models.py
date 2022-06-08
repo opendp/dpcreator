@@ -1,6 +1,7 @@
 from collections import OrderedDict
 import json
 import logging
+from os.path import splitext
 
 from django.apps import apps
 from django.conf import settings
@@ -18,6 +19,7 @@ from opendp_apps.model_helpers.basic_response import ok_resp, err_resp, BasicRes
 # Temp workaround!!! See Issue #300
 # https://github.com/opendp/dpcreator/issues/300
 from opendp_apps.utils.camel_to_snake import camel_to_snake
+from opendp_apps.profiler.static_vals_mime_types import get_mime_type
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -394,6 +396,14 @@ class UploadFileInfo(DataSetInfo):
     depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo',
                                                 on_delete=models.CASCADE,
                                                 null=True)
+
+    def get_file_type(self):
+        """
+        (hack) Return the file type based on the extension
+        TODO: save this as an attribute
+        """
+        _filename, file_extension = splitext(self.name)
+        return get_mime_type(file_extension, '(unknown file type)')
 
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the STEP
