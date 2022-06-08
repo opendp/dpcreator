@@ -29,6 +29,26 @@ class OpenDPUser(AbstractUser):
     def __str__(self):
         return self.username  # str(self.object_id)
 
+    def as_json(self):
+        """Used in the DP Release"""
+        user_info = {}
+        if self.first_name:
+            user_info['first_name'] = self.first_name
+        else:
+            user_info['first_name'] = None
+
+        if self.last_name:
+            user_info['last_name'] = self.last_name
+        else:
+            user_info['last_name'] = None
+
+        if self.email:
+            user_info['email'] = self.email
+        else:
+            user_info['email'] = None
+
+        return user_info
+
     @staticmethod
     def remove_handoff_id(opendp_user: OpenDPUser) -> bool:
         """Return True if the handoff_id is successfully set to None or already None"""

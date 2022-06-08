@@ -9,6 +9,7 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import render_to_string
 
+from opendp_apps.analysis.misc_formatters import get_readable_datetime
 from opendp_apps.analysis.models import ReleaseInfo
 from opendp_apps.analysis.setup_question_formatter import SetupQuestionFormatter
 from opendp_apps.dataset.dataset_formatter import DataSetFormatter
@@ -40,23 +41,6 @@ class ReleaseInfoFormatter(BasicErrCheck):
 
         self.analysis_plan = self.release_util.analysis_plan
         self.dataset = self.release_util.analysis_plan.dataset
-
-
-    def get_readable_datetime(self, dt_obj: dt):
-        """
-        Format a datetime object
-        https://docs.python.org/3/library/datetime.html#strftime-and-strptime-format-codes
-        """
-        tz_str = dt_obj.strftime("%Z")
-        if tz_str:
-            tz_str= f' {tz_str}'
-
-        readable_str = dt_obj.strftime("%B") + ' ' \
-                       + dt_obj.strftime("%d") + ', ' \
-                       + dt_obj.strftime("%Y") \
-                       + ' at ' + dt_obj.strftime("%H:%M:%S:%f") \
-                       + tz_str
-        return readable_str
 
     def get_release_data(self, as_json=False):
         """Return the formatted release"""
@@ -92,8 +76,8 @@ class ReleaseInfoFormatter(BasicErrCheck):
             # "release_url": None,    # via with https://github.com/opendp/dpcreator/issues/34
             "created": {
                 "iso": current_dt.isoformat(),
-                "human_readable": self.get_readable_datetime(current_dt),
-                "human_readable_date_only": current_dt.strftime('%w %B, %Y'),
+                "human_readable": get_readable_datetime(current_dt),
+                "human_readable_date_only": current_dt.strftime('%-d %B, %Y'),
             },
             "application": "DP Creator",
             "application_url": "https://github.com/opendp/dpcreator",
@@ -112,7 +96,7 @@ class ReleaseInfoFormatter(BasicErrCheck):
             release_json = json.dumps(self.release_dict, cls=DjangoJSONEncoder)
             release_json.encode()
         except TypeError as err_obj:
-            user_msg = 'Failed to convert the Release informaation into JSON. ({err_obj})'
+            user_msg = f'Failed to convert the Release information into JSON. ({err_obj})'
             self.add_err_msg(user_msg)
 
 

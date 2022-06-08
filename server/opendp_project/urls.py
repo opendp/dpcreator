@@ -26,7 +26,10 @@ from opendp_apps.analysis.views.validation_view import ValidationView
 from opendp_apps.banner_messages.views import BannerMessageViewSet
 
 from opendp_apps.content_pages.view_vue_settings import VueSettingsView
-from opendp_apps.dataset.views import DepositorSetupViewSet, DataSetInfoViewSet
+from opendp_apps.dataset.views import \
+    (DepositorSetupViewSet,
+     DataSetInfoViewSet,
+     UploadFileSetupViewSet)
 from opendp_apps.dataset.views_profile import ProfilingViewSet
 from opendp_apps.dataverses.urls import router as dataverse_router
 from opendp_apps.dataverses.views.dataverse_file_view import DataverseFileView
@@ -55,6 +58,7 @@ router.register(r'deposit', DepositorSetupViewSet, basename='deposit')
 
 router.register(r'dv-handoff', DataverseHandoffView, basename='dv-handoff')
 router.register(r'dv-file', DataverseFileView, basename='dv-file')
+router.register(r'direct-upload', UploadFileSetupViewSet, basename='direct-upload')
 
 router.register(r'profile', ProfilingViewSet, basename='profile')
 router.register(r'registered-dvs', RegisteredDataverseView, basename='registered-dvs')

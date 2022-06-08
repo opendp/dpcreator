@@ -4,7 +4,7 @@
       <v-sheet rounded="lg">
         <v-container>
           <h1 class="title-size-2" style="line-height:150%"><b>DP Release</b>
-            <br/>{{ datasetInfo.datasetSchemaInfo.name }}</h1>
+            <br/>{{ datasetInfo.name }}</h1>
           Current Status:
           <StatusTag class="my-5" :status="status"/>
           <p></p>
@@ -16,7 +16,7 @@
                 </p>
               </v-col>
               <v-col cols="6">
-                <a v-if="analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
+                <a v-if="analysisPlan.releaseInfo.dataverseDepositInfo && analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
                    data-test="dataverseLink"
                    class="text-decoration-none" :href="fileUrl"
                 >Check DP release in Dataverse
@@ -66,23 +66,27 @@
               <v-icon left>mdi-download</v-icon>
               <span>DP Release JSON File</span>
             </Button>
-          <div style="padding-top:20px;">
-            <hr /><br />
-            <h3 class="title-size-3">Dataverse deposits</h3>
-            <p v-if="!analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess" style="padding-bottom:20px; padding-top: 10px;">
-            <b>JSON file: </b><span
-              v-html="'' + analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.dvErrMsg"></span>
-            </p>
-            <p v-if="analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess" style="padding-bottom:20px; padding-top: 10px;">
-            <a
-                  data-test="dataverseLink"
-                  class="text-decoration-none" :href="fileUrl"
-               >Check DP release in Dataverse
-                 <v-icon small color="primary">mdi-open-in-new</v-icon>
-              </a>
-            </p>
-          </div>
-
+            <div style="padding-top:20px;">
+              <hr/>
+              <br/>
+              <div v-if="analysisPlan.releaseInfo.dataverseDepositInfo">
+                <h3 class="title-size-3">Dataverse deposits</h3>
+                <p v-if="!analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
+                   style="padding-bottom:20px; padding-top: 10px;">
+                  <b>JSON file: </b><span
+                    v-html="'' + analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.dvErrMsg"></span>
+                </p>
+                <p v-if="analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
+                   style="padding-bottom:20px; padding-top: 10px;">
+                  <a
+                      data-test="dataverseLink"
+                      class="text-decoration-none" :href="fileUrl"
+                  >Check DP release in Dataverse
+                    <v-icon small color="primary">mdi-open-in-new</v-icon>
+                  </a>
+                </p>
+              </div>
+            </div>
 
           </div>
 

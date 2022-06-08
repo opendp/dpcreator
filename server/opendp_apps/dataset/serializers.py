@@ -71,7 +71,8 @@ class DataSetInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DataSetInfo
-        fields = ['object_id', 'name', 'created', 'creator', 'source', 'status', 'status_name',]
+        fields = ['object_id', 'name', 'created', 'creator',
+                  'source', 'status', 'status_name']
         read_only_fields = ['object_id', 'id', 'created', 'updated']
 
 
@@ -141,18 +142,28 @@ class DataverseFileInfoSerializer(DataSetInfoSerializer):
 
     class Meta:
         model = DataverseFileInfo
-        fields = ['object_id', 'name', 'created', 'creator', 'installation_name', 'dataverse_file_id', 'dataset_doi',
-                  'file_doi', 'status', 'status_name', 'depositor_setup_info', 'dataset_schema_info',
-                  'file_schema_info', 'analysis_plans']
+        fields = ['object_id', 'name', 'created', 'creator', 'installation_name',
+                  'dataverse_file_id', 'dataset_doi',
+                  'file_doi', 'status', 'status_name', 'depositor_setup_info',
+                  'dataset_schema_info', 'file_schema_info', 'analysis_plans']
         extra_kwargs = {
             'url': {'view_name': 'dataset-info-list'},
         }
 
 
 class UploadFileInfoSerializer(serializers.ModelSerializer):
+    """
+    Used in the dataset list API. http://localhost:8000/api/dataset-info/
+    """
     creator = serializers.SlugRelatedField(queryset=OpenDPUser.objects.all(),
                                            slug_field='username',
                                            read_only=False)
+
+    depositor_setup_info = DepositorSetupInfoSerializer(read_only=True)
+
+    dataset_schema_info = serializers.JSONField(read_only=True)
+
+    file_schema_info = serializers.JSONField(read_only=True)
 
     analysis_plans = AnalysisPlanSerializer(many=True,
                                             read_only=True,
@@ -161,11 +172,26 @@ class UploadFileInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = UploadFileInfo
         fields = ['object_id', 'name', 'created', 'creator',
-                  #'data_file',
+                  'depositor_setup_info', 'dataset_schema_info', 'file_schema_info',
                   'status', 'status_name', 'analysis_plans']
         extra_kwargs = {
             'url': {'view_name': 'dataset-info-list'},
         }
+
+
+class UploadFileInfoCreationSerializer(serializers.ModelSerializer):
+    """
+    Used only for UploadFileInfo creation.
+    For retrieval APIs (list/get), see "UploadFileInfoSerializer"
+    """
+    name = serializers.CharField()
+    source_file = serializers.FileField(use_url=False)
+    creator = serializers.SlugRelatedField(slug_field='object_id',
+                                           queryset=OpenDPUser.objects.all())
+
+    class Meta:
+        model = UploadFileInfo
+        fields = ['object_id', 'name', 'source_file', 'creator']
 
 
 class DataSetInfoPolymorphicSerializer(PolymorphicSerializer):

@@ -253,7 +253,9 @@ export default {
                 this.$router.push(path)
               })
             } else {
-              this.$router.push(path)
+              this.$store.dispatch('dataset/clearAnalysisPlan').then(() => {
+                this.$router.push(path)
+              })
             }
           })
     },

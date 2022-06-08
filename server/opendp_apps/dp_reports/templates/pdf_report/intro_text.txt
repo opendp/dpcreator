@@ -1,2 +1,18 @@
-This report contains differentially private (DP) statistics calculated by a user of the DP Creator application using the dataset "{{ dataset.name }}" from the repository {{ dataset.installation.name }} at {{ dataset.installation.url }}.
+{% spaceless %}This report contains differentially private (DP) statistics calculated by the DP Creator application using the
+    {# ----- USER-UPLOADED FILE NOTE ----- #}
+    {% if dataset.type == 'upload'%} file "{{ dataset.name }}."
+       file named "{{ dataset.name }}" which was uploaded by
+       {% if dataset.creator.first_name and dataset.creator.last_name %}
+            user {{ dataset.creator.first_name }} {{ dataset.creator.last_name }}.
+        {% else %}
+            a person with username "{{ dataset.creator.username }}."
+        {% endif %}
+    {% elif dataset.type == 'dataverse' %}
+        {# ----- DATAVERSE-UPLOADED FILE NOTE ----- #}
+        dataset "{{ dataset.name }}" from the repository {{ dataset.installation.name }} at {{ dataset.installation.url }}.
+    {% else %}
+        {# ----- UNKNOWN SOURCE FILE NOTE ----- #}
+        (!! Error: Data from an unknown source. See pdf_report_maker.py 'pdf_report/intro_text.txt' !!)
+    {% endif %}
+{% endspaceless %}
 

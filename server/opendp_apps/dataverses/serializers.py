@@ -1,8 +1,7 @@
 from rest_framework import serializers
 
-from opendp_apps.dataset.models import DataverseFileInfo
+from opendp_apps.dataset.models import DataverseFileInfo, UploadFileInfo
 from opendp_apps.dataverses.models import RegisteredDataverse, DataverseHandoff
-from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.user.models import DataverseUser, OpenDPUser
 
 
@@ -12,6 +11,7 @@ class RegisteredDataverseSerializer(serializers.ModelSerializer):
         fields = ['name', 'dataverse_url',
                   'object_id', 'active',
                   'created', 'updated']
+
 
 class DataverseUserSerializer(serializers.ModelSerializer):
 

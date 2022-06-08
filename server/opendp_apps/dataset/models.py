@@ -1,5 +1,7 @@
 from collections import OrderedDict
 import json
+import logging
+from os.path import splitext
 
 from django.apps import apps
 from django.conf import settings
@@ -17,9 +19,11 @@ from opendp_apps.model_helpers.basic_response import ok_resp, err_resp, BasicRes
 # Temp workaround!!! See Issue #300
 # https://github.com/opendp/dpcreator/issues/300
 from opendp_apps.utils.camel_to_snake import camel_to_snake
+from opendp_apps.profiler.static_vals_mime_types import get_mime_type
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 UPLOADED_FILE_STORAGE = FileSystemStorage(location=settings.UPLOADED_FILE_STORAGE_ROOT)
-
 
 class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     """
@@ -105,14 +109,30 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         """shortcut to access the DepositorSetupInfo"""
         return self.get_depositor_setup_info()
 
+    def is_dataverse_file_info(self):
+        """Is this an instance of a DataverseFileInfo object?"""
+        if hasattr(self, 'get_real_instance') is False:
+            return False
+
+        return isinstance(self.get_real_instance(), DataverseFileInfo)
+
+    def is_upload_file_info(self):
+        """Is this an instance of an UploadFileInfo object?"""
+        if hasattr(self, 'get_real_instance') is False:
+            return False
+
+        return isinstance(self.get_real_instance(), UploadFileInfo)
+
     def get_depositor_setup_info(self):
         """Hack; need to address https://github.com/opendp/dpcreator/issues/257"""
-        if hasattr(self, 'dataversefileinfo'):
-            return self.dataversefileinfo.depositor_setup_info
-        elif hasattr(self, 'uploadfileinfo'):
-            return self.uploadfileinfo.depositor_setup_info
-
-        raise AttributeError('Unknown DataSetinfo type. No access to depositor_setup_info')
+        try:
+            return self.get_real_instance().depositor_setup_info
+        except AttributeError as err_obj:
+            user_msg = (f'Unknown DataSetinfo type. No access to depositor_setup_info.'
+                        f' depositor_setup_info. class:'
+                        f' {self.get_real_instance().__class__}. err: {err_obj}')
+            logger.error(user_msg)
+            raise AttributeError(user_msg)
 
     def get_dataset_size(self) -> BasicResponse:
         """Retrieve the rowCount index from the data_profile -- not always avaiable"""
@@ -316,6 +336,7 @@ class DataverseFileInfo(DataSetInfo):
 
         if not self.name:
             self.name = f'{self.dataset_doi} ({self.dv_installation})'
+
         self.source = DataSetInfo.SourceChoices.Dataverse
 
         super(DataverseFileInfo, self).save(*args, **kwargs)
@@ -376,12 +397,26 @@ class UploadFileInfo(DataSetInfo):
                                                 on_delete=models.CASCADE,
                                                 null=True)
 
+    def get_file_type(self):
+        """
+        (hack) Return the file type based on the extension
+        TODO: save this as an attribute
+        """
+        _filename, file_extension = splitext(self.name)
+        return get_mime_type(file_extension, '(unknown file type)')
+
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the STEP
         #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
         #       depending on the data
         #
         self.source = DataSetInfo.SourceChoices.UserUpload
+
+        if not self.depositor_setup_info:
+            # Set default DepositorSetupInfo object
+            dsi = DepositorSetupInfo.objects.create(creator=self.creator)
+            self.depositor_setup_info = dsi
+
         super(UploadFileInfo, self).save(*args, **kwargs)
 
     class Meta:
@@ -405,3 +440,23 @@ class UploadFileInfo(DataSetInfo):
                     object_id=self.object_id.hex)
 
         return info
+
+    @property
+    def status(self):
+        """
+        Return the user_step object
+        """
+        try:
+            return self.depositor_setup_info.user_step
+        except DepositorSetupInfo.DoesNotExist:
+            return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED
+
+    @property
+    def status_name(self):
+        """
+        Return the user_step label
+        """
+        try:
+            return self.depositor_setup_info.user_step.label
+        except DepositorSetupInfo.DoesNotExist:
+            return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED.label

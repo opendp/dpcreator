@@ -11,12 +11,13 @@ class DepositorSetupInfoAdmin(admin.ModelAdmin):
     save_on_top = True
     search_fields = ('dataset__name',)
     list_filter = ('is_complete', )
-    list_display = ('dataversefileinfo',
+    list_display = ('name',
                     'user_step',
                     'epsilon',
                     'updated',
                     'created',)
     readonly_fields = ('id',
+                       'name',
                        'object_id',
                        'is_complete',
                        'variable_info_display',
@@ -60,7 +61,7 @@ class ReleaseInfoAdmin(admin.ModelAdmin):
     readonly_fields = ('id',
                        'object_id',
                        'dataset',
-                       'dp_release', 'epsilon_used',
+                       'dp_release_json', 'epsilon_used',
                        'dataverse_deposit_info_json',
                        'download_json_url',
                        'download_pdf_url',

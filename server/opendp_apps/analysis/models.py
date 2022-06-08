@@ -111,6 +111,10 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         else:
             return f'{self.object_id} - {self.user_step}'
 
+    @mark_safe
+    def name(self):
+        return str(self)
+
     def get_dataset_info(self):
         """
         Access a DataSetInfo object, either dataversefileinfo or uploadfileinfo
@@ -205,6 +209,13 @@ class ReleaseInfo(TimestampedModelWithUUID):
     def save(self, *args, **kwargs):
         """Error check the dataverse_deposit_complete flag"""
         super(ReleaseInfo, self).save(*args, **kwargs)
+
+    @mark_safe
+    def dp_release_json(self):
+        """Return JSON string"""
+        if self.dp_release:
+            return '<pre>' + json.dumps(self.dp_release, indent=4) + '</pre>'
+        return ''
 
     @mark_safe
     def dataverse_deposit_info_json(self):
