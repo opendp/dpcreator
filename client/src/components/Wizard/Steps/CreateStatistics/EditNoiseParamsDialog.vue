@@ -79,6 +79,7 @@
             classes="mr-2 px-5"
             :click="handleSaveEditNoiseParamsDialog"
             :disabled="!validParamsForm"
+            data-test="editParamsSave"
             label="Confirm"
         />
         <Button
