@@ -95,7 +95,7 @@ export default {
             if (is_x_gte_kv(x, k, x / k)) return x / k
 
             // try increasingly large offsets until passes
-            for (pow of Array(20).keys()) {
+            for (let pow of Array(20).keys()) {
                 // candidate value v
                 let v = (x - Math.pow(10, pow - 20)) / k
                 if (is_x_gte_kv(x, k, v)) return v
