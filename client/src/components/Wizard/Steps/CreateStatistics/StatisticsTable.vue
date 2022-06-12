@@ -186,7 +186,7 @@ export default {
             lockedEpsilon = lockedEpsilon.plus(item.epsilon)
           }
         })
-        if (lockedEpsilon > this.totalEpsilon)
+        if (Number(lockedEpsilon) > Number(this.totalEpsilon))
           item.valid = false
       }
       this.updateCompleteStatus()
