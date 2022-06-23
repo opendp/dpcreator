@@ -453,7 +453,6 @@ class StatSpec:
     def get_single_err_msg(self):
         """Get the first message in the self.error_messages list"""
         if self.has_error():
-            print(f"self.get_err_msgs(): {self.get_err_msgs()}")
             return self.get_err_msgs()[0]
         return None
 
