@@ -5,7 +5,7 @@ from django.db import transaction
 from rest_framework import permissions, status
 from rest_framework.response import Response
 
-from opendp_apps.analysis.models import AnalysisPlan, DepositorSetupInfo
+from opendp_apps.analysis.models import AnalysisPlan, DepositorSetupInfo, ReleaseInfo
 from opendp_apps.dataset.models import DataSetInfo, UploadFileInfo
 from opendp_apps.dataset.permissions import IsOwnerOrBlocked
 from opendp_apps.dataset.serializers import \
@@ -103,8 +103,10 @@ class UploadFileSetupViewSet(BaseModelViewSet):
             creator is the logged in user
         """
         logger.info(f"Getting UploadFileInfo for user {self.request.user.object_id}")
-        qs = UploadFileInfo.objects.filter(creator=self.request.user)
-        return qs
+        return UploadFileInfo.objects.filter(creator=self.request.user)
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
 
     def list(self, request, *args, **kwargs):
         """
@@ -114,3 +116,13 @@ class UploadFileSetupViewSet(BaseModelViewSet):
         """
         serializer = UploadFileInfoCreationSerializer(self.get_queryset(), many=True)
         return Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        # We currently have on_delete set to protect, so we need to explicitly delete
+        # the AnalysisPlan and ReleaseInfo objects first.
+        AnalysisPlan.objects.filter(dataset=self.get_object()).delete()
+        ReleaseInfo.objects.filter(dataset=self.get_object()).delete()
+        return super().destroy(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
