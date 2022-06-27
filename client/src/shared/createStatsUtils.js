@@ -4,7 +4,8 @@ import release from "@/api/release";
 export const deltaStats = ['Histogram']
 export const CL_99 = "99"
 export const CL_95 = "95"
-
+export const MAX_TOTAL_EPSILON = 1
+export const MIN_EPSILON = .001
 
 export const confLevelOptions = [
     {text: "99%", value: .99},

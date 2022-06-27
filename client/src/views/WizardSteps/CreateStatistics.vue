@@ -271,7 +271,6 @@ export default {
         item.epsilon = +item.epsilon
         item.delta = +item.delta
       })
-
       this.$store.dispatch('dataset/updateDPStatistics', this.statistics)
 
     },
@@ -298,6 +297,7 @@ export default {
     },
     changeLockStatus(item) {
       item.locked = !item.locked;
+      this.saveUserInput()
     },
     deleteItem(item) {
       this.editedIndex = this.statistics.indexOf(item);

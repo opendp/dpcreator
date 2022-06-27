@@ -137,7 +137,7 @@
 import Button from "../../../DesignSystem/Button.vue";
 import QuestionIconTooltip from "../../../DynamicHelpResources/QuestionIconTooltip.vue";
 import Decimal from "decimal.js";
-import createStatsUtils from "@/shared/createStatsUtils";
+import createStatsUtils, {MAX_TOTAL_EPSILON, MIN_EPSILON} from "@/shared/createStatsUtils";
 
 export default {
   components: {QuestionIconTooltip, Button},
@@ -177,7 +177,7 @@ export default {
       item.valid = true
       if (isNaN(item.epsilon)) {
         item.valid = false
-      } else if (item.epsilon <= 0) {
+      } else if (item.epsilon < MIN_EPSILON || item.epsilon > MAX_TOTAL_EPSILON) {
         item.valid = false
       } else {
         let lockedEpsilon = new Decimal('0.0');
