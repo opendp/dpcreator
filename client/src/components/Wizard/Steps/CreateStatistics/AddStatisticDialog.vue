@@ -83,8 +83,8 @@
                   </v-radio-group>
                 </div>
         -->
-        <!--    <div v-if="editedItemDialog.handleAsFixed">-->
-        <div>
+        <div v-if="editedItemDialog.handleAsFixed">
+
           <span>Enter a <strong> fixed value</strong></span> for missing values:
           <div class="width50">
             <v-text-field
@@ -191,8 +191,7 @@
 <script>
 import Button from "../../../DesignSystem/Button.vue";
 import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
-import release from "@/api/release";
-import {mapState, mapGetters} from "vuex";
+import {mapGetters, mapState} from "vuex";
 import createStatsUtils from "@/shared/createStatsUtils";
 
 export default {
@@ -222,7 +221,7 @@ export default {
       if (this.editedItemDialog.statistic == ""
           || this.editedItemDialog.variable == ""
           || this.editedItemDialog.variable == undefined
-          || this.editedItemDialog.fixedValue == "") {
+          || (this.editedItemDialog.statistic != "count" && this.editedItemDialog.fixedValue == "")) {
         disabled = true
       }
       return disabled
@@ -405,6 +404,10 @@ export default {
     updateSelectedStatistic(statistic) {
       console.log('update selected statistic: ' + JSON.stringify(statistic))
       this.selectedStatistic = statistic
+      if (this.selectedStatistic.value == "count") {
+        this.editedItemDialog.missingValuesHandling = ""
+        this.editedItemDialog.handleAsFixed = false
+      }
     },
     updateFixedInputVisibility(handlingOption) {
       this.editedItemDialog.handleAsFixed =
