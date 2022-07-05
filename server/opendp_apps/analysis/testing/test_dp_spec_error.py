@@ -5,6 +5,8 @@ from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
 
 # from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.analysis import static_vals as astatic
+# from opendp_apps.analysis.models import DataSetInfo
+from opendp_apps.analysis.models import AnalysisPlan, DepositorSetupInfo
 
 from opendp_apps.model_helpers.msg_util import msgt
 
@@ -67,3 +69,28 @@ class DPSpecErrorTest(TestCase):
             DPSpecError({})
 
         self.assertEqual(str(context.exception), DPSpecError.ERR_MSG_REQUIRED_PROPS)
+
+    def test_40_depositor_setup_size(self):
+        """(40) Test values for dataset size question"""
+        msgt(self.test_40_depositor_setup_size.__doc__)
+
+        d = DepositorSetupInfo()
+
+        # Yes, dataset size may be made public
+        #
+        d.epsilon_questions = {'secret_sample': 'no',
+                               'population_size': '',
+                               'observations_number_can_be_public': 'yes'}
+        self.assertTrue(d.is_dataset_size_public())
+
+        for size_public in ['YES', True, 1, 'y']:
+            d.epsilon_questions['observations_number_can_be_public'] = size_public
+            self.assertTrue(d.is_dataset_size_public())
+
+        # No, dataset size is not explicitly set to be public
+        #
+        for size_private in [None, {}, 'no', False, 100, 'hello', 'oh-boy', bool]:
+            d.epsilon_questions['observations_number_can_be_public'] = size_private
+            self.assertFalse(d.is_dataset_size_public())
+
+    # def test_50_analysis_plan_dataset_size(self):

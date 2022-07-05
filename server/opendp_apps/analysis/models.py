@@ -1,5 +1,6 @@
 from collections import OrderedDict
 import json
+from distutils.util import strtobool
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
@@ -41,7 +42,6 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         STEP_9200_DATAVERSE_DOWNLOAD_FAILED = 'error_9200', 'Error 2: Dataverse Download Failed'
         STEP_9300_PROFILING_FAILED = 'error_9300', 'Error 3: Profiling Failed'
         STEP_9400_CREATE_RELEASE_FAILED = 'error_9400', 'Error 4: Create Release Failed'
-
 
     # User who initially added/uploaded data
     creator = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -92,7 +92,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
                                          ' value but may be overridden by the user.'),
                               validators=[validate_not_negative])
 
-    confidence_level = models.FloatField(\
+    confidence_level = models.FloatField(
                               choices=astatic.CL_CHOICES,
                               default=astatic.CL_95,
                               help_text=('Used for OpenDP operations, starts as the "default_delta"'
@@ -127,7 +127,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
 
         raise AttributeError('DepositorSetupInfo does not have access to a DataSetInfo instance')
 
-    def set_user_step(self, new_step:DepositorSteps) -> bool:
+    def set_user_step(self, new_step: DepositorSteps) -> bool:
         """Set a new user step. Does *not* save the object."""
         assert isinstance(new_step, DepositorSetupInfo.DepositorSteps), \
             "new_step must be a valid choice in DepositorSteps"
@@ -163,6 +163,19 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
             return f'<pre>{info_str}</pre>'
         except Exception as ex_obj:
             return f'Failed to conver to JSON string {ex_obj}'
+
+    def is_dataset_size_public(self) -> bool:
+        """Return a value depending on the answer in epsilon_questions"""
+        if not self.epsilon_questions:
+            return False
+
+        try:
+            # Retrieve the answer to the epsilon question with key: observations_number_can_be_public
+            #
+            is_size_public = str(self.epsilon_questions.get(astatic.SETUP_Q_05_ATTR, False))
+            return bool(strtobool(is_size_public))
+        except ValueError as _ex_obj:
+            return False
 
 class ReleaseInfo(TimestampedModelWithUUID):
     """
@@ -438,3 +451,13 @@ class AnalysisPlan(TimestampedModelWithUUID):
             return f'<pre>{info_str}</pre>'
         except Exception as ex_obj:
             return f'Failed to convert to JSON string {ex_obj}'
+
+    def is_dataset_size_public(self) -> bool:
+        """Return is_dataset_size_public from DepositorSetupInfo"""
+        if not self.dataset:
+            return False
+
+        if not self.dataset.depositor_setup_info:
+            return False
+
+        return self.dataset.depositor_setup_info.is_dataset_size_public()
