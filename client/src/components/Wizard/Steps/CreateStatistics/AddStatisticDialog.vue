@@ -119,7 +119,7 @@
             classes="mr-2 px-5"
             :click="save"
             :disabled="isButtonDisabled"
-            data-test="Create statistic"
+            data-test="Create Statistic"
             :label="getButtonLabel"
         />
 

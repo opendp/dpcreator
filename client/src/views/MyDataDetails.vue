@@ -19,7 +19,7 @@
                 <a v-if="analysisPlan.releaseInfo.dataverseDepositInfo && analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
                    data-test="dataverseLink"
                    class="text-decoration-none" :href="fileUrl"
-                >Check DP release in Dataverse
+                >Check DP Release in Dataverse
                   <v-icon small color="primary">mdi-open-in-new</v-icon>
                 </a>
               </v-col>
@@ -81,7 +81,7 @@
                   <a
                       data-test="dataverseLink"
                       class="text-decoration-none" :href="fileUrl"
-                  >Check DP release in Dataverse
+                  >Check DP Release in Dataverse
                     <v-icon small color="primary">mdi-open-in-new</v-icon>
                   </a>
                 </p>
