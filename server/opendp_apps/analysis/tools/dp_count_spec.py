@@ -33,7 +33,7 @@ class DPCountSpec(StatSpec):
                       col_index=3,
                       variable_info=dict(min=0, max=24, type=VAR_TYPE_FLOAT),
                       statistic=DP_MEAN,
-                      dataset_size=365,
+                      dataset_size=None,
                       epsilon=0.5,
                       cl=CL_95,
                       fixed_value=1)

@@ -299,7 +299,7 @@ class StatSpec:
         #
         self.validate_property('statistic')
         self.validate_property('epsilon')
-        self.validate_property('dataset_size')
+        # self.validate_property('dataset_size')
         self.validate_property('col_index')
         self.validate_property('missing_values_handling')
 

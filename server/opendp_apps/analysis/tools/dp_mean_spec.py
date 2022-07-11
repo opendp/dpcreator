@@ -65,7 +65,14 @@ class DPMeanSpec(StatSpec):
             # Convert the impute value to a float!
             if not self.cast_property_to_float('fixed_value'):
                 return
+
         self.floatify_int_values()
+
+    def run_02_basic_validation(self):
+        """Add dataset size validation"""
+        self.validate_property('dataset_size')
+
+        super().run_02_basic_validation()
 
     def run_03_custom_validation(self):
         """

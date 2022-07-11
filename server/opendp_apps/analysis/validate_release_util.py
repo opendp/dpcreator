@@ -137,8 +137,8 @@ class ValidateReleaseUtil(BasicErrCheck):
         # Any stat specific validation errors?
         #   - Fail on 1st error found
         for stat_spec in self.stat_spec_list:
-            if stat_spec.has_error():
-                stat_spec.print_debug()
+            # if stat_spec.has_error():
+            #    stat_spec.print_debug()
             if stat_spec.has_error():
                 user_msg = (f'Validation error found for variable "{stat_spec.variable}"'
                             f' and statistic "{stat_spec.statistic}":'
@@ -419,7 +419,7 @@ class ValidateReleaseUtil(BasicErrCheck):
             - Some sample input from the UI--e.g. contents of "dp_stat:
                 {
                     "statistic": astatic.DP_MEAN,
-                    "variable_key": "eye_height"
+                    "variable": "eye_height"
                     "epsilon": 1,
                     "delta": 0,
                     "error": "",
