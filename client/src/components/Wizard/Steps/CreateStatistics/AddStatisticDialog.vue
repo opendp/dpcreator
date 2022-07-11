@@ -119,7 +119,7 @@
             classes="mr-2 px-5"
             :click="save"
             :disabled="isButtonDisabled"
-            data-test="Create Statistic"
+            data-test="Create Statistic Button"
             :label="getButtonLabel"
         />
 
@@ -214,7 +214,7 @@ export default {
       return count
     },
     getButtonLabel: function () {
-      return this.formTitle === 'Edit Statistic' ? 'Save' : 'Create statistic'
+      return this.formTitle === 'Edit Statistic' ? 'Save' : 'Create Statistic'
     },
     isButtonDisabled: function () {
       let disabled = false
