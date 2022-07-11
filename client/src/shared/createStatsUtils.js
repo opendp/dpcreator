@@ -4,7 +4,8 @@ import release from "@/api/release";
 export const deltaStats = ['Histogram']
 export const CL_99 = "99"
 export const CL_95 = "95"
-
+export const MAX_TOTAL_EPSILON = 1
+export const MIN_EPSILON = .001
 
 export const confLevelOptions = [
     {text: "99%", value: .99},
@@ -95,7 +96,7 @@ export default {
             if (is_x_gte_kv(x, k, x / k)) return x / k
 
             // try increasingly large offsets until passes
-            for (pow of Array(20).keys()) {
+            for (let pow of Array(20).keys()) {
                 // candidate value v
                 let v = (x - Math.pow(10, pow - 20)) / k
                 if (is_x_gte_kv(x, k, v)) return v
