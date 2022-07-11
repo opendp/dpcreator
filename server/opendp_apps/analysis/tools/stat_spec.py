@@ -266,8 +266,12 @@ class StatSpec:
             # clipping bounds are too broad, so we need to pass back a useful error message to them explaining what
             # they need to do.
             if 'decision boundary' in str(err):
-                self.add_err_msg(f'Please make the difference between the min and max values for '
-                                 f'{self.variable} smaller')
+                self.add_err_msg(f'Sorry! The difference between the min and max values for the variable'
+                                 f' "{self.variable}" is too large. (This error will be fixed in version 0.5.0 of the'
+                                 f' OpenDP library.)')
+            else:
+                self.add_err_msg(f'Unexpected assertion error when validating the variance statistic.'
+                                 f' Exception: {err}')
         except Exception as ex_obj:
             if hasattr(ex_obj, 'message'):
                 self.add_err_msg(f'{ex_obj.message} (Exception)')
