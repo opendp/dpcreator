@@ -41,7 +41,7 @@
               :itemsPerPage="itemsPerPage"
           />
 
-          <Button v-if="myDataList.length > itemsPerPage"
+          <Button v-if="myDataList !== null && myDataList.length > itemsPerPage"
                   color="primary"
                   outlined
                   :class="{
