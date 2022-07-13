@@ -420,3 +420,5 @@ if AZURE_LOGGING is True:
     DEFAULT_LOGGER = 'azure'
 else:
     DEFAULT_LOGGER = 'django'
+
+ALLOW_RELEASE_DELETION = os.getenv('ALLOW_RELEASE_DELETION', True)

@@ -13,7 +13,7 @@ from opendp_apps.dataset.serializers import \
      DepositorSetupInfoSerializer,
      UploadFileInfoCreationSerializer)
 from opendp_project.views import BaseModelViewSet
-from opendp_apps.utils.view_helper import get_json_error, get_json_success
+from opendp_apps.utils.view_helper import get_json_error
 
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
@@ -117,12 +117,17 @@ class UploadFileSetupViewSet(BaseModelViewSet):
         serializer = UploadFileInfoCreationSerializer(self.get_queryset(), many=True)
         return Response(serializer.data)
 
-    def destroy(self, request, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):
         # We currently have on_delete set to protect, so we need to explicitly delete
         # the AnalysisPlan and ReleaseInfo objects first.
-        AnalysisPlan.objects.filter(dataset=self.get_object()).delete()
-        ReleaseInfo.objects.filter(dataset=self.get_object()).delete()
+        release_info = ReleaseInfo.objects.filter(dataset=self.get_object())
+        if release_info.exists():
+            if not settings.ALLOW_RELEASE_DELETION:
+                return Response(data=get_json_error('Deleting ReleaseInfo objects is not allowed'),
+                                status=status.HTTP_401_UNAUTHORIZED)
+            release_info.dataset = None
+            release_info.save()
+            release_info.delete()
+        analysis_plans = AnalysisPlan.objects.filter(dataset=self.get_object()).update(dataset=None)
+        analysis_plans.delete()
         return super().destroy(request, *args, **kwargs)
-
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
