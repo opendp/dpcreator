@@ -31,24 +31,25 @@
             My Data
           </h2>
           <MyDataTable
-              v-if="getMyDataList"
+              v-if="myDataList"
               :class="{
               'my-7': $vuetify.breakpoint.xsOnly,
               'my-5': $vuetify.breakpoint.smAndUp
             }"
-              :datasets="getMyDataList"
+              :datasets="myDataList"
               :paginationVisible="false"
-              :itemsPerPage="5"
+              :itemsPerPage="itemsPerPage"
           />
-          <Button
-              color="primary"
-              outlined
-              :class="{
+
+          <Button v-if="myDataList.length > itemsPerPage"
+                  color="primary"
+                  outlined
+                  :class="{
               'width100 mx-auto d-block mt-10': $vuetify.breakpoint.xsOnly
             }"
-              classes="font-weight-bold mt-5"
-              :click="() => $router.push(NETWORK_CONSTANTS.MY_DATA.PATH)"
-              label="See All My Data Files"
+                  classes="font-weight-bold mt-5"
+                  :click="() => $router.push(NETWORK_CONSTANTS.MY_DATA.PATH)"
+                  label="See All My Data Files"
           />
         </v-col>
       </v-row>
@@ -85,11 +86,10 @@ export default {
   },
   computed: {
     ...mapGetters('auth', ['isAuthenticated']),
-    ...mapGetters('dataset', ['getMyDataList']),
 
     ...mapState('auth', ['user']),
     ...mapState('dataverse', ['fileLocked']),
-    ...mapState('dataset', ['datasetList']),
+    ...mapState('dataset', ['datasetList', 'myDataList']),
     uploadedFile() {
       return this.datasetList ? this.datasetList[0] : null
     },
@@ -98,7 +98,8 @@ export default {
     }
   },
   data: () => ({
-    NETWORK_CONSTANTS
+    NETWORK_CONSTANTS,
+    itemsPerPage: 5
   })
 };
 </script>
