@@ -42,6 +42,7 @@
         </div>
       </template>
       <template v-slot:[`item.options`]="{ item }">
+        <!--
         <Button
             :data-test="action"
             v-for="(action, index) in statusInformation[stepInformation[item.userStep].workflowStatus]
@@ -63,6 +64,7 @@
             :click="() => handleButtonClick(action, item)"
             :label="actionsInformation[action]"
         />
+        -->
       </template>
       <template v-slot:footer="{ props }">
         <div
@@ -94,6 +96,49 @@
           </div>
         </div>
       </template>
+      <template v-slot:[`item.actions`]="{ item }">
+        <div class="d-flex justify-space-between">
+          <v-tooltip bottom max-width="220px">
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon
+                  v-bind="attrs"
+                  v-on="on"
+                  class="mr-2"
+                  @click="handleButtonClick('viewDetails', item)"
+              >
+                mdi-eye
+              </v-icon>
+            </template>
+            <span>View Details</span>
+          </v-tooltip>
+          <v-tooltip bottom max-width="220px">
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon
+                  v-bind="attrs"
+                  v-on="on"
+                  class="mr-2"
+                  @click="handleButtonClick('continueWorkflow', item)"
+              >
+                mdi-arrow-right
+              </v-icon>
+            </template>
+            <span>Continue</span>
+          </v-tooltip>
+          <v-tooltip bottom max-width="220px">
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon
+                  v-bind="attrs"
+                  v-on="on"
+                  @click="handleButtonClick('delete', item)"
+              >
+                mdi-delete
+              </v-icon>
+            </template>
+            <span>Delete</span>
+          </v-tooltip>
+        </div>
+      </template>
+
     </v-data-table>
   </div>
 </template>
@@ -225,8 +270,7 @@ export default {
         {text: "Data File", value: "datasetInfo.name"},
         {text: "Status", value: "status"},
         {text: "Remaining time to complete release", value: "timeRemaining"},
-        {text: "Options", value: "options", align: "end"},
-        {text: "", value: "actions"}
+        {text: "Options", value: "actions", align: "end"}
       ],
       statusInformation,
       actionsInformation,
