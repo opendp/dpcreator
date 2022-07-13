@@ -157,6 +157,10 @@
     min-width: unset !important;
   }
 
+  .delete {
+    min-width: unset !important;
+  }
+
   .v-data-table-header-mobile {
     display: none;
   }
@@ -221,7 +225,8 @@ export default {
         {text: "Data File", value: "datasetInfo.name"},
         {text: "Status", value: "status"},
         {text: "Remaining time to complete release", value: "timeRemaining"},
-        {text: "Options", value: "options", align: "end"}
+        {text: "Options", value: "options", align: "end"},
+        {text: "", value: "actions"}
       ],
       statusInformation,
       actionsInformation,
@@ -234,6 +239,19 @@ export default {
   methods: {
     handleButtonClick(action, item) {
       this[action](item)
+    },
+    delete(item) {
+      //   console.log('calling delete: '+ item.datasetInfo.objectId)
+      // this.$emit("delete", this.datasetInfo.objectId)
+      if (item.analysisPlan !== null) {
+        const payload = {
+          datasetId: item.datasetInfo.objectId,
+          analysisPlanId: item.analysisPlan.objectId
+        }
+        this.$store.dispatch('dataset/deleteAnalysisPlan', payload)
+      } else {
+        this.$store.dispatch('dataset/deleteDataset', item.datasetInfo.objectId)
+      }
     },
     viewDetails(item) {
       this.goToPage(item, `${NETWORK_CONSTANTS.MY_DATA_DETAILS.PATH}`)
