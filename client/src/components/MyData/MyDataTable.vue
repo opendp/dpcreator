@@ -98,44 +98,27 @@
       </template>
       <template v-slot:[`item.actions`]="{ item }">
         <div class="d-flex justify-space-between">
-          <v-tooltip bottom max-width="220px">
+
+          <v-tooltip
+
+              v-for="(action, index) in statusInformation[stepInformation[item.userStep].workflowStatus]
+            .availableActions"
+              bottom max-width="220px">
             <template v-slot:activator="{ on, attrs }">
               <v-icon
+                  :data-test="action"
                   v-bind="attrs"
                   v-on="on"
                   class="mr-2"
-                  @click="handleButtonClick('viewDetails', item)"
+                  @click="handleButtonClick(action, item)"
               >
-                mdi-eye
+                {{ actionsInformation.icons[action] }}
+
               </v-icon>
             </template>
-            <span>View Details</span>
+            <span>{{ actionsInformation[action] }}</span>
           </v-tooltip>
-          <v-tooltip bottom max-width="220px">
-            <template v-slot:activator="{ on, attrs }">
-              <v-icon
-                  v-bind="attrs"
-                  v-on="on"
-                  class="mr-2"
-                  @click="handleButtonClick('continueWorkflow', item)"
-              >
-                mdi-arrow-right
-              </v-icon>
-            </template>
-            <span>Continue</span>
-          </v-tooltip>
-          <v-tooltip bottom max-width="220px">
-            <template v-slot:activator="{ on, attrs }">
-              <v-icon
-                  v-bind="attrs"
-                  v-on="on"
-                  @click="handleButtonClick('delete', item)"
-              >
-                mdi-delete
-              </v-icon>
-            </template>
-            <span>Delete</span>
-          </v-tooltip>
+
         </div>
       </template>
 
@@ -284,6 +267,7 @@ export default {
     handleButtonClick(action, item) {
       this[action](item)
     },
+
     delete(item) {
       //   console.log('calling delete: '+ item.datasetInfo.objectId)
       // this.$emit("delete", this.datasetInfo.objectId)
