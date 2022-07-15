@@ -256,7 +256,22 @@ class StatSpec:
         except OpenDPException as ex_obj:
             self.add_err_msg(f'{ex_obj.message} (OpenDPException)')
             return False
-
+        except AssertionError as err:
+            # An AssertionError can be raised from the binary_search method in the OpenDP library for several reasons:
+            # 1. Bounds are not the same type
+            # 2. Bounds are neither floats nor ints
+            # 3. The search value is outside the bounds (assert max != min) which means that we won't find the value we
+            #    are looking for.
+            # Scenarios 1 and 2 elsewhere and are unlikely to be raised, but scenario 3 can happen when the user's
+            # clipping bounds are too broad, so we need to pass back a useful error message to them explaining what
+            # they need to do.
+            if 'decision boundary' in str(err):
+                self.add_err_msg(f'Sorry! The difference between the min and max values for the variable'
+                                 f' "{self.variable}" is too large. (This error will be fixed in version 0.5.0 of the'
+                                 f' OpenDP library.)')
+            else:
+                self.add_err_msg(f'Unexpected assertion error when validating the variance statistic.'
+                                 f' Exception: {err}')
         except Exception as ex_obj:
             if hasattr(ex_obj, 'message'):
                 self.add_err_msg(f'{ex_obj.message} (Exception)')

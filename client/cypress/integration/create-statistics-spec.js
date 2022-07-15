@@ -10,7 +10,7 @@
             cy.clearData()
 
         })
-        it('Updated dpStatistics Correctly', () => {
+        it('Validates Correctly after epsilon changes', () => {
             const mockDVfile = 'EyeDemoMockDV.json'
             const demoDatafile = 'EyeDemoStatsTest.json'
 
@@ -23,6 +23,58 @@
                 // select the variables we will use
                 cy.selectVariable(demoData.variables)
 
+                // Continue to Set Epsilon Step
+                cy.epsilonStep()
+                const statsData = {
+                    "datasetName": "Eye-typing experiment",
+                    "statistics": [
+                        {
+                            "statistic": "Mean",
+                            "variable": "Trial",
+                            "fixedValue": "3",
+                            "roundedAccuracy": "0.164"
+                        }
+                    ]
+                }
+                const newAccuracy = "1.64"
+                cy.createStatistics(statsData)
+                cy.get('tr').first().get('td').should('contain', statsData.statistics[0].statistic)
+                cy.get('table').contains('td', statsData.statistics[0].statistic).should('be.visible');
+
+                const epsilonInput = '[data-test="editEpsilonInput"]'
+                cy.get('[data-test=editConfidenceIcon]').click();
+                cy.get('[data-test="confirmButton"] > .v-btn__content').click();
+                cy.get('[data-test=editEpsilonInput]').click();
+                cy.get('[data-test=editEpsilonInput]').clear()
+                cy.get('[data-test=editEpsilonInput]').type('.1');
+                cy.wait(1000)
+                cy.get('[data-test=editParamsSave]').click();
+                cy.get('table').contains('td', newAccuracy).should('be.visible')
+                cy.get('tr').first().get('td').should('contain', statsData.statistics[0].statistic)
+                cy.get('table').contains('td', statsData.statistics[0].statistic).should('be.visible');
+
+                cy.get('[data-test=editConfidenceIcon]').click();
+                cy.get('[data-test="confirmButton"] > .v-btn__content').click();
+                cy.get('[data-test=editEpsilonInput]').click();
+                cy.get('[data-test=editEpsilonInput]').clear()
+                cy.get('[data-test=editEpsilonInput]').type('1');
+                cy.wait(1000)
+                cy.get('[data-test=editParamsSave]').click();
+                cy.get('table').contains('td', statsData.statistics[0].roundedAccuracy).should('be.visible')
+
+            })
+        })
+        it('Updated dpStatistics Correctly', () => {
+            const mockDVfile = 'EyeDemoMockDV.json'
+            const demoDatafile = 'EyeDemoStatsTest.json'
+            cy.createMockDataset(mockDVfile)
+            cy.fixture(demoDatafile).then((demoData) => {
+                cy.url().should('contain', 'welcome')
+                cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
+                    demoData['datasetName'])
+                cy.goToConfirmVariables(demoData.variables)
+                // select the variables we will use
+                cy.selectVariable(demoData.variables)
                 // Continue to Set Epsilon Step
                 cy.epsilonStep()
                 // Add all the statistics in the Create Statistics Step
