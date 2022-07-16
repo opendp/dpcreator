@@ -9,3 +9,5 @@ DEBUG = True
 #                                                            '[0, 1, 2, 3, 4, 5, 6]'))
 
 DEFAULT_LOGGER = 'console'
+
+ALLOW_DEMO_LOADING = os.environ.get('ALLOW_DEMO_LOADING', False)
