@@ -151,6 +151,16 @@ spec:
                 secretKeyRef:
                   name: dpcreator-app-secrets
                   key: SENDGRID_API_KEY
+            - name: USER_DEPOSITOR_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dpcreator-app-secrets
+                  key: USER_DEPOSITOR_PASSWORD
+            - name: USER_ANALYST_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dpcreator-app-secrets
+                  key: USER_ANALYST_PASSWORD
         # -------------------------------------------------
         # (4) Celery Queue - same image/settings as except for "command"
         # -------------------------------------------------
