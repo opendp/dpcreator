@@ -420,3 +420,5 @@ if AZURE_LOGGING is True:
     DEFAULT_LOGGER = 'azure'
 else:
     DEFAULT_LOGGER = 'django'
+
+ALLOW_DEMO_LOADING = os.environ.get('ALLOW_DEMO_LOADING', False)

@@ -10,4 +10,3 @@ DEBUG = True
 
 DEFAULT_LOGGER = 'console'
 
-ALLOW_DEMO_LOADING = os.environ.get('ALLOW_DEMO_LOADING', False)
