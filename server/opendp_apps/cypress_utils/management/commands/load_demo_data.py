@@ -4,6 +4,7 @@ Allow deletion of data in between cypress tests
 import os
 from os.path import abspath, dirname, isdir, isfile, join
 
+from django.apps import apps
 from django.conf import settings
 from django.core.files import File
 from django.core.management.base import BaseCommand
@@ -53,6 +54,21 @@ class Command(BaseCommand):
         analyst_user.set_password(analyst_password)
         analyst_user.save()
         self.write_success_msg(f'Analyst created: {analyst_user}')
+
+        # "Verify" users via email
+        #
+        VerifyModel = apps.get_model(app_label='account', model_name='emailaddress')
+        verify_analyst = VerifyModel(user=analyst_user,
+                                     email=analyst_user.email,
+                                     primary=True,
+                                     verified=True)
+        verify_analyst.save()
+
+        verify_depositor =  VerifyModel(user=depositor_user,
+                                        email=depositor_user.email,
+                                        primary=True,
+                                        verified=True)
+        verify_depositor.save()
 
         # Create UploadFileInfo
         #
