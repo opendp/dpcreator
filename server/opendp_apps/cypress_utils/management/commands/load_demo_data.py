@@ -1,6 +1,7 @@
 """
 Allow deletion of data in between cypress tests
 """
+import json
 import os
 from os.path import abspath, dirname, isfile, join
 
@@ -24,6 +25,8 @@ class Command(BaseCommand):
     help = "Prepares data for demo / user testing"
     depositor_username = 'dp_depositor'
     analyst_username = 'dp_analyst'
+    data_profile = None  # Placeholder to load dict from JSON file
+    variable_info = None   # Placeholder to load dict from JSON file
 
     @check_allow_demo_loading  # Do not remove this check
     def handle(self, *args, **options):
@@ -156,249 +159,32 @@ class Command(BaseCommand):
 
         return depositor_setup
 
-    @staticmethod
-    def get_data_profile() -> dict:
-        """Return fixed data profile"""
-        return {
-            "dataset": {
-                "rowCount": 7000,
-                "variableCount": 10,
-                "variableOrder": [
-                    [
-                        0,
-                        "sex"
-                    ],
-                    [
-                        1,
-                        "age"
-                    ],
-                    [
-                        2,
-                        "maritalstatus"
-                    ],
-                    [
-                        3,
-                        "Havingchild"
-                    ],
-                    [
-                        4,
-                        "highesteducationlevel"
-                    ],
-                    [
-                        5,
-                        "sourceofstress"
-                    ],
-                    [
-                        6,
-                        "smoking"
-                    ],
-                    [
-                        7,
-                        "optimisim"
-                    ],
-                    [
-                        8,
-                        "lifesattisfaction"
-                    ],
-                    [
-                        9,
-                        "selfesteem"
-                    ]
-                ]
-            },
-            "variables": {
-                "age": {
-                    "name": "age",
-                    "type": "Integer",
-                    "label": "",
-                    "sort_order": 1
-                },
-                "sex": {
-                    "name": "sex",
-                    "type": "Integer",
-                    "label": "",
-                    "sort_order": 0
-                },
-                "smoking": {
-                    "name": "smoking",
-                    "type": "Categorical",
-                    "label": "",
-                    "categories": [
+    def get_data_profile(self) -> dict:
+        """Return fixed data profile from JSON file: teacher_survey_data_profile.json"""
+        if not self.data_profile:
+            self.data_profile = self.get_json_file_as_dict('teacher_survey_data_profile.json')
 
-                    ],
-                    "sort_order": 6
-                },
-                "optimisim": {
-                    "name": "optimisim",
-                    "type": "Categorical",
-                    "label": "",
-                    "categories": [
+        return self.data_profile
 
-                    ],
-                    "sort_order": 7
-                },
-                "selfesteem": {
-                    "name": "selfesteem",
-                    "type": "Categorical",
-                    "label": "",
-                    "categories": [
+    def get_variable_info(self) -> dict:
+        """Return fixed variable_info from JSON file: teacher_survey_variable_info.json"""
+        if not self.variable_info:
+            self.variable_info = self.get_json_file_as_dict('teacher_survey_variable_info.json')
 
-                    ],
-                    "sort_order": 9
-                },
-                "Havingchild": {
-                    "name": "Havingchild",
-                    "type": "Categorical",
-                    "label": "",
-                    "categories": [
+        return self.variable_info
 
-                    ],
-                    "sort_order": 3
-                },
-                "maritalstatus": {
-                    "name": "maritalstatus",
-                    "type": "Integer",
-                    "label": "",
-                    "sort_order": 2
-                },
-                "sourceofstress": {
-                    "name": "sourceofstress",
-                    "type": "Categorical",
-                    "label": "",
-                    "categories": [
+    def get_json_file_as_dict(self, filename: str) -> dict:
+        """Open a JSON file and return the contents as a Python dict"""
+        filepath = join(DEMO_FILE_DIR, filename)
+        if not isfile(filepath):
+            user_msg = f'Failed to find test data file: {filepath}'
+            self.stdout.write(self.style.ERROR(user_msg))
+            return None
 
-                    ],
-                    "sort_order": 5
-                },
-                "lifesattisfaction": {
-                    "name": "lifesattisfaction",
-                    "type": "Categorical",
-                    "label": "",
-                    "categories": [
+        json_content = open(filepath, 'r').read()
 
-                    ],
-                    "sort_order": 8
-                },
-                "highesteducationlevel": {
-                    "name": "highesteducationlevel",
-                    "type": "Integer",
-                    "label": "",
-                    "sort_order": 4
-                }
-            }
-        }
+        file_dict = json.loads(json_content)
 
-    @staticmethod
-    def get_variable_info() -> dict:
-        """Return fixed variable info"""
-        return {
-            "age": {
-                "max": 75,
-                "min": 20,
-                "name": "age",
-                "type": "Integer",
-                "label": "age",
-                "selected": True,
-                "sortOrder": 1
-            },
-            "sex": {
-                "max": 3,
-                "min": 1,
-                "name": "sex",
-                "type": "Integer",
-                "label": "sex",
-                "selected": True,
-                "sortOrder": 0
-            },
-            "smoking": {
-                "max": 0,
-                "min": 0,
-                "name": "smoking",
-                "type": "Categorical",
-                "label": "smoking",
-                "selected": True,
-                "sortOrder": 6,
-                "categories": [
+        self.write_success_msg(f'Loaded file to Python dict: {filename}')
 
-                ]
-            },
-            "optimisim": {
-                "max": 30,
-                "min": 6,
-                "name": "optimisim",
-                "type": "Integer",
-                "label": "optimisim",
-                "selected": True,
-                "sortOrder": 7,
-                "categories": [
-
-                ]
-            },
-            "selfesteem": {
-                "max": 40,
-                "min": 10,
-                "name": "selfesteem",
-                "type": "Integer",
-                "label": "selfesteem",
-                "selected": True,
-                "sortOrder": 9,
-                "categories": [
-
-                ]
-            },
-            "havingchild": {
-                "name": "Havingchild",
-                "type": "Categorical",
-                "label": "Havingchild",
-                "selected": True,
-                "sortOrder": 3,
-                "categories": [
-
-                ]
-            },
-            "maritalstatus": {
-                "max": 8,
-                "min": 1,
-                "name": "maritalstatus",
-                "type": "Integer",
-                "label": "maritalstatus",
-                "selected": True,
-                "sortOrder": 2,
-                "categories": [
-
-                ]
-            },
-            "sourceofstress": {
-                "max": 9,
-                "min": 1,
-                "name": "sourceofstress",
-                "type": "Integer",
-                "label": "sourceofstress",
-                "selected": True,
-                "sortOrder": 5,
-                "categories": [
-
-                ]
-            },
-            "lifesattisfaction": {
-                "max": 35,
-                "min": 5,
-                "name": "lifesattisfaction",
-                "type": "Integer",
-                "label": "lifesattisfaction",
-                "selected": True,
-                "sortOrder": 8,
-                "categories": [
-
-                ]
-            },
-            "highesteducationlevel": {
-                "max": 6,
-                "min": 1,
-                "name": "highesteducationlevel",
-                "type": "Integer",
-                "label": "highesteducationlevel",
-                "selected": True,
-                "sortOrder": 4
-            }
-        }
+        return file_dict
