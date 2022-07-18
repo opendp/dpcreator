@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.core.management import get_commands, call_command
 from django.http import HttpResponseRedirect
@@ -5,6 +6,7 @@ from django.urls import path
 
 from .models import \
     (DataSetInfo, DataverseFileInfo, UploadFileInfo)
+
 
 class DataSetInfoAdmin(admin.ModelAdmin):
     change_list_template = "admin/dataset/datasetinfo_change_list.html"
@@ -19,6 +21,10 @@ class DataSetInfoAdmin(admin.ModelAdmin):
                     'updated',
                     'created',)
     readonly_fields = ('id', 'object_id', 'source', 'created', 'updated',)
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = {'allow_demo_loading': settings.ALLOW_DEMO_LOADING}
+        return super().changelist_view(request, extra_context=extra_context)
 
     def get_urls(self):
         urls = super().get_urls()
@@ -57,6 +63,7 @@ class DataSetInfoAdmin(admin.ModelAdmin):
             self.message_user(request, user_msg)
         return HttpResponseRedirect("../")
 
+
 admin.site.register(DataSetInfo, DataSetInfoAdmin)
 
 
@@ -74,17 +81,21 @@ class DataverseFileInfoAdmin(admin.ModelAdmin):
                     'created',)
     list_display_links = ('id', 'name')
     readonly_fields = ('id', 'object_id', 'source', 'created', 'updated',)
+
+
 admin.site.register(DataverseFileInfo, DataverseFileInfoAdmin)
+
 
 class UploadFileInfoAdmin(admin.ModelAdmin):
     save_on_top = True
     search_fields = ('name',)
     list_filter = ('source', 'creator')
     list_display = ('name',
-                    #'data_file',
+                    # 'data_file',
                     'creator',
                     'updated',
                     'created',)
     readonly_fields = ('id', 'source', 'created', 'updated',)
-admin.site.register(UploadFileInfo, UploadFileInfoAdmin)
 
+
+admin.site.register(UploadFileInfo, UploadFileInfoAdmin)

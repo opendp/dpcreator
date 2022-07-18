@@ -3,9 +3,11 @@ Allow deletion of data in between cypress tests
 """
 from django.apps import apps
 from django.core.management.base import BaseCommand
-from opendp_apps.cypress_utils.check_setup import are_cypress_settings_in_place
+
 from opendp_apps.cypress_utils import static_vals as cystatic
+from opendp_apps.cypress_utils.check_setup import are_cypress_settings_in_place
 from opendp_apps.user.models import OpenDPUser, DataverseUser
+
 
 class Command(BaseCommand):
     help = "Deletes data for Cypress tests"
@@ -14,7 +16,7 @@ class Command(BaseCommand):
         """Delete data in-between Cypress tests"""
 
         # Important check!!
-        if not are_cypress_settings_in_place(): # Do not remove this check
+        if not are_cypress_settings_in_place():  # Do not remove this check
             self.stdout.write(self.style.ERROR(cystatic.MESSAGE_CLEAR_DATA_CMD_ERR))
             return
 

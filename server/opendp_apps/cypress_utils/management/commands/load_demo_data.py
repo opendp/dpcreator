@@ -4,14 +4,12 @@ Allow deletion of data in between cypress tests
 import os
 from os.path import abspath, dirname, isfile, join
 
-from django.conf import settings
+from allauth.account.models import EmailAddress as VerifyEmailAddress
 from django.core.files import File
 from django.core.management.base import BaseCommand
 
-from allauth.account.models import EmailAddress as VerifyEmailAddress
-
 from opendp_apps.analysis.models import AnalysisPlan, DepositorSetupInfo
-from opendp_apps.cypress_utils import static_vals as cystatic
+from opendp_apps.cypress_utils.management.commands.demo_loading_decorator import check_allow_demo_loading
 from opendp_apps.dataset.models import UploadFileInfo
 from opendp_apps.user.models import OpenDPUser
 from opendp_apps.utils.randname import get_rand_alphanumeric
@@ -27,14 +25,10 @@ class Command(BaseCommand):
     depositor_username = 'dp_depositor'
     analyst_username = 'dp_analyst'
 
+    @check_allow_demo_loading  # Do not remove this check
     def handle(self, *args, **options):
         """Delete data in-between user tests"""
         self.stdout.write(self.style.WARNING('>> Preparing to load demo data'))
-
-        # Important check!!
-        if not settings.ALLOW_DEMO_LOADING:  # Do not remove this check
-            self.stdout.write(self.style.ERROR(cystatic.MESSAGE_CLEAR_DATA_CMD_ERR))
-            return
 
         if self.is_demo_data_already_loaded():
             return
@@ -77,12 +71,12 @@ class Command(BaseCommand):
         self.write_success_msg(f'DepositorSetupInfo created: {depositor_setup}')
 
         upload_file = UploadFileInfo.objects.create(
-                    name='Teacher Survey',
-                    creator=analyst_user,
-                    data_profile=self.get_data_profile(),
-                    profile_variables=self.get_data_profile(),
-                    depositor_setup_info=depositor_setup,
-                    )
+            name='Teacher Survey',
+            creator=analyst_user,
+            data_profile=self.get_data_profile(),
+            profile_variables=self.get_data_profile(),
+            depositor_setup_info=depositor_setup,
+        )
         upload_file.save()
         self.write_success_msg(f'UploadFileInfo created: {upload_file}')
 
@@ -166,133 +160,133 @@ class Command(BaseCommand):
     def get_data_profile() -> dict:
         """Return fixed data profile"""
         return {
-               "dataset": {
-                  "rowCount": 7000,
-                  "variableCount": 10,
-                  "variableOrder": [
-                     [
+            "dataset": {
+                "rowCount": 7000,
+                "variableCount": 10,
+                "variableOrder": [
+                    [
                         0,
                         "sex"
-                     ],
-                     [
+                    ],
+                    [
                         1,
                         "age"
-                     ],
-                     [
+                    ],
+                    [
                         2,
                         "maritalstatus"
-                     ],
-                     [
+                    ],
+                    [
                         3,
                         "Havingchild"
-                     ],
-                     [
+                    ],
+                    [
                         4,
                         "highesteducationlevel"
-                     ],
-                     [
+                    ],
+                    [
                         5,
                         "sourceofstress"
-                     ],
-                     [
+                    ],
+                    [
                         6,
                         "smoking"
-                     ],
-                     [
+                    ],
+                    [
                         7,
                         "optimisim"
-                     ],
-                     [
+                    ],
+                    [
                         8,
                         "lifesattisfaction"
-                     ],
-                     [
+                    ],
+                    [
                         9,
                         "selfesteem"
-                     ]
-                  ]
-               },
-               "variables": {
-                  "age": {
-                     "name": "age",
-                     "type": "Integer",
-                     "label": "",
-                     "sort_order": 1
-                  },
-                  "sex": {
-                     "name": "sex",
-                     "type": "Integer",
-                     "label": "",
-                     "sort_order": 0
-                  },
-                  "smoking": {
-                     "name": "smoking",
-                     "type": "Categorical",
-                     "label": "",
-                     "categories": [
+                    ]
+                ]
+            },
+            "variables": {
+                "age": {
+                    "name": "age",
+                    "type": "Integer",
+                    "label": "",
+                    "sort_order": 1
+                },
+                "sex": {
+                    "name": "sex",
+                    "type": "Integer",
+                    "label": "",
+                    "sort_order": 0
+                },
+                "smoking": {
+                    "name": "smoking",
+                    "type": "Categorical",
+                    "label": "",
+                    "categories": [
 
-                     ],
-                     "sort_order": 6
-                  },
-                  "optimisim": {
-                     "name": "optimisim",
-                     "type": "Categorical",
-                     "label": "",
-                     "categories": [
+                    ],
+                    "sort_order": 6
+                },
+                "optimisim": {
+                    "name": "optimisim",
+                    "type": "Categorical",
+                    "label": "",
+                    "categories": [
 
-                     ],
-                     "sort_order": 7
-                  },
-                  "selfesteem": {
-                     "name": "selfesteem",
-                     "type": "Categorical",
-                     "label": "",
-                     "categories": [
+                    ],
+                    "sort_order": 7
+                },
+                "selfesteem": {
+                    "name": "selfesteem",
+                    "type": "Categorical",
+                    "label": "",
+                    "categories": [
 
-                     ],
-                     "sort_order": 9
-                  },
-                  "Havingchild": {
-                     "name": "Havingchild",
-                     "type": "Categorical",
-                     "label": "",
-                     "categories": [
+                    ],
+                    "sort_order": 9
+                },
+                "Havingchild": {
+                    "name": "Havingchild",
+                    "type": "Categorical",
+                    "label": "",
+                    "categories": [
 
-                     ],
-                     "sort_order": 3
-                  },
-                  "maritalstatus": {
-                     "name": "maritalstatus",
-                     "type": "Integer",
-                     "label": "",
-                     "sort_order": 2
-                  },
-                  "sourceofstress": {
-                     "name": "sourceofstress",
-                     "type": "Categorical",
-                     "label": "",
-                     "categories": [
+                    ],
+                    "sort_order": 3
+                },
+                "maritalstatus": {
+                    "name": "maritalstatus",
+                    "type": "Integer",
+                    "label": "",
+                    "sort_order": 2
+                },
+                "sourceofstress": {
+                    "name": "sourceofstress",
+                    "type": "Categorical",
+                    "label": "",
+                    "categories": [
 
-                     ],
-                     "sort_order": 5
-                  },
-                  "lifesattisfaction": {
-                     "name": "lifesattisfaction",
-                     "type": "Categorical",
-                     "label": "",
-                     "categories": [
+                    ],
+                    "sort_order": 5
+                },
+                "lifesattisfaction": {
+                    "name": "lifesattisfaction",
+                    "type": "Categorical",
+                    "label": "",
+                    "categories": [
 
-                     ],
-                     "sort_order": 8
-                  },
-                  "highesteducationlevel": {
-                     "name": "highesteducationlevel",
-                     "type": "Integer",
-                     "label": "",
-                     "sort_order": 4
-                  }
-               }
+                    ],
+                    "sort_order": 8
+                },
+                "highesteducationlevel": {
+                    "name": "highesteducationlevel",
+                    "type": "Integer",
+                    "label": "",
+                    "sort_order": 4
+                }
             }
+        }
 
     @staticmethod
     def get_variable_info() -> dict:
