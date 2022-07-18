@@ -125,6 +125,7 @@
               :data-test="variable.label+':categories'"
               v-on:click="currentRow=variable.index"
               :search-input.sync="categoryInput"
+              @change="changeCategories(variable)"
               @update:search-input="delimitInput(variable)"
               :delimiters="[',']"
           >
@@ -425,6 +426,10 @@ export default {
       } else {
         return this.variables
       }
+    },
+    changeCategories(variable) {
+      //  console.log('category change: ' + JSON.stringify(variable) +','+this.categoryInput)
+      this.saveUserInput(variable)
     },
     delimitInput(variable) {
       if (this.categoryInput && this.categoryInput.split(",").length > 1) {
