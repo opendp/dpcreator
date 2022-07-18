@@ -98,7 +98,7 @@ const actions = {
      */
     deleteDataset({commit, state}, datasetId) {
         console.log('in delete, datasetId = ' + datasetId)
-        // Skip API call until it is ready
+        dataset.deleteDatasetInfo(datasetId)
         commit(REMOVE_DATASET, datasetId)
     },
     /**
@@ -109,11 +109,21 @@ const actions = {
      * @param {datasetId, analysisPlanId}
      */
     deleteAnalysisPlan({commit, state}, {datasetId, analysisPlanId}) {
-        console.log('in delete, datasetId = ' + datasetId + ',analysisPlanId=' + analysisPlanId)
-        // Skip API call until it is ready
-        // To update the Vuex store, just need to remove one row from the myDataList table which
-        // includes the analysis plan
-        commit(REMOVE_ANALYSIS_PLAN, analysisPlanId)
+        // check how many analysisPlans  are associated with the dataset
+        // if this is the only analysis plan for the dataset, then delete the dataset as well.
+        const theDataset = state.datasetList.find(item => item.objectId === datasetId)
+        try {
+            analysis.deleteAnalysisPlan(analysisPlanId)
+            commit(REMOVE_ANALYSIS_PLAN, analysisPlanId)
+            if (theDataset.analysisPlans.length == 0) {
+                dataset.deleteDatasetInfo(datasetId)
+                commit(REMOVE_DATASET, datasetId)
+            }
+        } catch (error) {
+            console.log(error);
+
+        }
+
     },
     uploadDataset({commit, state}, {file, creatorId}) {
         let formData = new FormData();
@@ -473,10 +483,13 @@ const mutations = {
         state.datasetList = state.datasetList.filter(item => item.objectId !== id)
         state.myDataList = state.myDataList.filter(item => item.datasetInfo.objectId !== id)
     },
-    [REMOVE_ANALYSIS_PLAN](state, id) {
-        //  console.log('removing analysisPlan id = '+ id)
+    [REMOVE_ANALYSIS_PLAN](state, analysisPlanId) {
         state.myDataList = state.myDataList.filter(item =>
-            item.analysisPlan == null || item.analysisPlan.objectId !== id)
+            item.analysisPlan == null || item.analysisPlan.objectId !== analysisPlanId)
+        state.datasetList.forEach(dataset => {
+            dataset.analysisPlans = dataset.analysisPlans.filter(analysisPlan => analysisPlan.objectId !== analysisPlanId)
+        })
+
     },
     [SET_DATASET_LIST](state, datasetList) {
         state.datasetList = datasetList
