@@ -1,0 +1,135 @@
+{
+    "age": {
+        "max": 75,
+        "min": 20,
+        "name": "age",
+        "type": "Integer",
+        "label": "age",
+        "selected": true,
+        "sortOrder": 1
+    },
+    "sex": {
+        "max": 3,
+        "min": 1,
+        "name": "sex",
+        "type": "Categorical",
+        "label": "sex",
+        "selected": true,
+        "sortOrder": 0,
+        "categories": [
+            1,
+            2,
+            3
+        ]
+    },
+    "smoking": {
+        "max": 0,
+        "min": 0,
+        "name": "smoking",
+        "type": "Categorical",
+        "label": "smoking",
+        "selected": true,
+        "sortOrder": 6,
+        "categories": [
+            1,
+            2
+        ]
+    },
+    "optimisim": {
+        "max": 30,
+        "min": 6,
+        "name": "optimisim",
+        "type": "Integer",
+        "label": "optimisim",
+        "selected": true,
+        "sortOrder": 7,
+        "categories": []
+    },
+    "selfesteem": {
+        "max": 40,
+        "min": 10,
+        "name": "selfesteem",
+        "type": "Integer",
+        "label": "selfesteem",
+        "selected": true,
+        "sortOrder": 9,
+        "categories": []
+    },
+    "havingchild": {
+        "name": "Havingchild",
+        "type": "Categorical",
+        "label": "Havingchild",
+        "selected": true,
+        "sortOrder": 3,
+        "categories": [
+            1,
+            2
+        ]
+    },
+    "maritalstatus": {
+        "max": 8,
+        "min": 1,
+        "name": "maritalstatus",
+        "type": "Categorical",
+        "label": "maritalstatus",
+        "selected": true,
+        "sortOrder": 2,
+        "categories": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+        ]
+    },
+    "sourceofstress": {
+        "max": 9,
+        "min": 1,
+        "name": "sourceofstress",
+        "type": "Categorical",
+        "label": "sourceofstress",
+        "selected": true,
+        "sortOrder": 5,
+        "categories": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+        ]
+    },
+    "lifesattisfaction": {
+        "max": 35,
+        "min": 5,
+        "name": "lifesattisfaction",
+        "type": "Integer",
+        "label": "lifesattisfaction",
+        "selected": true,
+        "sortOrder": 8,
+        "categories": []
+    },
+    "highesteducationlevel": {
+        "max": 6,
+        "min": 1,
+        "name": "highesteducationlevel",
+        "type": "Categorical",
+        "label": "highesteducationlevel",
+        "selected": true,
+        "sortOrder": 4,
+        "categories": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+        ]
+    }
+}

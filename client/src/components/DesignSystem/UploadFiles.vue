@@ -31,7 +31,7 @@
                 data-test="fileInput"
                 accept=".csv,.tsv"
                 show-size
-                label="Click to select a file, or drag file here"
+                label="Click to select a file, or drag file here (.csv, .tab, .tsv)"
                 @change="selectFile"
             ></v-file-input>
 

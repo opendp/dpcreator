@@ -27,6 +27,7 @@ ROOT_URLCONF = 'opendp_project.urls_cypress'
 # (3) ALLOW_CYPRESS_ENDPOINT value is set
 ALLOW_CYPRESS_ENDPOINT = 'cypress-in-ci-endpoint'
 
+ALLOW_DEMO_LOADING = True
 
 ACCOUNT_EMAIL_VERIFICATION = os.environ.get('ACCOUNT_EMAIL_VERIFICATION', 'none')  # 'mandatory'
 
