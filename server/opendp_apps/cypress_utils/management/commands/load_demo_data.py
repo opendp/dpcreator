@@ -2,12 +2,13 @@
 Allow deletion of data in between cypress tests
 """
 import os
-from os.path import abspath, dirname, isdir, isfile, join
+from os.path import abspath, dirname, isfile, join
 
-from django.apps import apps
 from django.conf import settings
 from django.core.files import File
 from django.core.management.base import BaseCommand
+
+from allauth.account.models import EmailAddress as VerifyEmailAddress
 
 from opendp_apps.analysis.models import AnalysisPlan, DepositorSetupInfo
 from opendp_apps.cypress_utils import static_vals as cystatic
@@ -19,6 +20,7 @@ DEMO_FILE_DIR = join(dirname(abspath(__file__)), 'demo_files')  # /cypress_utils
 
 depositor_password = os.environ.get('USER_DEPOSITOR_PASSWORD', 'Test-for-2022')
 analyst_password = os.environ.get('USER_ANALYST_PASSWORD', 'Test-for-2022')
+
 
 class Command(BaseCommand):
     help = "Prepares data for demo / user testing"
@@ -57,17 +59,16 @@ class Command(BaseCommand):
 
         # "Verify" users via email
         #
-        VerifyModel = apps.get_model(app_label='account', model_name='emailaddress')
-        verify_analyst = VerifyModel(user=analyst_user,
-                                     email=analyst_user.email,
-                                     primary=True,
-                                     verified=True)
+        verify_analyst = VerifyEmailAddress(user=analyst_user,
+                                            email=analyst_user.email,
+                                            primary=True,
+                                            verified=True)
         verify_analyst.save()
 
-        verify_depositor =  VerifyModel(user=depositor_user,
-                                        email=depositor_user.email,
-                                        primary=True,
-                                        verified=True)
+        verify_depositor = VerifyEmailAddress(user=depositor_user,
+                                              email=depositor_user.email,
+                                              primary=True,
+                                              verified=True)
         verify_depositor.save()
 
         # Create UploadFileInfo
@@ -113,18 +114,17 @@ class Command(BaseCommand):
 
     def is_demo_data_already_loaded(self) -> bool:
         """Check if any of the demo data is already in the system"""
-        if OpenDPUser.objects.filter(username=self.depositor_username).first() is not None:
+        if OpenDPUser.objects.filter(username=self.depositor_username).exists():
             user_msg = (f'The OpenDPUser "{self.depositor_username}" already exists.'
                         '\nPlease run "clear_test_data" before attempting to run the "load_demo_data" command')
             self.stdout.write(self.style.ERROR(user_msg))
             return True
 
-        if OpenDPUser.objects.filter(username=self.analyst_username).first() is not None:
+        if OpenDPUser.objects.filter(username=self.analyst_username).exists():
             user_msg = (f'The OpenDPUser "{self.analyst_username}" already exists.'
                         '\nPlease run "clear_test_data" before attempting to run the "load_demo_data" command')
             self.stdout.write(self.style.ERROR(user_msg))
             return True
-
 
         return False
 
@@ -162,30 +162,140 @@ class Command(BaseCommand):
 
         return depositor_setup
 
-    def get_data_profile(self) -> dict:
+    @staticmethod
+    def get_data_profile() -> dict:
         """Return fixed data profile"""
-        return {"dataset":
-            {"rowCount": 7000,
-             "variableCount": 10,
-             "variableOrder": [[0, "sex"], [1, "age"],
-                               [2, "maritalstatus"], [3, "Havingchild"],
-                               [4, "highesteducationlevel"], [5, "sourceofstress"],
-                               [6, "smoking"], [7, "optimisim"],
-                               [8, "lifesattisfaction"], [9, "selfesteem"]]},
-            "variables": {
-                "age": {"name": "age", "type": "Integer", "label": "", "sort_order": 1},
-                "sex": {"name": "sex", "type": "Integer", "label": "", "sort_order": 0},
-                "smoking": {"name": "smoking", "type": "Categorical", "label": "", "categories": [], "sort_order": 6},
-                "optimisim": {"name": "optimisim", "type": "Categorical", "label": "", "categories": [], "sort_order": 7},
-                "selfesteem": {"name": "selfesteem", "type": "Categorical", "label": "", "categories": [], "sort_order": 9},
-                "Havingchild": {"name": "Havingchild", "type": "Categorical", "label": "", "categories": [], "sort_order": 3},
-                "maritalstatus": {"name": "maritalstatus", "type": "Integer", "label": "", "sort_order": 2},
-                "sourceofstress": {"name": "sourceofstress", "type": "Categorical", "label": "", "categories": [], "sort_order": 5},
-                "lifesattisfaction": {"name": "lifesattisfaction", "type": "Categorical", "label": "", "categories": [], "sort_order": 8},
-                "highesteducationlevel": {"name": "highesteducationlevel", "type": "Integer", "label": "", "sort_order": 4}}}
+        return {
+               "dataset": {
+                  "rowCount": 7000,
+                  "variableCount": 10,
+                  "variableOrder": [
+                     [
+                        0,
+                        "sex"
+                     ],
+                     [
+                        1,
+                        "age"
+                     ],
+                     [
+                        2,
+                        "maritalstatus"
+                     ],
+                     [
+                        3,
+                        "Havingchild"
+                     ],
+                     [
+                        4,
+                        "highesteducationlevel"
+                     ],
+                     [
+                        5,
+                        "sourceofstress"
+                     ],
+                     [
+                        6,
+                        "smoking"
+                     ],
+                     [
+                        7,
+                        "optimisim"
+                     ],
+                     [
+                        8,
+                        "lifesattisfaction"
+                     ],
+                     [
+                        9,
+                        "selfesteem"
+                     ]
+                  ]
+               },
+               "variables": {
+                  "age": {
+                     "name": "age",
+                     "type": "Integer",
+                     "label": "",
+                     "sort_order": 1
+                  },
+                  "sex": {
+                     "name": "sex",
+                     "type": "Integer",
+                     "label": "",
+                     "sort_order": 0
+                  },
+                  "smoking": {
+                     "name": "smoking",
+                     "type": "Categorical",
+                     "label": "",
+                     "categories": [
 
+                     ],
+                     "sort_order": 6
+                  },
+                  "optimisim": {
+                     "name": "optimisim",
+                     "type": "Categorical",
+                     "label": "",
+                     "categories": [
 
-    def get_variable_info(self) -> dict:
+                     ],
+                     "sort_order": 7
+                  },
+                  "selfesteem": {
+                     "name": "selfesteem",
+                     "type": "Categorical",
+                     "label": "",
+                     "categories": [
+
+                     ],
+                     "sort_order": 9
+                  },
+                  "Havingchild": {
+                     "name": "Havingchild",
+                     "type": "Categorical",
+                     "label": "",
+                     "categories": [
+
+                     ],
+                     "sort_order": 3
+                  },
+                  "maritalstatus": {
+                     "name": "maritalstatus",
+                     "type": "Integer",
+                     "label": "",
+                     "sort_order": 2
+                  },
+                  "sourceofstress": {
+                     "name": "sourceofstress",
+                     "type": "Categorical",
+                     "label": "",
+                     "categories": [
+
+                     ],
+                     "sort_order": 5
+                  },
+                  "lifesattisfaction": {
+                     "name": "lifesattisfaction",
+                     "type": "Categorical",
+                     "label": "",
+                     "categories": [
+
+                     ],
+                     "sort_order": 8
+                  },
+                  "highesteducationlevel": {
+                     "name": "highesteducationlevel",
+                     "type": "Integer",
+                     "label": "",
+                     "sort_order": 4
+                  }
+               }
+            }
+
+    @staticmethod
+    def get_variable_info() -> dict:
         """Return fixed variable info"""
         return {
             "age": {

@@ -37,20 +37,20 @@ def setup_demo_data(request):
     """
     if not request.user.is_authenticated:
         return JsonResponse({'success': False,
-                             'message': 'nothing 1'},
-                            status=404)
+                             'message': 'The user is not authenticated.'},
+                            status=403)
 
     if not request.user.is_superuser:
         return JsonResponse({'success': False,
-                             'message': 'nothing 2'},
-                            status=404)
+                             'message': 'A superuser is required.'},
+                            status=403)
 
     # Note: this check is made again in the command
     #
     if not are_cypress_settings_in_place():
         return JsonResponse({'success': False,
-                             'message': 'nothing 3'},
-                            status=404)
+                             'message': 'The settings for this feature are not active. (cypress_settings)'},
+                            status=403)
 
     call_command('setup_demo')
 
