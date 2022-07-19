@@ -30,7 +30,7 @@ base_specs = dict(
 specs_dev_dpcreator_org = dict(base_specs, **dict(
                 # DEPLOYMENT SPECIFIC VARIABLES:
                 deploy_name="dev",
-                dpcreator_container_tag="2022-0717-dev",  # Tag for Images
+                dpcreator_container_tag="2022-0719-dev",  # Tag for Images
                 #
                 dpcreator_startup_script_filename="azure_dev.dpcreator.org.sh",
                 #
