@@ -41,7 +41,7 @@
                 type="number"
                 data-test="editEpsilonInput"
                 v-model="editEpsilon"
-                :rules="epsilonRules"
+                :rules="[validateEpsilon]"
             />
           </div>
           <small class="mr-16 grey--text text--darken-2">
@@ -79,6 +79,7 @@
             classes="mr-2 px-5"
             :click="handleSaveEditNoiseParamsDialog"
             :disabled="!validParamsForm"
+            data-test="editParamsSave"
             label="Confirm"
         />
         <Button
@@ -123,10 +124,9 @@
 <script>
 import Button from "../../../DesignSystem/Button.vue";
 import AdditionalInformationAlert from "../../../DynamicHelpResources/AdditionalInformationAlert";
-import {confLevelOptions} from "@/shared/createStatsUtils";
+import {confLevelOptions, MAX_TOTAL_EPSILON, MIN_EPSILON} from "@/shared/createStatsUtils";
+import {mapState} from "vuex";
 
-const MAX_TOTAL_EPSILON = 1
-const MIN_TOTAL_EPSILON = .001
 export default {
   name: "EditNoiseParamsDialog",
   components: {
@@ -136,6 +136,9 @@ export default {
   mounted() {
 
   },
+  computed: {
+    ...mapState('dataset', ['datasetInfo', "analysisPlan"]),
+  },
   data: function () {
     return {
       validParamsForm: false,
@@ -143,8 +146,6 @@ export default {
       editDelta: this.delta,
       editConfidenceLevel: this.confidenceLevel,
       confidenceLevelOptions: confLevelOptions,
-      epsilonRules: [v => (v >= MIN_TOTAL_EPSILON && v <= MAX_TOTAL_EPSILON)
-          || "Epsilon must be between " + MIN_TOTAL_EPSILON + " and " + MAX_TOTAL_EPSILON],
     };
   },
   props: ["dialogEditNoiseParams", "epsilon", "delta", "confidenceLevel"],
@@ -160,9 +161,35 @@ export default {
     },
     confidenceLevel: function (newVal) {
       this.editConfidenceLevel = newVal
-    },
+    }
   },
   methods: {
+    validateEpsilon(v) {
+      if (this) {
+        let lockedEpsilon = 0
+        let unlockedCount = 0
+        if (this.analysisPlan.dpStatistics) {
+          this.analysisPlan.dpStatistics.forEach(stat => {
+            if (stat.locked) {
+              lockedEpsilon += stat.epsilon
+            } else {
+              unlockedCount++
+            }
+          })
+        }
+        // The minimum  total epsilon needs to take into account the
+        // statistics that have already been created. (Each unlocked epsilon needs to be >= MIN_EPSILON)
+        const minTotalEpsilon = Math.max(MIN_EPSILON, lockedEpsilon + MIN_EPSILON * unlockedCount)
+
+
+        // console.log('v: ' + v + ' totalLocked: ' + lockedEpsilon + ' MAX_TOTAL:' + MAX_TOTAL_EPSILON)
+        return (v >= minTotalEpsilon && v <= MAX_TOTAL_EPSILON)
+            || "Epsilon must be between " + minTotalEpsilon + " and " + MAX_TOTAL_EPSILON
+      } else {
+        return true
+      }
+
+    },
     handleCancelEditNoiseParamsDialog() {
       this.editEpsilon = this.epsilon;
       this.editDelta = this.delta;

@@ -81,7 +81,6 @@
 </style>
 
 <script>
-import Decimal from 'decimal.js';
 import ColoredBorderAlert from "../../components/DynamicHelpResources/ColoredBorderAlert.vue";
 import AddStatisticDialog from "../../components/Wizard/Steps/CreateStatistics/AddStatisticDialog.vue";
 import DeleteStatisticDialog from "../../components/Wizard/Steps/CreateStatistics/DeleteStatisticDialog.vue";
@@ -245,6 +244,14 @@ export default {
     setAccuracyAndSaveUserInput() {
       // if there are statistics, update them with the accuracy values
       // (we don't have to check validation because that was done in the Dialog)
+      let props = {
+        epsilon: this.epsilon,
+        delta: this.delta,
+        confidenceLevel: this.confidenceLevel
+      }
+      const payload = {objectId: this.getDepositorSetupInfo.objectId, props: props}
+      this.$store.dispatch('dataset/updateDepositorSetupInfo',
+          payload)
       if (this.statistics.length > 0) {
         createStatsUtils.releaseValidation(this.analysisPlan.objectId, this.statistics)
             .then((validateResults) => {
@@ -255,8 +262,6 @@ export default {
               }
               this.saveUserInput()
             })
-      } else {
-        this.saveUserInput()
       }
     },
     saveUserInput() {
@@ -266,14 +271,6 @@ export default {
         item.epsilon = +item.epsilon
         item.delta = +item.delta
       })
-      let props = {
-        epsilon: this.epsilon,
-        delta: this.delta,
-        confidenceLevel: this.confidenceLevel
-      }
-      const payload = {objectId: this.getDepositorSetupInfo.objectId, props: props}
-      this.$store.dispatch('dataset/updateDepositorSetupInfo',
-          payload)
       this.$store.dispatch('dataset/updateDPStatistics', this.statistics)
 
     },
@@ -300,6 +297,7 @@ export default {
     },
     changeLockStatus(item) {
       item.locked = !item.locked;
+      this.saveUserInput()
     },
     deleteItem(item) {
       this.editedIndex = this.statistics.indexOf(item);

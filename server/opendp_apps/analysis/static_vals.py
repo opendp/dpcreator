@@ -50,18 +50,29 @@ DP_HISTOGRAM_CATEGORICAL = 'histogram_categorical'
 DP_HISTOGRAM_INTEGER = 'histogram_integer'
 DP_QUANTILE = 'quantile'
 DP_VARIANCE = 'variance'
-DP_STATS_CHOICES = [DP_MEAN,
-                    DP_SUM,
-                    DP_COUNT,
+DP_STATS_CHOICES = [DP_COUNT,
                     DP_HISTOGRAM,
+                    DP_MEAN,
+                    DP_QUANTILE,
+                    DP_SUM,
                     # DP_HISTOGRAM_CATEGORICAL,
                     # DP_HISTOGRAM_INTEGER,
-                    DP_QUANTILE,
                     DP_VARIANCE]
+
+DP_STATS_REQUIRE_COUNTS = [DP_MEAN,
+                           DP_SUM,
+                           DP_QUANTILE,
+                           DP_VARIANCE]
+
+VALID_DP_STATS_CHOICES_STR = ', '.join(DP_STATS_CHOICES)
 
 # --------------------------------------
 # Missing value handling
 # --------------------------------------
+KEY_MISSING_VALUES_HANDLING = 'missing_values_handling'
+KEY_FIXED_VALUE = 'fixed_value'
+KEY_AUTO_GENERATED_DP_COUNT = 'auto_generated_dp_count'
+
 MISSING_VAL_DROP = 'drop'
 MISSING_VAL_INSERT_RANDOM = 'insert_random'
 MISSING_VAL_INSERT_FIXED = 'insert_fixed'
