@@ -36,6 +36,8 @@
                 'Uploaded')
 
             cy.get('[data-test="delete"]').click({force: true})
+            cy.get('[data-test="deleteDatasetConfirm"]').click({force: true})
+
             cy.get('tr').should('not.contain',
                 'Replication Data for: Eye-typing experiment')
             // click to my-profile, then back to my-data page and make sure the dataset is still removed
@@ -80,6 +82,7 @@
                     'In Progress')
 
                 cy.get('[data-test="delete"]').click({force: true})
+                cy.get('[data-test="deleteDatasetConfirm"]').click({force: true})
                 cy.get('tr').should('not.contain',
                     'Replication Data for: Eye-typing experiment')
                 // click to my-profile, then back to my-data page and make sure the dataset is still removed

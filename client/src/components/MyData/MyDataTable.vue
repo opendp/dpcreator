@@ -123,7 +123,14 @@
       </template>
 
     </v-data-table>
+    <DeleteDatasetDialog
+        :dialogDelete="dialogDelete"
+        :selectedItem="selectedItem"
+        v-on:cancel="closeDelete"
+        v-on:confirm="deleteItemConfirm"
+    />
   </div>
+
 </template>
 
 <style lang="scss">
@@ -212,6 +219,7 @@ import stepInformation from "@/data/stepInformation";
 import StatusTag from "../DesignSystem/StatusTag.vue";
 import Button from "../DesignSystem/Button.vue";
 import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
+import DeleteDatasetDialog from "@/components/MyData/DeleteDatasetDialog";
 
 const {
   VIEW_DETAILS,
@@ -221,7 +229,7 @@ const {
 
 export default {
   name: "MyDataTable",
-  components: {StatusTag, Button},
+  components: {StatusTag, Button, DeleteDatasetDialog},
   props: {
     datasets: {
       type: Array
@@ -248,6 +256,8 @@ export default {
       page: 1,
       pageCount: 0,
       search: "",
+      dialogDelete: false,
+      selectedItem: null,
       headers: [
         {value: "num"},
         {text: "Data File", value: "datasetInfo.name"},
@@ -267,10 +277,12 @@ export default {
     handleButtonClick(action, item) {
       this[action](item)
     },
-
-    delete(item) {
-      //   console.log('calling delete: '+ item.datasetInfo.objectId)
-      // this.$emit("delete", this.datasetInfo.objectId)
+    deleteItem(item) {
+      this.selectedItem = Object.assign({}, item);
+      this.dialogDelete = true;
+    },
+    deleteItemConfirm() {
+      const item = this.selectedItem
       if (item.analysisPlan !== null) {
         const payload = {
           datasetId: item.datasetInfo.objectId,
@@ -280,6 +292,15 @@ export default {
       } else {
         this.$store.dispatch('dataset/deleteDataset', item.datasetInfo.objectId)
       }
+      this.closeDelete();
+    },
+    closeDelete() {
+      this.dialogDelete = false
+      this.selectedItem = null
+    },
+
+    delete(item) {
+      this.deleteItem(item)
     },
     viewDetails(item) {
       this.goToPage(item, `${NETWORK_CONSTANTS.MY_DATA_DETAILS.PATH}`)
