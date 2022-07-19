@@ -7,7 +7,7 @@ base_specs = dict(
                 #
                 dpcreator_app_container="ghcr.io/opendp/dpcreator/app",     # app image (server + compiled Vue.js)
                 dpcreator_nginx_container="ghcr.io/opendp/dpcreator/nginx",  # Nginx image
-                dpcreator_container_tag="latest",  # Tag for Images
+                dpcreator_container_tag="2022-0719",  # "latest",  # Tag for Images
                 #
                 DEFAULT_FROM_EMAIL='info@opendp.org',  # Related to the Sendgrid API call
                 #
@@ -30,7 +30,7 @@ base_specs = dict(
 specs_dev_dpcreator_org = dict(base_specs, **dict(
                 # DEPLOYMENT SPECIFIC VARIABLES:
                 deploy_name="dev",
-                dpcreator_container_tag="2022-0719-dev",  # Tag for Images
+                # dpcreator_container_tag="2022-0719",  # Tag for Images
                 #
                 dpcreator_startup_script_filename="azure_dev.dpcreator.org.sh",
                 #

@@ -3,14 +3,14 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: dpcreator-db-data-configmap-dev
+  name: dpcreator-db-data-configmap-demo
 data:
   #
   # Database settings for postgres and Django
   #
   #
   # DB_HOST Should be the same as the service name at the end of this file:
-  DB_HOST: "dpcreator-postgres-service-dev"
+  DB_HOST: "dpcreator-postgres-service-demo"
   DB_PORT: "5432"
   DB_ENGINE: "django.db.backends.postgresql_psycopg2"
   #
@@ -24,17 +24,17 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dpcreator-database-dev
+  name: dpcreator-database-demo
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dpcreator-dev
+      app: dpcreator-demo
       tier: postgres
   template:
     metadata:
       labels:
-        app: dpcreator-dev
+        app: dpcreator-demo
         tier: postgres
     spec:
       volumes:
@@ -46,7 +46,7 @@ spec:
         #    diskName: dpcreator-postgres-02
         #    diskURI: /subscriptions/14d2f886-16d9-4a5b-87f0-7aa1c4608026/resourceGroups/MC_DPCreatorResourceGroup_DPCreatorCluster01_eastus/providers/Microsoft.Compute/disks/dpcreator-postgres-02
       containers:
-        - name: dpcreator-postgres-dev
+        - name: dpcreator-postgres-demo
           image: postgres:13
           imagePullPolicy: Always
           ports:
@@ -59,7 +59,7 @@ spec:
           #  mountPath: /var/lib/postgresql/data
           envFrom:
           - configMapRef:
-              name: dpcreator-db-data-configmap-dev
+              name: dpcreator-db-data-configmap-demo
           env:
             - name: POSTGRES_USER
               valueFrom:
@@ -78,16 +78,16 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: dpcreator-postgres-service-dev
+  name: dpcreator-postgres-service-demo
   labels:
-    app: dpcreator-dev
+    app: dpcreator-demo
     tier: postgres
 spec:
   clusterIP: None
   ports:
     - port: 5432
   selector:
-    app: dpcreator-dev
+    app: dpcreator-demo
     tier: postgres
 ---
 # ----------------------------------------
@@ -97,7 +97,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: dpcreator-app-configmap-dev
+  name: dpcreator-app-configmap-demo
 data:
   #
   STATIC_ROOT: "/dpcreator_volume/static/dist"
@@ -121,29 +121,29 @@ data:
   #
   #
   VUE_APP_GOOGLE_CLIENT_ID: "750757442540-4bg3aulcrm802i8pguo851lq8kikf5ge.apps.googleusercontent.com"
-  VUE_APP_ADOBE_PDF_CLIENT_ID: "34a0c926740d4ddb9758dbc6da2a4f39"
+  VUE_APP_ADOBE_PDF_CLIENT_ID: "44937032e26b4033a840626ed0cd8e79"
   VUE_APP_WEBSOCKET_PREFIX: "wss://"
   #
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dpcreator-app-dev
+  name: dpcreator-app-demo
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dpcreator-dev
+      app: dpcreator-demo
       tier: app
   template:
     metadata:
       labels:
-        app: dpcreator-dev
+        app: dpcreator-demo
         tier: app
     spec:
       #restartPolicy: Always
       volumes:
-        - name: dpcreator-volume-dev
+        - name: dpcreator-volume-demo
           emptyDir: {}
           # azureDisk:
           #  kind: Managed
@@ -164,7 +164,7 @@ spec:
             # ----------------------------------
             # shared between containers
             # ----------------------------------
-            - name: dpcreator-volume-dev
+            - name: dpcreator-volume-demo
               mountPath: /dpcreator_volume
               #subPath: 2ravens_org-apricot
               #readOnly: true
@@ -185,7 +185,7 @@ spec:
         - name: dpcreator-app
           image: ghcr.io/opendp/dpcreator/app:2022-0719
           imagePullPolicy: Always
-          command: [ "azure_dev.dpcreator.org.sh" ]
+          command: [ "azure_demo.dpcreator.org.sh" ]
           #command: [ "/bin/sh" ]
           # args: [ "-c", "./migrate.sh && python manage.py runserver 0.0.0.0:8000"]
           ports:
@@ -196,15 +196,15 @@ spec:
             # ----------------------------------
             # shared between containers
             # ----------------------------------
-            - name: dpcreator-volume-dev
+            - name: dpcreator-volume-demo
               mountPath: /dpcreator_volume
               #subPath: 2ravens_org-apricot
               #readOnly: false
           envFrom:
           - configMapRef:
-              name: dpcreator-db-data-configmap-dev
+              name: dpcreator-db-data-configmap-demo
           - configMapRef:
-              name: dpcreator-app-configmap-dev
+              name: dpcreator-app-configmap-demo
           env:
             # Same storage roots on dpcreator-app and celery-worker
             #
@@ -216,7 +216,7 @@ spec:
             - name: DJANGO_SETTINGS_MODULE
               value: opendp_project.settings.azure_test_01
             - name: ALLOWED_HOSTS
-              value: "40.85.170.176,dev.dpcreator.org,127.0.0.1,0.0.0.0"
+              value: "13.82.125.69,demo.dpcreator.org,127.0.0.1,0.0.0.0"
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
@@ -272,15 +272,15 @@ spec:
             # ----------------------------------
             # shared between containers
             # ----------------------------------
-            - name: dpcreator-volume-dev
+            - name: dpcreator-volume-demo
               mountPath: /dpcreator_volume
               #subPath: 2ravens_org-apricot
               #readOnly: false
           envFrom:
           - configMapRef:
-              name: dpcreator-db-data-configmap-dev
+              name: dpcreator-db-data-configmap-demo
           - configMapRef:
-              name: dpcreator-app-configmap-dev
+              name: dpcreator-app-configmap-demo
           env:
             # Same storage roots on dpcreator-app and celery-worker
             #
@@ -292,7 +292,7 @@ spec:
               value: opendp_project.settings.azure_test_01
             # ----------------------------------------------------
             - name: ALLOWED_HOSTS
-              value: "40.85.170.176,dev.dpcreator.org,127.0.0.1,0.0.0.0"
+              value: "13.82.125.69,demo.dpcreator.org,127.0.0.1,0.0.0.0"
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
@@ -325,16 +325,16 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: dpcreator-load-balancer-dev
+  name: dpcreator-load-balancer-demo
   labels:
-    app: dpcreator-dev
+    app: dpcreator-demo
     tier: load-balancer
 spec:
   type: LoadBalancer
   # IP mapped to dpcreator.2ravens.org
-  loadBalancerIP: 40.85.170.176
+  loadBalancerIP: 13.82.125.69
   selector:
-    app: dpcreator-dev
+    app: dpcreator-demo
     tier: app
   ports:
   - port: 80
