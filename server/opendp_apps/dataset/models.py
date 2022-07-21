@@ -8,6 +8,9 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.dispatch import receiver
+from django.db.models.signals import post_delete
+
 # from django_cryptography.fields import encrypt
 from polymorphic.models import PolymorphicModel
 
@@ -461,3 +464,28 @@ class UploadFileInfo(DataSetInfo):
             return self.depositor_setup_info.user_step.label
         except DepositorSetupInfo.DoesNotExist:
             return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED.label
+
+# ----------------------------------------------------------------------
+# post_delete used for removing depositor_setup_info OneToOneField's
+# ----------------------------------------------------------------------
+@receiver(post_delete, sender=DataverseFileInfo)
+def post_delete_depositor_info_from_dv_file_info(sender, instance, *args, **kwargs):
+    # Delete the DepositorSetupInfo object -- a OneToOneField
+    DepositorSetupModel = apps.get_model(app_label='analysis', model_name='DepositorSetupInfo')
+
+    try:
+        if instance.depositor_setup_info:
+            instance.depositor_setup_info.delete()
+    except DepositorSetupModel.DoesNotExist:
+        print('Does not exist. Already deleted.')
+
+@receiver(post_delete, sender=UploadFileInfo)
+def post_delete_depositor_info_from_upload_file_info(sender, instance, *args, **kwargs):
+    # Delete the DepositorSetupInfo object -- a OneToOneField
+    DepositorSetupModel = apps.get_model(app_label='analysis', model_name='DepositorSetupInfo')
+
+    try:
+        if instance.depositor_setup_info: # just in case user is not specified
+            instance.depositor_setup_info.delete()
+    except DepositorSetupModel.DoesNotExist:
+        print('Does not exist. Already deleted.')
