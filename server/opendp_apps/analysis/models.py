@@ -176,12 +176,13 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         except Exception as ex_obj:
             return f'Failed to conver to JSON string {ex_obj}'
 
+
 class ReleaseInfo(TimestampedModelWithUUID):
     """
     Release of differentially private result from an AnalysisPlan
     """
     dataset = models.ForeignKey('dataset.DataSetInfo',
-                                on_delete=models.PROTECT)
+                                on_delete=models.CASCADE)
 
     epsilon_used = models.FloatField(null=False,
                                      blank=False,
@@ -398,7 +399,7 @@ class AnalysisPlan(TimestampedModelWithUUID):
     name = models.CharField(max_length=255)
 
     dataset = models.ForeignKey('dataset.DataSetInfo',
-                                on_delete=models.PROTECT)
+                                on_delete=models.CASCADE)
     is_complete = models.BooleanField(default=False)
     user_step = models.CharField(max_length=128,
                                  choices=AnalystSteps.choices)

@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from opendp_project.views import BaseModelViewSet
-from opendp_apps.analysis.models import AnalysisPlan
+from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.serializers import \
@@ -28,13 +28,14 @@ class AnalysisPlanViewSet(BaseModelViewSet):
         'retrieve': AnalysisPlanSerializer,
         'create': DatasetObjectIdSerializer,
         'partial_update': AnalysisPlanSerializer,
+        'destroy': AnalysisPlanSerializer
     }
     default_serializer_class = AnalysisPlanSerializer
 
     def get_serializer_class(self):
         return self.serializer_classes.get(self.action, self.default_serializer_class)
 
-    http_method_names = ['get', 'post', 'patch']
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_queryset(self):
         """
@@ -114,3 +115,13 @@ class AnalysisPlanViewSet(BaseModelViewSet):
         logger.info("Analysis update with request " + json.dumps(request.data))
 
         return partial_update_result
+
+    def delete(self, request, *args, **kwargs):
+        analysis_plan = self.get_object()
+        if analysis_plan.release_info.exists():
+            if not settings.ALLOW_RELEASE_DELETION:
+                return Response(get_json_error('Deleting AnalysisPlan with an associated ReleaseInfo is not allowed'),
+                                status=status.HTTP_400_BAD_REQUEST)
+            else:
+                analysis_plan.release_info.delete()
+        return super().destroy(request, *args, **kwargs)
