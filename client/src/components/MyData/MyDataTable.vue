@@ -42,6 +42,7 @@
         </div>
       </template>
       <template v-slot:[`item.options`]="{ item }">
+        <!--
         <Button
             :data-test="action"
             v-for="(action, index) in statusInformation[stepInformation[item.userStep].workflowStatus]
@@ -63,6 +64,7 @@
             :click="() => handleButtonClick(action, item)"
             :label="actionsInformation[action]"
         />
+        -->
       </template>
       <template v-slot:footer="{ props }">
         <div
@@ -94,8 +96,41 @@
           </div>
         </div>
       </template>
+      <template v-slot:[`item.actions`]="{ item }">
+        <div class="d-flex justify-space-between">
+
+          <v-tooltip
+
+              v-for="(action, index) in statusInformation[stepInformation[item.userStep].workflowStatus]
+            .availableActions"
+              bottom max-width="220px">
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon
+                  :data-test="action"
+                  v-bind="attrs"
+                  v-on="on"
+                  class="mr-2"
+                  @click="handleButtonClick(action, item)"
+              >
+                {{ actionsInformation.icons[action] }}
+
+              </v-icon>
+            </template>
+            <span>{{ actionsInformation[action] }}</span>
+          </v-tooltip>
+
+        </div>
+      </template>
+
     </v-data-table>
+    <DeleteDatasetDialog
+        :dialogDelete="dialogDelete"
+        :selectedItem="selectedItem"
+        v-on:cancel="closeDelete"
+        v-on:confirm="deleteItemConfirm"
+    />
   </div>
+
 </template>
 
 <style lang="scss">
@@ -157,6 +192,10 @@
     min-width: unset !important;
   }
 
+  .delete {
+    min-width: unset !important;
+  }
+
   .v-data-table-header-mobile {
     display: none;
   }
@@ -180,6 +219,7 @@ import stepInformation from "@/data/stepInformation";
 import StatusTag from "../DesignSystem/StatusTag.vue";
 import Button from "../DesignSystem/Button.vue";
 import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
+import DeleteDatasetDialog from "@/components/MyData/DeleteDatasetDialog";
 
 const {
   VIEW_DETAILS,
@@ -189,7 +229,7 @@ const {
 
 export default {
   name: "MyDataTable",
-  components: {StatusTag, Button},
+  components: {StatusTag, Button, DeleteDatasetDialog},
   props: {
     datasets: {
       type: Array
@@ -216,12 +256,14 @@ export default {
       page: 1,
       pageCount: 0,
       search: "",
+      dialogDelete: false,
+      selectedItem: null,
       headers: [
         {value: "num"},
         {text: "Data File", value: "datasetInfo.name"},
         {text: "Status", value: "status"},
         {text: "Remaining time to complete release", value: "timeRemaining"},
-        {text: "Options", value: "options", align: "end"}
+        {text: "Options", value: "actions", align: "end"}
       ],
       statusInformation,
       actionsInformation,
@@ -234,6 +276,31 @@ export default {
   methods: {
     handleButtonClick(action, item) {
       this[action](item)
+    },
+    deleteItem(item) {
+      this.selectedItem = Object.assign({}, item);
+      this.dialogDelete = true;
+    },
+    deleteItemConfirm() {
+      const item = this.selectedItem
+      if (item.analysisPlan !== null) {
+        const payload = {
+          datasetId: item.datasetInfo.objectId,
+          analysisPlanId: item.analysisPlan.objectId
+        }
+        this.$store.dispatch('dataset/deleteAnalysisPlan', payload)
+      } else {
+        this.$store.dispatch('dataset/deleteDataset', item.datasetInfo.objectId)
+      }
+      this.closeDelete();
+    },
+    closeDelete() {
+      this.dialogDelete = false
+      this.selectedItem = null
+    },
+
+    delete(item) {
+      this.deleteItem(item)
     },
     viewDetails(item) {
       this.goToPage(item, `${NETWORK_CONSTANTS.MY_DATA_DETAILS.PATH}`)

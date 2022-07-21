@@ -12,8 +12,6 @@ DANGER: This Cypress settings file introduces an API endpoint that deletes nearl
             settings.ALLOW_CYPRESS_TEST_ENDPOINT == cypress_utils.statics_vals.ALLOW_CYPRESS_TEST_ENDPOINT_VAL
 
 """
-import os
-
 from opendp_project.settings.base import *
 
 DEBUG = True
