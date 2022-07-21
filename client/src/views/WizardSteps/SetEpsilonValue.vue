@@ -7,6 +7,27 @@
       }}
     </p>
 
+   <div
+       :class="`${radioObservationsNumberShouldBeDisabled ? 'disabled' : ''}`"
+   >
+      <span class="font-weight-bold title-size-2 d-flex"
+      ><v-icon color="primary" left>mdi-play</v-icon> Can the number of
+        observations in your data file be made public knowledge?
+      </span>
+     <v-radio-group
+         v-model="observationsNumberCanBePublic"
+         class="pl-2"
+         :disabled="radioObservationsNumberShouldBeDisabled"
+         v-on:change="saveUserInput"
+     >
+       <RadioItem label="Yes." data-test="Public Observations - yes" value="yes"/>
+       <RadioItem label="No." value="no"/>
+       <RadioItem label="I'm unsure." value="unsure"/>
+     </v-radio-group>
+
+     <AdditionalInformationAlert locale-tag="set epsilon.help data public">
+     </AdditionalInformationAlert>
+   </div>
     <span class="font-weight-bold title-size-2 d-flex"
     ><v-icon color="primary" left>mdi-play</v-icon> Is your data a secret and
       simple random sample from a larger population?
@@ -25,6 +46,7 @@
             id="populationSize"
             placeholder="E.g. 5,000,000"
             type="number"
+            hide-spin-buttons="true"
             background-color="soft_primary"
             v-on:change="saveUserInput"
         />
@@ -37,27 +59,6 @@
     <AdditionalInformationAlert class="mb-10" locale-tag="set epsilon.help data secret">
     </AdditionalInformationAlert>
 
-    <div
-        :class="`${radioObservationsNumberShouldBeDisabled ? 'disabled' : ''}`"
-    >
-      <span class="font-weight-bold title-size-2 d-flex"
-      ><v-icon color="primary" left>mdi-play</v-icon> Can the number of
-        observations in your data file be made public knowledge?
-      </span>
-      <v-radio-group
-          v-model="observationsNumberCanBePublic"
-          class="pl-2"
-          :disabled="radioObservationsNumberShouldBeDisabled"
-          v-on:change="saveUserInput"
-      >
-        <RadioItem label="Yes." data-test="Public Observations - yes" value="yes"/>
-        <RadioItem label="No." value="no"/>
-        <RadioItem label="I'm unsure." value="unsure"/>
-      </v-radio-group>
-
-      <AdditionalInformationAlert locale-tag="set epsilon.help data public">
-      </AdditionalInformationAlert>
-    </div>
   </div>
 </template>
 
