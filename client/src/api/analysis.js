@@ -1,8 +1,8 @@
-import {session, wrappedSession} from './session';
+import {wrappedSession} from './session';
+import caseConversion from "@/shared/caseConversion";
 
 
 const camelcaseKeys = require('camelcase-keys');
-import caseConversion from "@/shared/caseConversion";
 
 export default {
 
@@ -32,5 +32,8 @@ export default {
         return wrappedSession.patch('/api/analyze/' + objectId + '/',
             snakeProps)
     },
+    deleteAnalysisPlan(analysisId) {
+        return wrappedSession.delete('/api/analyze/' + analysisId + '/')
+    }
 
 };
