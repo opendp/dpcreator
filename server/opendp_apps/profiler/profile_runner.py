@@ -51,7 +51,6 @@ class ProfileRunner(BasicErrCheck):
         self.num_variables = None
         self.data_profile = None  # Data profile information
 
-
         # Set to 'True' for a file available via a filepath
         # self.dataset_is_filepath = kwargs.get(pstatic.KEY_DATASET_IS_FILEPATH, False)
 
@@ -66,18 +65,19 @@ class ProfileRunner(BasicErrCheck):
         super().add_err_msg(err_msg)
         self.set_depositor_info_status(DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
 
-
     def set_depositor_info_status(self, new_step: DepositorSetupInfo.DepositorSteps) -> bool:
         """Update the status on the DepositorSetupInfo object.
         Only available if the dataset_info_object is populated"""
         if not self.dataset_info:
-            return
+            return False
 
         # Update the step
         self.dataset_info.depositor_setup_info.set_user_step(new_step)
 
         # save it
         self.dataset_info.depositor_setup_info.save()
+
+        return True
 
     def run_basic_checks(self):
         """
@@ -93,7 +93,6 @@ class ProfileRunner(BasicErrCheck):
                 return
 
             self.dataset_info_updater = DataSetInfoUpdater(self.dataset_info)
-
 
         # Is the dataset_pointer correct?
         #
@@ -126,8 +125,6 @@ class ProfileRunner(BasicErrCheck):
                 return
             else:
                 self.ds_pointer_for_pandas = self.dataset_pointer
-
-
 
     def run_profile_process(self):
         """
@@ -163,7 +160,8 @@ class ProfileRunner(BasicErrCheck):
 
         # Pre-profile: update user_step
         if self.dataset_info:
-            if self.dataset_info.depositor_setup_info.user_step < DepositorSetupInfo.DepositorSteps.STEP_0300_PROFILING_PROCESSING:
+            if self.dataset_info.depositor_setup_info.user_step < \
+                    DepositorSetupInfo.DepositorSteps.STEP_0300_PROFILING_PROCESSING:
                 self.set_depositor_info_status(DepositorSetupInfo.DepositorSteps.STEP_0300_PROFILING_PROCESSING)
 
         try:
@@ -185,5 +183,6 @@ class ProfileRunner(BasicErrCheck):
         # Profiling success: update DataSetInfo profile and user_step
         if self.dataset_info:
             self.dataset_info_updater.save_data_profile(variable_info_handler.data_profile)
-            if self.dataset_info.depositor_setup_info.user_step < DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE:
+            if self.dataset_info.depositor_setup_info.user_step < \
+                    DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE:
                 self.set_depositor_info_status(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
