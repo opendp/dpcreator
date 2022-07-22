@@ -33,7 +33,7 @@
       simple random sample from a larger population?
     </span>
     <v-radio-group v-model="secretSample" class="pl-2" v-on:change="saveUserInput">
-      <RadioItem label="Yes." value="yes"/>
+      <RadioItem data-test="Larger Population - yes" label="Yes." value="yes"/>
       <div
           :class="
           `${secretSample === 'yes' ? 'population-size-container' : 'd-none'}`
@@ -42,12 +42,15 @@
         <strong>Population size: </strong>
         <v-text-field
             v-model="populationSize"
+            data-test="populationSizeInput"
+            data
             class="d-inline-block"
             id="populationSize"
             placeholder="E.g. 5,000,000"
             type="number"
             hide-spin-buttons="true"
             background-color="soft_primary"
+            :rules="[validatePopulationSize]"
             v-on:change="saveUserInput"
         />
         <strong>people</strong>
@@ -138,6 +141,10 @@ export default {
     }
   },
   methods: {
+    validatePopulationSize(n) {
+      return (n > this.datasetInfo.depositorSetupInfo.datasetSize)
+          || "Population size must greater than sample size."
+    },
     saveUserInput() {
       const userInput = {
         epsilonQuestions: {
