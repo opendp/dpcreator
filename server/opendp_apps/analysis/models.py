@@ -174,7 +174,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
             info_str = json.dumps(self.variable_info, indent=4)
             return f'<pre>{info_str}</pre>'
         except Exception as ex_obj:
-            return f'Failed to conver to JSON string {ex_obj}'
+            return f'Failed to convert to JSON string {ex_obj}'
 
 
 class ReleaseInfo(TimestampedModelWithUUID):
