@@ -5,7 +5,7 @@ from django.db import transaction
 from rest_framework import permissions, status
 from rest_framework.response import Response
 
-from opendp_apps.analysis.models import AnalysisPlan, DepositorSetupInfo
+from opendp_apps.analysis.models import AnalysisPlan, DepositorSetupInfo, ReleaseInfo
 from opendp_apps.dataset.models import DataSetInfo, UploadFileInfo
 from opendp_apps.dataset.permissions import IsOwnerOrBlocked
 from opendp_apps.dataset.serializers import \
@@ -13,7 +13,7 @@ from opendp_apps.dataset.serializers import \
      DepositorSetupInfoSerializer,
      UploadFileInfoCreationSerializer)
 from opendp_project.views import BaseModelViewSet
-from opendp_apps.utils.view_helper import get_json_error, get_json_success
+from opendp_apps.utils.view_helper import get_json_error
 
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
@@ -103,8 +103,10 @@ class UploadFileSetupViewSet(BaseModelViewSet):
             creator is the logged in user
         """
         logger.info(f"Getting UploadFileInfo for user {self.request.user.object_id}")
-        qs = UploadFileInfo.objects.filter(creator=self.request.user)
-        return qs
+        return UploadFileInfo.objects.filter(creator=self.request.user)
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
 
     def list(self, request, *args, **kwargs):
         """
@@ -114,3 +116,18 @@ class UploadFileSetupViewSet(BaseModelViewSet):
         """
         serializer = UploadFileInfoCreationSerializer(self.get_queryset(), many=True)
         return Response(serializer.data)
+
+    def delete(self, request, *args, **kwargs):
+        # We currently have on_delete set to protect, so we need to explicitly delete
+        # the AnalysisPlan and ReleaseInfo objects first.
+        release_info = ReleaseInfo.objects.filter(dataset=self.get_object())
+        if release_info.exists():
+            if not settings.ALLOW_RELEASE_DELETION:
+                return Response(data=get_json_error('Deleting ReleaseInfo objects is not allowed'),
+                                status=status.HTTP_401_UNAUTHORIZED)
+            release_info.dataset = None
+            release_info.save()
+            release_info.delete()
+        analysis_plans = AnalysisPlan.objects.filter(dataset=self.get_object()).update(dataset=None)
+        analysis_plans.delete()
+        return super().destroy(request, *args, **kwargs)

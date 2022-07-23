@@ -1,28 +1,22 @@
-import json
 from http import HTTPStatus
-from os.path import abspath, dirname, isfile, join
-import requests
+from os.path import abspath, dirname, join
 import uuid
-
-CURRENT_DIR = dirname(abspath(__file__))
-TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 
-from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
-from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
 from opendp_apps.dataverses.testing.test_endpoints import BaseEndpointTest
 from opendp_apps.model_helpers.msg_util import msgt
-from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.profiler import static_vals as pstatic
-from opendp_apps.utils.extra_validators import *
+
+CURRENT_DIR = dirname(abspath(__file__))
+TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
 
 class TestFileUpload(BaseEndpointTest):
 
     fixtures = ['test_dataset_data_001.json', ]
+    maxDiff = None
 
     def setUp(self):
         self.user_obj, _created = get_user_model().objects.get_or_create(username='dev_admin')
@@ -87,3 +81,20 @@ class TestFileUpload(BaseEndpointTest):
         jresp = resp.json()
         self.assertTrue('creator' in jresp)
         self.assertTrue(jresp['creator'][0].find('does not exist') > -1)
+
+    def test_30_file_upload_delete(self):
+        """
+        Create a file upload and then delete it via the API
+        :return:
+        """
+        payload = dict(name='Fatigue Direct Upload',
+                       creator=self.user_obj.object_id,
+                       source_file=self.test_file_obj)
+
+        direct_upload_url = '/api/direct-upload/'
+
+        resp = self.client.post(direct_upload_url,
+                                data=payload)
+        object_id = resp.json().get('object_id')
+        response = self.client.delete(f'{direct_upload_url}{object_id}/')
+        self.assertEqual(response.status_code, 204)
