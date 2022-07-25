@@ -27,14 +27,13 @@ from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
 from opendp_apps.analysis.tools.dp_variance_spec import DPVarianceSpec
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler import static_vals as pstatic
-from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class StatSpecBuilder(BasicErrCheck):
 
-    def __init__(self, analysis_plan: AnalysisPlan, dp_statistics: list = None, **kwargs):
+    def __init__(self, analysis_plan: AnalysisPlan, dp_statistics: list = None):
         """
         Note: Do not use the __init__ directly, use one of these static methods:
             - build_with_public_count(...)
@@ -119,6 +118,12 @@ class StatSpecBuilder(BasicErrCheck):
         if not self.does_stats_list_have_a_dp_count():
             # It there's no DP Count, then add one.
             self.add_dp_count()
+            success, dp_stats_or_err = self.redistribute_epsilon(self.max_epsilon, self.dp_statistics)
+            if success is True:
+                self.dp_statistics = dp_stats_or_err
+            else:
+                self.add_err_msg(dp_stats_or_err)
+                return False
 
         return True
 
@@ -144,11 +149,10 @@ class StatSpecBuilder(BasicErrCheck):
         return False
 
     @staticmethod
-    def redistribute_epsilon(max_epsilon, dp_statistics) -> tuple[bool, Union[list, str]]:
+    def redistribute_epsilon(max_epsilon, dp_statistics) -> tuple:
         """
         Redistribute the epsilon between stats **after** adding a new DP Count
         """
-
         # How many locked vs unlocked stats?
         #
         num_locked_stats = len([dp_stat for dp_stat in dp_statistics
@@ -159,16 +163,15 @@ class StatSpecBuilder(BasicErrCheck):
         #
         locked_epsilon = 0
         if num_locked_stats > 0:
-            locked_epsilon= sum([dp_stat['epsilon'] for dp_stat in dp_statistics
-                                 if dp_stat.get('locked') is True])
+            locked_epsilon = sum([dp_stat['epsilon'] for dp_stat in dp_statistics
+                                  if dp_stat.get('locked') is True])
 
         if locked_epsilon >= max_epsilon:
             return False, astatic.ERR_MSG_BAD_TOTAL_LOCKED_EPSILON
 
         # Set new epsilon for each unlocked stat
         #
-        new_unlocked_epsilon = ((max_epsilon - locked_epsilon) / num_unlocked_stats) \
-                               - astatic.MAX_EPSILON_OFFSET
+        new_unlocked_epsilon = ((max_epsilon - locked_epsilon) / num_unlocked_stats) - astatic.MAX_EPSILON_OFFSET
 
         updated_stats = []
         for dp_stat in dp_statistics:
@@ -265,63 +268,7 @@ class StatSpecBuilder(BasicErrCheck):
         self.add_err_msg(user_msg)
         return False
 
-    def xcompute_dp_count_for_validation(self):
-        """
-        Naive version, use the first DP Count in list
-        - Return None or integer count
-        """
-        if self.has_error():
-            return None
-
-        # Get the DP Count specification
-        dp_count_spec = self.get_first_dp_count_spec()
-        if dp_count_spec is None:
-            return None
-
-        # Add variable info and column index
-        dp_count_spec = self.set_stat_spec_additional_params(dp_count_spec)
-        if dp_count_spec is None:
-            return None
-
-        if 'error_message' in dp_count_spec:
-            self.add_err_msg(dp_count_spec['error_message'])
-            return None
-
-        # Is the spec valid
-        if dp_count_spec.has_error():
-            user_msg = (f'Validation error found for variable "{dp_count_spec.variable}"'
-                        f' and statistic "{dp_count_spec.statistic}":'
-                        f' {dp_count_spec.get_single_err_msg()}')
-            self.add_err_msg(user_msg)
-            return
-
-        #
-        variable_indices_info = self.analysis_plan.dataset.get_variable_order(as_indices=True)
-        if not variable_indices_info.success:
-            user_msg = f'Failed to get column indices. {variable_indices_info.message}'
-            self.add_err_msg(user_msg)
-            return None
-
-        col_indices = variable_indices_info.data
-
-        # -----------------------------------
-        # Get the file/dataset pointer -- needs adjusting for blob/S3 type objects
-        # -----------------------------------
-        try:
-            filepath = self.analysis_plan.dataset.source_file.path
-        except ValueError as err_obj:
-            user_msg = (f'Failed to calculate statistics. Unable to access the data file. '
-                        f' ({err_obj})')
-            self.add_err_msg(user_msg)
-            return
-
-        sep_char = get_data_file_separator(filepath)
-
-        file_handle = open(filepath, 'r')
-        stat_spec.run_chain(col_indices, file_handle, sep_char=sep_char)
-        file_handle.close()
-
-    def set_stat_spec_additional_params(self, stat_spec: dict) -> dict:
+    def set_stat_spec_additional_params(self, stat_spec: dict) -> Union[dict, None]:
         """For an initial stat spec from dp_statistics, add 'variable_info' and the 'col_idx'"""
         if self.has_error():
             return None
