@@ -1,8 +1,4 @@
 """
-Used to create StatSpec objects including adding DPCount objects when necessary
-
-"""
-"""
 - Build computation chain from user-created statistic specifications
     - Validate computation
     - Run computation
@@ -15,43 +11,23 @@ Used to create StatSpec objects including adding DPCount objects when necessary
         - Retrieve the variable type/min/max/categories from AnalysisPlan.variable_info
         - Retrieve
 """
-import copy
 import logging
-import pkg_resources
 from typing import Union
 
 from django.conf import settings
-from django.core.files.base import ContentFile
-from django.core.exceptions import ValidationError
 
 from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
-from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
-from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
-from opendp_apps.analysis.tools.dp_variance_spec import DPVarianceSpec
-from opendp_apps.analysis.release_email_util import ReleaseEmailUtil
-from opendp_apps.analysis.tools.stat_spec import StatSpec
-from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
+from opendp_apps.analysis.models import AnalysisPlan
 from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
-from opendp_apps.analysis.tools.dp_histogram_integer_spec import DPHistogramIntegerSpec
 from opendp_apps.analysis.tools.dp_histogram_categorical_spec import DPHistogramCategoricalSpec
+from opendp_apps.analysis.tools.dp_histogram_integer_spec import DPHistogramIntegerSpec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
+from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
 from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
-
-from opendp_apps.dataset.models import DataSetInfo
-from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
-
-from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
-
-from opendp_apps.user.models import OpenDPUser
-from opendp_apps.profiler import static_vals as pstatic
-
-from opendp_apps.utils.extra_validators import \
-    (validate_epsilon_not_null,
-     validate_not_negative)
+from opendp_apps.analysis.tools.dp_variance_spec import DPVarianceSpec
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
+from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
-
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -67,14 +43,16 @@ class StatSpecBuilder(BasicErrCheck):
         self.analysis_plan = analysis_plan
         self.dp_statistics = dp_statistics
 
+        self.max_epsilon = None  # retrieved later via the analysis_plan
         self.stat_spec_list = []
         self.stats_requiring_count = []
-        self.dataset_size = None
-        self.use_private_count = True   # May be changed during process via "determine_dataset_size()"
+
+        self.validation_dataset_size = None  # Dataset size from profile; used for validation
+        self.use_private_count = True  # Conservative default; May change via "determine_dataset_size()"
         self.dataset_size_required = True
         self.dp_count_added = False
 
-        self.build_stat_specs()
+        self.run_build_spec_process()
 
     def add_err_msg(self, err_msg):
         """Add an error message"""
@@ -82,9 +60,12 @@ class StatSpecBuilder(BasicErrCheck):
         self.error_message = err_msg
         logger.error(err_msg)
 
-    def run_build_stat_spec_process(self):
-        """  """
+    def run_build_spec_process(self):
+        """Build/validate the stat specs  """
         if self.has_error():
+            return
+
+        if not self.set_max_epsilon():
             return
 
         # Set the dp_statistics attribute
@@ -95,10 +76,21 @@ class StatSpecBuilder(BasicErrCheck):
         if not self.determine_dataset_size():
             return
 
+    def set_max_epsilon(self) -> bool:
+        """Set the max epsilon based on the analysis plan"""
+        if not self.analysis_plan:
+            self.add_err_msg('The AnalysisPlan was not specified.')
+            return False
+
+        self.max_epsilon = self.analysis_plan.dataset.get_depositor_setup_info().epsilon
+
+        return True
+
     def determine_dataset_size(self):
         """
         Depending on 'is_private_count" and the contents of `dp_statistics`,
-        determine the dataset size
+        determine the dataset size.
+
         """
         if self.has_error():
             return False
@@ -108,6 +100,9 @@ class StatSpecBuilder(BasicErrCheck):
             self.add_err_msg('The AnalysisPlan was not specified.')
             return False
 
+        # Use the actual dataset size FOR VALIDATION ONLY
+        self.validation_dataset_size = self.analysis_plan.dataset.get_dataset_size()
+
         # If the dataset size isn't required, all set...
         self.dataset_size_required = self.is_dataset_size_required()
         if self.is_dataset_size_required() is False:
@@ -115,13 +110,10 @@ class StatSpecBuilder(BasicErrCheck):
 
         # May the dataset size be made public?
         if self.analysis_plan.is_dataset_size_public():
-            # Yes, use the actual dataset size
-            self.dataset_size = self.analysis_plan.dataset.get_dataset_size()
             self.use_private_count = False
-            return True
-
-        # No, dataset size is not public
-        self.use_private_count = True
+        else:
+            # No, dataset size is not public
+            self.use_private_count = True
 
         # Does the stats list already contain a count?
         if not self.does_stats_list_have_a_dp_count():
@@ -134,6 +126,9 @@ class StatSpecBuilder(BasicErrCheck):
         """Do any of the statistics require dataset_size for input?"""
         self.stats_requiring_count = []
 
+        # Iterate through the statistics
+        # For those requiring dataset size, add them to a list
+        #
         for dp_stat in self.dp_statistics:
             stat_name = dp_stat.get('statistic', None)
             if not self.is_valid_statistic_name(stat_name):
@@ -148,10 +143,45 @@ class StatSpecBuilder(BasicErrCheck):
 
         return False
 
+    @staticmethod
+    def redistribute_epsilon(max_epsilon, dp_statistics) -> tuple[bool, Union[list, str]]:
+        """
+        Redistribute the epsilon between stats **after** adding a new DP Count
+        """
+
+        # How many locked vs unlocked stats?
+        #
+        num_locked_stats = len([dp_stat for dp_stat in dp_statistics
+                                if dp_stat.get('locked') is True])
+        num_unlocked_stats = len(dp_statistics) - num_locked_stats
+
+        # How much epsilon is locked? e.g. can't be redistributed
+        #
+        locked_epsilon = 0
+        if num_locked_stats > 0:
+            locked_epsilon= sum([dp_stat['epsilon'] for dp_stat in dp_statistics
+                                 if dp_stat.get('locked') is True])
+
+        if locked_epsilon >= max_epsilon:
+            return False, astatic.ERR_MSG_BAD_TOTAL_LOCKED_EPSILON
+
+        # Set new epsilon for each unlocked stat
+        #
+        new_unlocked_epsilon = ((max_epsilon - locked_epsilon) / num_unlocked_stats) \
+                               - astatic.MAX_EPSILON_OFFSET
+
+        updated_stats = []
+        for dp_stat in dp_statistics:
+            if dp_stat.get('locked') is False:
+                dp_stat['epsilon'] = new_unlocked_epsilon
+            updated_stats.append(dp_stat)
+
+        return True, updated_stats
+
     def add_dp_count(self):
         """Add a DP Count to the dp_statistics list"""
         if self.has_error():
-            return
+            return False
 
         if not self.stats_requiring_count:
             user_msg = "No stats found requiring a count"
@@ -163,11 +193,11 @@ class StatSpecBuilder(BasicErrCheck):
         stat_needing_count = self.stats_requiring_count[0]
 
         dp_count = {
-            astatic.KEY_AUTO_GENERATED_DP_COUNT: True,
+            astatic.KEY_AUTO_GENERATED: True,
             "statistic": astatic.DP_COUNT,
             "variable": stat_needing_count['variable'],
             "label": stat_needing_count['variable'],
-            "epsilon": 0.1, # TODO: FIX! (initial test value)
+            "epsilon": 0.1,  # This will be set/redistributed!
             "delta": 0,
             astatic.KEY_MISSING_VALUES_HANDLING: stat_needing_count[astatic.KEY_MISSING_VALUES_HANDLING],
             astatic.KEY_FIXED_VALUE: stat_needing_count["fixed_value"],
@@ -235,7 +265,7 @@ class StatSpecBuilder(BasicErrCheck):
         self.add_err_msg(user_msg)
         return False
 
-    def compute_dp_count_for_validation(self):
+    def xcompute_dp_count_for_validation(self):
         """
         Naive version, use the first DP Count in list
         - Return None or integer count
@@ -332,7 +362,7 @@ class StatSpecBuilder(BasicErrCheck):
         stat_num = 0
 
         for dp_stat in self.dp_statistics:
-            stat_num += 1       # not used yet...
+            stat_num += 1  # not used yet...
             """
             We're putting together lots of properties to pass to
             statistic specific classes such as DPMeanSpec.
@@ -355,8 +385,8 @@ class StatSpecBuilder(BasicErrCheck):
             # -------------------------------------
             # (1) Begin building the property dict
             # -------------------------------------
-            props = dp_stat         # start with what is in dp_stat--the UI input
-            props['dataset_size'] = self.dataset_size   # add dataset size
+            props = dp_stat  # start with what is in dp_stat--the UI input
+            props['dataset_size'] = self.validation_dataset_size  # add dataset size
 
             #  Some high-level error checks, before making the StatSpec
             variable = props.get('variable')
