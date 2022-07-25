@@ -8,7 +8,7 @@
     </p>
 
    <div
-       :class="`${radioObservationsNumberShouldBeDisabled ? 'disabled' : ''}`"
+
    >
       <span class="font-weight-bold title-size-2 d-flex"
       ><v-icon color="primary" left>mdi-play</v-icon> Can the number of
@@ -17,7 +17,6 @@
      <v-radio-group
          v-model="observationsNumberCanBePublic"
          class="pl-2"
-         :disabled="radioObservationsNumberShouldBeDisabled"
          v-on:change="saveUserInput"
      >
        <RadioItem label="Yes." data-test="Public Observations - yes" value="yes"/>
@@ -50,7 +49,7 @@
             type="number"
             hide-spin-buttons="true"
             background-color="soft_primary"
-            :rules="[validatePopulationSize]"
+            :rules="[populationSizeRule]"
             v-on:change="saveUserInput"
         />
         <strong>people</strong>
@@ -141,10 +140,15 @@ export default {
     }
   },
   methods: {
-    validatePopulationSize(n) {
-      return (n > this.datasetInfo.depositorSetupInfo.datasetSize)
+    populationSizeRule(n) {
+      return (this.populationSizeIsValid(n))
           || "Population size must greater than sample size."
     },
+    populationSizeIsValid(pop) {
+      let valid = this.secretSample !== 'yes' || pop > this.datasetInfo.depositorSetupInfo.datasetSize
+      return valid
+    },
+
     saveUserInput() {
       const userInput = {
         epsilonQuestions: {
@@ -153,19 +157,32 @@ export default {
           observationsNumberCanBePublic: this.observationsNumberCanBePublic,
         }
       }
+
       const payload = {objectId: this.getDepositorSetupInfo.objectId, props: userInput}
       this.$store.dispatch('dataset/updateDepositorSetupInfo',
           payload)
     }
   },
   watch: {
-
-    observationsNumberCanBePublic: function (newValue, oldValue) {
-      if (newValue !== "") {
-        console.log('updating isComplete')
-
-
+    secretSample: function (newValue, oldValue) {
+      if (newValue !== "" && this.populationSizeIsValid(this.populationSize)) {
         this.$emit("stepCompleted", 2, true);
+      } else {
+        this.$emit("stepCompleted", 2, false);
+      }
+    },
+    populationSize: function (newValue, oldValue) {
+      if (this.observationsNumberCanBePublic !== "" && this.secretSample !== "" && this.populationSizeIsValid(this.populationSize)) {
+        this.$emit("stepCompleted", 2, true);
+      } else {
+        this.$emit("stepCompleted", 2, false);
+      }
+    },
+    observationsNumberCanBePublic: function (newValue, oldValue) {
+      if (newValue !== "" && this.secretSample !== "" && this.populationSizeIsValid(this.populationSize)) {
+        this.$emit("stepCompleted", 2, true);
+      } else {
+        this.$emit("stepCompleted", 2, false);
       }
     }
   }
