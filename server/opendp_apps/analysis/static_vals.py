@@ -71,7 +71,7 @@ VALID_DP_STATS_CHOICES_STR = ', '.join(DP_STATS_CHOICES)
 # --------------------------------------
 KEY_MISSING_VALUES_HANDLING = 'missing_values_handling'
 KEY_FIXED_VALUE = 'fixed_value'
-KEY_AUTO_GENERATED_DP_COUNT = 'auto_generated_dp_count'
+KEY_AUTO_GENERATED = 'auto_generated'
 
 MISSING_VAL_DROP = 'drop'
 MISSING_VAL_INSERT_RANDOM = 'insert_random'
@@ -107,6 +107,7 @@ ERR_MSG_NO_ANALYSIS_PLAN = 'AnalysisPlan object not found for this object_id and
 ERR_MSG_FIELDS_NOT_UPDATEABLE = 'These fields are not updatable'
 
 ERR_MSG_BAD_TOTAL_EPSILON = 'The depositor setup info has an invalid epsilon value'
+ERR_MSG_BAD_TOTAL_LOCKED_EPSILON = 'The "locked" epsilon cannot be greater than the total epsilon value'
 ERR_MSG_BAD_TOTAL_DELTA = 'The depositor setup info has an invalid delta value'
 
 ERR_MSG_INVALID_MIN_MAX = 'The "max" must be greater than the "min"'

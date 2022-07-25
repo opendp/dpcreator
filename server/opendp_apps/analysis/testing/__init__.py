@@ -17,5 +17,6 @@ python manage.py test opendp_apps.analysis.testing.test_dp_spec_error
 
 python manage.py test opendp_apps.analysis.testing.test_run_release.TestRunRelease.test_90_dp_count_pums_data
 
+python manage.py test opendp_apps.analysis.testing.test_stat_spec_builder
 
 """
