@@ -29,3 +29,30 @@ def clear_test_data(request):
 
     return JsonResponse({'success': True,
                          'message': 'Data cleared'})
+
+def setup_demo_data(request):
+    """
+    Clear data and then setup the demo data
+    Should only be available during cypress tests
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({'success': False,
+                             'message': 'The user is not authenticated.'},
+                            status=403)
+
+    if not request.user.is_superuser:
+        return JsonResponse({'success': False,
+                             'message': 'A superuser is required.'},
+                            status=403)
+
+    # Note: this check is made again in the command
+    #
+    if not are_cypress_settings_in_place():
+        return JsonResponse({'success': False,
+                             'message': 'The settings for this feature are not active. (cypress_settings)'},
+                            status=403)
+
+    call_command('setup_demo')
+
+    return JsonResponse({'success': True,
+                         'message': 'Data cleared and demo data loaded'})

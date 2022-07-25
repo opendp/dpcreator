@@ -54,7 +54,7 @@
           <MyDataTable
               v-if="!loading"
               :class="{ 'my-5': $vuetify.breakpoint.smAndUp }"
-              :datasets="getMyDataList"
+              :datasets="myDataList"
               :searchTerm="search"
               :itemsPerPage="5"
           />
@@ -71,7 +71,7 @@ import UploadFiles from "../components/DesignSystem/UploadFiles";
 
 import MyDataTable from "../components/MyData/MyDataTable.vue";
 import SupportBanner from "../components/SupportBanner.vue";
-import {mapGetters} from "vuex";
+import {mapState} from "vuex";
 
 export default {
   name: "MyData",
@@ -84,8 +84,7 @@ export default {
 
   },
   computed: {
-
-    ...mapGetters('dataset', ['getMyDataList'])
+    ...mapState('dataset', ['myDataList']),
   },
   data: () => ({
     loading: true,

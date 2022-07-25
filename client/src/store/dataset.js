@@ -3,6 +3,8 @@ import analysis from "@/api/analysis";
 
 import {
     PATCH_DEPOSITOR_INFO,
+    REMOVE_ANALYSIS_PLAN,
+    REMOVE_DATASET,
     SET_ANALYSIS_PLAN,
     SET_DATASET_INFO,
     SET_DATASET_LIST,
@@ -86,6 +88,42 @@ const actions = {
         commit('SET_PROFILER_MSG', null)
         commit('SET_PROFILER_STATUS', null)
         commit('SET_MYDATA_LIST', null)
+    },
+    /**
+     * 1. Make API call to delete the dataset
+     * 2. remove the dataset from datasetList in the state
+     * @param commit
+     * @param state
+     * @param datasetId
+     */
+    deleteDataset({commit, state}, datasetId) {
+        console.log('in delete, datasetId = ' + datasetId)
+        dataset.deleteDatasetInfo(datasetId)
+        commit(REMOVE_DATASET, datasetId)
+    },
+    /**
+     * 1. Make API call to delete the dataset
+     * 2. remove the dataset from datasetList in the state
+     * @param commit
+     * @param state
+     * @param {datasetId, analysisPlanId}
+     */
+    deleteAnalysisPlan({commit, state}, {datasetId, analysisPlanId}) {
+        // check how many analysisPlans  are associated with the dataset
+        // if this is the only analysis plan for the dataset, then delete the dataset as well.
+        const theDataset = state.datasetList.find(item => item.objectId === datasetId)
+        try {
+            analysis.deleteAnalysisPlan(analysisPlanId)
+            commit(REMOVE_ANALYSIS_PLAN, analysisPlanId)
+            if (theDataset.analysisPlans.length == 0) {
+                dataset.deleteDatasetInfo(datasetId)
+                commit(REMOVE_DATASET, datasetId)
+            }
+        } catch (error) {
+            console.log(error);
+
+        }
+
     },
     uploadDataset({commit, state}, {file, creatorId}) {
         let formData = new FormData();
@@ -438,6 +476,20 @@ const mutations = {
     },
     [SET_ANALYSIS_PLAN](state, analysisPlan) {
         state.analysisPlan = analysisPlan
+    },
+    [REMOVE_DATASET](state, id) {
+        //  console.log('removing id = '+ id)
+
+        state.datasetList = state.datasetList.filter(item => item.objectId !== id)
+        state.myDataList = state.myDataList.filter(item => item.datasetInfo.objectId !== id)
+    },
+    [REMOVE_ANALYSIS_PLAN](state, analysisPlanId) {
+        state.myDataList = state.myDataList.filter(item =>
+            item.analysisPlan == null || item.analysisPlan.objectId !== analysisPlanId)
+        state.datasetList.forEach(dataset => {
+            dataset.analysisPlans = dataset.analysisPlans.filter(analysisPlan => analysisPlan.objectId !== analysisPlanId)
+        })
+
     },
     [SET_DATASET_LIST](state, datasetList) {
         state.datasetList = datasetList

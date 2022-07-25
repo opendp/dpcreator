@@ -12,8 +12,6 @@ DANGER: This Cypress settings file introduces an API endpoint that deletes nearl
             settings.ALLOW_CYPRESS_TEST_ENDPOINT == cypress_utils.statics_vals.ALLOW_CYPRESS_TEST_ENDPOINT_VAL
 
 """
-import os
-
 from opendp_project.settings.base import *
 
 DEBUG = True
@@ -27,6 +25,7 @@ ROOT_URLCONF = 'opendp_project.urls_cypress'
 # (3) ALLOW_CYPRESS_ENDPOINT value is set
 ALLOW_CYPRESS_ENDPOINT = 'cypress-in-ci-endpoint'
 
+ALLOW_DEMO_LOADING = True
 
 ACCOUNT_EMAIL_VERIFICATION = os.environ.get('ACCOUNT_EMAIL_VERIFICATION', 'none')  # 'mandatory'
 

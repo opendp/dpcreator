@@ -308,7 +308,7 @@ assert TOTAL_EPSILON_MIN > 0, \
 assert TOTAL_EPSILON_MAX > 0, \
     f"The TOTAL_EPSILON_MAX must be greater than 0.0. Found: {TOTAL_EPSILON_MAX}"
 assert TOTAL_EPSILON_MAX > TOTAL_EPSILON_MIN, \
-    (f"The TOTAL_EPSILON_MAX must be greater than the TOTAL_EPSILON_MIN. " 
+    (f"The TOTAL_EPSILON_MAX must be greater than the TOTAL_EPSILON_MIN. "
      f" Found min: {TOTAL_EPSILON_MIN} / max: {TOTAL_EPSILON_MAX}")
 
 # ---------------------------
@@ -420,3 +420,10 @@ if AZURE_LOGGING is True:
     DEFAULT_LOGGER = 'azure'
 else:
     DEFAULT_LOGGER = 'django'
+
+# For delete endpoints, allow the deletion of releases
+#   DO NOT ENABLE FOR PRODUCTION USE CASES!
+ALLOW_RELEASE_DELETION = os.getenv('ALLOW_RELEASE_DELETION', True)
+
+# Allow loading of demo data
+ALLOW_DEMO_LOADING = os.environ.get('ALLOW_DEMO_LOADING', False)

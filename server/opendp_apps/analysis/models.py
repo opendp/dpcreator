@@ -70,7 +70,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
                                         blank=True,
                                         help_text='Default based on answers to epsilon_questions.',
                                         validators=[validate_epsilon_or_none])
-    
+
     epsilon = models.FloatField(null=True, blank=True,
                                 help_text=('Used for OpenDP operations, starts as the "default_epsilon"'
                                            ' value but may be overridden by the user.'),
@@ -133,7 +133,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
             "new_step must be a valid choice in DepositorSteps"
         self.user_step = new_step
         return True
-    
+
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the STEP
         #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
@@ -182,7 +182,7 @@ class ReleaseInfo(TimestampedModelWithUUID):
     Release of differentially private result from an AnalysisPlan
     """
     dataset = models.ForeignKey('dataset.DataSetInfo',
-                                on_delete=models.PROTECT)
+                                on_delete=models.CASCADE)
 
     epsilon_used = models.FloatField(null=False,
                                      blank=False,
@@ -399,7 +399,7 @@ class AnalysisPlan(TimestampedModelWithUUID):
     name = models.CharField(max_length=255)
 
     dataset = models.ForeignKey('dataset.DataSetInfo',
-                                on_delete=models.PROTECT)
+                                on_delete=models.CASCADE)
     is_complete = models.BooleanField(default=False)
     user_step = models.CharField(max_length=128,
                                  choices=AnalystSteps.choices)

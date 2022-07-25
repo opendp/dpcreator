@@ -28,6 +28,9 @@ python /code/server/manage.py loaddata opendp_apps/content_pages/fixtures/sites-
 printf "\n(30) Keep only one registered dataverse"
 python /code/server/manage.py set_registered_dataverse https://demo-dataverse.dpcreator.org "Demo Dataverse"
 
+printf "\n(35) Update the superuser with the env variable DJANGO_ADMIN_PASSWORD"
+python /code/server/manage.py create_superuser
+
 # -----------------------------------------
 # Collect static files to a shared volume
 #  where they are nginx accessible
