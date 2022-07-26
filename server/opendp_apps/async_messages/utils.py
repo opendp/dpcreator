@@ -2,6 +2,7 @@
 Utils related to websocket messages
 """
 
+
 def get_websocket_id(request):
     """Create a websocket_id based on the logged in user"""
     if not request.user.is_authenticated:
