@@ -42,10 +42,10 @@ class TestDepositorInfo(BaseEndpointTest):
         response.pop('updated')
         self.assertEqual(response,
                          {'id': 1,
-                          'creator': 1,
                           'created': '2021-03-23T17:22:50.889000Z',
                           'object_id': '9255c067-e435-43bd-8af1-33a6987ffc9b',
                           'dataset_questions': None,
+                          'dataset_size': None,
                           'epsilon_questions': None,
                           'is_complete': False,
                           'user_step': 'step_100',

@@ -98,6 +98,18 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
                               help_text=('Used for OpenDP operations, starts as the "default_delta"'
                                          ' value but may be overridden by the user.'))
 
+    @property
+    def dataset_size(self):
+        """Return the dataset_size from the DataSetInfo.variable_info"""
+        ds_info = self.get_dataset_info()
+
+        dataset_size_info = ds_info.get_dataset_size()
+
+        if dataset_size_info.success:
+            return dataset_size_info.data
+
+        return None
+
     class Meta:
         verbose_name = 'Depositor Setup Data'
         verbose_name_plural = 'Depositor Setup Data'
@@ -162,7 +174,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
             info_str = json.dumps(self.variable_info, indent=4)
             return f'<pre>{info_str}</pre>'
         except Exception as ex_obj:
-            return f'Failed to conver to JSON string {ex_obj}'
+            return f'Failed to convert to JSON string {ex_obj}'
 
 
 class ReleaseInfo(TimestampedModelWithUUID):
