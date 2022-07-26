@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from .models import \
     (DepositorSetupInfo,
      AnalysisPlan,
@@ -10,7 +11,7 @@ from .models import \
 class DepositorSetupInfoAdmin(admin.ModelAdmin):
     save_on_top = True
     search_fields = ('dataset__name',)
-    list_filter = ('is_complete', )
+    list_filter = ('is_complete',)
     list_display = ('name',
                     'user_step',
                     'epsilon',
