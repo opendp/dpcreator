@@ -3,3 +3,6 @@
 # For convenience commands
 #
 fabric==2.5.0
+
+# For finding unused code
+vulture==2.5
