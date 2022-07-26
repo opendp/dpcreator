@@ -1,10 +1,10 @@
-import json
+from django.http import HttpResponse
+from django.shortcuts import render
+
+from opendp_apps.utils.randname import random_with_n_digits
 from .forms import ReportForm
 from .pdf_report_maker import PDFReportMaker
-from opendp_apps.utils.randname import random_with_n_digits
 
-from django.shortcuts import render
-from django.http import HttpResponse
 
 # Create your views here.
 def view_create_pdf_report(request):
@@ -28,7 +28,6 @@ def view_create_pdf_report(request):
 
             response = HttpResponse(pdf_contents_or_err,
                                     content_type='application/pdf')
-            #response['Content-Disposition'] = 'attachment; filename="report.pdf"'
             return response
 
     else:

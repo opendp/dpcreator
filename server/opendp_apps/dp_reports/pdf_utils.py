@@ -2,11 +2,12 @@
 Used for making the Release PDF
 """
 from decimal import Decimal
+
+from borb.pdf.canvas.color.color import HexColor
 from borb.pdf.canvas.layout.layout_element import Alignment
+from borb.pdf.canvas.layout.table.table import TableCell
 from borb.pdf.canvas.layout.text.chunk_of_text import ChunkOfText
 from borb.pdf.canvas.layout.text.paragraph import Paragraph
-from borb.pdf.canvas.layout.table.table import TableCell
-from borb.pdf.canvas.color.color import HexColor
 
 from opendp_apps.dp_reports import font_util
 

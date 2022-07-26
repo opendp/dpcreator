@@ -1,28 +1,12 @@
-import json
-
-from os.path import abspath, dirname, isfile, join
-
-CURRENT_DIR = dirname(abspath(__file__))
-TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
+from os.path import abspath, dirname, join
 
 from django.contrib.auth import get_user_model
-from django.core.files import File
 from django.test.testcases import TestCase
 
 from rest_framework.test import APIClient
-from rest_framework.reverse import reverse as drf_reverse
 
-from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
-from opendp_apps.analysis.models import AnalysisPlan, AuxiliaryFileDepositRecord
-from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
-from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 from opendp_apps.dataset.models import DataSetInfo
-from opendp_apps.dataset.dataset_formatter import DataSetFormatter
 from opendp_apps.model_helpers.msg_util import msgt
-from opendp_apps.profiler import tasks as profiler_tasks
-from opendp_apps.profiler import  static_vals as pstatic
-from opendp_apps.utils.extra_validators import VALIDATE_MSG_EPSILON
 
 from borb.pdf.document import Document
 from borb.pdf.page.page import Page
@@ -31,6 +15,10 @@ from borb.pdf.canvas.layout.page_layout.page_layout import PageLayout
 from borb.pdf.canvas.layout.text.paragraph import Paragraph
 from borb.pdf.pdf import PDF
 from borb.pdf.canvas.color.color import HexColor
+
+CURRENT_DIR = dirname(abspath(__file__))
+TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
+
 
 class TestRunRelease(TestCase):
     fixtures = ['test_dataset_data_001.json']
@@ -80,4 +68,3 @@ class TestRunRelease(TestCase):
         dataset_info.save()
 
         print('dataset_info.source_file', dataset_info.source_file)
-
