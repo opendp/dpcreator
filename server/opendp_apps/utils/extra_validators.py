@@ -1,6 +1,6 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 
-from django.conf import settings
 from opendp_apps.analysis import static_vals as astatic
 
 VALIDATE_MSG_ZERO_OR_GREATER = 'The value must be a number, zero or greater.'
@@ -91,7 +91,6 @@ def validate_epsilon_or_none(value):
 
 
 def validate_not_empty_or_none(value):
-
     if value == 0:
         pass
     elif not value:
@@ -99,7 +98,6 @@ def validate_not_empty_or_none(value):
 
 
 def validate_not_none(value):
-
     if value is None:
         raise ValidationError('The value cannot be None.')
 
@@ -124,13 +122,3 @@ def validate_float(value):
         raise ValidationError(VALIDATE_MSG_NOT_FLOAT)
     except TypeError:
         raise ValidationError(VALIDATE_MSG_NOT_FLOAT)
-
-"""
-from opendp_apps.utils.extra_validators import *
-
-try:
-    validate_not_negative_or_none(-0.3)
-except ValidationError as err_obj:
-    err_obj.messages
-    err_obj.message
-"""
