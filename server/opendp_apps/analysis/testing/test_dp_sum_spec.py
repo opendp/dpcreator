@@ -1,7 +1,6 @@
 from os.path import abspath, dirname, isfile, join
 
 from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
-
 from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import static_vals as pstatic
