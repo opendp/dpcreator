@@ -2,8 +2,8 @@
 An object with some basic methods for capturing errors
 """
 
-class BasicErrCheck():
 
+class BasicErrCheck:
     error_found = False
     error_message = None
 
@@ -24,7 +24,7 @@ class BasicErrCheck():
 
     def get_error_message(self):
         """Return the error message if 'has_error' is True"""
-        assert self.has_error(),\
+        assert self.has_error(), \
             "Please check that '.has_error()' is True before using this method"
 
         return self.error_message
@@ -43,8 +43,7 @@ class BasicErrCheck():
         self.add_err_msg(err_msg)
 
 
-class BasicErrCheckList():
-
+class BasicErrCheckList:
     error_found = False
     error_messages = []
 
@@ -54,7 +53,7 @@ class BasicErrCheckList():
 
     def get_error_messages(self):
         """Return the error message if 'has_error' is True"""
-        assert self.has_error(),\
+        assert self.has_error(), \
             "Please check that '.has_error()' is True before using this method"
 
         return self.error_messages
@@ -88,6 +87,7 @@ def try_it():
     b.add_err_msg('uh oh')
     print(b.has_error())
     print(b.get_error_message())
+
 
 if __name__ == '__main__':
     try_it()
