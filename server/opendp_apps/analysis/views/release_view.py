@@ -20,17 +20,6 @@ from opendp_apps.utils.view_helper import get_json_error
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
-class PassthroughRenderer(renderers.BaseRenderer):
-    """
-        Return data as-is. View should supply a Response.
-    """
-    media_type = ''
-    format = ''
-
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        return data
-
-
 class ReleaseFileDownloadView(viewsets.ReadOnlyModelViewSet):
     """
     Download **PUBLIC** JSON and PDF Release Files
