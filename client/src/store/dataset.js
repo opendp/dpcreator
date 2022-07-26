@@ -15,7 +15,6 @@ import {
 } from './types';
 import {
     depositorSteps,
-    STEP_0400_PROFILING_COMPLETE,
     STEP_0600_EPSILON_SET,
     STEP_1200_PROCESS_COMPLETE,
     wizardNextSteps,
@@ -358,20 +357,11 @@ const actions = {
                 commit(SET_PROFILER_MSG, wsMsg.userMessage)
                 commit(SET_PROFILER_STATUS, wsMsg.success)
                 console.log('ws_msg.user_message: ' + wsMsg.userMessage);
+                this.dispatch('dataset/setDatasetInfo', state.datasetInfo.objectId)
 
-                if (wsMsg.data) {
-                    const profileData = JSON.parse(wsMsg.data.profileStr)
-                    const profileStr = JSON.stringify(profileData.variables, null, 2);
-                    console.log(typeof wsMsg.data);
-                      var props = {
-                          variableInfo: profileData.variables,
-                          userStep: STEP_0400_PROFILING_COMPLETE
-                      }
-                    props = camelcaseKeys(props, {deep: true})
-                    const payload = {objectId: state.datasetInfo.depositorSetupInfo.objectId, props: props}
-                    this.dispatch('dataset/updateDepositorSetupInfo', payload)
-                    return (wsMsg.userMessage)
-                }
+
+                return (wsMsg.userMessage)
+
 
             }
 

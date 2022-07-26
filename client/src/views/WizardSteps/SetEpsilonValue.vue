@@ -7,12 +7,32 @@
       }}
     </p>
 
+   <div
+
+   >
+      <span class="font-weight-bold title-size-2 d-flex"
+      ><v-icon color="primary" left>mdi-play</v-icon> Can the number of
+        observations in your data file be made public knowledge?
+      </span>
+     <v-radio-group
+         v-model="observationsNumberCanBePublic"
+         class="pl-2"
+         v-on:change="saveUserInput"
+     >
+       <RadioItem label="Yes." data-test="Public Observations - yes" value="yes"/>
+       <RadioItem label="No." value="no"/>
+       <RadioItem label="I'm unsure." value="unsure"/>
+     </v-radio-group>
+
+     <AdditionalInformationAlert locale-tag="set epsilon.help data public">
+     </AdditionalInformationAlert>
+   </div>
     <span class="font-weight-bold title-size-2 d-flex"
     ><v-icon color="primary" left>mdi-play</v-icon> Is your data a secret and
       simple random sample from a larger population?
     </span>
     <v-radio-group v-model="secretSample" class="pl-2" v-on:change="saveUserInput">
-      <RadioItem label="Yes." value="yes"/>
+      <RadioItem data-test="Larger Population - yes" label="Yes." value="yes"/>
       <div
           :class="
           `${secretSample === 'yes' ? 'population-size-container' : 'd-none'}`
@@ -21,11 +41,15 @@
         <strong>Population size: </strong>
         <v-text-field
             v-model="populationSize"
+            data-test="populationSizeInput"
+            data
             class="d-inline-block"
             id="populationSize"
             placeholder="E.g. 5,000,000"
             type="number"
+            hide-spin-buttons="true"
             background-color="soft_primary"
+            :rules="[populationSizeRule]"
             v-on:change="saveUserInput"
         />
         <strong>people</strong>
@@ -37,27 +61,6 @@
     <AdditionalInformationAlert class="mb-10" locale-tag="set epsilon.help data secret">
     </AdditionalInformationAlert>
 
-    <div
-        :class="`${radioObservationsNumberShouldBeDisabled ? 'disabled' : ''}`"
-    >
-      <span class="font-weight-bold title-size-2 d-flex"
-      ><v-icon color="primary" left>mdi-play</v-icon> Can the number of
-        observations in your data file be made public knowledge?
-      </span>
-      <v-radio-group
-          v-model="observationsNumberCanBePublic"
-          class="pl-2"
-          :disabled="radioObservationsNumberShouldBeDisabled"
-          v-on:change="saveUserInput"
-      >
-        <RadioItem label="Yes." data-test="Public Observations - yes" value="yes"/>
-        <RadioItem label="No." value="no"/>
-        <RadioItem label="I'm unsure." value="unsure"/>
-      </v-radio-group>
-
-      <AdditionalInformationAlert locale-tag="set epsilon.help data public">
-      </AdditionalInformationAlert>
-    </div>
   </div>
 </template>
 
@@ -137,6 +140,15 @@ export default {
     }
   },
   methods: {
+    populationSizeRule(n) {
+      return (this.populationSizeIsValid(n))
+          || "Population size must greater than sample size."
+    },
+    populationSizeIsValid(pop) {
+      let valid = this.secretSample !== 'yes' || pop > this.datasetInfo.depositorSetupInfo.datasetSize
+      return valid
+    },
+
     saveUserInput() {
       const userInput = {
         epsilonQuestions: {
@@ -145,19 +157,32 @@ export default {
           observationsNumberCanBePublic: this.observationsNumberCanBePublic,
         }
       }
+
       const payload = {objectId: this.getDepositorSetupInfo.objectId, props: userInput}
       this.$store.dispatch('dataset/updateDepositorSetupInfo',
           payload)
     }
   },
   watch: {
-
-    observationsNumberCanBePublic: function (newValue, oldValue) {
-      if (newValue !== "") {
-        console.log('updating isComplete')
-
-
+    secretSample: function (newValue, oldValue) {
+      if (newValue !== "" && this.populationSizeIsValid(this.populationSize)) {
         this.$emit("stepCompleted", 2, true);
+      } else {
+        this.$emit("stepCompleted", 2, false);
+      }
+    },
+    populationSize: function (newValue, oldValue) {
+      if (this.observationsNumberCanBePublic !== "" && this.secretSample !== "" && this.populationSizeIsValid(this.populationSize)) {
+        this.$emit("stepCompleted", 2, true);
+      } else {
+        this.$emit("stepCompleted", 2, false);
+      }
+    },
+    observationsNumberCanBePublic: function (newValue, oldValue) {
+      if (newValue !== "" && this.secretSample !== "" && this.populationSizeIsValid(this.populationSize)) {
+        this.$emit("stepCompleted", 2, true);
+      } else {
+        this.$emit("stepCompleted", 2, false);
       }
     }
   }
