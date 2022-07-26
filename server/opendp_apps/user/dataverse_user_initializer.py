@@ -9,8 +9,8 @@ This class is hooked into the OpenDP User register/login steps and does the foll
 from __future__ import annotations
 
 import logging
-
 from json import JSONDecodeError
+
 from django.conf import settings
 from requests.exceptions import InvalidSchema
 from rest_framework import status as http_status

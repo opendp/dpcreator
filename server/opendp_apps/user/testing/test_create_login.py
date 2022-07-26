@@ -2,22 +2,18 @@
 For more context regarding these tests, please see the document:
 - /server/opendp_apps/user/README.md
 """
-from unittest import skip
 
 import requests_mock
-
 from django.test import TestCase, override_settings
-
+from rest_framework import status as http_status
+from rest_framework.authtoken.models import TokenProxy
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
-from rest_framework import status as http_status
 
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.models import ManifestTestParams, DataverseHandoff
-from opendp_apps.model_helpers.msg_util import msg, msgt
-from opendp_apps.user.models import OpenDPUser, DataverseUser
-from opendp_apps.user.dataverse_user_initializer import DataverseUserInitializer
-from rest_framework.authtoken.models import TokenProxy
+from opendp_apps.model_helpers.msg_util import msgt
+from opendp_apps.user.models import DataverseUser
 
 
 @requests_mock.Mocker()
@@ -307,7 +303,6 @@ class TestDataverseHandoffView(TestCase):
         reg_opendp_user = self.setup_register_user(handoff_id=None)
         self.assertEqual(str(reg_opendp_user.username), self.signup_data['username'])
 
-
         dv_user_data = dict(user=reg_opendp_user.object_id,
                             dv_handoff=self.test_handoff_id)
 
@@ -333,8 +328,8 @@ class TestDataverseHandoffView(TestCase):
         # Make the same API call, it should be a 200, not a 201
         #
         resp_update = self.client.post(self.dv_user_url,
-                                data=dv_user_data,
-                                format='json')
+                                       data=dv_user_data,
+                                       format='json')
 
         # print('resp_update.status', resp_update.status_code)
         # print('resp_update.content', resp_update.content)

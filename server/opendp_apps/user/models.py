@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import uuid as uuid
 
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.conf import settings
-
 from django_cryptography.fields import encrypt
 
 from opendp_apps.dataverses.models import RegisteredDataverse
@@ -18,10 +17,10 @@ class OpenDPUser(AbstractUser):
     """
     object_id = models.UUIDField(default=uuid.uuid4, editable=False)
     handoff_id = models.UUIDField(
-                    default=None,
-                    null=True,
-                    help_text=('Temporary storage of a DataverseHandoff.object_id'
-                               ' when arriving from Dataverse.'))
+        default=None,
+        null=True,
+        help_text=('Temporary storage of a DataverseHandoff.object_id'
+                   ' when arriving from Dataverse.'))
 
     class Meta:
         verbose_name = 'OpenDP User'
@@ -59,6 +58,7 @@ class OpenDPUser(AbstractUser):
         opendp_user.save()
 
         return True
+
 
 class DataverseUser(TimestampedModelWithUUID):
     """
@@ -111,6 +111,7 @@ class DataverseUser(TimestampedModelWithUUID):
                     created=str(self.created),
                     object_id=self.object_id.hex)
 
+
 class Group(models.Model):
     """
     Organize OpenDP Users into (potentially multiple)
@@ -118,6 +119,7 @@ class Group(models.Model):
     """
     name = models.CharField(max_length=128)
     created = models.DateTimeField(auto_now_add=True, blank=True)
+
 
 class GroupMembership(models.Model):
     """
@@ -129,6 +131,7 @@ class GroupMembership(models.Model):
     class MembershipTypes(models.TextChoices):
         ADMIN = 'AD', 'Admin'
         MEMBER = 'ME', 'Member'
+
     membership_type = models.CharField(max_length=128, choices=MembershipTypes.choices)
 
 
