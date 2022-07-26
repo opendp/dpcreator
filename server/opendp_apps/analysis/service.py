@@ -24,4 +24,3 @@ class StepUpdater(object):
         if 'error' not in new_step.value:
             self._depositor_setup_info.user_step = new_step
             self._depositor_setup_info.save()
-

@@ -2,17 +2,17 @@
 Given a Release object, send an email with attached PDF/JSON files
 """
 from mimetypes import guess_type
-from smtplib import SMTPException
 from os.path import basename
+from smtplib import SMTPException
 
-from django.db.models.fields.files import FieldFile
-from django.contrib.sites.models import Site
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.mail.message import EmailMessage
+from django.db.models.fields.files import FieldFile
 from django.template.loader import render_to_string
 
-from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.analysis.models import ReleaseInfo, ReleaseEmailRecord
+from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 
 
 class ReleaseEmailUtil(BasicErrCheck):
@@ -124,7 +124,6 @@ class ReleaseEmailUtil(BasicErrCheck):
             self.msg_sent = msg.send(fail_silently=False)  # returns 1 or 0
         except SMTPException as err_obj:
             self.mail_rec_note = f'Email failed. {err_obj}'
-
 
         # Save the ReleaseEmailRecord
         if self.msg_sent == 1:

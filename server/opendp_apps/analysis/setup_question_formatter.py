@@ -14,12 +14,15 @@ Example output:
    "observations_number_can_be_public": "yes"}
 """
 from __future__ import annotations
+
 import json
+
 from django.core.serializers.json import DjangoJSONEncoder
 
-from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
+
 
 class SetupQuestionFormatter(BasicErrCheck):
     """Format the setup questions for use in a release"""
@@ -85,15 +88,3 @@ class SetupQuestionFormatter(BasicErrCheck):
             return None
 
         return self.formatted_questions
-
-"""
-docker-compose run server python manage.py shell
-
-from opendp_apps.analysis.models import DepositorSetupInfo
-from opendp_apps.analysis.setup_question_formatter import SetupQuestionFormatter
-
-d = DepositorSetupInfo.objects.first()
-setup = SetupQuestionFormatter(d)
-print(setup.as_json())
-
-"""

@@ -1,37 +1,34 @@
-from collections import OrderedDict
 import json
+from collections import OrderedDict
 
-from django.core.serializers.json import DjangoJSONEncoder
-from django.db import models
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db import models
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-
 from rest_framework import status
 from rest_framework.reverse import reverse as drf_reverse
 
-from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.model_helpers.models import \
-    (TimestampedModelWithUUID,)
-from opendp_apps.utils.extra_validators import \
-    (validate_not_negative,
-     validate_epsilon_or_none)
-
+from opendp_apps.dataverses import static_vals as dv_static
+from opendp_apps.model_helpers.models import TimestampedModelWithUUID
+from opendp_apps.utils.extra_validators import validate_not_negative, validate_epsilon_or_none
 
 RELEASE_FILE_STORAGE = FileSystemStorage(location=settings.RELEASE_FILE_STORAGE_ROOT)
+
 
 class DepositorSetupInfo(TimestampedModelWithUUID):
     """
     Metadata and aggregate data about potential release of Dataset
     """
+
     class DepositorSteps(models.TextChoices):
         """
         Enumeration for different statuses during depositor process
         """
         STEP_0100_UPLOADED = 'step_100', 'Step 1: Uploaded'
-        STEP_0200_VALIDATED = 'step_200', 'Step 2: Validated'   # done automatically for Dataverse use case
+        STEP_0200_VALIDATED = 'step_200', 'Step 2: Validated'  # done automatically for Dataverse use case
         STEP_0300_PROFILING_PROCESSING = 'step_300', 'Step 3: Profiling Processing'
         STEP_0400_PROFILING_COMPLETE = 'step_400', 'Step 4: Profiling Complete'
         STEP_0500_VARIABLE_DEFAULTS_CONFIRMED = 'step_500', 'Step 5: Variable Defaults Confirmed'
@@ -41,7 +38,6 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         STEP_9200_DATAVERSE_DOWNLOAD_FAILED = 'error_9200', 'Error 2: Dataverse Download Failed'
         STEP_9300_PROFILING_FAILED = 'error_9300', 'Error 3: Profiling Failed'
         STEP_9400_CREATE_RELEASE_FAILED = 'error_9400', 'Error 4: Create Release Failed'
-
 
     # User who initially added/uploaded data
     creator = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -70,7 +66,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
                                         blank=True,
                                         help_text='Default based on answers to epsilon_questions.',
                                         validators=[validate_epsilon_or_none])
-    
+
     epsilon = models.FloatField(null=True, blank=True,
                                 help_text=('Used for OpenDP operations, starts as the "default_epsilon"'
                                            ' value but may be overridden by the user.'),
@@ -92,16 +88,16 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
                                          ' value but may be overridden by the user.'),
                               validators=[validate_not_negative])
 
-    confidence_level = models.FloatField(\
-                              choices=astatic.CL_CHOICES,
-                              default=astatic.CL_95,
-                              help_text=('Used for OpenDP operations, starts as the "default_delta"'
-                                         ' value but may be overridden by the user.'))
+    confidence_level = models.FloatField( \
+        choices=astatic.CL_CHOICES,
+        default=astatic.CL_95,
+        help_text=('Used for OpenDP operations, starts as the "default_delta"'
+                   ' value but may be overridden by the user.'))
 
     class Meta:
         verbose_name = 'Depositor Setup Data'
         verbose_name_plural = 'Depositor Setup Data'
-        ordering = ('-created', )
+        ordering = ('-created',)
 
     def __str__(self):
         if hasattr(self, 'dataversefileinfo'):
@@ -127,13 +123,13 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
 
         raise AttributeError('DepositorSetupInfo does not have access to a DataSetInfo instance')
 
-    def set_user_step(self, new_step:DepositorSteps) -> bool:
+    def set_user_step(self, new_step: DepositorSteps) -> bool:
         """Set a new user step. Does *not* save the object."""
         assert isinstance(new_step, DepositorSetupInfo.DepositorSteps), \
             "new_step must be a valid choice in DepositorSteps"
         self.user_step = new_step
         return True
-    
+
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the STEP
         #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
@@ -178,26 +174,26 @@ class ReleaseInfo(TimestampedModelWithUUID):
     dp_release = models.JSONField()
 
     dp_release_json_file = models.FileField( \
-                                   storage=RELEASE_FILE_STORAGE,
-                                   upload_to='release-files/%Y/%m/%d/',
-                                   blank=True, null=True)
+        storage=RELEASE_FILE_STORAGE,
+        upload_to='release-files/%Y/%m/%d/',
+        blank=True, null=True)
 
     dp_release_pdf_file = models.FileField(
-                                   storage=RELEASE_FILE_STORAGE,
-                                   upload_to='release-files/%Y/%m/%d/',
-                                   blank=True, null=True)
+        storage=RELEASE_FILE_STORAGE,
+        upload_to='release-files/%Y/%m/%d/',
+        blank=True, null=True)
 
     dataverse_deposit_info = models.JSONField(blank=True,
                                               null=True,
                                               help_text='Only applies to Dataverse files')
 
-    dv_json_deposit_complete = models.BooleanField(\
-                                default=False,
-                                help_text='Only applies to Dataverse datasets')
+    dv_json_deposit_complete = models.BooleanField( \
+        default=False,
+        help_text='Only applies to Dataverse datasets')
 
-    dv_pdf_deposit_complete = models.BooleanField(\
-                                default=False,
-                                help_text='Only applies to Dataverse datasets')
+    dv_pdf_deposit_complete = models.BooleanField( \
+        default=False,
+        help_text='Only applies to Dataverse datasets')
 
     class Meta:
         verbose_name = 'Release Information'
@@ -367,6 +363,7 @@ class AnalysisPlan(TimestampedModelWithUUID):
     Details of request for a differentially private release
     ! Do we want another object to monitor the plan once it is sent to the execution engine?
     """
+
     class AnalystSteps(models.TextChoices):
         """
         Enumeration for statuses during the analysis process
@@ -404,7 +401,7 @@ class AnalysisPlan(TimestampedModelWithUUID):
                                      blank=True)
 
     def __str__(self):
-        return f'{self.dataset}'    # - {self.user_step}'
+        return f'{self.dataset}'  # - {self.user_step}'
 
     def is_editable(self) -> bool:
         """

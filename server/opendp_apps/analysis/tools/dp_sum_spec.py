@@ -13,8 +13,8 @@ from opendp.trans import \
      make_select_column,
      make_split_dataframe, make_sized_bounded_sum)
 
-from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.analysis.tools.stat_spec import StatSpec
 
 enable_features("floating-point", "contrib")
 

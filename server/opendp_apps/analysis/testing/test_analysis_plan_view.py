@@ -6,7 +6,6 @@ from opendp_apps.dataverses.testing.test_endpoints import BaseEndpointTest
 
 
 class TestAnalysisPlanView(BaseEndpointTest):
-
     fixtures = ['test_data_001.json', 'test_analysis_001.json']
     maxDiff = None
 

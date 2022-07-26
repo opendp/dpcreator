@@ -2,13 +2,13 @@ from os.path import abspath, dirname, isfile, join
 
 from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
 
-CURRENT_DIR = dirname(abspath(__file__))
-TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
-
 from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.utils.extra_validators import *
+
+CURRENT_DIR = dirname(abspath(__file__))
+TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
 
 class DPSumStatSpecTest(StatSpecTestCase):
@@ -70,7 +70,6 @@ class DPSumStatSpecTest(StatSpecTestCase):
         # import json
         # print(json.dumps(dp_sum.get_release_dict(), indent=4))
 
-
     def test_20_sum_valid_spec(self):
         """(20) Run DP Sum valid spec, string column"""
         msgt(self.test_20_sum_valid_spec.__doc__)
@@ -91,7 +90,7 @@ class DPSumStatSpecTest(StatSpecTestCase):
 
         dp_sum = DPSumSpec(spec_props)
         if dp_sum.has_error():
-           print(dp_sum.get_err_msgs())
+            print(dp_sum.get_err_msgs())
 
         self.assertTrue(dp_sum.is_chain_valid())
         self.assertFalse(dp_sum.has_error())
@@ -119,10 +118,9 @@ class DPSumStatSpecTest(StatSpecTestCase):
         self.assertTrue(dp_sum.accuracy_val < 230.7)
 
         # Actual sum 444850
-        self.assertTrue(dp_sum.value > 400_000) # should be well within range
+        self.assertTrue(dp_sum.value > 400_000)  # should be well within range
 
         final_dict = dp_sum.get_release_dict()
         self.assertIn('description', final_dict)
         self.assertIn('text', final_dict['description'])
         self.assertIn('html', final_dict['description'])
-

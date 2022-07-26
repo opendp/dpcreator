@@ -89,7 +89,8 @@
       "email": "dv_user@mock.edu",
       "first_name": "Fname",
       "last_name": "Lname",
-      "dv_general_token": ""}
+      "dv_general_token": ""
+    }
   },
   {
     "model": "user.dataverseuser",
@@ -104,7 +105,8 @@
       "email": "mock_user@some.edu",
       "first_name": "Mock",
       "last_name": "User",
-      "dv_general_token": "shoefly-dont-bother-m3"}
+      "dv_general_token": "shoefly-dont-bother-m3"
+    }
   },
   {
     "model": "user.dataverseuser",
@@ -523,8 +525,25 @@
             "name": "Subject",
             "type": "Categorical",
             "label": "",
-            "categories": ["\"ac\"", "\"kj\"", "\"ys\"", "\"bh1\"", "\"bh2\"", "\"jm\"", "\"mh\"", "\"cw\"",
-  "\"jp\"", "\"rh\"", "\"aq\"", "\"ph\"", "\"le\"", "\"mn\"", "\"ls2\"", "\"no\"", "\"af\""]
+            "categories": [
+              "\"ac\"",
+              "\"kj\"",
+              "\"ys\"",
+              "\"bh1\"",
+              "\"bh2\"",
+              "\"jm\"",
+              "\"mh\"",
+              "\"cw\"",
+              "\"jp\"",
+              "\"rh\"",
+              "\"aq\"",
+              "\"ph\"",
+              "\"le\"",
+              "\"mn\"",
+              "\"ls2\"",
+              "\"no\"",
+              "\"af\""
+            ]
           },
           "Language": {
             "name": "Language",
@@ -999,8 +1018,25 @@
           "name": "Subject",
           "type": "Categorical",
           "label": "",
-          "categories": ["\"ac\"", "\"kj\"", "\"ys\"", "\"bh1\"", "\"bh2\"", "\"jm\"", "\"mh\"", "\"cw\"",
-            "\"jp\"", "\"rh\"", "\"aq\"", "\"ph\"", "\"le\"", "\"mn\"", "\"ls2\"", "\"no\"", "\"af\""],
+          "categories": [
+            "\"ac\"",
+            "\"kj\"",
+            "\"ys\"",
+            "\"bh1\"",
+            "\"bh2\"",
+            "\"jm\"",
+            "\"mh\"",
+            "\"cw\"",
+            "\"jp\"",
+            "\"rh\"",
+            "\"aq\"",
+            "\"ph\"",
+            "\"le\"",
+            "\"mn\"",
+            "\"ls2\"",
+            "\"no\"",
+            "\"af\""
+          ],
           "min": 0,
           "max": 10
         },

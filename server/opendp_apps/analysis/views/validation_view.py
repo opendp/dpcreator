@@ -1,26 +1,22 @@
 import logging
 
 from django.conf import settings
-
 from rest_framework import permissions, status, viewsets
 from rest_framework.response import Response
 
-from opendp_apps.utils.view_helper import get_json_error, get_json_success
-
 from opendp_apps.analysis.serializers import AnalysisPlanSerializer, \
     ReleaseValidationSerializer
-
+from opendp_apps.utils.view_helper import get_json_error, get_json_success
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class ValidationView(viewsets.ViewSet):
-
     statistics = ReleaseValidationSerializer()
     analysis_plan = AnalysisPlanSerializer()
     permission_classes = [permissions.IsAuthenticated]
 
-    http_method_names = ['post']    # 'patch']
+    http_method_names = ['post']
 
     def create(self, request, *args, **kwargs):
         """
@@ -116,8 +112,6 @@ class ValidationView(viewsets.ViewSet):
             return Response(get_json_error('Field validation failed',
                                            errors=release_info_serializer.errors),
                             status=status.HTTP_200_OK)
-                            #status=status.HTTP_400_BAD_REQUEST)
-
 
         save_result = release_info_serializer.save(**dict(opendp_user=request.user))
 
