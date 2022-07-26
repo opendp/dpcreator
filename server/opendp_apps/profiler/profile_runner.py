@@ -2,18 +2,17 @@
 Read and Profile a File.
 """
 import os
+
 from django.db.models.fields.files import FieldFile
 
 from opendp_apps.analysis.models import DepositorSetupInfo
-from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.dataset import static_vals as dstatic
-
+from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
-
-from opendp_apps.profiler.dataset_info_updater import DataSetInfoUpdater
-from opendp_apps.profiler.csv_reader import CsvReader
-from opendp_apps.profiler.variable_info import VariableInfoHandler
 from opendp_apps.profiler import static_vals as pstatic
+from opendp_apps.profiler.csv_reader import CsvReader
+from opendp_apps.profiler.dataset_info_updater import DataSetInfoUpdater
+from opendp_apps.profiler.variable_info import VariableInfoHandler
 
 
 class ProfileRunner(BasicErrCheck):
@@ -51,7 +50,6 @@ class ProfileRunner(BasicErrCheck):
         self.num_variables = None
         self.data_profile = None  # Data profile information
 
-
         # Set to 'True' for a file available via a filepath
         # self.dataset_is_filepath = kwargs.get(pstatic.KEY_DATASET_IS_FILEPATH, False)
 
@@ -65,7 +63,6 @@ class ProfileRunner(BasicErrCheck):
         """Add an error message and update the DepositorSetupInfo status"""
         super().add_err_msg(err_msg)
         self.set_depositor_info_status(DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
-
 
     def set_depositor_info_status(self, new_step: DepositorSetupInfo.DepositorSteps) -> bool:
         """Update the status on the DepositorSetupInfo object.
@@ -93,7 +90,6 @@ class ProfileRunner(BasicErrCheck):
                 return
 
             self.dataset_info_updater = DataSetInfoUpdater(self.dataset_info)
-
 
         # Is the dataset_pointer correct?
         #
@@ -126,8 +122,6 @@ class ProfileRunner(BasicErrCheck):
                 return
             else:
                 self.ds_pointer_for_pandas = self.dataset_pointer
-
-
 
     def run_profile_process(self):
         """
@@ -187,8 +181,6 @@ class ProfileRunner(BasicErrCheck):
             self.dataset_info_updater.save_data_profile(variable_info_handler.data_profile)
             if self.dataset_info.depositor_setup_info.user_step < DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE:
                 self.set_depositor_info_status(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
-
-
 
     def xrun_profile(self, df, dataset_info_object_id):
         """

@@ -77,7 +77,8 @@ class VariableInfoHandler(BasicErrCheck):
                 column_info['categories'] = []  # list([x for x in column.unique() if type(x) == str])[:category_limit]
                 column_info['type'] = VAR_TYPE_CATEGORICAL
             elif hasattr(column.dtypes, 'categories'):
-                column_info['categories'] = []  # list([x for x in column.dtypes.categories if type(x) == str])[:category_limit]
+                column_info[
+                    'categories'] = []  # list([x for x in column.dtypes.categories if type(x) == str])[:category_limit]
                 column_info['type'] = VAR_TYPE_CATEGORICAL
             elif 'int' in str(column.dtype):
                 # column_info['min'] = int(column.min()) if not np.isnan(column.min()) else None
@@ -104,7 +105,7 @@ if __name__ == '__main__':
 
     fname = 'Fatigue_data.tab'
     # fname = 'teacher_climate_survey_lwd.csv'
-    csv_reader = CsvReader(os.path.join(BASE_DIR, 'test_data' , 'teacher_climate_survey_lwd.csv'))
+    csv_reader = CsvReader(os.path.join(BASE_DIR, 'test_data', 'teacher_climate_survey_lwd.csv'))
     df = csv_reader.read()
     v = VariableInfoHandler(df)
     profile_dict = v.run_profile_process()

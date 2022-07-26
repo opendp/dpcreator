@@ -1,264 +1,246 @@
 {
-   "dataset":{
-      "rowCount":1000,
-      "variableCount":20,
-      "variableOrder":[
-         [
-            0,
-            "id"
-         ],
-         [
-            1,
-            "first_name"
-         ],
-         [
-            2,
-            "last_name"
-         ],
-         [
-            3,
-            "email"
-         ],
-         [
-            4,
-            "gender"
-         ],
-         [
-            5,
-            "ip_address"
-         ],
-         [
-            6,
-            "App Version"
-         ],
-         [
-            7,
-            "Boolean1"
-         ],
-         [
-            8,
-            "Boolean2"
-         ],
-         [
-            9,
-            "Boolean3"
-         ],
-         [
-            10,
-            "Car Make"
-         ],
-         [
-            11,
-            "Car Model Year"
-         ],
-         [
-            12,
-            "bye bye Color 1"
-         ],
-         [
-            13,
-            "Color 2"
-         ],
-         [
-            14,
-            "Construction  Material"
-         ],
-         [
-            15,
-            "Credit Card Type"
-         ],
-         [
-            16,
-            "Currency"
-         ],
-         [
-            17,
-            "EIN"
-         ],
-         [
-            18,
-            "Family Name Chinese"
-         ],
-         [
-            19,
-            "Gender Facebook"
-         ]
+  "dataset": {
+    "rowCount": 1000,
+    "variableCount": 20,
+    "variableOrder": [
+      [
+        0,
+        "id"
+      ],
+      [
+        1,
+        "first_name"
+      ],
+      [
+        2,
+        "last_name"
+      ],
+      [
+        3,
+        "email"
+      ],
+      [
+        4,
+        "gender"
+      ],
+      [
+        5,
+        "ip_address"
+      ],
+      [
+        6,
+        "App Version"
+      ],
+      [
+        7,
+        "Boolean1"
+      ],
+      [
+        8,
+        "Boolean2"
+      ],
+      [
+        9,
+        "Boolean3"
+      ],
+      [
+        10,
+        "Car Make"
+      ],
+      [
+        11,
+        "Car Model Year"
+      ],
+      [
+        12,
+        "bye bye Color 1"
+      ],
+      [
+        13,
+        "Color 2"
+      ],
+      [
+        14,
+        "Construction  Material"
+      ],
+      [
+        15,
+        "Credit Card Type"
+      ],
+      [
+        16,
+        "Currency"
+      ],
+      [
+        17,
+        "EIN"
+      ],
+      [
+        18,
+        "Family Name Chinese"
+      ],
+      [
+        19,
+        "Gender Facebook"
       ]
-   },
-   "variables":{
-      "id":{
-         "name":"id",
-         "type":"Integer",
-         "label":"",
-         "sort_order":0
-      },
-      "EIN":{
-         "name":"EIN",
-         "type":"Categorical",
-         "label":"",
-         "categories":[
-
-         ],
-         "sort_order":17
-      },
-      "email":{
-         "name":"email",
-         "type":"Categorical",
-         "label":"",
-         "categories":[
-
-         ],
-         "sort_order":3
-      },
-      "gender":{
-         "name":"gender",
-         "type":"Categorical",
-         "label":"",
-         "categories":[
-
-         ],
-         "sort_order":4
-      },
-      "bye bye Color 1":{
-         "name":"bye bye Color 1",
-         "type":"Categorical",
-         "label":"",
-         "categories":[
-
-         ],
-         "sort_order":12
-      },
-      "Color 2":{
-         "name":"Color 2",
-         "type":"Categorical",
-         "label":"",
-         "categories":[
-
-         ],
-         "sort_order":13
-      },
-      "Boolean1":{
-         "name":"Boolean1",
-         "type":"Boolean",
-         "label":"",
-         "categories":[
-
-         ],
-         "sort_order":7
-      },
-      "Boolean2":{
-         "name":"Boolean2",
-         "type":"Categorical",
-         "label":"",
-         "categories":[
-
-         ],
-         "sort_order":8
-      },
-      "Boolean3":{
-         "name":"Boolean3",
-         "type":"Categorical",
-         "label":"",
-         "categories":[
-
-         ],
-         "sort_order":9
-      },
-      "Car Make":{
-         "name":"Car Make",
-         "type":"Categorical",
-         "label":"",
-         "categories":[
-
-         ],
-         "sort_order":10
-      },
-      "Currency":{
-         "name":"Currency",
-         "type":"Categorical",
-         "label":"",
-         "categories":[
-
-         ],
-         "sort_order":16
-      },
-      "last_name":{
-         "name":"last_name",
-         "type":"Categorical",
-         "label":"",
-         "categories":[
-
-         ],
-         "sort_order":2
-      },
-      "first_name":{
-         "name":"first_name",
-         "type":"Categorical",
-         "label":"",
-         "categories":[
-
-         ],
-         "sort_order":1
-      },
-      "ip_address":{
-         "name":"ip_address",
-         "type":"Categorical",
-         "label":"",
-         "categories":[
-
-         ],
-         "sort_order":5
-      },
-      "App Version":{
-         "name":"App Version",
-         "type":"Categorical",
-         "label":"",
-         "categories":[
-
-         ],
-         "sort_order":6
-      },
-      "Car Model Year":{
-         "name":"Car Model Year",
-         "type":"Float",
-         "label":"",
-         "sort_order":11
-      },
-      "Gender Facebook":{
-         "name":"Gender Facebook",
-         "type":"Categorical",
-         "label":"",
-         "categories":[
-
-         ],
-         "sort_order":19
-      },
-      "Credit Card Type":{
-         "name":"Credit Card Type",
-         "type":"Categorical",
-         "label":"",
-         "categories":[
-
-         ],
-         "sort_order":15
-      },
-      "Family Name Chinese":{
-         "name":"Family Name Chinese",
-         "type":"Categorical",
-         "label":"",
-         "categories":[
-
-         ],
-         "sort_order":18
-      },
-      "Construction  Material":{
-         "name":"Construction  Material",
-         "type":"Categorical",
-         "label":"",
-         "categories":[
-
-         ],
-         "sort_order":14
-      }
-   }
+    ]
+  },
+  "variables": {
+    "id": {
+      "name": "id",
+      "type": "Integer",
+      "label": "",
+      "sort_order": 0
+    },
+    "EIN": {
+      "name": "EIN",
+      "type": "Categorical",
+      "label": "",
+      "categories": [
+      ],
+      "sort_order": 17
+    },
+    "email": {
+      "name": "email",
+      "type": "Categorical",
+      "label": "",
+      "categories": [
+      ],
+      "sort_order": 3
+    },
+    "gender": {
+      "name": "gender",
+      "type": "Categorical",
+      "label": "",
+      "categories": [
+      ],
+      "sort_order": 4
+    },
+    "bye bye Color 1": {
+      "name": "bye bye Color 1",
+      "type": "Categorical",
+      "label": "",
+      "categories": [
+      ],
+      "sort_order": 12
+    },
+    "Color 2": {
+      "name": "Color 2",
+      "type": "Categorical",
+      "label": "",
+      "categories": [
+      ],
+      "sort_order": 13
+    },
+    "Boolean1": {
+      "name": "Boolean1",
+      "type": "Boolean",
+      "label": "",
+      "categories": [
+      ],
+      "sort_order": 7
+    },
+    "Boolean2": {
+      "name": "Boolean2",
+      "type": "Categorical",
+      "label": "",
+      "categories": [
+      ],
+      "sort_order": 8
+    },
+    "Boolean3": {
+      "name": "Boolean3",
+      "type": "Categorical",
+      "label": "",
+      "categories": [
+      ],
+      "sort_order": 9
+    },
+    "Car Make": {
+      "name": "Car Make",
+      "type": "Categorical",
+      "label": "",
+      "categories": [
+      ],
+      "sort_order": 10
+    },
+    "Currency": {
+      "name": "Currency",
+      "type": "Categorical",
+      "label": "",
+      "categories": [
+      ],
+      "sort_order": 16
+    },
+    "last_name": {
+      "name": "last_name",
+      "type": "Categorical",
+      "label": "",
+      "categories": [
+      ],
+      "sort_order": 2
+    },
+    "first_name": {
+      "name": "first_name",
+      "type": "Categorical",
+      "label": "",
+      "categories": [
+      ],
+      "sort_order": 1
+    },
+    "ip_address": {
+      "name": "ip_address",
+      "type": "Categorical",
+      "label": "",
+      "categories": [
+      ],
+      "sort_order": 5
+    },
+    "App Version": {
+      "name": "App Version",
+      "type": "Categorical",
+      "label": "",
+      "categories": [
+      ],
+      "sort_order": 6
+    },
+    "Car Model Year": {
+      "name": "Car Model Year",
+      "type": "Float",
+      "label": "",
+      "sort_order": 11
+    },
+    "Gender Facebook": {
+      "name": "Gender Facebook",
+      "type": "Categorical",
+      "label": "",
+      "categories": [
+      ],
+      "sort_order": 19
+    },
+    "Credit Card Type": {
+      "name": "Credit Card Type",
+      "type": "Categorical",
+      "label": "",
+      "categories": [
+      ],
+      "sort_order": 15
+    },
+    "Family Name Chinese": {
+      "name": "Family Name Chinese",
+      "type": "Categorical",
+      "label": "",
+      "categories": [
+      ],
+      "sort_order": 18
+    },
+    "Construction  Material": {
+      "name": "Construction  Material",
+      "type": "Categorical",
+      "label": "",
+      "categories": [
+      ],
+      "sort_order": 14
+    }
+  }
 }
