@@ -1,7 +1,6 @@
 """
 Set the specified RegisteredDataverse as active while marking any others as inactive
 """
-from django.apps import apps
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
 from django.core.validators import URLValidator
@@ -84,4 +83,3 @@ class Command(BaseCommand):
                     f'\n     - object_id: {rd.object_id}'
                     '\nSuccess!')
         self.stdout.write(self.style.SUCCESS(user_msg))
-

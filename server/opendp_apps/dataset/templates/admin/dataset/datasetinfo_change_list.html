@@ -7,13 +7,19 @@
                 <p>Warning!! Both buttons delete all other test data!</p>
                 <form action="setup-demo/" method="POST" style="display: inline-block;">
                     {% csrf_token %}
-                    <button type="submit" style="border-radius: 5px; background-color: #ed2b37; border:0; color: #ffffff; line-height: 150%;">Setup Demo</button>
+                    <button type="submit"
+                            style="border-radius: 5px; background-color: #ed2b37; border:0; color: #ffffff; line-height: 150%;">
+                        Setup Demo
+                    </button>
                 </form>
                 <form action="clear-test-data/" method="POST" style="display: inline-block;">
                     {% csrf_token %}
-                    <button type="submit" style="border-radius: 5px; background-color: #ed2b37; border:0; color: #ffffff; line-height: 150%;">Clear Test Data</button>
+                    <button type="submit"
+                            style="border-radius: 5px; background-color: #ed2b37; border:0; color: #ffffff; line-height: 150%;">
+                        Clear Test Data
+                    </button>
                 </form>
-                <br /><br />
+                <br/><br/>
             </div>
         {% endif %}
     {% endif %}

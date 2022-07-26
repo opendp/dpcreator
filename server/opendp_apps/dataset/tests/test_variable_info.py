@@ -1,7 +1,6 @@
-import pandas as pd
-
 from os.path import abspath, dirname, join
 
+import pandas as pd
 from django.test import TestCase
 
 from opendp_apps.profiler.variable_info import VariableInfoHandler

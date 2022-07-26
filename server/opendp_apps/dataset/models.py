@@ -1,6 +1,6 @@
-from collections import OrderedDict
 import json
 import logging
+from collections import OrderedDict
 from os.path import splitext
 
 from django.apps import apps
@@ -8,21 +8,19 @@ from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.dispatch import receiver
 from django.db.models.signals import post_delete
-
-# from django_cryptography.fields import encrypt
+from django.dispatch import receiver
 from polymorphic.models import PolymorphicModel
 
 from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.dataverses.models import RegisteredDataverse
-from opendp_apps.model_helpers.models import \
-    (TimestampedModelWithUUID,)
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp, BasicResponse
+from opendp_apps.model_helpers.models import \
+    (TimestampedModelWithUUID, )
+from opendp_apps.profiler.static_vals_mime_types import get_mime_type
 # Temp workaround!!! See Issue #300
 # https://github.com/opendp/dpcreator/issues/300
 from opendp_apps.utils.camel_to_snake import camel_to_snake
-from opendp_apps.profiler.static_vals_mime_types import get_mime_type
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -34,6 +32,7 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     Base type for table that either holds DV data
     or a file upload
     """
+
     class SourceChoices(models.TextChoices):
         UserUpload = 'upload', 'Upload'
         Dataverse = 'dataverse', 'Dataverse'
@@ -263,7 +262,7 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
             if isinstance(load1, dict):
                 return load1
 
-            return json.loads(load1, object_pairs_hook=OrderedDict) # JSON string to OrderedDict
+            return json.loads(load1, object_pairs_hook=OrderedDict)  # JSON string to OrderedDict
 
         except json.JSONDecodeError:
             return None
@@ -465,6 +464,7 @@ class UploadFileInfo(DataSetInfo):
         except DepositorSetupInfo.DoesNotExist:
             return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED.label
 
+
 # ----------------------------------------------------------------------
 # post_delete used for removing depositor_setup_info OneToOneField's
 # ----------------------------------------------------------------------
@@ -479,13 +479,14 @@ def post_delete_depositor_info_from_dv_file_info(sender, instance, *args, **kwar
     except DepositorSetupModel.DoesNotExist:
         print('Does not exist. Already deleted.')
 
+
 @receiver(post_delete, sender=UploadFileInfo)
 def post_delete_depositor_info_from_upload_file_info(sender, instance, *args, **kwargs):
     # Delete the DepositorSetupInfo object -- a OneToOneField
     DepositorSetupModel = apps.get_model(app_label='analysis', model_name='DepositorSetupInfo')
 
     try:
-        if instance.depositor_setup_info: # just in case user is not specified
+        if instance.depositor_setup_info:  # just in case user is not specified
             instance.depositor_setup_info.delete()
     except DepositorSetupModel.DoesNotExist:
         print('Does not exist. Already deleted.')
