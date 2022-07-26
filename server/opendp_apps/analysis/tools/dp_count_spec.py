@@ -4,9 +4,9 @@ Wrapper class for DP Count functionality
 import logging
 
 from django.conf import settings
-
 from opendp.accuracy import laplacian_scale_to_accuracy
 from opendp.meas import make_base_geometric
+from opendp.mod import OpenDPException
 from opendp.mod import binary_search, enable_features
 from opendp.trans import \
     (make_cast,
@@ -14,13 +14,11 @@ from opendp.trans import \
      make_impute_constant,
      make_select_column,
      make_split_dataframe)
-from opendp.mod import OpenDPException
+
+from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.analysis.tools.stat_spec import StatSpec
 
 enable_features("floating-point", "contrib")
-
-from opendp_apps.analysis.tools.stat_spec import StatSpec
-from opendp_apps.analysis import static_vals as astatic
-
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -104,14 +102,14 @@ class DPCountSpec(StatSpec):
             return self.preprocessor
 
         preprocessor = (
-            # Selects a column of df, Vec<str>
-            make_select_column(key=self.col_index, TOA=str) >>
-            # Cast the column to str
-            make_cast(TIA=str, TOA=str) >>
-            # Impute missing values
-            make_impute_constant(self.fixed_value) >>
-            # Count!
-            make_count(TIA=str)
+                # Selects a column of df, Vec<str>
+                make_select_column(key=self.col_index, TOA=str) >>
+                # Cast the column to str
+                make_cast(TIA=str, TOA=str) >>
+                # Impute missing values
+                make_impute_constant(self.fixed_value) >>
+                # Count!
+                make_count(TIA=str)
         )
 
         self.scale = binary_search(lambda s: self.check_scale(s, preprocessor, 1, self.epsilon),
@@ -197,6 +195,6 @@ class DPCountSpec(StatSpec):
                      f"\nColumn index: {self.col_index}"
                      f"\nColumn accuracy_val: {self.accuracy_val}"
                      f"\nColumn accuracy_message: {self.accuracy_msg}"
-                     f"\n\nDP Count: {self.value}" ))
+                     f"\n\nDP Count: {self.value}"))
 
         return True

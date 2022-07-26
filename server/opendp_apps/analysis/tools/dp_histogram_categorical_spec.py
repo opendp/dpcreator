@@ -1,18 +1,17 @@
 import logging
-from django.conf import settings
 
+from django.conf import settings
 from opendp.accuracy import laplacian_scale_to_accuracy
-from opendp.trans import *
 from opendp.meas import *
 from opendp.mod import enable_features, binary_search_param, OpenDPException
+from opendp.trans import *
 from opendp.typing import *
 
-from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.profiler.static_vals import VAR_TYPE_INTEGER, VAR_TYPE_CATEGORICAL
+from opendp_apps.analysis.tools.stat_spec import StatSpec
+from opendp_apps.profiler.static_vals import VAR_TYPE_CATEGORICAL
 
 enable_features("floating-point", "contrib")
-
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -22,7 +21,7 @@ class DPHistogramCategoricalSpec(StatSpec):
     Create a Histogram using categorical (string) values.
     Requires "categories" to be specificed in the constructor
     """
-    STATISTIC_TYPE = astatic.DP_HISTOGRAM   #_CATEGORICAL
+    STATISTIC_TYPE = astatic.DP_HISTOGRAM  # _CATEGORICAL
 
     def __init__(self, props: dict):
         """Set the internals using the props dict"""
@@ -119,7 +118,7 @@ class DPHistogramCategoricalSpec(StatSpec):
         if self.has_error():
             return
 
-        pass    # Nothing to see here
+        pass  # Nothing to see here
 
     def check_scale(self, scale, preprocessor):
         """
@@ -149,10 +148,10 @@ class DPHistogramCategoricalSpec(StatSpec):
             return self.preprocessor
 
         preprocessor = (
-            make_select_column(key=self.col_index, TOA=str) >>
-            make_cast(TIA=str, TOA=str) >>
-            make_impute_constant(self.fixed_value) >>
-            make_count_by_categories(categories=self.categories, MO=L1Distance[int], TIA=str)
+                make_select_column(key=self.col_index, TOA=str) >>
+                make_cast(TIA=str, TOA=str) >>
+                make_impute_constant(self.fixed_value) >>
+                make_count_by_categories(categories=self.categories, MO=L1Distance[int], TIA=str)
         )
 
         self.scale = binary_search_param(
@@ -215,7 +214,8 @@ class DPHistogramCategoricalSpec(StatSpec):
             return False
 
         if not isinstance(column_names, list):
-            self.add_err_msg('DPHistogramSpecCategorical.run_chain(..): column_names must be a list. Found: (type({column_names}))')
+            self.add_err_msg(
+                'DPHistogramSpecCategorical.run_chain(..): column_names must be a list. Found: (type({column_names}))')
             return
 
         try:
@@ -259,6 +259,6 @@ class DPHistogramCategoricalSpec(StatSpec):
                      f"\nColumn index: {self.col_index}"
                      f"\nAccuracy value: {self.accuracy_val}"
                      f"\nAccuracy message: {self.accuracy_msg}"
-                     f"\n\nDP Histogram: {self.value}" ))
+                     f"\n\nDP Histogram: {self.value}"))
 
         return True

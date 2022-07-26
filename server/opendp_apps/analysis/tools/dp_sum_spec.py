@@ -1,9 +1,9 @@
 import logging
 
 from django.conf import settings
-
 from opendp.accuracy import laplacian_scale_to_accuracy
 from opendp.meas import make_base_laplace
+from opendp.mod import OpenDPException
 from opendp.mod import binary_search, enable_features
 from opendp.trans import \
     (make_bounded_resize,
@@ -12,12 +12,11 @@ from opendp.trans import \
      make_impute_constant,
      make_select_column,
      make_split_dataframe, make_sized_bounded_sum)
-from opendp.mod import OpenDPException
-
-enable_features("floating-point", "contrib")
 
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis import static_vals as astatic
+
+enable_features("floating-point", "contrib")
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 

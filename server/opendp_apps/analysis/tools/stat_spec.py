@@ -9,18 +9,18 @@ BaseClass for Univariate statistics for OpenDP.
 -
 """
 import abc  # import ABC, ABCMeta, abstractmethod
-from collections import OrderedDict
 import decimal
 import json
+from collections import OrderedDict
 from typing import Union
 
-from django.core.serializers.json import DjangoJSONEncoder
 from django.core.exceptions import ValidationError
+from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import render_to_string
-
 from opendp.mod import OpenDPException
 
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.analysis.stat_valid_info import StatValidInfo
 from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.utils.extra_validators import \
     (validate_confidence_level,
@@ -32,7 +32,6 @@ from opendp_apps.utils.extra_validators import \
      validate_not_negative,
      validate_int_greater_than_zero,
      validate_int_not_negative)
-from opendp_apps.analysis.stat_valid_info import StatValidInfo
 
 
 class StatSpec:
@@ -68,7 +67,7 @@ class StatSpec:
         self.epsilon = float(props.get('epsilon')) if props.get('epsilon') else None
         self.delta = float(props.get('delta')) if props.get('delta') else None
 
-        self.cl = props.get('cl')      # confidence level coefficient (e.g. .95, .99, etc)
+        self.cl = props.get('cl')  # confidence level coefficient (e.g. .95, .99, etc)
 
         self.noise_mechanism = None
         #
@@ -156,8 +155,9 @@ class StatSpec:
         """
         raise NotImplementedError('run_03_custom_validation')
 
+    # TODO: child classes sometimes have 2 params, sometimes have 4
     @abc.abstractmethod
-    def check_scale(self, scale, preprocessor):
+    def check_scale(self, scale, preprocessor, dataset_distance, epsilon):
         """
         See "dp_mean_spec.py for an example of instantiation
 
@@ -171,6 +171,10 @@ class StatSpec:
         ```
         pass
         ```
+        :param scale:
+        :param preprocessor:
+        :param dataset_distance:
+        :param epsilon:
         """
         raise NotImplementedError('check_scale')
 
@@ -524,16 +528,16 @@ class StatSpec:
             'Only use this after "run_chain()" was completed successfully"'
 
         final_info = OrderedDict({
-                         "statistic": self.statistic,
-                         "variable": self.variable,
-                         "variable_type": self.var_type,
-                         "result": {
-                            "value": self.value
-                         },
-                         "noise_mechanism": self.noise_mechanism,
-                         "epsilon": self.epsilon,
-                         "delta": self.delta,
-                    })
+            "statistic": self.statistic,
+            "variable": self.variable,
+            "variable_type": self.var_type,
+            "result": {
+                "value": self.value
+            },
+            "noise_mechanism": self.noise_mechanism,
+            "epsilon": self.epsilon,
+            "delta": self.delta,
+        })
 
         # Min/Max
         #
