@@ -2,18 +2,17 @@
 Read and Profile a File.
 """
 import os
+
 from django.db.models.fields.files import FieldFile
 
 from opendp_apps.analysis.models import DepositorSetupInfo
-from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.dataset import static_vals as dstatic
-
+from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
-
-from opendp_apps.profiler.dataset_info_updater import DataSetInfoUpdater
-from opendp_apps.profiler.csv_reader import CsvReader
-from opendp_apps.profiler.variable_info import VariableInfoHandler
 from opendp_apps.profiler import static_vals as pstatic
+from opendp_apps.profiler.csv_reader import CsvReader
+from opendp_apps.profiler.dataset_info_updater import DataSetInfoUpdater
+from opendp_apps.profiler.variable_info import VariableInfoHandler
 
 
 class ProfileRunner(BasicErrCheck):

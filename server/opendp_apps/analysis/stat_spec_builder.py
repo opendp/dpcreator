@@ -11,6 +11,7 @@
         - Retrieve the variable type/min/max/categories from AnalysisPlan.variable_info
         - Retrieve
 """
+import copy
 import logging
 from typing import Union
 
@@ -25,6 +26,7 @@ from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
 from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
 from opendp_apps.analysis.tools.dp_variance_spec import DPVarianceSpec
+from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler import static_vals as pstatic
 
@@ -74,6 +76,9 @@ class StatSpecBuilder(BasicErrCheck):
         # Determine the dataset size (if needed)
         if not self.determine_dataset_size():
             return
+
+        # Build StatSpec list
+        self.build_stat_specs()
 
     def set_max_epsilon(self) -> bool:
         """Set the max epsilon based on the analysis plan"""
@@ -268,33 +273,9 @@ class StatSpecBuilder(BasicErrCheck):
         self.add_err_msg(user_msg)
         return False
 
-    def set_stat_spec_additional_params(self, stat_spec: dict) -> Union[dict, None]:
-        """For an initial stat spec from dp_statistics, add 'variable_info' and the 'col_idx'"""
-        if self.has_error():
-            return None
-
-        if not stat_spec:
-            user_msg = '"stat_spec" cannot be unspecified.'
-            self.add_err_msg(user_msg)
-            return None
-
-        var_name = stat_spec.get('variable')
-        variable_info = self.analysis_plan.variable_info.get(var_name)
-        if not variable_info:
-            user_msg = f'Variable info for {var_name} not found.'
-            stat_spec['error_message'] = user_msg
-            # self.add_err_msg(user_msg)
-            return stat_spec
-        else:
-            stat_spec['variable_info'] = variable_info
-
-        col_idx_info = self.analysis_plan.dataset.get_variable_index(variable_info.get('name'))
-        if col_idx_info.success:
-            stat_spec['col_index'] = col_idx_info.data
-        else:
-            stat_spec['error_message'] = col_idx_info.message
-
-        return stat_spec
+    def add_stat_spec(self, stat_spec: StatSpec):
+        """Add a StatSpec subclass to a list"""
+        self.stat_spec_list.append(stat_spec)
 
     def build_stat_specs(self):
         """
@@ -332,102 +313,132 @@ class StatSpecBuilder(BasicErrCheck):
             # -------------------------------------
             # (1) Begin building the property dict
             # -------------------------------------
-            props = dp_stat  # start with what is in dp_stat--the UI input
-            props['dataset_size'] = self.validation_dataset_size  # add dataset size
+            dp_stat['dataset_size'] = self.validation_dataset_size  # add dataset size
 
             #  Some high-level error checks, before making the StatSpec
-            variable = props.get('variable')
-            statistic = props.get('statistic', 'shrug?')
-            # epsilon = props.get('epsilon')
+            variable = dp_stat.get('variable')
+            statistic = dp_stat.get('statistic', 'shrug?')
+            # epsilon = dp_stat.get('epsilon')
             # var_type = None
 
             # (1) Is variable defined?
-            if not props.get('variable'):
-                props['error_message'] = (f'"variable" is missing from this'
-                                          f'DP Stat specification.')
-                self.add_stat_spec(DPSpecError(props))
+            if not dp_stat.get('variable'):
+                dp_stat['error_message'] = (f'The "variable" is missing from this'
+                                            f'DP Stat specification.')
+                self.add_stat_spec(DPSpecError(dp_stat))
                 continue  # to the next dp_stat specification
 
             # (2) Is this a known statistic? If not stop here.
             if statistic not in astatic.DP_STATS_CHOICES:
-                props['error_message'] = f'Statistic "{statistic}" is not supported'
-                self.add_stat_spec(DPSpecError(props))
+                dp_stat['error_message'] = f'Statistic "{statistic}" is not supported'
+                self.add_stat_spec(DPSpecError(dp_stat))
                 logger.error(f'ValidateReleaseUtil.build_stat_specs: Statistic "{statistic}" is not supported')
                 continue  # to the next dp_stat specification
 
             # (3) Add variable_info which has min/max/categories, variable type, etc.
             variable_info = self.analysis_plan.variable_info.get(variable)
             if variable_info:
-                props['variable_info'] = variable_info
+                dp_stat['variable_info'] = variable_info
                 var_type = variable_info.get('type')
             else:
-                props['error_message'] = 'Variable in validation info not found.'
-                self.add_stat_spec(DPSpecError(props))
+                dp_stat['error_message'] = 'Variable in validation info not found.'
+                self.add_stat_spec(DPSpecError(dp_stat))
                 logger.error(f'ValidateReleaseUtil.build_stat_specs: Variable in validation info not found.')
                 continue  # to the next dp_stat specification
 
             # (4) Retrieve the column index
             col_idx_info = self.analysis_plan.dataset.get_variable_index(variable_info['name'])
             if col_idx_info.success:
-                props['col_index'] = col_idx_info.data
+                dp_stat['col_index'] = col_idx_info.data
             else:
-                props['error_message'] = col_idx_info.message
-                self.add_stat_spec(DPSpecError(props))
+                dp_stat['error_message'] = col_idx_info.message
+                self.add_stat_spec(DPSpecError(dp_stat))
                 logger.error(f'ValidateReleaseUtil.build_stat_specs: {col_idx_info.message}')
                 continue  # to the next dp_stat specification
 
-            # Okay, "props" are built! Let's see if they work!
+            # Okay, "dp_stat" are built! Let's see if they work!
             if statistic == astatic.DP_COUNT:
                 # DP Count!
-                self.add_stat_spec(DPCountSpec(props))
+                self.add_stat_spec(DPCountSpec(dp_stat))
 
             elif statistic in astatic.DP_HISTOGRAM:
                 if var_type == pstatic.VAR_TYPE_CATEGORICAL:
                     # 4/12/2022 - temp hack to distinguish numeric categories
                     #   - need updated UI, etc.
                     #
-                    has_int_cats, _min_max = self.has_integer_categories(props)
+                    has_int_cats, _min_max = self.has_integer_categories(dp_stat)
 
                     if has_int_cats:
                         # Artificially set the min/max
                         #
-                        props['variable_info']['type'] = pstatic.VAR_TYPE_INTEGER
-                        props['variable_info']['min'] = _min_max[0]
-                        props['variable_info']['max'] = _min_max[1]
-                        self.add_stat_spec(DPHistogramIntegerSpec(props))
+                        dp_stat['variable_info']['type'] = pstatic.VAR_TYPE_INTEGER
+                        dp_stat['variable_info']['min'] = _min_max[0]
+                        dp_stat['variable_info']['max'] = _min_max[1]
+                        self.add_stat_spec(DPHistogramIntegerSpec(dp_stat))
                     else:
-                        self.add_stat_spec(DPHistogramCategoricalSpec(props))
+                        self.add_stat_spec(DPHistogramCategoricalSpec(dp_stat))
 
                 elif var_type == pstatic.VAR_TYPE_INTEGER:
                     # DP Histogram (Integer)!
-                    self.add_stat_spec(DPHistogramIntegerSpec(props))
+                    self.add_stat_spec(DPHistogramIntegerSpec(dp_stat))
 
                 else:
                     # DP Histogram - unsupported type
-                    props['error_message'] = (f'Statistic is "{astatic.DP_HISTOGRAM}" but '
-                                              f' variable type is unsupported: "{var_type}"')
-                    self.add_stat_spec(DPSpecError(props))
+                    dp_stat['error_message'] = (f'Statistic is "{astatic.DP_HISTOGRAM}" but '
+                                                f' variable type is unsupported: "{var_type}"')
+                    self.add_stat_spec(DPSpecError(dp_stat))
                     logger.error(f'ValidateReleaseUtil.build_stat_specs: Statistic is "{astatic.DP_HISTOGRAM}" but '
                                  f'variable type is unsupported: "{var_type}"')
                     continue  # to the next dp_stat specification
 
             elif statistic == astatic.DP_MEAN:
                 # DP Mean!
-                self.add_stat_spec(DPMeanSpec(props))
+                self.add_stat_spec(DPMeanSpec(dp_stat))
 
             elif statistic == astatic.DP_SUM:
                 # DP Mean!
-                self.add_stat_spec(DPSumSpec(props))
+                self.add_stat_spec(DPSumSpec(dp_stat))
 
             elif statistic == astatic.DP_VARIANCE:
-                self.add_stat_spec(DPVarianceSpec(props))
+                self.add_stat_spec(DPVarianceSpec(dp_stat))
 
             elif statistic in astatic.DP_STATS_CHOICES:
                 # Stat not yet available or an error
-                props['error_message'] = (f'Statistic "{statistic}" will be supported'
-                                          f' soon!')
+                dp_stat['error_message'] = (f'Statistic "{statistic}" will be supported'
+                                            f' soon!')
                 logger.error('ValidateReleaseUtil.build_stat_specs: Statistic "{statistic}" will be supported soon!')
-                self.add_stat_spec(DPSpecError(props))
+                self.add_stat_spec(DPSpecError(dp_stat))
             else:
                 # Shouldn't reach here, unknown stats are captured up above
                 pass
+
+    @staticmethod
+    def has_integer_categories(dp_stat: dict):
+        """
+        # 4/12/2022 - temporary hack for histograms
+        Check if the dp_stat['variable_info']['categories'] list consists of continuous integers
+
+        False: return False, None
+        True:  return True, (min, max)
+        """
+        if not dp_stat:
+            return False, None
+
+        # Are there categories?
+        if ('variable_info' in dp_stat) and ('categories' in dp_stat['variable_info']):
+
+            # Get the categories
+            cats = copy.deepcopy(dp_stat['variable_info']['categories'])
+
+            # Are all the values integers?
+            all_int_check = [isinstance(x, int) for x in cats]
+
+            # Nope, return
+            if False in all_int_check:
+                return False, None
+
+            # All integers, are they continuous?
+            if sorted(cats) == list(range(min(cats), max(cats) + 1)):
+                return True, (min(cats), max(cats))
+
+        return False, None

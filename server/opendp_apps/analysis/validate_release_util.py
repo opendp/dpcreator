@@ -532,37 +532,6 @@ class ValidateReleaseUtil(BasicErrCheck):
                 # Shouldn't reach here, unknown stats are captured up above
                 pass
 
-    @staticmethod
-    def has_integer_categories(props: dict):
-        """
-        # 4/12/2022 - temporary hack for histograms
-        Check if the props['variable_info']['categories'] list consists of continuous integers
-
-        False: return False, None
-        True:  return True, (min, max)
-        """
-        if not props:
-            return False, None
-
-        # Are there categories?
-        if ('variable_info' in props) and ('categories' in props['variable_info']):
-
-            # Get the categories
-            cats = copy.deepcopy(props['variable_info']['categories'])
-
-            # Are all the values integers?
-            all_int_check = [isinstance(x, int) for x in cats]
-
-            # Nope, return
-            if False in all_int_check:
-                return False, None
-
-            # All integers, are they continuous?
-            if sorted(cats) == list(range(min(cats), max(cats) + 1)):
-                return True, (min(cats), max(cats))
-
-        return False, None
-
     def run_preliminary_steps(self):
         """Run preliminary steps before validation"""
 
