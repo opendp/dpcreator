@@ -1,26 +1,22 @@
 import requests_mock
-
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-
 from rest_framework import status
 
 from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
 from opendp_apps.dataverses.models import ManifestTestParams
 from opendp_apps.dataverses.testing import schema_test_data
-from opendp_apps.user.models import OpenDPUser, DataverseUser
 from opendp_apps.model_helpers.msg_util import msgt
+from opendp_apps.user.models import OpenDPUser, DataverseUser
 
 
 class DataverseFileViewTest(TestCase):
-
     fixtures = ['test_dataverses_01.json',
                 'test_manifest_params_04.json',
                 'test_opendp_users_01.json']
 
     def setUp(self) -> None:
-
         self.test_opendp_user = DataverseUser.objects.get(object_id='6c4986b1-e90d-48a2-98d5-3a37da1fd331').user
 
         # Create a DataverseHandoff object using the ManifestTestParams
@@ -33,7 +29,6 @@ class DataverseFileViewTest(TestCase):
 
         self.user_obj, _created = get_user_model().objects.get_or_create(username='dv_depositor')
         self.client.force_login(self.user_obj)
-
 
     def test_05_manifest_params_url(self):
         """(05) manifest params url"""
@@ -119,7 +114,6 @@ class DataverseFileViewTest(TestCase):
         self.assertEqual(response.json().get('success'), False)
         self.assertTrue('message' in response.json())
 
-
     def test_20_schema_info_parsing(self):
         """(20) Retrieve the correct dataset from schema info, using File Ids"""
         msgt(self.test_20_schema_info_parsing.__doc__)
@@ -127,9 +121,9 @@ class DataverseFileViewTest(TestCase):
         # Schema contains file info, when file Id is an int
         #
         file_resp = DataverseManifestParams.get_file_specific_schema_info(
-                            schema_test_data.schema_info_01,
-                            file_id=schema_test_data.schema_info_01_file_id,
-                            file_persistent_id=schema_test_data.schema_info_01_file_pid)
+            schema_test_data.schema_info_01,
+            file_id=schema_test_data.schema_info_01_file_id,
+            file_persistent_id=schema_test_data.schema_info_01_file_pid)
 
         self.assertTrue(file_resp.success is True)
         self.assertTrue('contentUrl' in file_resp.data)
@@ -139,9 +133,9 @@ class DataverseFileViewTest(TestCase):
         # Schema contains file info, when file Id is a string
         #
         file_resp = DataverseManifestParams.get_file_specific_schema_info(
-                                            schema_test_data.schema_info_01,
-                                            file_id=str(schema_test_data.schema_info_01_file_id),
-                                            file_persistent_id=schema_test_data.schema_info_01_file_pid)
+            schema_test_data.schema_info_01,
+            file_id=str(schema_test_data.schema_info_01_file_id),
+            file_persistent_id=schema_test_data.schema_info_01_file_pid)
 
         self.assertTrue(file_resp.success is True)
         self.assertTrue('contentUrl' in file_resp.data)
@@ -155,9 +149,9 @@ class DataverseFileViewTest(TestCase):
         bad_file_id = '63'
 
         file_resp = DataverseManifestParams.get_file_specific_schema_info(
-                            schema_test_data.schema_info_01,
-                            file_id=bad_file_id,
-                            file_persistent_id=schema_test_data.schema_info_01_file_pid)
+            schema_test_data.schema_info_01,
+            file_id=bad_file_id,
+            file_persistent_id=schema_test_data.schema_info_01_file_pid)
         self.assertTrue(file_resp.success is False)
         self.assertTrue(file_resp.message.find(bad_file_id) > -1)
 
@@ -165,9 +159,9 @@ class DataverseFileViewTest(TestCase):
         #
         bad_file_id = 99999
         file_resp = DataverseManifestParams.get_file_specific_schema_info(
-                            schema_test_data.schema_info_01,
-                            file_id=bad_file_id,
-                            file_persistent_id=schema_test_data.schema_info_01_file_pid)
+            schema_test_data.schema_info_01,
+            file_id=bad_file_id,
+            file_persistent_id=schema_test_data.schema_info_01_file_pid)
         self.assertTrue(file_resp.success is False)
         self.assertTrue(file_resp.message.find(str(bad_file_id)) > -1)
 
@@ -207,7 +201,6 @@ class DataverseFileViewTest(TestCase):
                                           'creator': self.test_opendp_user.object_id},
                                     content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
 
         # Attempt to create the same DataverseFileInfo object with a different user
         #   - Should receive a file locked message

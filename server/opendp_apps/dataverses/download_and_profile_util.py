@@ -13,24 +13,17 @@ Basic workflow:
 """
 import json
 
-from django.core.serializers.json import DjangoJSONEncoder
 from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.core.serializers.json import DjangoJSONEncoder
 
-from opendp_apps.analysis.models import DepositorSetupInfo
-from opendp_apps.async_messages.websocket_message import WebsocketMessage
 from opendp_apps.async_messages import static_vals as async_static
-
-from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
+from opendp_apps.async_messages.websocket_message import WebsocketMessage
 from opendp_apps.dataset.models import DataSetInfo
-
 from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadHandler
-from opendp_apps.profiler.csv_reader import CsvReader
-from opendp_apps.profiler.dataset_info_updater import DataSetInfoUpdater
-from opendp_apps.profiler.profile_runner import ProfileRunner
+from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler.tasks import run_profile_by_filefield
 
-from opendp_apps.profiler import static_vals as pstatic
 
 class DownloadAndProfileUtil(BasicErrCheck):
 

@@ -3,14 +3,14 @@ Views meant to mimic calls by PyDataverse
 """
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
-from django.http import HttpResponse, JsonResponse
-from opendp_apps.dataverses.models import ManifestTestParams
+from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
 from opendp_apps.dataverses.dataverse_request_handler import DataverseRequestHandler
-from opendp_apps.dataverses import static_vals as dv_static
+from opendp_apps.dataverses.models import ManifestTestParams
 
 
 @csrf_exempt
@@ -35,6 +35,7 @@ def view_test_dv_post(request):
     return render(request,
                   'dataverses/view_test_dv_post.html',
                   resp)
+
 
 @login_required
 def view_dataverse_incoming_1(request):

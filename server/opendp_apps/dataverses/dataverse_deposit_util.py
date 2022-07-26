@@ -2,7 +2,6 @@
 Utility for depositing Dataverse auxiliary files related to a ReleaseInfo object
 """
 import logging
-
 from collections import OrderedDict
 from os.path import basename
 
@@ -15,7 +14,6 @@ from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.models import ReleaseInfo, AuxiliaryFileDepositRecord
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
-
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -310,8 +308,3 @@ class DataverseDepositUtil(BasicErrCheck):
         self.release_info.dataverse_deposit_info = deposit_info_dict
 
         self.release_info.save()
-
-
-"""
-
-"""

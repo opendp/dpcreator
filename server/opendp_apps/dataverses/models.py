@@ -1,24 +1,20 @@
-from urllib.parse import urlencode
-from typing import Union
 import uuid
+from typing import Union
+from urllib.parse import urlencode
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.conf import settings
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-
-from rest_framework.reverse import reverse as drf_reverse
-
 from django_cryptography.fields import encrypt
-
+from rest_framework.reverse import reverse as drf_reverse
 
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
-
 from opendp_apps.model_helpers.models import \
-    (TimestampedModelWithUUID,)
+    (TimestampedModelWithUUID, )
 
 UPLOADED_FILE_STORAGE = FileSystemStorage(location=settings.UPLOADED_FILE_STORAGE_ROOT)
 
@@ -126,13 +122,12 @@ class DataverseParams(TimestampedModelWithUUID):
     class Meta:
         abstract = True
 
-
     def as_dict(self):
         """
         Return the params as a Python dict
         """
         params = {dv_static.DV_PARAM_FILE_ID: self.fileId,
-                  #dv_static.DV_PARAM_SITE_URL: self.site_url,
+                  # dv_static.DV_PARAM_SITE_URL: self.site_url,
                   dv_static.DV_API_GENERAL_TOKEN: self.apiGeneralToken,
                   dv_static.DV_PARAM_DATASET_PID: self.datasetPid,
                   dv_static.DV_PARAM_FILE_PID: self.filePid}
@@ -157,7 +152,7 @@ class DataverseHandoff(DataverseParams):
 
     def save(self, *args, **kwargs):
 
-        #if not self.dv_installation:
+        # if not self.dv_installation:
         #    self.dv_installation = DataverseHandoff.get_registered_dataverse(self.siteUrl)
 
         # Set then name to the File DOI or ID
@@ -180,10 +175,11 @@ class DataverseHandoff(DataverseParams):
             dv_handoff.delete()
         except DataverseHandoff.DoesNotExist:
             return True
-        except ValidationError: # str is not a UUID, etc.
+        except ValidationError:  # str is not a UUID, etc.
             return False
 
         return True
+
 
 class ManifestTestParams(DataverseParams):
     """
@@ -223,7 +219,6 @@ class ManifestTestParams(DataverseParams):
         verbose_name = ('Manifest Test Parameter')
         verbose_name_plural = ('Manifest Test Parameters')
 
-
     def make_test_handoff_object(self):
         """For unit tests, make a DataverseHandoff object with the same params"""
 
@@ -241,7 +236,6 @@ class ManifestTestParams(DataverseParams):
         dv_handoff.save()
 
         return ok_resp(data=dv_handoff)
-
 
     def get_manifest_url_params(self, selected_params=None):
         """
@@ -270,7 +264,6 @@ class ManifestTestParams(DataverseParams):
 
     view_as_dict_link.allow_tags = True
 
-
     @mark_safe
     def mock_user_info_link(self):
         """
@@ -281,8 +274,8 @@ class ManifestTestParams(DataverseParams):
 
         user_lnk = reverse('view_get_user_info')
         return f'<a href="{user_lnk}">API: user info</a>'
-    mock_user_info_link.allow_tags = True
 
+    mock_user_info_link.allow_tags = True
 
     '''
     @mark_safe
@@ -310,6 +303,7 @@ class ManifestTestParams(DataverseParams):
         dataset_lnk = reverse('view_get_dataset_export')
         return (f'<a href="{dataset_lnk}?persistentId={self.datasetPid}'
                 f'&exporter={dv_static.EXPORTER_FORMAT_SCHEMA_ORG}">schema.org info</a>')
+
     schema_org_info_link.allow_tags = True
 
     def as_dict(self):
@@ -341,7 +335,7 @@ class ManifestTestParams(DataverseParams):
         """
         link to mimic incoming DV
         """
-        #if not (self.use_mock_dv_api and self.apiGeneralToken):
+        # if not (self.use_mock_dv_api and self.apiGeneralToken):
         #    return 'n/a'
 
         user_lnk = reverse('view_dataverse_incoming_1')
@@ -359,7 +353,7 @@ class ManifestTestParams(DataverseParams):
         """
         link to mimic incoming DV
         """
-        #if not (self.use_mock_dv_api and self.apiGeneralToken):
+        # if not (self.use_mock_dv_api and self.apiGeneralToken):
         #    return 'n/a'
 
         user_lnk = reverse('view_dataverse_incoming_2')
@@ -369,6 +363,7 @@ class ManifestTestParams(DataverseParams):
             return f'<a href="{user_lnk}?{url_params}" target="_blank">Test 2: Mock Dataverse incoming link</a>'
         else:
             return f'<a href="{user_lnk}?{url_params}" target="_blank">Test 2: Dataverse incoming link (public dataset)</a>'
+
     dataverse_incoming_link_2.allow_tags = True
 
     @mark_safe
@@ -382,6 +377,5 @@ class ManifestTestParams(DataverseParams):
             return f'<a href="{handoff_url}?{url_params}" target="_blank">Handoff!: Mock Dataverse incoming link</a>'
         else:
             return f'<a href="{handoff_url}?{url_params}" target="_blank">Handoff!: Dataverse incoming link (public dataset)</a>'
+
     dataverse_handoff_test_link.allow_tags = True
-
-
