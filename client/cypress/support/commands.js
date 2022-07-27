@@ -217,7 +217,7 @@ Cypress.Commands.add('enterStatsInPopup', (demoData) => {
         const varDataTest = '[data-test="' + demoVar + '"]'
         cy.get(varDataTest).click({force: true})
         cy.get('[data-test="Fixed value"]').type(demoStat.fixedValue)
-        cy.get('[data-test="Create statistic"]').click({force: true})
+        cy.get('[data-test="Create Statistic Button"]').click({force: true})
         cy.get('[data-test="Create Statistics Title').should('be.visible')
         cy.get('[data-test="Add Statistic"]').should('be.visible')
         // The statistic should have been created
