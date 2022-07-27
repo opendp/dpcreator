@@ -79,8 +79,17 @@ class DepositorSetupInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DepositorSetupInfo
-        fields = '__all__'
-        read_only_fields = ['object_id', 'id', 'created', 'updated']
+        fields = ['object_id', 'id', 'created', 'updated',
+                  'is_complete',
+                  'user_step',
+                  'dataset_questions',
+                  'epsilon_questions',
+                  'dataset_size',
+                  'variable_info',
+                  'default_epsilon', 'epsilon',
+                  'default_delta', 'delta',
+                  'confidence_level']
+        read_only_fields = ['object_id', 'id', 'created', 'updated', 'is_complete']
 
     def update(self, instance, validated_data):
         """

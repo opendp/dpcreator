@@ -10,6 +10,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from django.utils.safestring import mark_safe
 from polymorphic.models import PolymorphicModel
 
 from opendp_apps.analysis.models import DepositorSetupInfo
@@ -299,6 +300,18 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         if self.is_dataverse_dataset():
             return self.dataversefileinfo
         return None
+
+    @mark_safe
+    def data_profile_display(self):
+        """For admin display of the variable info"""
+        if not self.data_profile:
+            return 'n/a'
+
+        try:
+            info_str = json.dumps(self.data_profile, indent=4)
+            return f'<pre>{info_str}</pre>'
+        except Exception as ex_obj:
+            return f'Failed to convert to JSON string {ex_obj}'
 
 
 class DataverseFileInfo(DataSetInfo):
