@@ -50,6 +50,16 @@ Cypress.Commands.add('epsilonStep', () => {
     cy.get('[data-test="Public Observations - yes"]').check({force: true})
 
 })
+Cypress.Commands.add('uploadFile', (testfile) => {
+    cy.get('[data-test="My Data"]').click();
+    cy.url().should('contains', 'my-data')
+    cy.get('[data-test="myDataUploadButton"]').click();
+    cy.get('[data-test="fileInput"]').selectFile(testfile, {force: true})
+    cy.get('tr').should('contain',
+        'PUMS5extract1000.csv')
+    cy.get('tr').should('contain',
+        'Uploaded')
+})
 Cypress.Commands.add('runDemo', (mockDVfile, demoDatafile) => {
     cy.clearData()
     cy.createMockDataset(mockDVfile)
@@ -207,7 +217,7 @@ Cypress.Commands.add('enterStatsInPopup', (demoData) => {
         const varDataTest = '[data-test="' + demoVar + '"]'
         cy.get(varDataTest).click({force: true})
         cy.get('[data-test="Fixed value"]').type(demoStat.fixedValue)
-        cy.get('[data-test="Create Statistic Button"]').click({force: true})
+        cy.get('[data-test="Create statistic"]').click({force: true})
         cy.get('[data-test="Create Statistics Title').should('be.visible')
         cy.get('[data-test="Add Statistic"]').should('be.visible')
         // The statistic should have been created

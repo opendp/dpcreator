@@ -3,7 +3,9 @@
     <v-container>
       <v-sheet rounded="lg">
         <v-container>
-          <h1 class="title-size-2" style="line-height:150%"><b>DP Release</b>
+          <h1 class="title-size-2" style="line-height:150%">
+            <b v-if="status === COMPLETED">DP Release</b>
+            <b v-if="status !== COMPLETED">Data File</b>
             <br/>{{ datasetInfo.name }}</h1>
           Current Status:
           <StatusTag class="my-5" :status="status"/>
@@ -19,7 +21,7 @@
                 <a v-if="analysisPlan.releaseInfo.dataverseDepositInfo && analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
                    data-test="dataverseLink"
                    class="text-decoration-none" :href="fileUrl"
-                >Check DP Release in Dataverse
+                >Check DP release in Dataverse
                   <v-icon small color="primary">mdi-open-in-new</v-icon>
                 </a>
               </v-col>
@@ -81,7 +83,7 @@
                   <a
                       data-test="dataverseLink"
                       class="text-decoration-none" :href="fileUrl"
-                  >Check DP Release in Dataverse
+                  >Check DP release in Dataverse
                     <v-icon small color="primary">mdi-open-in-new</v-icon>
                   </a>
                 </p>
@@ -97,6 +99,7 @@
             ].availableActions.filter(action => action !== VIEW_DETAILS)"
               :key="action + '-' + index"
               color="primary"
+              :data-test="action"
               :click="() => handleButtonClick(action, datasetTitle)"
               :label="actionsInformation[action]"
               :class="{
@@ -115,6 +118,13 @@
               :class="{
               'width80 mx-auto d-block': $vuetify.breakpoint.xsOnly
             }"
+          />
+          <DeleteDatasetDialog
+              :dialogDelete="dialogDelete"
+              :datasetInfo="datasetInfo"
+              :analysisPlan="analysisPlan"
+              v-on:cancel="closeDelete"
+              v-on:close="datasetDeleted"
           />
         </v-container>
       </v-sheet>
@@ -136,6 +146,7 @@ import {mapGetters, mapState} from "vuex";
 import stepInformation from "@/data/stepInformation";
 import Chart from "../components/MyData/Chart.vue";
 import ReleasePDF from "@/components/MyData/ReleasePDF";
+import DeleteDatasetDialog from "@/components/MyData/DeleteDatasetDialog";
 
 const {
   IN_PROGRESS,
@@ -159,11 +170,23 @@ export default {
     StatusTag,
     Button,
     SupportBanner,
-    Chart
+    Chart,
+    DeleteDatasetDialog
   },
 
   methods: {
+    delete(item) {
+      this.dialogDelete = true
+    },
+    closeDelete() {
+      this.dialogDelete = false
+    },
+    datasetDeleted() {
+      this.dialogDelete = false
+      this.$router.push(NETWORK_CONSTANTS.MY_DATA.PATH)
+    },
     handleButtonClick(action, item) {
+      console.log('handling action: ' + action)
       this[action](item);
     },
     continueWorkflow(item) {
@@ -313,6 +336,7 @@ export default {
     expanded: [],
     maxResults: 10,
     generalErrorSummary: "Error summary: lorem ipsum dolor sit amet.",
+    dialogDelete: false,
     statsHeaders: [
       {text: 'Variable', value: 'variable', sortable: false},
       {text: 'Statistic', value: 'statistic', sortable: false},
