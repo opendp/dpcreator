@@ -20,7 +20,11 @@ class DataSetInfoAdmin(admin.ModelAdmin):
                     'source',
                     'updated',
                     'created',)
-    readonly_fields = ('id', 'object_id', 'source', 'created', 'updated',)
+    readonly_fields = ('id',
+                       'object_id',
+                       'source',
+                       'data_profile_display',
+                       'created', 'updated',)
 
     def changelist_view(self, request, extra_context=None):
         extra_context = {'allow_demo_loading': settings.ALLOW_DEMO_LOADING}
