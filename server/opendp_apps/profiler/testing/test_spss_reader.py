@@ -10,15 +10,15 @@ class TestSpssReader(TestCase):
         file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'survey.sav')
         column_limit = 1
         spss_reader = SpssReader(file_path, column_limit=column_limit)
-        df, meta = spss_reader.read()
-        self.assertEqual(meta.column_names[2:5], ['age', 'marital', 'child'])
+        df = spss_reader.read()
+        self.assertEqual(spss_reader.meta.column_names[2:5], ['age', 'marital', 'child'])
         self.assertListEqual(list(df.columns), ['id'])
 
     def test_read_dta(self):
         file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'golf.dta')
         column_limit = 2
         spss_reader = SpssReader(file_path, column_limit=column_limit)
-        df, meta = spss_reader.read()
+        df = spss_reader.read()
         print(df)
-        self.assertEqual(meta.column_names, ['score', 'age'])
+        self.assertEqual(spss_reader.meta.column_names, ['score', 'age'])
         self.assertListEqual(list(df.columns), ['score', 'age'])

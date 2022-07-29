@@ -151,7 +151,7 @@ class ProfileRunner(BasicErrCheck):
             extension = file_extension_determiner.get_file_extension()
             if extension in ['.dta', '.sav']:
                 self.dataframe = SpssReader(self.ds_pointer_for_pandas, column_limit=self.max_num_features).read()
-            if extension == '.csv':
+            else:
                 self.dataframe = CsvReader(self.ds_pointer_for_pandas, column_limit=self.max_num_features).read()
 
         except UnicodeDecodeError as ex_obj:
