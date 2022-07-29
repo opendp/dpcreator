@@ -39,7 +39,7 @@ class ProfilerTest(TestCase):
         self.mock_params = ManifestTestParams.objects.filter(use_mock_dv_api=True).first()
         """
 
-    def profile_good_file(self, filename, num_features_orig, num_features_profile, num_rows, **kwargs):
+    def profile_good_file(self, filename, num_features_profile, num_rows, **kwargs):
         """Used by multiple tests...."""
 
         # File to profile
@@ -95,19 +95,19 @@ class ProfilerTest(TestCase):
 
         msgt('-- Profile gking-crisis.tab')
         # https://dataverse.harvard.edu/file.xhtml?persistentId=doi:10.7910/DVN/OLD7MB/ZI4N3J&version=4.2
-        self.profile_good_file('gking-crisis.tab', 19, 19, 3345)
+        self.profile_good_file('gking-crisis.tab', 19, 3345)
 
         msgt('-- Profile voter_validation_lwd.csv')
         # https://github.com/privacytoolsproject/PSI-Service/blob/develop/data/voter_validation_lwd.csv
-        self.profile_good_file('voter_validation_lwd.csv', 35, 35, 20771)
+        self.profile_good_file('voter_validation_lwd.csv', 35, 20771)
 
         msgt('-- Profile teacher_climate_survey_lwd.csv')
         # https://github.com/privacytoolsproject/PSI-Service/blob/develop/data/teacher_climate_survey_lwd.csv
-        self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 132, 1500)
+        self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 1500)
 
         # Don't save row count
         params = {pstatic.KEY_SAVE_ROW_COUNT: False}
-        self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 132, 1500, **params)
+        self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 1500, **params)
 
     def test_010_profile_good_file(self):
         """(10) Profile file directory"""
@@ -196,7 +196,7 @@ class ProfilerTest(TestCase):
         # Retrieve DataSetInfo
         #
         dsi = DataSetInfo.objects.get(object_id=self.ds_01_object_id)
-        self.assertEqual(dsi.depositor_setup_info.user_step, \
+        self.assertEqual(dsi.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
 
         # Try to profile and empty Django FileField
@@ -239,7 +239,7 @@ class ProfilerTest(TestCase):
         # Retrieve DataSetInfo
         #
         dsi = DataSetInfo.objects.get(object_id=self.ds_01_object_id)
-        self.assertEqual(dsi.depositor_setup_info.user_step, \
+        self.assertEqual(dsi.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
 
         # --------------------------------------------------
@@ -272,7 +272,7 @@ class ProfilerTest(TestCase):
         self.assertTrue('variables' in info)
         self.assertEqual(len(info['variables'].keys()), settings.PROFILER_COLUMN_LIMIT)
 
-        self.assertEqual(dsi2.depositor_setup_info.user_step, \
+        self.assertEqual(dsi2.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
 
         # print('dsi2.profile_variables', dsi2.profile_variables)

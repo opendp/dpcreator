@@ -2,7 +2,7 @@ import logging
 
 from django.conf import settings
 from django.http import FileResponse
-from rest_framework import permissions, viewsets, renderers, status
+from rest_framework import permissions, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response

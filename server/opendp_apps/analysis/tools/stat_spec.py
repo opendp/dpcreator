@@ -8,7 +8,7 @@ BaseClass for Univariate statistics for OpenDP.
 - Implementing the "get_preprocessor" method acts as validation.
 -
 """
-import abc  # import ABC, ABCMeta, abstractmethod
+import abc
 import decimal
 import json
 from collections import OrderedDict
@@ -289,7 +289,7 @@ class StatSpec:
 
         return True
 
-    def floatify_int_values(self, more_props_to_floatify=[]):
+    def floatify_int_values(self, more_props_to_floatify=None):
         """
         The OpenDP library throws domain mismatches
         if all parameters aren't the same type.
@@ -300,6 +300,8 @@ class StatSpec:
 
         - more_props_to_floatify - list of additional properties to "floatify"
         """
+        if more_props_to_floatify is None:
+            more_props_to_floatify = []
         assert isinstance(more_props_to_floatify, list), \
             '"more_props_to_floatify" must be a list, even and empty list'
 
