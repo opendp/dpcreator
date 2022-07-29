@@ -30,7 +30,7 @@ def examine_release():
 def ticket_414():
     import os
     from django.conf import settings
-    from opendp_apps.profiler.csv_reader import CsvReader
+    from opendp_apps.profiler.tools.csv_reader import CsvReader
     from opendp_apps.profiler.variable_info import VariableInfoHandler
 
     fname = 'Fatigue_data.tab'

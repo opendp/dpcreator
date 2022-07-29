@@ -1,8 +1,6 @@
 from collections import OrderedDict
 from os.path import abspath, dirname, isfile, join
 
-from opendp_apps.profiler.csv_reader import DelimiterNotFoundException
-
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 PROFILER_FIXTURES_DIR = join(dirname(CURRENT_DIR), 'fixtures')

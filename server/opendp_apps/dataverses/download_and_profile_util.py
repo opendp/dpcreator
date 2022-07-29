@@ -25,7 +25,7 @@ from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.dataset.models import DataSetInfo
 
 from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadHandler
-from opendp_apps.profiler.csv_reader import CsvReader
+from opendp_apps.profiler.tools.csv_reader import CsvReader
 from opendp_apps.profiler.dataset_info_updater import DataSetInfoUpdater
 from opendp_apps.profiler.profile_runner import ProfileRunner
 from opendp_apps.profiler.tasks import run_profile_by_filefield

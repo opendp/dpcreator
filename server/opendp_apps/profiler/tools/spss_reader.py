@@ -1,0 +1,39 @@
+import os
+
+import pyreadstat
+
+from opendp_apps.profiler.tools.base_data_reader import BaseDataReader
+from opendp_apps.profiler.tools.data_reader_exceptions import InvalidFileType
+
+
+class SpssReader(BaseDataReader):
+
+    def __init__(self, filepath, column_limit):
+        self.meta = None
+        super().__init__(filepath=filepath, column_limit=column_limit)
+
+    def read(self):
+        file_name, extension = os.path.splitext(self.filepath)
+        if extension == '.sav':
+            df, meta = pyreadstat.read_sav(self.filepath)
+        elif extension == '.dta':
+            df, meta = pyreadstat.read_dta(self.filepath)
+        else:
+            raise InvalidFileType(f"The file type {extension} is not supported by SpssReader")
+        if self.column_limit:
+            df = df[df.columns[:self.column_limit]]
+        self.meta = meta
+        return df, meta
+
+
+if __name__ == '__main__':
+
+    reader = SpssReader('../../../../survey.sav', column_limit=2)
+    df, meta = reader.read()
+    print(meta.column_names)
+    print(meta.column_labels)
+    print(meta.column_names_to_labels)
+    print(meta.number_rows)
+    print(meta.number_columns)
+    print(meta.file_label)
+    print(meta.file_encoding)
