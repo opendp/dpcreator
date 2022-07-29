@@ -23,17 +23,4 @@ class SpssReader(BaseDataReader):
         if self.column_limit:
             df = df[df.columns[:self.column_limit]]
         self.meta = meta
-        return df, meta
-
-
-if __name__ == '__main__':
-
-    reader = SpssReader('../../../../survey.sav', column_limit=2)
-    df, meta = reader.read()
-    print(meta.column_names)
-    print(meta.column_labels)
-    print(meta.column_names_to_labels)
-    print(meta.number_rows)
-    print(meta.number_columns)
-    print(meta.file_label)
-    print(meta.file_encoding)
+        return df

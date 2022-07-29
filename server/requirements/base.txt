@@ -25,6 +25,7 @@ pycountry==20.7.3
 pyDataverse==0.3.0
 pyreadstat==1.1.9
 python-dotenv==0.15.0
+python-magic==0.4.27
 pyparsing==2.4.7
 pytz==2020.1
 redis==3.5.3
