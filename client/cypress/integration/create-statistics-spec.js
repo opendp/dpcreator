@@ -10,6 +10,49 @@
             cy.clearData()
 
         })
+        it('Validates fixed value max-min', () => {
+            const mockDVfile = 'EyeDemoMockDV.json'
+            const demoDatafile = 'EyeDemoStatsTest.json'
+
+            cy.createMockDataset(mockDVfile)
+            cy.fixture(demoDatafile).then((demoData) => {
+                cy.url().should('contain', 'welcome')
+                cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
+                    demoData['datasetName'])
+                cy.goToConfirmVariables(demoData.variables)
+                // select the variables we will use
+                let variables = {
+                    "Trial": {
+                        "name": "Trial",
+                        "label": "",
+                        "type": "Integer",
+                        "min": "0",
+                        "max": "10"
+                    },
+                }
+                cy.selectVariable(variables)
+
+                // Continue to Set Epsilon Step
+                cy.epsilonStep()
+
+                // cy.createStatistics(statsData)
+                cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
+                cy.get('[data-test="Add Statistic"]').click({force: true});
+                cy.get('[data-test="AddStatisticDialog"]').should('be.visible')
+
+                cy.get('[data-test="Histogram"]').click({force: true});
+                const varDataTest = '[data-test="Trial"]'
+                cy.get(varDataTest).click({force: true})
+                cy.get('[data-test="Fixed value"]').type((Number(variables.Trial.max) + 1))
+                cy.get('div').should('contain', 'Value must be between')
+                cy.get('[data-test="Fixed value"]').clear()
+                cy.get('[data-test="Fixed value"]').type((Number(variables.Trial.max) - 1))
+                cy.get('div').should('not.contain', 'Value must be between')
+
+
+            })
+        })
+
         it('Validates Correctly after epsilon changes', () => {
             const mockDVfile = 'EyeDemoMockDV.json'
             const demoDatafile = 'EyeDemoStatsTest.json'
