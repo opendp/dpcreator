@@ -19,7 +19,7 @@
         <Button
             data-test="deleteDatasetConfirm"
             color="primary"
-            :click="() => $emit('confirm')"
+            :click="() => deleteConfirm()"
             label="OK"
         />
         <Button
@@ -40,12 +40,28 @@ import Button from "@/components/DesignSystem/Button";
 export default {
   components: {Button},
   name: "DeleteDatasetDialog",
-  props: ["dialogDelete", "selectedItem"],
+  props: ["dialogDelete", "datasetInfo", "analysisPlan"],
   methods: {
+    deleteConfirm() {
+
+      if (this.analysisPlan !== null) {
+        const payload = {
+          datasetId: this.datasetInfo.objectId,
+          analysisPlanId: this.analysisPlan.objectId
+        }
+        this.$store.dispatch('dataset/deleteAnalysisPlan', payload)
+      } else {
+        this.$store.dispatch('dataset/deleteDataset', this.datasetInfo.objectId)
+      }
+      this.closeDelete();
+    },
+    closeDelete() {
+      this.$emit("close")
+    },
     datasetInfoName() {
       let name = ""
-      if (this.selectedItem !== null) {
-        name = this.selectedItem.datasetInfo.name
+      if (this.datasetInfo !== null) {
+        name = this.datasetInfo.name
       }
       return name
     }
