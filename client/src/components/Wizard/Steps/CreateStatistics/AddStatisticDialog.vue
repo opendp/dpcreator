@@ -436,6 +436,9 @@ export default {
       if (this.selectedStatistic.value == "count") {
         this.editedItemDialog.missingValuesHandling = ""
         this.editedItemDialog.handleAsFixed = false
+      } else {
+        this.editedItemDialog.missingValuesHandling = "insert_fixed"
+        this.editedItemDialog.handleAsFixed = true
       }
     },
     updateFixedInputVisibility(handlingOption) {
