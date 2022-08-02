@@ -86,12 +86,14 @@
         <div v-if="editedItemDialog.handleAsFixed">
 
           <span>Enter a <strong> fixed value</strong></span> for missing values:
+          <div>{{ minMax }}</div>
           <div class="width50">
             <v-text-field
                 v-model="editedItemDialog.fixedValue"
                 background-color="soft_primary"
                 class="top-borders-radius width50"
                 data-test="Fixed value"
+                :rules="[validateFixedValue]"
             ></v-text-field>
           </div>
         </div>
@@ -229,6 +231,19 @@ export default {
     isMultiple: function () {
       return this.editedIndex === -1;
     },
+
+    minMax: function () {
+      let minMax = ""
+      if (this.editedItemDialog.variable &&
+          this.variableInfo[this.editedItemDialog.variable] &&
+          this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('min')
+      ) {
+        minMax = "(must be between " +
+            this.variableInfo[this.editedItemDialog.variable].min + " and " +
+            this.variableInfo[this.editedItemDialog.variable].max + ")"
+      }
+      return minMax
+    },
     variables: function () {
       let displayVars = []
       for (const key in this.variableInfo) {
@@ -310,6 +325,20 @@ export default {
     ]
   }),
   methods: {
+    validateFixedValue(v) {
+      let valid = true
+      if (this.editedItemDialog.variable &&
+          this.variableInfo[this.editedItemDialog.variable] &&
+          this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('min')) {
+        const val = Number(v)
+        if (val < this.variableInfo[this.editedItemDialog.variable].min ||
+            val > this.variableInfo[this.editedItemDialog.variable].max)
+          valid = false
+      }
+      return valid || "Value must be between " +
+          this.variableInfo[this.editedItemDialog.variable].min +
+          " and " + this.variableInfo[this.editedItemDialog.variable].max
+    },
     save() {
       try {
         this.editedItemDialog.label = this.selectedStatistic.label
