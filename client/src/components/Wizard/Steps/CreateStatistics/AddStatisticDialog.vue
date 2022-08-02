@@ -238,7 +238,7 @@ export default {
           this.variableInfo[this.editedItemDialog.variable] &&
           this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('min')
       ) {
-        minMax = "(must be between " +
+        minMax = "(Must be between " +
             this.variableInfo[this.editedItemDialog.variable].min + " and " +
             this.variableInfo[this.editedItemDialog.variable].max + ")"
       }
