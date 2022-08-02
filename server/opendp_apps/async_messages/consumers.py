@@ -3,13 +3,11 @@ import json
 import logging
 from datetime import datetime
 
-from django.conf import settings
-
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
+from django.conf import settings
 
 from opendp_apps.async_messages import static_vals as mstatic
-
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 

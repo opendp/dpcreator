@@ -21,10 +21,10 @@ from django.urls import path, include
 from django.views.generic import TemplateView, RedirectView
 from rest_framework import routers
 
+from opendp_apps.analysis.views.analysis_plan_view import AnalysisPlanViewSet
 from opendp_apps.analysis.views.release_view import ReleaseView, ReleaseFileDownloadView
 from opendp_apps.analysis.views.validation_view import ValidationView
 from opendp_apps.banner_messages.views import BannerMessageViewSet
-
 from opendp_apps.content_pages.view_vue_settings import VueSettingsView
 from opendp_apps.dataset.views import \
     (DepositorSetupViewSet,
@@ -36,11 +36,8 @@ from opendp_apps.dataverses.views.dataverse_file_view import DataverseFileView
 from opendp_apps.dataverses.views.dataverse_handoff_view import DataverseHandoffView
 from opendp_apps.dataverses.views.dataverse_user_view import DataverseUserView
 from opendp_apps.dataverses.views.registered_dataverse_view import RegisteredDataverseView
-
 from opendp_apps.terms_of_access.views import TermsOfAccessViewSet, TermsOfAccessAgreementViewSet
-from opendp_apps.analysis.views.analysis_plan_view import AnalysisPlanViewSet
-
-from opendp_apps.user.views import GoogleLogin, OpenDPRegister
+from opendp_apps.user.views import GoogleLogin
 from opendp_apps.user.views import UserViewSet
 
 admin.site.site_header = 'DP Creator Admin Panel'
@@ -99,6 +96,3 @@ urlpatterns = [
 if settings.USE_DEV_STATIC_SERVER:
     print(f'Serving directory "{settings.STATIC_ROOT}" from url "{settings.STATIC_URL}"')
     urlpatterns += staticfiles_urlpatterns()
-    # urlpatterns += static(settings.STATIC_URL,
-    #                      document_root=settings.STATIC_ROOT,
-    #                      kwargs={'show_indexes': True})

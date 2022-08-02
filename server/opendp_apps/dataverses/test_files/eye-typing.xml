@@ -1,939 +1,1086 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<codeBook xmlns="ddi:codebook:2_5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="ddi:codebook:2_5 https://ddialliance.org/Specification/DDI-Codebook/2.5/XMLSchema/codebook.xsd" version="2.5">
-  <docDscr>
-    <citation>
-      <titlStmt>
-        <titl>Replication Data for: Eye-typing experiment</titl>
-        <IDNo agency="DOI">doi:10.7910/DVN/PUXVDH</IDNo>
-      </titlStmt>
-      <distStmt>
-        <distrbtr source="archive">Harvard Dataverse</distrbtr>
-        <distDate>2020-11-04</distDate>
-      </distStmt>
-      <verStmt source="archive">
-        <version date="2020-11-04" type="RELEASED">1</version>
-      </verStmt>
-      <biblCit>Bafna, Tanya, 2020, "Replication Data for: Eye-typing experiment", https://doi.org/10.7910/DVN/PUXVDH, Harvard Dataverse, V1, UNF:6:xxqeAyaf5PkxtclXqimbsQ== [fileUNF]</biblCit>
-    </citation>
-  </docDscr>
-  <stdyDscr>
-    <citation>
-      <titlStmt>
-        <titl>Replication Data for: Eye-typing experiment</titl>
-        <IDNo agency="DOI">doi:10.7910/DVN/PUXVDH</IDNo>
-      </titlStmt>
-      <rspStmt>
-        <AuthEnty affiliation="Danmarks Tekniske Universitet">Bafna, Tanya</AuthEnty>
-      </rspStmt>
-      <prodStmt/>
-      <distStmt>
-        <distrbtr source="archive">Harvard Dataverse</distrbtr>
-        <contact affiliation="Danmarks Tekniske Universitet" email="taba@dtu.dk">Bafna, Tanya</contact>
-        <depositr>Bafna, Tanya</depositr>
-        <depDate>2020-11-04</depDate>
-      </distStmt>
-    </citation>
-    <stdyInfo>
-      <subject>
-        <keyword>Engineering</keyword>
-        <keyword>Medicine, Health and Life Sciences</keyword>
-        <keyword>eye-tracking, eye-typing, mental fatigue</keyword>
-      </subject>
-      <abstract date="2020-11-04">The data consists of performance and eye-tracking features obtained during an eye-typing experiment conducted over 4 days, 2 sessions on each day, with 18 participants.</abstract>
-      <sumDscr/>
-    </stdyInfo>
-    <method>
-      <dataColl>
-        <sources/>
-      </dataColl>
-      <anlyInfo/>
-    </method>
-    <dataAccs>
-      <notes type="DVN:TOU" level="dv">CC0 Waiver</notes>
-      <setAvail/>
-      <useStmt/>
-    </dataAccs>
-    <othrStdyMat/>
-  </stdyDscr>
-  <fileDscr ID="f4164587" URI="https://dataverse.harvard.edu/api/access/datafile/4164587">
-    <fileTxt>
-      <fileName>Fatigue_data.tab</fileName>
-      <dimensns>
-        <caseQnty>183</caseQnty>
-        <varQnty>24</varQnty>
-      </dimensns>
-      <fileType>text/tab-separated-values</fileType>
-    </fileTxt>
-    <notes level="file" type="VDC:UNF" subject="Universal Numeric Fingerprint">UNF:6:v78zc9GtP8U5uKqo8AtPqA==</notes>
-  </fileDscr>
-  <fileDscr ID="f4164586" URI="https://dataverse.harvard.edu/api/access/datafile/4164586">
-    <fileTxt>
-      <fileName>Fatigue_difference_consecutive_subjScore.tab</fileName>
-      <dimensns>
-        <caseQnty>137</caseQnty>
-        <varQnty>6</varQnty>
-      </dimensns>
-      <fileType>text/tab-separated-values</fileType>
-    </fileTxt>
-    <notes level="file" type="VDC:UNF" subject="Universal Numeric Fingerprint">UNF:6:ARQedAR4nBPrBXv+PUYIng==</notes>
-  </fileDscr>
-  <fileDscr ID="f4164589" URI="https://dataverse.harvard.edu/api/access/datafile/4164589">
-    <fileTxt>
-      <fileName>Fatigue_difference_terminal_initial_subjScore.tab</fileName>
-      <dimensns>
-        <caseQnty>133</caseQnty>
-        <varQnty>6</varQnty>
-      </dimensns>
-      <fileType>text/tab-separated-values</fileType>
-    </fileTxt>
-    <notes level="file" type="VDC:UNF" subject="Universal Numeric Fingerprint">UNF:6:Ia5W2TN6VIRg7mXzg5pb9g==</notes>
-  </fileDscr>
-  <fileDscr ID="f4164588" URI="https://dataverse.harvard.edu/api/access/datafile/4164588">
-    <fileTxt>
-      <fileName>PerceivedEffort_data.tab</fileName>
-      <dimensns>
-        <caseQnty>623</caseQnty>
-        <varQnty>24</varQnty>
-      </dimensns>
-      <fileType>text/tab-separated-values</fileType>
-    </fileTxt>
-    <notes level="file" type="VDC:UNF" subject="Universal Numeric Fingerprint">UNF:6:6KPC1UelMnEYqS0SWBcklA==</notes>
-  </fileDscr>
-  <fileDscr ID="f4164590" URI="https://dataverse.harvard.edu/api/access/datafile/4164590">
-    <fileTxt>
-      <fileName>PerceivedEffort_subjScore.tab</fileName>
-      <dimensns>
-        <caseQnty>704</caseQnty>
-        <varQnty>8</varQnty>
-      </dimensns>
-      <fileType>text/tab-separated-values</fileType>
-    </fileTxt>
-    <notes level="file" type="VDC:UNF" subject="Universal Numeric Fingerprint">UNF:6:8qXrN5PMcH3dx96fBY9fcw==</notes>
-  </fileDscr>
-  <dataDscr>
-    <var ID="v22939545" name="Subject" intrvl="discrete">
-      <location fileid="f4164587"/>
-      <labl level="variable">Subject</labl>
-      <varFormat type="character"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:OWZRAI6VhGVFAwNtZCcOdA==</notes>
-    </var>
-    <var ID="v22939549" name="Language" intrvl="discrete">
-      <location fileid="f4164587"/>
-      <labl level="variable">Language</labl>
-      <varFormat type="character"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:W8oGPcV64+asdr+rJEmXHQ==</notes>
-    </var>
-    <var ID="v22939537" name="Session" intrvl="discrete">
-      <location fileid="f4164587"/>
-      <labl level="variable">Session</labl>
-      <sumStat type="mean">1.3169398907103824</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="medn">1.0</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="stdev">0.4665602816003742</sumStat>
-      <sumStat type="vald">183.0</sumStat>
-      <sumStat type="min">1.0</sumStat>
-      <sumStat type="max">2.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:0EzAgSiVt6RNuPfFNb2Ggw==</notes>
-    </var>
-    <var ID="v22939541" name="ObjectiveTaskDifficulty" intrvl="discrete">
-      <location fileid="f4164587"/>
-      <labl level="variable">ObjectiveTaskDifficulty</labl>
-      <varFormat type="character"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:DRwaEVay9dpz/sQTsisx0Q==</notes>
-    </var>
-    <var ID="v22939538" name="Trial" intrvl="discrete">
-      <location fileid="f4164587"/>
-      <labl level="variable">Trial</labl>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="stdev">1.9606713825783675</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="medn">4.0</sumStat>
-      <sumStat type="vald">183.0</sumStat>
-      <sumStat type="max">7.0</sumStat>
-      <sumStat type="mean">2.710382513661202</sumStat>
-      <sumStat type="min">0.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:og9P/VCMmlSwly58TQpCsA==</notes>
-    </var>
-    <var ID="v22939540" name="TypingSpeed" intrvl="contin">
-      <location fileid="f4164587"/>
-      <labl level="variable">TypingSpeed</labl>
-      <sumStat type="min">3.743425108</sumStat>
-      <sumStat type="stdev">3.324253292033515</sumStat>
-      <sumStat type="vald">183.0</sumStat>
-      <sumStat type="medn">8.495308507</sumStat>
-      <sumStat type="mean">9.40159728790164</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="max">19.06720494</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:LnRBWV+wBrYuSzV66xP86Q==</notes>
-    </var>
-    <var ID="v22939542" name="CorrectedError" intrvl="contin">
-      <location fileid="f4164587"/>
-      <labl level="variable">CorrectedError</labl>
-      <sumStat type="stdev">0.11002403457101198</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="vald">183.0</sumStat>
-      <sumStat type="mean">0.04815829401092898</sumStat>
-      <sumStat type="medn">0.016393443</sumStat>
-      <sumStat type="min">0.0</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="max">0.85</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:adQ/7VMhGaQPLJ6Xt5SU5Q==</notes>
-    </var>
-    <var ID="v22939536" name="ReadTextEventsRatio" intrvl="contin">
-      <location fileid="f4164587"/>
-      <labl level="variable">ReadTextEventsRatio</labl>
-      <sumStat type="medn">0.032243831</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="max">0.209885777</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="mean">0.04409194481420765</sumStat>
-      <sumStat type="stdev">0.03983063898461143</sumStat>
-      <sumStat type="vald">183.0</sumStat>
-      <sumStat type="min">0.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:MKXZlXFklqPBt1zHuX25Cw==</notes>
-    </var>
-    <var ID="v22939535" name="AttendedButNotSelectedRate" intrvl="contin">
-      <location fileid="f4164587"/>
-      <labl level="variable">AttendedButNotSelectedRate</labl>
-      <sumStat type="stdev">0.5021662198181305</sumStat>
-      <sumStat type="max">3.75</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="mean">0.6082719546502733</sumStat>
-      <sumStat type="medn">0.527777778</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="min">0.0</sumStat>
-      <sumStat type="vald">183.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:veZoGuAfFHTXkaTW5W6lgQ==</notes>
-    </var>
-    <var ID="v22939533" name="UncorrectedErrorRate" intrvl="contin">
-      <location fileid="f4164587"/>
-      <labl level="variable">UncorrectedErrorRate</labl>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="min">0.0</sumStat>
-      <sumStat type="medn">0.091983122</sumStat>
-      <sumStat type="stdev">0.1968847025667955</sumStat>
-      <sumStat type="max">0.866601753</sumStat>
-      <sumStat type="vald">183.0</sumStat>
-      <sumStat type="mean">0.16413797557923498</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:6FLqAIBRs1qS8pK5VYOrew==</notes>
-    </var>
-    <var ID="v22939532" name="BaselinePupilDiameter" intrvl="contin">
-      <location fileid="f4164587"/>
-      <labl level="variable">BaselinePupilDiameter</labl>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="min">2.741023535</sumStat>
-      <sumStat type="stdev">0.7145495031896698</sumStat>
-      <sumStat type="vald">183.0</sumStat>
-      <sumStat type="medn">4.771097128</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="mean">4.667432569513661</sumStat>
-      <sumStat type="max">6.159838701</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:z0pDpJ9+sfixESmBW4GN1A==</notes>
-    </var>
-    <var ID="v22939551" name="BlinkFrequency" intrvl="contin">
-      <location fileid="f4164587"/>
-      <labl level="variable">BlinkFrequency</labl>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="stdev">5.090397929703375</sumStat>
-      <sumStat type="min">0.0</sumStat>
-      <sumStat type="vald">183.0</sumStat>
-      <sumStat type="max">26.29485098</sumStat>
-      <sumStat type="medn">4.502611346</sumStat>
-      <sumStat type="mean">5.778146111355191</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:IkEw57XbUmOwPV/3uRaxdw==</notes>
-    </var>
-    <var ID="v22939546" name="BlinkDuration" intrvl="contin">
-      <location fileid="f4164587"/>
-      <labl level="variable">BlinkDuration</labl>
-      <sumStat type="vald">183.0</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="medn">0.1143622</sumStat>
-      <sumStat type="min">0.0</sumStat>
-      <sumStat type="max">0.2831295</sumStat>
-      <sumStat type="mean">0.11275348861748634</sumStat>
-      <sumStat type="stdev">0.04963798677359441</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:fsJ7a+PeFWCOKm8VvItmgQ==</notes>
-    </var>
-    <var ID="v22939543" name="BlinkInterval" intrvl="contin">
-      <location fileid="f4164587"/>
-      <labl level="variable">BlinkInterval</labl>
-      <sumStat type="vald">183.0</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="stdev">7.061736754706636</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="medn">3.7141</sumStat>
-      <sumStat type="mean">5.212163642677596</sumStat>
-      <sumStat type="max">58.380231</sumStat>
-      <sumStat type="min">0.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:xoykW/qdqDDaNgAQDU2llg==</notes>
-    </var>
-    <var ID="v22939547" name="BlinkBurstRatio" intrvl="contin">
-      <location fileid="f4164587"/>
-      <labl level="variable">BlinkBurstRatio</labl>
-      <sumStat type="min">0.0</sumStat>
-      <sumStat type="max">8.764950327</sumStat>
-      <sumStat type="vald">183.0</sumStat>
-      <sumStat type="stdev">1.4047330154640523</sumStat>
-      <sumStat type="medn">0.365071675</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="mean">0.8978196722459018</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:F1CtsFi4RvG+eWTDsvGzBg==</notes>
-    </var>
-    <var ID="v22939544" name="SaccadeAmplitude" intrvl="contin">
-      <location fileid="f4164587"/>
-      <labl level="variable">SaccadeAmplitude</labl>
-      <sumStat type="mean">8.73294767779235</sumStat>
-      <sumStat type="stdev">1.5749240978009356</sumStat>
-      <sumStat type="max">14.57423163</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="vald">183.0</sumStat>
-      <sumStat type="min">4.161174476</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="medn">8.540226364</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:SjA4hdpU4XRI7h4BvAbXlA==</notes>
-    </var>
-    <var ID="v22939550" name="SaccadeDuration" intrvl="contin">
-      <location fileid="f4164587"/>
-      <labl level="variable">SaccadeDuration</labl>
-      <sumStat type="mean">82.02397843879781</sumStat>
-      <sumStat type="medn">79.18280769</sumStat>
-      <sumStat type="max">136.7437807</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="vald">183.0</sumStat>
-      <sumStat type="min">58.84660952</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="stdev">10.419062321776677</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:10k2A6jX3vUuidCjSa1Krw==</notes>
-    </var>
-    <var ID="v22939554" name="SaccadeVelocity" intrvl="contin">
-      <location fileid="f4164587"/>
-      <labl level="variable">SaccadeVelocity</labl>
-      <sumStat type="medn">98.69275765</sumStat>
-      <sumStat type="max">141.1218046</sumStat>
-      <sumStat type="stdev">15.912315030039355</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="mean">97.96175420284153</sumStat>
-      <sumStat type="vald">183.0</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="min">34.54276895</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:JQB6QFmHPnqSvawCz9mcTg==</notes>
-    </var>
-    <var ID="v22939534" name="SaccadePeakVelocity" intrvl="contin">
-      <location fileid="f4164587"/>
-      <labl level="variable">SaccadePeakVelocity</labl>
-      <sumStat type="mean">295.6354532797814</sumStat>
-      <sumStat type="max">415.4443327</sumStat>
-      <sumStat type="stdev">48.56838601973926</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="medn">293.0026399</sumStat>
-      <sumStat type="min">155.0075668</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="vald">183.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:73e2wn6DqmQs1vjmtPThfw==</notes>
-    </var>
-    <var ID="v22939548" name="EyeHeight" intrvl="contin">
-      <location fileid="f4164587"/>
-      <labl level="variable">EyeHeight</labl>
-      <sumStat type="max">4.846733074</sumStat>
-      <sumStat type="vald">183.0</sumStat>
-      <sumStat type="medn">-0.851190845</sumStat>
-      <sumStat type="min">-7.953123756</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="stdev">1.998255477015733</sumStat>
-      <sumStat type="mean">-0.9503854412185792</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:Vhn3DNw3dzGwV9npZppFZw==</notes>
-    </var>
-    <var ID="v22939539" name="Fatigue" intrvl="discrete">
-      <location fileid="f4164587"/>
-      <labl level="variable">Fatigue</labl>
-      <sumStat type="stdev">1.3404004148324897</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="min">1.0</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="vald">183.0</sumStat>
-      <sumStat type="max">6.0</sumStat>
-      <sumStat type="mean">3.005464480874317</sumStat>
-      <sumStat type="medn">3.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:iuTVvDCbxJWspsUjYBRsPQ==</notes>
-    </var>
-    <var ID="v22939555" name="ObjectiveTaskDifficulty_cat" intrvl="discrete">
-      <location fileid="f4164587"/>
-      <labl level="variable">ObjectiveTaskDifficulty_cat</labl>
-      <varFormat type="character"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:IYIH8ItsTIOL3WWbnJpVnA==</notes>
-    </var>
-    <var ID="v22939552" name="DayNr" intrvl="discrete">
-      <location fileid="f4164587"/>
-      <labl level="variable">DayNr</labl>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="vald">183.0</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="mean">2.918032786885246</sumStat>
-      <sumStat type="stdev">1.4292288164979476</sumStat>
-      <sumStat type="medn">3.0</sumStat>
-      <sumStat type="min">1.0</sumStat>
-      <sumStat type="max">5.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:BIWdkhA8NaoEDc2oFeqQhg==</notes>
-    </var>
-    <var ID="v22939553" name="lrPupilCorrelation" intrvl="contin">
-      <location fileid="f4164587"/>
-      <labl level="variable">lrPupilCorrelation</labl>
-      <sumStat type="min">0.768410701</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="vald">183.0</sumStat>
-      <sumStat type="medn">0.896310906</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="mean">0.8905170015300546</sumStat>
-      <sumStat type="max">0.987012535</sumStat>
-      <sumStat type="stdev">0.05649995137968394</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:gqf291WTrixiN5vudB2/eQ==</notes>
-    </var>
-    <var ID="v22939521" name="Subject" intrvl="discrete">
-      <location fileid="f4164586"/>
-      <labl level="variable">Subject</labl>
-      <varFormat type="character"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:H4AnA1PFUNF2hVwR3Ejqvg==</notes>
-    </var>
-    <var ID="v22939518" name="DayNr" intrvl="discrete">
-      <location fileid="f4164586"/>
-      <labl level="variable">DayNr</labl>
-      <sumStat type="medn">3.0</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="vald">137.0</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="min">1.0</sumStat>
-      <sumStat type="stdev">1.1056278997982851</sumStat>
-      <sumStat type="mean">2.5036496350364965</sumStat>
-      <sumStat type="max">4.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:JF3w7uzYzzYXpeJ/zhumsA==</notes>
-    </var>
-    <var ID="v22939519" name="Language" intrvl="discrete">
-      <location fileid="f4164586"/>
-      <labl level="variable">Language</labl>
-      <varFormat type="character"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:eGqCLH/6NOoCOvEYZQbwzA==</notes>
-    </var>
-    <var ID="v22939523" name="Session" intrvl="discrete">
-      <location fileid="f4164586"/>
-      <labl level="variable">Session</labl>
-      <sumStat type="min">1.0</sumStat>
-      <sumStat type="max">2.0</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="vald">137.0</sumStat>
-      <sumStat type="medn">2.0</sumStat>
-      <sumStat type="stdev">0.5017145356786985</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="mean">1.510948905109489</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:B6XNB22Hn4HVVKHciLQXKQ==</notes>
-    </var>
-    <var ID="v22939520" name="ObjectiveTaskDifficulty" intrvl="discrete">
-      <location fileid="f4164586"/>
-      <labl level="variable">ObjectiveTaskDifficulty</labl>
-      <varFormat type="character"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:xfrcMccoXmKSPJiLvk+vdw==</notes>
-    </var>
-    <var ID="v22939522" name="Fatigue_diff" intrvl="discrete">
-      <location fileid="f4164586"/>
-      <labl level="variable">Fatigue_diff</labl>
-      <sumStat type="medn">0.0</sumStat>
-      <sumStat type="stdev">1.4405717222950063</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="max">5.0</sumStat>
-      <sumStat type="mean">0.5109489051094892</sumStat>
-      <sumStat type="vald">137.0</sumStat>
-      <sumStat type="min">-4.0</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:BGEecO9Oid3VaN/deiaf4Q==</notes>
-    </var>
-    <var ID="v22939513" name="Subject" intrvl="discrete">
-      <location fileid="f4164589"/>
-      <labl level="variable">Subject</labl>
-      <varFormat type="character"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:fPSnJu2AxcziuAZiKnHvkA==</notes>
-    </var>
-    <var ID="v22939514" name="DayNr" intrvl="discrete">
-      <location fileid="f4164589"/>
-      <labl level="variable">DayNr</labl>
-      <sumStat type="vald">133.0</sumStat>
-      <sumStat type="stdev">1.0975957071232023</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="max">4.0</sumStat>
-      <sumStat type="min">1.0</sumStat>
-      <sumStat type="mean">2.5413533834586466</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="medn">3.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:aNOItviw7PhZ/3efsb/X3Q==</notes>
-    </var>
-    <var ID="v22939516" name="Language" intrvl="discrete">
-      <location fileid="f4164589"/>
-      <labl level="variable">Language</labl>
-      <varFormat type="character"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:pRl2F63unsucxaXG51KW4A==</notes>
-    </var>
-    <var ID="v22939515" name="Session" intrvl="discrete">
-      <location fileid="f4164589"/>
-      <labl level="variable">Session</labl>
-      <sumStat type="medn">1.0</sumStat>
-      <sumStat type="vald">133.0</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="min">1.0</sumStat>
-      <sumStat type="max">2.0</sumStat>
-      <sumStat type="mean">1.4962406015037595</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="stdev">0.5018761791997308</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:8k8vvB5xYuhTuua3go+z4A==</notes>
-    </var>
-    <var ID="v22939512" name="ObjectiveTaskDifficulty" intrvl="discrete">
-      <location fileid="f4164589"/>
-      <labl level="variable">ObjectiveTaskDifficulty</labl>
-      <varFormat type="character"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:zuW6/2njfemU6+mMTRN11A==</notes>
-    </var>
-    <var ID="v22939517" name="Fatigue_diff" intrvl="discrete">
-      <location fileid="f4164589"/>
-      <labl level="variable">Fatigue_diff</labl>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="mean">0.6691729323308269</sumStat>
-      <sumStat type="min">-2.0</sumStat>
-      <sumStat type="medn">0.0</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="stdev">1.3911070613836616</sumStat>
-      <sumStat type="vald">133.0</sumStat>
-      <sumStat type="max">5.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:n5dk84Q+WNMsPrBy9clKvQ==</notes>
-    </var>
-    <var ID="v22939579" name="Subject" intrvl="discrete">
-      <location fileid="f4164588"/>
-      <labl level="variable">Subject</labl>
-      <varFormat type="character"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:UG3wL0wV9gh540M5qyUvDA==</notes>
-    </var>
-    <var ID="v22939557" name="Language" intrvl="discrete">
-      <location fileid="f4164588"/>
-      <labl level="variable">Language</labl>
-      <varFormat type="character"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:xDqUDMRGXw8nB1hIP2zGOQ==</notes>
-    </var>
-    <var ID="v22939569" name="Session" intrvl="discrete">
-      <location fileid="f4164588"/>
-      <labl level="variable">Session</labl>
-      <sumStat type="min">1.0</sumStat>
-      <sumStat type="medn">1.0</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="mean">1.492776886035313</sumStat>
-      <sumStat type="stdev">0.5003495498200019</sumStat>
-      <sumStat type="max">2.0</sumStat>
-      <sumStat type="vald">623.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:xqwA5ie4/rY3hYmUzCn6MA==</notes>
-    </var>
-    <var ID="v22939576" name="SessionDifficulty" intrvl="discrete">
-      <location fileid="f4164588"/>
-      <labl level="variable">SessionDifficulty</labl>
-      <varFormat type="character"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:DVpHG9e6DRhI+qAqP+xHEw==</notes>
-    </var>
-    <var ID="v22939578" name="Trial" intrvl="discrete">
-      <location fileid="f4164588"/>
-      <labl level="variable">Trial</labl>
-      <sumStat type="min">0.0</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="stdev">1.415588765371824</sumStat>
-      <sumStat type="medn">2.0</sumStat>
-      <sumStat type="vald">623.0</sumStat>
-      <sumStat type="max">5.0</sumStat>
-      <sumStat type="mean">1.969502407704655</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:F2ljS7DvmGsyK/aAHcIALw==</notes>
-    </var>
-    <var ID="v22939568" name="PerceivedEffort" intrvl="discrete">
-      <location fileid="f4164588"/>
-      <labl level="variable">PerceivedEffort</labl>
-      <sumStat type="min">1.0</sumStat>
-      <sumStat type="stdev">1.7757049168054928</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="medn">4.0</sumStat>
-      <sumStat type="mean">3.706260032102727</sumStat>
-      <sumStat type="vald">623.0</sumStat>
-      <sumStat type="max">7.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:x0i9nZ0zbiFdl03DLjzpBQ==</notes>
-    </var>
-    <var ID="v22939575" name="TypingSpeed" intrvl="contin">
-      <location fileid="f4164588"/>
-      <labl level="variable">TypingSpeed</labl>
-      <sumStat type="vald">623.0</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="max">19.83998702</sumStat>
-      <sumStat type="stdev">3.35657577728011</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="medn">8.462882839</sumStat>
-      <sumStat type="mean">9.449478444642054</sumStat>
-      <sumStat type="min">3.353120638</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:W2FbMlrU+0lizIIAvNNvfQ==</notes>
-    </var>
-    <var ID="v22939556" name="CorrectedError" intrvl="contin">
-      <location fileid="f4164588"/>
-      <labl level="variable">CorrectedError</labl>
-      <sumStat type="stdev">0.11179673709055903</sumStat>
-      <sumStat type="max">0.85</sumStat>
-      <sumStat type="mean">0.052348541107544166</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="vald">623.0</sumStat>
-      <sumStat type="medn">0.020618557</sumStat>
-      <sumStat type="min">0.0</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:ho1F6PP4rsYkTnPJUVQ8aw==</notes>
-    </var>
-    <var ID="v22939574" name="ReadTextEventsRatio" intrvl="contin">
-      <location fileid="f4164588"/>
-      <labl level="variable">ReadTextEventsRatio</labl>
-      <sumStat type="vald">623.0</sumStat>
-      <sumStat type="min">0.0</sumStat>
-      <sumStat type="medn">0.033033278</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="stdev">0.041050385046217615</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="mean">0.04270941866613162</sumStat>
-      <sumStat type="max">0.413401432</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:MHzoaHzlSX8vO2dCN5qMZg==</notes>
-    </var>
-    <var ID="v22939577" name="AttendedButNotSelectedRate" intrvl="contin">
-      <location fileid="f4164588"/>
-      <labl level="variable">AttendedButNotSelectedRate</labl>
-      <sumStat type="min">0.0</sumStat>
-      <sumStat type="vald">623.0</sumStat>
-      <sumStat type="max">3.75</sumStat>
-      <sumStat type="medn">0.5</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="mean">0.594653813245586</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="stdev">0.4694757756296505</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:DPyzyLUy4mEl7eKMnZQVdA==</notes>
-    </var>
-    <var ID="v22939567" name="UncorrectedError" intrvl="contin">
-      <location fileid="f4164588"/>
-      <labl level="variable">UncorrectedError</labl>
-      <sumStat type="min">0.0</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="vald">623.0</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="mean">0.16450019769823437</sumStat>
-      <sumStat type="medn">0.090454545</sumStat>
-      <sumStat type="stdev">0.19664502095312253</sumStat>
-      <sumStat type="max">0.885517799</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:ETX5Ik3USvFYcSVWIr4OWw==</notes>
-    </var>
-    <var ID="v22939570" name="BaselinePupilDiameter" intrvl="contin">
-      <location fileid="f4164588"/>
-      <labl level="variable">BaselinePupilDiameter</labl>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="medn">4.74854531</sumStat>
-      <sumStat type="mean">4.616679053789727</sumStat>
-      <sumStat type="max">6.460803561</sumStat>
-      <sumStat type="stdev">0.7028012452159281</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="min">2.566472598</sumStat>
-      <sumStat type="vald">623.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:tnUd1oceucA8FCjWe9rePw==</notes>
-    </var>
-    <var ID="v22939572" name="BlinkFrequency" intrvl="contin">
-      <location fileid="f4164588"/>
-      <labl level="variable">BlinkFrequency</labl>
-      <sumStat type="min">0.0</sumStat>
-      <sumStat type="medn">4.527129844</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="mean">6.1283947478170155</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="max">31.94419274</sumStat>
-      <sumStat type="stdev">5.611008925229178</sumStat>
-      <sumStat type="vald">623.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:nouWfe8Waq+shhkbPWbZwg==</notes>
-    </var>
-    <var ID="v22939573" name="BlinkDuration" intrvl="contin">
-      <location fileid="f4164588"/>
-      <labl level="variable">BlinkDuration</labl>
-      <sumStat type="max">0.310888</sumStat>
-      <sumStat type="vald">623.0</sumStat>
-      <sumStat type="mean">0.1155641627271268</sumStat>
-      <sumStat type="min">0.0</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="stdev">0.05081068681706649</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="medn">0.119891143</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:FaBdg+wM89fsHcjBTX8DeQ==</notes>
-    </var>
-    <var ID="v22939566" name="BlinkInterval" intrvl="contin">
-      <location fileid="f4164588"/>
-      <labl level="variable">BlinkInterval</labl>
-      <sumStat type="max">125.775807</sumStat>
-      <sumStat type="mean">5.437330588889246</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="stdev">8.235429393840151</sumStat>
-      <sumStat type="medn">3.799806345</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="min">0.0</sumStat>
-      <sumStat type="vald">623.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:89X+uzjiu0JdQvaZKPk8jA==</notes>
-    </var>
-    <var ID="v22939560" name="BlinkBurstRatio" intrvl="contin">
-      <location fileid="f4164588"/>
-      <labl level="variable">BlinkBurstRatio</labl>
-      <sumStat type="min">0.0</sumStat>
-      <sumStat type="medn">0.46851778</sumStat>
-      <sumStat type="max">9.865118347</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="vald">623.0</sumStat>
-      <sumStat type="stdev">1.565434404163273</sumStat>
-      <sumStat type="mean">1.004468222886036</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:TkOMXh3LTVDMTfMqxE393A==</notes>
-    </var>
-    <var ID="v22939571" name="SaccadeAmplitude" intrvl="contin">
-      <location fileid="f4164588"/>
-      <labl level="variable">SaccadeAmplitude</labl>
-      <sumStat type="stdev">1.5914436912332726</sumStat>
-      <sumStat type="medn">9.063199781</sumStat>
-      <sumStat type="max">14.57423163</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="vald">623.0</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="mean">9.12894464771589</sumStat>
-      <sumStat type="min">4.75056932</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:zseR7D3PYfNewpt6ZXyvVg==</notes>
-    </var>
-    <var ID="v22939559" name="SaccadeDuration" intrvl="contin">
-      <location fileid="f4164588"/>
-      <labl level="variable">SaccadeDuration</labl>
-      <sumStat type="vald">623.0</sumStat>
-      <sumStat type="max">173.6437629</sumStat>
-      <sumStat type="medn">80.09115481</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="mean">82.93850861035313</sumStat>
-      <sumStat type="min">58.60069464</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="stdev">11.908969212914512</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:9bBTst67yd1i3Nj5NL2woA==</notes>
-    </var>
-    <var ID="v22939558" name="SaccadeVelocity" intrvl="contin">
-      <location fileid="f4164588"/>
-      <labl level="variable">SaccadeVelocity</labl>
-      <sumStat type="max">148.0956881</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="min">39.82260369</sumStat>
-      <sumStat type="mean">102.34232529295345</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="stdev">15.815830543935885</sumStat>
-      <sumStat type="medn">101.2006082</sumStat>
-      <sumStat type="vald">623.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:xUQPAd3lInyV1tPZKXar5A==</notes>
-    </var>
-    <var ID="v22939563" name="SaccadePeakVelocity" intrvl="contin">
-      <location fileid="f4164588"/>
-      <labl level="variable">SaccadePeakVelocity</labl>
-      <sumStat type="medn">303.8142925</sumStat>
-      <sumStat type="min">153.338225</sumStat>
-      <sumStat type="vald">623.0</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="mean">305.921971711557</sumStat>
-      <sumStat type="stdev">51.8106917676561</sumStat>
-      <sumStat type="max">462.7546506</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:G98Wug6rdwaex2AXUUx/0g==</notes>
-    </var>
-    <var ID="v22939564" name="EyeHeight" intrvl="contin">
-      <location fileid="f4164588"/>
-      <labl level="variable">EyeHeight</labl>
-      <sumStat type="mean">-1.020124291179775</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="max">5.286433665</sumStat>
-      <sumStat type="vald">623.0</sumStat>
-      <sumStat type="medn">-0.982756491</sumStat>
-      <sumStat type="min">-12.37411246</sumStat>
-      <sumStat type="stdev">2.141257528178946</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:6Pc8JMgAZUt5go8Z3axfvw==</notes>
-    </var>
-    <var ID="v22939561" name="DayNr" intrvl="discrete">
-      <location fileid="f4164588"/>
-      <labl level="variable">DayNr</labl>
-      <sumStat type="vald">623.0</sumStat>
-      <sumStat type="min">1.0</sumStat>
-      <sumStat type="max">5.0</sumStat>
-      <sumStat type="stdev">1.445637228217304</sumStat>
-      <sumStat type="medn">3.0</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="mean">2.9871589085072228</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:qBgRBxONOboJwkryZciOAg==</notes>
-    </var>
-    <var ID="v22939565" name="Trial_day" intrvl="discrete">
-      <location fileid="f4164588"/>
-      <labl level="variable">Trial_day</labl>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="vald">623.0</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="min">0.0</sumStat>
-      <sumStat type="medn">4.0</sumStat>
-      <sumStat type="max">9.0</sumStat>
-      <sumStat type="stdev">2.8866544999715287</sumStat>
-      <sumStat type="mean">4.43338683788122</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:YSwYmCqcdMRMGlkqy0G5sA==</notes>
-    </var>
-    <var ID="v22939562" name="lrPupilCorrelation" intrvl="contin">
-      <location fileid="f4164588"/>
-      <labl level="variable">lrPupilCorrelation</labl>
-      <sumStat type="mean">0.891102264388443</sumStat>
-      <sumStat type="max">0.987012535</sumStat>
-      <sumStat type="medn">0.894655903</sumStat>
-      <sumStat type="stdev">0.0550456656504299</sumStat>
-      <sumStat type="min">0.768410701</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="vald">623.0</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:+TwQ4RBKLQsNjcpP8n3QAg==</notes>
-    </var>
-    <var ID="v22939525" name="Subject" intrvl="discrete">
-      <location fileid="f4164590"/>
-      <labl level="variable">Subject</labl>
-      <varFormat type="character"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:4xR+HxKDwPs72pn71PC57g==</notes>
-    </var>
-    <var ID="v22939531" name="DayNr" intrvl="discrete">
-      <location fileid="f4164590"/>
-      <labl level="variable">DayNr</labl>
-      <sumStat type="medn">3.0</sumStat>
-      <sumStat type="max">5.0</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="min">1.0</sumStat>
-      <sumStat type="mean">2.943181818181817</sumStat>
-      <sumStat type="vald">704.0</sumStat>
-      <sumStat type="stdev">1.456689710068207</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:4X7pHc9AFAtxGVpi/I89XA==</notes>
-    </var>
-    <var ID="v22939530" name="Language" intrvl="discrete">
-      <location fileid="f4164590"/>
-      <labl level="variable">Language</labl>
-      <varFormat type="character"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:DZEdTmBt9UHSHrqFpzMgkw==</notes>
-    </var>
-    <var ID="v22939526" name="Session" intrvl="discrete">
-      <location fileid="f4164590"/>
-      <labl level="variable">Session</labl>
-      <sumStat type="stdev">0.5002827985973065</sumStat>
-      <sumStat type="medn">2.0</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="min">1.0</sumStat>
-      <sumStat type="vald">704.0</sumStat>
-      <sumStat type="mean">1.5085227272727273</sumStat>
-      <sumStat type="max">2.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:k7ueB26HcnznYySWHlA+ZQ==</notes>
-    </var>
-    <var ID="v22939528" name="ObjectiveTaskDifficulty" intrvl="discrete">
-      <location fileid="f4164590"/>
-      <labl level="variable">ObjectiveTaskDifficulty</labl>
-      <varFormat type="character"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:vSrO600xwyo7ZB551rtFWg==</notes>
-    </var>
-    <var ID="v22939524" name="Trial" intrvl="discrete">
-      <location fileid="f4164590"/>
-      <labl level="variable">Trial</labl>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="vald">704.0</sumStat>
-      <sumStat type="medn">2.0</sumStat>
-      <sumStat type="mean">1.9744318181818181</sumStat>
-      <sumStat type="max">5.0</sumStat>
-      <sumStat type="stdev">1.4149877343547872</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="min">0.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:BTZhMvXbkKn+rtMYALm7Bg==</notes>
-    </var>
-    <var ID="v22939527" name="PerceivedEffort" intrvl="discrete">
-      <location fileid="f4164590"/>
-      <labl level="variable">PerceivedEffort</labl>
-      <sumStat type="mean">3.8366477272727257</sumStat>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="vald">704.0</sumStat>
-      <sumStat type="min">1.0</sumStat>
-      <sumStat type="medn">4.0</sumStat>
-      <sumStat type="stdev">1.784321830138371</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="max">7.0</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:srdpRFVP8r7F4HvH4iVz1g==</notes>
-    </var>
-    <var ID="v22939529" name="Trial_day" intrvl="discrete">
-      <location fileid="f4164590"/>
-      <labl level="variable">Trial_day</labl>
-      <sumStat type="invd">0.0</sumStat>
-      <sumStat type="mean">4.517045454545455</sumStat>
-      <sumStat type="mode">.</sumStat>
-      <sumStat type="medn">5.0</sumStat>
-      <sumStat type="min">0.0</sumStat>
-      <sumStat type="max">9.0</sumStat>
-      <sumStat type="vald">704.0</sumStat>
-      <sumStat type="stdev">2.8866188203756944</sumStat>
-      <varFormat type="numeric"/>
-      <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">UNF:6:1tlhekf/Lau/B3BVCI8enw==</notes>
-    </var>
-  </dataDscr>
+<codeBook xmlns="ddi:codebook:2_5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="ddi:codebook:2_5 https://ddialliance.org/Specification/DDI-Codebook/2.5/XMLSchema/codebook.xsd"
+          version="2.5">
+    <docDscr>
+        <citation>
+            <titlStmt>
+                <titl>Replication Data for: Eye-typing experiment</titl>
+                <IDNo agency="DOI">doi:10.7910/DVN/PUXVDH</IDNo>
+            </titlStmt>
+            <distStmt>
+                <distrbtr source="archive">Harvard Dataverse</distrbtr>
+                <distDate>2020-11-04</distDate>
+            </distStmt>
+            <verStmt source="archive">
+                <version date="2020-11-04" type="RELEASED">1</version>
+            </verStmt>
+            <biblCit>Bafna, Tanya, 2020, "Replication Data for: Eye-typing experiment",
+                https://doi.org/10.7910/DVN/PUXVDH, Harvard Dataverse, V1, UNF:6:xxqeAyaf5PkxtclXqimbsQ== [fileUNF]
+            </biblCit>
+        </citation>
+    </docDscr>
+    <stdyDscr>
+        <citation>
+            <titlStmt>
+                <titl>Replication Data for: Eye-typing experiment</titl>
+                <IDNo agency="DOI">doi:10.7910/DVN/PUXVDH</IDNo>
+            </titlStmt>
+            <rspStmt>
+                <AuthEnty affiliation="Danmarks Tekniske Universitet">Bafna, Tanya</AuthEnty>
+            </rspStmt>
+            <prodStmt/>
+            <distStmt>
+                <distrbtr source="archive">Harvard Dataverse</distrbtr>
+                <contact affiliation="Danmarks Tekniske Universitet" email="taba@dtu.dk">Bafna, Tanya</contact>
+                <depositr>Bafna, Tanya</depositr>
+                <depDate>2020-11-04</depDate>
+            </distStmt>
+        </citation>
+        <stdyInfo>
+            <subject>
+                <keyword>Engineering</keyword>
+                <keyword>Medicine, Health and Life Sciences</keyword>
+                <keyword>eye-tracking, eye-typing, mental fatigue</keyword>
+            </subject>
+            <abstract date="2020-11-04">The data consists of performance and eye-tracking features obtained during an
+                eye-typing experiment conducted over 4 days, 2 sessions on each day, with 18 participants.
+            </abstract>
+            <sumDscr/>
+        </stdyInfo>
+        <method>
+            <dataColl>
+                <sources/>
+            </dataColl>
+            <anlyInfo/>
+        </method>
+        <dataAccs>
+            <notes type="DVN:TOU" level="dv">CC0 Waiver</notes>
+            <setAvail/>
+            <useStmt/>
+        </dataAccs>
+        <othrStdyMat/>
+    </stdyDscr>
+    <fileDscr ID="f4164587" URI="https://dataverse.harvard.edu/api/access/datafile/4164587">
+        <fileTxt>
+            <fileName>Fatigue_data.tab</fileName>
+            <dimensns>
+                <caseQnty>183</caseQnty>
+                <varQnty>24</varQnty>
+            </dimensns>
+            <fileType>text/tab-separated-values</fileType>
+        </fileTxt>
+        <notes level="file" type="VDC:UNF" subject="Universal Numeric Fingerprint">UNF:6:v78zc9GtP8U5uKqo8AtPqA==
+        </notes>
+    </fileDscr>
+    <fileDscr ID="f4164586" URI="https://dataverse.harvard.edu/api/access/datafile/4164586">
+        <fileTxt>
+            <fileName>Fatigue_difference_consecutive_subjScore.tab</fileName>
+            <dimensns>
+                <caseQnty>137</caseQnty>
+                <varQnty>6</varQnty>
+            </dimensns>
+            <fileType>text/tab-separated-values</fileType>
+        </fileTxt>
+        <notes level="file" type="VDC:UNF" subject="Universal Numeric Fingerprint">UNF:6:ARQedAR4nBPrBXv+PUYIng==
+        </notes>
+    </fileDscr>
+    <fileDscr ID="f4164589" URI="https://dataverse.harvard.edu/api/access/datafile/4164589">
+        <fileTxt>
+            <fileName>Fatigue_difference_terminal_initial_subjScore.tab</fileName>
+            <dimensns>
+                <caseQnty>133</caseQnty>
+                <varQnty>6</varQnty>
+            </dimensns>
+            <fileType>text/tab-separated-values</fileType>
+        </fileTxt>
+        <notes level="file" type="VDC:UNF" subject="Universal Numeric Fingerprint">UNF:6:Ia5W2TN6VIRg7mXzg5pb9g==
+        </notes>
+    </fileDscr>
+    <fileDscr ID="f4164588" URI="https://dataverse.harvard.edu/api/access/datafile/4164588">
+        <fileTxt>
+            <fileName>PerceivedEffort_data.tab</fileName>
+            <dimensns>
+                <caseQnty>623</caseQnty>
+                <varQnty>24</varQnty>
+            </dimensns>
+            <fileType>text/tab-separated-values</fileType>
+        </fileTxt>
+        <notes level="file" type="VDC:UNF" subject="Universal Numeric Fingerprint">UNF:6:6KPC1UelMnEYqS0SWBcklA==
+        </notes>
+    </fileDscr>
+    <fileDscr ID="f4164590" URI="https://dataverse.harvard.edu/api/access/datafile/4164590">
+        <fileTxt>
+            <fileName>PerceivedEffort_subjScore.tab</fileName>
+            <dimensns>
+                <caseQnty>704</caseQnty>
+                <varQnty>8</varQnty>
+            </dimensns>
+            <fileType>text/tab-separated-values</fileType>
+        </fileTxt>
+        <notes level="file" type="VDC:UNF" subject="Universal Numeric Fingerprint">UNF:6:8qXrN5PMcH3dx96fBY9fcw==
+        </notes>
+    </fileDscr>
+    <dataDscr>
+        <var ID="v22939545" name="Subject" intrvl="discrete">
+            <location fileid="f4164587"/>
+            <labl level="variable">Subject</labl>
+            <varFormat type="character"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:OWZRAI6VhGVFAwNtZCcOdA==
+            </notes>
+        </var>
+        <var ID="v22939549" name="Language" intrvl="discrete">
+            <location fileid="f4164587"/>
+            <labl level="variable">Language</labl>
+            <varFormat type="character"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:W8oGPcV64+asdr+rJEmXHQ==
+            </notes>
+        </var>
+        <var ID="v22939537" name="Session" intrvl="discrete">
+            <location fileid="f4164587"/>
+            <labl level="variable">Session</labl>
+            <sumStat type="mean">1.3169398907103824</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="medn">1.0</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="stdev">0.4665602816003742</sumStat>
+            <sumStat type="vald">183.0</sumStat>
+            <sumStat type="min">1.0</sumStat>
+            <sumStat type="max">2.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:0EzAgSiVt6RNuPfFNb2Ggw==
+            </notes>
+        </var>
+        <var ID="v22939541" name="ObjectiveTaskDifficulty" intrvl="discrete">
+            <location fileid="f4164587"/>
+            <labl level="variable">ObjectiveTaskDifficulty</labl>
+            <varFormat type="character"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:DRwaEVay9dpz/sQTsisx0Q==
+            </notes>
+        </var>
+        <var ID="v22939538" name="Trial" intrvl="discrete">
+            <location fileid="f4164587"/>
+            <labl level="variable">Trial</labl>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="stdev">1.9606713825783675</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="medn">4.0</sumStat>
+            <sumStat type="vald">183.0</sumStat>
+            <sumStat type="max">7.0</sumStat>
+            <sumStat type="mean">2.710382513661202</sumStat>
+            <sumStat type="min">0.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:og9P/VCMmlSwly58TQpCsA==
+            </notes>
+        </var>
+        <var ID="v22939540" name="TypingSpeed" intrvl="contin">
+            <location fileid="f4164587"/>
+            <labl level="variable">TypingSpeed</labl>
+            <sumStat type="min">3.743425108</sumStat>
+            <sumStat type="stdev">3.324253292033515</sumStat>
+            <sumStat type="vald">183.0</sumStat>
+            <sumStat type="medn">8.495308507</sumStat>
+            <sumStat type="mean">9.40159728790164</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="max">19.06720494</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:LnRBWV+wBrYuSzV66xP86Q==
+            </notes>
+        </var>
+        <var ID="v22939542" name="CorrectedError" intrvl="contin">
+            <location fileid="f4164587"/>
+            <labl level="variable">CorrectedError</labl>
+            <sumStat type="stdev">0.11002403457101198</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="vald">183.0</sumStat>
+            <sumStat type="mean">0.04815829401092898</sumStat>
+            <sumStat type="medn">0.016393443</sumStat>
+            <sumStat type="min">0.0</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="max">0.85</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:adQ/7VMhGaQPLJ6Xt5SU5Q==
+            </notes>
+        </var>
+        <var ID="v22939536" name="ReadTextEventsRatio" intrvl="contin">
+            <location fileid="f4164587"/>
+            <labl level="variable">ReadTextEventsRatio</labl>
+            <sumStat type="medn">0.032243831</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="max">0.209885777</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="mean">0.04409194481420765</sumStat>
+            <sumStat type="stdev">0.03983063898461143</sumStat>
+            <sumStat type="vald">183.0</sumStat>
+            <sumStat type="min">0.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:MKXZlXFklqPBt1zHuX25Cw==
+            </notes>
+        </var>
+        <var ID="v22939535" name="AttendedButNotSelectedRate" intrvl="contin">
+            <location fileid="f4164587"/>
+            <labl level="variable">AttendedButNotSelectedRate</labl>
+            <sumStat type="stdev">0.5021662198181305</sumStat>
+            <sumStat type="max">3.75</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="mean">0.6082719546502733</sumStat>
+            <sumStat type="medn">0.527777778</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="min">0.0</sumStat>
+            <sumStat type="vald">183.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:veZoGuAfFHTXkaTW5W6lgQ==
+            </notes>
+        </var>
+        <var ID="v22939533" name="UncorrectedErrorRate" intrvl="contin">
+            <location fileid="f4164587"/>
+            <labl level="variable">UncorrectedErrorRate</labl>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="min">0.0</sumStat>
+            <sumStat type="medn">0.091983122</sumStat>
+            <sumStat type="stdev">0.1968847025667955</sumStat>
+            <sumStat type="max">0.866601753</sumStat>
+            <sumStat type="vald">183.0</sumStat>
+            <sumStat type="mean">0.16413797557923498</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:6FLqAIBRs1qS8pK5VYOrew==
+            </notes>
+        </var>
+        <var ID="v22939532" name="BaselinePupilDiameter" intrvl="contin">
+            <location fileid="f4164587"/>
+            <labl level="variable">BaselinePupilDiameter</labl>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="min">2.741023535</sumStat>
+            <sumStat type="stdev">0.7145495031896698</sumStat>
+            <sumStat type="vald">183.0</sumStat>
+            <sumStat type="medn">4.771097128</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="mean">4.667432569513661</sumStat>
+            <sumStat type="max">6.159838701</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:z0pDpJ9+sfixESmBW4GN1A==
+            </notes>
+        </var>
+        <var ID="v22939551" name="BlinkFrequency" intrvl="contin">
+            <location fileid="f4164587"/>
+            <labl level="variable">BlinkFrequency</labl>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="stdev">5.090397929703375</sumStat>
+            <sumStat type="min">0.0</sumStat>
+            <sumStat type="vald">183.0</sumStat>
+            <sumStat type="max">26.29485098</sumStat>
+            <sumStat type="medn">4.502611346</sumStat>
+            <sumStat type="mean">5.778146111355191</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:IkEw57XbUmOwPV/3uRaxdw==
+            </notes>
+        </var>
+        <var ID="v22939546" name="BlinkDuration" intrvl="contin">
+            <location fileid="f4164587"/>
+            <labl level="variable">BlinkDuration</labl>
+            <sumStat type="vald">183.0</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="medn">0.1143622</sumStat>
+            <sumStat type="min">0.0</sumStat>
+            <sumStat type="max">0.2831295</sumStat>
+            <sumStat type="mean">0.11275348861748634</sumStat>
+            <sumStat type="stdev">0.04963798677359441</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:fsJ7a+PeFWCOKm8VvItmgQ==
+            </notes>
+        </var>
+        <var ID="v22939543" name="BlinkInterval" intrvl="contin">
+            <location fileid="f4164587"/>
+            <labl level="variable">BlinkInterval</labl>
+            <sumStat type="vald">183.0</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="stdev">7.061736754706636</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="medn">3.7141</sumStat>
+            <sumStat type="mean">5.212163642677596</sumStat>
+            <sumStat type="max">58.380231</sumStat>
+            <sumStat type="min">0.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:xoykW/qdqDDaNgAQDU2llg==
+            </notes>
+        </var>
+        <var ID="v22939547" name="BlinkBurstRatio" intrvl="contin">
+            <location fileid="f4164587"/>
+            <labl level="variable">BlinkBurstRatio</labl>
+            <sumStat type="min">0.0</sumStat>
+            <sumStat type="max">8.764950327</sumStat>
+            <sumStat type="vald">183.0</sumStat>
+            <sumStat type="stdev">1.4047330154640523</sumStat>
+            <sumStat type="medn">0.365071675</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="mean">0.8978196722459018</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:F1CtsFi4RvG+eWTDsvGzBg==
+            </notes>
+        </var>
+        <var ID="v22939544" name="SaccadeAmplitude" intrvl="contin">
+            <location fileid="f4164587"/>
+            <labl level="variable">SaccadeAmplitude</labl>
+            <sumStat type="mean">8.73294767779235</sumStat>
+            <sumStat type="stdev">1.5749240978009356</sumStat>
+            <sumStat type="max">14.57423163</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="vald">183.0</sumStat>
+            <sumStat type="min">4.161174476</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="medn">8.540226364</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:SjA4hdpU4XRI7h4BvAbXlA==
+            </notes>
+        </var>
+        <var ID="v22939550" name="SaccadeDuration" intrvl="contin">
+            <location fileid="f4164587"/>
+            <labl level="variable">SaccadeDuration</labl>
+            <sumStat type="mean">82.02397843879781</sumStat>
+            <sumStat type="medn">79.18280769</sumStat>
+            <sumStat type="max">136.7437807</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="vald">183.0</sumStat>
+            <sumStat type="min">58.84660952</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="stdev">10.419062321776677</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:10k2A6jX3vUuidCjSa1Krw==
+            </notes>
+        </var>
+        <var ID="v22939554" name="SaccadeVelocity" intrvl="contin">
+            <location fileid="f4164587"/>
+            <labl level="variable">SaccadeVelocity</labl>
+            <sumStat type="medn">98.69275765</sumStat>
+            <sumStat type="max">141.1218046</sumStat>
+            <sumStat type="stdev">15.912315030039355</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="mean">97.96175420284153</sumStat>
+            <sumStat type="vald">183.0</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="min">34.54276895</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:JQB6QFmHPnqSvawCz9mcTg==
+            </notes>
+        </var>
+        <var ID="v22939534" name="SaccadePeakVelocity" intrvl="contin">
+            <location fileid="f4164587"/>
+            <labl level="variable">SaccadePeakVelocity</labl>
+            <sumStat type="mean">295.6354532797814</sumStat>
+            <sumStat type="max">415.4443327</sumStat>
+            <sumStat type="stdev">48.56838601973926</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="medn">293.0026399</sumStat>
+            <sumStat type="min">155.0075668</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="vald">183.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:73e2wn6DqmQs1vjmtPThfw==
+            </notes>
+        </var>
+        <var ID="v22939548" name="EyeHeight" intrvl="contin">
+            <location fileid="f4164587"/>
+            <labl level="variable">EyeHeight</labl>
+            <sumStat type="max">4.846733074</sumStat>
+            <sumStat type="vald">183.0</sumStat>
+            <sumStat type="medn">-0.851190845</sumStat>
+            <sumStat type="min">-7.953123756</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="stdev">1.998255477015733</sumStat>
+            <sumStat type="mean">-0.9503854412185792</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:Vhn3DNw3dzGwV9npZppFZw==
+            </notes>
+        </var>
+        <var ID="v22939539" name="Fatigue" intrvl="discrete">
+            <location fileid="f4164587"/>
+            <labl level="variable">Fatigue</labl>
+            <sumStat type="stdev">1.3404004148324897</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="min">1.0</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="vald">183.0</sumStat>
+            <sumStat type="max">6.0</sumStat>
+            <sumStat type="mean">3.005464480874317</sumStat>
+            <sumStat type="medn">3.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:iuTVvDCbxJWspsUjYBRsPQ==
+            </notes>
+        </var>
+        <var ID="v22939555" name="ObjectiveTaskDifficulty_cat" intrvl="discrete">
+            <location fileid="f4164587"/>
+            <labl level="variable">ObjectiveTaskDifficulty_cat</labl>
+            <varFormat type="character"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:IYIH8ItsTIOL3WWbnJpVnA==
+            </notes>
+        </var>
+        <var ID="v22939552" name="DayNr" intrvl="discrete">
+            <location fileid="f4164587"/>
+            <labl level="variable">DayNr</labl>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="vald">183.0</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="mean">2.918032786885246</sumStat>
+            <sumStat type="stdev">1.4292288164979476</sumStat>
+            <sumStat type="medn">3.0</sumStat>
+            <sumStat type="min">1.0</sumStat>
+            <sumStat type="max">5.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:BIWdkhA8NaoEDc2oFeqQhg==
+            </notes>
+        </var>
+        <var ID="v22939553" name="lrPupilCorrelation" intrvl="contin">
+            <location fileid="f4164587"/>
+            <labl level="variable">lrPupilCorrelation</labl>
+            <sumStat type="min">0.768410701</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="vald">183.0</sumStat>
+            <sumStat type="medn">0.896310906</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="mean">0.8905170015300546</sumStat>
+            <sumStat type="max">0.987012535</sumStat>
+            <sumStat type="stdev">0.05649995137968394</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:gqf291WTrixiN5vudB2/eQ==
+            </notes>
+        </var>
+        <var ID="v22939521" name="Subject" intrvl="discrete">
+            <location fileid="f4164586"/>
+            <labl level="variable">Subject</labl>
+            <varFormat type="character"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:H4AnA1PFUNF2hVwR3Ejqvg==
+            </notes>
+        </var>
+        <var ID="v22939518" name="DayNr" intrvl="discrete">
+            <location fileid="f4164586"/>
+            <labl level="variable">DayNr</labl>
+            <sumStat type="medn">3.0</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="vald">137.0</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="min">1.0</sumStat>
+            <sumStat type="stdev">1.1056278997982851</sumStat>
+            <sumStat type="mean">2.5036496350364965</sumStat>
+            <sumStat type="max">4.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:JF3w7uzYzzYXpeJ/zhumsA==
+            </notes>
+        </var>
+        <var ID="v22939519" name="Language" intrvl="discrete">
+            <location fileid="f4164586"/>
+            <labl level="variable">Language</labl>
+            <varFormat type="character"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:eGqCLH/6NOoCOvEYZQbwzA==
+            </notes>
+        </var>
+        <var ID="v22939523" name="Session" intrvl="discrete">
+            <location fileid="f4164586"/>
+            <labl level="variable">Session</labl>
+            <sumStat type="min">1.0</sumStat>
+            <sumStat type="max">2.0</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="vald">137.0</sumStat>
+            <sumStat type="medn">2.0</sumStat>
+            <sumStat type="stdev">0.5017145356786985</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="mean">1.510948905109489</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:B6XNB22Hn4HVVKHciLQXKQ==
+            </notes>
+        </var>
+        <var ID="v22939520" name="ObjectiveTaskDifficulty" intrvl="discrete">
+            <location fileid="f4164586"/>
+            <labl level="variable">ObjectiveTaskDifficulty</labl>
+            <varFormat type="character"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:xfrcMccoXmKSPJiLvk+vdw==
+            </notes>
+        </var>
+        <var ID="v22939522" name="Fatigue_diff" intrvl="discrete">
+            <location fileid="f4164586"/>
+            <labl level="variable">Fatigue_diff</labl>
+            <sumStat type="medn">0.0</sumStat>
+            <sumStat type="stdev">1.4405717222950063</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="max">5.0</sumStat>
+            <sumStat type="mean">0.5109489051094892</sumStat>
+            <sumStat type="vald">137.0</sumStat>
+            <sumStat type="min">-4.0</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:BGEecO9Oid3VaN/deiaf4Q==
+            </notes>
+        </var>
+        <var ID="v22939513" name="Subject" intrvl="discrete">
+            <location fileid="f4164589"/>
+            <labl level="variable">Subject</labl>
+            <varFormat type="character"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:fPSnJu2AxcziuAZiKnHvkA==
+            </notes>
+        </var>
+        <var ID="v22939514" name="DayNr" intrvl="discrete">
+            <location fileid="f4164589"/>
+            <labl level="variable">DayNr</labl>
+            <sumStat type="vald">133.0</sumStat>
+            <sumStat type="stdev">1.0975957071232023</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="max">4.0</sumStat>
+            <sumStat type="min">1.0</sumStat>
+            <sumStat type="mean">2.5413533834586466</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="medn">3.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:aNOItviw7PhZ/3efsb/X3Q==
+            </notes>
+        </var>
+        <var ID="v22939516" name="Language" intrvl="discrete">
+            <location fileid="f4164589"/>
+            <labl level="variable">Language</labl>
+            <varFormat type="character"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:pRl2F63unsucxaXG51KW4A==
+            </notes>
+        </var>
+        <var ID="v22939515" name="Session" intrvl="discrete">
+            <location fileid="f4164589"/>
+            <labl level="variable">Session</labl>
+            <sumStat type="medn">1.0</sumStat>
+            <sumStat type="vald">133.0</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="min">1.0</sumStat>
+            <sumStat type="max">2.0</sumStat>
+            <sumStat type="mean">1.4962406015037595</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="stdev">0.5018761791997308</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:8k8vvB5xYuhTuua3go+z4A==
+            </notes>
+        </var>
+        <var ID="v22939512" name="ObjectiveTaskDifficulty" intrvl="discrete">
+            <location fileid="f4164589"/>
+            <labl level="variable">ObjectiveTaskDifficulty</labl>
+            <varFormat type="character"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:zuW6/2njfemU6+mMTRN11A==
+            </notes>
+        </var>
+        <var ID="v22939517" name="Fatigue_diff" intrvl="discrete">
+            <location fileid="f4164589"/>
+            <labl level="variable">Fatigue_diff</labl>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="mean">0.6691729323308269</sumStat>
+            <sumStat type="min">-2.0</sumStat>
+            <sumStat type="medn">0.0</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="stdev">1.3911070613836616</sumStat>
+            <sumStat type="vald">133.0</sumStat>
+            <sumStat type="max">5.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:n5dk84Q+WNMsPrBy9clKvQ==
+            </notes>
+        </var>
+        <var ID="v22939579" name="Subject" intrvl="discrete">
+            <location fileid="f4164588"/>
+            <labl level="variable">Subject</labl>
+            <varFormat type="character"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:UG3wL0wV9gh540M5qyUvDA==
+            </notes>
+        </var>
+        <var ID="v22939557" name="Language" intrvl="discrete">
+            <location fileid="f4164588"/>
+            <labl level="variable">Language</labl>
+            <varFormat type="character"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:xDqUDMRGXw8nB1hIP2zGOQ==
+            </notes>
+        </var>
+        <var ID="v22939569" name="Session" intrvl="discrete">
+            <location fileid="f4164588"/>
+            <labl level="variable">Session</labl>
+            <sumStat type="min">1.0</sumStat>
+            <sumStat type="medn">1.0</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="mean">1.492776886035313</sumStat>
+            <sumStat type="stdev">0.5003495498200019</sumStat>
+            <sumStat type="max">2.0</sumStat>
+            <sumStat type="vald">623.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:xqwA5ie4/rY3hYmUzCn6MA==
+            </notes>
+        </var>
+        <var ID="v22939576" name="SessionDifficulty" intrvl="discrete">
+            <location fileid="f4164588"/>
+            <labl level="variable">SessionDifficulty</labl>
+            <varFormat type="character"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:DVpHG9e6DRhI+qAqP+xHEw==
+            </notes>
+        </var>
+        <var ID="v22939578" name="Trial" intrvl="discrete">
+            <location fileid="f4164588"/>
+            <labl level="variable">Trial</labl>
+            <sumStat type="min">0.0</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="stdev">1.415588765371824</sumStat>
+            <sumStat type="medn">2.0</sumStat>
+            <sumStat type="vald">623.0</sumStat>
+            <sumStat type="max">5.0</sumStat>
+            <sumStat type="mean">1.969502407704655</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:F2ljS7DvmGsyK/aAHcIALw==
+            </notes>
+        </var>
+        <var ID="v22939568" name="PerceivedEffort" intrvl="discrete">
+            <location fileid="f4164588"/>
+            <labl level="variable">PerceivedEffort</labl>
+            <sumStat type="min">1.0</sumStat>
+            <sumStat type="stdev">1.7757049168054928</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="medn">4.0</sumStat>
+            <sumStat type="mean">3.706260032102727</sumStat>
+            <sumStat type="vald">623.0</sumStat>
+            <sumStat type="max">7.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:x0i9nZ0zbiFdl03DLjzpBQ==
+            </notes>
+        </var>
+        <var ID="v22939575" name="TypingSpeed" intrvl="contin">
+            <location fileid="f4164588"/>
+            <labl level="variable">TypingSpeed</labl>
+            <sumStat type="vald">623.0</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="max">19.83998702</sumStat>
+            <sumStat type="stdev">3.35657577728011</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="medn">8.462882839</sumStat>
+            <sumStat type="mean">9.449478444642054</sumStat>
+            <sumStat type="min">3.353120638</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:W2FbMlrU+0lizIIAvNNvfQ==
+            </notes>
+        </var>
+        <var ID="v22939556" name="CorrectedError" intrvl="contin">
+            <location fileid="f4164588"/>
+            <labl level="variable">CorrectedError</labl>
+            <sumStat type="stdev">0.11179673709055903</sumStat>
+            <sumStat type="max">0.85</sumStat>
+            <sumStat type="mean">0.052348541107544166</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="vald">623.0</sumStat>
+            <sumStat type="medn">0.020618557</sumStat>
+            <sumStat type="min">0.0</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:ho1F6PP4rsYkTnPJUVQ8aw==
+            </notes>
+        </var>
+        <var ID="v22939574" name="ReadTextEventsRatio" intrvl="contin">
+            <location fileid="f4164588"/>
+            <labl level="variable">ReadTextEventsRatio</labl>
+            <sumStat type="vald">623.0</sumStat>
+            <sumStat type="min">0.0</sumStat>
+            <sumStat type="medn">0.033033278</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="stdev">0.041050385046217615</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="mean">0.04270941866613162</sumStat>
+            <sumStat type="max">0.413401432</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:MHzoaHzlSX8vO2dCN5qMZg==
+            </notes>
+        </var>
+        <var ID="v22939577" name="AttendedButNotSelectedRate" intrvl="contin">
+            <location fileid="f4164588"/>
+            <labl level="variable">AttendedButNotSelectedRate</labl>
+            <sumStat type="min">0.0</sumStat>
+            <sumStat type="vald">623.0</sumStat>
+            <sumStat type="max">3.75</sumStat>
+            <sumStat type="medn">0.5</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="mean">0.594653813245586</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="stdev">0.4694757756296505</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:DPyzyLUy4mEl7eKMnZQVdA==
+            </notes>
+        </var>
+        <var ID="v22939567" name="UncorrectedError" intrvl="contin">
+            <location fileid="f4164588"/>
+            <labl level="variable">UncorrectedError</labl>
+            <sumStat type="min">0.0</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="vald">623.0</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="mean">0.16450019769823437</sumStat>
+            <sumStat type="medn">0.090454545</sumStat>
+            <sumStat type="stdev">0.19664502095312253</sumStat>
+            <sumStat type="max">0.885517799</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:ETX5Ik3USvFYcSVWIr4OWw==
+            </notes>
+        </var>
+        <var ID="v22939570" name="BaselinePupilDiameter" intrvl="contin">
+            <location fileid="f4164588"/>
+            <labl level="variable">BaselinePupilDiameter</labl>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="medn">4.74854531</sumStat>
+            <sumStat type="mean">4.616679053789727</sumStat>
+            <sumStat type="max">6.460803561</sumStat>
+            <sumStat type="stdev">0.7028012452159281</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="min">2.566472598</sumStat>
+            <sumStat type="vald">623.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:tnUd1oceucA8FCjWe9rePw==
+            </notes>
+        </var>
+        <var ID="v22939572" name="BlinkFrequency" intrvl="contin">
+            <location fileid="f4164588"/>
+            <labl level="variable">BlinkFrequency</labl>
+            <sumStat type="min">0.0</sumStat>
+            <sumStat type="medn">4.527129844</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="mean">6.1283947478170155</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="max">31.94419274</sumStat>
+            <sumStat type="stdev">5.611008925229178</sumStat>
+            <sumStat type="vald">623.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:nouWfe8Waq+shhkbPWbZwg==
+            </notes>
+        </var>
+        <var ID="v22939573" name="BlinkDuration" intrvl="contin">
+            <location fileid="f4164588"/>
+            <labl level="variable">BlinkDuration</labl>
+            <sumStat type="max">0.310888</sumStat>
+            <sumStat type="vald">623.0</sumStat>
+            <sumStat type="mean">0.1155641627271268</sumStat>
+            <sumStat type="min">0.0</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="stdev">0.05081068681706649</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="medn">0.119891143</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:FaBdg+wM89fsHcjBTX8DeQ==
+            </notes>
+        </var>
+        <var ID="v22939566" name="BlinkInterval" intrvl="contin">
+            <location fileid="f4164588"/>
+            <labl level="variable">BlinkInterval</labl>
+            <sumStat type="max">125.775807</sumStat>
+            <sumStat type="mean">5.437330588889246</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="stdev">8.235429393840151</sumStat>
+            <sumStat type="medn">3.799806345</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="min">0.0</sumStat>
+            <sumStat type="vald">623.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:89X+uzjiu0JdQvaZKPk8jA==
+            </notes>
+        </var>
+        <var ID="v22939560" name="BlinkBurstRatio" intrvl="contin">
+            <location fileid="f4164588"/>
+            <labl level="variable">BlinkBurstRatio</labl>
+            <sumStat type="min">0.0</sumStat>
+            <sumStat type="medn">0.46851778</sumStat>
+            <sumStat type="max">9.865118347</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="vald">623.0</sumStat>
+            <sumStat type="stdev">1.565434404163273</sumStat>
+            <sumStat type="mean">1.004468222886036</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:TkOMXh3LTVDMTfMqxE393A==
+            </notes>
+        </var>
+        <var ID="v22939571" name="SaccadeAmplitude" intrvl="contin">
+            <location fileid="f4164588"/>
+            <labl level="variable">SaccadeAmplitude</labl>
+            <sumStat type="stdev">1.5914436912332726</sumStat>
+            <sumStat type="medn">9.063199781</sumStat>
+            <sumStat type="max">14.57423163</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="vald">623.0</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="mean">9.12894464771589</sumStat>
+            <sumStat type="min">4.75056932</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:zseR7D3PYfNewpt6ZXyvVg==
+            </notes>
+        </var>
+        <var ID="v22939559" name="SaccadeDuration" intrvl="contin">
+            <location fileid="f4164588"/>
+            <labl level="variable">SaccadeDuration</labl>
+            <sumStat type="vald">623.0</sumStat>
+            <sumStat type="max">173.6437629</sumStat>
+            <sumStat type="medn">80.09115481</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="mean">82.93850861035313</sumStat>
+            <sumStat type="min">58.60069464</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="stdev">11.908969212914512</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:9bBTst67yd1i3Nj5NL2woA==
+            </notes>
+        </var>
+        <var ID="v22939558" name="SaccadeVelocity" intrvl="contin">
+            <location fileid="f4164588"/>
+            <labl level="variable">SaccadeVelocity</labl>
+            <sumStat type="max">148.0956881</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="min">39.82260369</sumStat>
+            <sumStat type="mean">102.34232529295345</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="stdev">15.815830543935885</sumStat>
+            <sumStat type="medn">101.2006082</sumStat>
+            <sumStat type="vald">623.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:xUQPAd3lInyV1tPZKXar5A==
+            </notes>
+        </var>
+        <var ID="v22939563" name="SaccadePeakVelocity" intrvl="contin">
+            <location fileid="f4164588"/>
+            <labl level="variable">SaccadePeakVelocity</labl>
+            <sumStat type="medn">303.8142925</sumStat>
+            <sumStat type="min">153.338225</sumStat>
+            <sumStat type="vald">623.0</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="mean">305.921971711557</sumStat>
+            <sumStat type="stdev">51.8106917676561</sumStat>
+            <sumStat type="max">462.7546506</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:G98Wug6rdwaex2AXUUx/0g==
+            </notes>
+        </var>
+        <var ID="v22939564" name="EyeHeight" intrvl="contin">
+            <location fileid="f4164588"/>
+            <labl level="variable">EyeHeight</labl>
+            <sumStat type="mean">-1.020124291179775</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="max">5.286433665</sumStat>
+            <sumStat type="vald">623.0</sumStat>
+            <sumStat type="medn">-0.982756491</sumStat>
+            <sumStat type="min">-12.37411246</sumStat>
+            <sumStat type="stdev">2.141257528178946</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:6Pc8JMgAZUt5go8Z3axfvw==
+            </notes>
+        </var>
+        <var ID="v22939561" name="DayNr" intrvl="discrete">
+            <location fileid="f4164588"/>
+            <labl level="variable">DayNr</labl>
+            <sumStat type="vald">623.0</sumStat>
+            <sumStat type="min">1.0</sumStat>
+            <sumStat type="max">5.0</sumStat>
+            <sumStat type="stdev">1.445637228217304</sumStat>
+            <sumStat type="medn">3.0</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="mean">2.9871589085072228</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:qBgRBxONOboJwkryZciOAg==
+            </notes>
+        </var>
+        <var ID="v22939565" name="Trial_day" intrvl="discrete">
+            <location fileid="f4164588"/>
+            <labl level="variable">Trial_day</labl>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="vald">623.0</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="min">0.0</sumStat>
+            <sumStat type="medn">4.0</sumStat>
+            <sumStat type="max">9.0</sumStat>
+            <sumStat type="stdev">2.8866544999715287</sumStat>
+            <sumStat type="mean">4.43338683788122</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:YSwYmCqcdMRMGlkqy0G5sA==
+            </notes>
+        </var>
+        <var ID="v22939562" name="lrPupilCorrelation" intrvl="contin">
+            <location fileid="f4164588"/>
+            <labl level="variable">lrPupilCorrelation</labl>
+            <sumStat type="mean">0.891102264388443</sumStat>
+            <sumStat type="max">0.987012535</sumStat>
+            <sumStat type="medn">0.894655903</sumStat>
+            <sumStat type="stdev">0.0550456656504299</sumStat>
+            <sumStat type="min">0.768410701</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="vald">623.0</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:+TwQ4RBKLQsNjcpP8n3QAg==
+            </notes>
+        </var>
+        <var ID="v22939525" name="Subject" intrvl="discrete">
+            <location fileid="f4164590"/>
+            <labl level="variable">Subject</labl>
+            <varFormat type="character"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:4xR+HxKDwPs72pn71PC57g==
+            </notes>
+        </var>
+        <var ID="v22939531" name="DayNr" intrvl="discrete">
+            <location fileid="f4164590"/>
+            <labl level="variable">DayNr</labl>
+            <sumStat type="medn">3.0</sumStat>
+            <sumStat type="max">5.0</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="min">1.0</sumStat>
+            <sumStat type="mean">2.943181818181817</sumStat>
+            <sumStat type="vald">704.0</sumStat>
+            <sumStat type="stdev">1.456689710068207</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:4X7pHc9AFAtxGVpi/I89XA==
+            </notes>
+        </var>
+        <var ID="v22939530" name="Language" intrvl="discrete">
+            <location fileid="f4164590"/>
+            <labl level="variable">Language</labl>
+            <varFormat type="character"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:DZEdTmBt9UHSHrqFpzMgkw==
+            </notes>
+        </var>
+        <var ID="v22939526" name="Session" intrvl="discrete">
+            <location fileid="f4164590"/>
+            <labl level="variable">Session</labl>
+            <sumStat type="stdev">0.5002827985973065</sumStat>
+            <sumStat type="medn">2.0</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="min">1.0</sumStat>
+            <sumStat type="vald">704.0</sumStat>
+            <sumStat type="mean">1.5085227272727273</sumStat>
+            <sumStat type="max">2.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:k7ueB26HcnznYySWHlA+ZQ==
+            </notes>
+        </var>
+        <var ID="v22939528" name="ObjectiveTaskDifficulty" intrvl="discrete">
+            <location fileid="f4164590"/>
+            <labl level="variable">ObjectiveTaskDifficulty</labl>
+            <varFormat type="character"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:vSrO600xwyo7ZB551rtFWg==
+            </notes>
+        </var>
+        <var ID="v22939524" name="Trial" intrvl="discrete">
+            <location fileid="f4164590"/>
+            <labl level="variable">Trial</labl>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="vald">704.0</sumStat>
+            <sumStat type="medn">2.0</sumStat>
+            <sumStat type="mean">1.9744318181818181</sumStat>
+            <sumStat type="max">5.0</sumStat>
+            <sumStat type="stdev">1.4149877343547872</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="min">0.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:BTZhMvXbkKn+rtMYALm7Bg==
+            </notes>
+        </var>
+        <var ID="v22939527" name="PerceivedEffort" intrvl="discrete">
+            <location fileid="f4164590"/>
+            <labl level="variable">PerceivedEffort</labl>
+            <sumStat type="mean">3.8366477272727257</sumStat>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="vald">704.0</sumStat>
+            <sumStat type="min">1.0</sumStat>
+            <sumStat type="medn">4.0</sumStat>
+            <sumStat type="stdev">1.784321830138371</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="max">7.0</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:srdpRFVP8r7F4HvH4iVz1g==
+            </notes>
+        </var>
+        <var ID="v22939529" name="Trial_day" intrvl="discrete">
+            <location fileid="f4164590"/>
+            <labl level="variable">Trial_day</labl>
+            <sumStat type="invd">0.0</sumStat>
+            <sumStat type="mean">4.517045454545455</sumStat>
+            <sumStat type="mode">.</sumStat>
+            <sumStat type="medn">5.0</sumStat>
+            <sumStat type="min">0.0</sumStat>
+            <sumStat type="max">9.0</sumStat>
+            <sumStat type="vald">704.0</sumStat>
+            <sumStat type="stdev">2.8866188203756944</sumStat>
+            <varFormat type="numeric"/>
+            <notes subject="Universal Numeric Fingerprint" level="variable" type="Dataverse:UNF">
+                UNF:6:1tlhekf/Lau/B3BVCI8enw==
+            </notes>
+        </var>
+    </dataDscr>
 </codeBook>

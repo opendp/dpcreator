@@ -12,9 +12,8 @@ from opendp_apps.dataset.serializers import \
     (DataSetInfoPolymorphicSerializer,
      DepositorSetupInfoSerializer,
      UploadFileInfoCreationSerializer)
-from opendp_project.views import BaseModelViewSet
 from opendp_apps.utils.view_helper import get_json_error
-
+from opendp_project.views import BaseModelViewSet
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -95,6 +94,7 @@ class UploadFileSetupViewSet(BaseModelViewSet):
     """Used only for creating an initial UploadFile"""
     serializer_class = UploadFileInfoCreationSerializer
     permission_classes = [IsOwnerOrBlocked]
+
     # http_method_names = ['post']    # 'patch']
 
     def get_queryset(self):

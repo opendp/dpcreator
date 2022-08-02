@@ -13,40 +13,35 @@
 """
 import copy
 import logging
-import pkg_resources
 
+import pkg_resources
 from django.conf import settings
-from django.core.files.base import ContentFile
 from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
-from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
-from opendp_apps.analysis.tools.dp_variance_spec import DPVarianceSpec
 from opendp_apps.analysis.release_email_util import ReleaseEmailUtil
-from opendp_apps.analysis.tools.stat_spec import StatSpec
-from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
+from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
-from opendp_apps.analysis.tools.dp_histogram_integer_spec import DPHistogramIntegerSpec
 from opendp_apps.analysis.tools.dp_histogram_categorical_spec import DPHistogramCategoricalSpec
+from opendp_apps.analysis.tools.dp_histogram_integer_spec import DPHistogramIntegerSpec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
+from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
 from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
-
+from opendp_apps.analysis.tools.dp_variance_spec import DPVarianceSpec
+from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
-
 from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
-
-from opendp_apps.user.models import OpenDPUser
+from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler import static_vals as pstatic
-
+from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
+from opendp_apps.user.models import OpenDPUser
 from opendp_apps.utils.extra_validators import \
     (validate_epsilon_not_null,
      validate_not_negative)
-from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
-from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
-
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -61,25 +56,25 @@ class ValidateReleaseUtil(BasicErrCheck):
             - ValidateReleaseUtil.validate_mode(...)  # e.g. run validations only
             - ValidateReleaseUtil.compute_mode(...)     # run the commputation chain
         """
-        self.opendp_user = opendp_user     # to be retrieved
+        self.opendp_user = opendp_user  # to be retrieved
 
         self.analysis_plan_id = analysis_plan_id
-        self.analysis_plan = None       # to be retrieved
+        self.analysis_plan = None  # to be retrieved
 
         self.dp_statistics = dp_statistics  # User defined
         self.compute_mode = compute_mode
 
         self.run_dataverse_deposit = kwargs.get('run_dataverse_deposit', False)
 
-        self.max_epsilon = None         # from analysis_plan.dataset.get_depositor_setup_info()
-        self.max_delta = None           # from analysis_plan.dataset.get_depositor_setup_info()
-        self.dataset_size = None        # from analysis_plan.dataset
+        self.max_epsilon = None  # from analysis_plan.dataset.get_depositor_setup_info()
+        self.max_delta = None  # from analysis_plan.dataset.get_depositor_setup_info()
+        self.dataset_size = None  # from analysis_plan.dataset
 
-        self.stat_spec_list = []        # list of StatSpec objects
-        self.validation_info = []       # list of StatValidInfo objects to send to UI
+        self.stat_spec_list = []  # list of StatSpec objects
+        self.validation_info = []  # list of StatValidInfo objects to send to UI
 
-        self.release_stats = []         # compute mode: potential stat for a ReleaseInfo
-        self.release_info = None        # compute_mode: potential full ReleaseInfo object
+        self.release_stats = []  # compute mode: potential stat for a ReleaseInfo
+        self.release_info = None  # compute_mode: potential full ReleaseInfo object
 
         self.opendp_version = pkg_resources.get_distribution('opendp').version
 
@@ -409,7 +404,7 @@ class ValidateReleaseUtil(BasicErrCheck):
         stat_num = 0
 
         for dp_stat in self.dp_statistics:
-            stat_num += 1       # not used yet...
+            stat_num += 1  # not used yet...
             """
             We're putting together lots of properties to pass to
             statistic specific classes such as DPMeanSpec.
@@ -432,8 +427,8 @@ class ValidateReleaseUtil(BasicErrCheck):
             # -------------------------------------
             # (1) Begin building the property dict
             # -------------------------------------
-            props = dp_stat         # start with what is in dp_stat--the UI input
-            props['dataset_size'] = self.dataset_size   # add dataset size
+            props = dp_stat  # start with what is in dp_stat--the UI input
+            props['dataset_size'] = self.dataset_size  # add dataset size
 
             #  Some high-level error checks, before making the StatSpec
             variable = props.get('variable')

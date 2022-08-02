@@ -1,6 +1,6 @@
+import uuid
 from http import HTTPStatus
 from os.path import abspath, dirname, join
-import uuid
 
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -14,7 +14,6 @@ TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
 
 class TestFileUpload(BaseEndpointTest):
-
     fixtures = ['test_dataset_data_001.json', ]
     maxDiff = None
 
@@ -40,7 +39,7 @@ class TestFileUpload(BaseEndpointTest):
                        creator=self.user_obj.object_id,
                        source_file=self.test_file_obj)
 
-        upload_url = '/api/direct-upload/' # reverse("direct-upload-create")
+        upload_url = '/api/direct-upload/'  # reverse("direct-upload-create")
 
         resp = self.client.post(upload_url,
                                 data=payload)

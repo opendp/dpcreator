@@ -2,18 +2,17 @@ import json
 import logging
 from datetime import datetime
 
-from django.shortcuts import render
+from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.http import JsonResponse
+from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
 
 from opendp_apps.async_messages import static_vals as async_static
+from opendp_apps.async_messages.tasks import profile_dataset_info, send_test_msg
 from opendp_apps.async_messages.utils import get_websocket_id
 from opendp_apps.async_messages.websocket_message import WebsocketMessage
-from opendp_apps.async_messages.tasks import profile_dataset_info, send_test_msg
 from opendp_apps.dataset.models import DataSetInfo
-
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -33,17 +32,12 @@ def view_profile_test(request):
 
 
 @csrf_exempt
-# @user_passes_test(lambda u: u.is_superuser)
 def ajax_profile_by_dataset_object_id(request):
     """Profile DataSetInfo based on ajax input from 'view_profile_test'
     In a POST, send 'dataset_object_id'
     """
     json_data = json.loads(request.body)
     logger.info(f'ajax_profile_by_dataset_object_id: json_data = {json_data}')
-
-    # if not request.user.is_superuser:
-    #     return JsonResponse(dict(success=False, message='nope'),
-    #                        status=status.HTTP_403_FORBIDDEN)
 
     websocket_id = get_websocket_id(request)
     logger.info(f'ajax_profile_by_dataset_object_id: websocket_id = {websocket_id}')
@@ -60,8 +54,9 @@ def ajax_profile_by_dataset_object_id(request):
             f'({datetime.now()}) Looking good, ready for the next step')
 
     ws_msg.send_message(websocket_id)
-    #send_test_msg.delay(websocket_id)
-    logger.info("ajax_profile_by_dataset_object_id: json_data['dataset_object_id'] = %s", json_data['dataset_object_id'])
+    # send_test_msg.delay(websocket_id)
+    logger.info("ajax_profile_by_dataset_object_id: json_data['dataset_object_id'] = %s",
+                json_data['dataset_object_id'])
     profile_dataset_info.delay(json_data['dataset_object_id'], websocket_id=websocket_id)
 
     return JsonResponse(dict(success=True, message='should be sending a websocket message...'))
@@ -69,13 +64,11 @@ def ajax_profile_by_dataset_object_id(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def index(request):
-
-    info = dict(ws_name=f'{request.user.object_id}')
     return render(request, 'async_messages/index.html')
+
 
 @user_passes_test(lambda u: u.is_superuser)
 def view_room(request):
-
     room_name = 'download-profile'
     info = dict(room_name=f'{room_name}',
                 ws_name=f'{request.user.object_id}')
@@ -88,9 +81,7 @@ def view_push_test(request):
     websocket_id = request.user.object_id
     info = dict(websocket_id=websocket_id)
 
-
     send_test_msg.delay(websocket_id)
-    #send_test_msg(websocket_id)
 
     ws_msg = WebsocketMessage.get_success_message( \
         'TYPE_OF_MESSAGE',
@@ -100,20 +91,3 @@ def view_push_test(request):
     ws_msg.send_message(websocket_id)
 
     return render(request, 'async_messages/push.html', info)
-
-"""
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-
-def send_ws_message(websocket_id, text_data='hello'):
-    channel_layer = get_channel_layer()
-
-    group_name = ChatConsumer.get_group_name(websocket_id)
-    print('group_name', group_name)
-    async_to_sync(channel_layer.group_send)( \
-        group_name,
-        {
-            'type': mstatic.MESSAGE_TYPE,
-            'message': text_data
-        })
-"""

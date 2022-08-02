@@ -9,6 +9,7 @@ class RedisClient(object):
     that handles instance parameters
     (host, etc.) automatically
     """
+
     def __init__(self):
         self.r = redis.Redis(
             host=os.environ.get('REDIS_HOST'),

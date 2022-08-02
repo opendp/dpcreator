@@ -1,8 +1,9 @@
-from django.conf import settings
 import csv
+
 import pandas as pd
 
 from opendp_apps.profiler import static_vals as pstatic
+
 
 class DelimiterNotFoundException(Exception):
     """
@@ -11,11 +12,13 @@ class DelimiterNotFoundException(Exception):
     """
     pass
 
+
 class ColumnLimitInvalid(Exception):
     """
     The column limit may be None or an integer > 0
     """
     pass
+
 
 class CsvReader:
 
@@ -36,7 +39,6 @@ class CsvReader:
                 raise ColumnLimitInvalid(f'{pstatic.ERR_MSG_COLUMN_LIMIT} Found: "{self.column_limit}"')
             if self.column_limit < 1:
                 raise ColumnLimitInvalid(f'{pstatic.ERR_MSG_COLUMN_LIMIT} Found: "{self.column_limit}"')
-
 
     def read(self):
         """

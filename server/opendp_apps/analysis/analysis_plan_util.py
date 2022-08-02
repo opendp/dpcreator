@@ -1,19 +1,18 @@
 from django.contrib.auth import get_user_model
 from rest_framework import status
 
-from opendp_apps.dataset.models import DataSetInfo
-from opendp_apps.analysis.models import AnalysisPlan
 from opendp_apps.analysis import static_vals as astatic
-
-from opendp_apps.utils.randname import get_rand_alphanumeric
+from opendp_apps.analysis.models import AnalysisPlan
+from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.model_helpers.basic_response import BasicResponse, ok_resp, err_resp
+from opendp_apps.utils.randname import get_rand_alphanumeric
 
 
 class AnalysisPlanUtil:
     """Functions used by API endpoints"""
 
     @staticmethod
-    def retrieve_analysis(analysis_object_id: str,  opendp_user: get_user_model()) -> BasicResponse:
+    def retrieve_analysis(analysis_object_id: str, opendp_user: get_user_model()) -> BasicResponse:
         """
         Retrieve an existing AnalysisPlan object by its object_id and analyst
         """
@@ -29,13 +28,12 @@ class AnalysisPlanUtil:
         # -------------------------------
         try:
             plan = AnalysisPlan.objects.get(object_id=analysis_object_id,
-                                              analyst=opendp_user)
+                                            analyst=opendp_user)
         except AnalysisPlan.DoesNotExist:
             return err_resp(astatic.ERR_MSG_NO_ANALYSIS_PLAN,
                             data=status.HTTP_400_BAD_REQUEST)
 
         return ok_resp(plan, message='Plan created!')
-
 
     @staticmethod
     def create_plan(dataset_object_id: str, opendp_user: get_user_model()) -> BasicResponse:
@@ -64,7 +62,6 @@ class AnalysisPlanUtil:
             return err_resp(astatic.ERR_MSG_NO_DATASET,
                             data=status.HTTP_400_BAD_REQUEST)
 
-
         # ------------------------------------
         # Is the DepositorSetupInfo complete?
         # ------------------------------------
@@ -73,17 +70,16 @@ class AnalysisPlanUtil:
             return err_resp(astatic.ERR_MSG_SETUP_INCOMPLETE,
                             data=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-
         # ------------------------------------
         # Create the plan!
         # ------------------------------------
-        plan = AnalysisPlan(\
-                analyst=opendp_user,
-                name=f'Plan {get_rand_alphanumeric(7)}',  # need a better name here!
-                dataset=ds_info,
-                is_complete=False,
-                variable_info=ds_info.depositor_setup_info.variable_info,
-                user_step=AnalysisPlan.AnalystSteps.STEP_0700_VARIABLES_CONFIRMED)
+        plan = AnalysisPlan(
+            analyst=opendp_user,
+            name=f'Plan {get_rand_alphanumeric(7)}',  # need a better name here!
+            dataset=ds_info,
+            is_complete=False,
+            variable_info=ds_info.depositor_setup_info.variable_info,
+            user_step=AnalysisPlan.AnalystSteps.STEP_0700_VARIABLES_CONFIRMED)
 
         plan.save()
 

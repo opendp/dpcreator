@@ -5,6 +5,7 @@ Convenience class for holding statistic validation information
 
 class StatValidInfo:
     """Class to hold the result of a single stat validation"""
+
     def __init__(self, variable, statistic, valid, message, value=None, accuracy_val=None, accuracy_msg=None):
         """
         :param variable str
@@ -21,7 +22,6 @@ class StatValidInfo:
         self.value = value
         self.accuracy_val = accuracy_val
         self.accuracy_msg = accuracy_msg
-
 
     def as_dict(self):
         """Return as a dict"""
@@ -45,7 +45,6 @@ class StatValidInfo:
 
         return info
 
-
     @staticmethod
     def get_error_msg_dict(variable, statistic, message=None):
         """
@@ -54,7 +53,6 @@ class StatValidInfo:
         :param message  (optional)
         """
         return StatValidInfo(variable, statistic, False, message).as_dict()
-
 
     @staticmethod
     def get_success_msg_dict(variable, statistic, message=None,
@@ -70,7 +68,6 @@ class StatValidInfo:
         return StatValidInfo(variable, statistic, True, message, value=None,
                              accuracy_val=accuracy_val, accuracy_msg=accuracy_msg).as_dict()
 
-
     @staticmethod
     def get_success_msg_dict_with_val(variable, statistic, message=None, value=None,
                                       accuracy_val=None, accuracy_msg=None):
@@ -80,22 +77,3 @@ class StatValidInfo:
         return StatValidInfo(variable, statistic, True, message,
                              value=value, accuracy_val=accuracy_val,
                              accuracy_msg=accuracy_msg).as_dict()
-
-"""
-from opendp_apps.analysis.stat_valid_info import StatValidInfo
-
-info = StatValidInfo.get_error_msg(3, 'mean', 'Max is less than Min')
-print(info)
-
-{'column_index': 3, 'statistic': 'mean', 'valid': False, 'message': 'Max is less than Min'}
-
-user_msg = ("When the {dist} scale is {scale}, the DP estimate differs from the true value "
-             "by no more than {accuracy} at a level-alpha of {alpha}, "
-             "or with (1 - {alpha})100% = {perc}% confidence.")
-          
-StatValidInfo.get_success_msg(4, 'histogram', user_msg, accuracy=0.7)
-StatValidInfo.get_success_msg_dict(4, 'histogram', user_msg, accuracy=0.7)
-
-print(info)
-
-"""

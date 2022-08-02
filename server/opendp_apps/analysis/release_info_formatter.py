@@ -2,9 +2,9 @@
 Given a ValidateReleaseUtil object that has computed stat,
 build the release dict!
 """
+import json
 from collections import OrderedDict
 from datetime import datetime as dt
-import json
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import render_to_string
@@ -21,8 +21,8 @@ class ReleaseInfoFormatter(BasicErrCheck):
     def __init__(self, release_util):
         """Init with a ValidateReleaseUtil object"""
         self.release_util = release_util
-        self.analysis_plan = None   # from release_util.analysis_plan
-        self.dataset = None         # from release_util.analysis_plan.dataset
+        self.analysis_plan = None  # from release_util.analysis_plan
+        self.dataset = None  # from release_util.analysis_plan.dataset
 
         self.release_dict = {}
         self.check_it()
@@ -99,7 +99,6 @@ class ReleaseInfoFormatter(BasicErrCheck):
             user_msg = f'Failed to convert the Release information into JSON. ({err_obj})'
             self.add_err_msg(user_msg)
 
-
     @staticmethod
     def get_json_filename(release_info_obj: ReleaseInfo) -> str:
         """
@@ -119,13 +118,14 @@ class ReleaseInfoFormatter(BasicErrCheck):
         return f'release-{release_info_obj.object_id}.pdf'
 
     @staticmethod
-    def create_release_description_html(release_info_obj: ReleaseInfo=None) -> str:
+    def create_release_description_html(release_info_obj: ReleaseInfo = None) -> str:
         """
         Create an HTML description using a ReleaseInfo object
         """
         html_desc = render_to_string('analysis/release_description.html',
-                                     {'dp_statistics': release_info_obj.dp_statistics}) #release_info_obj})
+                                     {'dp_statistics': release_info_obj.dp_statistics})  # release_info_obj})
         return html_desc
+
 
 """
 python manage.py shell

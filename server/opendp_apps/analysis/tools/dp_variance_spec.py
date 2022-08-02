@@ -5,6 +5,7 @@ Wrapper class for DP Variance functionality
 """
 from opendp.accuracy import laplacian_scale_to_accuracy
 from opendp.meas import make_base_laplace
+from opendp.mod import OpenDPException
 from opendp.mod import binary_search, enable_features
 from opendp.trans import \
     (make_bounded_resize,
@@ -14,12 +15,11 @@ from opendp.trans import \
      make_select_column,
      make_split_dataframe,
      make_sized_bounded_variance)
-from opendp.mod import OpenDPException
+
+from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.analysis.tools.stat_spec import StatSpec
 
 enable_features("floating-point", "contrib")
-
-from opendp_apps.analysis.tools.stat_spec import StatSpec
-from opendp_apps.analysis import static_vals as astatic
 
 
 class DPVarianceSpec(StatSpec):
@@ -200,12 +200,5 @@ class DPVarianceSpec(StatSpec):
             else:
                 self.add_err_msg(f'{ex_obj} (Exception)')
             return False
-
-        #print((f"Epsilon: {self.epsilon}"
-        #       f"\nColumn name: {self.variable}"
-        #       f"\nColumn index: {self.col_index}"
-        #       f"\nColumn accuracy_val: {self.accuracy_val}"
-        #       f"\nColumn accuracy_message: {self.accuracy_message}"
-        #       f"\n\nDP Mean: {self.value}" ))
 
         return True

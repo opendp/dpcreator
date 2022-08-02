@@ -525,8 +525,25 @@
             "name": "Subject",
             "type": "Categorical",
             "label": "",
-            "categories": ["\"ac\"", "\"kj\"", "\"ys\"", "\"bh1\"", "\"bh2\"", "\"jm\"", "\"mh\"", "\"cw\"",
-              "\"jp\"", "\"rh\"", "\"aq\"", "\"ph\"", "\"le\"", "\"mn\"", "\"ls2\"", "\"no\"", "\"af\""]
+            "categories": [
+              "\"ac\"",
+              "\"kj\"",
+              "\"ys\"",
+              "\"bh1\"",
+              "\"bh2\"",
+              "\"jm\"",
+              "\"mh\"",
+              "\"cw\"",
+              "\"jp\"",
+              "\"rh\"",
+              "\"aq\"",
+              "\"ph\"",
+              "\"le\"",
+              "\"mn\"",
+              "\"ls2\"",
+              "\"no\"",
+              "\"af\""
+            ]
           },
           "Language": {
             "name": "Language",
@@ -1001,8 +1018,25 @@
           "name": "Subject",
           "type": "Categorical",
           "label": "",
-          "categories": ["\"ac\"", "\"kj\"", "\"ys\"", "\"bh1\"", "\"bh2\"", "\"jm\"", "\"mh\"", "\"cw\"",
-            "\"jp\"", "\"rh\"", "\"aq\"", "\"ph\"", "\"le\"", "\"mn\"", "\"ls2\"", "\"no\"", "\"af\""]
+          "categories": [
+            "\"ac\"",
+            "\"kj\"",
+            "\"ys\"",
+            "\"bh1\"",
+            "\"bh2\"",
+            "\"jm\"",
+            "\"mh\"",
+            "\"cw\"",
+            "\"jp\"",
+            "\"rh\"",
+            "\"aq\"",
+            "\"ph\"",
+            "\"le\"",
+            "\"mn\"",
+            "\"ls2\"",
+            "\"no\"",
+            "\"af\""
+          ]
         },
         "language": {
           "name": "Language",

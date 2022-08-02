@@ -1,38 +1,32 @@
-from os.path import abspath, dirname, join
 import json
 import uuid
+from os.path import abspath, dirname, join
 
-#from unittest import skip
-from django.test import TestCase
 from django.contrib.auth import get_user_model
-
+from django.test import TestCase
 from rest_framework.test import APIClient
 
+from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.models import AnalysisPlan
-from opendp_apps.dataset.models import DataSetInfo
-from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.dataset import static_vals as dstatic
-from opendp_apps.model_helpers.msg_util import msg, msgt
-
+from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.model_helpers.msg_util import msgt
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(CURRENT_DIR), 'test_files')
 
 
 class AnalysisPlanTest(TestCase):
-
-    fixtures = ['test_analysis_001.json',]
+    fixtures = ['test_analysis_001.json', ]
 
     def setUp(self):
-
         # test client
         self.client = APIClient()
 
         self.user_obj, _created = get_user_model().objects.get_or_create(username='dev_admin')
 
         self.client.force_login(self.user_obj)
-
 
     def test_10_create_plan(self):
         """(10) Create AnalysisPlan directly"""
@@ -67,7 +61,6 @@ class AnalysisPlanTest(TestCase):
 
         dataset_info = DataSetInfo.objects.get(id=4)
 
-
         payload = json.dumps({"object_id": str(dataset_info.object_id)})
         response = self.client.post('/api/analyze/',
                                     payload,
@@ -90,7 +83,6 @@ class AnalysisPlanTest(TestCase):
                          dataset_info.depositor_setup_info.variable_info)
         self.assertEqual(the_plan['dp_statistics'], None)
 
-
         # -----------------------------------------
         # Retrieve the new Analysis Plan via API
         # -----------------------------------------
@@ -99,7 +91,7 @@ class AnalysisPlanTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         the_plan2 = response.json()
-        #self.assertEqual(jresp.get('success'), True)
+        # self.assertEqual(jresp.get('success'), True)
         self.assertEqual(the_plan2['object_id'], plan_object_id)
         self.assertEqual(the_plan2['name'], plan_name)
 
@@ -149,7 +141,6 @@ class AnalysisPlanTest(TestCase):
 
         self.assertEqual(dataset_info.depositor_setup_info.variable_info, None)
 
-
         plan_util = AnalysisPlanUtil.create_plan(dataset_info.object_id,
                                                  self.user_obj)
 
@@ -161,7 +152,7 @@ class AnalysisPlanTest(TestCase):
         """(60) Fail using bad dataset id (not a UUID) via the API"""
         msgt(self.test_60_bad_dataset_id_via_api.__doc__)
 
-        payload = json.dumps({"object_id": 'mickey mouse'})#str(dataset_info.object_id)})
+        payload = json.dumps({"object_id": 'mickey mouse'})  # str(dataset_info.object_id)})
         response = self.client.post('/api/analyze/',
                                     payload,
                                     content_type='application/json')
@@ -170,7 +161,6 @@ class AnalysisPlanTest(TestCase):
         jresp = response.json()
         self.assertEqual(jresp['success'], False)
         self.assertTrue(jresp['message'].find('Must be a valid UUID') > -1)
-
 
     def test_70_invalid_dataset_id_via_api(self):
         """(70) Fail using invalid dataset ID (but it is a valid UUID)"""
@@ -188,9 +178,8 @@ class AnalysisPlanTest(TestCase):
         self.assertEqual(response.status_code, 400)
         jresp = response.json()
         self.assertEqual(jresp['success'], False)
-        self.assertTrue(jresp['message'].find(\
-                        dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND) > -1)
-
+        self.assertTrue(jresp['message'].find( \
+            dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND) > -1)
 
     def test_80_update_plan(self):
         """(80) Update AnalysisPlan"""
@@ -210,14 +199,13 @@ class AnalysisPlanTest(TestCase):
         plan_object_id = plan_util.data.object_id
         payload = json.dumps(dict(dp_statistics=dict(hi='there')))
         response = self.client.patch(f'/api/analyze/{plan_object_id}/',
-                                    payload,
-                                    content_type='application/json')
+                                     payload,
+                                     content_type='application/json')
 
         self.assertEqual(response.status_code, 200)
         jresp = response.json()
 
         self.assertEqual(jresp['dp_statistics'], dict(hi='there'))
-
 
     def test_90_update_plan_fail_bad_id(self):
         """(90) Update AnalysisPlan, fail w/ bad id"""
@@ -227,8 +215,8 @@ class AnalysisPlanTest(TestCase):
 
         payload = json.dumps(dict(dp_statistics=dict(hi='there')))
         response = self.client.patch(f'/api/analyze/{nonsense_dataset_id}/',
-                                    payload,
-                                    content_type='application/json')
+                                     payload,
+                                     content_type='application/json')
 
         self.assertEqual(response.status_code, 404)
 
@@ -251,11 +239,10 @@ class AnalysisPlanTest(TestCase):
 
         payload = json.dumps(dict(name='haha'))
         response = self.client.patch(f'/api/analyze/{plan_object_id}/',
-                                    payload,
-                                    content_type='application/json')
+                                     payload,
+                                     content_type='application/json')
 
         self.assertEqual(response.status_code, 400)
 
         jresp = response.json()
         self.assertTrue(jresp['message'].find(astatic.ERR_MSG_FIELDS_NOT_UPDATEABLE) > -1)
-

@@ -2,18 +2,17 @@
 Read and Profile a File.
 """
 import os
+
 from django.db.models.fields.files import FieldFile
 
 from opendp_apps.analysis.models import DepositorSetupInfo
-from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.dataset import static_vals as dstatic
-
+from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
-
-from opendp_apps.profiler.dataset_info_updater import DataSetInfoUpdater
-from opendp_apps.profiler.csv_reader import CsvReader
-from opendp_apps.profiler.variable_info import VariableInfoHandler
 from opendp_apps.profiler import static_vals as pstatic
+from opendp_apps.profiler.csv_reader import CsvReader
+from opendp_apps.profiler.dataset_info_updater import DataSetInfoUpdater
+from opendp_apps.profiler.variable_info import VariableInfoHandler
 
 
 class ProfileRunner(BasicErrCheck):
@@ -69,15 +68,13 @@ class ProfileRunner(BasicErrCheck):
         """Update the status on the DepositorSetupInfo object.
         Only available if the dataset_info_object is populated"""
         if not self.dataset_info:
-            return False
+            return
 
         # Update the step
         self.dataset_info.depositor_setup_info.set_user_step(new_step)
 
         # save it
         self.dataset_info.depositor_setup_info.save()
-
-        return True
 
     def run_basic_checks(self):
         """
@@ -160,8 +157,7 @@ class ProfileRunner(BasicErrCheck):
 
         # Pre-profile: update user_step
         if self.dataset_info:
-            if self.dataset_info.depositor_setup_info.user_step < \
-                    DepositorSetupInfo.DepositorSteps.STEP_0300_PROFILING_PROCESSING:
+            if self.dataset_info.depositor_setup_info.user_step < DepositorSetupInfo.DepositorSteps.STEP_0300_PROFILING_PROCESSING:
                 self.set_depositor_info_status(DepositorSetupInfo.DepositorSteps.STEP_0300_PROFILING_PROCESSING)
 
         try:
@@ -183,6 +179,37 @@ class ProfileRunner(BasicErrCheck):
         # Profiling success: update DataSetInfo profile and user_step
         if self.dataset_info:
             self.dataset_info_updater.save_data_profile(variable_info_handler.data_profile)
-            if self.dataset_info.depositor_setup_info.user_step < \
-                    DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE:
+            if self.dataset_info.depositor_setup_info.user_step < DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE:
                 self.set_depositor_info_status(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
+
+    def xrun_profile(self, df, dataset_info_object_id):
+        """
+        Process dataframe for variable profiling, while updating the DatasetInfo object at each step
+        :param df:
+        :param dataset_info_object_id:
+        :return: VariableInfoHandler
+        """
+        dataset_info = None
+        dataset_info_updater = None
+
+        if dataset_info_object_id:
+            dataset_info = DataSetInfo.objects.get(object_id=dataset_info_object_id)
+            dataset_info_updater = DataSetInfoUpdater(dataset_info)
+
+        try:
+            ph = VariableInfoHandler(df)
+            if dataset_info:
+                if dataset_info.depositor_setup_info.user_step < DepositorSetupInfo.DepositorSteps.STEP_0300_PROFILING_PROCESSING:
+                    dataset_info_updater.update_step(DepositorSetupInfo.DepositorSteps.STEP_0300_PROFILING_PROCESSING)
+            ph.run_profile_process()
+
+        except Exception as ex:
+            if dataset_info:
+                dataset_info_updater.update_step(DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
+            raise ex
+        if dataset_info:
+            dataset_info_updater.save_data_profile(ph.data_profile)
+            if dataset_info.depositor_setup_info.user_step < DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE:
+                dataset_info_updater.update_step(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
+
+        return ph

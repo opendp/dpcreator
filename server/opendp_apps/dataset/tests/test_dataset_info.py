@@ -1,19 +1,16 @@
 import requests_mock
-
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.dataverses.testing.test_endpoints import BaseEndpointTest
-from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.utils.extra_validators import \
     VALIDATE_MSG_ZERO_OR_GREATER, VALIDATE_MSG_EPSILON
-from opendp_apps.model_helpers.msg_util import msgt
 
 
 @requests_mock.Mocker()
 class TestDepositorInfo(BaseEndpointTest):
-
     fixtures = ['test_dataverses_01.json',
                 'test_manifest_params_04.json',
                 'test_opendp_users_01.json',
@@ -56,7 +53,6 @@ class TestDepositorInfo(BaseEndpointTest):
                           'confidence_level': astatic.CL_99,
                           'variable_info': None})
 
-
     def test_20_patch_restricted_field(self, req_mocker):
         """Try to patch a field that isn't allowed"""
         msgt(self.test_20_patch_restricted_field.__doc__)
@@ -71,7 +67,6 @@ class TestDepositorInfo(BaseEndpointTest):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {'message': 'These fields are not updatable',
                                            'fields': ['dataset_schema_info']})
-
 
     def test_30_patch_bad_values(self, req_mocker):
         """(30) Attempt a patch with a invalid values for updateable fields"""

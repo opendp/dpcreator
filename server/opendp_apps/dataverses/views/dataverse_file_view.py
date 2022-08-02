@@ -6,10 +6,9 @@ from rest_framework.response import Response
 
 from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses.serializers import DataverseFileInfoMakerSerializer
-from opendp_apps.user.models import OpenDPUser
 from opendp_apps.user.dataverse_user_initializer import DataverseUserInitializer
+from opendp_apps.user.models import OpenDPUser
 from opendp_project.views import BaseModelViewSet
-
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -45,7 +44,7 @@ class DataverseFileView(BaseModelViewSet):
             logger.error(f'DataverseFileView: No OpenDPUser found for id: {opendp_user_id}')
             return Response({'success': False,
                              'message': f'No OpenDPUser found for id: {opendp_user_id}'},
-                             status=status.HTTP_400_BAD_REQUEST)
+                            status=status.HTTP_400_BAD_REQUEST)
 
         # (2) Create the DataverseFileInfo object
         #

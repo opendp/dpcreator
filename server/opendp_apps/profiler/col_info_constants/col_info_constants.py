@@ -1,7 +1,6 @@
 '''Contants used in the preprocess logic and metadata output'''
 PREPROCESS_ID = 'preprocessId'
 
-
 SELF_SECTION_KEY = 'self'
 VERSION_KEY = 'version'
 VARIABLES_SECTION_KEY = 'variables'
@@ -13,7 +12,7 @@ VARIABLE_DISPLAY_SECTION_KEY = 'variableDisplay'
 DATASET_LEVEL_KEY = 'dataset'
 DATASET_DESCRIPTION = 'description'
 DATASET_UNIT_OF_ANALYSIS = 'unitOfAnalysis'
-DATASET_STRUCTURE = 'structure' # wide or long
+DATASET_STRUCTURE = 'structure'  # wide or long
 STRUCTURE_WIDE = 'wide'
 STRUCTURE_LONG = 'long'
 
@@ -26,7 +25,6 @@ DATA_SOURCE_NAME = 'name'
 DATA_SOURCE_TYPE = 'type'
 DATA_SOURCE_FORMAT = 'format'
 DATA_SOURCE_FILESIZE = 'filesize'
-
 
 UNKNOWN = 'unknown'
 NOT_IMPLEMENTED = 'NOT IMPLEMENTED'
@@ -96,7 +94,6 @@ TIME_VALUES = (TIME_YES,
 # --------------------------------------
 PLOT_BAR = "bar"
 PLOT_CONTINUOUS = "continuous"
-
 
 CUSTOM_KEY = 'customStatistics'
 UPDATE_VARIABLE_DISPLAY = 'UPDATE_VARIABLE_DISPLAY'
