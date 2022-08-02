@@ -68,6 +68,12 @@ class DPSumSpec(StatSpec):
                 return
         self.floatify_int_values()
 
+    def run_02_basic_validation(self):
+        """Add dataset size validation"""
+        self.validate_property('dataset_size')
+
+        super().run_02_basic_validation()
+
     def run_03_custom_validation(self):
         """
         This is a place for initial checking/transformations

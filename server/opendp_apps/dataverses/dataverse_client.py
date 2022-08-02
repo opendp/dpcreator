@@ -159,3 +159,16 @@ if __name__ == '__main__':
     print()
     resp = client.get_user_info(api_token)
     print(resp.__dict__)
+
+"""
+import requests
+ye_host = 'https://dataverse.harvard.edu'
+dv_url = f'{ye_host}/api/v1/users/:me'
+
+# make the request
+headers = {'X-Dataverse-key': api_token}
+try:
+    response = requests.get(dv_url, headers=headers)
+except ConnectionError as err_obj:
+    return err_resp(f'Failed to connect. {err_obj}')
+"""

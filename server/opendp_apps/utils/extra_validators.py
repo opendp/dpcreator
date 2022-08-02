@@ -60,6 +60,18 @@ def validate_int_greater_than_zero(value):
         raise ValidationError(VALIDATE_MSG_ONE_OR_GREATER)
 
 
+def validate_int_greater_than_zero_or_none(value):
+    """Validate int greater >= 1"""
+    if value is None:
+        return
+
+    if not isinstance(value, int):
+        raise ValidationError(VALIDATE_MSG_NOT_INT)
+
+    if value < 1:
+        raise ValidationError(VALIDATE_MSG_ONE_OR_GREATER)
+
+
 def validate_int_not_negative(value):
     """Validate int greater >= 0"""
     if not isinstance(value, int):

@@ -11,9 +11,12 @@ python manage.py test opendp_apps.analysis.testing.test_dp_histogram_spec.Histog
 
 python manage.py test opendp_apps.analysis.testing.test_dp_sum_spec.DPSumStatSpecTest
 
+python manage.py test opendp_apps.analysis.testing.test_dp_spec_error
+
 .test_105_run_dphist_calculation_categorical
 
 python manage.py test opendp_apps.analysis.testing.test_run_release.TestRunRelease.test_90_dp_count_pums_data
 
+python manage.py test opendp_apps.analysis.testing.test_stat_spec_builder
 
 """
