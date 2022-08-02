@@ -59,7 +59,7 @@ def profile_dataset_info(dataset_object_id: DataSetInfo.object_id, websocket_id=
     """
     dp_util = DownloadAndProfileUtil(dataset_object_id, websocket_id)
     if dp_util.has_error():
-        logger.error("profile_dataset_info: ", dp_util.get_err_msg())
+        logger.error(f"profile_dataset_info: {dp_util.get_err_msg()}")
         if websocket_id:
             return dict(success=False, messsage=dp_util.get_err_msg())
         return err_resp(dp_util.get_err_msg())  # direct error `message`

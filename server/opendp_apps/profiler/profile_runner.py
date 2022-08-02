@@ -11,7 +11,7 @@ from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 
 from opendp_apps.profiler.dataset_info_updater import DataSetInfoUpdater
-from opendp_apps.profiler.tools.FileExtensionDeterminer import FileExtensionDeterminer
+from opendp_apps.profiler.tools.file_extension_determiner import FileExtensionDeterminer
 from opendp_apps.profiler.tools.csv_reader import CsvReader
 from opendp_apps.profiler.tools.spss_reader import SpssReader
 from opendp_apps.profiler.variable_info import VariableInfoHandler

@@ -37,6 +37,8 @@ from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
 
 from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
+from opendp_apps.profiler.tools.file_extension_determiner import FileExtensionDeterminer
+from opendp_apps.profiler.tools.spss_reader import SpssReader
 
 from opendp_apps.user.models import OpenDPUser
 from opendp_apps.profiler import static_vals as pstatic
@@ -174,7 +176,17 @@ class ValidateReleaseUtil(BasicErrCheck):
         for stat_spec in self.stat_spec_list:
 
             # Okay! -> run_chain(...)!
-            file_handle = open(filepath, 'r')
+            file_extension_determiner = FileExtensionDeterminer(filepath)
+            file_extension = file_extension_determiner.get_file_extension()
+            print(f"FILE EXTENSION: {file_extension}")
+            if 'csv' not in file_extension:
+                # file_handle = open(filepath, 'rb')
+                spss_reader = SpssReader(filepath)
+                df = spss_reader.read()
+                df.to_csv('temp.csv')
+                file_handle = open('temp.csv', 'r')
+            else:
+                file_handle = open(filepath, 'r')
             stat_spec.run_chain(col_indices, file_handle, sep_char=sep_char)
             file_handle.close()
 
