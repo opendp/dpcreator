@@ -61,6 +61,12 @@ class StatSpecBuilder(BasicErrCheck):
         self.error_message = err_msg
         logger.error(err_msg)
 
+    def get_stat_spec_list(self) -> list:
+        """Return a list of StatSpec objects"""
+        assert self.has_error() is False, 'Verify that "has_error()" is False before calling this method'
+
+        return self.stat_spec_list
+
     def run_build_spec_process(self):
         """Build/validate the stat specs  """
         if self.has_error():
@@ -105,11 +111,18 @@ class StatSpecBuilder(BasicErrCheck):
             return False
 
         # Use the actual dataset size FOR VALIDATION ONLY
-        self.validation_dataset_size = self.analysis_plan.dataset.get_dataset_size()
+        #
+        ds_size_info = self.analysis_plan.dataset.get_dataset_size()
+        if not ds_size_info.success:
+            self.add_err_msg(ds_size_info.message)
+            return False
+
+        self.validation_dataset_size = ds_size_info.data
 
         # If the dataset size isn't required, all set...
+        #
         self.dataset_size_required = self.is_dataset_size_required()
-        if self.is_dataset_size_required() is False:
+        if not self.is_dataset_size_required():
             return True
 
         # May the dataset size be made public?
@@ -119,8 +132,8 @@ class StatSpecBuilder(BasicErrCheck):
             # No, dataset size is not public
             self.use_private_count = True
 
-        # Does the stats list already contain a count?
-        if not self.does_stats_list_have_a_dp_count():
+        # If the count must be private, does the stats list already contain a count?
+        if self.use_private_count is True and not self.does_stats_list_have_a_dp_count():
             # It there's no DP Count, then add one.
             self.add_dp_count()
             success, dp_stats_or_err = self.redistribute_epsilon(self.max_epsilon, self.dp_statistics)

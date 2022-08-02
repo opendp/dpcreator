@@ -985,6 +985,10 @@
         "radio_only_one_individual_per_row": "yes",
         "radio_depend_on_private_information": "yes"
       },
+      "epsilon_questions": {
+        "secret_sample": "no",
+        "population_size": "",
+        "observations_number_can_be_public": "yes"},
       "variable_info": {
         "trial": {
           "name": "Trial",
