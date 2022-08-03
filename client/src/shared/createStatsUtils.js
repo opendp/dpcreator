@@ -112,13 +112,13 @@ export default {
         let returnObj = {valid: true, data: null}
         return release.validate(analysisPlanId, tempStats)
             .then((resp) => {
-                //     console.log('releaseValidation, validate response: ' + JSON.stringify(resp))
-                returnObj.data = resp.data
-                resp.data.forEach((item, index) => {
-                    if (item.valid !== true) {
-                        returnObj.valid = false;
-                    }
-                })
+                console.log('releaseValidation, validate response: ' + JSON.stringify(resp))
+                returnObj.valid = resp.success
+                returnObj.data = [{
+                    "valid": returnObj.valid,
+                    "message": (resp.message + ": " + JSON.stringify(resp.errors))
+                }]
+
                 return returnObj
             })
             .catch((error) => {
