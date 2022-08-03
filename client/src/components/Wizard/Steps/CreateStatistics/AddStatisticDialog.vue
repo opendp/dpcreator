@@ -434,11 +434,15 @@ export default {
       console.log('update selected statistic: ' + JSON.stringify(statistic))
       this.selectedStatistic = statistic
       if (this.selectedStatistic.value == "count") {
-        this.editedItemDialog.missingValuesHandling = ""
+        //TODO: remove the assignment of "insert_fixed" when server validation is updated
+        this.editedItemDialog.missingValuesHandling = "insert_fixed"
         this.editedItemDialog.handleAsFixed = false
+        this.editedItemDialog.fixedValue = 'na'
       } else {
         this.editedItemDialog.missingValuesHandling = "insert_fixed"
         this.editedItemDialog.handleAsFixed = true
+        this.editedItemDialog.fixedValue = ''
+
       }
     },
     updateFixedInputVisibility(handlingOption) {
