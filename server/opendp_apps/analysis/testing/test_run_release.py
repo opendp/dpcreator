@@ -1,29 +1,27 @@
 import json
-
 from os.path import abspath, dirname, isfile, join
+
+from django.contrib.auth import get_user_model
+from django.core import mail
+from django.core.files import File
+from django.test import TestCase, override_settings
+from rest_framework.reverse import reverse as drf_reverse
+from rest_framework.test import APIClient
+
+from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
+from opendp_apps.analysis.models import AnalysisPlan, AuxiliaryFileDepositRecord, ReleaseEmailRecord
+from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
+from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
+from opendp_apps.dataset.dataset_formatter import DataSetFormatter
+from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.model_helpers.msg_util import msgt
+from opendp_apps.profiler import static_vals as pstatic
+from opendp_apps.profiler import tasks as profiler_tasks
+from opendp_apps.utils.extra_validators import VALIDATE_MSG_EPSILON
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
-
-from django.contrib.auth import get_user_model
-from django.core.files import File
-from django.core import mail
-from django.test import TestCase, override_settings
-
-from rest_framework.test import APIClient
-from rest_framework.reverse import reverse as drf_reverse
-
-from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
-from opendp_apps.analysis.models import AnalysisPlan, AuxiliaryFileDepositRecord, ReleaseEmailRecord
-from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
-from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
-from opendp_apps.dataset.models import DataSetInfo
-from opendp_apps.dataset.dataset_formatter import DataSetFormatter
-from opendp_apps.model_helpers.msg_util import msgt
-from opendp_apps.profiler import tasks as profiler_tasks
-from opendp_apps.profiler import  static_vals as pstatic
-from opendp_apps.utils.extra_validators import VALIDATE_MSG_EPSILON
 
 
 class TestRunRelease(TestCase):
@@ -110,7 +108,7 @@ class TestRunRelease(TestCase):
                                    'jp', 'rh', 'aq', 'ph', 'le', 'mn', 'ls2', 'no', 'af'],
                     'type': pstatic.VAR_TYPE_CATEGORICAL
                 }
-             }
+            }
         ]
 
     def add_source_file(self, dataset_info: DataSetInfo, filename: str, add_profile: bool = False) -> DataSetInfo:
@@ -275,7 +273,7 @@ class TestRunRelease(TestCase):
         self.assertTrue(AuxiliaryFileDepositRecord.objects.filter(release_info=updated_plan.release_info).count() > 0)
         for dep_rec in AuxiliaryFileDepositRecord.objects.filter(release_info=updated_plan.release_info):
             self.assertTrue(dep_rec.deposit_success is False)
-            self.assertTrue(dep_rec.http_status_code == 403 or\
+            self.assertTrue(dep_rec.http_status_code == 403 or \
                             dep_rec.http_status_code < 0)
 
         # The source_file should be deleted
@@ -382,12 +380,11 @@ class TestRunRelease(TestCase):
                                         analysis_plan_jresp['release_info']['dp_release']['statistics']))
         self.assertIsNotNone(histogram_results)
 
-        #print(json.dumps(histogram_results, indent=4))
+        # print(json.dumps(histogram_results, indent=4))
         self.assertTrue(type(histogram_results[0]['result']), dict)
         histogram_values = histogram_results[0]['result']['value']
         self.assertTrue('categories' in histogram_values)
         self.assertTrue('values' in histogram_values)
-
 
         self.assertIn('dp_release', analysis_plan_jresp['release_info'])
 
@@ -399,13 +396,12 @@ class TestRunRelease(TestCase):
         self.assertTrue(updated_plan.release_info.dp_release_json_file.name.endswith(json_filename))
         self.assertTrue(updated_plan.release_info.dp_release_json_file.size >= 2600)
 
-
         # Check that the AuxiliaryFileDepositRecord objects are correct
         #
         self.assertTrue(AuxiliaryFileDepositRecord.objects.filter(release_info=updated_plan.release_info).count() > 0)
         for dep_rec in AuxiliaryFileDepositRecord.objects.filter(release_info=updated_plan.release_info):
             self.assertTrue(dep_rec.deposit_success is False)
-            self.assertTrue(dep_rec.http_status_code == 403 or\
+            self.assertTrue(dep_rec.http_status_code == 403 or \
                             dep_rec.http_status_code < 0)
 
         # Uncomment next line to show the AnalysisPlan output
@@ -414,7 +410,6 @@ class TestRunRelease(TestCase):
 
         # The source_file should be deleted
         self.assertTrue(not analysis_plan.dataset.source_file)
-
 
     def test_70_dataset_formatter_eye_fatigue_file(self):
         """(70) Test the DataSetFormatter -- dataset info formatted for inclusion in ReleaseInfo.dp_release"""
@@ -508,7 +503,7 @@ class TestRunRelease(TestCase):
         self.assertEqual(ds_info['installation']['name'], 'Harvard Dataverse')
         self.assertEqual(ds_info['installation']['url'], 'https://dataverse.harvard.edu')
 
-        self.assertEqual(ds_info['file_information']['name'], "crisis.tab",)
+        self.assertEqual(ds_info['file_information']['name'], "crisis.tab", )
         self.assertEqual(ds_info['file_information']['identifier'], "https://doi.org/10.7910/DVN/OLD7MB/ZI4N3J")
         self.assertEqual(ds_info['file_information']['fileFormat'], "text/tab-separated-values")
 
@@ -523,60 +518,103 @@ class TestRunRelease(TestCase):
         dataset_info = DataSetInfo.objects.get(id=4)
 
         # Hack 1: Update to the PUMS data profile
-        dataset_info.data_profile = {"self": {"created_at": "2021-10-04 15:20:00", "description": "TwoRavens metadata generated by https://github.com/TwoRavens/raven-metadata-service"}, "$schema": "https://github.com/TwoRavens/raven-metadata-service/schema/jsonschema/1-2-0.json#", "dataset": {"rowCount": 10000, "variableCount": 11, "variableOrder": [[0, "X"], [1, "state"], [2, "puma"], [3, "sex"], [4, "age"], [5, "educ"], [6, "income"], [7, "latino"], [8, "black"], [9, "asian"], [10, "married"]]}, "variables": {"X": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "X"}, "age": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "age"}, "sex": {"binary": True, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "sex"}, "educ": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "educ"}, "puma": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "puma"}, "asian": {"binary": True, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "asian"}, "black": {"binary": True, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "black"}, "state": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "state"}, "income": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "income"}, "latino": {"binary": True, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "latino"}, "married": {"binary": True, "nature": "ordinal", "numchar": "numeric", "interval": "discrete", "description": "", "variableName": "married"}}}
+        dataset_info.data_profile = {"self": {"created_at": "2021-10-04 15:20:00",
+                                              "description": "TwoRavens metadata generated by https://github.com/TwoRavens/raven-metadata-service"},
+                                     "$schema": "https://github.com/TwoRavens/raven-metadata-service/schema/jsonschema/1-2-0.json#",
+                                     "dataset": {"rowCount": 10000, "variableCount": 11,
+                                                 "variableOrder": [[0, "X"], [1, "state"], [2, "puma"], [3, "sex"],
+                                                                   [4, "age"], [5, "educ"], [6, "income"],
+                                                                   [7, "latino"], [8, "black"], [9, "asian"],
+                                                                   [10, "married"]]}, "variables": {
+                "X": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete",
+                      "description": "", "variableName": "X"},
+                "age": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete",
+                        "description": "", "variableName": "age"},
+                "sex": {"binary": True, "nature": "ordinal", "numchar": "numeric", "interval": "discrete",
+                        "description": "", "variableName": "sex"},
+                "educ": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete",
+                         "description": "", "variableName": "educ"},
+                "puma": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete",
+                         "description": "", "variableName": "puma"},
+                "asian": {"binary": True, "nature": "ordinal", "numchar": "numeric", "interval": "discrete",
+                          "description": "", "variableName": "asian"},
+                "black": {"binary": True, "nature": "ordinal", "numchar": "numeric", "interval": "discrete",
+                          "description": "", "variableName": "black"},
+                "state": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete",
+                          "description": "", "variableName": "state"},
+                "income": {"binary": False, "nature": "ordinal", "numchar": "numeric", "interval": "discrete",
+                           "description": "", "variableName": "income"},
+                "latino": {"binary": True, "nature": "ordinal", "numchar": "numeric", "interval": "discrete",
+                           "description": "", "variableName": "latino"},
+                "married": {"binary": True, "nature": "ordinal", "numchar": "numeric", "interval": "discrete",
+                            "description": "", "variableName": "married"}}}
 
         # Hack 2: Update to the PUMS data profile_variables
         dataset_info.profile_variables = {"dataset":
-                  {"rowCount": 10000,
-                   "variableCount": 11,
-                   "variableOrder": [[0, "X"], [1, "state"], [2, "puma"], [3, "sex"],
-                                     [4, "age"], [5, "educ"], [6, "income"], [7, "latino"],
-                                     [8, "black"], [9, "asian"], [10, "married"]]},
-                   "variables": {"X": {"max": None, "min": None, "name": "X",
-                                       "type": "Numerical", "label": ""},
-                                 "age": {"max": None, "min": None, "name": "age",
-                                         "type": "Numerical", "label": ""},
-                                 "sex": {"name": "sex", "type": "Boolean", "label": ""},
-                                 "educ": {"max": None, "min": None, "name": "educ",
-                                            "type": "Numerical", "label": ""},
-                                 "puma": {"max": None, "min": None, "name": "puma",
-                                            "type": "Numerical", "label": ""},
-                                 "asian": {"name": "asian", "type": "Boolean", "label": ""},
-                                 "black": {"name": "black", "type": "Boolean", "label": ""},
-                                 "state": {"max": None, "min": None, "name": "state",
-                                           "type": "Numerical", "label": ""},
-                                 "income": {"max": None, "min": None, "name": "income",
-                                            "type": "Numerical", "label": ""},
-                                 "latino": {"name": "latino", "type": "Boolean", "label": ""},
-                                 "married": {"name": "married", "type": "Boolean", "label": ""}}}
+                                              {"rowCount": 10000,
+                                               "variableCount": 11,
+                                               "variableOrder": [[0, "X"], [1, "state"], [2, "puma"], [3, "sex"],
+                                                                 [4, "age"], [5, "educ"], [6, "income"], [7, "latino"],
+                                                                 [8, "black"], [9, "asian"], [10, "married"]]},
+                                          "variables": {"X": {"max": None, "min": None, "name": "X",
+                                                              "type": "Numerical", "label": ""},
+                                                        "age": {"max": None, "min": None, "name": "age",
+                                                                "type": "Numerical", "label": ""},
+                                                        "sex": {"name": "sex", "type": "Boolean", "label": ""},
+                                                        "educ": {"max": None, "min": None, "name": "educ",
+                                                                 "type": "Numerical", "label": ""},
+                                                        "puma": {"max": None, "min": None, "name": "puma",
+                                                                 "type": "Numerical", "label": ""},
+                                                        "asian": {"name": "asian", "type": "Boolean", "label": ""},
+                                                        "black": {"name": "black", "type": "Boolean", "label": ""},
+                                                        "state": {"max": None, "min": None, "name": "state",
+                                                                  "type": "Numerical", "label": ""},
+                                                        "income": {"max": None, "min": None, "name": "income",
+                                                                   "type": "Numerical", "label": ""},
+                                                        "latino": {"name": "latino", "type": "Boolean", "label": ""},
+                                                        "married": {"name": "married", "type": "Boolean", "label": ""}}}
 
         self.add_source_file(dataset_info, 'PUMS5extract10000.csv', True)
 
-        #from django.core import serializers
-        #data = serializers.serialize("json", DataSetInfo.objects.filter(pk=4))
-        #print('data', data)
-        #return
+        # from django.core import serializers
+        # data = serializers.serialize("json", DataSetInfo.objects.filter(pk=4))
+        # print('data', data)
+        # return
 
         analysis_plan = self.analysis_plan
 
         # Hack 3: Update to the PUMS data variable_info
-        analysis_plan.variable_info = {"x": {"max": None, "min": None, "name": "X", "type": "Numerical", "label": ""}, "age": {"max": 100, "min": 0, "name": "age", "type": "Numerical", "label": "age"}, "sex": {"name": "sex", "type": "Boolean", "label": ""}, "educ": {"max": None, "min": None, "name": "educ", "type": "Numerical", "label": ""}, "puma": {"max": None, "min": None, "name": "puma", "type": "Numerical", "label": ""}, "asian": {"name": "asian", "type": "Boolean", "label": ""}, "black": {"name": "black", "type": "Boolean", "label": ""}, "state": {"max": None, "min": None, "name": "state", "type": "Numerical", "label": ""}, "income": {"max": 100016, "min": 0, "name": "income", "type": "Numerical", "label": "income"}, "latino": {"name": "latino", "type": "Boolean", "label": ""}, "married": {"name": "married", "type": "Boolean", "label": ""}}
+        analysis_plan.variable_info = {"x": {"max": None, "min": None, "name": "X", "type": "Numerical", "label": ""},
+                                       "age": {"max": 100, "min": 0, "name": "age", "type": "Numerical",
+                                               "label": "age"}, "sex": {"name": "sex", "type": "Boolean", "label": ""},
+                                       "educ": {"max": None, "min": None, "name": "educ", "type": "Numerical",
+                                                "label": ""},
+                                       "puma": {"max": None, "min": None, "name": "puma", "type": "Numerical",
+                                                "label": ""},
+                                       "asian": {"name": "asian", "type": "Boolean", "label": ""},
+                                       "black": {"name": "black", "type": "Boolean", "label": ""},
+                                       "state": {"max": None, "min": None, "name": "state", "type": "Numerical",
+                                                 "label": ""},
+                                       "income": {"max": 100016, "min": 0, "name": "income", "type": "Numerical",
+                                                  "label": "income"},
+                                       "latino": {"name": "latino", "type": "Boolean", "label": ""},
+                                       "married": {"name": "married", "type": "Boolean", "label": ""}}
 
         # Send the dp_statistics for validation
         #
-        analysis_plan.dp_statistics =   [{'variable': 'age',
-                      'col_index': 4,
-                      'statistic': astatic.DP_SUM,
-                      'dataset_size': 10_000,
-                      'epsilon': 1.0,
-                      'delta': 0.0,
-                      'cl': astatic.CL_95,
-                      'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'fixed_value': '44',
-                      'variable_info': {'min': 18,
-                                        'max': 95,
-                                        'type': pstatic.VAR_TYPE_INTEGER},
-                      }]
+        analysis_plan.dp_statistics = [{'variable': 'age',
+                                        'col_index': 4,
+                                        'statistic': astatic.DP_SUM,
+                                        'dataset_size': 10_000,
+                                        'epsilon': 1.0,
+                                        'delta': 0.0,
+                                        'cl': astatic.CL_95,
+                                        'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+                                        'fixed_value': '44',
+                                        'variable_info': {'min': 18,
+                                                          'max': 95,
+                                                          'type': pstatic.VAR_TYPE_INTEGER},
+                                        }]
 
         analysis_plan.save()
 
@@ -586,7 +624,6 @@ class TestRunRelease(TestCase):
                                     content_type='application/json')
 
         jresp = response.json()
-        #print('jresp', json.dumps(jresp,))
 
         self.assertEqual(response.status_code, 201)
         self.assertIsNotNone(jresp['dp_release'])
@@ -605,7 +642,6 @@ class TestRunRelease(TestCase):
         # The source_file should be deleted
         self.assertTrue(not analysis_plan.dataset.source_file)
 
-
     @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True, SKIP_EMAIL_RELEASE_FOR_TESTS=False)
     def test_100_release_email(self):
         """(100) Run stats and test email"""
@@ -620,7 +656,7 @@ class TestRunRelease(TestCase):
 
         # Check the basics
         #
-        release_util = ValidateReleaseUtil.compute_mode(\
+        release_util = ValidateReleaseUtil.compute_mode( \
             self.user_obj,
             analysis_plan.object_id,
             run_dataverse_deposit=False)
@@ -645,7 +681,7 @@ class TestRunRelease(TestCase):
         self.assertTrue(email_rec.json_attached)
         self.assertEqual(email_rec.note, '')
 
-       # Test that one message has been sent.
+        # Test that one message has been sent.
         self.assertEqual(len(mail.outbox), 1)
 
         # Verify that the subject of the first message is correct.

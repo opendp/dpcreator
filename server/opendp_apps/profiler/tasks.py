@@ -1,13 +1,11 @@
 from django.core.exceptions import ValidationError as DjangoValidationError
 
-from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.dataset import static_vals as dstatic
-
-from opendp_apps.profiler.profile_runner import ProfileRunner #run_profile
-from opendp_apps.profiler import static_vals as pstatic
-from opendp_project.celery import celery_app
-
 from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
+from opendp_apps.profiler import static_vals as pstatic
+from opendp_apps.profiler.profile_runner import ProfileRunner  # run_profile
+from opendp_project.celery import celery_app
 
 
 @celery_app.task(ignore_result=True)

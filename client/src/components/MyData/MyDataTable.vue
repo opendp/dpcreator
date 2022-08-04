@@ -124,10 +124,12 @@
 
     </v-data-table>
     <DeleteDatasetDialog
+        v-if="selectedItem"
         :dialogDelete="dialogDelete"
-        :selectedItem="selectedItem"
+        :datasetInfo="selectedItem.datasetInfo"
+        :analysisPlan="selectedItem.analysisPlan"
         v-on:cancel="closeDelete"
-        v-on:confirm="deleteItemConfirm"
+        v-on:close="closeDelete"
     />
   </div>
 
@@ -280,19 +282,6 @@ export default {
     deleteItem(item) {
       this.selectedItem = Object.assign({}, item);
       this.dialogDelete = true;
-    },
-    deleteItemConfirm() {
-      const item = this.selectedItem
-      if (item.analysisPlan !== null) {
-        const payload = {
-          datasetId: item.datasetInfo.objectId,
-          analysisPlanId: item.analysisPlan.objectId
-        }
-        this.$store.dispatch('dataset/deleteAnalysisPlan', payload)
-      } else {
-        this.$store.dispatch('dataset/deleteDataset', item.datasetInfo.objectId)
-      }
-      this.closeDelete();
     },
     closeDelete() {
       this.dialogDelete = false

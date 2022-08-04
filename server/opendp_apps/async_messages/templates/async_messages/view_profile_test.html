@@ -8,16 +8,19 @@ Example of using async/websockets.
     <meta charset="utf-8"/>
     <title>Test profile</title>
 
-<!-- START: bootstrap/google fonts for formatting / not necessary for websocket functionality -->
+    <!-- START: bootstrap/google fonts for formatting / not necessary for websocket functionality -->
     <!-- Bootstrap CDN -->
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
     <!-- Bootstrap bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8"
+            crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
-<!-- END: bootstrap/google fonts -->
+    <!-- END: bootstrap/google fonts -->
 
 </head>
 <body style="margin:40px;">
@@ -26,67 +29,76 @@ Example of using async/websockets.
 <!-- Start: Table Listing DataSetInfo objects -->
 <table class="table table-bordered">
     <thead>
-        <tr>
-            <td>#</td>
-            <td>name<br>(type)</td>
-            <td>object id</td>
-            <td>source</td>
-            <td>profile</td>
-        </tr>
+    <tr>
+        <td>#</td>
+        <td>name<br>(type)</td>
+        <td>object id</td>
+        <td>source</td>
+        <td>profile</td>
+    </tr>
     </thead>
     <tbody>
-        <!-- Loop Through the DataSet Info objects -->
-        {% for ds in ds_info_objects %}
+    <!-- Loop Through the DataSet Info objects -->
+    {% for ds in ds_info_objects %}
         <tr>
-            <!-- row number --><td>{{ forloop.counter}}</td>
-            <!-- name --><td>{{ ds.name}}<br />({{ ds.polymorphic_ctype.name }})</td>
-            <!-- object_id --><td>{{ ds.object_id}}</td>
+            <!-- row number -->
+            <td>{{ forloop.counter }}</td>
+            <!-- name -->
+            <td>{{ ds.name }}<br/>({{ ds.polymorphic_ctype.name }})</td>
+            <!-- object_id -->
+            <td>{{ ds.object_id }}</td>
             <!-- source file -->
-            <td>{% if ds.source_file and ds.data_profile  %}
-                    <!-- file and data profile exist -->
-                    <i class="bi bi-emoji-sunglasses"></i>
-                    Profile Done!
-                {% elif ds.source_file %}
-                    <!-- file exists -->
-                    <i class="bi table"></i>
-                    (source file exists)
-                    <a href="#" id="{{ ds.object_id}}" class="profile-btn btn btn-sm btn-primary">Profile!</a>
-                {% elif ds.data_profile %}
-                    Hmm, data_profile but not source...
-                {% else %}
-                    <!-- neither file nor data_profile exists -->
-                    <i class="bi bi-exclamation-diamond"></i>
-                        (not available)
-                     <a href="#" id="{{ ds.object_id}}" class="profile-btn btn btn-sm btn-primary">Download + Profile!</a>
-                {% endif %}
+            <td>{% if ds.source_file and ds.data_profile %}
+                <!-- file and data profile exist -->
+                <i class="bi bi-emoji-sunglasses"></i>
+                Profile Done!
+            {% elif ds.source_file %}
+                <!-- file exists -->
+                <i class="bi table"></i>
+                (source file exists)
+                <a href="#" id="{{ ds.object_id }}" class="profile-btn btn btn-sm btn-primary">Profile!</a>
+            {% elif ds.data_profile %}
+                Hmm, data_profile but not source...
+            {% else %}
+                <!-- neither file nor data_profile exists -->
+                <i class="bi bi-exclamation-diamond"></i>
+                (not available)
+                <a href="#" id="{{ ds.object_id }}" class="profile-btn btn btn-sm btn-primary">Download + Profile!</a>
+            {% endif %}
             </td>
             <td>{% if ds.data_profile %}
-                    <i class="bi bi-file-spreadsheet"></i>
-                    <br />(profile exists)
-                {% else %}
-                    <i class="bi bi-exclamation-square"></i>
-                    <br />(no profile)
-                {% endif %}
+                <i class="bi bi-file-spreadsheet"></i>
+                <br/>(profile exists)
+            {% else %}
+                <i class="bi bi-exclamation-square"></i>
+                <br/>(no profile)
+            {% endif %}
             </td>
         </tr>
-        {% endfor %}
+    {% endfor %}
     </tbody>
 </table>
 <!-- End: Table Listing DataSetInfo objects -->
 
-    <h5>Response from initial Http POST</h5>
-    <div id="postResult" style="border:1px solid #006699;margin:20px;">&nbsp;</div>
+<h5>Response from initial Http POST</h5>
+<div id="postResult" style="border:1px solid #006699;margin:20px;">&nbsp;</div>
 
-    <h5>User Message from websocket</h5>
-    <pre id="webSocketUserMessage" style="border:1px solid #006699;margin:30px;">(nuthin' yet)</pre>
+<h5>User Message from websocket</h5>
+<pre id="webSocketUserMessage" style="border:1px solid #006699;margin:30px;">(nuthin' yet)</pre>
 
-    <h5>Profile Result from websocket</h5>
-    <div id="webSocketProfileResult" style="border:1px solid #006699;margin:30px;">(no profile yet)</div>
+<h5>Profile Result from websocket</h5>
+<div id="webSocketProfileResult" style="border:1px solid #006699;margin:30px;">(no profile yet)</div>
 
 <!-- START: jQuery, Popper.js, Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
 <!-- END: jQuery, Popper.js, Bootstrap JS -->
 
 <!-- Start: Hidden HTML input element for the Django CSRF token -->
@@ -104,7 +116,7 @@ Example of using async/websockets.
     /* ---------------------------------------------- */
     /* Add a handler for incoming websocket messages  */
     /* ---------------------------------------------- */
-    chatSocket.onmessage = function(e) {
+    chatSocket.onmessage = function (e) {
 
         // parse the incoming JSON to a .js object
         const ws_data = JSON.parse(e.data);  // JSON -> javascript object
@@ -132,7 +144,7 @@ Example of using async/websockets.
             // ---------------------------------------
             if (ws_msg.success === true) {
                 console.log('-- success message');
-            } else if (ws_msg.success === false){
+            } else if (ws_msg.success === false) {
                 console.log('-- error message');
                 alert(ws_msg.user_message);
             } else {
@@ -151,7 +163,7 @@ Example of using async/websockets.
             // ---------------------------------------
             // ws_msg.data: Is the profile there?
             // ---------------------------------------
-            if( ws_msg?.data) {
+            if (ws_msg?.data) {
                 //console.log(typeof 42);
 
                 const profileStr = JSON.stringify(JSON.parse(ws_msg.data.profile_str), null, 2);
@@ -173,7 +185,7 @@ Example of using async/websockets.
     //  Button handlers and AJAX call to kickoff the
     //   profiling process
     // ------------------------------------------------
-    $(document).ready(function() {
+    $(document).ready(function () {
 
         // Retrieve the csrfmiddlewaretoken in the hidden HTML form field
         //
@@ -181,7 +193,7 @@ Example of using async/websockets.
 
         // The Profile button has been clicked....
         //
-        $("a.profile-btn").click(function() {
+        $("a.profile-btn").click(function () {
 
             // Get the dataset object_id
             let dataset_id = this.id
@@ -204,29 +216,29 @@ Example of using async/websockets.
             // Send in a POST request with JSON params and the CSRF token for auth
             //
             fetch(request, {
-              //credentials: 'include',
-              method: "POST",
-              mode: 'same-origin',  // Do not send CSRF token to another domain.
-              headers: {
-                  'Content-Type': 'application/json',
-                  'X-CSRFToken': csrftoken
-              },
-              body: JSON.stringify(params)
+                //credentials: 'include',
+                method: "POST",
+                mode: 'same-origin',  // Do not send CSRF token to another domain.
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify(params)
             })
-            .then(response => response.json())
-            .then(data => {
-              console.log('Success:', data);
-              document.querySelector('#postResult').innerHTML = data.message;
-            })
-            .catch((error) => {
-              console.error('Error:', error);
-              document.querySelector('#postResult').innerHTML = error;
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    document.querySelector('#postResult').innerHTML = data.message;
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    document.querySelector('#postResult').innerHTML = error;
 
-            });
+                });
         });
     });
 
 
-    </script>
+</script>
 </body>
 </html>

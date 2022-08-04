@@ -1,21 +1,17 @@
 import logging
 
-from collections import OrderedDict
-
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
-
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework import permissions, status
+from rest_framework import permissions
 from rest_framework import status, viewsets
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from opendp_apps.async_messages.tasks import profile_dataset_info
 from opendp_apps.async_messages.utils import get_websocket_id
 from opendp_apps.dataset.serializers import DatasetObjectIdSerializer
 from opendp_apps.utils.view_helper import get_json_error, get_json_success
-from opendp_apps.async_messages.tasks import profile_dataset_info
-
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -34,8 +30,6 @@ class ProfilingViewSet(viewsets.ViewSet):
                     ' In API docs, see "Extra Actions"')
         return Response(get_json_error(user_msg),
                         status=status.HTTP_501_NOT_IMPLEMENTED)
-
-        return Response(get_json_success())
 
     @csrf_exempt
     @action(methods=['post'], detail=False, url_path='retrieve-profile')
@@ -109,7 +103,6 @@ class ProfilingViewSet(viewsets.ViewSet):
             return Response(get_json_error(dsi_info.message),
                             status=status.HTTP_404_NOT_FOUND)
 
-
         websocket_id = get_websocket_id(request)
 
         profile_dataset_info.delay(ois.get_object_id(), websocket_id=websocket_id)
@@ -162,9 +155,9 @@ class ProfilingViewSet(viewsets.ViewSet):
         return Response(get_json_success(user_msg,
                                          data=dp_util.get_profile_variables()))
 
-    #instance = self.get_object()
-    #serializer_obj = self.get_serializer(instance=instance)
-    #return Response(serializer_obj.data)
+    # instance = self.get_object()
+    # serializer_obj = self.get_serializer(instance=instance)
+    # return Response(serializer_obj.data)
     # 5ce0e9a55ffa654bcee01238041fb31a
 
 

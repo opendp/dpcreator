@@ -1,5 +1,4 @@
 import json
-
 from os.path import abspath, dirname, isfile, join
 from unittest import skip
 
@@ -8,15 +7,14 @@ from django.core.files import File
 from django.test import TestCase, override_settings
 from rest_framework.test import APIClient
 
+from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.models import AnalysisPlan
-from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.serializers import ReleaseValidationSerializer
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
 from opendp_apps.utils.extra_validators import VALIDATE_MSG_EPSILON
-
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')

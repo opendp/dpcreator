@@ -1,15 +1,11 @@
-from unittest import skip
-
 import requests_mock
-
-from django.test import TestCase
 from django.contrib.auth import get_user_model
-
+from django.test import TestCase
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
 from opendp_apps.dataverses import static_vals as dv_static
-from opendp_apps.dataverses.models import ManifestTestParams, DataverseHandoff
+from opendp_apps.dataverses.models import ManifestTestParams
 from opendp_apps.model_helpers.msg_util import msg, msgt
 
 
@@ -79,11 +75,11 @@ class TestDataverseHandoffView(TestCase):
         #
         url = reverse('dv-handoff-list')
 
-        #self.data[dv_static.DV_PARAM_SITE_URL] = 'dataverse.harvard.edu'
+        # self.data[dv_static.DV_PARAM_SITE_URL] = 'dataverse.harvard.edu'
 
         response = self.client.post(url, data=self.data, format='json')
 
-        #msg(response)
+        # msg(response)
 
         # Ensure redirect
         self.assertEqual(response.status_code, 302)
@@ -129,4 +125,4 @@ class TestDataverseHandoffView(TestCase):
         # Other params are present and valid, so we should just see dv_installation here
 
         expected_url = '/?error_code=site_url&unreg_dv_url=https://invalidsite.com'
-        self.assertEqual(response.url, expected_url) #'/?error_code=site_url')
+        self.assertEqual(response.url, expected_url)  # '/?error_code=site_url')

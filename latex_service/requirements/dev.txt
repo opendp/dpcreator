@@ -1,5 +1,0 @@
--r base.txt
-
-# For convenience commands
-#
-fabric==2.5.0

@@ -1,17 +1,14 @@
-from os.path import abspath, dirname, join
 import datetime
-# from unittest import skip
+from os.path import abspath, dirname, join
 
-from django.utils import timezone
-from django.test import TestCase
 from django.contrib.auth import get_user_model
-
+from django.test import TestCase
+from django.utils import timezone
 from rest_framework.test import APIClient
 
-from opendp_apps.banner_messages.models import BannerMessage
 from opendp_apps.banner_messages import static_vals as bstatic
+from opendp_apps.banner_messages.models import BannerMessage
 from opendp_apps.model_helpers.msg_util import msgt
-
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(CURRENT_DIR), 'test_files')
@@ -20,7 +17,6 @@ TEST_DATA_DIR = join(dirname(CURRENT_DIR), 'test_files')
 class BannerMessageTest(TestCase):
 
     def setUp(self):
-
         # test client
         self.client = APIClient()
 
@@ -128,11 +124,3 @@ class BannerMessageTest(TestCase):
         self.assertEqual(banner_info['count'], 2)
         self.assertEqual(banner_info['results'][0]['type'], bstatic.BANNER_TYPE_INFORMATIONAL)
         self.assertEqual(banner_info['results'][1]['type'], bstatic.BANNER_TYPE_WARNING)
-
-        # Set banners to inactive
-        #
-        self.banner1.save_as_inactive()
-        self.banner2.save_as_inactive()
-
-        banner_info = self.get_banner_messages_via_api(0)
-

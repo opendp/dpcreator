@@ -3,20 +3,17 @@ import logging
 
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
-
 from rest_framework import status
 from rest_framework.response import Response
 
-from opendp_project.views import BaseModelViewSet
-from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
+from opendp_apps.analysis.models import AnalysisPlan
 from opendp_apps.analysis.serializers import \
     AnalysisPlanSerializer
 from opendp_apps.dataset.serializers import DatasetObjectIdSerializer
-
 from opendp_apps.utils.view_helper import get_json_error
-
+from opendp_project.views import BaseModelViewSet
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -53,7 +50,6 @@ class AnalysisPlanViewSet(BaseModelViewSet):
         #
         ois = DatasetObjectIdSerializer(data=request.data)
         if not ois.is_valid():
-            #print(ois.errors)
             if 'object_id' in ois.errors:
                 user_msg = '"object_id" error: %s' % (ois.errors['object_id'][0])
             else:
@@ -79,7 +75,7 @@ class AnalysisPlanViewSet(BaseModelViewSet):
         # Did AnalysisPlan creation work?
         if plan_util.success:
             # Yes, it worked!
-            new_plan = plan_util.data                       # "data" holds the AnalysisPlan object
+            new_plan = plan_util.data  # "data" holds the AnalysisPlan object
             serializer = AnalysisPlanSerializer(new_plan)  # serialize the data
             logger.info(f"AnalysisPlan created: {serializer.data}")
 

@@ -1,31 +1,28 @@
-from os.path import abspath, dirname, isdir, isfile, join
 import json
-import responses
-
+from os.path import abspath, dirname, isfile, join
 from unittest import skip
-from django.test import TestCase
+
+import responses
 from django.contrib.auth import get_user_model
 from django.core.serializers.json import DjangoJSONEncoder
-
-from rest_framework.reverse import reverse
+from django.test import TestCase
 from rest_framework.test import APIClient
 
 from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadHandler
-from opendp_apps.model_helpers.msg_util import msg, msgt
-from opendp_apps.profiler import tasks as profiler_tasks
+from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import static_vals as pstatic
+from opendp_apps.profiler import tasks as profiler_tasks
 from opendp_apps.user.models import DataverseUser
-
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(CURRENT_DIR), 'test_files')
 
-class DownloadHandlerTests(TestCase):
 
-    fixtures = ['test_profile_dataset_01.json',]
+class DownloadHandlerTests(TestCase):
+    fixtures = ['test_profile_dataset_01.json', ]
 
     def setUp(self):
 
@@ -102,7 +99,7 @@ class DownloadHandlerTests(TestCase):
 
         # check for several features within the profile
         json_profile = json.dumps(profile_handler.data_profile, cls=DjangoJSONEncoder, indent=4)
-        for fn in ['WARCRI', 'WARCASE',	'SCMEDIAN']:
+        for fn in ['WARCRI', 'WARCASE', 'SCMEDIAN']:
             self.assertTrue(json_profile.find(fn) > -1)
 
         # Check the status on depositor_setup_info.DepositorSetupInfo
@@ -126,7 +123,7 @@ class DownloadHandlerTests(TestCase):
         #
         dhandler = DataverseDownloadHandler(dfi)
 
-        #print('dhandler.has_error()', dhandler.has_error())
+        # print('dhandler.has_error()', dhandler.has_error())
         self.assertTrue(dhandler.has_error())
 
         print(dhandler.get_err_msg())
@@ -135,11 +132,9 @@ class DownloadHandlerTests(TestCase):
         # Check the status on depositor_setup_info.DepositorSetupInfo
         #
         dfi2 = DataverseFileInfo.objects.get(pk=3)
-        #self.assertTrue(not dfi2.depositor_setup_info)
+        # self.assertTrue(not dfi2.depositor_setup_info)
         self.assertEqual(dfi2.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_9200_DATAVERSE_DOWNLOAD_FAILED)
-
-
 
     def test_30_error_no_content_url(self):
         """(30) Error: No "contentUrl" key in file_schema_info"""
@@ -157,7 +152,7 @@ class DownloadHandlerTests(TestCase):
         #
         dhandler = DataverseDownloadHandler(dfi)
 
-        #print('dhandler.has_error()', dhandler.has_error())
+        # print('dhandler.has_error()', dhandler.has_error())
         self.assertTrue(dhandler.has_error())
 
         print(dhandler.get_err_msg())
@@ -168,8 +163,6 @@ class DownloadHandlerTests(TestCase):
         dfi2 = DataverseFileInfo.objects.get(pk=3)
         self.assertEqual(dfi2.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_9200_DATAVERSE_DOWNLOAD_FAILED)
-
-
 
     def test_40_error_empty_content_url(self):
         """(40) Error: Empty "contentUrl" in file_schema_info"""
@@ -186,7 +179,7 @@ class DownloadHandlerTests(TestCase):
         # Run DataverseDownloadHandler
         #
         dhandler = DataverseDownloadHandler(dfi)
-        #print('dhandler.has_error()', dhandler.has_error())
+        # print('dhandler.has_error()', dhandler.has_error())
         self.assertTrue(dhandler.has_error())
 
         print(dhandler.get_err_msg())
@@ -197,7 +190,6 @@ class DownloadHandlerTests(TestCase):
         dfi2 = DataverseFileInfo.objects.get(pk=3)
         self.assertEqual(dfi2.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_9200_DATAVERSE_DOWNLOAD_FAILED)
-
 
     def test_50_no_dataverse_user(self):
         """(50) Error: No DataverseUser connected to the DataverseFileInfo.creator"""
@@ -211,7 +203,7 @@ class DownloadHandlerTests(TestCase):
         du.delete()
 
         dhandler = DataverseDownloadHandler(dfi)
-        #print('dhandler.has_error()', dhandler.has_error())
+        # print('dhandler.has_error()', dhandler.has_error())
         self.assertTrue(dhandler.has_error())
         print(dhandler.get_err_msg())
         self.assertTrue(dhandler.get_err_msg().find('dv_download_070') > -1)
@@ -221,7 +213,6 @@ class DownloadHandlerTests(TestCase):
         dfi2 = DataverseFileInfo.objects.get(pk=3)
         self.assertEqual(dfi2.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_9200_DATAVERSE_DOWNLOAD_FAILED)
-
 
     def test_60_no_dataverse_user_token(self):
         """(60) Error: DataverseUser doesn't have a token"""
@@ -236,7 +227,7 @@ class DownloadHandlerTests(TestCase):
         du.save()
 
         dhandler = DataverseDownloadHandler(dfi)
-        #print('dhandler.has_error()', dhandler.has_error())
+        # print('dhandler.has_error()', dhandler.has_error())
         self.assertTrue(dhandler.has_error())
         print(dhandler.get_err_msg())
         self.assertTrue(dhandler.get_err_msg().find('dv_download_080') > -1)
@@ -262,7 +253,6 @@ class DownloadHandlerTests(TestCase):
         dfi.file_schema_info = updated_file_schema_info
         dfi.save()
 
-
         crisis_filepath = join(TEST_DATA_DIR, 'crisis.tab')
         print('crisis_filepath', crisis_filepath)
         self.assertTrue(isfile(crisis_filepath))
@@ -281,7 +271,7 @@ class DownloadHandlerTests(TestCase):
         # Run the Downloader!
         # ---------------------------
         dhandler = DataverseDownloadHandler(dfi)
-        #print('dhandler.has_error()', dhandler.has_error())
+        # print('dhandler.has_error()', dhandler.has_error())
         self.assertTrue(not dhandler.has_error())
 
         print('dfi.source_file', dfi.source_file)
@@ -295,7 +285,6 @@ class DownloadHandlerTests(TestCase):
         dfi2 = DataverseFileInfo.objects.get(pk=3)
         self.assertEqual(dfi2.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
-
 
     @skip
     @responses.activate
@@ -312,7 +301,6 @@ class DownloadHandlerTests(TestCase):
 
         with responses.RequestsMock() as rsps:
             with open(crisis_filepath, "rb") as data_file:
-
                 rsps.add(
                     responses.GET,
                     "https://dataverse.harvard.edu/api/access/datafile/101649",
@@ -326,7 +314,7 @@ class DownloadHandlerTests(TestCase):
                     responses.POST,
                     "http://dpcreator.org/api/profile/run-direct-profile/",
                     json.dumps({'success': True,
-                                'data': {'dataset' : {'variableCount': 19},
+                                'data': {'dataset': {'variableCount': 19},
                                          'variables':
                                              {'SCMEDIAN':
                                                   {'type': pstatic.VAR_TYPE_NUMERICAL}
@@ -340,8 +328,8 @@ class DownloadHandlerTests(TestCase):
                 # Run the Profiler!
                 # ---------------------------
                 response = self.client.post('http://dpcreator.org/api/profile/run-direct-profile/',
-                                           json.dumps({"object_id": "af0d01d4-073c-46fa-a2ff-829193828b82"}),
-                                           content_type='application/json')
+                                            json.dumps({"object_id": "af0d01d4-073c-46fa-a2ff-829193828b82"}),
+                                            content_type='application/json')
 
                 print('response.content', response.content)
                 self.assertEqual(response.status_code, 200)
@@ -362,8 +350,7 @@ class DownloadHandlerTests(TestCase):
         self.assertTrue(not dfi.source_file)
 
         with responses.RequestsMock() as rsps:
-
-            rsps.add(\
+            rsps.add( \
                 responses.GET,
                 "https://dataverse.harvard.edu/api/access/datafile/101649",
                 json={'error': 'not found'},
@@ -373,12 +360,11 @@ class DownloadHandlerTests(TestCase):
             # Run the Profiler!
             # ---------------------------
             response = self.client.post('/api/profile/run-direct-profile/',
-                                       json.dumps({"object_id": "af0d01d4-073c-46fa-a2ff-829193828b82"}),
-                                       content_type='application/json')
-
+                                        json.dumps({"object_id": "af0d01d4-073c-46fa-a2ff-829193828b82"}),
+                                        content_type='application/json')
 
             self.assertEqual(response.status_code, 200)
             jresp = response.json()
-            #print(jresp)
+            # print(jresp)
             self.assertEqual(jresp.get('success'), False)
             self.assertTrue(jresp.get('message').find('failed') > -1)

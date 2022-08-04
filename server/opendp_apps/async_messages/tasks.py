@@ -1,20 +1,18 @@
 import json
 import logging
-
 from datetime import datetime
 from os.path import abspath, dirname, join
 
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 
-from opendp_project.celery import celery_app
 from opendp_apps.async_messages import static_vals as async_static
 from opendp_apps.async_messages.websocket_message import WebsocketMessage
 from opendp_apps.dataset.models import DataSetInfo
-from opendp_apps.profiler import tasks as profiler_tasks
-from opendp_apps.model_helpers.basic_response import BasicResponse, ok_resp, err_resp
 from opendp_apps.dataverses.download_and_profile_util import DownloadAndProfileUtil
-
+from opendp_apps.model_helpers.basic_response import BasicResponse, ok_resp, err_resp
+from opendp_apps.profiler import tasks as profiler_tasks
+from opendp_project.celery import celery_app
 
 CURRENT_DIR = dirname(abspath(__file__))
 SERVER_DIR = dirname(CURRENT_DIR)
@@ -75,10 +73,6 @@ def profile_dataset_info(dataset_object_id: DataSetInfo.object_id, websocket_id=
 @celery_app.task
 def send_test_msg(websocket_id):
     filepath = join(TEST_DATA_DIR, 'fearonLaitin.csv')
-    # dsi = DataSetInfo.objects.first()
-
-    # with Celery:
-    # profiler = ProfileHandler.run_profile_by_filepath.delay(filepath, dsi.object_id)
 
     profiler = profiler_tasks.run_profile_by_filepath(filepath)  # , dsi.object_id)
     if profiler.has_error():

@@ -5,9 +5,9 @@ Mimic the Dataverse urls for testing
 - download file
 """
 from django.urls import path, re_path
-from opendp_apps.dataverses.views import manifest_test_params_view
 
 from opendp_apps.dataverses import mock_dv_views
+from opendp_apps.dataverses.views import manifest_test_params_view
 
 MOCK_API_PREFIX = 'api'
 MOCK_API_VERSION = 'v1'
@@ -33,14 +33,14 @@ urlpatterns = [
     # Dataverse version and build numbers
     #
     path(f'{MOCK_API_PREFIX}/{MOCK_API_VERSION}/info/version',
-        mock_dv_views.view_get_info_version,
-        name='view_get_info_version'),
+         mock_dv_views.view_get_info_version,
+         name='view_get_info_version'),
 
     # Dataverse server url
     #
     path(f'{MOCK_API_PREFIX}/{MOCK_API_VERSION}/info/server',
-        mock_dv_views.view_get_info_server,
-        name='view_get_info_server'),
+         mock_dv_views.view_get_info_server,
+         name='view_get_info_server'),
 
     # Get DDI or schema.org dataset information
     #

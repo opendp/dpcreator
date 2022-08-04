@@ -1,16 +1,15 @@
-import random, string
+import random
+import string
 
-from django.contrib.auth import get_user_model
-
-from django.test import TestCase
 from django.apps import apps
+from django.contrib.auth import get_user_model
+from django.test import TestCase
 
 from opendp_apps.user.models import OpenDPUser, DataverseUser
 from opendp_apps.user.serializers import OpenDPUserSerializer
 
 
 class TestUserSerializer(TestCase):
-
     fixtures = ['test_dataverses_01.json',
                 'test_manifest_params_04.json',
                 'test_opendp_users_01.json']
@@ -56,13 +55,12 @@ class TestUserSerializer(TestCase):
         eeyore.save()
 
         dv_eeyore = DataverseUser(user=eeyore,
-                             dv_installation=apps.get_model('dataverses', 'RegisteredDataverse').objects.first(),
-                             persistent_id=''.join(random.choices(string.ascii_uppercase + string.digits, k=8)),
-                             first_name=eeyore.first_name,
-                             last_name=eeyore.last_name,
-                             email=eeyore.email)
+                                  dv_installation=apps.get_model('dataverses', 'RegisteredDataverse').objects.first(),
+                                  persistent_id=''.join(random.choices(string.ascii_uppercase + string.digits, k=8)),
+                                  first_name=eeyore.first_name,
+                                  last_name=eeyore.last_name,
+                                  email=eeyore.email)
         dv_eeyore.save()
-
 
         # get a reference to the DataverseUser model
         ye_model = apps.get_model('user', 'DataverseUser')
@@ -79,4 +77,3 @@ class TestUserSerializer(TestCase):
 
         self.assertEqual(del_cnt, 2)
         self.assertEqual(del_details, {'user.DataverseUser': 1, 'user.OpenDPUser': 1})
-

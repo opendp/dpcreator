@@ -15,15 +15,8 @@
 
         })
         it('Uploads file with select input', () => {
-
-            cy.get('[data-test="My Data"]').click();
-            cy.url().should('contains', 'my-data')
-            cy.get('[data-test="myDataUploadButton"]').click();
-            cy.get('[data-test="fileInput"]').selectFile('cypress/fixtures/PUMS5extract1000.csv', {force: true})
-            cy.get('tr').should('contain',
-                'PUMS5extract1000.csv')
-            cy.get('tr').should('contain',
-                'Uploaded')
+            let testfile = 'cypress/fixtures/PUMS5extract1000.csv'
+            cy.uploadFile(testfile)
 
         })
         it('Uploads file with drag drop', () => {

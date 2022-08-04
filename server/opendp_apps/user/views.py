@@ -1,11 +1,11 @@
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from dj_rest_auth.registration.views import RegisterView
+from dj_rest_auth.registration.views import SocialLoginView
 from rest_framework import viewsets, permissions
 
 from opendp_apps.user.models import OpenDPUser  # Session
 from opendp_apps.user.serializers import OpenDPUserSerializer  # SessionSerializer,
-from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-from dj_rest_auth.registration.views import SocialLoginView
-from dj_rest_auth.registration.views import RegisterView
 
 """
 class SessionViewSet(viewsets.ModelViewSet):

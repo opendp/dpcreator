@@ -1,18 +1,18 @@
 """
 Convenience class for handling Dataverse file transfers
 """
-from os.path import basename
 import pathlib
-import requests
+from os.path import basename
 from tempfile import TemporaryFile
 from urllib.parse import urlsplit
 
+import requests
 from django.core.files import File
 
-from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
-from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses import static_vals as dv_static
+from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 
 
 class DataverseDownloadHandler(BasicErrCheck):
@@ -169,12 +169,3 @@ class DataverseDownloadHandler(BasicErrCheck):
             self.new_file_name = f'{self.new_file_name}.tab'
 
         return True
-
-
-'''
-from opendp_apps.dataset.models import DataverseFileInfo
-from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadHandler
-
-dfi = DataverseFileInfo.objects.get(pk=3)
-dhandler = DataverseDownloadHandler(dfi)
-'''

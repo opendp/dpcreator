@@ -1,11 +1,7 @@
 from django.test.testcases import TestCase
 
-# from unittest import skip
-from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
-
-# from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.analysis import static_vals as astatic
-
+from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
 from opendp_apps.model_helpers.msg_util import msgt
 
 
@@ -15,20 +11,19 @@ class DPSpecErrorTest(TestCase):
     def setUp(self):
         """Some reusable info"""
         self.spec_props = {'variable': 'Income',
-                  'col_index': 3,
-                  'statistic': astatic.DP_MEAN,
-                  'dataset_size': 10_000,
-                  'epsilon': 1.0,
-                  'delta': 0.0,
-                  'cl': astatic.CL_95,
-                  #'accuracy': None,
-                  'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                  'fixed_value': '45_000',
-                  'variable_info': {'min': 14_000,
-                                    'max': 2_500_000,
-                                    'type': 'Float',},
-                  }
-
+                           'col_index': 3,
+                           'statistic': astatic.DP_MEAN,
+                           'dataset_size': 10_000,
+                           'epsilon': 1.0,
+                           'delta': 0.0,
+                           'cl': astatic.CL_95,
+                           # 'accuracy': None,
+                           'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+                           'fixed_value': '45_000',
+                           'variable_info': {'min': 14_000,
+                                             'max': 2_500_000,
+                                             'type': 'Float', },
+                           }
 
     def test_10_min_spec_err(self):
         """(10) Test minimal DPSpecError"""
@@ -43,7 +38,6 @@ class DPSpecErrorTest(TestCase):
         print(dp_spec.get_error_msg_dict())
         self.assertEqual(dp_spec.get_error_msg_dict()['valid'], False)
 
-
     def test_20_min_spec_err(self):
         """(10) Test DPSpecError with data and error"""
         msgt(self.test_20_min_spec_err.__doc__)
@@ -55,7 +49,6 @@ class DPSpecErrorTest(TestCase):
 
         print(dp_spec.get_error_msg_dict())
         self.assertEqual(dp_spec.get_error_msg_dict()['valid'], False)
-
 
     def test_30_fail_empty_props(self):
         """(30) Fail with empty constructor"""

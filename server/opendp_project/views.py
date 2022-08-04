@@ -1,5 +1,3 @@
-import logging
-
 from django.http import HttpResponse
 from rest_framework import permissions, viewsets
 

@@ -6,7 +6,6 @@ from opendp_apps.model_helpers.msg_util import msgt
 
 
 class TestDepositorSerializer(TestCase):
-
     fixtures = ['test_dataverses_01.json',
                 'test_manifest_params_04.json',
                 'test_opendp_users_01.json',

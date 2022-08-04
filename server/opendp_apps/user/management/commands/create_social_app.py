@@ -1,15 +1,14 @@
 import json
 
-from django.core.management.base import BaseCommand
-from django.contrib.sites.models import Site
-
 from allauth.socialaccount.models import *
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
     """
     This command expects a json file in the server/ directory
     """
+
     def handle(self, *args, **options):
         filepath = 'google_account.json'
         with open(filepath, 'r') as infile:

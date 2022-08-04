@@ -1,31 +1,31 @@
 [
-    {
+  {
     "model": "dataverses.registereddataverse",
     "pk": 1,
     "fields": {
-        "created": "2020-11-09T17:55:43.854Z",
-        "updated": "2020-11-09T17:55:53.111Z",
-        "object_id": "58fd79dc-8541-4aa1-a7c2-85a5b443efa1",
-        "name": "Harvard Dataverse",
-        "dataverse_url": "https://dataverse.harvard.edu",
-        "active": true,
-        "notes": "Harvard Dataverse"
-        }
-    },
-    {
+      "created": "2020-11-09T17:55:43.854Z",
+      "updated": "2020-11-09T17:55:53.111Z",
+      "object_id": "58fd79dc-8541-4aa1-a7c2-85a5b443efa1",
+      "name": "Harvard Dataverse",
+      "dataverse_url": "https://dataverse.harvard.edu",
+      "active": true,
+      "notes": "Harvard Dataverse"
+    }
+  },
+  {
     "model": "dataverses.registereddataverse",
     "pk": 2,
     "fields": {
-        "created": "2020-11-09T17:56:12.419Z",
-        "updated": "2020-11-09T17:56:12.419Z",
-        "object_id": "2281c623-a06f-498a-8efc-23ebb0c25de1",
-        "name": "Mock Local Dataverse",
-        "dataverse_url": "http://127.0.0.1:8000/dv-mock-api",
-        "active": true,
-        "notes": "For testing"
-        }
-    },
-    {
+      "created": "2020-11-09T17:56:12.419Z",
+      "updated": "2020-11-09T17:56:12.419Z",
+      "object_id": "2281c623-a06f-498a-8efc-23ebb0c25de1",
+      "name": "Mock Local Dataverse",
+      "dataverse_url": "http://127.0.0.1:8000/dv-mock-api",
+      "active": true,
+      "notes": "For testing"
+    }
+  },
+  {
     "model": "dataverses.dataversehandoff",
     "pk": 1,
     "fields": {
@@ -38,44 +38,44 @@
       "created": "2020-11-09T17:55:43.854Z",
       "updated": "2020-11-09T17:55:43.854Z"
     }
-},
+  },
   {
     "model": "dataverses.registereddataverse",
     "pk": 3,
     "fields": {
-        "created": "2021-07-12T18:56:37.011Z",
-        "updated": "2021-07-12T18:56:59.730Z",
-        "object_id": "b16d47b3-c1c7-403e-9b66-e32d49aa7a5f",
-        "name": "Test Dataverse EC2",
-        "dataverse_url": "http://ec2-35-171-244-178.compute-1.amazonaws.com",
-        "active": true,
-        "notes": "Test Dataverse. Created on 7/12/2021"
+      "created": "2021-07-12T18:56:37.011Z",
+      "updated": "2021-07-12T18:56:59.730Z",
+      "object_id": "b16d47b3-c1c7-403e-9b66-e32d49aa7a5f",
+      "name": "Test Dataverse EC2",
+      "dataverse_url": "http://ec2-35-171-244-178.compute-1.amazonaws.com",
+      "active": true,
+      "notes": "Test Dataverse. Created on 7/12/2021"
     }
-},
-{
+  },
+  {
     "model": "dataverses.registereddataverse",
     "pk": 4,
     "fields": {
-        "created": "2022-01-19T17:43:38.158Z",
-        "updated": "2022-01-19T17:45:52.624Z",
-        "object_id": "5bb1c891-3d85-4d27-8efa-7f14f7cd4779",
-        "name": "dev-dataverse.dpcreator.org",
-        "dataverse_url": "http://dev-dataverse.dpcreator.org",
-        "active": true,
-        "notes": ""
+      "created": "2022-01-19T17:43:38.158Z",
+      "updated": "2022-01-19T17:45:52.624Z",
+      "object_id": "5bb1c891-3d85-4d27-8efa-7f14f7cd4779",
+      "name": "dev-dataverse.dpcreator.org",
+      "dataverse_url": "http://dev-dataverse.dpcreator.org",
+      "active": true,
+      "notes": ""
     }
-},
+  },
   {
     "model": "dataverses.registereddataverse",
     "pk": 5,
     "fields": {
-        "created": "2022-03-21T17:43:38.158Z",
-        "updated": "2022-03-21T17:45:52.624Z",
-        "object_id": "1241a052-059a-4229-b69e-3c5b77decbd3",
-        "name": "demo-dataverse.dpcreator.org",
-        "dataverse_url": "https://demo-dataverse.dpcreator.org",
-        "active": true,
-        "notes": ""
+      "created": "2022-03-21T17:43:38.158Z",
+      "updated": "2022-03-21T17:45:52.624Z",
+      "object_id": "1241a052-059a-4229-b69e-3c5b77decbd3",
+      "name": "demo-dataverse.dpcreator.org",
+      "dataverse_url": "https://demo-dataverse.dpcreator.org",
+      "active": true,
+      "notes": ""
     }
-}
+  }
 ]

@@ -6,10 +6,12 @@ from opendp_apps.user.models import OpenDPUser
 
 _ADMIN_PASSWORD = os.environ.get('DJANGO_ADMIN_PASSWORD', 'admin')
 
+
 class Command(BaseCommand):
     """
     This command expects a json file in the server/ directory
     """
+
     def handle(self, *args, **options):
         """Create a test superuser"""
         self.stdout.write(self.style.WARNING('>> Preparing to create superuser'))
@@ -28,11 +30,11 @@ class Command(BaseCommand):
             self.write_success_msg(user_msg)
         else:
             params = dict(username=username,
-                      email='opendp_admin@some.edu',
-                      first_name='Molly',
-                      last_name='McNamara',
-                      is_superuser=True,
-                      is_staff=True)
+                          email='opendp_admin@some.edu',
+                          first_name='Molly',
+                          last_name='McNamara',
+                          is_superuser=True,
+                          is_staff=True)
             opendp_user, _created = OpenDPUser.objects.get_or_create(**params)
             self.write_success_msg(f'>> superuser created: {opendp_user.username}')
 

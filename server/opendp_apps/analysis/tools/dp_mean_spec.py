@@ -5,6 +5,7 @@ Wrapper class for DP Mean functionality
 """
 from opendp.accuracy import laplacian_scale_to_accuracy
 from opendp.meas import make_base_laplace
+from opendp.mod import OpenDPException
 from opendp.mod import binary_search, enable_features
 from opendp.trans import \
     (make_bounded_resize,
@@ -14,7 +15,6 @@ from opendp.trans import \
      make_select_column,
      make_sized_bounded_mean,
      make_split_dataframe)
-from opendp.mod import OpenDPException
 
 enable_features("floating-point", "contrib")
 
@@ -47,7 +47,7 @@ class DPMeanSpec(StatSpec):
         Add a list of required properties
         example: ['min', 'max']
         """
-        return ['min', 'max', 'cl',]    # 'fixed_value']
+        return ['min', 'max', 'cl', ]  # 'fixed_value']
 
     def run_01_initial_handling(self):
         """
@@ -105,16 +105,16 @@ class DPMeanSpec(StatSpec):
             return self.preprocessor
 
         preprocessor = (
-            # Selects a column of df, Vec<str>
-            make_select_column(key=self.col_index, TOA=str) >>
-            # Cast the column as Vec<Optional<Float>>
-            make_cast(TIA=str, TOA=float) >>
-            # Impute missing values to 0 Vec<Float>
-            make_impute_constant(self.fixed_value) >>
-            # Clamp age values
-            make_clamp(self.get_bounds()) >>
-            make_bounded_resize(self.dataset_size, self.get_bounds(), self.fixed_value) >>
-            make_sized_bounded_mean(self.dataset_size, self.get_bounds())
+                # Selects a column of df, Vec<str>
+                make_select_column(key=self.col_index, TOA=str) >>
+                # Cast the column as Vec<Optional<Float>>
+                make_cast(TIA=str, TOA=float) >>
+                # Impute missing values to 0 Vec<Float>
+                make_impute_constant(self.fixed_value) >>
+                # Clamp age values
+                make_clamp(self.get_bounds()) >>
+                make_bounded_resize(self.dataset_size, self.get_bounds(), self.fixed_value) >>
+                make_sized_bounded_mean(self.dataset_size, self.get_bounds())
         )
 
         self.scale = binary_search(lambda s: self.check_scale(s, preprocessor, 1, self.epsilon), bounds=(0.0, 1000.0))
@@ -150,7 +150,6 @@ class DPMeanSpec(StatSpec):
                              f" Here the units are the same units the variable has in the dataset.")
         """
         return True
-
 
     def run_chain(self, column_names, file_obj, sep_char=","):
         """
@@ -201,12 +200,5 @@ class DPMeanSpec(StatSpec):
             else:
                 self.add_err_msg(f'{ex_obj} (Exception)')
             return False
-
-        #print((f"Epsilon: {self.epsilon}"
-        #       f"\nColumn name: {self.variable}"
-        #       f"\nColumn index: {self.col_index}"
-        #       f"\nColumn accuracy_val: {self.accuracy_val}"
-        #       f"\nColumn accuracy_message: {self.accuracy_message}"
-        #       f"\n\nDP Mean: {self.value}" ))
 
         return True

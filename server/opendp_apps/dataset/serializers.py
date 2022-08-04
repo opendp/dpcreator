@@ -3,16 +3,15 @@ from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.serializers import raise_errors_on_nested_writes
 from rest_framework.utils import model_meta
-
 from rest_polymorphic.serializers import PolymorphicSerializer
 
 from opendp_apps.analysis.models import DepositorSetupInfo
-from opendp_apps.dataset.models import DataSetInfo, DataverseFileInfo, UploadFileInfo
+from opendp_apps.analysis.serializers import AnalysisPlanSerializer
 from opendp_apps.dataset import static_vals as dstatic
+from opendp_apps.dataset.models import DataSetInfo, DataverseFileInfo, UploadFileInfo
 from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.basic_response import BasicResponse, ok_resp, err_resp
 from opendp_apps.user.models import OpenDPUser
-from opendp_apps.analysis.serializers import AnalysisPlanSerializer
 
 
 class DatasetObjectIdSerializer(serializers.Serializer):
@@ -62,7 +61,6 @@ class DatasetObjectIdSerializer(serializers.Serializer):
 
 
 class DataSetInfoSerializer(serializers.ModelSerializer):
-
     creator = serializers.SlugRelatedField(queryset=OpenDPUser.objects.all(),
                                            slug_field='username',
                                            read_only=False)
@@ -78,7 +76,6 @@ class DataSetInfoSerializer(serializers.ModelSerializer):
 
 class DepositorSetupInfoSerializer(serializers.ModelSerializer):
     """Serializer for the DepositorSetupInfo"""
-    # dataset_size = serializers.Field(source='dataset_size')
 
     class Meta:
         model = DepositorSetupInfo
@@ -206,7 +203,6 @@ class UploadFileInfoCreationSerializer(serializers.ModelSerializer):
 
 
 class DataSetInfoPolymorphicSerializer(PolymorphicSerializer):
-
     model_serializer_mapping = {
         DataSetInfo: DataSetInfoSerializer,
         DataverseFileInfo: DataverseFileInfoSerializer,

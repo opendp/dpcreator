@@ -1,5 +1,4 @@
 import decimal
-
 from os.path import abspath, dirname, isfile, join
 from unittest import skip
 
@@ -26,19 +25,19 @@ class HistogramStatSpecTest(StatSpecTestCase):
         """Reusable properties for testing basic 'StatSpec' functionality"""
 
         self.spec_props = {'variable': 'Subject',
-                      'col_index': 0,
-                      'statistic': astatic.DP_HISTOGRAM,
-                      'dataset_size': 183,
-                      'epsilon': 1.0,
-                      'delta': 0.0,
-                      'cl': astatic.CL_95,
-                      'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'fixed_value': 'ac',
-                      'variable_info': {'categories': ['ac', 'kj', 'ys', 'bh1', 'bh2', 'jm', 'mh', 'cw',
-                                                       'jp', 'rh', 'aq', 'ph', 'le', 'mn', 'ls2', 'no',
-                                                       'af'],
-                                        'type': pstatic.VAR_TYPE_CATEGORICAL},
-                      }
+                           'col_index': 0,
+                           'statistic': astatic.DP_HISTOGRAM,
+                           'dataset_size': 183,
+                           'epsilon': 1.0,
+                           'delta': 0.0,
+                           'cl': astatic.CL_95,
+                           'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+                           'fixed_value': 'ac',
+                           'variable_info': {'categories': ['ac', 'kj', 'ys', 'bh1', 'bh2', 'jm', 'mh', 'cw',
+                                                            'jp', 'rh', 'aq', 'ph', 'le', 'mn', 'ls2', 'no',
+                                                            'af'],
+                                             'type': pstatic.VAR_TYPE_CATEGORICAL},
+                           }
 
         self.dp_hist = DPHistogramCategoricalSpec(self.spec_props)
 
@@ -54,7 +53,6 @@ class HistogramStatSpecTest(StatSpecTestCase):
 
         dp_hist_int = DPHistogramIntegerSpec({})
         self.assertEqual(dp_hist_int.noise_mechanism, astatic.NOISE_GEOMETRIC_MECHANISM)
-
 
     def test_05_get_variable_order(self):
         """(05) Test get variable order"""
@@ -176,7 +174,6 @@ class HistogramStatSpecTest(StatSpecTestCase):
         self.assertTrue('categories' in dp_hist.value)
         self.assertTrue('values' in dp_hist.value)
 
-
     def test_110_run_dphist_calculation_categorical2(self):
         """(110) Run DP 2nd categorical calculation, with only 2 categories"""
         msgt(self.test_110_run_dphist_calculation_categorical2.__doc__)
@@ -227,7 +224,6 @@ class HistogramStatSpecTest(StatSpecTestCase):
         self.assertTrue('categories' in dp_hist.value)
         self.assertTrue('values' in dp_hist.value)
 
-
     def test_120_run_dphist_calculation_integer(self):
         """(120) Run DP histogram calculation with integer values"""
         msgt(self.test_120_run_dphist_calculation_integer.__doc__)
@@ -250,7 +246,8 @@ class HistogramStatSpecTest(StatSpecTestCase):
         }
 
         dp_hist = DPHistogramIntegerSpec(spec_props)
-        print(f"DPHistogramIntegerSpecSpec valid? {dp_hist.has_error()}. get_error_msg_dict: {dp_hist.get_error_msg_dict()}")
+        print(
+            f"DPHistogramIntegerSpecSpec valid? {dp_hist.has_error()}. get_error_msg_dict: {dp_hist.get_error_msg_dict()}")
         if dp_hist.has_error():
             print(f"get_error_messages(): {dp_hist.get_error_messages()}")
         self.assertTrue(dp_hist.is_chain_valid())

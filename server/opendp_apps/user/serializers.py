@@ -1,15 +1,12 @@
-from django.contrib.auth.models import Group
-from django.conf import settings
-
-from rest_framework import serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from dj_rest_auth.serializers import LoginSerializer
+from django.contrib.auth.models import Group
 from django.db import transaction
-from .models import OpenDPUser, DataverseUser
-from ..dataverses.models import DataverseHandoff
-from ..utils.view_helper import get_object_or_error_response
+from rest_framework import serializers
 
 from opendp_apps.user.dataverse_user_initializer import DataverseUserInitializer
+from .models import OpenDPUser
+from ..dataverses.models import DataverseHandoff
 
 """
 class SessionSerializer(serializers.HyperlinkedModelSerializer):
@@ -112,4 +109,3 @@ class CustomRegisterSerializer(RegisterSerializer):
                 user.save()
 
         return user
-

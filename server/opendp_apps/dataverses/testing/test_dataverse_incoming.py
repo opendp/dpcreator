@@ -1,28 +1,26 @@
 from unittest import skip
-import requests_mock
 
-from django.test import Client, tag, TestCase
+import requests_mock
+from django.contrib.auth import get_user_model
+from django.test import Client, TestCase
 from django.urls import reverse
 
-from django.contrib.auth import get_user_model
+from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses import static_vals as dv_static
-from opendp_apps.dataverses.models import ManifestTestParams
 from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
 from opendp_apps.dataverses.dataverse_request_handler import DataverseRequestHandler
-from opendp_apps.user.models import DataverseUser
-from opendp_apps.dataset.models import DataverseFileInfo
+from opendp_apps.dataverses.models import ManifestTestParams
 from opendp_apps.model_helpers.msg_util import msgt
+from opendp_apps.user.models import DataverseUser
 
-TAG_WEB_CLIENT = 'web-client' # skip these tests on travis; need to fix as many use requests to access the localhost
+TAG_WEB_CLIENT = 'web-client'  # skip these tests on travis; need to fix as many use requests to access the localhost
 
 
 class DataverseIncomingTest(TestCase):
-
     fixtures = ['test_dataverses_01.json',
                 'test_manifest_params_04.json']
 
     def setUp(self):
-
         # test client
         self.client = Client()
 
@@ -44,8 +42,8 @@ class DataverseIncomingTest(TestCase):
         #
         params_dict = self.mock_params.as_dict()
         dv_manifest = DataverseManifestParams(params_dict)
-        #print(dv_manifest.has_error())
-        #print(dv_manifest.get_err_msg())
+        # print(dv_manifest.has_error())
+        # print(dv_manifest.get_err_msg())
         self.assertTrue(dv_manifest.has_error() is False)
 
         print('3. Test with missing param. fileId')
@@ -126,9 +124,10 @@ class DataverseIncomingTest(TestCase):
         self.assertEqual(dv_user.last_name, 'User')  # from test_manifest_params_04.json
 
         print('4. Has a DataverseUser file info object been created?')
-        file_info = DataverseFileInfo.objects.filter(creator=self.user_obj, dataverse_file_id=self.mock_params.fileId).first()
+        file_info = DataverseFileInfo.objects.filter(creator=self.user_obj,
+                                                     dataverse_file_id=self.mock_params.fileId).first()
         self.assertTrue(file_info is not None)
-        #print('----' + f'{DataverseFileInfo.objects.count()}' + '----------')
+        # print('----' + f'{DataverseFileInfo.objects.count()}' + '----------')
 
     # @tag(TAG_WEB_CLIENT)
     @requests_mock.Mocker()
@@ -202,7 +201,7 @@ class DataverseIncomingTest(TestCase):
         msgt(self.test_110_check_dv_handler_via_url_no_params.__doc__)
         print('Set up requests mocker')
         self.set_requests_mocker(req_mocker)
-        
+
         print('1. Go to page with NO params')
         #
         url = reverse('view_dataverse_incoming_2')

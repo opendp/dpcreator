@@ -2,10 +2,11 @@ from django.contrib import admin
 
 from .models import BannerMessage
 
+
 class BannerMessageAdmin(admin.ModelAdmin):
     save_on_top = True
     search_fields = ('name',)
-    list_filter = ('active', 'is_timed_message', 'type')#, 'editor')
+    list_filter = ('active', 'is_timed_message', 'type')  # , 'editor')
     list_editable = ['sort_order']
     list_display = ('name',
                     'active',
@@ -23,12 +24,13 @@ class BannerMessageAdmin(admin.ModelAdmin):
             'fields': ('is_timed_message', 'view_start_time', 'view_stop_time'),
         }),
         ('Read-only fields.', {
-            'fields': ('id', 'object_id', 'editor', 'created', 'updated'), #
+            'fields': ('id', 'object_id', 'editor', 'created', 'updated'),  #
         }),
     )
 
     def save_model(self, request, obj, form, change):
         obj.editor = request.user
         super().save_model(request, obj, form, change)
+
 
 admin.site.register(BannerMessage, BannerMessageAdmin)
