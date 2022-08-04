@@ -2,35 +2,22 @@ import logging
 
 from django.conf import settings
 from django.http import FileResponse
-
-from rest_framework import permissions, viewsets, renderers, status
+from rest_framework import permissions, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from opendp_apps.utils.view_helper import get_json_error, get_json_success
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
-from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
 from opendp_apps.analysis.serializers import \
     (AnalysisPlanObjectIdSerializer,
      AnalysisPlanSerializer,
      ReleaseInfoFileDownloadSerializer,
      ReleaseInfoSerializer,
      ReleaseValidationSerializer)
-
+from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
+from opendp_apps.utils.view_helper import get_json_error
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
-
-
-class PassthroughRenderer(renderers.BaseRenderer):
-    """
-        Return data as-is. View should supply a Response.
-    """
-    media_type = ''
-    format = ''
-
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        return data
 
 
 class ReleaseFileDownloadView(viewsets.ReadOnlyModelViewSet):
@@ -116,7 +103,7 @@ class ReleaseFileDownloadView(viewsets.ReadOnlyModelViewSet):
             logger.error(user_msg + ' ReleaseInfo: ' + release_info.object_id)
             return Response(get_json_error(user_msg),
                             status=status.HTTP_400_BAD_REQUEST)
-            
+
         # send file
         response = FileResponse(file_handle, content_type='application/json')
         response['Content-Length'] = release_info.dp_release_json_file.size
@@ -127,10 +114,9 @@ class ReleaseFileDownloadView(viewsets.ReadOnlyModelViewSet):
 
 
 class ReleaseView(viewsets.ViewSet):
-
     analysis_plan = AnalysisPlanSerializer()
     permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ['post']    # 'patch']
+    http_method_names = ['post']  # 'patch']
 
     def get_queryset(self):
         """

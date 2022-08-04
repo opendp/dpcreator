@@ -1,10 +1,9 @@
-import os
 from opendp_project.settings.base import *
 
 # ----------------------------------
 # Azure specific settings
 # ----------------------------------
-#DEBUG = False
+# DEBUG = False
 ASGI_APPLICATION = "opendp_project.asgi_azure.application"
 
 # to test...
@@ -24,7 +23,7 @@ if not os.path.isdir(STATIC_ROOT):
     os.makedirs(STATIC_ROOT)
 
 STATICFILES_DIRS = [
-    #os.path.join(BASE_DIR, 'static')
+    # os.path.join(BASE_DIR, 'static')
     os.path.join(BASE_DIR, 'static', 'dist')
 ]
 

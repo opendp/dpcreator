@@ -4,11 +4,10 @@ from django.conf import settings
 from rest_framework import status
 from rest_framework.response import Response
 
-from opendp_apps.user.models import OpenDPUser, DataverseUser
 from opendp_apps.dataverses.serializers import DataverseUserSerializer
 from opendp_apps.user.dataverse_user_initializer import DataverseUserInitializer
+from opendp_apps.user.models import OpenDPUser, DataverseUser
 from opendp_project.views import BaseModelViewSet
-
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -72,7 +71,7 @@ class DataverseUserView(BaseModelViewSet):
             logger.error(f'DataverseUserView: No OpenDPUser found for id: {opendp_user_id}')
             return Response({'success': False,
                              'message': f'No OpenDPUser found for id: {opendp_user_id}'},
-                             status=status.HTTP_400_BAD_REQUEST)
+                            status=status.HTTP_400_BAD_REQUEST)
 
         # (2) Update the DataverseUser object
         #

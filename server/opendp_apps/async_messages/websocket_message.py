@@ -1,24 +1,27 @@
 """
 Basic class to hold a single streaming message returned by a TA2
 """
-from datetime import datetime
 from collections import OrderedDict
+from datetime import datetime
 
-from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
 from opendp_apps.async_messages import static_vals as mstatic
 from opendp_apps.async_messages.consumers import ChatConsumer
 
+
 class WebsocketMessage(object):
     """Basic message sent back via a websocket"""
+
     def __init__(self, msg_type, success, user_message, msg_cnt=None, data=None, **kwargs):
         assert success in (True, False), 'success must be True or False'
 
-        self.msg_type = msg_type # e.g. GetSearchSolutionsResults
+        self.msg_type = msg_type  # e.g. GetSearchSolutionsResults
         self.success = success
         self.user_message = user_message
         self.msg_cnt = msg_cnt
-        self.data = data    # e.g. python OrderedDict
+        self.data = data  # e.g. python OrderedDict
         self.timestamp = datetime.now()
         self.additional_args = kwargs
 
@@ -32,10 +35,10 @@ class WebsocketMessage(object):
 
         group_name = ChatConsumer.get_group_name(websocket_id)
 
-        async_to_sync(channel_layer.group_send)(\
-                group_name,
-                dict(type=mstatic.MESSAGE_TYPE,
-                     message=self.as_dict()))
+        async_to_sync(channel_layer.group_send)( \
+            group_name,
+            dict(type=mstatic.MESSAGE_TYPE,
+                 message=self.as_dict()))
 
     @staticmethod
     def get_success_message(msg_type, user_message, msg_cnt=None, data=None, **kwargs):
@@ -90,12 +93,3 @@ class WebsocketMessage(object):
                 od2[k] = val2
             od['additional_info'] = od2
         return dict(od)
-
-"""
-msg_dict = dict(msg_type=grpc_call_name,
-                timestamp=datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
-                message='it worked!',
-                msg_cnt=msg_cnt,
-                success=True,
-                data=msg_json_info.result_obj)
-"""

@@ -1,14 +1,15 @@
 from collections import OrderedDict
 from datetime import datetime
 
-from django.db import models
-from django.db.models.query import QuerySet
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db import models
+from django.db.models.query import QuerySet
 from django.utils import timezone
 
 from opendp_apps.banner_messages import static_vals as bstatic
 from opendp_apps.model_helpers.models import TimestampedModelWithUUID
+
 
 class BannerMessage(TimestampedModelWithUUID):
     """
@@ -33,21 +34,21 @@ class BannerMessage(TimestampedModelWithUUID):
     content = models.TextField(help_text='Banner content. May contain basic HTMl tags: links, boldface, etc.')
 
     is_timed_message = models.BooleanField(
-                        default=False,
-                        help_text=('Optional. If True, use "active" as well as both'
-                                   ' "view_start_time"/"view_stop_time" settings to determine banner display.'))
+        default=False,
+        help_text=('Optional. If True, use "active" as well as both'
+                   ' "view_start_time"/"view_stop_time" settings to determine banner display.'))
 
     view_start_time = models.DateTimeField(
-                                  blank=True,
-                                  null=True,
-                                  help_text=('Optional. Used in conjunction with' 
-                                             ' "is_timed_message" and "view_stop_time"'))
+        blank=True,
+        null=True,
+        help_text=('Optional. Used in conjunction with'
+                   ' "is_timed_message" and "view_stop_time"'))
 
     view_stop_time = models.DateTimeField(
-                                  blank=True,
-                                  null=True,
-                                  help_text=('Optional. Used in conjunction with' 
-                                             ' "is_timed_message" and "view_start_time"'))
+        blank=True,
+        null=True,
+        help_text=('Optional. Used in conjunction with'
+                   ' "is_timed_message" and "view_start_time"'))
 
     class Meta:
         db_table = "banner_messages"
@@ -87,15 +88,15 @@ class BannerMessage(TimestampedModelWithUUID):
         Return as dict
         """
         info = OrderedDict(dict(
-                    id=self.id,
-                    name=str(self.name),
-                    type=self.type,
-                    sort_order=self.sort_order,
-                    content=self.content,
-                    is_timed_message=self.is_timed_message,
-                    updated=str(self.updated),
-                    created=str(self.created),
-                    object_id=self.object_id.hex))
+            id=self.id,
+            name=str(self.name),
+            type=self.type,
+            sort_order=self.sort_order,
+            content=self.content,
+            is_timed_message=self.is_timed_message,
+            updated=str(self.updated),
+            created=str(self.created),
+            object_id=self.object_id.hex))
 
         return info
 
@@ -131,8 +132,8 @@ class BannerMessage(TimestampedModelWithUUID):
             models.Q(active=True, is_timed_message=False) |
             # active and timed
             models.Q(active=True, is_timed_message=True,
-              view_start_time__lte=current_time,
-              view_stop_time__gte=current_time) \
+                     view_start_time__lte=current_time,
+                     view_stop_time__gte=current_time) \
             ).order_by('active', 'sort_order', '-created')
 
         return qs

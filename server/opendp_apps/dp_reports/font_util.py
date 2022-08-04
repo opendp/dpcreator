@@ -1,8 +1,9 @@
 """
 Methods for retrieving custom fonts
 """
-from pathlib import Path
 from os.path import abspath, dirname, join
+from pathlib import Path
+
 from borb.pdf.canvas.font.simple_font.true_type_font import TrueTypeFont
 
 FONT_DIR = join(dirname(abspath(__file__)), 'static', 'fonts')
@@ -26,6 +27,7 @@ FONT_INFO = {
 DEFAULT_FONT = OPEN_SANS_REGULAR
 
 LOADED_FONTS = {}
+
 
 def get_custom_font(font_name):
     """Get a custom TTF"""
@@ -51,10 +53,3 @@ def get_custom_font(font_name):
 
     # return the font object
     return font_obj
-
-
-
-
-# construct the Font object
-# font_path: Path = Path(__file__).parent / "Jsfont-Regular.ttf"
-# font: Font = TrueTypeFont.true_type_font_from_file(font_path)

@@ -3,24 +3,20 @@ import logging
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-
 from requests.utils import quote
-
-from rest_framework.response import Response
-from rest_framework.decorators import action
 from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
+from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.models import DataverseHandoff, RegisteredDataverse
 from opendp_apps.dataverses.serializers import DataverseHandoffSerializer
-from opendp_apps.dataverses import static_vals as dv_static
 from opendp_project.views import BaseModelViewSet
-
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class DataverseHandoffView(BaseModelViewSet):
-
     queryset = DataverseHandoff.objects.all()
     serializer_class = DataverseHandoffSerializer
 

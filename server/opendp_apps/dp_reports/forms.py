@@ -1,8 +1,9 @@
-from collections import OrderedDict
 import json
+from collections import OrderedDict
 
 from django import forms
 from django.core.exceptions import ValidationError
+
 
 class ReportForm(forms.Form):
     """Create a PDF from a JSON Release"""

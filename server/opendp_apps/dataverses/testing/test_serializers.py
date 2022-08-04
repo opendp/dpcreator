@@ -1,5 +1,5 @@
-from django.test import TestCase
 from django.contrib.auth import get_user_model
+from django.test import TestCase
 
 from opendp_apps.dataverses.models import DataverseHandoff
 from opendp_apps.dataverses.serializers import DataverseUserSerializer
@@ -7,7 +7,6 @@ from opendp_apps.user.models import DataverseUser
 
 
 class TestDataverseUserSerializer(TestCase):
-
     fixtures = ['test_dataverses_01.json',
                 'test_manifest_params_04.json',
                 'test_opendp_users_01.json']

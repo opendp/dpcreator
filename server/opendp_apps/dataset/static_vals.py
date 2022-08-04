@@ -1,5 +1,3 @@
-
-
 ERR_MSG_DATASET_INFO_NOT_FOUND = 'DataSetInfo object not found'
 ERR_MSG_INVALID_DATASET_INFO_OBJECT_ID = 'Invalid DataSetInfo object id.'
 

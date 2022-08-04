@@ -1,5 +1,4 @@
 import requests_mock
-
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
@@ -10,7 +9,6 @@ from opendp_apps.model_helpers.msg_util import msgt
 
 @requests_mock.Mocker()
 class TestDataSetSerializer(BaseEndpointTest):
-
     fixtures = ['test_dataverses_01.json',
                 'test_manifest_params_04.json',
                 'test_opendp_users_01.json',
@@ -86,7 +84,7 @@ class TestDataSetSerializer(BaseEndpointTest):
                                          'resourcetype': 'DataverseFileInfo',
                                          'dataset_schema_info': None,
                                          'file_schema_info': None,
-                                         'analysis_plans':[]})
+                                         'analysis_plans': []})
         self.assertEqual(response.status_code, 201)
 
     def test_unsuccessful_post(self, req_mocker):

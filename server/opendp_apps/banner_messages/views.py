@@ -1,10 +1,7 @@
-from django.utils import timezone
-
 from rest_framework import permissions, viewsets
 
 from opendp_apps.banner_messages.models import BannerMessage
 from opendp_apps.banner_messages.serializers import BannerMessageSerializer
-from opendp_project.views import BaseModelViewSet
 
 
 class BannerMessageViewSet(viewsets.ModelViewSet):

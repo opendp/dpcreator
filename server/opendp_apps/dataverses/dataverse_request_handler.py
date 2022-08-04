@@ -20,15 +20,13 @@ Completes the following steps:
 
 
 """
-from django.conf import settings
 
-from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
+from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses import static_vals as dv_static
-
+from opendp_apps.dataverses.dataverse_manifest_params import DataverseManifestParams
 # from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.user.models import DataverseUser, OpenDPUser
-from opendp_apps.dataset.models import DataverseFileInfo
 
 
 class DataverseRequestHandler(BasicErrCheck):
@@ -61,7 +59,6 @@ class DataverseRequestHandler(BasicErrCheck):
 
         self.process_dv_request()
 
-
     def process_dv_request(self):
         """
         Main function that walks through the process
@@ -86,7 +83,6 @@ class DataverseRequestHandler(BasicErrCheck):
 
         if not self.update_dataverse_file_info():
             return
-
 
     def retrieve_user_info(self):
         """
@@ -144,16 +140,16 @@ class DataverseRequestHandler(BasicErrCheck):
         if self.has_error():
             return False
 
-        test_data = {\
-         'id': 11086,
-         'identifier': '@raman_prasad',
-         'displayName': 'Raman Prasad',
-         'firstName': 'Raman',
-         'lastName': 'Prasad', 'email': 'raman_prasad@harvard.edu', 'superuser': False,
-         'affiliation': 'Harvard University',
-         'persistentUserId': 'https://fed.huit.harvard.edu/idp/shibboleth|0e459e6d562ec7e5@harvard.edu',
-         'createdTime': '2000-01-01T05:00:00Z', 'lastApiUseTime': '2020-11-16T21:52:14Z',
-         'authenticationProviderId': 'shib'}
+        test_data = { \
+            'id': 11086,
+            'identifier': '@raman_prasad',
+            'displayName': 'Raman Prasad',
+            'firstName': 'Raman',
+            'lastName': 'Prasad', 'email': 'raman_prasad@harvard.edu', 'superuser': False,
+            'affiliation': 'Harvard University',
+            'persistentUserId': 'https://fed.huit.harvard.edu/idp/shibboleth|0e459e6d562ec7e5@harvard.edu',
+            'createdTime': '2000-01-01T05:00:00Z', 'lastApiUseTime': '2020-11-16T21:52:14Z',
+            'authenticationProviderId': 'shib'}
 
         dv_persistent_id = self.user_info.get(dv_static.DV_PERSISTENT_USER_ID)
         if not dv_persistent_id:
@@ -163,9 +159,9 @@ class DataverseRequestHandler(BasicErrCheck):
             return False
 
         self.dataverse_user, _created = DataverseUser.objects.get_or_create(
-                                            user=self.user,     # logged in user
-                                            dv_installation=self.mparams.registered_dataverse, # from GET request
-                                            persistent_id=dv_persistent_id)     # from User Info
+            user=self.user,  # logged in user
+            dv_installation=self.mparams.registered_dataverse,  # from GET request
+            persistent_id=dv_persistent_id)  # from User Info
 
         # update params, if needed
         self.dataverse_user.email = self.user_info.get(dv_static.DV_EMAIL)
@@ -184,7 +180,8 @@ class DataverseRequestHandler(BasicErrCheck):
                             dataverse_file_id=self.mparams.fileId
                             )
         defaults = dict(creator=self.user,  # logged in user, OpenDP user
-                        name=self.schema_info_for_file.get(dv_static.SCHEMA_KEY_NAME, f'DV file {self.mparams.filePid}'),
+                        name=self.schema_info_for_file.get(dv_static.SCHEMA_KEY_NAME,
+                                                           f'DV file {self.mparams.filePid}'),
                         dataset_doi=self.mparams.datasetPid,
                         file_doi=self.mparams.filePid if self.mparams.filePid else '')
 
@@ -195,18 +192,3 @@ class DataverseRequestHandler(BasicErrCheck):
         return True
 
         # Need to check depositor status, is file in use, is there a release, etc...
-
-
-""" 
-#DataverseUser
-(TimestampedModelWithUUID):
-user = models.ForeignKey(OpenDPUser,
-                         on_delete=models.PROTECT)
-
-dv_installation = models.CharField(max_length=255)
-persistent_id = models.CharField(max_length=255)  # Persistent DV user id within an installation
-
-dataverse_email = models.EmailField(max_length=255, blank=True)
-dataverse_first_name = models.CharField(max_length=255, blank=True)
-dataverse_last_name = models.CharField(max_length=255, blank=True)
-"""

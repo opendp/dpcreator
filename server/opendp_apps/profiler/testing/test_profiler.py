@@ -1,33 +1,28 @@
+import json
 from collections import OrderedDict
 from os.path import abspath, dirname, isfile, join
 
-from opendp_apps.profiler.csv_reader import DelimiterNotFoundException
+from django.conf import settings
+from django.core.files import File
+from django.core.serializers.json import DjangoJSONEncoder
+from django.test import TestCase
+
+from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.dataset import static_vals as dstatic
+from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dataverses.models import RegisteredDataverse
+from opendp_apps.model_helpers.msg_util import msgt
+from opendp_apps.profiler import static_vals as pstatic
+from opendp_apps.profiler import tasks as profiler_tasks
+from opendp_apps.profiler.profile_runner import ProfileRunner
+from opendp_apps.utils.camel_to_snake import camel_to_snake
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 PROFILER_FIXTURES_DIR = join(dirname(CURRENT_DIR), 'fixtures')
 
-import json
-
-from django.test import TestCase
-from django.conf import settings
-from django.core.files import File
-
-from opendp_apps.dataset import static_vals as dstatic
-from opendp_apps.model_helpers.msg_util import msgt
-from opendp_apps.profiler import tasks as profiler_tasks
-from opendp_apps.profiler import static_vals as pstatic
-from opendp_apps.profiler.profile_runner import ProfileRunner
-from opendp_apps.utils.camel_to_snake import camel_to_snake
-
-from opendp_apps.dataset.models import DataSetInfo
-from opendp_apps.dataverses.models import RegisteredDataverse
-from opendp_apps.analysis.models import DepositorSetupInfo
-from django.core.serializers.json import DjangoJSONEncoder
-
 
 class ProfilerTest(TestCase):
-
     fixtures = ['test_profiler_data_001.json']
 
     def setUp(self):
@@ -44,7 +39,7 @@ class ProfilerTest(TestCase):
         self.mock_params = ManifestTestParams.objects.filter(use_mock_dv_api=True).first()
         """
 
-    def profile_good_file(self, filename, num_features_orig, num_features_profile, num_rows, **kwargs):
+    def profile_good_file(self, filename, num_features_profile, num_rows, **kwargs):
         """Used by multiple tests...."""
 
         # File to profile
@@ -100,20 +95,19 @@ class ProfilerTest(TestCase):
 
         msgt('-- Profile gking-crisis.tab')
         # https://dataverse.harvard.edu/file.xhtml?persistentId=doi:10.7910/DVN/OLD7MB/ZI4N3J&version=4.2
-        self.profile_good_file('gking-crisis.tab', 19, 19, 3345)
+        self.profile_good_file('gking-crisis.tab', 19, 3345)
 
         msgt('-- Profile voter_validation_lwd.csv')
         # https://github.com/privacytoolsproject/PSI-Service/blob/develop/data/voter_validation_lwd.csv
-        self.profile_good_file('voter_validation_lwd.csv', 35, 35, 20771)
+        self.profile_good_file('voter_validation_lwd.csv', 35, 20771)
 
         msgt('-- Profile teacher_climate_survey_lwd.csv')
         # https://github.com/privacytoolsproject/PSI-Service/blob/develop/data/teacher_climate_survey_lwd.csv
-        self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 132, 1500)
-        
+        self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 1500)
+
         # Don't save row count
         params = {pstatic.KEY_SAVE_ROW_COUNT: False}
-        self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 132, 1500, **params)
-
+        self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 1500, **params)
 
     def test_010_profile_good_file(self):
         """(10) Profile file directory"""
@@ -195,7 +189,6 @@ class ProfilerTest(TestCase):
         self.assertTrue(isfile(filepath))
         self.assertTrue('UnicodeDecodeError' in profiler.get_err_msg())
 
-
     def test_30_filefield_empty(self):
         """(30) Test with empty file field"""
         msgt(self.test_30_filefield_empty.__doc__)
@@ -203,7 +196,7 @@ class ProfilerTest(TestCase):
         # Retrieve DataSetInfo
         #
         dsi = DataSetInfo.objects.get(object_id=self.ds_01_object_id)
-        self.assertEqual(dsi.depositor_setup_info.user_step, \
+        self.assertEqual(dsi.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
 
         # Try to profile and empty Django FileField
@@ -246,7 +239,7 @@ class ProfilerTest(TestCase):
         # Retrieve DataSetInfo
         #
         dsi = DataSetInfo.objects.get(object_id=self.ds_01_object_id)
-        self.assertEqual(dsi.depositor_setup_info.user_step, \
+        self.assertEqual(dsi.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
 
         # --------------------------------------------------
@@ -279,10 +272,10 @@ class ProfilerTest(TestCase):
         self.assertTrue('variables' in info)
         self.assertEqual(len(info['variables'].keys()), settings.PROFILER_COLUMN_LIMIT)
 
-        self.assertEqual(dsi2.depositor_setup_info.user_step, \
+        self.assertEqual(dsi2.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
 
-        #print('dsi2.profile_variables', dsi2.profile_variables)
+        # print('dsi2.profile_variables', dsi2.profile_variables)
         # self.assertEqual(len(dsi2.profile_variables['variables'].keys()),
         #                  settings.PROFILER_COLUMN_LIMIT)
 
@@ -296,8 +289,6 @@ class ProfilerTest(TestCase):
         #
         for idx, colname in dsi2.profile_variables['dataset']['variableOrder']:
             self.assertTrue(colname in dsi2.profile_variables['variables'])
-
-
 
     def test_45_bad_dataset_id(self):
         """(45) Test using bad DatasetInfo object id"""
@@ -338,7 +329,6 @@ class ProfilerTest(TestCase):
         print(profiler.get_err_msg())
         self.assertTrue(dstatic.ERR_MSG_INVALID_DATASET_INFO_OBJECT_ID in profiler.get_err_msg())
 
-
     def test_050_bad_column_limit(self):
         """(50) Profile bad column limit"""
         msgt(self.test_050_bad_column_limit.__doc__)
@@ -352,7 +342,7 @@ class ProfilerTest(TestCase):
         #
         prunner = profiler_tasks.run_profile_by_filepath(filepath, max_num_features=-1)
 
-        #if prunner.has_error():   print(prunner.get_err_msg())
+        # if prunner.has_error():   print(prunner.get_err_msg())
         self.assertTrue(prunner.has_error())
         self.assertTrue(pstatic.ERR_MSG_COLUMN_LIMIT in prunner.get_err_msg())
 
@@ -387,8 +377,3 @@ class ProfilerTest(TestCase):
                         (varname_snakecase in plan_var_info)
             print(f'> Check: {orig_varname}/{varname_snakecase} -> {var_found}')
             self.assertTrue(var_found)
-
-"""
-docker-compose run server python manage.py test opendp_apps.profiler.testing.test_profiler.ProfilerTest.test_100_locate_var_info
-
-"""

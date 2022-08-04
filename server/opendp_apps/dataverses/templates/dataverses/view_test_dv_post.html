@@ -1,46 +1,46 @@
-{%  extends "dataverses/test_base.html" %}
+{% extends "dataverses/test_base.html" %}
 
 {% block main_content %}
 
- <div class="card shadow-sm">
-      <div class="card-header">
-        <h4 class="my-0 font-weight-normal">Incoming Params from POST request</h4>
-      </div>
-
-      <div class="card-body">
-        {% if IS_POST is False %}
-            <div class="alert alert-danger" role="alert">
-                The request was not a POST
-            </div>
-        {% else %}
-            <span class="badge badge-success">Success (It's a POST)</span>
-        {% endif %}
-        {% if incoming_params %}
-          <table class="table table-bordered table-condensed table-sm">
-          {% for key, val in incoming_params.items %}
-              <tr>
-                  <th>{{ key }}</th>
-                  <td>{{ val }}</td>
-              </tr>
-          {% endfor %}
-          </table>
-        {% endif %}
-      </div>
-  </div>
-    <br /><br />
     <div class="card shadow-sm">
-          <div class="card-header">
-            <h4 class="my-0 font-weight-normal">post test</h4>
-          </div>
-          <div class="card-body">
-              <form action="{% url 'view_test_dv_post' %}" method="post">
-                  <label for="val1">Val 1</label> <input type="text" id="val1" name="val1">
-                  <br /><label for="val2">Val 2</label> <input type="text" id="val2" name="val2">
-                  <br /><label for="val3">Val 3</label> <input type="text" id="val3" name="val3">
-                  <br />&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;    <input type="submit" value="Submit" />
-              </form>
-          </div>
-      </div>
+        <div class="card-header">
+            <h4 class="my-0 font-weight-normal">Incoming Params from POST request</h4>
+        </div>
 
-    <br /><br />
+        <div class="card-body">
+            {% if IS_POST is False %}
+                <div class="alert alert-danger" role="alert">
+                    The request was not a POST
+                </div>
+            {% else %}
+                <span class="badge badge-success">Success (It's a POST)</span>
+            {% endif %}
+            {% if incoming_params %}
+                <table class="table table-bordered table-condensed table-sm">
+                    {% for key, val in incoming_params.items %}
+                        <tr>
+                            <th>{{ key }}</th>
+                            <td>{{ val }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+        </div>
+    </div>
+    <br/><br/>
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h4 class="my-0 font-weight-normal">post test</h4>
+        </div>
+        <div class="card-body">
+            <form action="{% url 'view_test_dv_post' %}" method="post">
+                <label for="val1">Val 1</label> <input type="text" id="val1" name="val1">
+                <br/><label for="val2">Val 2</label> <input type="text" id="val2" name="val2">
+                <br/><label for="val3">Val 3</label> <input type="text" id="val3" name="val3">
+                <br/>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <input type="submit" value="Submit"/>
+            </form>
+        </div>
+    </div>
+
+    <br/><br/>
 {% endblock %}

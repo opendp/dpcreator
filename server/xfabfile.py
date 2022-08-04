@@ -118,19 +118,13 @@ def dc_init_db(context):
     print("Docker Compose: Run init_db")
     fab_local(cmds)
 
+
 def dc_create_superuser(context):
     """Dockder compose: create a test superuser"""
     cmd = 'docker-compose run opendp_server fab -r ./server/ create-django-superuser'
 
     print("Docker Compose: create superuser")
     fab_local(cmd)
-
-#@task
-#def dc_run_dev(context):
-#    """Docker compose: Run the Django development server"""
-#    init_db(context)
-#
- #   fab_local('docker-compose run python manage.py runserver')
 
 
 def create_user(username, last_name, first_name, **kwargs):
@@ -220,13 +214,7 @@ def redis_stop(context):
     redis_cmd = 'docker stop dpcreator-redis'
     fab_local(redis_cmd)
     return
-    #redis_cmd = 'pkill -f redis'
-    redis_cmd = 'docker stop dpcreator-redis'
-    with settings(warn_only=True):
-        result = fab_local(redis_cmd, capture=True)
 
-        if result.failed:
-            print('Nothing to stop')
 
 @task
 def redis_restart(context):

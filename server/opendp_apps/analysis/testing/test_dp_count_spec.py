@@ -1,19 +1,17 @@
 import json
 from os.path import abspath, dirname, isfile, join
 
-CURRENT_DIR = dirname(abspath(__file__))
-TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
-
 from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
 from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
 from opendp_apps.model_helpers.msg_util import msgt
-from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.utils.extra_validators import *
 
+CURRENT_DIR = dirname(abspath(__file__))
+TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
+
 
 class DPCountStatSpecTest(StatSpecTestCase):
-
     fixtures = ['test_dataset_data_001.json', ]
 
     def test_05_valid_noise_mechanism(self):
@@ -41,7 +39,7 @@ class DPCountStatSpecTest(StatSpecTestCase):
 
         dp_count = DPCountSpec(spec_props)
         dp_count.is_chain_valid()
-        #if dp_count.has_error():
+        # if dp_count.has_error():
         #    print(dp_count.get_err_msgs())
 
         # ------------------------------------------------------
@@ -66,11 +64,11 @@ class DPCountStatSpecTest(StatSpecTestCase):
         self.assertFalse(dp_count.has_error())
 
         # val from local machine: 4.6051702036798
-        #self.assertTrue(dp_count.accuracy_val > 4.5)
-        #self.assertTrue(dp_count.accuracy_val < 4.7)
+        # self.assertTrue(dp_count.accuracy_val > 4.5)
+        # self.assertTrue(dp_count.accuracy_val < 4.7)
 
         # Actual count 184
-        self.assertTrue(dp_count.value > 170) # should be well within range
+        self.assertTrue(dp_count.value > 170)  # should be well within range
 
     def test_20_count_valid_spec(self):
         """(20) Run DP Count valid spec, integer column"""
@@ -255,16 +253,16 @@ class DPCountStatSpecTest(StatSpecTestCase):
         msgt(self.test_50_count_missing_vals_str.__doc__)
 
         xspec_props = {'variable': 'gender',
-                      'col_index': 4,
-                      'statistic': astatic.DP_COUNT,
-                      'dataset_size': 1_000,
-                      'epsilon': 1.0,
-                      'delta': 0.0,
-                      'cl': astatic.CL_95,
-                      'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'fixed_value': 'Genderfluid',
-                      'variable_info': {'type': pstatic.VAR_TYPE_CATEGORICAL},
-                      }
+                       'col_index': 4,
+                       'statistic': astatic.DP_COUNT,
+                       'dataset_size': 1_000,
+                       'epsilon': 1.0,
+                       'delta': 0.0,
+                       'cl': astatic.CL_95,
+                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+                       'fixed_value': 'Genderfluid',
+                       'variable_info': {'type': pstatic.VAR_TYPE_CATEGORICAL},
+                       }
         # right from UI
         spec_props = {'error': '', 'label': 'gender', 'locked': False,
                       'epsilon': 1.0, 'delta': 0.0, 'cl': 0.95,
@@ -272,8 +270,8 @@ class DPCountStatSpecTest(StatSpecTestCase):
                       'fixed_value': 'male', 'handle_as_fixed': True,
                       'missing_values_handling': 'insert_fixed', 'dataset_size': 1000,
                       'variable_info': {'name': 'gender', 'type': 'Categorical',
-                           'label': 'gender', 'selected': True,
-                           'categories': ['Genderfluid'], 'sort_order': 4}, 'col_index': 4}
+                                        'label': 'gender', 'selected': True,
+                                        'categories': ['Genderfluid'], 'sort_order': 4}, 'col_index': 4}
 
         dp_count = DPCountSpec(spec_props)
         dp_count.is_chain_valid()
@@ -359,6 +357,6 @@ class DPCountStatSpecTest(StatSpecTestCase):
         # Actual count 184
         self.assertTrue(dp_count.value > 970)  # should be well within range
 
-    def show_release_result(self, release_dict:{}):
+    def show_release_result(self, release_dict: {}):
         """print the result to the screen"""
         print(json.dumps(release_dict, indent=4))

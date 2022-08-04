@@ -56,7 +56,6 @@ from opendp_apps.analysis.models import ReleaseInfo
 from opendp_apps.profiler.static_vals import VAR_TYPE_CATEGORICAL
 from opendp_apps.utils.randname import random_with_n_digits
 
-
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
@@ -181,9 +180,9 @@ class PDFReportMaker(BasicErrCheck):
 
         if not self.pdf_output_file:
             self.pdf_output_file = join(CURRENT_DIR,
-                                   'test_data',
-                                   'pdfs',
-                                   'pdf_report_01_%s.pdf' % (random_with_n_digits(6)))
+                                        'test_data',
+                                        'pdfs',
+                                        'pdf_report_01_%s.pdf' % (random_with_n_digits(6)))
 
         print('pdf_output_file', self.pdf_output_file)
         with open(self.pdf_output_file, "wb") as out_file_handle:
@@ -558,7 +557,6 @@ class PDFReportMaker(BasicErrCheck):
         for paragraph_obj in pdf_preset_text.PARAMETERS_AND_BOUNDS_02:
             self.add_to_layout(paragraph_obj)
 
-
     def add_negative_values(self):
         """Add page(s) on negative values"""
         if self.has_error():
@@ -638,8 +636,8 @@ class PDFReportMaker(BasicErrCheck):
 
         # Dataset is a UserUpload
         if dataset_info['type'] == DataSetInfo.SourceChoices.UserUpload:
-            #note = '!Not a Dataverse dataset. Add handling! (pdf_report_maker.py / add_data_source_and_lib)'
-            #self.add_to_layout(putil.txt_reg_para(note))
+            # note = '!Not a Dataverse dataset. Add handling! (pdf_report_maker.py / add_data_source_and_lib)'
+            # self.add_to_layout(putil.txt_reg_para(note))
             self.add_dataset_upload_info(dataset_info)
             self.add_opendp_lib_info()
             return

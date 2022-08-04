@@ -18,16 +18,15 @@ With other props:
 
 """
 from opendp_apps.analysis.tools.stat_spec import StatSpec
-from opendp_apps.analysis import static_vals as astatic
 
 
 class DPSpecError(StatSpec):
-
     ERR_MSG_REQUIRED_PROPS = ('It is required that "props" has an "error_message".'
                               'e.g.: `spec = DPSpecError(error_message="Something wrong")`')
     """
     This is used to hold an error message!
     """
+
     def __init__(self, props: dict):
         """
         Minimum format for props
@@ -39,8 +38,7 @@ class DPSpecError(StatSpec):
 
         assert 'error_message' in props, self.ERR_MSG_REQUIRED_PROPS
 
-        self.add_err_msg(props['error_message'])    # Sets `self.error_found = True`
-
+        self.add_err_msg(props['error_message'])  # Sets `self.error_found = True`
 
     def run_02_basic_validation(self):
         """Unusual override!!!"""

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from opendp_apps.dataset.models import DataverseFileInfo, UploadFileInfo
+from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses.models import RegisteredDataverse, DataverseHandoff
 from opendp_apps.user.models import DataverseUser, OpenDPUser
 
@@ -14,7 +14,6 @@ class RegisteredDataverseSerializer(serializers.ModelSerializer):
 
 
 class DataverseUserSerializer(serializers.ModelSerializer):
-
     user = serializers.SlugRelatedField(queryset=OpenDPUser.objects.all(),
                                         slug_field='object_id',
                                         read_only=False)
@@ -46,7 +45,6 @@ class DataverseUserSerializer(serializers.ModelSerializer):
 
 
 class DataverseHandoffSerializer(serializers.ModelSerializer):
-
     site_url = serializers.SlugRelatedField(queryset=RegisteredDataverse.objects.filter(active=True),
                                             slug_field='dataverse_url',
                                             read_only=False,
@@ -58,7 +56,6 @@ class DataverseHandoffSerializer(serializers.ModelSerializer):
 
 
 class DataverseFileInfoMakerSerializer(serializers.ModelSerializer):
-
     dv_installation = serializers.PrimaryKeyRelatedField(queryset=RegisteredDataverse.objects.all())
     creator = serializers.PrimaryKeyRelatedField(queryset=OpenDPUser.objects.all())
 

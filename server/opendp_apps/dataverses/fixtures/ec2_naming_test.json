@@ -1,87 +1,87 @@
 [
-    {
+  {
     "model": "dataverses.manifesttestparams",
     "pk": 5,
     "fields": {
-        "created": "2021-12-07T17:23:52.347Z",
-        "updated": "2021-12-07T17:27:57.174Z",
-        "object_id": "0dc1bed5-e8dc-486a-aeef-f0c3b938f6b3",
-        "fileId": 84,
-        "datasetPid": "doi:10.5072/FK2/V6YFKL",
-        "filePid": "",
-        "apiGeneralToken": "60a26e39-fea3-4620-974d-642964ef96c2",
-        "name": "bonabo: variable naming",
-        "site_url": "http://127.0.0.1:8000/dv-mock-api",
-        "use_mock_dv_api": true,
-        "schema_org_content": {
-            "@id": "https://doi.org/10.5072/FK2/V6YFKL",
-            "name": "Annie Test Dataset1",
-            "@type": "Dataset",
-            "author": [
-                {
-                    "name": "Wu, Annie"
-                }
-            ],
-            "creator": [
-                {
-                    "name": "Wu, Annie"
-                }
-            ],
-            "license": {
-                "url": "https://creativecommons.org/publicdomain/zero/1.0/",
-                "text": "CC0",
-                "@type": "Dataset"
-            },
-            "version": "1",
-            "@context": "http://schema.org",
-            "keywords": [
-                "Other"
-            ],
-            "provider": {
-                "name": "Root",
-                "@type": "Organization"
-            },
-            "publisher": {
-                "name": "Root",
-                "@type": "Organization"
-            },
-            "identifier": "https://doi.org/10.5072/FK2/V6YFKL",
-            "description": [
-                "test dataset1"
-            ],
-            "dateModified": "2021-12-06",
-            "distribution": [
-                {
-                    "name": "bonabo MOCK_DATA 28var numlast v2.tab",
-                    "@type": "DataDownload",
-                    "contentUrl": "http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/84",
-                    "fileFormat": "text/tab-separated-values",
-                    "contentSize": 234725
-                }
-            ],
-            "datePublished": "2021-12-06",
-            "includedInDataCatalog": {
-                "url": "http://ec2-35-171-244-178.compute-1.amazonaws.com",
-                "name": "Root",
-                "@type": "DataCatalog"
-            }
+      "created": "2021-12-07T17:23:52.347Z",
+      "updated": "2021-12-07T17:27:57.174Z",
+      "object_id": "0dc1bed5-e8dc-486a-aeef-f0c3b938f6b3",
+      "fileId": 84,
+      "datasetPid": "doi:10.5072/FK2/V6YFKL",
+      "filePid": "",
+      "apiGeneralToken": "60a26e39-fea3-4620-974d-642964ef96c2",
+      "name": "bonabo: variable naming",
+      "site_url": "http://127.0.0.1:8000/dv-mock-api",
+      "use_mock_dv_api": true,
+      "schema_org_content": {
+        "@id": "https://doi.org/10.5072/FK2/V6YFKL",
+        "name": "Annie Test Dataset1",
+        "@type": "Dataset",
+        "author": [
+          {
+            "name": "Wu, Annie"
+          }
+        ],
+        "creator": [
+          {
+            "name": "Wu, Annie"
+          }
+        ],
+        "license": {
+          "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+          "text": "CC0",
+          "@type": "Dataset"
         },
-        "user_info": {
-            "id": 9474,
-            "email": "mock_user@some.edu",
-            "lastName": "User",
-            "firstName": "Mock",
-            "object_id": "2dd1aa0a-7e48-49e1-af0d-efbd2f68d0bf",
-            "superuser": false,
-            "identifier": "@mock_user",
-            "affiliation": "Some University",
-            "createdTime": "2000-01-01T05:00:00Z",
-            "displayName": "Mock User",
-            "lastApiUseTime": "2020-11-16T19:34:51Z",
-            "persistentUserId": "https://fed.some-it.some.edu/idp/shibboleth|92459eabc12ec34@some.edu",
-            "authenticationProviderId": "shib"
+        "version": "1",
+        "@context": "http://schema.org",
+        "keywords": [
+          "Other"
+        ],
+        "provider": {
+          "name": "Root",
+          "@type": "Organization"
         },
-        "raw_file": ""
+        "publisher": {
+          "name": "Root",
+          "@type": "Organization"
+        },
+        "identifier": "https://doi.org/10.5072/FK2/V6YFKL",
+        "description": [
+          "test dataset1"
+        ],
+        "dateModified": "2021-12-06",
+        "distribution": [
+          {
+            "name": "bonabo MOCK_DATA 28var numlast v2.tab",
+            "@type": "DataDownload",
+            "contentUrl": "http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/84",
+            "fileFormat": "text/tab-separated-values",
+            "contentSize": 234725
+          }
+        ],
+        "datePublished": "2021-12-06",
+        "includedInDataCatalog": {
+          "url": "http://ec2-35-171-244-178.compute-1.amazonaws.com",
+          "name": "Root",
+          "@type": "DataCatalog"
+        }
+      },
+      "user_info": {
+        "id": 9474,
+        "email": "mock_user@some.edu",
+        "lastName": "User",
+        "firstName": "Mock",
+        "object_id": "2dd1aa0a-7e48-49e1-af0d-efbd2f68d0bf",
+        "superuser": false,
+        "identifier": "@mock_user",
+        "affiliation": "Some University",
+        "createdTime": "2000-01-01T05:00:00Z",
+        "displayName": "Mock User",
+        "lastApiUseTime": "2020-11-16T19:34:51Z",
+        "persistentUserId": "https://fed.some-it.some.edu/idp/shibboleth|92459eabc12ec34@some.edu",
+        "authenticationProviderId": "shib"
+      },
+      "raw_file": ""
     }
-}
+  }
 ]

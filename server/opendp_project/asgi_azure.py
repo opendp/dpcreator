@@ -20,11 +20,10 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from opendp_apps.async_messages import routing as async_routing
 
 application = ProtocolTypeRouter({
-  "http": AsgiHandler(),
-  "websocket": AuthMiddlewareStack(
-    URLRouter(
-      async_routing.websocket_urlpatterns   # ws://async_messages/ws
-    )
-  ),
+    "http": AsgiHandler(),
+    "websocket": AuthMiddlewareStack(
+        URLRouter(
+            async_routing.websocket_urlpatterns  # ws://async_messages/ws
+        )
+    ),
 })
-

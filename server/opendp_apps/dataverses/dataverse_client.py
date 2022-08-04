@@ -1,11 +1,10 @@
 import json
 from pprint import pprint
 
-import requests
-from requests.exceptions import ConnectionError
 import lxml.etree as etree
-
+import requests
 from pyDataverse.api import Api, DataAccessApi, NativeApi
+from requests.exceptions import ConnectionError
 
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.models import RegisteredDataverse
@@ -35,8 +34,6 @@ class DataverseClient(object):
         api_token = user_api_token if user_api_token else self.api_token
         # remove any trailing "/"
         ye_host = RegisteredDataverse.format_dv_url(self._host)
-        #while ye_host.endswith('/'):
-        #    ye_host = ye_host[:-1]
 
         # format url
         dv_url = f'{ye_host}/api/v1/users/:me'
@@ -128,7 +125,6 @@ class DDI(object):
 
 
 if __name__ == '__main__':
-
     host = 'https://dataverse.harvard.edu'
     doi = 'doi:10.7910/DVN/GEWLZD'
 

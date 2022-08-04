@@ -5,11 +5,9 @@ import logging
 
 from django.conf import settings
 
-from opendp_project.celery import celery_app
-
 from opendp_apps.analysis.models import ReleaseInfo
 from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
-
+from opendp_project.celery import celery_app
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -39,5 +37,3 @@ def run_pdf_report_maker(release_info_object_id, websocket_id=None, **kwargs):
     logger.info('PDF created and saved to the ReleaseInfo object')
     return {'success': True,
             'message': f'PDF created and saved to the ReleaseInfo object'}
-
-

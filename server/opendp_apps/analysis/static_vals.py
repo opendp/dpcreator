@@ -1,8 +1,5 @@
-from decimal import Decimal
-
 NOISE_GEOMETRIC_MECHANISM = 'Geometric'
 NOISE_LAPLACE_MECHANISM = 'Laplace'
-
 
 """
 Epsilon related values
@@ -12,12 +9,12 @@ and 1.
 When checking max_epsilon, offset it by 10**-14 to avoid
   floating point addition issues. e.g. exceeding an espilon of 1 by: 0.0000000000000001
 """
-MAX_EPSILON_OFFSET = 10**-14
+MAX_EPSILON_OFFSET = 10 ** -14
 
 # ---------------------------------
 # Confidence level static values
 # ---------------------------------
-CL_90 = 0.90    # just to look at
+CL_90 = 0.90  # just to look at
 CL_95 = 0.95
 CL_99 = 0.99
 
@@ -85,7 +82,7 @@ MISSING_VAL_HANDING_LABELS = {
 
 
 def missing_val_label(missing_val_type):
-    assert missing_val_type in MISSING_VAL_HANDING_LABELS,\
+    assert missing_val_type in MISSING_VAL_HANDING_LABELS, \
         f"The type of missing value is unknown! {missing_val_type}"
     return MISSING_VAL_HANDING_LABELS.get(missing_val_type)
 
@@ -97,7 +94,6 @@ ERR_MSG_ANALYSIS_PLAN_NOT_FOUND = 'The AnalysisPlan was not found.'
 
 ERR_MSG_DATASET_ID_REQUIRED = 'The DataSetInfo id is required.'
 ERR_MSG_ANALYSIS_ID_REQUIRED = 'The AnalysisPlan id is required.'
-
 
 ERR_MSG_USER_REQUIRED = 'The OpenDP user is required.'
 ERR_MSG_NO_DATASET = 'DataSetInfo object not found for this object_id and creator'
@@ -136,23 +132,22 @@ SETUP_Q_02_TEXT = ('Which of the following best describes your data file?',
                    ' which may be changed later in the process.')
 
 SETUP_Q_02_ANSWERS = dict(
-                    public=('Public Information', None),
-                    notHarmButConfidential=(('Information that, if disclosed,'
-                                             ' would not cause material harm,'
-                                             ' but which the organization has chosen to keep confidential'),
-                                            {'epsilon': 1, 'delta': 10-5}),
-                    couldCauseHarm=(('Information that could cause risk of material harm to individuals'
-                                     ' or the organization if disclosed'),
-                                    {'epsilon': .25, 'delta': 10e-6}),
-                    wouldLikelyCauseHarm=(('Information that would likely cause serious harm to individuals'
-                                           ' or the organization if disclosed'),
-                                          {'epsilon': .05, 'delta': 10e-7}),
-                    wouldCauseSevereHarm=(('Information that would cause severe harm to individuals or the'
-                                           ' organization if disclosed. Use of this application is not'
-                                           ' recommended.'),
-                                          None),
-                    )
-
+    public=('Public Information', None),
+    notHarmButConfidential=(('Information that, if disclosed,'
+                             ' would not cause material harm,'
+                             ' but which the organization has chosen to keep confidential'),
+                            {'epsilon': 1, 'delta': 10 - 5}),
+    couldCauseHarm=(('Information that could cause risk of material harm to individuals'
+                     ' or the organization if disclosed'),
+                    {'epsilon': .25, 'delta': 10e-6}),
+    wouldLikelyCauseHarm=(('Information that would likely cause serious harm to individuals'
+                           ' or the organization if disclosed'),
+                          {'epsilon': .05, 'delta': 10e-7}),
+    wouldCauseSevereHarm=(('Information that would cause severe harm to individuals or the'
+                           ' organization if disclosed. Use of this application is not'
+                           ' recommended.'),
+                          None),
+)
 
 SETUP_Q_03_ATTR = 'radio_only_one_individual_per_row'
 SETUP_Q_03_TEXT = ('Does each individual appear in only one row?',
@@ -163,7 +158,7 @@ SETUP_Q_04_TEXT = ('Is your data a secret and simple random sample from a larger
                    ('If the data is a simple random sample, we can use methods (amplification)'
                     ' to increase the accuracy and utility of the statistics you create.'))
 
-SETUP_Q_04a_ATTR = 'population_size'    # if SETUP_Q_04_ATTR answer is "yes"
+SETUP_Q_04a_ATTR = 'population_size'  # if SETUP_Q_04_ATTR answer is "yes"
 SETUP_Q_04a_TEXT = 'Population size'
 
 SETUP_Q_05_ATTR = 'observations_number_can_be_public'
@@ -172,12 +167,12 @@ SETUP_Q_05_TEXT = ('Can the number of observations in your data file be made pub
                     ' of your privacy budget to estimate it.'))
 
 SETUP_QUESTION_LOOKUP = {
-                         SETUP_Q_01_ATTR: SETUP_Q_01_TEXT,
-                         SETUP_Q_02_ATTR: SETUP_Q_02_TEXT,
-                         SETUP_Q_03_ATTR: SETUP_Q_03_TEXT,
-                         SETUP_Q_04_ATTR: SETUP_Q_04_TEXT,
-                         SETUP_Q_05_ATTR: SETUP_Q_05_TEXT,
-                         }
+    SETUP_Q_01_ATTR: SETUP_Q_01_TEXT,
+    SETUP_Q_02_ATTR: SETUP_Q_02_TEXT,
+    SETUP_Q_03_ATTR: SETUP_Q_03_TEXT,
+    SETUP_Q_04_ATTR: SETUP_Q_04_TEXT,
+    SETUP_Q_05_ATTR: SETUP_Q_05_TEXT,
+}
 SETUP_QUESTION_LIST = [SETUP_Q_01_ATTR,
                        SETUP_Q_02_ATTR,
                        SETUP_Q_03_ATTR,

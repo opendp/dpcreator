@@ -1,27 +1,25 @@
 import json
+
 import requests_mock
-from unittest import skip
-from django.test import TestCase
 from django.contrib.auth import get_user_model
+from django.test import TestCase
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.models import ManifestTestParams, DataverseHandoff
-from opendp_apps.user.models import DataverseUser
 from opendp_apps.model_helpers.msg_util import msg, msgt
+from opendp_apps.user.models import DataverseUser
 
-TAG_WEB_CLIENT = 'web-client' # skip these tests on travis; need to fix as many use requests to access the localhost
+TAG_WEB_CLIENT = 'web-client'  # skip these tests on travis; need to fix as many use requests to access the localhost
 
 
 class BaseEndpointTest(TestCase):
-
     fixtures = ['test_dataverses_01.json',
                 'test_manifest_params_04.json',
                 'test_opendp_users_01.json']
 
     def setUp(self):
-
         # test client
         self.client = APIClient()
 
@@ -40,20 +38,20 @@ class BaseEndpointTest(TestCase):
         self.dv_user_url = reverse('dv-user-list')
 
         self.dv_updated_user_info = {'status': 'OK', 'data': {
-                "id": 9974,
-                "object_id": "2dd1aa0a-7e48-49e1-af0d-efbd2f68d0bf",
-                "email": "mock_email_updated@some.edu",
-                "firstName": "UpdatedFname",
-                "lastName": "UpdatedLname",
-                "superuser": False,
-                "identifier": "@mock_user",
-                "affiliation": "Some University",
-                "createdTime": "2000-01-01T05:00:00Z",
-                "displayName": "Mock User",
-                "lastApiUseTime": "2020-11-16T19:34:51Z",
-                "persistentUserId": "updatedPersistentUserId",
-                "authenticationProviderId": "shib"
-            }}
+            "id": 9974,
+            "object_id": "2dd1aa0a-7e48-49e1-af0d-efbd2f68d0bf",
+            "email": "mock_email_updated@some.edu",
+            "firstName": "UpdatedFname",
+            "lastName": "UpdatedLname",
+            "superuser": False,
+            "identifier": "@mock_user",
+            "affiliation": "Some University",
+            "createdTime": "2000-01-01T05:00:00Z",
+            "displayName": "Mock User",
+            "lastApiUseTime": "2020-11-16T19:34:51Z",
+            "persistentUserId": "updatedPersistentUserId",
+            "authenticationProviderId": "shib"
+        }}
         self.dv_user_invalid_token = {
             "status": "ERROR",
             "message": "User with token 7957c20e-5316-47d5-bd23-2afd19f2d00a not found."
@@ -69,16 +67,16 @@ class BaseEndpointTest(TestCase):
         Set up test urls that are used by the requests library
         """
         server_info = {
-                        dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_OK,
-                       'data': {'message': 'dataverse.MOCK-SERVER.edu'}
-                      }
+            dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_OK,
+            'data': {'message': 'dataverse.MOCK-SERVER.edu'}
+        }
         req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/info/server', json=server_info)
 
         # User Info
         user_info = {dv_static.DV_KEY_STATUS: dv_static.STATUS_VAL_OK, 'data': self.mock_params.user_info}
         req_mocker.get('http://127.0.0.1:8000/dv-mock-api/api/v1/users/:me', json=user_info)
 
-        #req_mocker.get('http://www.invalidsite.com/api/v1/users/:me')
+        # req_mocker.get('http://www.invalidsite.com/api/v1/users/:me')
 
         # Schema.org dataset info
         schema_url = ('http://127.0.0.1:8000/dv-mock-api/api/v1/datasets/export?exporter='
@@ -236,7 +234,7 @@ class DataversePostTest(BaseEndpointTest):
         msg(response.json())
         self.assertEqual(response.status_code, 201)
         dataverse_users_count = DataverseUser.objects.count()
-        self.assertEqual(initial_dv_user_count+1, dataverse_users_count)
+        self.assertEqual(initial_dv_user_count + 1, dataverse_users_count)
 
         # Now make the same request, and demonstrate that it queried for DataverseUser
         # rather than creating another one
@@ -245,9 +243,9 @@ class DataversePostTest(BaseEndpointTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(dataverse_users_count, DataverseUser.objects.count())
 
+
 @requests_mock.Mocker()
 class DataversePutTest(BaseEndpointTest):
-
     url = reverse('dv-user-detail', kwargs={'object_id': '4472310a-f591-403a-b8d6-dfb562f8b32f'})
 
     def test_10_successful_update(self, req_mocker):
@@ -266,7 +264,7 @@ class DataversePutTest(BaseEndpointTest):
         # ---------------------------
         orig_user = DataverseUser.objects.get(pk=2)
         # url = reverse('dv-user-detail', kwargs={'pk': orig_user.object_id})
-        #print('orig_user', orig_user, orig_user.id, orig_user.last_name, orig_user.first_name)
+        # print('orig_user', orig_user, orig_user.id, orig_user.last_name, orig_user.first_name)
 
         response = self.client.put(self.url, data=self.dv_user_api_input_01, format='json')
 
@@ -278,7 +276,7 @@ class DataversePutTest(BaseEndpointTest):
         self.assertEqual(response.status_code, 200)
 
         updated_user = DataverseUser.objects.get(pk=1)
-        #print('updated_user', updated_user, updated_user.id, updated_user.last_name, updated_user.first_name)
+        # print('updated_user', updated_user, updated_user.id, updated_user.last_name, updated_user.first_name)
         self.assertNotEqual(orig_user.first_name, updated_user.first_name)
         self.assertNotEqual(orig_user.last_name, updated_user.last_name)
         self.assertNotEqual(orig_user.email, updated_user.email)

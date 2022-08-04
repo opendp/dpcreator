@@ -1,19 +1,19 @@
 [
-{
+  {
     "model": "banner_messages.bannermessage",
     "pk": 1,
     "fields": {
-        "created": "2021-12-07T00:10:07.369Z",
-        "updated": "2021-12-07T14:43:24.093Z",
-        "name": "Demo Site Notice",
-        "active": true,
-        "type": "WARN",
-        "sort_order": 1,
-        "editor": 1,
-        "content": "This site is for demonstration purposes only. Please DO NOT use sensitive or confidential data. For more information, please <a href=\"https://docs.google.com/document/d/e/2PACX-1vRlZ2IgigIhl4oz_uOakQPxovzlrmFkbD-x_9RUO31dC0eRq2wCt_vN2Go0_9LTRd67srjgy04CfPVk/pub\" target=\"_blank\">read the tutorial</a> or <a href=\"mailto:info@opendp.org?subject=DP%20Creator\">contact us</a>.",
-        "is_timed_message": false,
-        "view_start_time": null,
-        "view_stop_time": null
+      "created": "2021-12-07T00:10:07.369Z",
+      "updated": "2021-12-07T14:43:24.093Z",
+      "name": "Demo Site Notice",
+      "active": true,
+      "type": "WARN",
+      "sort_order": 1,
+      "editor": 1,
+      "content": "This site is for demonstration purposes only. Please DO NOT use sensitive or confidential data. For more information, please <a href=\"https://docs.google.com/document/d/e/2PACX-1vRlZ2IgigIhl4oz_uOakQPxovzlrmFkbD-x_9RUO31dC0eRq2wCt_vN2Go0_9LTRd67srjgy04CfPVk/pub\" target=\"_blank\">read the tutorial</a> or <a href=\"mailto:info@opendp.org?subject=DP%20Creator\">contact us</a>.",
+      "is_timed_message": false,
+      "view_start_time": null,
+      "view_stop_time": null
     }
-}
+  }
 ]

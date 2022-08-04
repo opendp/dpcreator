@@ -10,10 +10,10 @@ https://docs.djangoproject.com/en/3.0/howto/deployment/asgi/
 import os
 
 import django
-
 from channels.auth import AuthMiddlewareStack
 from channels.http import AsgiHandler
 from channels.routing import ProtocolTypeRouter, URLRouter
+
 from opendp_apps.async_messages import routing as async_routing
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opendp_project.settings.development')
@@ -21,11 +21,10 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'opendp_project.settings.develop
 django.setup()
 
 application = ProtocolTypeRouter({
-  "http": AsgiHandler(),
-  "websocket": AuthMiddlewareStack(
-    URLRouter(
-      async_routing.websocket_urlpatterns
-    )
-  ),
+    "http": AsgiHandler(),
+    "websocket": AuthMiddlewareStack(
+        URLRouter(
+            async_routing.websocket_urlpatterns
+        )
+    ),
 })
-
