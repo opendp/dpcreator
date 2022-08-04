@@ -8,7 +8,7 @@ from opendp_apps.profiler.tools.data_reader_exceptions import InvalidFileType
 
 class SpssReader(BaseDataReader):
 
-    def __init__(self, filepath, column_limit):
+    def __init__(self, filepath, column_limit=None):
         self.meta = None
         super().__init__(filepath=filepath, column_limit=column_limit)
 
@@ -24,3 +24,8 @@ class SpssReader(BaseDataReader):
             df = df[df.columns[:self.column_limit]]
         self.meta = meta
         return df
+
+
+if __name__ == '__main__':
+    reader = SpssReader('server/opendp_apps/profiler/testing/golf.dta', 20)
+    print(reader.read())

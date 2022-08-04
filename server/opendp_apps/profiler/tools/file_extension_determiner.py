@@ -25,10 +25,12 @@ class FileExtensionDeterminer(object):
         self.extension = None
 
     def get_file_extension(self):
-        magic_extension = None
         if self.filepath:
             self.filename, self.extension = os.path.splitext(self.filepath)
-            if not self.extension:
+            logger.info(f"self.filename, self.extension = {self.filename}, {self.extension}")
+            if self.extension:
+                return self.extension
+            else:
                 logger.info(f"File {self.filepath} does not contain a file extension. "
                             f"Trying magic to infer the file type.")
                 magic_extension = magic.from_file(self.filepath)

@@ -179,8 +179,7 @@ class ValidateReleaseUtil(BasicErrCheck):
             file_extension_determiner = FileExtensionDeterminer(filepath)
             file_extension = file_extension_determiner.get_file_extension()
             print(f"FILE EXTENSION: {file_extension}")
-            if 'csv' not in file_extension:
-                # file_handle = open(filepath, 'rb')
+            if file_extension not in ['.csv', '.tab']:
                 spss_reader = SpssReader(filepath)
                 df = spss_reader.read()
                 df.to_csv('temp.csv')
