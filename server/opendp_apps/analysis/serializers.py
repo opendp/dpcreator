@@ -97,7 +97,7 @@ class DPStatisticSerializer(serializers.Serializer):
     # e.g. ['mean', 'sum', 'count', 'histogram', 'quantile'] etc.
     statistic = serializers.ChoiceField(choices=astatic.DP_STATS_CHOICES)
 
-    fixed_value = serializers.CharField()
+    fixed_value = serializers.CharField(allow_blank=True)
     handle_as_fixed = serializers.BooleanField()
 
     # e.g. ['drop', 'insert_random', 'insert_fixed']
