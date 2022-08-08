@@ -42,6 +42,11 @@
                 cy.get('[data-test="Count"]').click({force: true});
                 cy.get('[data-test="Trial"]').click({force: true})
                 cy.get('[data-test="Fixed value"]').should('not.exist')
+                cy.get('[data-test="Mean"]').click({force: true});
+                cy.get('[data-test="Fixed value"]').should('exist')
+                cy.get('[data-test="Count"]').click({force: true});
+                cy.get('[data-test="Fixed value"]').should('not.exist')
+
                 cy.get('[data-test="Create Statistic Button"]').click({force: true})
                 // The statistic should have been created
                 cy.get('tr').first().get('td').should('contain', "Count")
