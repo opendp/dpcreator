@@ -32,6 +32,7 @@
                 label="Password"
                 :rules="passwordRules"
                 @click:append="showPassword = !showPassword"
+                @keyup.enter="handleLogin"
             ></v-text-field>
             <router-link
                 :to="NETWORK_CONSTANTS.FORGOT_YOUR_PASSWORD.PATH"
@@ -99,7 +100,7 @@ import SocialLoginButton from "../components/Accounts/SocialLoginButton.vue";
 import SocialLoginSeparator from "../components/Accounts/SocialLoginSeparator.vue";
 import Button from "../components/DesignSystem/Button.vue";
 import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
-import {mapState, mapGetters} from 'vuex';
+import {mapGetters, mapState} from 'vuex';
 import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
 
 export default {
