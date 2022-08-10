@@ -1,191 +1,201 @@
 <template>
   <div class="confirmVariablesPage">
     <h1 class="title-size-1">Confirm Variables</h1>
-    <p v-html="$t('confirm variables.confirm variables intro')"></p>
-    <ColoredBorderAlert type="warning">
-      <template v-slot:content>
-        Currently, the DP Creator takes the first 20 variables of the data file.
-      </template>
-    </ColoredBorderAlert>
-    <ColoredBorderAlert type="info" icon="mdi-shield-half-full">
-      <template v-slot:content>
-        Any changes will be applied for the purpose of creating the differential
-        privacy release only, and will <strong>not affect</strong> the original
-        data file.
-      </template>
-    </ColoredBorderAlert>
-    <v-text-field
-        v-model="search"
-        append-icon="mdi-magnify"
-        label="Search Variables"
-        single-line
-        hide-details
-    ></v-text-field>
 
-    <Checkbox
-        data-test="filterCheckBox"
-        :class="{ 'width80 mx-auto': $vuetify.breakpoint.xsOnly }"
-        :value.sync="filterSelected"
-        text='Show Only Selected Variables'
-    />
-
-    <v-data-table
-        :headers="headers"
-        :search="search"
-        data-test="variableTable"
-        v-model="selected"
-        :items="items"
-        class="my-10"
-        :items-per-page="20"
-        :loading="loadingVariables"
-        :hide-default-footer="true"
-        :single-select="false"
-        item-key="name"
-        show-select
-        v-on:toggle-select-all="handleSelectAll"
-        v-on:item-selected="handleItemSelected"
-    >
-      <template v-slot:loading>
-        <LoadingBar v-for="i in 20" :key="i"/>
-      </template>
-      <template v-slot:[`header.type`]="{ header }">
-        {{ header.text }}
-        <DynamicQuestionIconTooltip
-            locale-tag="confirm variables.help type"
-        />
-      </template>
-      <template v-slot:[`header.additional_information`]="{ header }">
-        {{ header.text }}
-        <DynamicQuestionIconTooltip
-            locale-tag="confirm variables.help variable"
-        />
-      </template>
-      <!--
-      <template v-slot:item.data-table-select="{ on, props }">
-        <v-simple-checkbox color="green" v-bind="props" v-on="on"></v-simple-checkbox>
-      </template>-->
-      <template v-slot:[`item.index`]="{ index }">
-        <span data-test="variableRow" class="index-td grey--text">{{ index + 1 }}</span>
-      </template>
-
-      <template v-slot:[`item.label`]="{ item }">
-        <div v-if="item.editDisabled">
-          <span>{{ item.label }}</span>
-          <v-icon right @click="item.editDisabled = !item.editDisabled">
-            mdi-pencil
-          </v-icon>
-        </div>
-        <v-text-field
-            v-else
-            v-model="item.label"
-            type="text"
-            :readonly="item.editDisabled"
-            :append-outer-icon="'mdi-check'"
-            @click:append-outer="item.editDisabled = !item.editDisabled"
-            v-on:change="saveUserInput(item)"
-        ></v-text-field>
-      </template>
-      <template v-slot:[`item.type`]="{ item }">
-        <v-select
-            v-if="showToolTip(item)"
-            v-model="item.type"
-            :items="['Float', 'Integer', 'Categorical', 'Boolean']"
-            :data-test="item.label+':selectToolTip'"
-            standard
-            v-tooltip="'Changing type will clear additional info.'"
-            class="d-inline-block select"
-            v-on:click="currentRow=item.index"
-            v-on:hover="currentRow=item.index"
-            dense
-            v-on:change="changeVariableType(item)"
-        ></v-select>
-        <v-select
-            v-else
-            v-model="item.type"
-            :items="['Float', 'Integer', 'Categorical', 'Boolean']"
-            :data-test="item.label+':select'"
-            standard
-            class="d-inline-block select"
-            v-on:click="currentRow=item.index"
-            v-on:hover="currentRow=item.index"
-            dense
-            v-on:change="changeVariableType(item)"
-        ></v-select>
-      </template>
-
-      <template v-slot:[`item.additional_information`]="{ item: variable }">
-        <div v-if="variable.type === 'Categorical'">
-          <v-combobox
-              v-model="variable.additional_information['categories']"
-              chips
-              label="Add categories"
-              multiple
-              class="my-0 py-0"
-              background-color="soft_primary my-0"
-              :data-test="variable.label+':categories'"
-              v-on:click="currentRow=variable.index"
-              :search-input.sync="categoryInput"
-              @change="changeCategories(variable)"
-              @update:search-input="delimitInput(variable)"
-              :delimiters="[',']"
-          >
-            <template v-slot:selection="{ attrs, item, select, selected }">
-              <v-chip
-                  :v-bind="attrs"
-                  :input-value="selected"
-                  close
-                  color="blue darken-2"
-                  text-color="white"
-                  :click="select"
-                  :item="item"
-
-                  @click:close="removeCategoryFromVariable(item, variable)"
-              >
-                <div data-test="categoryChip"><strong>{{ item }}
-                  <!--{{ 'attrs:'+ JSON.stringify(attrs) }}{{ 'select:' +select }}{{ 'selected'+selected }}-->
-                </strong></div>
-              </v-chip>
-            </template>
-          </v-combobox>
-        </div>
-        <div v-if="isNumerical(variable.type)" class="range-input-wrapper">
-          <v-text-field
-              background-color="soft_primary mb-0"
-              label="Add min"
-              v-model="variable.additional_information['min']"
-              class="text-center py-0"
-              :rules="[checkMin]"
-              :data-test="variable.label+':min'"
-
-              v-on:click="currentRow=variable.index"
-              v-on:keyup="saveUserInput(variable)"
-          ></v-text-field>
-          <v-text-field
-              background-color="soft_primary mb-0"
-              label="Add max"
-              :rules="[checkMax]"
-              :data-test="variable.label+':max'"
-              v-model="variable.additional_information['max']"
-              class="text-center py-0"
-              v-on:click="currentRow=variable.index"
-              v-on:keyup="saveUserInput(variable)"
-          ></v-text-field>
-        </div>
-      </template>
-    </v-data-table>
-    <div v-if="selected.length == 0">
+    <div v-if="userStep ==  'error_9300'">
       <ColoredBorderAlert type="warning">
         <template v-slot:content>
-          Please select at least one variable to continue.
+          Profiler error: {{ profilerMsg }}
         </template>
       </ColoredBorderAlert>
     </div>
-    <div v-if="!formCompleted(variables)">
+    <div v-else>
+      <p v-html="$t('confirm variables.confirm variables intro')"></p>
       <ColoredBorderAlert type="warning">
         <template v-slot:content>
-          Please fix missing or invalid input to continue.
+          Currently, the DP Creator takes the first 20 variables of the data file.
         </template>
       </ColoredBorderAlert>
+      <ColoredBorderAlert type="info" icon="mdi-shield-half-full">
+        <template v-slot:content>
+          Any changes will be applied for the purpose of creating the differential
+          privacy release only, and will <strong>not affect</strong> the original
+          data file.
+        </template>
+      </ColoredBorderAlert>
+      <v-text-field
+          v-model="search"
+          append-icon="mdi-magnify"
+          label="Search Variables"
+          single-line
+          hide-details
+      ></v-text-field>
+
+      <Checkbox
+          data-test="filterCheckBox"
+          :class="{ 'width80 mx-auto': $vuetify.breakpoint.xsOnly }"
+          :value.sync="filterSelected"
+          text='Show Only Selected Variables'
+      />
+
+      <v-data-table
+          :headers="headers"
+          :search="search"
+          data-test="variableTable"
+          v-model="selected"
+          :items="items"
+          class="my-10"
+          :items-per-page="20"
+          :loading="loadingVariables"
+          :hide-default-footer="true"
+          :single-select="false"
+          item-key="name"
+          show-select
+          v-on:toggle-select-all="handleSelectAll"
+          v-on:item-selected="handleItemSelected"
+      >
+        <template v-slot:loading>
+          <LoadingBar v-for="i in 20" :key="i"/>
+        </template>
+        <template v-slot:[`header.type`]="{ header }">
+          {{ header.text }}
+          <DynamicQuestionIconTooltip
+              locale-tag="confirm variables.help type"
+          />
+        </template>
+        <template v-slot:[`header.additional_information`]="{ header }">
+          {{ header.text }}
+          <DynamicQuestionIconTooltip
+              locale-tag="confirm variables.help variable"
+          />
+        </template>
+        <!--
+        <template v-slot:item.data-table-select="{ on, props }">
+          <v-simple-checkbox color="green" v-bind="props" v-on="on"></v-simple-checkbox>
+        </template>-->
+        <template v-slot:[`item.index`]="{ index }">
+          <span data-test="variableRow" class="index-td grey--text">{{ index + 1 }}</span>
+        </template>
+
+        <template v-slot:[`item.label`]="{ item }">
+          <div v-if="item.editDisabled">
+            <span>{{ item.label }}</span>
+            <v-icon right @click="item.editDisabled = !item.editDisabled">
+              mdi-pencil
+            </v-icon>
+          </div>
+          <v-text-field
+              v-else
+              v-model="item.label"
+              type="text"
+              :readonly="item.editDisabled"
+              :append-outer-icon="'mdi-check'"
+              @click:append-outer="item.editDisabled = !item.editDisabled"
+              v-on:change="saveUserInput(item)"
+          ></v-text-field>
+        </template>
+        <template v-slot:[`item.type`]="{ item }">
+          <v-select
+              v-if="showToolTip(item)"
+              v-model="item.type"
+              :items="['Float', 'Integer', 'Categorical', 'Boolean']"
+              :data-test="item.label+':selectToolTip'"
+              standard
+              v-tooltip="'Changing type will clear additional info.'"
+              class="d-inline-block select"
+              v-on:click="currentRow=item.index"
+              v-on:hover="currentRow=item.index"
+              dense
+              v-on:change="changeVariableType(item)"
+          ></v-select>
+          <v-select
+              v-else
+              v-model="item.type"
+              :items="['Float', 'Integer', 'Categorical', 'Boolean']"
+              :data-test="item.label+':select'"
+              standard
+              class="d-inline-block select"
+              v-on:click="currentRow=item.index"
+              v-on:hover="currentRow=item.index"
+              dense
+              v-on:change="changeVariableType(item)"
+          ></v-select>
+        </template>
+
+        <template v-slot:[`item.additional_information`]="{ item: variable }">
+          <div v-if="variable.type === 'Categorical'">
+            <v-combobox
+                v-model="variable.additional_information['categories']"
+                chips
+                label="Add categories"
+                multiple
+                class="my-0 py-0"
+                background-color="soft_primary my-0"
+                :data-test="variable.label+':categories'"
+                v-on:click="currentRow=variable.index"
+                :search-input.sync="categoryInput"
+                @change="changeCategories(variable)"
+                @update:search-input="delimitInput(variable)"
+                :delimiters="[',']"
+            >
+              <template v-slot:selection="{ attrs, item, select, selected }">
+                <v-chip
+                    :v-bind="attrs"
+                    :input-value="selected"
+                    close
+                    color="blue darken-2"
+                    text-color="white"
+                    :click="select"
+                    :item="item"
+
+                    @click:close="removeCategoryFromVariable(item, variable)"
+                >
+                  <div data-test="categoryChip"><strong>{{ item }}
+                    <!--{{ 'attrs:'+ JSON.stringify(attrs) }}{{ 'select:' +select }}{{ 'selected'+selected }}-->
+                  </strong></div>
+                </v-chip>
+              </template>
+            </v-combobox>
+          </div>
+          <div v-if="isNumerical(variable.type)" class="range-input-wrapper">
+            <v-text-field
+                background-color="soft_primary mb-0"
+                label="Add min"
+                v-model="variable.additional_information['min']"
+                class="text-center py-0"
+                :rules="[checkMin]"
+                :data-test="variable.label+':min'"
+
+                v-on:click="currentRow=variable.index"
+                v-on:keyup="saveUserInput(variable)"
+            ></v-text-field>
+            <v-text-field
+                background-color="soft_primary mb-0"
+                label="Add max"
+                :rules="[checkMax]"
+                :data-test="variable.label+':max'"
+                v-model="variable.additional_information['max']"
+                class="text-center py-0"
+                v-on:click="currentRow=variable.index"
+                v-on:keyup="saveUserInput(variable)"
+            ></v-text-field>
+          </div>
+        </template>
+      </v-data-table>
+      <div v-if="selected.length == 0">
+        <ColoredBorderAlert type="warning">
+          <template v-slot:content>
+            Please select at least one variable to continue.
+          </template>
+        </ColoredBorderAlert>
+      </div>
+      <div v-if="!formCompleted(variables)">
+        <ColoredBorderAlert type="warning">
+          <template v-slot:content>
+            Please fix missing or invalid input to continue.
+          </template>
+        </ColoredBorderAlert>
+      </div>
     </div>
   </div>
 </template>
@@ -386,8 +396,8 @@ export default {
   props: ["stepperPosition"],
   computed: {
     ...mapState('auth', ['error', 'user']),
-    ...mapState('dataset', ['datasetInfo', 'analysisPlan']),
-    ...mapGetters('dataset', ['getDepositorSetupInfo']),
+    ...mapState('dataset', ['datasetInfo', 'analysisPlan', 'profilerMsg']),
+    ...mapGetters('dataset', ['getDepositorSetupInfo', 'userStep']),
 
   },
   created: function () {

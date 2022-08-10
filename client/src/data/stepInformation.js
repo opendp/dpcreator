@@ -14,10 +14,10 @@ export const STEP_1100_DV_RELEASE_DEPOSITED = 'step_1100'
 export const STEP_1200_PROCESS_COMPLETE = 'step_1200'
 
 // Error statuses should begin with 9
-export const STEP_9100_VALIDATION_FAILED = 'step_9100'
-export const STEP_9200_DATAVERSE_DOWNLOAD_FAILED = 'step_9200'
-export const STEP_9300_PROFILING_FAILED = 'step_9300'
-export const STEP_9400_CREATE_RELEASE_FAILED = 'step_9400'
+export const STEP_9100_VALIDATION_FAILED = 'error_9100'
+export const STEP_9200_DATAVERSE_DOWNLOAD_FAILED = 'error_9200'
+export const STEP_9300_PROFILING_FAILED = 'error_9300'
+export const STEP_9400_CREATE_RELEASE_FAILED = 'error_9400'
 export const STEP_9500_RELEASE_CREATION_FAILED = 'error_9500'
 export const STEP_9600_RELEASE_DEPOSIT_FAILED = 'error_9600'
 
