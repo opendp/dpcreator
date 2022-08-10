@@ -51,12 +51,14 @@ Cypress.Commands.add('epsilonStep', () => {
 
 })
 Cypress.Commands.add('uploadFile', (testfile) => {
+    let path = require('path');
+    let filename = path.basename(testfile)
     cy.get('[data-test="My Data"]').click();
     cy.url().should('contains', 'my-data')
     cy.get('[data-test="myDataUploadButton"]').click();
     cy.get('[data-test="fileInput"]').selectFile(testfile, {force: true})
     cy.get('tr').should('contain',
-        'PUMS5extract1000.csv')
+        filename)
     cy.get('tr').should('contain',
         'Uploaded')
 })
@@ -135,14 +137,10 @@ Cypress.Commands.add('storeExample', (email, password) => {
 
 })
 Cypress.Commands.add('goToConfirmVariables', (variableData) => {
-    // click on the start Process button on the welcome page,
-    // to navigate to the Validate Dataset step of the Wizard
-
-    cy.get('[data-test="Start Process"]').click();
-    cy.url().should('contain', 'wizard')
-    cy.get('[data-test="radioPrivateInformationYes"]').check({force: true})
-    cy.get('[data-test="notHarmButConfidential"]').check({force: true})
-    cy.get('[data-test="radioOnlyOneIndividualPerRowYes"]').check({force: true})
+    // Click on the start Process button on the welcome page,
+    // to navigate to the Validate Dataset step of the Wizard.
+    // Answer the questions in this step.
+    cy.wizardStepOne()
 
     // click on continue to go to trigger the profiler and go to the Confirm Variables Page
     cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
@@ -155,10 +153,18 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
 
 
 })
-Cypress.Commands.add('selectVariable',(demoVariables)=> {
-    Object.keys(demoVariables).forEach((varKey)=> {
+Cypress.Commands.add('wizardStepOne', () => {
+    cy.get('[data-test="continueWorkflow"]').click();
+    cy.url().should('contain', 'wizard')
+    cy.get('[data-test="radioPrivateInformationYes"]').check({force: true})
+    cy.get('[data-test="notHarmButConfidential"]').check({force: true})
+    cy.get('[data-test="radioOnlyOneIndividualPerRowYes"]').check({force: true})
+
+})
+Cypress.Commands.add('selectVariable', (demoVariables) => {
+    Object.keys(demoVariables).forEach((varKey) => {
         const demoVar = demoVariables[varKey]
-        console.log('testing ' +JSON.stringify(demoVar.name))
+        console.log('testing ' + JSON.stringify(demoVar.name))
         cy.contains('td', demoVar.name).parent('tr').should('be.visible')
         cy.contains('td', demoVar.name).parent('tr').children().first().click()
         // If numeric, enter min & max

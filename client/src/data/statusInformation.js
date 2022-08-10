@@ -18,7 +18,7 @@ export default {
         availableActions: ["viewDetails", "delete", "cancelExecution"]
     },
     error: {
-        label: "Execution Error",
+        label: "Error",
         color: "red lighten-3",
         icon: "mdi-alert",
         availableActions: ["viewDetails", "delete"]

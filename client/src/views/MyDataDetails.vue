@@ -43,7 +43,7 @@
           </ColoredBorderAlert>
           <ColoredBorderAlert type="error" v-if="generalError">
             <template v-slot:content>
-              {{ generalErrorSummary }}
+              {{ stepLabel }}
             </template>
           </ColoredBorderAlert>
           <div class="mb-5" v-if="status === COMPLETED">
@@ -134,6 +134,7 @@
 </template>
 
 <script>
+
 import statusInformation from "../data/statusInformation";
 import actionsInformation from "../data/actionsInformation";
 import QuestionIconTooltip from "../components/DynamicHelpResources/QuestionIconTooltip.vue";
@@ -311,6 +312,9 @@ export default {
 
     status: function () {
       return stepInformation[this.userStep].workflowStatus
+    },
+    stepLabel: function () {
+      return stepInformation[this.userStep].label
     },
     generalError: function () {
       return this.status === ERROR;

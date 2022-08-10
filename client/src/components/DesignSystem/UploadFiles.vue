@@ -29,9 +29,9 @@
           <div data-test="dragArea" @dragover.prevent @drop.prevent @drop="dragFile">
             <v-file-input
                 data-test="fileInput"
-                accept=".csv,.tsv"
+                accept=".csv,.tsv,.sav,.dta"
                 show-size
-                label="Click to select a file, or drag file here (.csv, .tab, .tsv)"
+                label="Click to select a file, or drag file here (.csv, .tab, .tsv,.sav,.dta)"
                 @change="selectFile"
             ></v-file-input>
 

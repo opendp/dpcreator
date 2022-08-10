@@ -186,7 +186,9 @@ class DPMeanSpec(StatSpec):
                                                    col_names=column_names)
 
             computation_chain = parse_dataframe >> self.preprocessor
-
+            # if file_extension != '.csv':
+            #     file_obj.write('temp.csv')
+            # with open('temp.csv') as file_obj:
             self.value = computation_chain(file_obj.read())
 
         except OpenDPException as ex_obj:

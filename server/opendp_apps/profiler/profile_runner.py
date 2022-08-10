@@ -1,18 +1,24 @@
 """
 Read and Profile a File.
 """
+import logging
 import os
-
 from django.db.models.fields.files import FieldFile
 
 from opendp_apps.analysis.models import DepositorSetupInfo
-from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dataset import static_vals as dstatic
+
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
-from opendp_apps.profiler import static_vals as pstatic
-from opendp_apps.profiler.csv_reader import CsvReader
+
 from opendp_apps.profiler.dataset_info_updater import DataSetInfoUpdater
+from opendp_apps.profiler.tools.file_extension_determiner import FileExtensionDeterminer
+from opendp_apps.profiler.tools.csv_reader import CsvReader
+from opendp_apps.profiler.tools.spss_reader import SpssReader
 from opendp_apps.profiler.variable_info import VariableInfoHandler
+from opendp_apps.profiler import static_vals as pstatic
+
+logger = logging.getLogger(__file__)
 
 
 class ProfileRunner(BasicErrCheck):
@@ -142,7 +148,14 @@ class ProfileRunner(BasicErrCheck):
         # (2) Open the dataframe
         #
         try:
-            self.dataframe = CsvReader(self.ds_pointer_for_pandas, column_limit=self.max_num_features).read()
+            logger.info(f"Opening {self.ds_pointer_for_pandas}")
+            file_extension_determiner = FileExtensionDeterminer(self.ds_pointer_for_pandas)
+            extension = file_extension_determiner.get_file_extension()
+            logger.info(f"Found extension: {extension}")
+            if extension in ['.dta', '.sav']:
+                self.dataframe = SpssReader(self.ds_pointer_for_pandas, column_limit=self.max_num_features).read()
+            else:
+                self.dataframe = CsvReader(self.ds_pointer_for_pandas, column_limit=self.max_num_features).read()
         except UnicodeDecodeError as ex_obj:
             user_msg = f'Failed to open file due to UnicodeDecodeError. ({ex_obj})'
             self.add_err_msg(user_msg)

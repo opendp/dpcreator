@@ -4,7 +4,7 @@ Profile a data file
 from collections import OrderedDict
 
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
-from opendp_apps.profiler.csv_reader import CsvReader
+from opendp_apps.profiler.tools.csv_reader import CsvReader
 from opendp_apps.profiler.static_vals import \
     (KEY_SAVE_ROW_COUNT,
      VAR_TYPE_BOOLEAN,

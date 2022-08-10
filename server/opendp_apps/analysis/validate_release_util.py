@@ -38,6 +38,9 @@ from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
+from opendp_apps.profiler.tools.file_extension_determiner import FileExtensionDeterminer
+from opendp_apps.profiler.tools.spss_reader import SpssReader
+
 from opendp_apps.user.models import OpenDPUser
 from opendp_apps.utils.extra_validators import \
     (validate_epsilon_not_null,
@@ -169,7 +172,15 @@ class ValidateReleaseUtil(BasicErrCheck):
         for stat_spec in self.stat_spec_list:
 
             # Okay! -> run_chain(...)!
-            file_handle = open(filepath, 'r')
+            file_extension_determiner = FileExtensionDeterminer(filepath)
+            file_extension = file_extension_determiner.get_file_extension()
+            if file_extension not in ['.csv', '.tab']:
+                spss_reader = SpssReader(filepath)
+                df = spss_reader.read()
+                df.to_csv('temp.csv')
+                file_handle = open('temp.csv', 'r')
+            else:
+                file_handle = open(filepath, 'r')
             stat_spec.run_chain(col_indices, file_handle, sep_char=sep_char)
             file_handle.close()
 

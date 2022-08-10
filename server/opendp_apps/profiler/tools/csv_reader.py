@@ -1,44 +1,15 @@
 import csv
 
 import pandas as pd
+from pandas.errors import EmptyDataError
 
+from opendp_apps.model_helpers.basic_response import err_resp
 from opendp_apps.profiler import static_vals as pstatic
+from opendp_apps.profiler.tools.base_data_reader import BaseDataReader
+from opendp_apps.profiler.tools.data_reader_exceptions import DelimiterNotFoundException
 
 
-class DelimiterNotFoundException(Exception):
-    """
-    This exception should be raised when a file does not have a clear
-    delimiter (empty, corrupted, etc.)
-    """
-    pass
-
-
-class ColumnLimitInvalid(Exception):
-    """
-    The column limit may be None or an integer > 0
-    """
-    pass
-
-
-class CsvReader:
-
-    def __init__(self, filepath, column_limit=None):
-        """
-        Utility for reading a delimited file into a dataframe,
-        with automatic delimiter detection
-        :param filepath: File to read from
-        :param column_limit: If passed, only return the first N columns in the dataframe
-        """
-        self.filepath = filepath
-        self.delimiter = None
-
-        self.column_limit = column_limit
-
-        if self.column_limit is not None:
-            if not isinstance(self.column_limit, int):
-                raise ColumnLimitInvalid(f'{pstatic.ERR_MSG_COLUMN_LIMIT} Found: "{self.column_limit}"')
-            if self.column_limit < 1:
-                raise ColumnLimitInvalid(f'{pstatic.ERR_MSG_COLUMN_LIMIT} Found: "{self.column_limit}"')
+class CsvReader(BaseDataReader):
 
     def read(self):
         """
