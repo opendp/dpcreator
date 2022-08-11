@@ -3,7 +3,7 @@ from unittest import skip
 import requests_mock
 from rest_framework.test import APIClient
 
-from opendp_apps.dataverses.testing.test_endpoints import BaseEndpointTest
+from opendp_apps.dataverses.testing.test_endpoints_post import BaseEndpointTest
 from opendp_apps.model_helpers.msg_util import msgt
 
 

@@ -8,10 +8,13 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from opendp_apps.utils.view_helper import get_json_error, get_json_success
+
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.models import DataverseHandoff, RegisteredDataverse
 from opendp_apps.dataverses.serializers import DataverseHandoffSerializer
 from opendp_project.views import BaseModelViewSet
+from opendp_apps.dataverses.signed_url_handler import SignedUrlHandler
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -34,6 +37,23 @@ class DataverseHandoffView(BaseModelViewSet):
         # queryset = DataverseHandoff.objects.all()
         # serializer = DataverseHandoffSerializer(queryset, many=True, context={'request': request})
         # return Response(serializer.data)
+
+    @action(methods=['post'], detail=False, url_path='init-connection', url_name='init-connection')
+    def init_connection(self, request):
+        """
+        Initialize the Dataverse connection by receiving/validating signed-urls from Dataverse
+        """
+        request_data = request.data.copy()
+
+        print('request_data', request_data)
+
+        validation_info = SignedUrlHandler.validate_signed_urls(request_data)
+        if validation_info.success:
+            return Response(get_json_success('The signed urls are valid'), status=status.HTTP_200_OK)
+        else:
+            return Response(get_json_error(validation_info.message),
+                            status=status.HTTP_400_BAD_REQUEST)
+
 
     @action(methods=['get', 'post'], detail=False)
     def dv_orig_create(self, request):

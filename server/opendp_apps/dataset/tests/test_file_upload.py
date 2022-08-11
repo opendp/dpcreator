@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 
-from opendp_apps.dataverses.testing.test_endpoints import BaseEndpointTest
+from opendp_apps.dataverses.testing.test_endpoints_post import BaseEndpointTest
 from opendp_apps.model_helpers.msg_util import msgt
 
 CURRENT_DIR = dirname(abspath(__file__))

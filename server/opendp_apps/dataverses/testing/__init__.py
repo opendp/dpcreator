@@ -12,7 +12,7 @@ docker-compose run server python manage.py test opendp_apps.dataverses.testing.t
 docker-compose run server
 python manage.py test opendp_apps.dataverses.testing.test_downloader_handler.DownloadHandlerTests.test_80_direct_profile
 
-
+docker-compose run server python manage.py test opendp_apps.dataverses.testing.test_endpoints.DataversePostTest.test_60_dataverse_signed_urls
 
 
 python manage.py test opendp_apps.dataverses.testing.test_file_view.FileViewGetTest.test_10_successful_get

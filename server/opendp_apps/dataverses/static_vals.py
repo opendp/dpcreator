@@ -1,5 +1,29 @@
 HEADER_KEY_DATAVERSE = 'X-Dataverse-key'
 
+
+# ----------------------------------
+# Dataverse signed url params
+# ----------------------------------
+DV_URL_KEY_APIS = 'apis'
+DV_URL_KEY_HTTP_METHOD = 'httpMethod'
+DV_URL_KEY_NAME = 'name'
+DV_URL_KEY_SIGNED_URL = 'signedUrl'
+DV_URL_KEY_TIMEOUT = 'timeOut'
+
+DV_URL_USER_INFO = 'userInfo'
+DV_URL_SCHEMA_INFO = 'schemaInfo'
+DV_URL_RETRIEVE_DATA_FILE = 'retrieveDataFile'
+DV_URL_DEPOSIT_DP_RELEASE_FILE = 'depositDPReleaseFile'
+REQUIRED_DV_URLS = [DV_URL_USER_INFO,
+                    DV_URL_SCHEMA_INFO,
+                    DV_URL_RETRIEVE_DATA_FILE,
+                    DV_URL_DEPOSIT_DP_RELEASE_FILE]
+REQUIRED_DV_URL_METHODS = {DV_URL_USER_INFO: 'GET',
+                           DV_URL_SCHEMA_INFO: 'GET',
+                           DV_URL_RETRIEVE_DATA_FILE: 'GET',
+                           DV_URL_DEPOSIT_DP_RELEASE_FILE: 'POST'}
+
+
 # -----------------------------
 # Dataverse Manifest Params
 #   - sent over via GET

@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.dataset.models import DataSetInfo
-from opendp_apps.dataverses.testing.test_endpoints import BaseEndpointTest
+from opendp_apps.dataverses.testing.test_endpoints_post import BaseEndpointTest
 
 
 class TestAnalysisPlanView(BaseEndpointTest):
