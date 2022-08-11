@@ -49,9 +49,10 @@ class DataverseHandoffView(BaseModelViewSet):
 
         validation_info = SignedUrlHandler.validate_signed_urls(request_data)
         if validation_info.success:
-            return Response(get_json_success('The signed urls are valid'), status=status.HTTP_200_OK)
+            return Response(dict(message='The signed urls are valid'),
+                            status=status.HTTP_200_OK)
         else:
-            return Response(get_json_error(validation_info.message),
+            return Response(dict(message=validation_info.message),
                             status=status.HTTP_400_BAD_REQUEST)
 
 
