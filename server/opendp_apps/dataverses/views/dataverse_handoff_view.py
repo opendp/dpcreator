@@ -1,20 +1,18 @@
 import logging
 
+import requests.utils as request_utils
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from requests.utils import quote
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from opendp_apps.utils.view_helper import get_json_error, get_json_success
-
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.models import DataverseHandoff, RegisteredDataverse
-from opendp_apps.dataverses.serializers import DataverseHandoffSerializer
+from opendp_apps.dataverses.serializers import DataverseHandoffSerializer, SignedUrlGroup
+from opendp_apps.utils.format_errors import format_serializer_errors
 from opendp_project.views import BaseModelViewSet
-from opendp_apps.dataverses.signed_url_handler import SignedUrlHandler
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -45,16 +43,14 @@ class DataverseHandoffView(BaseModelViewSet):
         """
         request_data = request.data.copy()
 
-        print('request_data', request_data)
-
-        validation_info = SignedUrlHandler.validate_signed_urls(request_data)
-        if validation_info.success:
+        serializer = SignedUrlGroup(data=request_data)
+        if serializer.is_valid():
             return Response(dict(message='The signed urls are valid'),
                             status=status.HTTP_200_OK)
         else:
-            return Response(dict(message=validation_info.message),
+            return Response(dict(message="Errors found in the signedUrl data",
+                                 errors=format_serializer_errors(serializer.errors)),
                             status=status.HTTP_400_BAD_REQUEST)
-
 
     @action(methods=['get', 'post'], detail=False)
     def dv_orig_create(self, request):
@@ -118,7 +114,7 @@ class DataverseHandoffView(BaseModelViewSet):
                     if error_detail.code and k is not None:
                         error_code += ','.join([k, ''])
             # Remove trailing comma
-            error_code = quote(error_code[:-1])
+            error_code = request_utils.quote(error_code[:-1])
 
             logger.error(f'Invalid DataverseHandoffSerializer. Error_code: {error_code}')
 

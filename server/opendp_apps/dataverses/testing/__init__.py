@@ -4,8 +4,8 @@ Running individual tests
 python manage.py test opendp_apps.dataverses.testing.test_dataverse_handoff_view
 
 python manage.py test opendp_apps.dataverses.testing.test_dv_user_handler
-python manage.py test opendp_apps.dataverses.testing.test_endpoints.DataversePostTest
-python manage.py test opendp_apps.dataverses.testing.test_endpoints.DataversePostTest
+
+docker-compose run server python manage.py test opendp_apps.dataverses.testing.test_endpoints_post.DataversePostTest.test_70_dataverse_signed_urls
 
 docker-compose run server python manage.py test opendp_apps.dataverses.testing.test_downloader_profiler.DownloadProfileTests.test_20_download_errors
 

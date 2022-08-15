@@ -1,6 +1,5 @@
 HEADER_KEY_DATAVERSE = 'X-Dataverse-key'
 
-
 # ----------------------------------
 # Dataverse signed url params
 # ----------------------------------
@@ -14,15 +13,16 @@ DV_URL_USER_INFO = 'userInfo'
 DV_URL_SCHEMA_INFO = 'schemaInfo'
 DV_URL_RETRIEVE_DATA_FILE = 'retrieveDataFile'
 DV_URL_DEPOSIT_DP_RELEASE_FILE = 'depositDPReleaseFile'
-REQUIRED_DV_URLS = [DV_URL_USER_INFO,
-                    DV_URL_SCHEMA_INFO,
-                    DV_URL_RETRIEVE_DATA_FILE,
-                    DV_URL_DEPOSIT_DP_RELEASE_FILE]
+REQUIRED_DV_URL_NAMES = [DV_URL_USER_INFO,
+                         DV_URL_SCHEMA_INFO,
+                         DV_URL_RETRIEVE_DATA_FILE,
+                         DV_URL_DEPOSIT_DP_RELEASE_FILE]
+REQUIRED_DV_URL_NAME_CHOICES = [(x, x) for x in REQUIRED_DV_URL_NAMES]
 REQUIRED_DV_URL_METHODS = {DV_URL_USER_INFO: 'GET',
                            DV_URL_SCHEMA_INFO: 'GET',
                            DV_URL_RETRIEVE_DATA_FILE: 'GET',
                            DV_URL_DEPOSIT_DP_RELEASE_FILE: 'POST'}
-
+HTTP_METHOD_CHOICES = [(x, x) for x in ['GET', 'POST']]
 
 # -----------------------------
 # Dataverse Manifest Params
@@ -88,3 +88,6 @@ ERR_MSG_PDF_DEPOSIT_ALREADY_COMPLETE = 'PDF deposit already complete'
 
 ERR_MSG_JSON_DEPOSIT_FAILED = 'JSON deposit to Dataverse failed.'
 ERR_MSG_PDF_DEPOSIT_FAILED = 'PDF deposit to Dataverse failed.'
+
+ERR_MSG_EXPECTED_4_SIGNED_URLS = 'Expected to find 4 signed urls.'
+ERR_MSG_BAD_DATETIME_STRING = 'The datetime string in the signed url is not valid.'
