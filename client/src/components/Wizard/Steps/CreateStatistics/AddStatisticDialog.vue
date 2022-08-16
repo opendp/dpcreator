@@ -58,31 +58,9 @@
                 on-icon="mdi-check"
             ></v-radio>
           </v-radio-group>
-        </div>
-        <!--
-                <div>
-                  <span>
-                    How would you like<strong> missing values to be handled</strong>?
-                  </span>
 
-                  <v-radio-group
-                      row
-                      class="radio-group-statistics-modal"
-                      v-model="editedItemDialog.missingValuesHandling"
-                  >
-                    <v-radio
-                        class="rounded-pill mr-2"
-                        v-for="(handlingOption, index) in missingValuesHandling"
-                        :key="handlingOption + '-' + index"
-                        :label="handlingOption.label"
-                        :value="handlingOption.value"
-                        :data-test="handlingOption.label"
-                        on-icon="mdi-check"
-                        @click="() => updateFixedInputVisibility(handlingOption)"
-                    ></v-radio>
-                  </v-radio-group>
-                </div>
-        -->
+        </div>
+
         <div v-if="editedItemDialog.handleAsFixed">
 
           <span>Enter a <strong> fixed value</strong></span> for missing values:
@@ -97,7 +75,88 @@
             ></v-text-field>
           </div>
         </div>
+        <div class="width100" v-if="showHistogramOptions()">
+          <span>Choose option for <strong>histogram bins:</strong></span>
+          <v-radio-group
+              v-model="editedItemDialog.histogramBinType"
+          >
+            <v-container class="grey lighten-5">
+              <v-row>
+                <v-col>
+                  <v-radio v-if="this.variableInfo[this.editedItemDialog.variable]
+                  &&  this.variableInfo[this.editedItemDialog.variable].type ==  'Integer'"
+                           :key="ONE_BIN_PER_VALUE"
+                           :label="histogramOptions[ONE_BIN_PER_VALUE].label"
+                           :value="ONE_BIN_PER_VALUE"
+                           :data-test="ONE_BIN_PER_VALUE"
+                  ></v-radio>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col>
+                  <v-radio
+                      :key="EQUAL_BIN_RANGES"
+                      :label="histogramOptions[EQUAL_BIN_RANGES].label"
+                      :value="EQUAL_BIN_RANGES"
+                      :data-test="EQUAL_BIN_RANGES"
+                  ></v-radio>
+                </v-col>
+              </v-row>
+              <v-expand-transition>
+                <v-row v-show="editedItemDialog.histogramBinType == EQUAL_BIN_RANGES">
+                  <v-col>
 
+                    <v-text-field
+                        :label="'Enter Bins (max '+ maxBins()+')'"
+                        v-model="editedItemDialog.histogramBinValue"
+                        background-color="soft_primary"
+                        class="top-borders-radius"
+                        data-test="histogramBinValue"
+                        :rules="[validateFixedValue]"
+                    ></v-text-field>
+
+
+                  </v-col>
+
+                </v-row>
+              </v-expand-transition>
+              <v-row>
+                <v-col>
+                  <v-radio
+                      :key="BIN_EDGES"
+                      :label="histogramOptions[BIN_EDGES].label"
+                      :value="BIN_EDGES"
+                      :data-test="BIN_EDGES"
+                  ></v-radio>
+                </v-col>
+              </v-row>
+              <v-expand-transition>
+                <v-row v-show="editedItemDialog.histogramBinType == BIN_EDGES">
+                  <v-col>
+                    <v-expand-transition>
+                    <span>
+                      <div> <div display="inline-block;">{{ minEdge() }}</div>
+
+                    <v-text-field :label="'Enter Bins Edges '"
+                                  v-model="editedItemDialog.histogramBinValue"
+                                  background-color="soft_primary"
+                                  class="top-borders-radius width50"
+                                  data-test="histogramBinValue"
+                                  :rules="[validateFixedValue]"
+                    ></v-text-field>
+                   <div display="inline-block;">{{ maxEdge() }}</div>
+                  </div>
+                    </span>
+                    </v-expand-transition>
+
+                  </v-col>
+                </v-row>
+              </v-expand-transition>
+            </v-container>
+
+
+          </v-radio-group>
+        </div>
         <ColoredBorderAlert type="warning" v-if="validationError">
           <template v-slot:content>
             <div data-test="validation alertbox">
@@ -195,6 +254,10 @@ import Button from "../../../DesignSystem/Button.vue";
 import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
 import {mapGetters, mapState} from "vuex";
 import createStatsUtils from "@/shared/createStatsUtils";
+
+const ONE_BIN_PER_VALUE = "onePerValue"
+const EQUAL_BIN_RANGES = "equalRanges"
+const BIN_EDGES = "binEdges"
 
 export default {
   name: "AddStatisticDialog",
@@ -313,6 +376,8 @@ export default {
       delta: '0.0',
       error: "",
       missingValuesHandling: "insert_fixed",
+      histogramBinType: "",
+      histogramBinValue: null,
       handleAsFixed: true,
       fixedValue: "",
       locked: false,
@@ -322,9 +387,56 @@ export default {
       // "Drop them", remove this for now, until the library can use it
       {value: "insert_random", label: "Insert random value"},
       {value: "insert_fixed", label: "Insert fixed value"}
-    ]
+    ],
+
+    ONE_BIN_PER_VALUE,
+    EQUAL_BIN_RANGES,
+    BIN_EDGES,
+    histogramOptions: {
+      [ONE_BIN_PER_VALUE]: {label: "One bin per value"},
+      [EQUAL_BIN_RANGES]: {label: "Equal range bins"},
+      [BIN_EDGES]: {label: "Bin edges"}
+    }
   }),
   methods: {
+    disabled() {
+
+    },
+    showHistogramOptions() {
+      //  console.log('showHistogramOptions,  '+ this.editedItemDialog.statistic+',  '+this.editedItemDialog.variable+','+JSON.stringify(this.variableInfo[this.editedItemDialog.variable]))
+      let retVal = this.editedItemDialog.statistic == 'histogram'
+          && this.variableInfo[this.editedItemDialog.variable]
+          && this.variableInfo[this.editedItemDialog.variable].type !== "Category"
+      console.log(retVal)
+      return retVal
+    },
+    maxBins() {
+      let maxBins = 0
+      if (this.editedItemDialog.variable &&
+          this.variableInfo[this.editedItemDialog.variable] &&
+          this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('min')) {
+        maxBins = Number(this.variableInfo[this.editedItemDialog.variable].max) - Number(this.variableInfo[this.editedItemDialog.variable].min)
+      }
+      return maxBins
+    },
+    minEdge() {
+      let minEdge = 0
+      if (this.editedItemDialog.variable &&
+          this.variableInfo[this.editedItemDialog.variable] &&
+          this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('min')) {
+        minEdge = Number(this.variableInfo[this.editedItemDialog.variable].min)
+      }
+      return minEdge
+    },
+    maxEdge() {
+      let maxEdge = 0
+      if (this.editedItemDialog.variable &&
+          this.variableInfo[this.editedItemDialog.variable] &&
+          this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('max')) {
+        maxEdge = Number(this.variableInfo[this.editedItemDialog.variable].max)
+      }
+      return maxEdge
+    },
     validateFixedValue(v) {
       let valid = true
       if (this.editedItemDialog.variable &&
