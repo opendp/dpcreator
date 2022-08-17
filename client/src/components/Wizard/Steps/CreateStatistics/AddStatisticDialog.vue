@@ -96,7 +96,7 @@
                 <v-col>
                   <v-radio
                       :key="EQUAL_BIN_RANGES"
-                      :label="histogramOptions[EQUAL_BIN_RANGES].label"
+                      :label="histogramOptions[EQUAL_BIN_RANGES].label+' (max '+ maxBins()+')'"
                       :value="EQUAL_BIN_RANGES"
                       :data-test="EQUAL_BIN_RANGES"
                   ></v-radio>
@@ -107,11 +107,11 @@
                   <v-col>
 
                     <v-text-field
-                        :label="'Enter Bins (max '+ maxBins()+')'"
-                        v-model="editedItemDialog.histogramBinValue"
+                        label="Enter Bins "
+                        v-model="editedItemDialog.numberOfBins"
                         background-color="soft_primary"
-                        class="top-borders-radius"
-                        data-test="histogramBinValue"
+                        class="top-borders-radius  width50"
+                        data-test="numberOfBins"
                         :rules="[validateFixedValue]"
                     ></v-text-field>
 
@@ -131,25 +131,44 @@
                 </v-col>
               </v-row>
               <v-expand-transition>
-                <v-row v-show="editedItemDialog.histogramBinType == BIN_EDGES">
-                  <v-col>
-                    <v-expand-transition>
-                    <span>
-                      <div> <div display="inline-block;">{{ minEdge() }}</div>
-
-                    <v-text-field :label="'Enter Bins Edges '"
-                                  v-model="editedItemDialog.histogramBinValue"
-                                  background-color="soft_primary"
-                                  class="top-borders-radius width50"
-                                  data-test="histogramBinValue"
-                                  :rules="[validateFixedValue]"
-                    ></v-text-field>
-                   <div display="inline-block;">{{ maxEdge() }}</div>
-                  </div>
-                    </span>
-                    </v-expand-transition>
-
+                <v-row align-content="center" v-show="editedItemDialog.histogramBinType == BIN_EDGES">
+                  <v-col cols="3">
+                    {{ 'Min: ' + minEdge() }}
                   </v-col>
+                  <v-col cols="6">
+                    <v-combobox
+                        v-model="editedItemDialog.binEdges"
+                        chips
+                        label="Add edges"
+                        multiple
+                        class="my-0 py-0"
+                        background-color="soft_primary my-0"
+                        data-test="binEdges"
+                        :search-input.sync="edgesInput"
+                        @update:search-input="delimitInput()"
+                        :delimiters="[',']"
+                    >
+                      <template v-slot:selection="{ attrs, item, select, selected }">
+                        <v-chip
+                            :v-bind="attrs"
+                            :input-value="selected"
+                            close
+                            color="blue darken-2"
+                            text-color="white"
+                            :click="select"
+                            :item="item"
+                            @click:close="removeEdgeFromList(item)"
+                        >
+                          <div data-test="categoryChip"><strong>{{ item }}
+                          </strong></div>
+                        </v-chip>
+                      </template>
+                    </v-combobox>
+                  </v-col>
+                  <v-col cols="3">
+                    {{ 'Max: ' + maxEdge() }}
+                  </v-col>
+
                 </v-row>
               </v-expand-transition>
             </v-container>
@@ -366,6 +385,7 @@ export default {
       "Quantile": ["Integer", "Float"] // not yet available
     },
     selectedStatistic: null,
+    edgesInput: "",
     validationError: false,
     validationErrorMsg: null,
     editedItemDialog: {
@@ -377,7 +397,8 @@ export default {
       error: "",
       missingValuesHandling: "insert_fixed",
       histogramBinType: "",
-      histogramBinValue: null,
+      numberOfBins: null,
+      binEdges: [],
       handleAsFixed: true,
       fixedValue: "",
       locked: false,
@@ -399,8 +420,23 @@ export default {
     }
   }),
   methods: {
-    disabled() {
+    removeEdgeFromList(edge) {
+      this.editedItemDialog.binEdges.splice(
+          this.editedItemDialog.binEdges.indexOf(edge),
+          1
+      );
+    },
+    delimitInput(edges) {
+      if (this.edgesInput && this.edgesInput.split(",").length > 1) {
+        let v = JSON.parse(JSON.stringify(this.editedItemDialog.binEdges))
+        v.push(this.edgesInput)
+        const reducer = (a, e) => [...a, ...e.split(',')]
+        let edges = [...new Set(v.reduce(reducer, []))]
+        edges = edges.filter(word => word.length > 0);
 
+        this.editedItemDialog.binEdges = JSON.parse(JSON.stringify(edges))
+        this.edgesInput = ""
+      }
     },
     showHistogramOptions() {
       //  console.log('showHistogramOptions,  '+ this.editedItemDialog.statistic+',  '+this.editedItemDialog.variable+','+JSON.stringify(this.variableInfo[this.editedItemDialog.variable]))
