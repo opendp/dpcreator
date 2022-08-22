@@ -22,6 +22,7 @@ KW_MAX_NUM_FEATURES = 'max_num_features'
 
 # -----------------------------
 
+ERR_MSG_VAR_TYPE_NOT_NUMERIC = 'The variable type must be one of the following: %s' % (', '.join(NUMERIC_VAR_TYPES))
 ERR_MSG_COLUMN_LIMIT = 'The column_limit may be "None" or an integer greater than 0.'
 ERR_MSG_SOURCE_FILE_DOES_NOT_EXIST = 'The source file does not exist for dataset: '
 ERR_MSG_DATASET_POINTER_NOT_FIELDFILE = 'The dataset pointer is not a Django FieldFile object.'

@@ -190,7 +190,7 @@ class HistogramStatSpecTest(StatSpecTestCase):
             'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
             'variable_info': {
                 'categories': ['EN', 'DA'],
-                'type': 'Categorical'
+                'type': pstatic.VAR_TYPE_CATEGORICAL
             }
         }
 
@@ -241,7 +241,7 @@ class HistogramStatSpecTest(StatSpecTestCase):
             'variable_info': {
                 'min': 0,
                 'max': 7,
-                'type': 'Integer'
+                'type': pstatic.VAR_TYPE_INTEGER
             }
         }
 

@@ -45,17 +45,16 @@ class DPCountSpec(StatSpec):
     def get_stat_specific_validators(self) -> dict:
         """
         Update self.prop_validators to include validators specific to the subclass
-        @return:
+        @return: dict
         """
-        return {}  # No additional validators
+        # No additional validators
+        return {}
 
     def run_01_initial_transforms(self):
         """
         Missing value handling, if a fixed_value is given, make it string
         """
         pass
-        # if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
-        #    self.fixed_value = str(self.fixed_value)
 
     def run_03_custom_validation(self):
         """
@@ -66,8 +65,6 @@ class DPCountSpec(StatSpec):
         """
         # Custom validation not needed
         pass
-        if self.has_error():
-            return
 
     def check_scale(self, scale, preprocessor, dataset_distance, epsilon):
         """
@@ -95,7 +92,7 @@ class DPCountSpec(StatSpec):
             return self.preprocessor
 
         preprocessor = (
-                # Selects a column of df, Vec<str>
+            # Selects a column of df, Vec<str>
                 make_select_column(key=self.col_index, TOA=str) >>
                 # Cast the column to str
                 make_cast(TIA=str, TOA=str) >>
@@ -139,19 +136,18 @@ class DPCountSpec(StatSpec):
         """
         Calculate the DP Count!
 
-        :param columns. Examples: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
-                - In general using zero-based index of columns is preferred
-        :param file_obj - file like object to read data from
-        :param sep_char - separator from the object, default is "," for a .csv, etc
-
-        :return bool -  False: error messages are available through .get_err_msgs()
-                                or .get_error_msg_dict()
-                        True: results available through .value -- others params through
-                                .get_success_msg_dict()
-
         Example:
         # Note "\t" is for a tabular file
-        `dp_mean_spec.run_chain([0, 1, 2, 3], file_obj, sep_char="\t")`
+        `dp_count_spec.run_chain([0, 1, 2, 3], file_obj, sep_char="\t")`
+
+        @param column_names: Using a zero-based index of columns is preferred.
+                    Examples: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
+        @param file_obj: file like object to read data from
+        @param sep_char:  separator from the object, default is "," for a .csv, etc
+        @return: bool. if False: error messages are available through .get_err_msgs()
+                                 or .get_error_msg_dict()
+                       if True: results available through .value -- others params through
+                                .get_success_msg_dict()
         """
         if not self.preprocessor:
             assert False, 'Please call is_chain_valid() before using "run_chain()!'
@@ -176,6 +172,7 @@ class DPCountSpec(StatSpec):
         except OpenDPException as ex_obj:
             self.add_err_msg(f'{ex_obj.message} (OpenDPException)')
             return False
+
         except Exception as ex_obj:
             if hasattr(ex_obj, 'message'):
                 self.add_err_msg(f'{ex_obj.message} (Exception)')

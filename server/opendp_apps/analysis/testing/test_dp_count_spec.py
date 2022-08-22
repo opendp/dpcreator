@@ -28,7 +28,9 @@ class DPCountStatSpecTest(StatSpecTestCase):
                       'statistic': astatic.DP_COUNT,
                       'epsilon': 1.0,
                       'cl': astatic.CL_99,
-                      'variable_info': {'type': 'Float'},
+                      'variable_info': {
+                          'type': pstatic.VAR_TYPE_FLOAT
+                        },
                       }
 
         dp_count = DPCountSpec(spec_props)
@@ -232,17 +234,6 @@ class DPCountStatSpecTest(StatSpecTestCase):
         """(50) Run DP Count string"""
         msgt(self.test_50_count_missing_vals_str.__doc__)
 
-        xspec_props = {'variable': 'gender',
-                       'col_index': 4,
-                       'statistic': astatic.DP_COUNT,
-                       'dataset_size': 1_000,
-                       'epsilon': 1.0,
-                       'delta': 0.0,
-                       'cl': astatic.CL_95,
-                       'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                       'fixed_value': 'Genderfluid',
-                       'variable_info': {'type': pstatic.VAR_TYPE_CATEGORICAL},
-                       }
         # right from UI, many of these fields (e.g. dataset_size, missing_values_handling, etc., are ignored)
         spec_props = {'error': '',
                       'label': 'gender',
@@ -258,7 +249,7 @@ class DPCountStatSpecTest(StatSpecTestCase):
                       'dataset_size': 1000,
                       'variable_info': {
                           'name': 'gender',
-                          'type': 'Categorical',
+                          'type': pstatic.VAR_TYPE_CATEGORICAL,
                           'label': 'gender',
                           'selected': True,
                           'categories': ['Genderfluid'],

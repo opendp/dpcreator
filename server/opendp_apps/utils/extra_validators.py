@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.profiler import static_vals as pstatic
 
 VALIDATE_MSG_ZERO_OR_GREATER = 'The value must be a number, zero or greater.'
 VALIDATE_MSG_ONE_OR_GREATER = 'The value must be a number, 1 or greater.'
@@ -122,3 +123,9 @@ def validate_float(value):
         raise ValidationError(VALIDATE_MSG_NOT_FLOAT)
     except TypeError:
         raise ValidationError(VALIDATE_MSG_NOT_FLOAT)
+
+
+def validate_type_numeric(value):
+    """Make sure the variable type is integer or float"""
+    if value not in pstatic.NUMERIC_VAR_TYPES:
+        raise ValidationError(pstatic.ERR_MSG_VAR_TYPE_NOT_NUMERIC)

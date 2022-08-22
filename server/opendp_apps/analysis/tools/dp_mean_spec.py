@@ -22,15 +22,9 @@ enable_features("floating-point", "contrib")
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.utils.extra_validators import \
-    (validate_confidence_level,
-     validate_float,
-     validate_statistic,
-     validate_epsilon_not_null,
+    (validate_float,
      validate_missing_val_handlers,
-     validate_not_empty_or_none,
-     validate_not_negative,
-     validate_int_greater_than_zero,
-     validate_int_not_negative)
+     validate_int_greater_than_zero)
 
 class DPMeanSpec(StatSpec):
 
@@ -66,7 +60,6 @@ class DPMeanSpec(StatSpec):
                 return
 
         self.floatify_int_values(['min', 'max', 'cl'])
-
 
     def run_03_custom_validation(self):
         """
@@ -159,19 +152,18 @@ class DPMeanSpec(StatSpec):
         """
         Calculate the DP Mean!
 
-        :param columns. Examples: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
-                - In general using zero-based index of columns is preferred
-        :param file_obj - file like object to read data from
-        :param sep_char - separator from the object, default is "," for a .csv, etc
-
-        :return bool -  False: error messages are available through .get_err_msgs()
-                                or .get_error_msg_dict()
-                        True: results available through .value -- others params through
-                                .get_success_msg_dict()
-
         Example:
         # Note "\t" is for a tabular file
         `dp_mean_spec.run_chain([0, 1, 2, 3], file_obj, sep_char="\t")`
+
+        @param column_names: Using a zero-based index of columns is preferred.
+                    Examples: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
+        @param file_obj: file like object to read data from
+        @param sep_char:  separator from the object, default is "," for a .csv, etc
+        @return: bool. if False: error messages are available through .get_err_msgs()
+                                 or .get_error_msg_dict()
+                       if True: results available through .value -- others params through
+                                .get_success_msg_dict()
         """
         if not self.preprocessor:
             assert False, 'Please call is_chain_valid() before using "run_chain()!'

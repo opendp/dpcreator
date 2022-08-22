@@ -15,11 +15,6 @@ from opendp.trans import \
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.tools.stat_spec import StatSpec
-from opendp_apps.utils.extra_validators import \
-    (validate_float,
-     validate_missing_val_handlers,
-     validate_int_greater_than_zero,
-     validate_type_numeric)
 
 enable_features("floating-point", "contrib")
 
@@ -46,25 +41,23 @@ class DPSumSpec(StatSpec):
         super().__init__(props)
         self.noise_mechanism = astatic.NOISE_LAPLACE_MECHANISM
 
-    def get_stat_specific_validators(self) -> dict:
+    def additional_required_props(self):
         """
-        Update self.prop_validators to include validators specific to the subclass
-        @return:
+        Add a list of required properties
+        example: ['min', 'max']
         """
-        return dict(var_type=validate_type_numeric,
-                    dataset_size=validate_int_greater_than_zero,
-                    #
-                    min=validate_float,
-                    max=validate_float,
-                    #
-                    missing_values_handling=validate_missing_val_handlers)
+        return ['min', 'max', 'cl', ]  # 'fixed_value']
 
     def run_01_initial_transforms(self):
         """
         Make sure values are consistently floats
         """
-        if self.has_error():
+        if not self.statistic == self.STATISTIC_TYPE:
+            self.add_err_msg(f'The specified "statistic" is not "{self.STATISTIC_TYPE}". (StatSpec)"')
             return
+
+        if self.fixed_value is not None:
+            pass
 
         # Use the "impute_value" for missing values, make sure it's a float!
         #
@@ -72,8 +65,7 @@ class DPSumSpec(StatSpec):
             # Convert the impute value to a float!
             if not self.cast_property_to_float('fixed_value'):
                 return
-
-        self.floatify_int_values(['min', 'max', 'cl'])
+        self.floatify_int_values()
 
     def run_03_custom_validation(self):
         """
@@ -83,9 +75,6 @@ class DPSumSpec(StatSpec):
         self.check_numeric_fixed_value()
         """
         if self.has_error():
-            return
-
-        if self.validate_min_max() is False:
             return
 
         self.check_numeric_fixed_value()
@@ -158,18 +147,19 @@ class DPSumSpec(StatSpec):
         """
         Calculate the DP Sum!
 
+        :param column_names. e.g. [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
+                - In general using zero-based index of columns is preferred
+        :param file_obj - file like object to read data from
+        :param sep_char - separator from the object, default is "," for a .csv, etc
+
+        :return bool -  False: error messages are available through .get_err_msgs()
+                                or .get_error_msg_dict()
+                        True: results available through .value -- others params through
+                                .get_success_msg_dict()
+
         Example:
         # Note "\t" is for a tabular file
         `dp_sum_spec.run_chain([0, 1, 2, 3], file_obj, sep_char="\t")`
-
-        @param column_names: Using a zero-based index of columns is preferred.
-                    Examples: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
-        @param file_obj: file like object to read data from
-        @param sep_char:  separator from the object, default is "," for a .csv, etc
-        @return: bool. if False: error messages are available through .get_err_msgs()
-                                 or .get_error_msg_dict()
-                       if True: results available through .value -- others params through
-                                .get_success_msg_dict()
         """
         if not self.preprocessor:
             assert False, 'Please call is_chain_valid() before using "run_chain()!'
