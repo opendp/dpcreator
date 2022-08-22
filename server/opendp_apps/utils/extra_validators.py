@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 
@@ -13,6 +15,10 @@ VALIDATE_MSG_NOT_INT = 'The value must be an integer.'
 VALIDATE_MSG_NOT_VALID_CL_VALUE = 'Valid confidence level values:'
 VALIDATE_MSG_MISSING_VAL_HANDLER = 'Valid missing value handlers:'
 VALIDATE_MSG_UNSUPPORTED_STATISTIC = 'Valid statistics:'
+
+VALIDATE_MSG_CATEGORIES_LIST_EMPTY = 'The list of categories is empty'
+VALIDATE_MSG_CATEGORY_NOT_STRING = 'The list of categories contains a non-string'  # Only used for categorical variables
+VALIDATE_MSG_FIXED_VAL_NOT_IN_CATEGORIES = 'The fixed value is not one of the specified categories.'
 
 
 def validate_statistic(value):
@@ -125,7 +131,34 @@ def validate_float(value):
         raise ValidationError(VALIDATE_MSG_NOT_FLOAT)
 
 
-def validate_type_numeric(value):
+def validate_type_numeric(value:str):
     """Make sure the variable type is integer or float"""
     if value not in pstatic.NUMERIC_VAR_TYPES:
         raise ValidationError(pstatic.ERR_MSG_VAR_TYPE_NOT_NUMERIC)
+
+def validate_type_categorical(value: str):
+    """Make sure the variable type is integer or float"""
+    if not value == pstatic.VAR_TYPE_CATEGORICAL:
+        raise ValidationError(pstatic.ERR_MSG_VAR_TYPE_NOT_CATEGORICAL)
+
+def validate_categories_as_string(categories: list):
+    """Check that there are items in the list and each one is a string"""
+    if not categories:
+        raise ValidationError(pstatic.VALIDATE_MSG_CATEGORIES_LIST_EMPTY)
+
+    for x in categories:
+        if not isinstance(x, str):
+            raise ValidationError(pstatic.VALIDATE_MSG_CATEGORY_NOT_STRING + ': ' + type(x))
+
+    # cat_as_strings = [isinstance(x, str) for x in categories]
+    # if False in cat_as_strings
+
+def validate_fixed_value_in_categories(fixed_value: Any, categories: list):
+    """
+
+    @param fixed_value: any type of value
+    @param categories: list of values
+    @return:
+    """
+    if not fixed_value in categories:
+        raise ValidationError(VALIDATE_MSG_FIXED_VAL_NOT_IN_CATEGORIES)

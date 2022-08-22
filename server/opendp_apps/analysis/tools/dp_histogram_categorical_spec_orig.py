@@ -9,11 +9,7 @@ from opendp.typing import *
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.tools.stat_spec import StatSpec
-from opendp_apps.utils.extra_validators import \
-    (validate_not_none,
-     validate_type_categorical,
-     validate_categories_as_string,
-     validate_missing_val_handlers)
+from opendp_apps.profiler.static_vals import VAR_TYPE_CATEGORICAL
 
 enable_features("floating-point", "contrib")
 
@@ -32,14 +28,12 @@ class DPHistogramCategoricalSpec(StatSpec):
         super().__init__(props)
         self.noise_mechanism = astatic.NOISE_GEOMETRIC_MECHANISM
 
-    def get_stat_specific_validators(self) -> dict:
+    def additional_required_props(self):
         """
-        Update self.prop_validators to include validators specific to the subclass
-        @return:
+        Add a list of required properties
+        example: ['min', 'max']
         """
-        return dict(var_type=validate_type_categorical,
-                    categories=validate_categories_as_string,
-                    missing_values_handling=validate_missing_val_handlers)
+        return ['categories']
 
     def _add_double_quotes(self, value):
         """
@@ -65,22 +59,39 @@ class DPHistogramCategoricalSpec(StatSpec):
 
     def run_01_initial_transforms(self):
         """
-        Convert values to strings, where appropriate
         """
-        if self.has_error():
+        if not self.statistic == self.STATISTIC_TYPE:
+            user_msg = f'The specified "statistic" is not "{self.STATISTIC_TYPE}".'
+            self.add_err_msg(user_msg)
             return
+
+        if not self.var_type == VAR_TYPE_CATEGORICAL:
+            user_msg = (f'The specified variable type ("var_type")'
+                        f' is not "{VAR_TYPE_CATEGORICAL}". ({self.STATISTIC_TYPE})')
+
+            self.add_err_msg(user_msg)
+            return
+
+        # Convert fixed value to string
+        #
+        if self.fixed_value is not None:
+            try:
+                self.fixed_value = self._add_double_quotes(self.fixed_value)
+            except NameError as ex_obj:
+                user_msg = 'Failed to convert fixed_value to string.'
+                self.add_err_msg(user_msg)
+                return
 
         # Stringify categorical values (although they should be already)
         #
         updated_cats = []
-
-        # If the categories list has only one value, attempt to split it by ","
+        # The categories may come from the frontend as a single string,
+        # so we need to split them
         if len(self.categories) == 1:
             self.categories = self.categories[0].split(',')
-
-        # Iterate through the categories, changing them to strings
         for idx, x in enumerate(self.categories):
             try:
+                # TODO: This should never be reached
                 if not isinstance(x, str):
                     x = str(x)
                 x = self._add_double_quotes(x)
@@ -90,26 +101,24 @@ class DPHistogramCategoricalSpec(StatSpec):
                 self.add_err_msg(user_msg)
                 return
 
+        # remove duplicate categories while preserving order
+        #
+        # self.categories = sorted(set(updated_cats), key=updated_cats.index)
+
         # remove duplicate categories and sort them
         self.categories = sorted(set(updated_cats))
 
     def run_03_custom_validation(self):
         """
-        No custom validation needed
+        This is a place for initial checking/transformations
+        such as making sure values are floats
+        Example:
+        self.check_numeric_fixed_value()
         """
         if self.has_error():
             return
 
-        # If the fixed_value is to be used, make sure it's valid
-        if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
-
-            # Make sure the fixed value isn't None
-            if self.validate_property('fixed_value', validate_not_none):
-                # Double quote the fixed value and make sure it's a string
-                self.fixed_value = self._add_double_quotes(self.fixed_value)
-
-                # Is the fixed value one of the categories?
-                self.check_if_fixed_value_in_categories(self.fixed_value, self.categories)
+        pass  # Nothing to see here
 
     def check_scale(self, scale, preprocessor):
         """

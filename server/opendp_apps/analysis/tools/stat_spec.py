@@ -14,6 +14,7 @@ import copy
 import decimal
 import json
 from collections import OrderedDict
+from typing import Any
 from typing import Union
 
 from django.core.exceptions import ValidationError
@@ -28,7 +29,8 @@ from opendp_apps.utils.extra_validators import \
     (validate_confidence_level,
      validate_statistic,
      validate_epsilon_not_null,
-     validate_int_not_negative)
+     validate_int_not_negative,
+     validate_fixed_value_in_categories)
 
 
 class StatSpec:
@@ -403,6 +405,17 @@ class StatSpec:
             validator(getattr(self, prop_name))
         except ValidationError as err_obj:
             user_msg = f'{err_obj.message} ({prop_name})'
+            self.add_err_msg(user_msg)
+            return False
+
+        return True
+
+    def check_if_fixed_value_in_categories(self, fixed_value: Any, categories: list) -> bool:
+        """Check that the fixed value is in the list of categories"""
+        try:
+            validate_fixed_value_in_categories(fixed_value, categories)
+        except ValidationError as err_obj:
+            user_msg = f"{err_obj.message} ('fixed_value')"
             self.add_err_msg(user_msg)
             return False
 
