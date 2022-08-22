@@ -33,7 +33,7 @@ class DPHistogramSpec(StatSpec):
         """
         return ['min', 'max']
 
-    def run_01_initial_handling(self):
+    def run_01_initial_transforms(self):
         """
         """
         if not self.statistic == self.STATISTIC_TYPE:

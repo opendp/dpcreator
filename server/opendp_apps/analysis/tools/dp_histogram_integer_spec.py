@@ -34,7 +34,7 @@ class DPHistogramIntegerSpec(StatSpec):
         """
         return ['min', 'max']
 
-    def run_01_initial_handling(self):
+    def run_01_initial_transforms(self):
         """
         Make sure input parameters are the correct type (fixed_value, min, max, etc.)
         Create `self.categories` based on the min/max

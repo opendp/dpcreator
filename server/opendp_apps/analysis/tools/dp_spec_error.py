@@ -52,7 +52,7 @@ class DPSpecError(StatSpec):
     def additional_required_props(self):
         return []
 
-    def run_01_initial_handling(self):
+    def run_01_initial_transforms(self):
         pass
 
     def run_03_custom_validation(self):

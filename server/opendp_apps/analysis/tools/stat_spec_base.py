@@ -1,5 +1,4 @@
 """
-Reference: https://docs.google.com/spreadsheets/d/1pc0DA-BtbsAag22T3aSXS9MqbXaMVXmaVWfdD56Tj1U/edit#gid=1435268092
 BaseClass for Univariate statistics for OpenDP.
     - See "dp_mean_spec.py for an example of instantiation
 - Implement the methods marked with "@abstractmethod"
@@ -10,7 +9,6 @@ BaseClass for Univariate statistics for OpenDP.
 -
 """
 import abc
-import copy
 import decimal
 import json
 from collections import OrderedDict
@@ -26,8 +24,13 @@ from opendp_apps.analysis.stat_valid_info import StatValidInfo
 from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.utils.extra_validators import \
     (validate_confidence_level,
+     validate_float,
      validate_statistic,
      validate_epsilon_not_null,
+     validate_missing_val_handlers,
+     validate_not_empty_or_none,
+     validate_not_negative,
+     validate_int_greater_than_zero,
      validate_int_not_negative)
 
 
@@ -36,55 +39,56 @@ class StatSpec:
 
     STATISTIC_TYPE = None
 
-    default_validators = dict(statistic=validate_statistic,
-                              col_index=validate_int_not_negative,
-                              # dataset_size=validate_int_greater_than_zero,
-                              epsilon=validate_epsilon_not_null,
-                              cl=validate_confidence_level)
-
-    prop_validators = copy.copy(default_validators)
+    default_prop_validators = dict(statistic=validate_statistic,
+                                   col_index=validate_int_not_negative,
+                                   dataset_size=validate_int_greater_than_zero,
+                                   #
+                                   epsilon=validate_epsilon_not_null,
+                                   delta=validate_not_negative,  # add something more!
+                                   cl=validate_confidence_level,
+                                   #
+                                   min=validate_float,
+                                   max=validate_float,
+                                   categories=validate_not_empty_or_none,  # ?
+                                   #
+                                   missing_values_handling=validate_missing_val_handlers,
+                                   # fixed_value=validate_not_none, # more complex check
+                                   # fixed_value=
+                                   #
+                                   accuracy=validate_not_negative)
 
     def __init__(self, props: dict):
-        """
-        The basic constructor reads in a dict of variables and runs basic validation
-        @param props:
-        """
-        # (1) Mandatory fields
+        """Set the internals using the props dict"""
+        self.variable = props.get('variable')
+        self.col_index = props.get('col_index')
+        self.statistic = props.get('statistic')
+        self.dataset_size = props.get('dataset_size')
         #
-        self.statistic = props.get('statistic')  # type of statistic, example: analysis.static_vals.DP_MEAN
-        self.variable = props.get('variable')  # variable name
-        self.col_index = props.get('col_index')  # column index in the orig dataset
         self.epsilon = float(props.get('epsilon')) if props.get('epsilon') else None
+        self.delta = float(props.get('delta')) if props.get('delta') else None
+
         self.cl = props.get('cl')  # confidence level coefficient (e.g. .95, .99, etc)
-        self.variable_info = props.get('variable_info', {})  # retrieve min/max or categories, if needed
 
-        # (2) Retrieved from variable_info
-        self.var_type = self.variable_info.get('type')  # mandatory
-        self.min = self.variable_info.get('min')  # optional: depends on variable type/stat
-        self.max = self.variable_info.get('max')  # optional: depends on variable type/stat
-        self.categories = self.variable_info.get('categories')  # optional: depends on variable type/stat
-
-        # (3) Usage depends on the statistic
+        self.noise_mechanism = None
         #
-        self.dataset_size = props.get('dataset_size')  # dataset size
-        self.delta = float(props.get('delta')) if props.get('delta') else None  # privacy parameter
-        # Missing values handling
+        self.accuracy_val = None
+        self.accuracy_msg = None
+        #
         self.missing_values_handling = props.get('missing_values_handling')
         self.fixed_value = props.get('fixed_value')
-
-        # (4) Set explicitly by subclass (may change in the future)
-        self.noise_mechanism = None
-
-        # (5) Implementation depends on the statistics; Used for validation and computation
-        self.preprocessor = None  # set this each time get_preprocessor is called--hopefully once
-
-        # (6) Output fields
+        # self.missing_fixed_val = props.get('missing_fixed_val')
         #
-        self.value = None  # DP Stat(s)
-        self.scale = None  # Scale
+        # Note: min, max, categories are sent in via variable_info
+        self.variable_info = props.get('variable_info', {})  # derive the min/max if needed
+        self.min = self.variable_info.get('min')
+        self.max = self.variable_info.get('max')
 
-        self.accuracy_val = None  # Accuracy value
-        self.accuracy_msg = None  # Accuracy message for user
+        self.categories = self.variable_info.get('categories')
+        self.var_type = self.variable_info.get('type')
+
+        self.preprocessor = None  # set this each time get_preprocessor is called--hopefully once
+        self.value = None
+        self.scale = None
 
         # error handling
         self.error_found = False
@@ -104,26 +108,6 @@ class StatSpec:
         return f'{cl_fmt}%'
 
     @abc.abstractmethod
-    def get_stat_specific_validators(self) -> dict:
-        """
-        Update self.prop_validators to include validators specific to the subclass
-        @return:
-        """
-        raise NotImplementedError('set_stat_specific_validators')
-
-        # Example: implementation
-        """
-        return dict(dataset_size=validate_int_greater_than_zero,
-                    min=validate_float,
-                    max=validate_float,
-                    missing_values_handling=validate_missing_val_handlers)
-                    
-        # OR, if no additional validators
-        
-        return {} 
-        """
-
-    # @abc.abstractmethod
     def additional_required_props(self):
         """
         Add a list of required properties.
@@ -135,7 +119,8 @@ class StatSpec:
     @abc.abstractmethod
     def run_01_initial_transforms(self):
         """
-        This is a place for initial transformations such as making sure values are floats
+        This is a place for initial checking/transformations
+        such as making sure values are floats
         Example:
         `self.floatify_int_values()`
 
@@ -145,25 +130,28 @@ class StatSpec:
         ```
         if self.has_error():
             return
-        ```
+
         """
         raise NotImplementedError('run_01_initial_transforms')
 
     @abc.abstractmethod
     def run_03_custom_validation(self):
         """
-        This is a place for custom checking/transformations such as making sure min/max values are valid
-        Notes:
-        - See "dp_mean_spec.py for an example of instantiation
-        - Always start implementation with:
-            ```
-            if self.has_error():
-                return False
-            ```
-        - Or, if not implemented, simply use
-            ```
-            pass
-            ```
+        This is a place for custom checking/transformations
+        such as making sure values are floats
+
+        See "dp_mean_spec.py for an example of instantiation
+
+        Always start implementation with:
+        ```
+        if self.has_error():
+            return False
+        ```
+
+        Or, if not implemented, simply use
+        ```
+        pass
+        ```
         """
         raise NotImplementedError('run_03_custom_validation')
 
@@ -301,7 +289,7 @@ class StatSpec:
 
         return True
 
-    def floatify_int_values(self, props_to_floatify: list = ['cl', 'min', 'max']) -> bool:
+    def floatify_int_values(self, more_props_to_floatify=None):
         """
         The OpenDP library throws domain mismatches
         if all parameters aren't the same type.
@@ -312,22 +300,29 @@ class StatSpec:
 
         - more_props_to_floatify - list of additional properties to "floatify"
         """
-        assert isinstance(props_to_floatify, list), \
-            '"props_to_floatify" must be a list. Example: ["epsilon", "cl", "min", "max"]'
+        if more_props_to_floatify is None:
+            more_props_to_floatify = []
+        assert isinstance(more_props_to_floatify, list), \
+            '"more_props_to_floatify" must be a list, even and empty list'
+
+        props_to_floatify = ['epsilon', 'cl', 'min', 'max'] + more_props_to_floatify
 
         for prop_name in props_to_floatify:
-            if self.cast_property_to_float(prop_name) is False:
-                return False
-        return True
+            if not self.cast_property_to_float(prop_name):
+                return
 
     def run_02_basic_validation(self):
-        """This method should be unchanged in subclasses"""
+        """Evaluate the properties, make sure they are populated"""
         if self.has_error():  # something may be wrong in "run_01_initial_transforms()"
             return
 
-        if not self.statistic == self.STATISTIC_TYPE:
-            self.add_err_msg(f'The specified "statistic" is not "{self.STATISTIC_TYPE}".')
-            return
+        # Always validate these properties, mostly using the self.prop_validators
+        #
+        self.validate_property('statistic')
+        self.validate_property('epsilon')
+        self.validate_property('dataset_size')
+        self.validate_property('col_index')
+        self.validate_property('missing_values_handling')
 
         # Epsilon should always be a float
         if not self.cast_property_to_float('epsilon'):
@@ -338,33 +333,35 @@ class StatSpec:
             if not self.cast_property_to_float('delta'):
                 return
 
-        # Check the var_type
         if self.var_type not in pstatic.VALID_VAR_TYPES:
             self.add_err_msg(f'Invalid variable type: "{self.var_type}"')
             return
 
-        # Set the validators for the subclass
-        self.prop_validators.update(self.get_stat_specific_validators())
+        # Add additional required properties.
+        #   e.g. min, max, delta, etc.
+        for prop_name in self.additional_required_props():
+            if prop_name in self.prop_validators:
+                self.validate_property(prop_name)
 
-        # Run the validators
-        for attr_name in self.prop_validators.keys():
-            if not self.validate_property(attr_name):
+        if self.has_error():
+            return
+
+        # check the min/max relationship
+        #
+        if 'min' in self.additional_required_props() and \
+                'max' in self.additional_required_props():
+            if self.max > self.min:
+                pass
+            else:
+                user_msg = f'{self.variable} The min ({self.min}) must be less than the max ({self.max})'
+                self.add_err_msg(user_msg)
+                # self.add_err_msg(astatic.ERR_MSG_INVALID_MIN_MAX)
                 return
 
-    def validate_min_max(self):
-        """
-        If it applies, validate the min/max relationship
-        """
-        if self.has_error():
-            return False
-
-        if self.max > self.min:
-            return True
-
-        user_msg = f'{self.variable} The max ({self.max}) must be greater than the ({self.min})'
-        self.add_err_msg(user_msg)
-
-        return False
+        # If this is numeric variable, check the impute constant
+        #   (If impute constant isn't used, this check will simply exit)
+        # if self.var_type in pstatic.NUMERIC_VAR_TYPES:
+        #    self.check_numeric_fixed_value()
 
     def check_numeric_fixed_value(self):
         """
@@ -372,21 +369,19 @@ class StatSpec:
         Check that the fixed value/fixed_value is not outside the min/max range
         """
         if self.has_error():
-            return False
+            return
 
         if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
             if self.fixed_value < self.min:
                 user_msg = (f'The "fixed value" ({self.fixed_value})'
                             f' {astatic.ERR_IMPUTE_PHRASE_MIN} ({self.min})')
                 self.add_err_msg(user_msg)
-                return False
+                return
             elif self.fixed_value > self.max:
                 user_msg = (f'The "fixed value" ({self.fixed_value})'
                             f' {astatic.ERR_IMPUTE_PHRASE_MAX} ({self.max})')
                 self.add_err_msg(user_msg)
-                return False
-
-        return True
+                return
 
     def validate_property(self, prop_name: str, validator=None) -> bool:
         """Validate a property name using a validator"""
@@ -499,7 +494,7 @@ class StatSpec:
         info_dict = {
             'stat': self,
             'histogram_values': value,
-            'use_min_max': 'min' in self.get_stat_specific_validators().keys(),
+            'use_min_max': 'min' in self.additional_required_props(),
             'MISSING_VAL_INSERT_FIXED': astatic.MISSING_VAL_INSERT_FIXED,
             'MISSING_VAL_INSERT_RANDOM': astatic.MISSING_VAL_INSERT_RANDOM
         }
@@ -548,7 +543,7 @@ class StatSpec:
 
         # Min/Max
         #
-        if 'min' in self.get_stat_specific_validators().keys():
+        if 'min' in self.additional_required_props():
             final_info['bounds'] = OrderedDict({'min': self.min, 'max': self.max})
 
         # Missing values

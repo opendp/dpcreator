@@ -46,15 +46,27 @@ class DPMeanStatSpecTest(StatSpecTestCase):
                                                     'type': 'Float', },
                                   }
 
-    def test_05_valid_noise_mechanism(self):
+    def test_005_valid_noise_mechanism(self):
         """Check for the correct noise_mechanism"""
         dp_mean = DPMeanSpec({})
         self.assertEqual(dp_mean.noise_mechanism, astatic.NOISE_LAPLACE_MECHANISM)
 
+    def test_007_valid_stat_type(self):
+        """(7) Use the wrong stat, e.g. not a "mean" """
+        msgt(self.test_007_valid_stat_type.__doc__)
+
+        spec_props = self.spec_props
+        spec_props['statistic'] = astatic.DP_COUNT  # count instead of mean!
+        dp_mean = DPMeanSpec(spec_props)
+        if dp_mean.has_error():
+            print('err:', dp_mean.get_single_err_msg())
+
+        self.assertTrue(dp_mean.has_error())
+
     # @skip
-    def test_10_debug_mean(self):
+    def test_010_debug_mean(self):
         """(10) Test DP Mean Spec"""
-        msgt(self.test_10_debug_mean.__doc__)
+        msgt(self.test_010_debug_mean.__doc__)
 
         spec_props = self.spec_props
 
@@ -77,9 +89,9 @@ class DPMeanStatSpecTest(StatSpecTestCase):
             print('\n-- Looks good! --')
             print('\nUI info:', json.dumps(dp_mean.get_success_msg_dict()))
 
-    def test_05_get_variable_order(self):
+    def test_015_get_variable_order(self):
         """(05) Test get variable order"""
-        msgt(self.test_05_get_variable_order.__doc__)
+        msgt(self.test_015_get_variable_order.__doc__)
 
         analysis_plan = self.retrieve_new_plan()
 
@@ -88,9 +100,9 @@ class DPMeanStatSpecTest(StatSpecTestCase):
         self.assertTrue(variable_indices_info.success)
         self.assertEqual(variable_indices_info.data, [x for x in range(20)])
 
-    def test_10_valid_spec(self):
+    def test_017_valid_spec(self):
         """(10) Run DP Mean valid spec"""
-        msgt(self.test_10_valid_spec.__doc__)
+        msgt(self.test_017_valid_spec.__doc__)
 
         spec_props = {'variable': 'EyeHeight',
                       'col_index': 19,
@@ -131,9 +143,9 @@ class DPMeanStatSpecTest(StatSpecTestCase):
             self.assertTrue(dp_mean.is_chain_valid())
 
     # @skip
-    def test_20_bad_epsilon(self):
+    def test_020_bad_epsilon(self):
         """(20) Bad epsilon"""
-        msgt(self.test_20_bad_epsilon.__doc__)
+        msgt(self.test_020_bad_epsilon.__doc__)
 
         spec_props = self.spec_props
 
@@ -160,9 +172,9 @@ class DPMeanStatSpecTest(StatSpecTestCase):
             dp_mean = DPMeanSpec(spec_props)
             self.assertFalse(dp_mean.is_chain_valid())
 
-    def test_30_bad_confidence_levels(self):
+    def test_030_bad_confidence_levels(self):
         """(30) Bad confidence level vals"""
-        msgt(self.test_30_bad_confidence_levels.__doc__)
+        msgt(self.test_030_bad_confidence_levels.__doc__)
 
         spec_props = self.spec_props
 
@@ -187,9 +199,9 @@ class DPMeanStatSpecTest(StatSpecTestCase):
             self.assertFalse(dp_mean.is_chain_valid())
             self.assertTrue(dp_mean.get_single_err_msg().find('Failed to convert "cl" to a float') > -1)
 
-    def test_35_check_confidence_level_alpha(self):
+    def test_035_check_confidence_level_alpha(self):
         """(35) Check accuracy with bad confidence level"""
-        msgt(self.test_35_check_confidence_level_alpha.__doc__)
+        msgt(self.test_035_check_confidence_level_alpha.__doc__)
 
         # shouldn't happen, change cl after validity
         #
@@ -243,9 +255,9 @@ class DPMeanStatSpecTest(StatSpecTestCase):
         self.assertTrue(dp_mean.has_error())
         self.assertTrue(dp_mean.get_single_err_msg().startswith(astatic.ERR_MSG_CL_ALPHA_CL_GREATER_THAN_1))
 
-    def test_40_test_impute(self):
+    def test_040_test_impute(self):
         """(40) Test impute validation"""
-        msgt(self.test_40_test_impute.__doc__)
+        msgt(self.test_040_test_impute.__doc__)
 
         spec_props = self.spec_props
 

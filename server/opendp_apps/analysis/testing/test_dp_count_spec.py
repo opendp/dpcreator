@@ -26,15 +26,9 @@ class DPCountStatSpecTest(StatSpecTestCase):
         spec_props = {'variable': 'EyeHeight',
                       'col_index': 19,
                       'statistic': astatic.DP_COUNT,
-                      'dataset_size': 183,
                       'epsilon': 1.0,
-                      'delta': 0.0,
                       'cl': astatic.CL_99,
-                      'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'fixed_value': '182',
-                      'variable_info': {'min': -8,
-                                        'max': 5,
-                                        'type': 'Float', },
+                      'variable_info': {'type': 'Float'},
                       }
 
         dp_count = DPCountSpec(spec_props)
@@ -77,15 +71,9 @@ class DPCountStatSpecTest(StatSpecTestCase):
         spec_props = {'variable': 'age',
                       'col_index': 1,
                       'statistic': astatic.DP_COUNT,
-                      'dataset_size': 10_000,
                       'epsilon': 1.0,
-                      'delta': 0.0,
                       'cl': astatic.CL_95,
-                      'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'fixed_value': '44',
-                      'variable_info': {'min': 18,
-                                        'max': 95,
-                                        'type': pstatic.VAR_TYPE_INTEGER},
+                      'variable_info': {'type': pstatic.VAR_TYPE_INTEGER},
                       }
 
         dp_count = DPCountSpec(spec_props)
@@ -136,15 +124,11 @@ class DPCountStatSpecTest(StatSpecTestCase):
         spec_props = {'variable': 'TypingSpeed',
                       'col_index': 5,
                       'statistic': astatic.DP_COUNT,
-                      'dataset_size': 183,
                       'epsilon': 1.0,
-                      'delta': 0.0,
                       'cl': astatic.CL_99,
-                      'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'fixed_value': '62',
-                      'variable_info': {'min': 1,
-                                        'max': 61,
-                                        'type': pstatic.VAR_TYPE_FLOAT},
+                      'variable_info': {
+                          'type': pstatic.VAR_TYPE_FLOAT
+                        },
                       }
 
         dp_count = DPCountSpec(spec_props)
@@ -194,12 +178,8 @@ class DPCountStatSpecTest(StatSpecTestCase):
         spec_props = {'variable': 'Subject',
                       'col_index': 0,
                       'statistic': astatic.DP_COUNT,
-                      'dataset_size': 183,
                       'epsilon': 1.0,
-                      'delta': 0.0,
                       'cl': astatic.CL_95,
-                      'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'fixed_value': 'ac',
                       'variable_info': {'type': pstatic.VAR_TYPE_CATEGORICAL},
                       }
 
@@ -263,15 +243,27 @@ class DPCountStatSpecTest(StatSpecTestCase):
                        'fixed_value': 'Genderfluid',
                        'variable_info': {'type': pstatic.VAR_TYPE_CATEGORICAL},
                        }
-        # right from UI
-        spec_props = {'error': '', 'label': 'gender', 'locked': False,
-                      'epsilon': 1.0, 'delta': 0.0, 'cl': 0.95,
-                      'variable': 'gender', 'statistic': 'count',
-                      'fixed_value': 'male', 'handle_as_fixed': True,
-                      'missing_values_handling': 'insert_fixed', 'dataset_size': 1000,
-                      'variable_info': {'name': 'gender', 'type': 'Categorical',
-                                        'label': 'gender', 'selected': True,
-                                        'categories': ['Genderfluid'], 'sort_order': 4}, 'col_index': 4}
+        # right from UI, many of these fields (e.g. dataset_size, missing_values_handling, etc., are ignored)
+        spec_props = {'error': '',
+                      'label': 'gender',
+                      'locked': False,
+                      'epsilon': 1.0,
+                      'delta': 0.0,
+                      'cl': 0.95,
+                      'variable': 'gender',
+                      'statistic': 'count',
+                      'fixed_value': 'male',
+                      'handle_as_fixed': True,
+                      'missing_values_handling': 'insert_fixed',
+                      'dataset_size': 1000,
+                      'variable_info': {
+                          'name': 'gender',
+                          'type': 'Categorical',
+                          'label': 'gender',
+                          'selected': True,
+                          'categories': ['Genderfluid'],
+                          'sort_order': 4},
+                      'col_index': 4}
 
         dp_count = DPCountSpec(spec_props)
         dp_count.is_chain_valid()
@@ -314,12 +306,8 @@ class DPCountStatSpecTest(StatSpecTestCase):
         spec_props = {'variable': 'Boolean2',
                       'col_index': 8,
                       'statistic': astatic.DP_COUNT,
-                      'dataset_size': 1_000,
                       'epsilon': 1.0,
-                      'delta': 0.0,
                       'cl': astatic.CL_95,
-                      'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                      'fixed_value': 'true',
                       'variable_info': {'type': pstatic.VAR_TYPE_BOOLEAN},
                       }
 

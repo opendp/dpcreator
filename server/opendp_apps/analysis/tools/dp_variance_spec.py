@@ -49,7 +49,7 @@ class DPVarianceSpec(StatSpec):
         """
         return ['min', 'max', 'cl', ]
 
-    def run_01_initial_handling(self):
+    def run_01_initial_transforms(self):
         """
         Make sure values are consistently floats
         """

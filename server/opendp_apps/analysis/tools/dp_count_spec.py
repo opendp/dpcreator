@@ -27,14 +27,13 @@ class DPCountSpec(StatSpec):
     """
     Initiate with dict of properties. Example of needed properties:
 
-    spec_props = dict(var_name="hours_sleep",
-                      col_index=3,
-                      variable_info=dict(min=0, max=24, type=VAR_TYPE_FLOAT),
-                      statistic=DP_MEAN,
-                      dataset_size=365,
-                      epsilon=0.5,
-                      cl=CL_95,
-                      fixed_value=1)
+    spec_props = {'variable': 'age',
+              'col_index': 1,
+              'statistic': astatic.DP_COUNT,
+              'epsilon': 1.0,
+              'cl': astatic.CL_95,
+              'variable_info': {'type': pstatic.VAR_TYPE_INTEGER},
+              }
     """
     STATISTIC_TYPE = astatic.DP_COUNT
 
@@ -43,26 +42,20 @@ class DPCountSpec(StatSpec):
         super().__init__(props)
         self.noise_mechanism = astatic.NOISE_GEOMETRIC_MECHANISM
 
-    def additional_required_props(self):
+    def get_stat_specific_validators(self) -> dict:
         """
-        Add a list of required properties
-        example: ['min', 'max']
-        If no additional properties, return []
+        Update self.prop_validators to include validators specific to the subclass
+        @return:
         """
-        return ['cl']
+        return {}  # No additional validators
 
-    def run_01_initial_handling(self):
+    def run_01_initial_transforms(self):
         """
         Missing value handling, if a fixed_value is given, make it string
         """
-        if not self.statistic == self.STATISTIC_TYPE:
-            self.add_err_msg(f'The specified "statistic" is not "{self.STATISTIC_TYPE}". (StatSpec)"')
-            return
-
-        # Use the "impute_value" for missing values, make sure it's a float!
-        #
-        if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
-            self.fixed_value = str(self.fixed_value)
+        pass
+        # if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
+        #    self.fixed_value = str(self.fixed_value)
 
     def run_03_custom_validation(self):
         """
@@ -107,7 +100,7 @@ class DPCountSpec(StatSpec):
                 # Cast the column to str
                 make_cast(TIA=str, TOA=str) >>
                 # Impute missing values
-                make_impute_constant(self.fixed_value) >>
+                make_impute_constant('') >>  # Can this be an empty string?
                 # Count!
                 make_count(TIA=str)
         )

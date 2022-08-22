@@ -1,6 +1,8 @@
-import logging
+"""
+Wrapper class for DP Mean functionality
 
-from django.conf import settings
+
+"""
 from opendp.accuracy import laplacian_scale_to_accuracy
 from opendp.meas import make_base_laplace
 from opendp.mod import OpenDPException
@@ -11,30 +13,29 @@ from opendp.trans import \
      make_clamp,
      make_impute_constant,
      make_select_column,
-     make_split_dataframe, make_sized_bounded_sum)
-
-from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.analysis.tools.stat_spec import StatSpec
+     make_sized_bounded_mean,
+     make_split_dataframe)
 
 enable_features("floating-point", "contrib")
 
-logger = logging.getLogger(settings.DEFAULT_LOGGER)
+from opendp_apps.analysis.tools.stat_spec import StatSpec
+from opendp_apps.analysis import static_vals as astatic
 
 
-class DPSumSpec(StatSpec):
+class DPMeanSpec(StatSpec):
     """
     Initiate with dict of properties. Example of needed properties:
 
     spec_props = dict(var_name="hours_sleep",
                       col_index=3,
                       variable_info=dict(min=0, max=24, type=VAR_TYPE_FLOAT),
-                      statistic=DP_SUM,
+                      statistic=DP_MEAN,
                       dataset_size=365,
                       epsilon=0.5,
-                      cl=CL_95.
+                      cl=CL_95,
                       fixed_value=1)
     """
-    STATISTIC_TYPE = astatic.DP_SUM
+    STATISTIC_TYPE = astatic.DP_MEAN
 
     def __init__(self, props: dict):
         """Set the internals using the props dict"""
@@ -54,7 +55,6 @@ class DPSumSpec(StatSpec):
         """
         if not self.statistic == self.STATISTIC_TYPE:
             self.add_err_msg(f'The specified "statistic" is not "{self.STATISTIC_TYPE}". (StatSpec)"')
-            return
 
         if self.fixed_value is not None:
             pass
@@ -85,7 +85,7 @@ class DPSumSpec(StatSpec):
         :param scale:
         :param preprocessor:
         :param dataset_distance:
-        :param epsilon:
+        # :param epsilon:
         :return:
         """
         if self.has_error():
@@ -94,7 +94,7 @@ class DPSumSpec(StatSpec):
         return (preprocessor >> make_base_laplace(scale)).check(dataset_distance, epsilon)
 
     def get_preprocessor(self):
-        """Preprocessor for DP Sum (float)"""
+        """Preprocessor for DP Mean (float)"""
         if self.has_error():
             return None
 
@@ -104,15 +104,17 @@ class DPSumSpec(StatSpec):
             # Yes!
             return self.preprocessor
 
-        # Build the preprocessor!
-        #
         preprocessor = (
-                make_select_column(self.col_index, TOA=str) >>
+                # Selects a column of df, Vec<str>
+                make_select_column(key=self.col_index, TOA=str) >>
+                # Cast the column as Vec<Optional<Float>>
                 make_cast(TIA=str, TOA=float) >>
-                make_impute_constant(constant=self.fixed_value) >>
-                make_clamp(bounds=self.get_bounds()) >>
-                make_bounded_resize(size=self.dataset_size, bounds=self.get_bounds(), constant=self.fixed_value) >>
-                make_sized_bounded_sum(size=self.dataset_size, bounds=self.get_bounds())
+                # Impute missing values to 0 Vec<Float>
+                make_impute_constant(self.fixed_value) >>
+                # Clamp age values
+                make_clamp(self.get_bounds()) >>
+                make_bounded_resize(self.dataset_size, self.get_bounds(), self.fixed_value) >>
+                make_sized_bounded_mean(self.dataset_size, self.get_bounds())
         )
 
         self.scale = binary_search(lambda s: self.check_scale(s, preprocessor, 1, self.epsilon), bounds=(0.0, 1000.0))
@@ -124,7 +126,7 @@ class DPSumSpec(StatSpec):
         return preprocessor
 
     def set_accuracy(self):
-        """Return the accuracy measure using Laplace and the confidence interval as alpha"""
+        """Return the accuracy measure using Laplace and the confidence level alpha"""
         if self.has_error():
             return False
 
@@ -140,14 +142,20 @@ class DPSumSpec(StatSpec):
         # Note `self.accuracy_val` must bet set before using `self.get_accuracy_text()
         #
         self.accuracy_msg = self.get_accuracy_text()
-
+        """
+        self.accuracy_msg = (f"Releasing {self.statistic} for the variable {self.variable}."
+                             f" With at least probability {self.get_cl_text()} the output {self.statistic}"
+                             f" will differ from the true {self.statistic} by at"
+                             f" most {self.accuracy_val} units."
+                             f" Here the units are the same units the variable has in the dataset.")
+        """
         return True
 
     def run_chain(self, column_names, file_obj, sep_char=","):
         """
-        Calculate the DP Sum!
+        Calculate the DP Mean!
 
-        :param column_names. e.g. [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
+        :param columns. Examples: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
                 - In general using zero-based index of columns is preferred
         :param file_obj - file like object to read data from
         :param sep_char - separator from the object, default is "," for a .csv, etc
@@ -159,7 +167,7 @@ class DPSumSpec(StatSpec):
 
         Example:
         # Note "\t" is for a tabular file
-        `dp_sum_spec.run_chain([0, 1, 2, 3], file_obj, sep_char="\t")`
+        `dp_mean_spec.run_chain([0, 1, 2, 3], file_obj, sep_char="\t")`
         """
         if not self.preprocessor:
             assert False, 'Please call is_chain_valid() before using "run_chain()!'
@@ -170,7 +178,7 @@ class DPSumSpec(StatSpec):
             return False
 
         if not isinstance(column_names, list):
-            self.add_err_msg('DPSumSpec.run_chain(..): column_names must be a list. Found: (type({column_names}))')
+            self.add_err_msg('DPMeanSpec.run_chain(..): column_names must be a list. Found: (type({column_names}))')
             return
 
         try:
@@ -182,22 +190,13 @@ class DPSumSpec(StatSpec):
             self.value = computation_chain(file_obj.read())
 
         except OpenDPException as ex_obj:
-            logger.exception(ex_obj)
             self.add_err_msg(f'{ex_obj.message} (OpenDPException)')
             return False
         except Exception as ex_obj:
-            logger.exception(ex_obj)
             if hasattr(ex_obj, 'message'):
                 self.add_err_msg(f'{ex_obj.message} (Exception)')
             else:
                 self.add_err_msg(f'{ex_obj} (Exception)')
             return False
-
-        logger.info((f"Epsilon: {self.epsilon}"
-                     f"\nColumn name: {self.variable}"
-                     f"\nColumn index: {self.col_index}"
-                     f"\nColumn accuracy_val: {self.accuracy_val}"
-                     f"\nColumn accuracy_msg: {self.accuracy_msg}"
-                     f"\n\nDP Sum: {self.value}"))
 
         return True
