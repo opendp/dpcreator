@@ -2,8 +2,6 @@ import decimal
 from os.path import abspath, dirname, isfile, join
 from unittest import skip
 
-from opendp_apps.analysis.tools.dp_histogram_spec import DPHistogramSpec
-
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
@@ -138,15 +136,6 @@ class HistogramStatSpecTest(StatSpecTestCase):
             err_dict = dp_hist2.get_error_msg_dict()
             print(f"  - {err_dict['message']}")
             self.assertTrue(err_dict['message'].find(stat_err_msg) > -1)
-
-        good_impute_info = [-8, 5, '-8', '5', -7, 0, '0']
-
-        for good_impute in good_impute_info:
-            print(f'> good impute: {good_impute}')
-            new_props = spec_props.copy()
-            new_props['fixed_value'] = good_impute
-            dp_hist = DPHistogramSpec(new_props)
-            self.assertTrue(dp_hist.is_chain_valid())
 
     def test_100_run_dphist_calculation_categorical(self):
         """(100) Run DP histogram calculation"""
