@@ -12,7 +12,7 @@ from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.utils.extra_validators import VALIDATE_MSG_FIXED_VAL_NOT_IN_CATEGORIES
 
 
-class HistogramStatSpecTest(StatSpecTestCase):
+class HistogramCategoricalStatSpecTest(StatSpecTestCase):
     fixtures = ['test_dataset_data_001.json', ]
 
     def setUp(self):
@@ -178,7 +178,6 @@ class HistogramStatSpecTest(StatSpecTestCase):
         }
 
         dp_hist = DPHistogramCategoricalSpec(spec_props)
-        print(f"DPHistogramSpec valid? {dp_hist.has_error()}. get_error_msg_dict: {dp_hist.get_error_msg_dict()}")
         if dp_hist.has_error():
             print(f"get_error_messages(): {dp_hist.get_error_messages()}")
 

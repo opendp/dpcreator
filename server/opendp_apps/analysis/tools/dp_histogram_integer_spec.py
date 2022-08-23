@@ -10,6 +10,9 @@ from opendp.typing import *
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.profiler.static_vals import VAR_TYPE_INTEGER
+from opendp_apps.utils.extra_validators import \
+    (validate_int,
+     validate_missing_val_handlers)
 
 enable_features("floating-point", "contrib")
 
@@ -27,22 +30,19 @@ class DPHistogramIntegerSpec(StatSpec):
         super().__init__(props)
         self.noise_mechanism = astatic.NOISE_GEOMETRIC_MECHANISM
 
-    def additional_required_props(self):
-        """
-        Add a list of required properties
-        example: ['min', 'max']
-        """
-        return ['min', 'max']
+    def get_stat_specific_validators(self):
+        """Set validators used for the DP Mean"""
+
+        return dict(min=validate_int,
+                    max=validate_int,
+                    #
+                    missing_values_handling=validate_missing_val_handlers)
 
     def run_01_initial_transforms(self):
         """
         Make sure input parameters are the correct type (fixed_value, min, max, etc.)
         Create `self.categories` based on the min/max
         """
-        if not self.statistic == self.STATISTIC_TYPE:
-            self.add_err_msg(f'The specified "statistic" is not "{self.STATISTIC_TYPE}".')
-            return
-
         if not self.var_type == VAR_TYPE_INTEGER:
             user_msg = (f'The specified variable type ("var_type")'
                         f' is not "{VAR_TYPE_INTEGER}". ({self.STATISTIC_TYPE})')
@@ -53,19 +53,17 @@ class DPHistogramIntegerSpec(StatSpec):
         # Check the fixed_value, min, max -- makes sure they're integers
         #
         if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
-            # Convert the impute value to a float!
+            # Convert the impute value to an int
             if not self.cast_property_to_int('fixed_value'):
                 return
 
+        # Cast min/max to integers
+        #
         if not self.cast_property_to_int('min'):
             return
 
         if not self.cast_property_to_int('max'):
             return
-
-        # Make sure the fixed value is between the min/max
-        #
-        self.check_numeric_fixed_value()
 
         # Create categories
         #
@@ -80,6 +78,18 @@ class DPHistogramIntegerSpec(StatSpec):
         """
         if self.has_error():
             return
+
+        if self.validate_min_max() is False:
+            return
+
+        # Make sure the fixed value is between the min/max
+        #
+        self.check_numeric_fixed_value()
+
+        # If the fixed_value is to be used, make sure it's valid
+        if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
+            # Is the fixed value one of the categories?
+            self.check_if_fixed_value_in_categories(self.fixed_value, self.categories)
 
     def check_scale(self, scale, preprocessor):
         """

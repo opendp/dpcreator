@@ -130,6 +130,14 @@ def validate_float(value):
     except TypeError:
         raise ValidationError(VALIDATE_MSG_NOT_FLOAT)
 
+def validate_int(value):
+    """Make sure the value is a float"""
+    try:
+        int(value)
+    except ValueError:
+        raise ValidationError(VALIDATE_MSG_NOT_INT)
+    except TypeError:
+        raise ValidationError(VALIDATE_MSG_NOT_INT)
 
 def validate_type_numeric(value:str):
     """Make sure the variable type is integer or float"""

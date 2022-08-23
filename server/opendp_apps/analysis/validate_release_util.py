@@ -478,6 +478,7 @@ class ValidateReleaseUtil(BasicErrCheck):
 
             elif statistic in astatic.DP_HISTOGRAM:
                 if var_type == pstatic.VAR_TYPE_CATEGORICAL:
+                    print('---- Categorical Histogram ---')
                     # 4/12/2022 - temp hack to distinguish numeric categories
                     #   - need updated UI, etc.
                     #
@@ -494,10 +495,12 @@ class ValidateReleaseUtil(BasicErrCheck):
                         self.add_stat_spec(DPHistogramCategoricalSpec(props))
 
                 elif var_type == pstatic.VAR_TYPE_INTEGER:
+                    print('---- Integer Histogram ---')
                     # DP Histogram (Integer)!
                     self.add_stat_spec(DPHistogramIntegerSpec(props))
 
                 else:
+                    print('---- Unsupported Histogram ---')
                     # DP Histogram - unsupported type
                     props['error_message'] = (f'Statistic is "{astatic.DP_HISTOGRAM}" but '
                                               f' variable type is unsupported: "{var_type}"')
