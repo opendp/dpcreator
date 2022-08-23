@@ -44,14 +44,15 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         self.assertFalse(self.dp_hist.has_error())
         self.assertTrue(self.dp_hist.is_chain_valid())
 
-    def test_01_valid_noise_mechanism(self):
-        """Check for the correct noise_mechanism"""
+    def test_001_valid_noise_mechanism(self):
+        """(1) Check for the correct noise_mechanism"""
+        msgt(self.test_001_valid_noise_mechanism.__doc__)
         dp_hist_int = DPHistogramIntegerSpec({})
         self.assertEqual(dp_hist_int.noise_mechanism, astatic.NOISE_GEOMETRIC_MECHANISM)
 
-    def test_05_get_variable_order(self):
-        """(05) Test get variable order"""
-        msgt(self.test_05_get_variable_order.__doc__)
+    def test_005_get_variable_order(self):
+        """(5) Test get variable order"""
+        msgt(self.test_005_get_variable_order.__doc__)
 
         analysis_plan = self.retrieve_new_plan()
 
@@ -60,9 +61,9 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         self.assertTrue(variable_indices_info.success)
         self.assertEqual(variable_indices_info.data, [x for x in range(20)])
 
-    def test_10_valid_spec(self):
+    def test_010_valid_spec(self):
         """(10) Run DP Mean valid spec"""
-        msgt(self.test_10_valid_spec.__doc__)
+        msgt(self.test_010_valid_spec.__doc__)
 
         spec_props = self.spec_props.copy()
 
@@ -185,6 +186,12 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         self.assertTrue(release_dict['accuracy']['value'] < 6)
         self.assertTrue(release_dict['accuracy']['value'] > 4)
 
+        # Check that the fixed_value is in the list of categories
+        #
+        fixed_value = release_dict['missing_value_handling']['fixed_value']
+        categories = release_dict['result']['value']['categories']
+        self.assertTrue(fixed_value in categories)
+
     def test_130_run_dphist_calculation_integer(self):
         """(130) Run DP histogram calculation with integer values"""
         msgt(self.test_130_run_dphist_calculation_integer.__doc__)
@@ -222,3 +229,9 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
 
         # check that category_value_pairs are included--and that there are 9 of them
         self.assertEqual(26, len(release_dict['result']['value']['category_value_pairs']))
+
+        # Check that the fixed_value is in the list of categories
+        #
+        fixed_value = release_dict['missing_value_handling']['fixed_value']
+        categories = release_dict['result']['value']['categories']
+        self.assertTrue(fixed_value in categories)

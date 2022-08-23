@@ -157,6 +157,22 @@ class HistogramCategoricalStatSpecTest(StatSpecTestCase):
         self.assertTrue('categories' in dp_hist.value)
         self.assertTrue('values' in dp_hist.value)
 
+        release_dict = dp_hist.get_release_dict()
+        # import json; print(json.dumps(release_dict, indent=4))
+
+        # Check that the fixed_value and list of categories are "unquoted"
+        #
+        fixed_value = release_dict['missing_value_handling']['fixed_value']
+        self.assertEqual(fixed_value, DPHistogramCategoricalSpec._remove_double_quotes(fixed_value))
+
+        categories = release_dict['result']['value']['categories']
+        for cat_name in categories:
+            self.assertEqual(cat_name, DPHistogramCategoricalSpec._remove_double_quotes(cat_name))
+
+        # Check that the fixed_value is in the list of categories
+        #
+        self.assertTrue(fixed_value in categories)
+
     def test_110_run_dphist_calculation_categorical2(self):
         """(110) Run DP 2nd categorical calculation, with only 2 categories"""
         msgt(self.test_110_run_dphist_calculation_categorical2.__doc__)
@@ -205,3 +221,19 @@ class HistogramCategoricalStatSpecTest(StatSpecTestCase):
         self.assertFalse(dp_hist.has_error())
         self.assertTrue('categories' in dp_hist.value)
         self.assertTrue('values' in dp_hist.value)
+
+        release_dict = dp_hist.get_release_dict()
+        # import json; print(json.dumps(release_dict, indent=4))
+
+        # Check that the fixed_value and list of categories are "unquoted"
+        #
+        fixed_value = release_dict['missing_value_handling']['fixed_value']
+        self.assertEqual(fixed_value, DPHistogramCategoricalSpec._remove_double_quotes(fixed_value))
+
+        categories = release_dict['result']['value']['categories']
+        for cat_name in categories:
+            self.assertEqual(cat_name, DPHistogramCategoricalSpec._remove_double_quotes(cat_name))
+
+        # Check that the fixed_value is in the list of categories
+        #
+        self.assertTrue(fixed_value in categories)

@@ -41,7 +41,8 @@ class DPHistogramCategoricalSpec(StatSpec):
                     categories=validate_categories_as_string,
                     missing_values_handling=validate_missing_val_handlers)
 
-    def _add_double_quotes(self, value):
+    @staticmethod
+    def _add_double_quotes(value):
         """
         Categories and values need to be enclosed by double
         quotes in order to be handled by OpenDP
@@ -49,7 +50,8 @@ class DPHistogramCategoricalSpec(StatSpec):
         """
         return f'"{value}"'
 
-    def _remove_double_quotes(self, value):
+    @staticmethod
+    def _remove_double_quotes(value):
         """
         Categories and values need to be enclosed by double
         quotes in order to be handled by OpenDP
@@ -228,7 +230,11 @@ class DPHistogramCategoricalSpec(StatSpec):
                 self.add_err_msg(f'{ex_obj} (Exception)')
             return False
 
+        # Remove double quotes from the categories as well as fixed value
+        #
         fmt_categories = [self._remove_double_quotes(x) for x in self.categories] + ['uncategorized']
+        if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
+            self.fixed_value = self._remove_double_quotes(self.fixed_value)
 
         # Show warning if category count doesn't match values count
         if len(fmt_categories) > len(self.value):
