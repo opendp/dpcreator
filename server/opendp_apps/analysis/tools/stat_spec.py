@@ -318,11 +318,8 @@ class StatSpec:
             '"props_to_floatify" must be a list. Example: ["epsilon", "cl", "min", "max"]'
 
         for prop_name in props_to_floatify:
-            print('\n->casting prop: ', prop_name)
             if self.cast_property_to_float(prop_name) is False:
-                print('    ....Puke cast. Ugh...')
                 return False
-            print('    ....Nice cast!')
         return True
 
     def run_02_basic_validation(self):

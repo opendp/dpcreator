@@ -10,7 +10,7 @@ from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.utils.extra_validators import VALIDATE_MSG_FIXED_VAL_NOT_IN_CATEGORIES
-
+from opendp_apps.utils.variable_info_formatter import format_variable_info
 
 class HistogramCategoricalStatSpecTest(StatSpecTestCase):
     fixtures = ['test_dataset_data_001.json', ]
@@ -237,3 +237,48 @@ class HistogramCategoricalStatSpecTest(StatSpecTestCase):
         # Check that the fixed_value is in the list of categories
         #
         self.assertTrue(fixed_value in categories)
+
+    def test_130_format_variable_info_categories(self):
+        """(130) Test the formatting of variable info categories"""
+        msgt(self.test_110_run_dphist_calculation_categorical2.__doc__)
+
+        test_stats = {
+            "trial": {
+                "name": "Trial",
+                "type": "Integer",
+                "label": "",
+                "sortOrder": 4
+            },
+            "session": {
+                "name": "Session",
+                "type": "Boolean",
+                "label": "",
+                "sortOrder": 2,
+                "categories": []
+            },
+            "subject": {
+                "name": "Subject",
+                "type": "Categorical",
+                "label": "Subject",
+                "selected": True,
+                "sortOrder": 0,
+                "categories": [
+                    "ac",
+                    " kj",
+                    " ys",
+                    "zz",
+                    "bh1  ",
+                    " bh2    ",
+                    " jm\n",
+                    "\tmh",
+                ]
+            }
+        }
+        formatted_var_info = format_variable_info(test_stats)
+
+        expected_cats = ['ac', 'kj', 'ys', 'zz', 'bh1', 'bh2', 'jm', 'mh']
+        self.assertEqual(formatted_var_info['subject']['categories'], expected_cats)
+        print('var_info', formatted_var_info)
+
+        self.assertEqual(format_variable_info(None), None)
+        self.assertEqual(format_variable_info({}), {})

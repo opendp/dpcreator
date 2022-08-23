@@ -48,18 +48,24 @@ class DPHistogramCategoricalSpec(StatSpec):
         quotes in order to be handled by OpenDP
         :return:
         """
+        # Don't add double quotes if they're already there
+        if value.startswith('"') and value.endswith('"'):
+            return value
+
         return f'"{value}"'
 
     @staticmethod
     def _remove_double_quotes(value):
         """
-        Categories and values need to be enclosed by double
-        quotes in order to be handled by OpenDP
+        Remove double quotes after the DP process
         :return:
         """
         if len(value) < 2:
             return
 
+        # Only remove outermost set of double quotes--may conflict with _add_double_quotes
+        #   if the value is supposed to be double_quoted
+        #
         if value.startswith('"') and value.endswith('"'):
             value = value[1:-1]
 
@@ -85,6 +91,7 @@ class DPHistogramCategoricalSpec(StatSpec):
             try:
                 if not isinstance(x, str):
                     x = str(x)
+                # x = x.strip()  # do this earlier, before data saved
                 x = self._add_double_quotes(x)
                 updated_cats.append(x)
             except NameError as _ex_obj:
@@ -95,23 +102,26 @@ class DPHistogramCategoricalSpec(StatSpec):
         # remove duplicate categories and sort them
         self.categories = sorted(set(updated_cats))
 
-    def run_03_custom_validation(self):
-        """
-        No custom validation needed
-        """
-        if self.has_error():
-            return
-
         # If the fixed_value is to be used, make sure it's valid
         if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
 
             # Make sure the fixed value isn't None
             if self.validate_property('fixed_value', validate_not_none):
                 # Double quote the fixed value and make sure it's a string
+                if not isinstance(self.fixed_value, str):
+                    self.fixed_value = str(self.fixed_value)
                 self.fixed_value = self._add_double_quotes(self.fixed_value)
 
                 # Is the fixed value one of the categories?
                 self.check_if_fixed_value_in_categories(self.fixed_value, self.categories)
+                if self.has_error():
+                    return
+
+    def run_03_custom_validation(self):
+        """
+        No custom validation needed
+        """
+        pass
 
     def check_scale(self, scale, preprocessor):
         """

@@ -336,17 +336,25 @@ class ValidateReleaseUtil(BasicErrCheck):
         if not self.run_preliminary_steps():
             return
 
+        print('\n\n>> (a) after run_preliminary_steps dp_statistics: ', self.analysis_plan.dp_statistics)
+        print('\n\n>> (a1) after run_preliminary_steps variable_info: ', self.analysis_plan.variable_info)
+
         # Make sure the variable indices are available!
         # Not needed in this step but required for computation
         if self.get_variable_indices() is None:
-            # error already set
+            # error set in ^ get_variable_indices()
             return
+
+        print('\n\n>> (b) after get_variable_indices: ', self.analysis_plan.dp_statistics)
+        print('\n\n>> (b2) after run_preliminary_steps variable_info: ', self.analysis_plan.variable_info)
 
         self.build_stat_specs()
         if not self.stat_spec_list:
             logger.error('ValidateReleaseUtil.run_validation_process: No statistics were built!')
             self.add_err_msg('No statistics were built!')
             return
+
+        print('\n\n>> (c) after build_stat_specs: ', self.analysis_plan.dp_statistics)
 
         # Iterate through the stat specs and validate them!
         #
@@ -405,6 +413,7 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         for dp_stat in self.dp_statistics:
             stat_num += 1  # not used yet...
+            print(f'\n\n(b-{stat_num})', dp_stat)
             """
             We're putting together lots of properties to pass to
             statistic specific classes such as DPMeanSpec.
@@ -452,6 +461,7 @@ class ValidateReleaseUtil(BasicErrCheck):
 
             # (3) Add variable_info which has min/max/categories, variable type, etc.
             variable_info = self.analysis_plan.variable_info.get(variable)
+            print('\n\n>> variable_info', variable_info)
             if variable_info:
                 props['variable_info'] = variable_info
                 var_type = variable_info.get('type')
@@ -483,8 +493,10 @@ class ValidateReleaseUtil(BasicErrCheck):
                     #   - need updated UI, etc.
                     #
                     has_int_cats, _min_max = self.has_integer_categories(props)
-
+                    print('has_int_cats', has_int_cats)
+                    print('_min_max', _min_max)
                     if has_int_cats:
+                        print('using integer?')
                         # Artificially set the min/max
                         #
                         props['variable_info']['type'] = pstatic.VAR_TYPE_INTEGER
@@ -492,6 +504,8 @@ class ValidateReleaseUtil(BasicErrCheck):
                         props['variable_info']['max'] = _min_max[1]
                         self.add_stat_spec(DPHistogramIntegerSpec(props))
                     else:
+                        print('--- clearly categorical!  (validate_release_util) --')
+                        print('\n\nprops sent: ', props)
                         self.add_stat_spec(DPHistogramCategoricalSpec(props))
 
                 elif var_type == pstatic.VAR_TYPE_INTEGER:
@@ -577,6 +591,7 @@ class ValidateReleaseUtil(BasicErrCheck):
         if self.compute_mode:
             # In compute mode, run the stats saved in the plan!
             self.dp_statistics = self.analysis_plan.dp_statistics
+            print('\n\n>>compute mode, retrieve dp_stats', self.analysis_plan.dp_statistics)
             if not self.dp_statistics:
                 user_msg = 'The AnalysisPlan does not contain "dp_statistics"'
                 self.add_err_msg(user_msg)
