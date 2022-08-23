@@ -373,7 +373,7 @@ export default {
       "Mean": ["Integer", "Float"],
       "Count": ["Integer", "Float", "Categorical", "Boolean"],
       "Variance": ["Integer", "Float"],
-      "Histogram": ["Categorical", "Integer", "Boolean"],
+      "Histogram": ["Integer", "Float", "Categorical", "Boolean"],
       "Quantile": ["Integer", "Float"] // not yet available
     },
     selectedStatistic: null,
@@ -415,7 +415,8 @@ export default {
     isButtonDisabled: function () {
       let disabled = false
       let validHistogramOption = false
-      if (this.editedItemDialog.histogramBinType === ONE_BIN_PER_VALUE
+      if (!this.showHistogramOptions()
+          || this.editedItemDialog.histogramBinType === ONE_BIN_PER_VALUE
           || (this.editedItemDialog.histogramBinType === BIN_EDGES
               && this.editedItemDialog.binEdges instanceof Array
               && this.editedItemDialog.binEdges.length > 0
@@ -461,7 +462,7 @@ export default {
     showHistogramOptions() {
       let retVal = this.editedItemDialog.statistic == 'histogram'
           && this.variableInfo[this.editedItemDialog.variable]
-          && this.variableInfo[this.editedItemDialog.variable].type !== "Category"
+          && !["Categorical", "Boolean"].includes(this.variableInfo[this.editedItemDialog.variable].type)
       return retVal
     },
     maxBins() {
