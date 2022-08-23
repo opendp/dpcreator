@@ -217,6 +217,9 @@ Cypress.Commands.add('enterStatsInPopup', (demoData) => {
         const varDataTest = '[data-test="' + demoVar + '"]'
         cy.get(varDataTest).click({force: true})
         cy.get('[data-test="Fixed value"]').type(demoStat.fixedValue)
+        if (demoStat.statistic == 'Histogram') {
+            cy.get('[data-test="onePerValue"]').click({force: true})
+        }
         cy.get('[data-test="Create Statistic Button"]').click({force: true})
         cy.get('[data-test="Create Statistics Title').should('be.visible')
         cy.get('[data-test="Add Statistic"]').should('be.visible')

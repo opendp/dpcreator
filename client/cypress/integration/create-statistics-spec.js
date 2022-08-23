@@ -10,6 +10,24 @@
             cy.clearData()
 
         })
+        it('Updated dpStatistics Correctly', () => {
+            const mockDVfile = 'EyeDemoMockDV.json'
+            const demoDatafile = 'EyeDemoStatsTest.json'
+            cy.createMockDataset(mockDVfile)
+            cy.fixture(demoDatafile).then((demoData) => {
+                cy.url().should('contain', 'welcome')
+                cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
+                    demoData['datasetName'])
+                cy.goToConfirmVariables(demoData.variables)
+                // select the variables we will use
+                cy.selectVariable(demoData.variables)
+                // Continue to Set Epsilon Step
+                cy.epsilonStep()
+                // Add all the statistics in the Create Statistics Step
+                cy.createStatistics(demoData)
+            })
+        })
+
         it('Displays Fixed Value Input Correctly', () => {
             const mockDVfile = 'EyeDemoMockDV.json'
             const demoDatafile = 'EyeDemoStatsTest.json'
@@ -65,7 +83,7 @@
                 // The statistic should have been created
                 cy.get('tr').first().get('td').should('contain', "Mean")
 
-                cy.pause()
+
             })
         })
 
@@ -164,23 +182,6 @@
                 cy.get('[data-test=editParamsSave]').click();
                 cy.get('table').contains('td', statsData.statistics[0].roundedAccuracy).should('be.visible')
 
-            })
-        })
-        it('Updated dpStatistics Correctly', () => {
-            const mockDVfile = 'EyeDemoMockDV.json'
-            const demoDatafile = 'EyeDemoStatsTest.json'
-            cy.createMockDataset(mockDVfile)
-            cy.fixture(demoDatafile).then((demoData) => {
-                cy.url().should('contain', 'welcome')
-                cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
-                    demoData['datasetName'])
-                cy.goToConfirmVariables(demoData.variables)
-                // select the variables we will use
-                cy.selectVariable(demoData.variables)
-                // Continue to Set Epsilon Step
-                cy.epsilonStep()
-                // Add all the statistics in the Create Statistics Step
-                cy.createStatistics(demoData)
             })
         })
 
