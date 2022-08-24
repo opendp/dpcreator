@@ -14,6 +14,7 @@ from opendp_apps.utils.extra_validators import \
      validate_type_categorical,
      validate_categories_as_string,
      validate_missing_val_handlers,
+     validate_histogram_bin_type_one_per_value,
      VALIDATE_MSG_CATEGORIES_NOT_A_LIST,
      VALIDATE_MSG_CATEGORIES_LIST_EMPTY)
 
@@ -39,7 +40,8 @@ class DPHistogramCategoricalSpec(StatSpec):
         Update self.prop_validators to include validators specific to the subclass
         @return:
         """
-        return dict(var_type=validate_type_categorical,
+        return dict(histogram_bin_type=validate_histogram_bin_type_one_per_value,
+                    var_type=validate_type_categorical,
                     categories=validate_categories_as_string,
                     missing_values_handling=validate_missing_val_handlers)
 
@@ -50,6 +52,11 @@ class DPHistogramCategoricalSpec(StatSpec):
         """
         if self.has_error():
             return
+
+        # Categorical histograms are always bin type OnePerValue
+        # so allow a default!
+        if not self.histogram_bin_type:
+            self.histogram_bin_type = astatic.HIST_BIN_TYPE_ONE_PER_VALUE
 
         # If the categories list has only one value, attempt to split it by ","
         if not isinstance(self.categories, list):

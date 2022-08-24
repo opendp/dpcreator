@@ -63,6 +63,11 @@ class StatSpec:
         self.max = self.variable_info.get('max')  # optional: depends on variable type/stat
         self.categories = self.variable_info.get('categories')  # optional: depends on variable type/stat
 
+        # (2a) histogram specific
+        self.histogram_bin_type = self.variable_info.get('histogram_bin_type')
+        self.hist_number_of_bins = self.variable_info.get('number_of_bins')
+        self.hist_bin_edges = self.variable_info.get('bin_edges')
+
         # (3) Usage depends on the statistic
         #
         self.dataset_size = props.get('dataset_size')  # dataset size

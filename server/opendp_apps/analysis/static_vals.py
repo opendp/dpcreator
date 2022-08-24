@@ -64,6 +64,19 @@ DP_STATS_REQUIRE_COUNTS = [DP_MEAN,
 VALID_DP_STATS_CHOICES_STR = ', '.join(DP_STATS_CHOICES)
 
 # --------------------------------------
+# Histogram bin types
+# --------------------------------------
+HIST_BIN_TYPE_ONE_PER_VALUE = 'one_per_value'
+HIST_BIN_TYPE_EQUAL_RANGES = 'equal_ranges'
+HIST_BIN_TYPE_BIN_EDGES = 'bin_edges'
+HIST_VALID_BIN_TYPES = [HIST_BIN_TYPE_ONE_PER_VALUE,
+                        HIST_BIN_TYPE_EQUAL_RANGES,
+                        HIST_BIN_TYPE_BIN_EDGES]
+VALID_HIST_BIN_TYPE_CHOICES_STR = ', '.join(HIST_VALID_BIN_TYPES)
+ERR_MSG_HIST_BIN_TYPE_UKNOWN = (f'Unknown histogram bin type. Expected:'
+                                f' {VALID_HIST_BIN_TYPE_CHOICES_STR}')
+ERR_MSG_TOO_MANY_BINS = 'There are too many bins given the min and max values.'
+# --------------------------------------
 # Missing value handling
 # --------------------------------------
 KEY_MISSING_VALUES_HANDLING = 'missing_values_handling'

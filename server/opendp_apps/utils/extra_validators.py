@@ -169,5 +169,35 @@ def validate_fixed_value_in_categories(fixed_value: Any, categories: list):
     @param categories: list of values
     @return:
     """
+    if categories is None:
+        raise ValidationError(VALIDATE_MSG_CATEGORIES_NOT_A_LIST)
+
     if not fixed_value in categories:
         raise ValidationError(VALIDATE_MSG_FIXED_VAL_NOT_IN_CATEGORIES)
+
+def validate_histogram_bin_type(bin_type: str):
+    """
+    @param bin_type: expecting one of astatic.HIST_VALID_BIN_TYPES
+    @return:
+    """
+    if not bin_type in astatic.HIST_VALID_BIN_TYPES:
+        raise ValidationError(astatic.ERR_MSG_HIST_BIN_TYPE_UKNOWN)
+
+def validate_histogram_bin_type_one_per_value(bin_type: str):
+    """
+    @param bin_type: expecting astatic.HIST_BIN_TYPE_ONE_PER_VALUE
+    @return:
+    """
+    if not bin_type == astatic.HIST_BIN_TYPE_ONE_PER_VALUE:
+        raise ValidationError(f'Expected histogram bin type to be "{astatic.HIST_BIN_TYPE_ONE_PER_VALUE}"')
+
+def validate_histogram_bin_type_equal_ranges_or_edges(bin_type: str):
+    """
+    @param bin_type: expecting astatic.HIST_BIN_TYPE_ONE_PER_VALUE
+    @return:
+    """
+    valid_types = [astatic.HIST_BIN_TYPE_EQUAL_RANGES, astatic.HIST_BIN_TYPE_BIN_EDGES]
+    if not bin_type not in valid_types:
+        user_msg = (f'Expected histogram bin type to be "{astatic.HIST_BIN_TYPE_EQUAL_RANGES}"'
+                    f' or "{astatic.HIST_BIN_TYPE_BIN_EDGES}".')
+        raise ValidationError(user_msg)

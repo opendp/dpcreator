@@ -11,7 +11,8 @@ from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.profiler.static_vals import VAR_TYPE_INTEGER
 from opendp_apps.utils.extra_validators import \
-    (validate_int,
+    (validate_histogram_bin_type,
+     validate_int,
      validate_missing_val_handlers)
 
 enable_features("floating-point", "contrib")
@@ -33,7 +34,8 @@ class DPHistogramIntegerSpec(StatSpec):
     def get_stat_specific_validators(self):
         """Set validators used for the DP Mean"""
 
-        return dict(min=validate_int,
+        return dict(histogram_bin_type=validate_histogram_bin_type,
+                    min=validate_int,
                     max=validate_int,
                     #
                     missing_values_handling=validate_missing_val_handlers)
@@ -43,6 +45,11 @@ class DPHistogramIntegerSpec(StatSpec):
         Make sure input parameters are the correct type (fixed_value, min, max, etc.)
         Create `self.categories` based on the min/max
         """
+
+        # Allow a default for bin type
+        if not self.histogram_bin_type:
+            self.histogram_bin_type = astatic.HIST_BIN_TYPE_ONE_PER_VALUE
+
         if not self.var_type == VAR_TYPE_INTEGER:
             user_msg = (f'The specified variable type ("var_type")'
                         f' is not "{VAR_TYPE_INTEGER}". ({self.STATISTIC_TYPE})')
@@ -57,6 +64,10 @@ class DPHistogramIntegerSpec(StatSpec):
             if not self.cast_property_to_int('fixed_value'):
                 return
 
+        # Create categories
+        #
+        self.categories = [x for x in range(self.min, self.max + 1)]
+
         # Cast min/max to integers
         #
         if not self.cast_property_to_int('min'):
@@ -64,10 +75,6 @@ class DPHistogramIntegerSpec(StatSpec):
 
         if not self.cast_property_to_int('max'):
             return
-
-        # Create categories
-        #
-        self.categories = [x for x in range(self.min, self.max + 1)]
 
     def run_03_custom_validation(self):
         """
