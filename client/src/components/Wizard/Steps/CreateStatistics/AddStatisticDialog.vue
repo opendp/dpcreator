@@ -99,6 +99,7 @@
                       :label="histogramOptions[EQUAL_BIN_RANGES].label+' ('+ minEdge()+','+maxEdge()+')'"
                       :value="EQUAL_BIN_RANGES"
                       :data-test="EQUAL_BIN_RANGES"
+                      @click="editedItemDialog.binEdges=[]"
                   ></v-radio>
                 </v-col>
               </v-row>
@@ -127,6 +128,7 @@
                       :label="histogramOptions[BIN_EDGES].label"
                       :value="BIN_EDGES"
                       :data-test="BIN_EDGES"
+                      @click="editedItemDialog.numberOfBins=null"
                   ></v-radio>
                 </v-col>
               </v-row>
@@ -462,7 +464,7 @@ export default {
     showHistogramOptions() {
       let retVal = this.editedItemDialog.statistic == 'histogram'
           && this.variableInfo[this.editedItemDialog.variable]
-          && !["Categorical", "Boolean"].includes(this.variableInfo[this.editedItemDialog.variable].type)
+          && ["Integer", "Float"].includes(this.variableInfo[this.editedItemDialog.variable].type)
       return retVal
     },
     maxBins() {
@@ -526,8 +528,12 @@ export default {
       return valid
     },
     isNumBinsValid(v) {
-      const num = Number(v)
-      return Number.isInteger(num) && num >= 1 && num <= this.variableRange()
+      if (v !== null) {
+        const num = Number(v)
+        return Number.isInteger(num) && num >= 1 && num <= this.variableRange()
+      } else {
+        return true
+      }
     },
     validateNumBins(v) {
       return this.isNumBinsValid(v) || "Value must be an integer between 1 and " + this.variableRange()
