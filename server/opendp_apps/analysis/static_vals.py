@@ -117,6 +117,8 @@ ERR_MSG_INVALID_MIN_MAX = 'The "max" must be greater than the "min"'
 ERR_IMPUTE_PHRASE_MIN = 'cannot be less than the "min"'
 ERR_IMPUTE_PHRASE_MAX = 'cannot be more than the "max"'
 
+ERR_MAX_NOT_GREATER_THAN_MIN = 'The max must be greater than the min.'
+
 ERR_MSG_CL_ALPHA_CL_NOT_SET = 'Attempted to calculate confidence level (CL) alpha when CL was not set'
 ERR_MSG_CL_ALPHA_CL_NOT_NUMERIC = 'Failed to calculate confidence level (CL) alpha using CL of'
 ERR_MSG_CL_ALPHA_CL_GREATER_THAN_1 = 'Failed to calculate confidence level (CL) alpha. Value was greater than 1'

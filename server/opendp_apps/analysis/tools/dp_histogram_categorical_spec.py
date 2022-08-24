@@ -13,7 +13,9 @@ from opendp_apps.utils.extra_validators import \
     (validate_not_none,
      validate_type_categorical,
      validate_categories_as_string,
-     validate_missing_val_handlers)
+     validate_missing_val_handlers,
+     VALIDATE_MSG_CATEGORIES_NOT_A_LIST,
+     VALIDATE_MSG_CATEGORIES_LIST_EMPTY)
 
 enable_features("floating-point", "contrib")
 
@@ -41,57 +43,33 @@ class DPHistogramCategoricalSpec(StatSpec):
                     categories=validate_categories_as_string,
                     missing_values_handling=validate_missing_val_handlers)
 
-    @staticmethod
-    def _add_double_quotes(value):
-        """
-        Categories and values need to be enclosed by double
-        quotes in order to be handled by OpenDP
-        :return:
-        """
-        # Don't add double quotes if they're already there
-        if value.startswith('"') and value.endswith('"'):
-            return value
-
-        return f'"{value}"'
-
-    @staticmethod
-    def _remove_double_quotes(value):
-        """
-        Remove double quotes after the DP process
-        :return:
-        """
-        if len(value) < 2:
-            return
-
-        # Only remove outermost set of double quotes--may conflict with _add_double_quotes
-        #   if the value is supposed to be double_quoted
-        #
-        if value.startswith('"') and value.endswith('"'):
-            value = value[1:-1]
-
-        return value
-
     def run_01_initial_transforms(self):
         """
+
         Convert values to strings, where appropriate
         """
         if self.has_error():
+            return
+
+        # If the categories list has only one value, attempt to split it by ","
+        if not isinstance(self.categories, list):
+            self.add_err_msg(VALIDATE_MSG_CATEGORIES_NOT_A_LIST)
+            return
+
+        if len(self.categories) == 0:
+            self.add_err_msg(VALIDATE_MSG_CATEGORIES_LIST_EMPTY)
             return
 
         # Stringify categorical values (although they should be already)
         #
         updated_cats = []
 
-        # If the categories list has only one value, attempt to split it by ","
-        if len(self.categories) == 1:
-            self.categories = self.categories[0].split(',')
-
         # Iterate through the categories, changing them to strings
         for idx, x in enumerate(self.categories):
             try:
                 if not isinstance(x, str):
                     x = str(x)
-                # x = x.strip()  # do this earlier, before data saved
+                # x = x.strip()  # do this earlier, before data is saved
                 x = self._add_double_quotes(x)
                 updated_cats.append(x)
             except NameError as _ex_obj:
@@ -269,3 +247,33 @@ class DPHistogramCategoricalSpec(StatSpec):
                      f"\n\nDP Histogram: {self.value}"))
 
         return True
+
+    @staticmethod
+    def _add_double_quotes(value):
+        """
+        Categories and values need to be enclosed by double
+        quotes in order to be handled by OpenDP
+        :return:
+        """
+        # Don't add double quotes if they're already there
+        if value.startswith('"') and value.endswith('"'):
+            return value
+
+        return f'"{value}"'
+
+    @staticmethod
+    def _remove_double_quotes(value):
+        """
+        Remove double quotes after the DP process
+        :return:
+        """
+        if len(value) < 2:
+            return
+
+        # Only remove outermost set of double quotes--may conflict with _add_double_quotes
+        #   if the value is supposed to be double_quoted
+        #
+        if value.startswith('"') and value.endswith('"'):
+            value = value[1:-1]
+
+        return value

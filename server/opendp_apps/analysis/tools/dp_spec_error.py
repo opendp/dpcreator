@@ -44,13 +44,9 @@ class DPSpecError(StatSpec):
         """Unusual override!!!"""
         pass
 
-    #
-    # The methods below fields are required, e.g. @abc.abstract
-    #   on the parent class
-    #
-
-    def additional_required_props(self):
-        return []
+    def get_stat_specific_validators(self):
+        """Set validators used for the DP Mean"""
+        return {}
 
     def run_01_initial_transforms(self):
         pass

@@ -18,6 +18,10 @@ from opendp.trans import \
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.tools.stat_spec import StatSpec
+from opendp_apps.utils.extra_validators import \
+    (validate_float,
+     validate_missing_val_handlers,
+     validate_int_greater_than_zero)
 
 enable_features("floating-point", "contrib")
 
@@ -42,12 +46,15 @@ class DPVarianceSpec(StatSpec):
         super().__init__(props)
         self.noise_mechanism = astatic.NOISE_LAPLACE_MECHANISM
 
-    def additional_required_props(self):
-        """
-        Add a list of required properties
-        example: ['min', 'max']
-        """
-        return ['min', 'max', 'cl', ]
+    def get_stat_specific_validators(self):
+        """Set validators used for the DP Mean"""
+
+        return dict(dataset_size=validate_int_greater_than_zero,
+                    #
+                    min=validate_float,
+                    max=validate_float,
+                    #
+                    missing_values_handling=validate_missing_val_handlers)
 
     def run_01_initial_transforms(self):
         """
@@ -65,7 +72,12 @@ class DPVarianceSpec(StatSpec):
             # Convert the impute value to a float!
             if not self.cast_property_to_float('fixed_value'):
                 return
-        self.floatify_int_values()
+
+        self.floatify_int_values(['min', 'max', 'cl'])
+        if self.has_error():
+            return
+
+        self.check_numeric_fixed_value()
 
     def run_03_custom_validation(self):
         """
@@ -76,8 +88,6 @@ class DPVarianceSpec(StatSpec):
         """
         if self.has_error():
             return
-
-        self.check_numeric_fixed_value()
 
     def check_scale(self, scale, preprocessor, dataset_distance, epsilon):
         """

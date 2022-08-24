@@ -105,6 +105,8 @@ class ValidateReleaseUtil(BasicErrCheck):
 
     def add_stat_spec(self, stat_spec: StatSpec):
         """Add a StatSpec subclass to a list"""
+        assert isinstance(stat_spec, StatSpec), \
+            "stat_spec must be an instance of StatSpec"
         self.stat_spec_list.append(stat_spec)
 
     def run_release_process(self):
@@ -336,17 +338,11 @@ class ValidateReleaseUtil(BasicErrCheck):
         if not self.run_preliminary_steps():
             return
 
-        print('\n\n>> (a) after run_preliminary_steps dp_statistics: ', self.analysis_plan.dp_statistics)
-        print('\n\n>> (a1) after run_preliminary_steps variable_info: ', self.analysis_plan.variable_info)
-
         # Make sure the variable indices are available!
         # Not needed in this step but required for computation
         if self.get_variable_indices() is None:
             # error set in ^ get_variable_indices()
             return
-
-        print('\n\n>> (b) after get_variable_indices: ', self.analysis_plan.dp_statistics)
-        print('\n\n>> (b2) after run_preliminary_steps variable_info: ', self.analysis_plan.variable_info)
 
         self.build_stat_specs()
         if not self.stat_spec_list:
@@ -354,13 +350,13 @@ class ValidateReleaseUtil(BasicErrCheck):
             self.add_err_msg('No statistics were built!')
             return
 
-        print('\n\n>> (c) after build_stat_specs: ', self.analysis_plan.dp_statistics)
-
         # Iterate through the stat specs and validate them!
         #
         self.validation_info = []  # reset validation info
         running_epsilon = 0.0
+        item_cnt = 0
         for stat_spec in self.stat_spec_list:
+            item_cnt += 1
             # Check each stat_spec
             if not stat_spec.is_chain_valid():
                 # Nope: invalid!
@@ -410,10 +406,9 @@ class ValidateReleaseUtil(BasicErrCheck):
         # Iterate through the stats!
         self.stat_spec_list = []
         stat_num = 0
-
         for dp_stat in self.dp_statistics:
             stat_num += 1  # not used yet...
-            print(f'\n\n(b-{stat_num})', dp_stat)
+            # print(f'\n\n(b-{stat_num})', dp_stat)
             """
             We're putting together lots of properties to pass to
             statistic specific classes such as DPMeanSpec.
@@ -436,7 +431,7 @@ class ValidateReleaseUtil(BasicErrCheck):
             # -------------------------------------
             # (1) Begin building the property dict
             # -------------------------------------
-            props = dp_stat  # start with what is in dp_stat--the UI input
+            props = copy.deepcopy(dp_stat)  # start with what is in dp_stat--the UI input
             props['dataset_size'] = self.dataset_size  # add dataset size
 
             #  Some high-level error checks, before making the StatSpec
@@ -461,7 +456,7 @@ class ValidateReleaseUtil(BasicErrCheck):
 
             # (3) Add variable_info which has min/max/categories, variable type, etc.
             variable_info = self.analysis_plan.variable_info.get(variable)
-            print('\n\n>> variable_info', variable_info)
+
             if variable_info:
                 props['variable_info'] = variable_info
                 var_type = variable_info.get('type')
@@ -488,15 +483,11 @@ class ValidateReleaseUtil(BasicErrCheck):
 
             elif statistic in astatic.DP_HISTOGRAM:
                 if var_type == pstatic.VAR_TYPE_CATEGORICAL:
-                    print('---- Categorical Histogram ---')
                     # 4/12/2022 - temp hack to distinguish numeric categories
                     #   - need updated UI, etc.
                     #
                     has_int_cats, _min_max = self.has_integer_categories(props)
-                    print('has_int_cats', has_int_cats)
-                    print('_min_max', _min_max)
                     if has_int_cats:
-                        print('using integer?')
                         # Artificially set the min/max
                         #
                         props['variable_info']['type'] = pstatic.VAR_TYPE_INTEGER
@@ -504,17 +495,14 @@ class ValidateReleaseUtil(BasicErrCheck):
                         props['variable_info']['max'] = _min_max[1]
                         self.add_stat_spec(DPHistogramIntegerSpec(props))
                     else:
-                        print('--- clearly categorical!  (validate_release_util) --')
-                        print('\n\nprops sent: ', props)
+                        ye_spec = DPHistogramCategoricalSpec(props)
                         self.add_stat_spec(DPHistogramCategoricalSpec(props))
 
                 elif var_type == pstatic.VAR_TYPE_INTEGER:
-                    print('---- Integer Histogram ---')
                     # DP Histogram (Integer)!
                     self.add_stat_spec(DPHistogramIntegerSpec(props))
 
                 else:
-                    print('---- Unsupported Histogram ---')
                     # DP Histogram - unsupported type
                     props['error_message'] = (f'Statistic is "{astatic.DP_HISTOGRAM}" but '
                                               f' variable type is unsupported: "{var_type}"')
@@ -538,9 +526,12 @@ class ValidateReleaseUtil(BasicErrCheck):
                 # Stat not yet available or an error
                 props['error_message'] = (f'Statistic "{statistic}" will be supported'
                                           f' soon!')
-                logger.error('ValidateReleaseUtil.build_stat_specs: Statistic "{statistic}" will be supported soon!')
+                logger.error(('ValidateReleaseUtil.build_stat_specs: Statistic'
+                              ' "{statistic}" will be supported soon!'))
                 self.add_stat_spec(DPSpecError(props))
             else:
+                logger.error(('ValidateReleaseUtil.build_stat_specs: Shouldn\'t reach'
+                              ' here, unknown stats are captured up above'))
                 # Shouldn't reach here, unknown stats are captured up above
                 pass
 
@@ -591,7 +582,6 @@ class ValidateReleaseUtil(BasicErrCheck):
         if self.compute_mode:
             # In compute mode, run the stats saved in the plan!
             self.dp_statistics = self.analysis_plan.dp_statistics
-            print('\n\n>>compute mode, retrieve dp_stats', self.analysis_plan.dp_statistics)
             if not self.dp_statistics:
                 user_msg = 'The AnalysisPlan does not contain "dp_statistics"'
                 self.add_err_msg(user_msg)

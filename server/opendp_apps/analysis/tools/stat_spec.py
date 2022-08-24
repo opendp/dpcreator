@@ -10,7 +10,6 @@ BaseClass for Univariate statistics for OpenDP.
 -
 """
 import abc
-import copy
 import decimal
 import json
 from collections import OrderedDict
@@ -43,8 +42,6 @@ class StatSpec:
                               # dataset_size=validate_int_greater_than_zero,
                               epsilon=validate_epsilon_not_null,
                               cl=validate_confidence_level)
-
-    prop_validators = copy.copy(default_validators)
 
     def __init__(self, props: dict):
         """
@@ -79,6 +76,7 @@ class StatSpec:
 
         # (5) Implementation depends on the statistics; Used for validation and computation
         self.preprocessor = None  # set this each time get_preprocessor is called--hopefully once
+        self.prop_validators = {}  # combination of default_validators + get_stat_specific_validators()
 
         # (6) Output fields
         #
@@ -124,15 +122,6 @@ class StatSpec:
         
         return {} 
         """
-
-    # @abc.abstractmethod
-    def additional_required_props(self):
-        """
-        Add a list of required properties.
-        For example, a DP Mean might be:
-        `   return ['min', 'max', 'cl']`
-        """
-        raise NotImplementedError('additional_required_props')
 
     @abc.abstractmethod
     def run_01_initial_transforms(self):
@@ -322,6 +311,26 @@ class StatSpec:
                 return False
         return True
 
+    def get_prop_validator_keys(self):
+        """
+        Return the keys() of the prop_validators
+        @return:
+        """
+        return list(self.get_prop_validators().keys())
+
+    def get_prop_validators(self) -> dict:
+        """
+        Return the default validators combined with any subclass specific validators
+        @return:
+        """
+        if not self.prop_validators:
+            prop_validators = {}
+            prop_validators.update(self.default_validators)
+            prop_validators.update(self.get_stat_specific_validators())
+            self.prop_validators = prop_validators
+
+        return self.prop_validators
+
     def run_02_basic_validation(self):
         """This method should be unchanged in subclasses"""
         if self.has_error():  # something may be wrong in "run_01_initial_transforms()"
@@ -345,11 +354,8 @@ class StatSpec:
             self.add_err_msg(f'Invalid variable type: "{self.var_type}"')
             return
 
-        # Set the validators for the subclass
-        self.prop_validators.update(self.get_stat_specific_validators())
-
         # Run the validators
-        for attr_name in self.prop_validators.keys():
+        for attr_name in self.get_prop_validator_keys():
             if not self.validate_property(attr_name):
                 return
 
@@ -363,7 +369,7 @@ class StatSpec:
         if self.max > self.min:
             return True
 
-        user_msg = f'{self.variable} The max ({self.max}) must be greater than the ({self.min})'
+        user_msg = f'{self.variable} {astatic.ERR_MAX_NOT_GREATER_THAN_MIN} (max: {self.max}, min: {self.min})'
         self.add_err_msg(user_msg)
 
         return False
@@ -396,7 +402,7 @@ class StatSpec:
             return False
 
         if validator is None:
-            validator = self.prop_validators.get(prop_name)
+            validator = self.get_prop_validators().get(prop_name)
             if validator is None:
                 self.add_err_msg(f'Validator not found for property "{prop_name}"')
                 return False
@@ -512,7 +518,7 @@ class StatSpec:
         info_dict = {
             'stat': self,
             'histogram_values': value,
-            'use_min_max': 'min' in self.get_stat_specific_validators().keys(),
+            'use_min_max': 'min' in self.get_prop_validator_keys(),
             'MISSING_VAL_INSERT_FIXED': astatic.MISSING_VAL_INSERT_FIXED,
             'MISSING_VAL_INSERT_RANDOM': astatic.MISSING_VAL_INSERT_RANDOM
         }
@@ -561,7 +567,7 @@ class StatSpec:
 
         # Min/Max
         #
-        if 'min' in self.get_stat_specific_validators().keys():
+        if 'min' in self.get_prop_validator_keys():
             final_info['bounds'] = OrderedDict({'min': self.min, 'max': self.max})
 
         # Missing values

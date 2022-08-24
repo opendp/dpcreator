@@ -294,9 +294,10 @@ class TestValidationViewAndSerializers(TestCase):
                             'valid': False,
                             'message': astatic.ERR_MSG_INVALID_MIN_MAX}]
 
+        print(stats_valid.data)
         # self.assertEqual(expected_result, stats_valid.data)
         self.assertEqual(stats_valid.data[0]['valid'], False)
-        self.assertTrue(stats_valid.data[0]['message'].find('must be less than the max') > -1)
+        self.assertTrue(stats_valid.data[0]['message'].find(astatic.ERR_MAX_NOT_GREATER_THAN_MIN) > -1)
 
     def test_35_api_fail_bad_min_max(self):
         """(35) Fail: API, Add bad min/max values"""
@@ -333,7 +334,7 @@ class TestValidationViewAndSerializers(TestCase):
         # self.assertEqual(jresp['data'], expected_result)
 
         self.assertEqual(jresp['data'][0]['valid'], False)
-        self.assertTrue(jresp['data'][0]['message'].find('must be less than the max') > -1)
+        self.assertTrue(jresp['data'][0]['message'].find(astatic.ERR_MAX_NOT_GREATER_THAN_MIN) > -1)
 
     def test_40_fail_single_stat_bad_epsilon(self):
         """(40) Fail: Single stat exceeds total epsilon"""

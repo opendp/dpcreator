@@ -16,6 +16,7 @@ VALIDATE_MSG_NOT_VALID_CL_VALUE = 'Valid confidence level values:'
 VALIDATE_MSG_MISSING_VAL_HANDLER = 'Valid missing value handlers:'
 VALIDATE_MSG_UNSUPPORTED_STATISTIC = 'Valid statistics:'
 
+VALIDATE_MSG_CATEGORIES_NOT_A_LIST = 'The "categories" variable is not a list'
 VALIDATE_MSG_CATEGORIES_LIST_EMPTY = 'The list of categories is empty'
 VALIDATE_MSG_CATEGORY_NOT_STRING = 'The list of categories contains a non-string'  # Only used for categorical variables
 VALIDATE_MSG_FIXED_VAL_NOT_IN_CATEGORIES = 'The fixed value is not one of the specified categories.'
@@ -152,11 +153,11 @@ def validate_type_categorical(value: str):
 def validate_categories_as_string(categories: list):
     """Check that there are items in the list and each one is a string"""
     if not categories:
-        raise ValidationError(pstatic.VALIDATE_MSG_CATEGORIES_LIST_EMPTY)
+        raise ValidationError(VALIDATE_MSG_CATEGORIES_LIST_EMPTY)
 
     for x in categories:
         if not isinstance(x, str):
-            raise ValidationError(pstatic.VALIDATE_MSG_CATEGORY_NOT_STRING + ': ' + type(x))
+            raise ValidationError(VALIDATE_MSG_CATEGORY_NOT_STRING + ': ' + type(x))
 
     # cat_as_strings = [isinstance(x, str) for x in categories]
     # if False in cat_as_strings

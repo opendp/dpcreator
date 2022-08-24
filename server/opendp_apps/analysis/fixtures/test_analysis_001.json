@@ -514,7 +514,7 @@
             "name": "Trial",
             "type": "Categorical",
             "label": "",
-            "categories": null
+            "categories": []
           },
           "Session": {
             "name": "Session",
@@ -1007,7 +1007,7 @@
           "name": "Trial",
           "type": "Categorical",
           "label": "",
-          "categories": null
+          "categories": []
         },
         "session": {
           "name": "Session",
