@@ -539,7 +539,6 @@ export default {
       return this.isNumBinsValid(v) || "Value must be an integer between 1 and " + this.variableRange()
     },
     validateBinEdges(v) {
-
       return this.isEdgesInputValid(v) || "Edge must be a number between "
           + this.variableInfo[this.editedItemDialog.variable].min + " and "
           + this.variableInfo[this.editedItemDialog.variable].max
@@ -603,7 +602,10 @@ export default {
           if (stat.statistic === this.editedItemDialog.statistic
               && stat.variable === variable
               && stat.missingValuesHandling === this.editedItemDialog.missingValuesHandling
-              && stat.fixedValue === this.editedItemDialog.fixedValue) {
+              && stat.fixedValue === this.editedItemDialog.fixedValue
+              && stat.histogramBinType === this.editedItemDialog.histogramBinType
+              && stat.numberOfBins === this.editedItemDialog.numberOfBins
+              && stat.binEdges === this.editedItemDialog.binEdges) {
             isMatching = true
           }
         })
