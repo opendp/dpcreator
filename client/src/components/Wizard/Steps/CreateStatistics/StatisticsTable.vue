@@ -3,7 +3,11 @@
     <v-data-table
         :headers="headers"
         :items="statistics"
+        item-key="id"
         no-data-text="Create statistic"
+        show-expand
+        :single-expand="false"
+        :expanded.sync="expanded"
         :items-per-page="-1"
         hide-default-footer
     >
@@ -106,6 +110,26 @@
           </v-tooltip>
         </div>
       </template>
+      <template v-slot:item.data-table-expand="{ item, isExpanded, expand }">
+        <v-icon
+            large
+            @click="expand(true)" v-if="item.canExpand && !isExpanded">
+          >
+          mdi-chevron-down
+        </v-icon>
+        <v-icon
+            large
+            @click="expand(false)" v-if="item.canExpand && isExpanded">
+          >
+          mdi-chevron-up
+        </v-icon>
+
+      </template>
+      <template v-slot:expanded-item="{ headers, item }">
+        <td :colspan="11">
+          {{ getExpandedText(item) }}
+        </td>
+      </template>
     </v-data-table>
     <Button
         color="soft_primary primary--text"
@@ -152,9 +176,11 @@ export default {
       {text: "Epsilon", value: "epsilon"},
       {text: "Delta", value: "delta"},
       {text: "Error", value: "error", width: "15%"},
-      {text: "", value: "actions"}
+      {text: "", value: "actions"},
+      {text: "", value: 'data-table-expand'},
     ],
-    currentItem: null
+    currentItem: null,
+    expanded: []
   }),
   computed:
       {
@@ -169,6 +195,13 @@ export default {
     errorHelpText(item) {
       return "We are " + (item.cl * 100) + "% confident that the magnitude of the noise will"
           + " be less than " + this.getAccuracy(item)
+    },
+    getExpandedText(item) {
+      let text = ""
+      if (item.statistic == 'histogram') {
+        text = 'Histogram bin type: ' + item.histogramBinType
+      }
+      return text
     },
     getAccuracy(item) {
       return Number(item.accuracy.value).toPrecision(3)
