@@ -84,6 +84,10 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
                                               'fixed value within min/max bounds'):
                 return
 
+        self.histogram_bin_edges = np.histogram_bin_edges([],
+                                                          bins=self.histogram_number_of_bins,
+                                                          range=(self.min, self.max))
+
     def run_03_custom_validation(self):
         """
         No further checking needed

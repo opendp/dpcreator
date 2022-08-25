@@ -1,31 +1,68 @@
 """
-Validate histogram specs and, if needed, generate categories.
-
-Within a StatSpec, this class should be used in the function "run_03_custom_validation()", e.g.
-
-    histogram_util = histogram_util(self)
-    if histogram_util.has_error():
-        self.add_error_msg(histogram_util.get_error_message())
-        return
-    else:
-        if histogram_util.has_categories():
-            self.categories = histogram_util.get_categories()
+Return the correct Histogram StatSpec depending on the input properties
 """
-import numpy as np
-from django.core.exceptions import ValidationError
 
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.analysis.tools.dp_histogram_categorical_spec import DPHistogramCategoricalSpec
+from opendp_apps.analysis.tools.dp_histogram_int_equal_ranges_spec import DPHistogramIntEqualRangesSpec
+from opendp_apps.analysis.tools.dp_histogram_int_one_per_value_spec import DPHistogramIntOnePerValueSpec
+from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
 from opendp_apps.analysis.tools.stat_spec import StatSpec
-from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler import static_vals as pstatic
-from opendp_apps.utils.extra_validators import \
-    (validate_histogram_bin_type,
-     validate_histogram_bin_type_one_per_value,
-     validate_histogram_bin_type_equal_ranges_or_edges,
-     validate_int_greater_than_zero)
 
 
+def get_histogram_stat_spec(props: dict) -> StatSpec:
+    """
+    Make sure that the variable type is appropriate for the histogram settings.
+        (e) = edges
+        (c) = categories
+
+    Data Type	    onePerValue	    equalRanges	    binEdges
+    Categorical        X (c)
+    Integer	           X (c)            X (e)          X (e)
+    Float		                        X (e)          X (e)*
+
+    @param props:
+    @return: StatSpec of the correct Histogram type
+    """
+    var_type = props.get('var_type')
+    histogram_bin_type = props.get('histogram_bin_type')
+
+    # Categorical
+    if var_type == pstatic.VAR_TYPE_CATEGORICAL:
+        # Can only have bin type OnePerValue
+        return DPHistogramCategoricalSpec(props)
+    elif var_type == pstatic.VAR_TYPE_INTEGER:
+        # OnePerValue
+        if histogram_bin_type == astatic.HIST_BIN_TYPE_ONE_PER_VALUE:
+            return DPHistogramIntOnePerValueSpec(props)
+
+        elif histogram_bin_type == astatic.HIST_BIN_TYPE_EQUAL_RANGES:
+            # EqualRanges
+            return DPHistogramIntEqualRangesSpec(props)
+
+        elif histogram_bin_type == astatic.HIST_BIN_TYPE_BIN_EDGES:
+            # BinEdges
+            assert False, 'Histogram for Integer/Edges not available'
+
+        else:
+            # Unknown bin type
+            props['error_message'] = f'Unknown histogram_bin_type: "{histogram_bin_type}"'
+            return DPSpecError(props)
+
+    elif var_type == pstatic.VAR_TYPE_FLOAT:
+        # Float
+        assert False, 'Histograms for Floats not available'
+
+    else:
+        # Unknown bin type
+        props['error_message'] = f'Unknown variable type: "{var_type}"'
+        return DPSpecError(props)
+
+
+'''
 class HistogramUtil(BasicErrCheck):
+
 
     def __init__(self, stat_spec: StatSpec):
         """
@@ -34,13 +71,6 @@ class HistogramUtil(BasicErrCheck):
         """
         self.stat_spec = stat_spec
 
-        self.expect_edges = True
-        self.categories = None  # Generate categories if needed
-
-        self.bin_edges = None
-        self.fmt_categories = None
-
-        self.preprocessor = None
 
         self.run_process()
 
@@ -234,3 +264,4 @@ bin_size = len(values/num_bins)
 
 # edges = 
 """
+'''
