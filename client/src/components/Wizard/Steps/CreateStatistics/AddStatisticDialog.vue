@@ -99,7 +99,7 @@
                       :label="histogramOptions[EQUAL_BIN_RANGES].label+' ('+ minEdge()+','+maxEdge()+')'"
                       :value="EQUAL_BIN_RANGES"
                       :data-test="EQUAL_BIN_RANGES"
-                      @click="editedItemDialog.binEdges=[]"
+                      @click="editedItemDialog.histogramBinEdges=[]"
                   ></v-radio>
                 </v-col>
               </v-row>
@@ -109,10 +109,10 @@
 
                     <v-text-field
                         label="Enter number of bins within bounds"
-                        v-model="editedItemDialog.numberOfBins"
+                        v-model="editedItemDialog.histogramNumberOfBins"
                         background-color="soft_primary"
                         class="top-borders-radius  width80"
-                        data-test="numberOfBins"
+                        data-test="histogramNumberOfBins"
                         :rules="[validateNumBins]"
                     ></v-text-field>
 
@@ -128,7 +128,7 @@
                       :label="histogramOptions[BIN_EDGES].label"
                       :value="BIN_EDGES"
                       :data-test="BIN_EDGES"
-                      @click="editedItemDialog.numberOfBins=null"
+                      @click="editedItemDialog.histogramNumberOfBins=null"
                   ></v-radio>
                 </v-col>
               </v-row>
@@ -139,13 +139,13 @@
                   </v-col>
                   <v-col cols="6">
                     <v-combobox
-                        v-model="editedItemDialog.binEdges"
+                        v-model="editedItemDialog.histogramBinEdges"
                         chips
                         label="Add edges"
                         multiple
                         class="my-0 py-0"
                         background-color="soft_primary my-0"
-                        data-test="binEdges"
+                        data-test="histogramBinEdges"
                         :search-input.sync="edgesInput"
                         @update:search-input="delimitInput()"
                         :delimiters="[',']"
@@ -391,8 +391,8 @@ export default {
       error: "",
       missingValuesHandling: "insert_fixed",
       histogramBinType: "",
-      numberOfBins: null,
-      binEdges: [],
+      histogramNumberOfBins: null,
+      histogramBinEdges: [],
       handleAsFixed: true,
       fixedValue: "",
       locked: false,
@@ -420,12 +420,12 @@ export default {
       if (!this.showHistogramOptions()
           || this.editedItemDialog.histogramBinType === ONE_BIN_PER_VALUE
           || (this.editedItemDialog.histogramBinType === BIN_EDGES
-              && this.editedItemDialog.binEdges instanceof Array
-              && this.editedItemDialog.binEdges.length > 0
-              && this.isEdgesInputValid(this.editedItemDialog.binEdges))
+              && this.editedItemDialog.histogramBinEdges instanceof Array
+              && this.editedItemDialog.histogramBinEdges.length > 0
+              && this.isEdgesInputValid(this.editedItemDialog.histogramBinEdges))
           || (this.editedItemDialog.histogramBinType === EQUAL_BIN_RANGES
-              && this.editedItemDialog.numberOfBins
-              && this.isNumBinsValid(this.editedItemDialog.numberOfBins)
+              && this.editedItemDialog.histogramNumberOfBins
+              && this.isNumBinsValid(this.editedItemDialog.histogramNumberOfBins)
           )) {
         validHistogramOption = true
       }
@@ -441,23 +441,23 @@ export default {
       return disabled
     },
     removeEdgeFromList(edge) {
-      this.editedItemDialog.binEdges.splice(
-          this.editedItemDialog.binEdges.indexOf(edge),
+      this.editedItemDialog.histogramBinEdges.splice(
+          this.editedItemDialog.histogramBinEdges.indexOf(edge),
           1
       );
     },
     delimitInput(edges) {
       if (this.edgesInput && this.edgesInput.split(",").length > 1) {
         let v = []
-        if (this.editedItemDialog.binEdges) {
-          v = JSON.parse(JSON.stringify(this.editedItemDialog.binEdges))
+        if (this.editedItemDialog.histogramBinEdges) {
+          v = JSON.parse(JSON.stringify(this.editedItemDialog.histogramBinEdges))
         }
         v.push(this.edgesInput)
         const reducer = (a, e) => [...a, ...e.split(',')]
         let edges = [...new Set(v.reduce(reducer, []))]
         edges = edges.filter(word => word.length > 0);
 
-        this.editedItemDialog.binEdges = JSON.parse(JSON.stringify(edges))
+        this.editedItemDialog.histogramBinEdges = JSON.parse(JSON.stringify(edges))
         this.edgesInput = ""
       }
     },
@@ -604,8 +604,8 @@ export default {
               && stat.missingValuesHandling === this.editedItemDialog.missingValuesHandling
               && stat.fixedValue === this.editedItemDialog.fixedValue
               && stat.histogramBinType === this.editedItemDialog.histogramBinType
-              && stat.numberOfBins === this.editedItemDialog.numberOfBins
-              && stat.binEdges === this.editedItemDialog.binEdges) {
+              && stat.histogramNumberOfBins === this.editedItemDialog.histogramNumberOfBins
+              && stat.histogramBinEdges === this.editedItemDialog.histogramBinEdges) {
             isMatching = true
           }
         })
