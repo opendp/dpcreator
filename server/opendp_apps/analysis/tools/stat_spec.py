@@ -57,16 +57,17 @@ class StatSpec:
         self.cl = props.get('cl')  # confidence level coefficient (e.g. .95, .99, etc)
         self.variable_info = props.get('variable_info', {})  # retrieve min/max or categories, if needed
 
+        # (1a) histogram specific
+        self.histogram_bin_type = props.get('histogram_bin_type')
+        self.histogram_number_of_bins = props.get('histogram_number_of_bins')
+        self.histogram_bin_edges = props.get('histogram_bin_edges')
+
         # (2) Retrieved from variable_info
         self.var_type = self.variable_info.get('type')  # mandatory
         self.min = self.variable_info.get('min')  # optional: depends on variable type/stat
         self.max = self.variable_info.get('max')  # optional: depends on variable type/stat
         self.categories = self.variable_info.get('categories')  # optional: depends on variable type/stat
 
-        # (2a) histogram specific
-        self.histogram_bin_type = self.variable_info.get('histogram_bin_type')
-        self.hist_number_of_bins = self.variable_info.get('number_of_bins')
-        self.hist_bin_edges = self.variable_info.get('bin_edges')
 
         # (3) Usage depends on the statistic
         #
@@ -364,43 +365,6 @@ class StatSpec:
             if not self.validate_property(attr_name):
                 return
 
-    def validate_min_max(self):
-        """
-        If it applies, validate the min/max relationship
-        """
-        if self.has_error():
-            return False
-
-        if self.max > self.min:
-            return True
-
-        user_msg = f'{self.variable} {astatic.ERR_MAX_NOT_GREATER_THAN_MIN} (max: {self.max}, min: {self.min})'
-        self.add_err_msg(user_msg)
-
-        return False
-
-    def check_numeric_fixed_value(self):
-        """
-        For the case of handling missing values with a constant
-        Check that the fixed value/fixed_value is not outside the min/max range
-        """
-        if self.has_error():
-            return False
-
-        if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
-            if self.fixed_value < self.min:
-                user_msg = (f'The "fixed value" ({self.fixed_value})'
-                            f' {astatic.ERR_IMPUTE_PHRASE_MIN} ({self.min})')
-                self.add_err_msg(user_msg)
-                return False
-            elif self.fixed_value > self.max:
-                user_msg = (f'The "fixed value" ({self.fixed_value})'
-                            f' {astatic.ERR_IMPUTE_PHRASE_MAX} ({self.max})')
-                self.add_err_msg(user_msg)
-                return False
-
-        return True
-
     def validate_property(self, prop_name: str, validator=None) -> bool:
         """Validate a property name using a validator"""
         if self.has_error():
@@ -414,6 +378,20 @@ class StatSpec:
 
         try:
             validator(getattr(self, prop_name))
+        except ValidationError as err_obj:
+            user_msg = f'{err_obj.message} ({prop_name})'
+            self.add_err_msg(user_msg)
+            return False
+
+        return True
+
+    def validate_multi_values(self, val_list: list, validator, prop_name=None) -> bool:
+        """Validate a property name using a validator"""
+        if self.has_error():
+            return False
+
+        try:
+            validator(*val_list)
         except ValidationError as err_obj:
             user_msg = f'{err_obj.message} ({prop_name})'
             self.add_err_msg(user_msg)

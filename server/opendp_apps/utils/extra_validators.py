@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Union
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -131,6 +131,7 @@ def validate_float(value):
     except TypeError:
         raise ValidationError(VALIDATE_MSG_NOT_FLOAT)
 
+
 def validate_int(value):
     """Make sure the value is a float"""
     try:
@@ -140,20 +141,47 @@ def validate_int(value):
     except TypeError:
         raise ValidationError(VALIDATE_MSG_NOT_INT)
 
-def validate_type_numeric(value:str):
+
+def validate_is_numeric(value: Union[int, float]):
+    """Check that the value is an integer or float"""
+    validate_float(value)
+    validate_int(value)
+
+
+def validate_type_numeric(value: str):
     """Make sure the variable type is integer or float"""
     if value not in pstatic.NUMERIC_VAR_TYPES:
         raise ValidationError(pstatic.ERR_MSG_VAR_TYPE_NOT_NUMERIC)
+
 
 def validate_type_categorical(value: str):
     """Make sure the variable type is integer or float"""
     if not value == pstatic.VAR_TYPE_CATEGORICAL:
         raise ValidationError(pstatic.ERR_MSG_VAR_TYPE_NOT_CATEGORICAL)
 
+
+def validate_type_integer(value: str):
+    """Make sure the variable type is integer or float"""
+    if not value == pstatic.VAR_TYPE_INTEGER:
+        raise ValidationError(pstatic.ERR_MSG_VAR_TYPE_NOT_INTEGER)
+
+def validate_categories_as_list(categories: list):
+
+    if not isinstance(categories, list):
+        raise ValidationError(VALIDATE_MSG_CATEGORIES_NOT_A_LIST)
+
+
+def validate_categories_list_not_empty(categories: list):
+    """Make sure the categories are a non-empty list"""
+    validate_categories_as_list(categories)
+
+    if len(categories) == 0:
+        raise ValidationError(VALIDATE_MSG_CATEGORIES_LIST_EMPTY)
+
+
 def validate_categories_as_string(categories: list):
     """Check that there are items in the list and each one is a string"""
-    if not categories:
-        raise ValidationError(VALIDATE_MSG_CATEGORIES_LIST_EMPTY)
+    validate_categories_list_not_empty(categories)
 
     for x in categories:
         if not isinstance(x, str):
@@ -162,6 +190,7 @@ def validate_categories_as_string(categories: list):
     # cat_as_strings = [isinstance(x, str) for x in categories]
     # if False in cat_as_strings
 
+
 def validate_fixed_value_in_categories(fixed_value: Any, categories: list):
     """
 
@@ -169,19 +198,20 @@ def validate_fixed_value_in_categories(fixed_value: Any, categories: list):
     @param categories: list of values
     @return:
     """
-    if categories is None:
-        raise ValidationError(VALIDATE_MSG_CATEGORIES_NOT_A_LIST)
+    validate_categories_list_not_empty(categories)
 
-    if not fixed_value in categories:
+    if fixed_value not in categories:
         raise ValidationError(VALIDATE_MSG_FIXED_VAL_NOT_IN_CATEGORIES)
+
 
 def validate_histogram_bin_type(bin_type: str):
     """
     @param bin_type: expecting one of astatic.HIST_VALID_BIN_TYPES
     @return:
     """
-    if not bin_type in astatic.HIST_VALID_BIN_TYPES:
+    if bin_type not in astatic.HIST_VALID_BIN_TYPES:
         raise ValidationError(astatic.ERR_MSG_HIST_BIN_TYPE_UKNOWN)
+
 
 def validate_histogram_bin_type_one_per_value(bin_type: str):
     """
@@ -191,13 +221,69 @@ def validate_histogram_bin_type_one_per_value(bin_type: str):
     if not bin_type == astatic.HIST_BIN_TYPE_ONE_PER_VALUE:
         raise ValidationError(f'Expected histogram bin type to be "{astatic.HIST_BIN_TYPE_ONE_PER_VALUE}"')
 
-def validate_histogram_bin_type_equal_ranges_or_edges(bin_type: str):
+
+def validate_histogram_bin_type_equal_ranges(bin_type: str):
     """
-    @param bin_type: expecting astatic.HIST_BIN_TYPE_ONE_PER_VALUE
+    @param bin_type: expecting astatic.HIST_BIN_TYPE_EQUAL_RANGES
     @return:
     """
-    valid_types = [astatic.HIST_BIN_TYPE_EQUAL_RANGES, astatic.HIST_BIN_TYPE_BIN_EDGES]
-    if not bin_type not in valid_types:
-        user_msg = (f'Expected histogram bin type to be "{astatic.HIST_BIN_TYPE_EQUAL_RANGES}"'
-                    f' or "{astatic.HIST_BIN_TYPE_BIN_EDGES}".')
+    if not bin_type == astatic.HIST_BIN_TYPE_EQUAL_RANGES:
+        raise ValidationError(f'Expected histogram bin type to be "{astatic.HIST_BIN_TYPE_EQUAL_RANGES}"')
+
+
+def validate_histogram_bin_type_edges(bin_type: str):
+    """
+    @param bin_type: expecting astatic.HIST_BIN_TYPE_EQUAL_RANGES
+    @return:
+    """
+    if not bin_type == astatic.HIST_BIN_TYPE_BIN_EDGES:
+        raise ValidationError(f'Expected histogram bin type to be "{astatic.HIST_BIN_TYPE_BIN_EDGES}"')
+
+
+def validate_min_max(min_int: Union[int, float], max_int: Union[int, float]):
+    """
+    If it applies, validate the min/max relationship
+    """
+    validate_is_numeric(min_int)
+    validate_is_numeric(max_int)
+
+    if not max_int > min_int:
+        user_msg = f'{astatic.ERR_MAX_NOT_GREATER_THAN_MIN} (max: {max_int}, min: {min_int})'
+        raise ValidationError(user_msg)
+
+
+def validate_fixed_value_against_min_max(fixed_value: Union[int, float],
+                                      min_int: Union[int, float],
+                                      max_int: Union[int, float]):
+    validate_is_numeric(fixed_value)
+    validate_is_numeric(min_int)
+    validate_is_numeric(max_int)
+
+    if fixed_value < min_int:
+        user_msg = (f'The "fixed value" ({fixed_value})'
+                    f' {astatic.ERR_IMPUTE_PHRASE_MIN} ({min_int})')
+        raise ValidationError(user_msg)
+    elif fixed_value > max_int:
+        user_msg = (f'The "fixed value" ({fixed_value})'
+                    f' {astatic.ERR_IMPUTE_PHRASE_MAX} ({max_int})')
+        raise ValidationError(user_msg)
+
+
+def validate_num_bins_against_min_max(histogram_number_of_bins: int, min_int: int, max_int: int):
+    """
+    Check that the number of bins isn't more than the number of values
+
+    @param histogram_number_of_bins:
+    @param min_int:
+    @param max_int:
+    @return:
+    """
+    validate_int_greater_than_zero(histogram_number_of_bins)  # may be redundant
+    validate_min_max(min_int, max_int)
+
+    potential_num_values = max_int - min_int
+
+    if histogram_number_of_bins > potential_num_values:
+        user_msg = (f'There are more bins than values.'
+                    f' (hist_number_of_bins: {histogram_number_of_bins}) (# values: {potential_num_values})')
         raise ValidationError(user_msg)

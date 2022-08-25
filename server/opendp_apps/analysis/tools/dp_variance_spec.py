@@ -20,7 +20,9 @@ from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.utils.extra_validators import \
     (validate_float,
+     validate_fixed_value_against_min_max,
      validate_missing_val_handlers,
+     validate_min_max,
      validate_int_greater_than_zero)
 
 enable_features("floating-point", "contrib")
@@ -60,11 +62,15 @@ class DPVarianceSpec(StatSpec):
         """
         Make sure values are consistently floats
         """
-        if not self.statistic == self.STATISTIC_TYPE:
-            self.add_err_msg(f'The specified "statistic" is not "{self.STATISTIC_TYPE}". (StatSpec)"')
+        if self.has_error():
+            return
 
-        if self.fixed_value is not None:
-            pass
+        if not self.floatify_int_values(['min', 'max', 'cl']):
+            return
+
+        # validate min/max
+        if not self.validate_multi_values([self.min, self.max], validate_min_max, 'min/max'):
+            return
 
         # Use the "impute_value" for missing values, make sure it's a float!
         #
@@ -73,18 +79,14 @@ class DPVarianceSpec(StatSpec):
             if not self.cast_property_to_float('fixed_value'):
                 return
 
-        self.floatify_int_values(['min', 'max', 'cl'])
-        if self.has_error():
-            return
-
-        self.check_numeric_fixed_value()
+            if not self.validate_multi_values([self.fixed_value, self.min, self.max],
+                                              validate_fixed_value_against_min_max,
+                                              'Is fixed value within min/max bounds?'):
+                return
 
     def run_03_custom_validation(self):
         """
-        This is a place for initial checking/transformations
-        such as making sure values are floats
-        Example:
-        self.check_numeric_fixed_value()
+        For additional checking after validation
         """
         if self.has_error():
             return
@@ -95,7 +97,7 @@ class DPVarianceSpec(StatSpec):
         :param scale:
         :param preprocessor:
         :param dataset_distance:
-        # :param epsilon:
+        :param epsilon:
         :return:
         """
         if self.has_error():
@@ -116,15 +118,15 @@ class DPVarianceSpec(StatSpec):
 
         preprocessor = (
             # Selects a column of df, Vec<str>
-                make_select_column(key=self.col_index, TOA=str) >>
-                # Cast the column as Vec<Optional<Float>>
-                make_cast(TIA=str, TOA=float) >>
-                # Impute missing values to 0 Vec<Float>
-                make_impute_constant(self.fixed_value) >>
-                # Clamp age values
-                make_clamp(self.get_bounds()) >>
-                make_bounded_resize(self.dataset_size, self.get_bounds(), self.fixed_value) >>
-                make_sized_bounded_variance(self.dataset_size, self.get_bounds())
+            make_select_column(key=self.col_index, TOA=str) >>
+            # Cast the column as Vec<Optional<Float>>
+            make_cast(TIA=str, TOA=float) >>
+            # Impute missing values to 0 Vec<Float>
+            make_impute_constant(self.fixed_value) >>
+            # Clamp age values
+            make_clamp(self.get_bounds()) >>
+            make_bounded_resize(self.dataset_size, self.get_bounds(), self.fixed_value) >>
+            make_sized_bounded_variance(self.dataset_size, self.get_bounds())
         )
 
         self.scale = binary_search(lambda s: self.check_scale(s, preprocessor, 1, self.epsilon), bounds=(0.0, 100000.0))
@@ -136,7 +138,9 @@ class DPVarianceSpec(StatSpec):
         return preprocessor
 
     def set_accuracy(self):
-        """Return the accuracy measure using Laplace and the confidence level alpha"""
+        """
+        Return the accuracy measure using Laplace and the confidence level alpha
+        """
         if self.has_error():
             return False
 

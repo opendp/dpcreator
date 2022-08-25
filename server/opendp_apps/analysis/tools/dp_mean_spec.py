@@ -23,6 +23,8 @@ from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.utils.extra_validators import \
     (validate_float,
+     validate_min_max,
+     validate_fixed_value_against_min_max,
      validate_missing_val_handlers,
      validate_int_greater_than_zero)
 
@@ -50,7 +52,14 @@ class DPMeanSpec(StatSpec):
         Make sure values are consistently floats
         """
         if self.has_error():
-            return 
+            return
+
+        if not self.floatify_int_values(['min', 'max', 'cl']):
+            return
+
+        # validate min/max
+        if not self.validate_multi_values([self.min, self.max], validate_min_max, 'min/max'):
+            return
 
         # Use the "impute_value" for missing values, make sure it's a float!
         #
@@ -59,22 +68,18 @@ class DPMeanSpec(StatSpec):
             if not self.cast_property_to_float('fixed_value'):
                 return
 
-        self.floatify_int_values(['min', 'max', 'cl'])
+            if not self.validate_multi_values([self.fixed_value, self.min, self.max],
+                                              validate_fixed_value_against_min_max,
+                                              'Is fixed value within min/max bounds?'):
+                return
 
     def run_03_custom_validation(self):
         """
-        This is a place for initial checking/transformations
-        such as making sure values are floats
-        Example:
-        self.check_numeric_fixed_value()
+        For additional checking after validation
         """
         if self.has_error():
             return
 
-        if self.validate_min_max() is False:
-            return
-
-        self.check_numeric_fixed_value()
 
     def check_scale(self, scale, preprocessor, dataset_distance, epsilon):
         """

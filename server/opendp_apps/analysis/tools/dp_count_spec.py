@@ -58,12 +58,8 @@ class DPCountSpec(StatSpec):
 
     def run_03_custom_validation(self):
         """
-        This is a place for initial checking/transformations
-        such as making sure values are floats
-        Example:
-        self.check_numeric_fixed_value()
+        Custom validation not needed
         """
-        # Custom validation not needed
         pass
 
     def check_scale(self, scale, preprocessor, dataset_distance, epsilon):

@@ -5,7 +5,7 @@ CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
 from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
-from opendp_apps.analysis.tools.dp_histogram_integer_spec import DPHistogramIntegerSpec
+from opendp_apps.analysis.tools.dp_histogram_int_one_per_value_spec import DPHistogramIntOnePerValueSpec
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.profiler import static_vals as pstatic
@@ -37,7 +37,7 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
             }
         }
 
-        self.dp_hist = DPHistogramIntegerSpec(self.spec_props)
+        self.dp_hist = DPHistogramIntOnePerValueSpec(self.spec_props)
 
         if self.dp_hist.has_error():
             print(self.dp_hist.get_error_messages())
@@ -47,7 +47,7 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
     def test_001_valid_noise_mechanism(self):
         """(1) Check for the correct noise_mechanism"""
         msgt(self.test_001_valid_noise_mechanism.__doc__)
-        dp_hist_int = DPHistogramIntegerSpec({})
+        dp_hist_int = DPHistogramIntOnePerValueSpec({})
         self.assertEqual(dp_hist_int.noise_mechanism, astatic.NOISE_GEOMETRIC_MECHANISM)
 
     def test_005_get_variable_order(self):
@@ -70,20 +70,20 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         for epsilon_val in [0.1, .25, .65, .431, 1.0]:
             print(f'> Valid epsilon val: {epsilon_val}')
             spec_props['epsilon'] = epsilon_val
-            dp_hist = DPHistogramIntegerSpec(spec_props)
+            dp_hist = DPHistogramIntOnePerValueSpec(spec_props)
             self.assertTrue(dp_hist.is_chain_valid())
 
         print('   --------')
         for cl_val in [x[0] for x in astatic.CL_CHOICES]:
             print(f'> Valid cl val: {cl_val}')
             spec_props['cl'] = cl_val
-            dp_hist = DPHistogramIntegerSpec(spec_props)
+            dp_hist = DPHistogramIntOnePerValueSpec(spec_props)
             self.assertTrue(dp_hist.is_chain_valid())
 
         print('   --------')
         for good_ds in [1, 2, 10, 100, 56 ** 3, ]:
             spec_props['dataset_size'] = good_ds
-            dp_hist = DPHistogramIntegerSpec(spec_props)
+            dp_hist = DPHistogramIntOnePerValueSpec(spec_props)
             print(f'> Valid dataset_size: {good_ds}')
             self.assertTrue(dp_hist.is_chain_valid())
 
@@ -101,7 +101,7 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         for cl_val in list(float_range(-1, 0, '0.1')) + ['alphabet', 'soup']:
             # print(f'> Invalid ci val: {ci_val}')
             spec_props['cl'] = cl_val
-            dp_hist = DPHistogramIntegerSpec(spec_props)
+            dp_hist = DPHistogramIntOnePerValueSpec(spec_props)
             # print(dp_hist.is_chain_valid())
             valid = dp_hist.is_chain_valid()
             print(dp_hist.error_messages)
@@ -119,7 +119,7 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         for bad_impute, stat_err_msg in bad_impute_info:
             print(f'> bad impute: {bad_impute}')
             new_props['fixed_value'] = bad_impute
-            dp_hist2 = DPHistogramIntegerSpec(new_props)
+            dp_hist2 = DPHistogramIntOnePerValueSpec(new_props)
 
             self.assertFalse(dp_hist2.is_chain_valid())
             err_dict = dp_hist2.get_error_msg_dict()
@@ -147,7 +147,7 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
             }
         }
 
-        dp_hist = DPHistogramIntegerSpec(spec_props)
+        dp_hist = DPHistogramIntOnePerValueSpec(spec_props)
         # if not dp_hist.is_chain_valid(): print(f"get_error_messages(): {dp_hist.get_error_messages()}")
         self.assertTrue(dp_hist.is_chain_valid())
 
@@ -196,7 +196,7 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         """(130) Run DP histogram calculation with integer values"""
         msgt(self.test_130_run_dphist_calculation_integer.__doc__)
 
-        dp_hist = DPHistogramIntegerSpec(self.spec_props)
+        dp_hist = DPHistogramIntOnePerValueSpec(self.spec_props)
         self.assertTrue(dp_hist.is_chain_valid())
         # print('\nUI info:', json.dumps(dp_hist.get_success_msg_dict()))
 

@@ -26,7 +26,7 @@ from opendp_apps.analysis.release_email_util import ReleaseEmailUtil
 from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
 from opendp_apps.analysis.tools.dp_histogram_categorical_spec import DPHistogramCategoricalSpec
-from opendp_apps.analysis.tools.dp_histogram_integer_spec import DPHistogramIntegerSpec
+from opendp_apps.analysis.tools.dp_histogram_int_one_per_value_spec import DPHistogramIntOnePerValueSpec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
 from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
@@ -493,14 +493,14 @@ class ValidateReleaseUtil(BasicErrCheck):
                         props['variable_info']['type'] = pstatic.VAR_TYPE_INTEGER
                         props['variable_info']['min'] = _min_max[0]
                         props['variable_info']['max'] = _min_max[1]
-                        self.add_stat_spec(DPHistogramIntegerSpec(props))
+                        self.add_stat_spec(DPHistogramIntOnePerValueSpec(props))
                     else:
                         ye_spec = DPHistogramCategoricalSpec(props)
                         self.add_stat_spec(DPHistogramCategoricalSpec(props))
 
                 elif var_type == pstatic.VAR_TYPE_INTEGER:
                     # DP Histogram (Integer)!
-                    self.add_stat_spec(DPHistogramIntegerSpec(props))
+                    self.add_stat_spec(DPHistogramIntOnePerValueSpec(props))
 
                 else:
                     # DP Histogram - unsupported type

@@ -30,24 +30,28 @@ class HistogramUtil(BasicErrCheck):
     def __init__(self, stat_spec: StatSpec):
         """
 
-        @param stat_spec: Should be for a histogram, e.g. DPHistogramIntegerSpec, etc
+        @param stat_spec: Should be for a histogram, e.g. DPHistogramIntOnePerValueSpec, etc
         """
         self.stat_spec = stat_spec
 
         self.expect_edges = True
         self.categories = None  # Generate categories if needed
+
         self.bin_edges = None
+        self.fmt_categories = None
+
+        self.preprocessor = None
 
         self.run_process()
 
-    def use_edges(self):
+    def use_bin_edges(self):
         """Check if edges should be retrieved--if not use categories"""
         assert self.has_error() is False, \
             "Check that .has_error() is False before calling this method"
 
         return self.expect_edges
 
-    def get_edges(self) -> list:
+    def get_bin_edges(self) -> list:
         """
         Return calculated edges.
         Check that .has_error() is True before calling this method
@@ -56,7 +60,7 @@ class HistogramUtil(BasicErrCheck):
         assert self.has_error() is False, \
             "Check that .has_error() is False before calling this method"
 
-        return self.edges
+        return self.bin_edges
 
     def get_categories(self) -> list:
         """
@@ -79,9 +83,9 @@ class HistogramUtil(BasicErrCheck):
         if not self.validate_histogram_props():
             return
 
-        self.create_categories()
+        # self.create_categories()
 
-    def create_categories(self) -> bool:
+    def xcreate_categories(self) -> bool:
         """
         If applicable, create categories
         @return:
@@ -115,6 +119,7 @@ class HistogramUtil(BasicErrCheck):
         if self.stat_spec.var_type == pstatic.VAR_TYPE_CATEGORICAL:
             # Can only have bin type OnePerValue
             self.expect_edges = False
+            self.categories = self.stat_spec.categories
             if not self.validate_property(self.stat_spec.histogram_bin_type,
                                           validate_histogram_bin_type_one_per_value,
                                           'histogram_bin_type'):
@@ -183,13 +188,12 @@ class HistogramUtil(BasicErrCheck):
         self.add_err_msg(astatic.ERR_MSG_HIST_BIN_TYPE_UKNOWN)
         return False
 
-
     def set_integer_edges_from_number_of_bins(self) -> bool:
         """
         For var type, integer, set the edges based on the hist_number_of_bins
         @return: bool
         """
-        if not self.validate_property(self.stat_spec.hist_number_of_bins,
+        if not self.validate_property(self.stat_spec.histogram_number_of_bins,
                                       validate_int_greater_than_zero,
                                       'hist_number_of_bins'):
             return False
@@ -197,7 +201,7 @@ class HistogramUtil(BasicErrCheck):
         # Make sure there aren't more bins than values
         #
         num_items = self.stat_spec.max - self.stat_spec.min
-        if self.stat_spec.hist_number_of_bins > num_items:
+        if self.stat_spec.histogram_number_of_bins > num_items:
             user_msg = ('There are more bins than values.'
                         ' (hist_number_of_bins)')
             self.add_err_msg(user_msg)
@@ -206,12 +210,12 @@ class HistogramUtil(BasicErrCheck):
         # set bin_edges
         min_max = (self.stat_spec.min, self.stat_spec.max)
         bin_edges = np.histogram_bin_edges(
-                            [],
-                            bins=self.stat_spec.hist_number_of_bins,
-                            range=min_max)
+            [],
+            bins=self.stat_spec.histogram_number_of_bins,
+            range=min_max)
 
         # Note: adding 1 to the max, which includes the max in the last bin
-        self.bin_edges = [int(x) for x in bin_edges[:-1]] + int(self.max+1)
+        self.bin_edges = [int(x) for x in bin_edges[:-1]] + [self.stat_spec.max + 1]
         if len(self.bin_edges) != len(list(set(self.bin_edges))):
             self.bin_edges = None
             self.add_err_msg(astatic.ERR_MSG_TOO_MANY_BINS)

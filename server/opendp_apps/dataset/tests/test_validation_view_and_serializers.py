@@ -597,7 +597,7 @@ class TestValidationViewAndSerializers(TestCase):
         self.assertFalse(stats_valid.data[0]['valid'])
 
         user_msg2 = 'The "fixed value" (40.0) cannot be more than the "max" (5.0)'
-        self.assertEqual(stats_valid.data[0]['message'], user_msg2)
+        self.assertTrue(stats_valid.data[0]['message'].startswith(user_msg2))
 
     def test_80_fail_impute_too_low(self):
         """(80) Fail: Impute lower than min"""
@@ -646,7 +646,7 @@ class TestValidationViewAndSerializers(TestCase):
 
         user_msg3 = 'The "fixed value" (-10.0) cannot be less than the "min" (-8.0)'
 
-        self.assertEqual(stats_valid2.data[0]['message'], user_msg3)
+        self.assertTrue(stats_valid2.data[0]['message'].startswith(user_msg3))
 
     def test_90_ok_impute_equals_min(self):
         """(90) Fail: Impute equals min"""
