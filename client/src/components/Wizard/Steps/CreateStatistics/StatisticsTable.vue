@@ -127,7 +127,8 @@
       </template>
       <template v-slot:expanded-item="{ headers, item }">
         <td :colspan="11">
-          {{ getExpandedText(item) }}
+          <div v-html="getExpandedText(item)"></div>
+
         </td>
       </template>
     </v-data-table>
@@ -162,6 +163,13 @@ import Button from "../../../DesignSystem/Button.vue";
 import QuestionIconTooltip from "../../../DynamicHelpResources/QuestionIconTooltip.vue";
 import Decimal from "decimal.js";
 import createStatsUtils, {MAX_TOTAL_EPSILON, MIN_EPSILON} from "@/shared/createStatsUtils";
+import histogramOptions from "@/shared/histogramOptions";
+
+const {
+  ONE_BIN_PER_VALUE,
+  EQUAL_BIN_RANGES,
+  BIN_EDGES,
+} = histogramOptions.binType;
 
 export default {
   components: {QuestionIconTooltip, Button},
@@ -180,7 +188,11 @@ export default {
       {text: "", value: 'data-table-expand'},
     ],
     currentItem: null,
-    expanded: []
+    expanded: [],
+    ONE_BIN_PER_VALUE,
+    EQUAL_BIN_RANGES,
+    BIN_EDGES,
+    histogramOptions
   }),
   computed:
       {
@@ -199,7 +211,12 @@ export default {
     getExpandedText(item) {
       let text = ""
       if (item.statistic == 'histogram') {
-        text = 'Histogram bin type: ' + item.histogramBinType
+        text = '<b>Histogram bin type:  </b>' + histogramOptions[item.histogramBinType]
+        if (item.histogramBinType === BIN_EDGES) {
+          text += '.  <b>Bin edges: </b> ' + item.histogramBinEdges
+        } else if (item.histogramBinType === EQUAL_BIN_RANGES) {
+          text += '. <b>Number of bins: </b>' + item.histogramNumberOfBins
+        }
       }
       return text
     },

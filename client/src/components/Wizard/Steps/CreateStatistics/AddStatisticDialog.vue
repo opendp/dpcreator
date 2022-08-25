@@ -86,7 +86,7 @@
                   <v-radio v-if="this.variableInfo[this.editedItemDialog.variable]
                   &&  this.variableInfo[this.editedItemDialog.variable].type ==  'Integer'"
                            :key="ONE_BIN_PER_VALUE"
-                           :label="histogramOptions[ONE_BIN_PER_VALUE].label"
+                           :label="histogramOptions[ONE_BIN_PER_VALUE]"
                            :value="ONE_BIN_PER_VALUE"
                            :data-test="ONE_BIN_PER_VALUE"
                   ></v-radio>
@@ -96,7 +96,7 @@
                 <v-col>
                   <v-radio
                       :key="EQUAL_BIN_RANGES"
-                      :label="histogramOptions[EQUAL_BIN_RANGES].label+' ('+ minEdge()+','+maxEdge()+')'"
+                      :label="histogramOptions[EQUAL_BIN_RANGES]+' ('+ minEdge()+','+maxEdge()+')'"
                       :value="EQUAL_BIN_RANGES"
                       :data-test="EQUAL_BIN_RANGES"
                       @click="editedItemDialog.histogramBinEdges=[]"
@@ -125,7 +125,7 @@
                 <v-col>
                   <v-radio
                       :key="BIN_EDGES"
-                      :label="histogramOptions[BIN_EDGES].label"
+                      :label="histogramOptions[BIN_EDGES]"
                       :value="BIN_EDGES"
                       :data-test="BIN_EDGES"
                       @click="editedItemDialog.histogramNumberOfBins=null"
@@ -276,10 +276,14 @@ import Button from "../../../DesignSystem/Button.vue";
 import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
 import {mapGetters, mapState} from "vuex";
 import createStatsUtils from "@/shared/createStatsUtils";
+import histogramOptions from "@/shared/histogramOptions";
 
-const ONE_BIN_PER_VALUE = "onePerValue"
-const EQUAL_BIN_RANGES = "equalRanges"
-const BIN_EDGES = "binEdges"
+
+const {
+  ONE_BIN_PER_VALUE,
+  EQUAL_BIN_RANGES,
+  BIN_EDGES,
+} = histogramOptions.binType;
 
 export default {
   name: "AddStatisticDialog",
@@ -407,11 +411,7 @@ export default {
     ONE_BIN_PER_VALUE,
     EQUAL_BIN_RANGES,
     BIN_EDGES,
-    histogramOptions: {
-      [ONE_BIN_PER_VALUE]: {label: "One bin per value"},
-      [EQUAL_BIN_RANGES]: {label: "Equal range bins within variable bounds"},
-      [BIN_EDGES]: {label: "Bin edges"}
-    }
+    histogramOptions
   }),
   methods: {
     isButtonDisabled: function () {
