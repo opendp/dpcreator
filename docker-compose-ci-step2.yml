@@ -70,6 +70,7 @@ services:
       - server
   cypress:
     build: "./client/cypress"
+    command: "cypress run --spec integration/set-01/*"
     entrypoint: ""
     depends_on:
       - celery-queue
