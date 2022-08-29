@@ -28,7 +28,8 @@ def get_histogram_stat_spec(props: dict) -> StatSpec:
     """
     var_type = props.get('var_type')
 
-    histogram_bin_type = props.get('histogram_bin_type')
+    # TODO: Remove when integrated with frontend--in this branch the UI doesn't have bin types
+    histogram_bin_type = props.get('histogram_bin_type', astatic.HIST_BIN_TYPE_ONE_PER_VALUE)
 
     # Categorical
     if var_type == pstatic.VAR_TYPE_CATEGORICAL:

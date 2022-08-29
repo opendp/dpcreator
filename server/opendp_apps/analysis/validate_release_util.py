@@ -25,19 +25,16 @@ from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis.release_email_util import ReleaseEmailUtil
 from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
-from opendp_apps.analysis.tools.dp_histogram_categorical_spec import DPHistogramCategoricalSpec
-from opendp_apps.analysis.tools.dp_histogram_int_one_per_value_spec import DPHistogramIntOnePerValueSpec
-from opendp_apps.analysis.tools.histogram_util import get_histogram_stat_spec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
 from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
 from opendp_apps.analysis.tools.dp_variance_spec import DPVarianceSpec
+from opendp_apps.analysis.tools.histogram_util import get_histogram_stat_spec
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
 from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
-from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
 from opendp_apps.user.models import OpenDPUser
 from opendp_apps.utils.extra_validators import \
@@ -346,6 +343,12 @@ class ValidateReleaseUtil(BasicErrCheck):
             return
 
         self.build_stat_specs()
+
+        #print('\n\n>>> stat_spec_list', self.stat_spec_list)
+        #for x in self.stat_spec_list:
+        #    if x.has_error():
+        #        print(x, x.get_single_err_msg())
+
         if not self.stat_spec_list:
             logger.error('ValidateReleaseUtil.run_validation_process: No statistics were built!')
             self.add_err_msg('No statistics were built!')
