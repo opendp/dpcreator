@@ -25,18 +25,16 @@ from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis.release_email_util import ReleaseEmailUtil
 from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
-from opendp_apps.analysis.tools.dp_histogram_categorical_spec import DPHistogramCategoricalSpec
-from opendp_apps.analysis.tools.dp_histogram_integer_spec import DPHistogramIntegerSpec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
 from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
 from opendp_apps.analysis.tools.dp_variance_spec import DPVarianceSpec
+from opendp_apps.analysis.tools.histogram_util import get_histogram_stat_spec
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
 from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
-from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
 from opendp_apps.user.models import OpenDPUser
 from opendp_apps.utils.extra_validators import \
@@ -105,6 +103,8 @@ class ValidateReleaseUtil(BasicErrCheck):
 
     def add_stat_spec(self, stat_spec: StatSpec):
         """Add a StatSpec subclass to a list"""
+        assert isinstance(stat_spec, StatSpec), \
+            "stat_spec must be an instance of StatSpec"
         self.stat_spec_list.append(stat_spec)
 
     def run_release_process(self):
@@ -339,10 +339,16 @@ class ValidateReleaseUtil(BasicErrCheck):
         # Make sure the variable indices are available!
         # Not needed in this step but required for computation
         if self.get_variable_indices() is None:
-            # error already set
+            # error set in ^ get_variable_indices()
             return
 
         self.build_stat_specs()
+
+        #print('\n\n>>> stat_spec_list', self.stat_spec_list)
+        #for x in self.stat_spec_list:
+        #    if x.has_error():
+        #        print(x, x.get_single_err_msg())
+
         if not self.stat_spec_list:
             logger.error('ValidateReleaseUtil.run_validation_process: No statistics were built!')
             self.add_err_msg('No statistics were built!')
@@ -352,7 +358,9 @@ class ValidateReleaseUtil(BasicErrCheck):
         #
         self.validation_info = []  # reset validation info
         running_epsilon = 0.0
+        item_cnt = 0
         for stat_spec in self.stat_spec_list:
+            item_cnt += 1
             # Check each stat_spec
             if not stat_spec.is_chain_valid():
                 # Nope: invalid!
@@ -402,9 +410,9 @@ class ValidateReleaseUtil(BasicErrCheck):
         # Iterate through the stats!
         self.stat_spec_list = []
         stat_num = 0
-
         for dp_stat in self.dp_statistics:
             stat_num += 1  # not used yet...
+            # print(f'\n\n(b-{stat_num})', dp_stat)
             """
             We're putting together lots of properties to pass to
             statistic specific classes such as DPMeanSpec.
@@ -427,7 +435,7 @@ class ValidateReleaseUtil(BasicErrCheck):
             # -------------------------------------
             # (1) Begin building the property dict
             # -------------------------------------
-            props = dp_stat  # start with what is in dp_stat--the UI input
+            props = copy.deepcopy(dp_stat)  # start with what is in dp_stat--the UI input
             props['dataset_size'] = self.dataset_size  # add dataset size
 
             #  Some high-level error checks, before making the StatSpec
@@ -452,9 +460,11 @@ class ValidateReleaseUtil(BasicErrCheck):
 
             # (3) Add variable_info which has min/max/categories, variable type, etc.
             variable_info = self.analysis_plan.variable_info.get(variable)
+
             if variable_info:
                 props['variable_info'] = variable_info
                 var_type = variable_info.get('type')
+                props['var_type'] = var_type
             else:
                 props['error_message'] = 'Variable in validation info not found.'
                 self.add_stat_spec(DPSpecError(props))
@@ -477,34 +487,11 @@ class ValidateReleaseUtil(BasicErrCheck):
                 self.add_stat_spec(DPCountSpec(props))
 
             elif statistic in astatic.DP_HISTOGRAM:
-                if var_type == pstatic.VAR_TYPE_CATEGORICAL:
-                    # 4/12/2022 - temp hack to distinguish numeric categories
-                    #   - need updated UI, etc.
-                    #
-                    has_int_cats, _min_max = self.has_integer_categories(props)
-
-                    if has_int_cats:
-                        # Artificially set the min/max
-                        #
-                        props['variable_info']['type'] = pstatic.VAR_TYPE_INTEGER
-                        props['variable_info']['min'] = _min_max[0]
-                        props['variable_info']['max'] = _min_max[1]
-                        self.add_stat_spec(DPHistogramIntegerSpec(props))
-                    else:
-                        self.add_stat_spec(DPHistogramCategoricalSpec(props))
-
-                elif var_type == pstatic.VAR_TYPE_INTEGER:
-                    # DP Histogram (Integer)!
-                    self.add_stat_spec(DPHistogramIntegerSpec(props))
-
-                else:
-                    # DP Histogram - unsupported type
-                    props['error_message'] = (f'Statistic is "{astatic.DP_HISTOGRAM}" but '
-                                              f' variable type is unsupported: "{var_type}"')
-                    self.add_stat_spec(DPSpecError(props))
-                    logger.error(f'ValidateReleaseUtil.build_stat_specs: Statistic is "{astatic.DP_HISTOGRAM}" but '
-                                 f'variable type is unsupported: "{var_type}"')
-                    continue  # to the next dp_stat specification
+                # DP Histogram
+                # - Use function from HistogramUtil to determine correct StatSpec
+                #
+                hist_stat_spec = get_histogram_stat_spec(props)
+                self.add_stat_spec(hist_stat_spec)
 
             elif statistic == astatic.DP_MEAN:
                 # DP Mean!
@@ -521,42 +508,14 @@ class ValidateReleaseUtil(BasicErrCheck):
                 # Stat not yet available or an error
                 props['error_message'] = (f'Statistic "{statistic}" will be supported'
                                           f' soon!')
-                logger.error('ValidateReleaseUtil.build_stat_specs: Statistic "{statistic}" will be supported soon!')
+                logger.error(('ValidateReleaseUtil.build_stat_specs: Statistic'
+                              ' "{statistic}" will be supported soon!'))
                 self.add_stat_spec(DPSpecError(props))
             else:
+                logger.error(('ValidateReleaseUtil.build_stat_specs: Shouldn\'t reach'
+                              ' here, unknown stats are captured up above'))
                 # Shouldn't reach here, unknown stats are captured up above
                 pass
-
-    @staticmethod
-    def has_integer_categories(props: dict):
-        """
-        # 4/12/2022 - temporary hack for histograms
-        Check if the props['variable_info']['categories'] list consists of continuous integers
-
-        False: return False, None
-        True:  return True, (min, max)
-        """
-        if not props:
-            return False, None
-
-        # Are there categories?
-        if ('variable_info' in props) and ('categories' in props['variable_info']):
-
-            # Get the categories
-            cats = copy.deepcopy(props['variable_info']['categories'])
-
-            # Are all the values integers?
-            all_int_check = [isinstance(x, int) for x in cats]
-
-            # Nope, return
-            if False in all_int_check:
-                return False, None
-
-            # All integers, are they continuous?
-            if sorted(cats) == list(range(min(cats), max(cats) + 1)):
-                return True, (min(cats), max(cats))
-
-        return False, None
 
     def run_preliminary_steps(self):
         """Run preliminary steps before validation"""

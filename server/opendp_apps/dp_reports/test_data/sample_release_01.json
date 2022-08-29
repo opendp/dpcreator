@@ -116,21 +116,21 @@
       "epsilon": 0.5,
       "delta": null,
       "categories": [
-        "\"ac\"",
-        "\"bh2\"",
-        "\"cw\"",
-        "\"jm\"",
-        "\"jp\"",
-        "\"kj\"",
-        "\"ls2\"",
-        "\"mh\"",
-        "\"mn\"",
-        "\"no\"",
-        "\"ph\""
+        "ac",
+        "bh2",
+        "cw",
+        "jm",
+        "jp",
+        "kj",
+        "ls2",
+        "mh",
+        "mn",
+        "no",
+        "ph"
       ],
       "missing_value_handling": {
         "type": "insert_fixed",
-        "fixed_value": "\"ac\""
+        "fixed_value": "ac"
       },
       "confidence_level": 0.95,
       "confidence_level_alpha": 0.05,

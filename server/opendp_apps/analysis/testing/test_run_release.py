@@ -151,8 +151,11 @@ class TestRunRelease(TestCase):
 
         # Send the dp_statistics for validation
         #
-        analysis_plan.dp_statistics = self.general_stat_specs
+        analysis_plan.dp_statistics = [self.general_stat_specs[2]]
         analysis_plan.save()
+
+        analysis_plan2 = AnalysisPlan.objects.get(object_id=analysis_plan.object_id)
+        print('analysis_plan.dp_statistics - after save', analysis_plan2.dp_statistics)
 
         # Check the basics
         #
@@ -164,7 +167,7 @@ class TestRunRelease(TestCase):
         if release_util.has_error():
             print('release_util:', release_util.get_err_msg())
         self.assertFalse(release_util.has_error())
-
+        return
         release_info_object = release_util.get_new_release_info_object()
         dp_release = release_info_object.dp_release
 
@@ -242,10 +245,13 @@ class TestRunRelease(TestCase):
 
         # Send the dp_statistics for validation
         #
-        analysis_plan.dp_statistics = self.general_stat_specs
+        analysis_plan.dp_statistics = [self.general_stat_specs[2],
+                                       self.general_stat_specs[1]] #, self.general_stat_specs[2]]
         analysis_plan.save()
 
-        params = dict(object_id=str(analysis_plan.object_id))
+        analysis_plan2 = AnalysisPlan.objects.get(object_id=analysis_plan.object_id)
+
+        params = dict(object_id=str(analysis_plan2.object_id))
 
         response = self.client.post('/api/release/',
                                     json.dumps(params),
@@ -257,7 +263,7 @@ class TestRunRelease(TestCase):
         self.assertIsNotNone(jresp['dp_release'])
         self.assertIsNotNone(jresp['object_id'])
 
-        updated_plan = AnalysisPlan.objects.get(object_id=analysis_plan.object_id)
+        updated_plan = AnalysisPlan.objects.get(object_id=analysis_plan2.object_id)
         json_filename = ReleaseInfoFormatter.get_json_filename(updated_plan.release_info)
 
         # Check on the DP Release JSON file
@@ -303,6 +309,8 @@ class TestRunRelease(TestCase):
         self.assertEqual(response.status_code, 201)
 
         updated_plan = AnalysisPlan.objects.get(object_id=analysis_plan.object_id)
+
+        print('>> updated_plan.variable_info', updated_plan.variable_info)
 
         # ------------------------------------
         # (1) JSON file download url
@@ -365,6 +373,7 @@ class TestRunRelease(TestCase):
                                     content_type='application/json')
 
         jresp = response.json()
+        print('jresp-->', jresp)
         self.assertEqual(response.status_code, 201)
         self.assertIsNotNone(jresp['dp_release'])
         self.assertIsNotNone(jresp['object_id'])

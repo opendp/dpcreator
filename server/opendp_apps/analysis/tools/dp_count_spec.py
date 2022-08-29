@@ -27,14 +27,13 @@ class DPCountSpec(StatSpec):
     """
     Initiate with dict of properties. Example of needed properties:
 
-    spec_props = dict(var_name="hours_sleep",
-                      col_index=3,
-                      variable_info=dict(min=0, max=24, type=VAR_TYPE_FLOAT),
-                      statistic=DP_MEAN,
-                      dataset_size=365,
-                      epsilon=0.5,
-                      cl=CL_95,
-                      fixed_value=1)
+    spec_props = {'variable': 'age',
+              'col_index': 1,
+              'statistic': astatic.DP_COUNT,
+              'epsilon': 1.0,
+              'cl': astatic.CL_95,
+              'variable_info': {'type': pstatic.VAR_TYPE_INTEGER},
+              }
     """
     STATISTIC_TYPE = astatic.DP_COUNT
 
@@ -43,38 +42,25 @@ class DPCountSpec(StatSpec):
         super().__init__(props)
         self.noise_mechanism = astatic.NOISE_GEOMETRIC_MECHANISM
 
-    def additional_required_props(self):
+    def get_stat_specific_validators(self) -> dict:
         """
-        Add a list of required properties
-        example: ['min', 'max']
-        If no additional properties, return []
+        Update self.prop_validators to include validators specific to the subclass
+        @return: dict
         """
-        return ['cl']
+        # No additional validators
+        return {}
 
-    def run_01_initial_handling(self):
+    def run_01_initial_transforms(self):
         """
         Missing value handling, if a fixed_value is given, make it string
         """
-        if not self.statistic == self.STATISTIC_TYPE:
-            self.add_err_msg(f'The specified "statistic" is not "{self.STATISTIC_TYPE}". (StatSpec)"')
-            return
-
-        # Use the "impute_value" for missing values, make sure it's a float!
-        #
-        if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
-            self.fixed_value = str(self.fixed_value)
+        pass
 
     def run_03_custom_validation(self):
         """
-        This is a place for initial checking/transformations
-        such as making sure values are floats
-        Example:
-        self.check_numeric_fixed_value()
+        Custom validation not needed
         """
-        # Custom validation not needed
         pass
-        if self.has_error():
-            return
 
     def check_scale(self, scale, preprocessor, dataset_distance, epsilon):
         """
@@ -102,12 +88,12 @@ class DPCountSpec(StatSpec):
             return self.preprocessor
 
         preprocessor = (
-                # Selects a column of df, Vec<str>
+            # Selects a column of df, Vec<str>
                 make_select_column(key=self.col_index, TOA=str) >>
                 # Cast the column to str
                 make_cast(TIA=str, TOA=str) >>
                 # Impute missing values
-                make_impute_constant(self.fixed_value) >>
+                make_impute_constant('') >>  # Can this be an empty string?
                 # Count!
                 make_count(TIA=str)
         )
@@ -146,19 +132,18 @@ class DPCountSpec(StatSpec):
         """
         Calculate the DP Count!
 
-        :param columns. Examples: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
-                - In general using zero-based index of columns is preferred
-        :param file_obj - file like object to read data from
-        :param sep_char - separator from the object, default is "," for a .csv, etc
-
-        :return bool -  False: error messages are available through .get_err_msgs()
-                                or .get_error_msg_dict()
-                        True: results available through .value -- others params through
-                                .get_success_msg_dict()
-
         Example:
         # Note "\t" is for a tabular file
-        `dp_mean_spec.run_chain([0, 1, 2, 3], file_obj, sep_char="\t")`
+        `dp_count_spec.run_chain([0, 1, 2, 3], file_obj, sep_char="\t")`
+
+        @param column_names: Using a zero-based index of columns is preferred.
+                    Examples: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
+        @param file_obj: file like object to read data from
+        @param sep_char:  separator from the object, default is "," for a .csv, etc
+        @return: bool. if False: error messages are available through .get_err_msgs()
+                                 or .get_error_msg_dict()
+                       if True: results available through .value -- others params through
+                                .get_success_msg_dict()
         """
         if not self.preprocessor:
             assert False, 'Please call is_chain_valid() before using "run_chain()!'
@@ -183,6 +168,7 @@ class DPCountSpec(StatSpec):
         except OpenDPException as ex_obj:
             self.add_err_msg(f'{ex_obj.message} (OpenDPException)')
             return False
+
         except Exception as ex_obj:
             if hasattr(ex_obj, 'message'):
                 self.add_err_msg(f'{ex_obj.message} (Exception)')

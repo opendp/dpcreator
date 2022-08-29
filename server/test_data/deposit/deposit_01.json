@@ -104,11 +104,11 @@
          "variable":"Subject",
          "statistic":"histogram",
          "categories":[
-            "\"ac\"",
-            "\"bh2\"",
-            "\"cw\"",
-            "\"jm\"",
-            "\"mh\""
+            "ac",
+            "bh2",
+            "cw",
+            "jm",
+            "mh"
          ],
          "description":{
             "html":"A differentially private <b>Histogram</b> for variable <b>Subject</b> was calculated with the result <b>{&#x27;categories&#x27;: [&#x27;ac&#x27;, &#x27;bh2&#x27;, &#x27;cw&#x27;, &#x27;jm&#x27;, &#x27;mh&#x27;, &#x27;uncategorized&#x27;], &#x27;values&#x27;: [11, 13, 8, 12, 15, 127], &#x27;category_value_pairs&#x27;: [(&#x27;ac&#x27;, 11), (&#x27;bh2&#x27;, 13), (&#x27;cw&#x27;, 8), (&#x27;jm&#x27;, 12), (&#x27;mh&#x27;, 15), (&#x27;uncategorized&#x27;, 127)]}</b>. There is a probability of <b>95.0%</b> that the <b>DP Histogram</b> will differ from the true Histogram by at most <b>100.0</b> units. Here the units are the same units the variable <b>Subject</b>} has in the dataset.",

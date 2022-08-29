@@ -9,14 +9,21 @@ from opendp.typing import *
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.tools.stat_spec import StatSpec
-from opendp_apps.profiler.static_vals import VAR_TYPE_INTEGER
+from opendp_apps.utils.extra_validators import \
+    (validate_histogram_bin_type_one_per_value,
+     validate_int,
+     validate_type_integer,
+     validate_fixed_value_against_min_max,
+     validate_fixed_value_in_categories,
+     validate_min_max,
+     validate_missing_val_handlers)
 
 enable_features("floating-point", "contrib")
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
-class DPHistogramIntegerSpec(StatSpec):
+class DPHistogramIntOnePerValueSpec(StatSpec):
     """
     Create a Histogram using integer data
     """
@@ -27,59 +34,63 @@ class DPHistogramIntegerSpec(StatSpec):
         super().__init__(props)
         self.noise_mechanism = astatic.NOISE_GEOMETRIC_MECHANISM
 
-    def additional_required_props(self):
-        """
-        Add a list of required properties
-        example: ['min', 'max']
-        """
-        return ['min', 'max']
+    def get_stat_specific_validators(self):
+        """Set validators used for the DP Mean"""
 
-    def run_01_initial_handling(self):
+        return dict(histogram_bin_type=validate_histogram_bin_type_one_per_value,
+                    var_type=validate_type_integer,
+                    #
+                    min=validate_int,
+                    max=validate_int,
+                    #
+                    missing_values_handling=validate_missing_val_handlers)
+
+    def run_01_initial_transforms(self):
         """
         Make sure input parameters are the correct type (fixed_value, min, max, etc.)
         Create `self.categories` based on the min/max
         """
-        if not self.statistic == self.STATISTIC_TYPE:
-            self.add_err_msg(f'The specified "statistic" is not "{self.STATISTIC_TYPE}".')
-            return
+        # TODO: remove next check
+        # Default while converting to allowing different bin types
+        self.histogram_bin_type = astatic.HIST_BIN_TYPE_ONE_PER_VALUE
 
-        if not self.var_type == VAR_TYPE_INTEGER:
-            user_msg = (f'The specified variable type ("var_type")'
-                        f' is not "{VAR_TYPE_INTEGER}". ({self.STATISTIC_TYPE})')
-
-            self.add_err_msg(user_msg)
-            return
-
-        # Check the fixed_value, min, max -- makes sure they're integers
+        # Cast min/max to integers
         #
-        if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
-            # Convert the impute value to a float!
-            if not self.cast_property_to_int('fixed_value'):
-                return
-
         if not self.cast_property_to_int('min'):
             return
 
         if not self.cast_property_to_int('max'):
             return
 
-        # Make sure the fixed value is between the min/max
-        #
-        self.check_numeric_fixed_value()
+        if not self.validate_multi_values([self.min, self.max], validate_min_max, 'min/max'):
+            return
 
         # Create categories
         #
         self.categories = [x for x in range(self.min, self.max + 1)]
 
+        # Check the fixed_value, min, max -- makes sure they're integers
+        #
+        if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
+            # Convert the impute value to an int
+            if not self.cast_property_to_int('fixed_value'):
+                return
+
+            if not self.validate_multi_values([self.fixed_value, self.min, self.max],
+                                              validate_fixed_value_against_min_max,
+                                              'Is fixed value within min/max bounds?'):
+                return
+
+            if not self.validate_multi_values([self.fixed_value, self.categories],
+                                              validate_fixed_value_in_categories,
+                                              'fixed_value'):
+                return
+
     def run_03_custom_validation(self):
         """
-        This is a place for initial checking/transformations
-        such as making sure values are floats
-        Example:
-        self.check_numeric_fixed_value()
+        No further checking needed
         """
-        if self.has_error():
-            return
+        pass
 
     def check_scale(self, scale, preprocessor):
         """

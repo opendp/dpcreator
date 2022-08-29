@@ -64,6 +64,19 @@ DP_STATS_REQUIRE_COUNTS = [DP_MEAN,
 VALID_DP_STATS_CHOICES_STR = ', '.join(DP_STATS_CHOICES)
 
 # --------------------------------------
+# Histogram bin types
+# --------------------------------------
+HIST_BIN_TYPE_ONE_PER_VALUE = 'one_per_value'
+HIST_BIN_TYPE_EQUAL_RANGES = 'equal_ranges'
+HIST_BIN_TYPE_BIN_EDGES = 'bin_edges'
+HIST_VALID_BIN_TYPES = [HIST_BIN_TYPE_ONE_PER_VALUE,
+                        HIST_BIN_TYPE_EQUAL_RANGES,
+                        HIST_BIN_TYPE_BIN_EDGES]
+VALID_HIST_BIN_TYPE_CHOICES_STR = ', '.join(HIST_VALID_BIN_TYPES)
+ERR_MSG_HIST_BIN_TYPE_UKNOWN = (f'Unknown histogram bin type. Expected:'
+                                f' {VALID_HIST_BIN_TYPE_CHOICES_STR}')
+ERR_MSG_TOO_MANY_BINS = 'There are too many bins given the min and max values.'
+# --------------------------------------
 # Missing value handling
 # --------------------------------------
 KEY_MISSING_VALUES_HANDLING = 'missing_values_handling'
@@ -116,6 +129,8 @@ ERR_MSG_INVALID_MIN_MAX = 'The "max" must be greater than the "min"'
 
 ERR_IMPUTE_PHRASE_MIN = 'cannot be less than the "min"'
 ERR_IMPUTE_PHRASE_MAX = 'cannot be more than the "max"'
+
+ERR_MAX_NOT_GREATER_THAN_MIN = 'The max must be greater than the min.'
 
 ERR_MSG_CL_ALPHA_CL_NOT_SET = 'Attempted to calculate confidence level (CL) alpha when CL was not set'
 ERR_MSG_CL_ALPHA_CL_NOT_NUMERIC = 'Failed to calculate confidence level (CL) alpha using CL of'
