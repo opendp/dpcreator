@@ -9,75 +9,90 @@ from opendp.typing import *
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.tools.stat_spec import StatSpec
-from opendp_apps.profiler.static_vals import VAR_TYPE_INTEGER, VAR_TYPE_CATEGORICAL
+from opendp_apps.utils.extra_validators import \
+    (validate_histogram_bin_type_equal_ranges,
+     validate_fixed_value_against_min_max,
+     validate_int,
+     validate_int_greater_than_zero,
+     validate_min_max,
+     validate_missing_val_handlers,
+     validate_num_bins_against_min_max,
+     validate_type_integer)
 
 enable_features("floating-point", "contrib")
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
-class DPHistogramSpec(StatSpec):
+class DPHistogramIntEqualRangesSpec(StatSpec):
     """
-
+    Create a Histogram using integer data
     """
-    STATISTIC_TYPE = astatic.DP_HISTOGRAM
+    STATISTIC_TYPE = astatic.DP_HISTOGRAM  # _INTEGER
 
     def __init__(self, props: dict):
         """Set the internals using the props dict"""
         super().__init__(props)
+        self.noise_mechanism = astatic.NOISE_GEOMETRIC_MECHANISM
 
-    def additional_required_props(self):
-        """
-        Add a list of required properties
-        example: ['min', 'max']
-        """
-        return ['min', 'max']
+    def get_stat_specific_validators(self):
+        """Set validators used for the DP Mean"""
 
-    def run_01_initial_handling(self):
-        """
-        """
-        if not self.statistic == self.STATISTIC_TYPE:
-            self.add_err_msg(f'The specified "statistic" is not "{self.STATISTIC_TYPE}". (StatSpec)"')
-            return
+        return dict(histogram_bin_type=validate_histogram_bin_type_equal_ranges,
+                    histogram_number_of_bins=validate_int_greater_than_zero,
+                    var_type=validate_type_integer,
+                    #
+                    min=validate_int,
+                    max=validate_int,
+                    #
+                    missing_values_handling=validate_missing_val_handlers)
 
-        if self.var_type == VAR_TYPE_INTEGER:
-            self.categories = [int(i) for i in range(self.min, self.max)]
-            self.fixed_value = int(self.fixed_value)
-
-        # Using integers
+    def run_01_initial_transforms(self):
+        """
+        Make sure input parameters are the correct type (fixed_value, min, max, etc.)
+        Create `self.categories` based on the min/max
+        """
+        # Cast min/max to integers
         #
-        if self.var_type == VAR_TYPE_INTEGER:
-            if self.fixed_value is not None:
-                if not self.cast_property_to_int('fixed_value'):
-                    return
-
-        # if self.var_type == VAR_TYPE_CATEGORICAL:
-
-        # TODO: These default values are allowing the tests to pass,
-        #  but we need to process cases where min and max are referring to counts of a
-        #  categorical variable.
-        if not self.min:
-            self.min = 0
-        elif self.cast_property_to_int('min') is False:
+        if not self.cast_property_to_int('min'):
             return
 
-        if not self.max:
-            self.max = 10
-        elif self.cast_property_to_int('max') is False:
+        if not self.cast_property_to_int('max'):
             return
+
+        # validate min/max
+        if not self.validate_multi_values([self.min, self.max], validate_min_max, 'min/max'):
+            return
+
+        if not self.cast_property_to_int('histogram_number_of_bins'):
+            return
+
+        if not self.validate_multi_values([self.histogram_number_of_bins, self.min, self.max],
+                                          validate_num_bins_against_min_max,
+                                          'histogram_number_of_bins/max'):
+            return
+
+        # Check the fixed_value, min, max -- makes sure they're integers
+        #
+        if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
+            # Convert the impute value to an int
+            if not self.cast_property_to_int('fixed_value'):
+                return
+
+            if not self.validate_multi_values([self.fixed_value, self.min, self.max],
+                                              validate_fixed_value_against_min_max,
+                                              'fixed value within min/max bounds'):
+                return
+
+        self.histogram_bin_edges = np.histogram_bin_edges([],
+                                                          bins=self.histogram_number_of_bins,
+                                                          range=(self.min, self.max))
 
     def run_03_custom_validation(self):
         """
-        This is a place for initial checking/transformations
-        such as making sure values are floats
-        Example:
-        self.check_numeric_fixed_value()
+        No further checking needed
         """
-        if self.has_error():
-            return
-
-        if self.var_type == VAR_TYPE_INTEGER:
-            self.check_numeric_fixed_value()
+        pass
 
     def check_scale(self, scale, preprocessor):
         """
@@ -106,19 +121,11 @@ class DPHistogramSpec(StatSpec):
             # Yes!
             return self.preprocessor
 
-        # TODO: More general type handling
-        if self.var_type == VAR_TYPE_INTEGER:
-            toa = int
-            tia = int
-        else:
-            toa = str
-            tia = str
-
         preprocessor = (
                 make_select_column(key=self.col_index, TOA=str) >>
-                make_cast(TIA=str, TOA=toa) >>
+                make_cast(TIA=str, TOA=int) >>
                 make_impute_constant(self.fixed_value) >>
-                make_count_by_categories(categories=self.categories, MO=L1Distance[int], TIA=tia)
+                make_count_by_categories(categories=self.categories, MO=L1Distance[int], TIA=int)
         )
 
         self.scale = binary_search_param(
@@ -145,7 +152,7 @@ class DPHistogramSpec(StatSpec):
         self.accuracy_val = laplacian_scale_to_accuracy(self.scale, cl_alpha)
 
         # Note `self.accuracy_val` must bet set before using `self.get_accuracy_text()
-        self.accuracy_msg = self.get_accuracy_text(template_name='analysis/dp_histogram_accuracy_default.html')
+        self.accuracy_msg = self.get_accuracy_text(template_name='analysis/dp_histogram_accuracy_default.txt')
 
         return True
 
@@ -199,17 +206,28 @@ class DPHistogramSpec(StatSpec):
                 self.add_err_msg(f'{ex_obj} (Exception)')
             return False
 
+        fmt_categories = self.categories + ['uncategorized']
+
+        # Show warning if category count doesn't match values count
+        if len(fmt_categories) > len(self.value):
+            user_msg = (f'Warning. There are more categories (n={len(fmt_categories)})'
+                        f' than values (n={len(self.value)})')
+            self.add_err_msg(user_msg)
+
+            logger.warning(user_msg)
+            logger.warning(f'Categories (n={len(self.categories)}): {self.categories}')
+            logger.warning(f'Values (n={len(self.value)}): {self.value}')
+            return
+
+        self.value = dict(categories=fmt_categories,
+                          values=self.value,
+                          category_value_pairs=list(zip(fmt_categories, self.value)))
+
         logger.info((f"Epsilon: {self.epsilon}"
                      f"\nColumn name: {self.variable}"
                      f"\nColumn index: {self.col_index}"
                      f"\nAccuracy value: {self.accuracy_val}"
                      f"\nAccuracy message: {self.accuracy_msg}"
-                     f"\n\nDP Histogram (n={len(self.value)}): {self.value}"))
-
-        if self.var_type == VAR_TYPE_CATEGORICAL:
-            logger.info(f"Categories (n={len(self.categories)}): {self.categories}")
-        elif self.var_type == VAR_TYPE_INTEGER:
-            int_cats = [x for x in range(self.min, self.max)] + [self.max]
-            logger.info(f"Categories (integers) (n={len(int_cats)}): {int_cats}")
+                     f"\n\nDP Histogram: {self.value}"))
 
         return True

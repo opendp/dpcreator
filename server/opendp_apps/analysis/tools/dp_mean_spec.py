@@ -1,6 +1,7 @@
 """
-Wrapper class for DP Mean functionality
-
+Calculate a DP Mean.
+Note, the casting is str -> float.
+Therefore all fields used in the calculation (min, max, etc) need to float
 
 """
 from opendp.accuracy import laplacian_scale_to_accuracy
@@ -20,21 +21,15 @@ enable_features("floating-point", "contrib")
 
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.analysis import static_vals as astatic
-
+from opendp_apps.utils.extra_validators import \
+    (validate_float,
+     validate_min_max,
+     validate_fixed_value_against_min_max,
+     validate_missing_val_handlers,
+     validate_int_greater_than_zero)
 
 class DPMeanSpec(StatSpec):
-    """
-    Initiate with dict of properties. Example of needed properties:
 
-    spec_props = dict(var_name="hours_sleep",
-                      col_index=3,
-                      variable_info=dict(min=0, max=24, type=VAR_TYPE_FLOAT),
-                      statistic=DP_MEAN,
-                      dataset_size=365,
-                      epsilon=0.5,
-                      cl=CL_95,
-                      fixed_value=1)
-    """
     STATISTIC_TYPE = astatic.DP_MEAN
 
     def __init__(self, props: dict):
@@ -42,22 +37,29 @@ class DPMeanSpec(StatSpec):
         super().__init__(props)
         self.noise_mechanism = astatic.NOISE_LAPLACE_MECHANISM
 
-    def additional_required_props(self):
-        """
-        Add a list of required properties
-        example: ['min', 'max']
-        """
-        return ['min', 'max', 'cl', ]  # 'fixed_value']
+    def get_stat_specific_validators(self):
+        """Set validators used for the DP Mean"""
 
-    def run_01_initial_handling(self):
+        return dict(dataset_size=validate_int_greater_than_zero,
+                    #
+                    min=validate_float,
+                    max=validate_float,
+                    #
+                    missing_values_handling=validate_missing_val_handlers)
+
+    def run_01_initial_transforms(self):
         """
         Make sure values are consistently floats
         """
-        if not self.statistic == self.STATISTIC_TYPE:
-            self.add_err_msg(f'The specified "statistic" is not "{self.STATISTIC_TYPE}". (StatSpec)"')
+        if self.has_error():
+            return
 
-        if self.fixed_value is not None:
-            pass
+        if not self.floatify_int_values(['min', 'max', 'cl']):
+            return
+
+        # validate min/max
+        if not self.validate_multi_values([self.min, self.max], validate_min_max, 'min/max'):
+            return
 
         # Use the "impute_value" for missing values, make sure it's a float!
         #
@@ -65,19 +67,19 @@ class DPMeanSpec(StatSpec):
             # Convert the impute value to a float!
             if not self.cast_property_to_float('fixed_value'):
                 return
-        self.floatify_int_values()
+
+            if not self.validate_multi_values([self.fixed_value, self.min, self.max],
+                                              validate_fixed_value_against_min_max,
+                                              'Is fixed value within min/max bounds?'):
+                return
 
     def run_03_custom_validation(self):
         """
-        This is a place for initial checking/transformations
-        such as making sure values are floats
-        Example:
-        self.check_numeric_fixed_value()
+        For additional checking after validation
         """
         if self.has_error():
             return
 
-        self.check_numeric_fixed_value()
 
     def check_scale(self, scale, preprocessor, dataset_distance, epsilon):
         """
@@ -155,19 +157,18 @@ class DPMeanSpec(StatSpec):
         """
         Calculate the DP Mean!
 
-        :param columns. Examples: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
-                - In general using zero-based index of columns is preferred
-        :param file_obj - file like object to read data from
-        :param sep_char - separator from the object, default is "," for a .csv, etc
-
-        :return bool -  False: error messages are available through .get_err_msgs()
-                                or .get_error_msg_dict()
-                        True: results available through .value -- others params through
-                                .get_success_msg_dict()
-
         Example:
         # Note "\t" is for a tabular file
         `dp_mean_spec.run_chain([0, 1, 2, 3], file_obj, sep_char="\t")`
+
+        @param column_names: Using a zero-based index of columns is preferred.
+                    Examples: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
+        @param file_obj: file like object to read data from
+        @param sep_char:  separator from the object, default is "," for a .csv, etc
+        @return: bool. if False: error messages are available through .get_err_msgs()
+                                 or .get_error_msg_dict()
+                       if True: results available through .value -- others params through
+                                .get_success_msg_dict()
         """
         if not self.preprocessor:
             assert False, 'Please call is_chain_valid() before using "run_chain()!'

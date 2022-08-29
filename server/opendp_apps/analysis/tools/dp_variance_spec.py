@@ -18,6 +18,12 @@ from opendp.trans import \
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.tools.stat_spec import StatSpec
+from opendp_apps.utils.extra_validators import \
+    (validate_float,
+     validate_fixed_value_against_min_max,
+     validate_missing_val_handlers,
+     validate_min_max,
+     validate_int_greater_than_zero)
 
 enable_features("floating-point", "contrib")
 
@@ -42,22 +48,29 @@ class DPVarianceSpec(StatSpec):
         super().__init__(props)
         self.noise_mechanism = astatic.NOISE_LAPLACE_MECHANISM
 
-    def additional_required_props(self):
-        """
-        Add a list of required properties
-        example: ['min', 'max']
-        """
-        return ['min', 'max', 'cl', ]
+    def get_stat_specific_validators(self):
+        """Set validators used for the DP Mean"""
 
-    def run_01_initial_handling(self):
+        return dict(dataset_size=validate_int_greater_than_zero,
+                    #
+                    min=validate_float,
+                    max=validate_float,
+                    #
+                    missing_values_handling=validate_missing_val_handlers)
+
+    def run_01_initial_transforms(self):
         """
         Make sure values are consistently floats
         """
-        if not self.statistic == self.STATISTIC_TYPE:
-            self.add_err_msg(f'The specified "statistic" is not "{self.STATISTIC_TYPE}". (StatSpec)"')
+        if self.has_error():
+            return
 
-        if self.fixed_value is not None:
-            pass
+        if not self.floatify_int_values(['min', 'max', 'cl']):
+            return
+
+        # validate min/max
+        if not self.validate_multi_values([self.min, self.max], validate_min_max, 'min/max'):
+            return
 
         # Use the "impute_value" for missing values, make sure it's a float!
         #
@@ -65,19 +78,18 @@ class DPVarianceSpec(StatSpec):
             # Convert the impute value to a float!
             if not self.cast_property_to_float('fixed_value'):
                 return
-        self.floatify_int_values()
+
+            if not self.validate_multi_values([self.fixed_value, self.min, self.max],
+                                              validate_fixed_value_against_min_max,
+                                              'Is fixed value within min/max bounds?'):
+                return
 
     def run_03_custom_validation(self):
         """
-        This is a place for initial checking/transformations
-        such as making sure values are floats
-        Example:
-        self.check_numeric_fixed_value()
+        For additional checking after validation
         """
         if self.has_error():
             return
-
-        self.check_numeric_fixed_value()
 
     def check_scale(self, scale, preprocessor, dataset_distance, epsilon):
         """
@@ -85,7 +97,7 @@ class DPVarianceSpec(StatSpec):
         :param scale:
         :param preprocessor:
         :param dataset_distance:
-        # :param epsilon:
+        :param epsilon:
         :return:
         """
         if self.has_error():
@@ -106,15 +118,15 @@ class DPVarianceSpec(StatSpec):
 
         preprocessor = (
             # Selects a column of df, Vec<str>
-                make_select_column(key=self.col_index, TOA=str) >>
-                # Cast the column as Vec<Optional<Float>>
-                make_cast(TIA=str, TOA=float) >>
-                # Impute missing values to 0 Vec<Float>
-                make_impute_constant(self.fixed_value) >>
-                # Clamp age values
-                make_clamp(self.get_bounds()) >>
-                make_bounded_resize(self.dataset_size, self.get_bounds(), self.fixed_value) >>
-                make_sized_bounded_variance(self.dataset_size, self.get_bounds())
+            make_select_column(key=self.col_index, TOA=str) >>
+            # Cast the column as Vec<Optional<Float>>
+            make_cast(TIA=str, TOA=float) >>
+            # Impute missing values to 0 Vec<Float>
+            make_impute_constant(self.fixed_value) >>
+            # Clamp age values
+            make_clamp(self.get_bounds()) >>
+            make_bounded_resize(self.dataset_size, self.get_bounds(), self.fixed_value) >>
+            make_sized_bounded_variance(self.dataset_size, self.get_bounds())
         )
 
         self.scale = binary_search(lambda s: self.check_scale(s, preprocessor, 1, self.epsilon), bounds=(0.0, 100000.0))
@@ -126,7 +138,9 @@ class DPVarianceSpec(StatSpec):
         return preprocessor
 
     def set_accuracy(self):
-        """Return the accuracy measure using Laplace and the confidence level alpha"""
+        """
+        Return the accuracy measure using Laplace and the confidence level alpha
+        """
         if self.has_error():
             return False
 
@@ -142,34 +156,25 @@ class DPVarianceSpec(StatSpec):
         # Note `self.accuracy_val` must bet set before using `self.get_accuracy_text()
         #
         self.accuracy_msg = self.get_accuracy_text()
-        """
-        self.accuracy_msg = (f"Releasing {self.statistic} for the variable {self.variable}."
-                             f" With at least probability {self.get_cl_text()} the output {self.statistic}"
-                             f" will differ from the true {self.statistic} by at"
-                             f" most {self.accuracy_val} units."
-                             f" Here the units are the same units the variable has in the dataset.")
-        """
+
         return True
 
     def run_chain(self, column_names, file_obj, sep_char=","):
         """
         Calculate the DP Variance!
 
-        :param columns. Examples: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
-                - In general using zero-based index of columns is preferred
-        :param file_obj - file like object to read data from
-        :param sep_char - separator from the object, default is "," for a .csv, etc
-
-        :return bool -  False: error messages are available through .get_err_msgs()
-                                or .get_error_msg_dict()
-                        True: results available through .value -- others params through
-                                .get_success_msg_dict()
-
         Example:
         # Note "\t" is for a tabular file
-        `dp_variance
+        `dp_mean_spec.run_chain([0, 1, 2, 3], file_obj, sep_char="\t")`
 
-        _spec.run_chain([0, 1, 2, 3], file_obj, sep_char="\t")`
+        @param column_names: Using a zero-based index of columns is preferred.
+                    Examples: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
+        @param file_obj: file like object to read data from
+        @param sep_char:  separator from the object, default is "," for a .csv, etc
+        @return: bool. if False: error messages are available through .get_err_msgs()
+                                 or .get_error_msg_dict()
+                       if True: results available through .value -- others params through
+                                .get_success_msg_dict()
         """
         if not self.preprocessor:
             assert False, 'Please call is_chain_valid() before using "run_chain()!'

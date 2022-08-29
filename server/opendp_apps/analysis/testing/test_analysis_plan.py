@@ -51,6 +51,7 @@ class AnalysisPlanTest(TestCase):
         self.assertFalse(the_plan.is_complete)
         self.assertEqual(the_plan.user_step,
                          AnalysisPlan.AnalystSteps.STEP_0700_VARIABLES_CONFIRMED)
+
         self.assertEqual(the_plan.variable_info,
                          dataset_info.depositor_setup_info.variable_info)
         self.assertEqual(the_plan.dp_statistics, None)

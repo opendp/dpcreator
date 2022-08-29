@@ -9,7 +9,14 @@ from opendp.typing import *
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.tools.stat_spec import StatSpec
-from opendp_apps.profiler.static_vals import VAR_TYPE_CATEGORICAL
+from opendp_apps.utils.extra_validators import \
+    (validate_not_none,
+     validate_type_categorical,
+     validate_categories_as_string,
+     validate_categories_list_not_empty,
+     validate_missing_val_handlers,
+     validate_histogram_bin_type_one_per_value,
+     validate_fixed_value_in_categories)
 
 enable_features("floating-point", "contrib")
 
@@ -28,72 +35,42 @@ class DPHistogramCategoricalSpec(StatSpec):
         super().__init__(props)
         self.noise_mechanism = astatic.NOISE_GEOMETRIC_MECHANISM
 
-    def additional_required_props(self):
+    def get_stat_specific_validators(self) -> dict:
         """
-        Add a list of required properties
-        example: ['min', 'max']
+        Update self.prop_validators to include validators specific to the subclass
+        @return:
         """
-        return ['categories']
+        return dict(histogram_bin_type=validate_histogram_bin_type_one_per_value,
+                    var_type=validate_type_categorical,
+                    categories=validate_categories_as_string,
+                    missing_values_handling=validate_missing_val_handlers)
 
-    def _add_double_quotes(self, value):
+    def run_01_initial_transforms(self):
         """
-        Categories and values need to be enclosed by double
-        quotes in order to be handled by OpenDP
-        :return:
-        """
-        return f'"{value}"'
 
-    def _remove_double_quotes(self, value):
+        Convert values to strings, where appropriate
         """
-        Categories and values need to be enclosed by double
-        quotes in order to be handled by OpenDP
-        :return:
-        """
-        if len(value) < 2:
+        if self.has_error():
             return
 
-        if value.startswith('"') and value.endswith('"'):
-            value = value[1:-1]
+        # Categorical histograms are always bin type OnePerValue
+        # so allow a default!
+        if not self.histogram_bin_type:
+            self.histogram_bin_type = astatic.HIST_BIN_TYPE_ONE_PER_VALUE
 
-        return value
-
-    def run_01_initial_handling(self):
-        """
-        """
-        if not self.statistic == self.STATISTIC_TYPE:
-            user_msg = f'The specified "statistic" is not "{self.STATISTIC_TYPE}".'
-            self.add_err_msg(user_msg)
+        if not self.validate_property('categories', validate_categories_list_not_empty):
             return
-
-        if not self.var_type == VAR_TYPE_CATEGORICAL:
-            user_msg = (f'The specified variable type ("var_type")'
-                        f' is not "{VAR_TYPE_CATEGORICAL}". ({self.STATISTIC_TYPE})')
-
-            self.add_err_msg(user_msg)
-            return
-
-        # Convert fixed value to string
-        #
-        if self.fixed_value is not None:
-            try:
-                self.fixed_value = self._add_double_quotes(self.fixed_value)
-            except NameError as ex_obj:
-                user_msg = 'Failed to convert fixed_value to string.'
-                self.add_err_msg(user_msg)
-                return
 
         # Stringify categorical values (although they should be already)
         #
         updated_cats = []
-        # The categories may come from the frontend as a single string,
-        # so we need to split them
-        if len(self.categories) == 1:
-            self.categories = self.categories[0].split(',')
+
+        # Iterate through the categories, changing them to strings
         for idx, x in enumerate(self.categories):
             try:
-                # TODO: This should never be reached
                 if not isinstance(x, str):
                     x = str(x)
+                # x = x.strip()  # do this earlier, before data is saved
                 x = self._add_double_quotes(x)
                 updated_cats.append(x)
             except NameError as _ex_obj:
@@ -101,27 +78,38 @@ class DPHistogramCategoricalSpec(StatSpec):
                 self.add_err_msg(user_msg)
                 return
 
-        # remove duplicate categories while preserving order
-        #
-        # self.categories = sorted(set(updated_cats), key=updated_cats.index)
-
         # remove duplicate categories and sort them
         self.categories = sorted(set(updated_cats))
 
+        # If the fixed_value is to be used, make sure it's valid
+        if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
+
+            # Make sure the fixed value isn't None
+            if not self.validate_property('fixed_value', validate_not_none):
+                return
+
+            # Double quote the fixed value and make sure it's a string
+            if not isinstance(self.fixed_value, str):
+                self.fixed_value = str(self.fixed_value)
+
+            self.fixed_value = self._add_double_quotes(self.fixed_value)
+
+            # Is the fixed value one of the categories?
+            if not self.validate_multi_values([self.fixed_value, self.categories],
+                                              validate_fixed_value_in_categories,
+                                              'fixed_value'):
+                return
+
     def run_03_custom_validation(self):
         """
-        This is a place for initial checking/transformations
-        such as making sure values are floats
-        Example:
-        self.check_numeric_fixed_value()
+        No custom validation needed
         """
-        if self.has_error():
-            return
-
-        pass  # Nothing to see here
+        pass
 
     def check_scale(self, scale, preprocessor):
         """
+        TODO: Signature is wrong!!
+        TODO: Why does this make sense?? Domain of int, etc.!!
         Return T/F
         :param scale:
         :param preprocessor:
@@ -191,7 +179,7 @@ class DPHistogramCategoricalSpec(StatSpec):
         """
         Calculate the stats! See "dp_mean_spec.py" for an example of instantiation
 
-        :param columns, Example: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
+        :param column_names, Example: [0, 1, 2, 3] or ['a', 'b', 'c', 'd'] -- depends on your stat!
                 - In general using zero-based index of columns is preferred
         :param file_obj - file like object to read data from
         :param sep_char - separator from the object, default is "," for a .csv, etc
@@ -237,7 +225,11 @@ class DPHistogramCategoricalSpec(StatSpec):
                 self.add_err_msg(f'{ex_obj} (Exception)')
             return False
 
+        # Remove double quotes from the categories as well as fixed value
+        #
         fmt_categories = [self._remove_double_quotes(x) for x in self.categories] + ['uncategorized']
+        if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
+            self.fixed_value = self._remove_double_quotes(self.fixed_value)
 
         # Show warning if category count doesn't match values count
         if len(fmt_categories) > len(self.value):
@@ -262,3 +254,33 @@ class DPHistogramCategoricalSpec(StatSpec):
                      f"\n\nDP Histogram: {self.value}"))
 
         return True
+
+    @staticmethod
+    def _add_double_quotes(value):
+        """
+        Categories and values need to be enclosed by double
+        quotes in order to be handled by OpenDP
+        :return:
+        """
+        # Don't add double quotes if they're already there
+        if value.startswith('"') and value.endswith('"'):
+            return value
+
+        return f'"{value}"'
+
+    @staticmethod
+    def _remove_double_quotes(value):
+        """
+        Remove double quotes after the DP process
+        :return:
+        """
+        if len(value) < 2:
+            return
+
+        # Only remove outermost set of double quotes--may conflict with _add_double_quotes
+        #   if the value is supposed to be double_quoted
+        #
+        if value.startswith('"') and value.endswith('"'):
+            value = value[1:-1]
+
+        return value

@@ -14,6 +14,7 @@ from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.model_helpers.models import TimestampedModelWithUUID
 from opendp_apps.utils.extra_validators import validate_not_negative, validate_epsilon_or_none
+from opendp_apps.utils.variable_info_formatter import format_variable_info
 
 RELEASE_FILE_STORAGE = FileSystemStorage(location=settings.RELEASE_FILE_STORAGE_ROOT)
 
@@ -154,6 +155,10 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
             self.is_complete = True
         else:
             self.is_complete = False
+
+        if self.variable_info:
+            self.variable_info = format_variable_info(self.variable_info)
+
         # Specifically for this model, we are overriding the update method with an explicit list of
         # update_fields, so we need to set the updated field manually.
         # All other models will be updated without this step due to the auto_now option from the parent class.
@@ -434,6 +439,9 @@ class AnalysisPlan(TimestampedModelWithUUID):
             self.is_complete = True
         else:
             self.is_complete = False
+
+        if self.variable_info:
+            self.variable_info = format_variable_info(self.variable_info)
 
         super(AnalysisPlan, self).save(*args, **kwargs)
 
