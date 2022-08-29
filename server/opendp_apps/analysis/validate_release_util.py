@@ -27,6 +27,7 @@ from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
 from opendp_apps.analysis.tools.dp_histogram_categorical_spec import DPHistogramCategoricalSpec
 from opendp_apps.analysis.tools.dp_histogram_int_one_per_value_spec import DPHistogramIntOnePerValueSpec
+from opendp_apps.analysis.tools.histogram_util import get_histogram_stat_spec
 from opendp_apps.analysis.tools.dp_mean_spec import DPMeanSpec
 from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
 from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
@@ -460,6 +461,7 @@ class ValidateReleaseUtil(BasicErrCheck):
             if variable_info:
                 props['variable_info'] = variable_info
                 var_type = variable_info.get('type')
+                props['var_type'] = var_type
             else:
                 props['error_message'] = 'Variable in validation info not found.'
                 self.add_stat_spec(DPSpecError(props))
@@ -482,34 +484,11 @@ class ValidateReleaseUtil(BasicErrCheck):
                 self.add_stat_spec(DPCountSpec(props))
 
             elif statistic in astatic.DP_HISTOGRAM:
-                if var_type == pstatic.VAR_TYPE_CATEGORICAL:
-                    # 4/12/2022 - temp hack to distinguish numeric categories
-                    #   - need updated UI, etc.
-                    #
-                    has_int_cats, _min_max = self.has_integer_categories(props)
-                    if has_int_cats:
-                        # Artificially set the min/max
-                        #
-                        props['variable_info']['type'] = pstatic.VAR_TYPE_INTEGER
-                        props['variable_info']['min'] = _min_max[0]
-                        props['variable_info']['max'] = _min_max[1]
-                        self.add_stat_spec(DPHistogramIntOnePerValueSpec(props))
-                    else:
-                        ye_spec = DPHistogramCategoricalSpec(props)
-                        self.add_stat_spec(DPHistogramCategoricalSpec(props))
-
-                elif var_type == pstatic.VAR_TYPE_INTEGER:
-                    # DP Histogram (Integer)!
-                    self.add_stat_spec(DPHistogramIntOnePerValueSpec(props))
-
-                else:
-                    # DP Histogram - unsupported type
-                    props['error_message'] = (f'Statistic is "{astatic.DP_HISTOGRAM}" but '
-                                              f' variable type is unsupported: "{var_type}"')
-                    self.add_stat_spec(DPSpecError(props))
-                    logger.error(f'ValidateReleaseUtil.build_stat_specs: Statistic is "{astatic.DP_HISTOGRAM}" but '
-                                 f'variable type is unsupported: "{var_type}"')
-                    continue  # to the next dp_stat specification
+                # DP Histogram
+                # - Use function from HistogramUtil to determine correct StatSpec
+                #
+                hist_stat_spec = get_histogram_stat_spec(props)
+                self.add_stat_spec(hist_stat_spec)
 
             elif statistic == astatic.DP_MEAN:
                 # DP Mean!
@@ -534,37 +513,6 @@ class ValidateReleaseUtil(BasicErrCheck):
                               ' here, unknown stats are captured up above'))
                 # Shouldn't reach here, unknown stats are captured up above
                 pass
-
-    @staticmethod
-    def has_integer_categories(props: dict):
-        """
-        # 4/12/2022 - temporary hack for histograms
-        Check if the props['variable_info']['categories'] list consists of continuous integers
-
-        False: return False, None
-        True:  return True, (min, max)
-        """
-        if not props:
-            return False, None
-
-        # Are there categories?
-        if ('variable_info' in props) and ('categories' in props['variable_info']):
-
-            # Get the categories
-            cats = copy.deepcopy(props['variable_info']['categories'])
-
-            # Are all the values integers?
-            all_int_check = [isinstance(x, int) for x in cats]
-
-            # Nope, return
-            if False in all_int_check:
-                return False, None
-
-            # All integers, are they continuous?
-            if sorted(cats) == list(range(min(cats), max(cats) + 1)):
-                return True, (min(cats), max(cats))
-
-        return False, None
 
     def run_preliminary_steps(self):
         """Run preliminary steps before validation"""

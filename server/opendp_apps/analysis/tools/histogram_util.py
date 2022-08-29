@@ -1,6 +1,7 @@
 """
 Return the correct Histogram StatSpec depending on the input properties
 """
+import copy
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.tools.dp_histogram_categorical_spec import DPHistogramCategoricalSpec
@@ -26,12 +27,27 @@ def get_histogram_stat_spec(props: dict) -> StatSpec:
     @return: StatSpec of the correct Histogram type
     """
     var_type = props.get('var_type')
+
     histogram_bin_type = props.get('histogram_bin_type')
 
     # Categorical
     if var_type == pstatic.VAR_TYPE_CATEGORICAL:
-        # Can only have bin type OnePerValue
-        return DPHistogramCategoricalSpec(props)
+        # Technically, can only have bin type OnePerValue
+        # 4/12/2022 - temp hack to distinguish numeric categories
+        #   - need updated UI, etc.
+        #
+        has_int_cats, _min_max = has_integer_categories(props)
+        if has_int_cats:
+            # Artificially set the min/max
+            #
+            props['variable_info']['type'] = pstatic.VAR_TYPE_INTEGER
+            props['variable_info']['min'] = _min_max[0]
+            props['variable_info']['max'] = _min_max[1]
+            return DPHistogramIntOnePerValueSpec(props)
+        else:
+            # Can only have bin type OnePerValue
+            return DPHistogramCategoricalSpec(props)
+
     elif var_type == pstatic.VAR_TYPE_INTEGER:
         # OnePerValue
         if histogram_bin_type == astatic.HIST_BIN_TYPE_ONE_PER_VALUE:
@@ -52,12 +68,45 @@ def get_histogram_stat_spec(props: dict) -> StatSpec:
 
     elif var_type == pstatic.VAR_TYPE_FLOAT:
         # Float
-        assert False, 'Histograms for Floats not available'
+        assert False, 'Histograms are not available for Floats.'
 
     else:
         # Unknown bin type
         props['error_message'] = f'Unknown variable type: "{var_type}"'
         return DPSpecError(props)
+
+
+def has_integer_categories(props: dict):
+    """
+    4/12/2022 - temporary hack for histograms
+    Check if the props['variable_info']['categories'] list consists of continuous integers
+
+    @param props: dict
+    @return: tuple
+        if False: (False, None)
+        if True: (True, (min, max))
+    """
+    if not props:
+        return False, None
+
+    # Are there categories?
+    if ('variable_info' in props) and ('categories' in props['variable_info']):
+
+        # Get the categories
+        cats = copy.deepcopy(props['variable_info']['categories'])
+
+        # Are all the values integers?
+        all_int_check = [isinstance(x, int) for x in cats]
+
+        # Nope, return
+        if False in all_int_check:
+            return False, None
+
+        # All integers, are they continuous?
+        if sorted(cats) == list(range(min(cats), max(cats) + 1)):
+            return True, (min(cats), max(cats))
+
+    return False, None
 
 
 '''

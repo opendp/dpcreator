@@ -68,7 +68,6 @@ class StatSpec:
         self.max = self.variable_info.get('max')  # optional: depends on variable type/stat
         self.categories = self.variable_info.get('categories')  # optional: depends on variable type/stat
 
-
         # (3) Usage depends on the statistic
         #
         self.dataset_size = props.get('dataset_size')  # dataset size
