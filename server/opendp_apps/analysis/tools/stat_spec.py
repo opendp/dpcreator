@@ -291,7 +291,8 @@ class StatSpec:
                 self.add_err_msg(f'{ex_obj} (Exception)')
             return False
 
-        # Important, even if an exception wasn't thrown, an error may have been found
+        # Important, even if an exception wasn't thrown,
+        # an error may have been found earlier
         if self.has_error():
             return False
 

@@ -66,6 +66,10 @@ VALID_DP_STATS_CHOICES_STR = ', '.join(DP_STATS_CHOICES)
 # --------------------------------------
 # Histogram bin types
 # --------------------------------------
+KEY_HIST_BIN_TYPE = 'histogram_bin_type'
+KEY_HIST_NUMBER_OF_BINS = 'histogram_number_of_bins'
+KEY_HIST_BIN_EDGES = 'histogram_bin_edges'
+
 HIST_BIN_TYPE_ONE_PER_VALUE = 'onePerValue'
 HIST_BIN_TYPE_EQUAL_RANGES = 'equalRanges'
 HIST_BIN_TYPE_BIN_EDGES = 'binEdges'

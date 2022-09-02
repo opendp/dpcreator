@@ -2,11 +2,16 @@ import logging
 
 from django.conf import settings
 from opendp.accuracy import laplacian_scale_to_accuracy
-from opendp.meas import *
+from opendp.meas import make_base_geometric
 from opendp.mod import enable_features, binary_search_param, OpenDPException
-from opendp.trans import *
-from opendp.typing import *
-
+from opendp.typing import AllDomain, L1Distance, VectorDomain
+from opendp.trans import \
+    (make_cast,
+     make_count_by_categories,
+     make_impute_constant,
+     make_clamp,
+     make_split_dataframe,
+     make_select_column)
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.utils.extra_validators import \
@@ -99,10 +104,11 @@ class DPHistogramIntOnePerValueSpec(StatSpec):
         :param preprocessor:
         :return:
         """
-        if self.has_error():
-            return
+        return
+        #if self.has_error():
+        #    return
 
-        return preprocessor >> make_base_geometric(scale, D=VectorDomain[AllDomain[int]])
+        #return preprocessor >> make_base_geometric(scale, D=VectorDomain[AllDomain[int]])
 
     def get_preprocessor(self):
         """
@@ -120,15 +126,25 @@ class DPHistogramIntOnePerValueSpec(StatSpec):
             return self.preprocessor
 
         preprocessor = (
-                make_select_column(key=self.col_index, TOA=str) >>
-                make_cast(TIA=str, TOA=int) >>
-                make_impute_constant(self.fixed_value) >>
-                make_count_by_categories(categories=self.categories, MO=L1Distance[int], TIA=int)
+            make_select_column(key=self.col_index, TOA=str) >>
+            make_cast(TIA=str, TOA=int) >>
+            make_impute_constant(self.fixed_value) >>
+            make_count_by_categories(categories=self.categories,
+                                     MO=L1Distance[int], TIA=int)
         )
 
+        def check_scale(ye_scale, the_preprocessor):
+            return the_preprocessor >> make_base_geometric(
+                                        ye_scale,
+                                        D=VectorDomain[AllDomain[int]])
+
         self.scale = binary_search_param(
-            lambda s: self.check_scale(s, preprocessor), d_in=1, d_out=self.epsilon)
-        preprocessor = preprocessor >> make_base_geometric(scale=self.scale, D=VectorDomain[AllDomain[int]])
+                        lambda s: check_scale(s, preprocessor),
+                        d_in=1,
+                        d_out=self.epsilon)
+
+        preprocessor = check_scale(self.scale, preprocessor)
+        # preprocessor = preprocessor >> make_base_geometric(scale=self.scale, D=VectorDomain[AllDomain[int]])
 
         # keep a pointer to the preprocessor in case it's re-used
         self.preprocessor = preprocessor
