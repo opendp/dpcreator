@@ -308,6 +308,7 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         print(noisy_histogram_from_dataframe(data))
         print(noisy_histogram_from_dataframe(data))
 
+    @unittest.skip('not ready')
     def test_150_run_dphist_bins(self):
         """(150) Hist with bins"""
         msgt(self.test_150_run_dphist_bins.__doc__)
