@@ -23,6 +23,7 @@ from rest_framework import routers
 
 from opendp_apps.analysis.views.analysis_plan_view import AnalysisPlanViewSet
 from opendp_apps.analysis.views.release_view import ReleaseView, ReleaseFileDownloadView
+from opendp_apps.analysis.views.stat_helper_view import StatHelperView
 from opendp_apps.analysis.views.validation_view import ValidationView
 from opendp_apps.banner_messages.views import BannerMessageViewSet
 from opendp_apps.content_pages.view_vue_settings import VueSettingsView
@@ -61,6 +62,8 @@ router.register(r'profile', ProfilingViewSet, basename='profile')
 router.register(r'registered-dvs', RegisteredDataverseView, basename='registered-dvs')
 router.register(r'release', ReleaseView, basename='release')
 router.register(r'release-download', ReleaseFileDownloadView, basename='release-download')
+
+router.register(r'stat-helper', StatHelperView, basename='stat-helper')
 
 router.register(r'vue-settings', VueSettingsView, basename='vue-settings')
 

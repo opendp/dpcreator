@@ -1,7 +1,6 @@
 import logging
 from typing import Union
 
-import numpy as np
 from django.conf import settings
 from opendp.accuracy import laplacian_scale_to_accuracy
 from opendp.meas import make_base_discrete_laplace
@@ -16,15 +15,11 @@ from opendp.trans import \
      make_split_dataframe)
 from opendp.typing import VectorDomain, AllDomain, usize
 
-"""
-
-"""
-
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.analysis.tools.bin_edge_helper import BinEdgeHelper
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.utils.extra_validators import \
-    (validate_edge_count_two_or_greater,
-     validate_fixed_value_against_min_max,
+    (validate_fixed_value_against_min_max,
      validate_histogram_bin_type_equal_ranges,
      validate_int,
      validate_int_two_or_greater,
@@ -102,26 +97,13 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
                     'fixed value within min/max bounds'):
                 return
 
-        init_edges = np.linspace(self.min,
-                                 self.max,
-                                 self.histogram_number_of_bins).round().astype(int)
-
-        # Add "1" to the last edge, e.g. make the last edge inclusive of the max
-        # Example: [1, 26, 50, 75, 100] -> [1, 26, 50, 75, 101]; e.g. 100 -> 101
-        #
-        init_edges[-1] = init_edges[-1] + 1
-        self.histogram_bin_edges = [int(x) for x in init_edges]
-
-        self.validate_property('histogram_bin_edges', validate_edge_count_two_or_greater)
-        if self.has_error():
+        beh = BinEdgeHelper(self.min, self.max, self.histogram_number_of_bins)
+        if beh.has_error():
+            self.add_err_msg(beh.get_err_msg())
             return
 
-        print('get_bins_for_display', self.get_bins_for_display())
-        """
-        // Equivalent javascript for the front end
-        let linspace = (l, u, n) = > Array(n + 1).fill().map((_, i) = > l + i * (u - l) / n);
-        linspace(8, 82, 6).map(Math.round)
-        """
+        self.histogram_bin_edges = beh.bin_edges
+        self.categories = beh.buckets
 
     def run_03_custom_validation(self):
         """
@@ -159,7 +141,6 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
             return self.preprocessor
 
         categories_list = self.get_pseudo_categories_list()
-        print('categories_list', categories_list)
 
         # Note: earlier validation checks that "self.histogram_number_of_bins" is > 2
         num_bin_edges = len(self.histogram_bin_edges)
@@ -187,10 +168,8 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
             d_in=1,
             d_out=self.epsilon)
 
-        print('self.scale', self.scale)
         preprocessor = make_histogram(self.scale)
 
-        print('-- preprocessor 6')
         # keep a pointer to the preprocessor in case it's re-used
         self.preprocessor = preprocessor
         return preprocessor
@@ -215,28 +194,19 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
         self.accuracy_msg = self.get_accuracy_text(template_name='analysis/dp_histogram_accuracy_default.txt')
         return True
 
-        print('set_accuracy 1')
         if not self.preprocessor:
             self.preprocessor = self.get_preprocessor()
-
-        print('set_accuracy 2')
 
         # This is for histograms, so divide alpha by the number of counts
         # we just need the length, using the number of bin edges
         categories_list = self.get_pseudo_categories_list()
-
-        print('set_accuracy 3')
 
         cl_alpha = self.get_confidence_level_alpha() / len(categories_list)
         if cl_alpha is None:
             # Error already saved
             return False
 
-        print('set_accuracy 4')
-
         self.accuracy_val = laplacian_scale_to_accuracy(self.scale, cl_alpha)
-
-        print('set_accuracy 5')
 
         # Note `self.accuracy_val` must bet set before using `self.get_accuracy_text()
         self.accuracy_msg = self.get_accuracy_text(template_name='analysis/dp_histogram_accuracy_default.txt')
@@ -296,12 +266,9 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
         print('self.histogram_bin_edges', self.histogram_bin_edges)
         print('self.value', self.value)
 
-        fmt_categories = self.get_bins_for_display()
-        self.categories = fmt_categories
-
         # Show warning if category count doesn't match values count
-        if len(fmt_categories) > len(self.value):
-            user_msg = (f'Warning. There are more categories (n={len(fmt_categories)})'
+        if len(self.categories) > len(self.value):
+            user_msg = (f'Warning. There are more categories (n={len(self.categories)})'
                         f' than values (n={len(self.value)})')
             self.add_err_msg(user_msg)
 
@@ -310,9 +277,9 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
             logger.warning(f'Values (n={len(self.value)}): {self.value}')
             return
 
-        self.value = dict(categories=fmt_categories,
+        self.value = dict(categories=self.categories,
                           values=self.value,
-                          category_value_pairs=list(zip(fmt_categories, self.value)))
+                          category_value_pairs=list(zip(self.categories, self.value)))
 
         logger.info((f"Epsilon: {self.epsilon}"
                      f"\nColumn name: {self.variable}"
@@ -322,26 +289,3 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
                      f"\n\nDP Histogram: {self.value}"))
 
         return True
-
-    def get_bins_for_display(self) -> list:
-        """
-        Convert bin edges to bins for display
-        Example:
-         in: (1, 25, 50, 75, 101]   # Last number is, 101, is to include max in the last range
-         out: ["[1, 25)", "[26, 50)", "[51, 75)", "[76, 101)", "unknown"]  # Last number is, 101, to include max in the last range
-        @return: list
-        """
-        fmt_edges = []
-        last_edge = None
-        cnt = 0
-        for edge in self.histogram_bin_edges:
-            cnt += 1
-            if cnt > 1:
-                if cnt > 2:
-                    last_edge += 1
-                fmt_edges.append(f'[{last_edge}, {edge})')
-            last_edge = edge
-
-        fmt_edges.append('uncategorized')
-
-        return fmt_edges

@@ -64,7 +64,7 @@ def validate_not_negative(value):
 
 
 def validate_edge_count_two_or_greater(value: list):
-    """Validate that the length of the list of edges is at least 2"""
+    """Validate that the lenvalidate_min_maxgth of the list of edges is at least 2"""
     if not isinstance(value, list):
         raise ValidationError(VALIDATE_MSG_EDGES_NOT_A_LIST)
 
@@ -159,9 +159,10 @@ def validate_float(value):
 
 
 def validate_int(value):
-    """Make sure the value is a float"""
+    """Make sure the value is an int or can be converted to an int"""
     try:
-        int(value)
+        if not int(value) == float(value):
+            raise ValidationError(VALIDATE_MSG_NOT_INT)
     except ValueError:
         raise ValidationError(VALIDATE_MSG_NOT_INT)
     except TypeError:
@@ -171,7 +172,7 @@ def validate_int(value):
 def validate_is_numeric(value: Union[int, float]):
     """Check that the value is an integer or float"""
     validate_float(value)
-    validate_int(value)
+    # validate_int(value)
 
 
 def validate_type_numeric(value: str):
@@ -311,5 +312,5 @@ def validate_num_bins_against_min_max(histogram_number_of_bins: int, min_int: in
 
     if histogram_number_of_bins > potential_num_values:
         user_msg = (f'There are more bins than values.'
-                    f' (hist_number_of_bins: {histogram_number_of_bins}) (# values: {potential_num_values})')
+                    f' (hist_number_of_bins: {histogram_number_of_bins}) (value count: {potential_num_values})')
         raise ValidationError(user_msg)
