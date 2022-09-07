@@ -24,7 +24,7 @@ VALIDATE_MSG_FIXED_VAL_NOT_IN_CATEGORIES = 'The fixed value is not one of the sp
 
 VALIDATE_MSG_TWO_EDGES_MINIMUM = 'At least two edges are needed to create the histogram.'
 VALIDATE_MSG_EDGES_NOT_A_LIST = 'The "edges" are not a list'
-
+VALIDATE_MSG_MORE_BINS_THAN_VALUES = 'There are more bins than values.'
 
 def validate_statistic(value):
     """Statistic currently supported"""
@@ -311,6 +311,6 @@ def validate_num_bins_against_min_max(histogram_number_of_bins: int, min_int: in
     potential_num_values = max_int - min_int
 
     if histogram_number_of_bins > potential_num_values:
-        user_msg = (f'There are more bins than values.'
+        user_msg = (f'{VALIDATE_MSG_MORE_BINS_THAN_VALUES}'
                     f' (hist_number_of_bins: {histogram_number_of_bins}) (value count: {potential_num_values})')
         raise ValidationError(user_msg)
