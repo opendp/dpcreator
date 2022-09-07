@@ -80,7 +80,7 @@
           <v-radio-group
               v-model="editedItemDialog.histogramBinType"
           >
-            <v-container class="grey lighten-5">
+            <v-container>
               <v-row>
                 <v-col>
                   <v-radio v-if="this.variableInfo[this.editedItemDialog.variable]
@@ -89,6 +89,8 @@
                            :label="histogramOptions[ONE_BIN_PER_VALUE]"
                            :value="ONE_BIN_PER_VALUE"
                            :data-test="ONE_BIN_PER_VALUE"
+                           @click="editedItemDialog.histogramNumberOfBins=null;equalBinBuckets='';editedItemDialog.histogramBinEdges=[]"
+
                   ></v-radio>
                 </v-col>
               </v-row>
@@ -104,22 +106,25 @@
                 </v-col>
               </v-row>
               <v-expand-transition>
-                <v-row v-show="editedItemDialog.histogramBinType == EQUAL_BIN_RANGES">
-                  <v-col>
+                <div>
+                  <v-row v-show="editedItemDialog.histogramBinType == EQUAL_BIN_RANGES">
+                    <v-col>
 
-                    <v-text-field
-                        label="Enter number of bins within bounds"
-                        v-model="editedItemDialog.histogramNumberOfBins"
-                        background-color="soft_primary"
-                        class="top-borders-radius  width80"
-                        data-test="histogramNumberOfBins"
-                        :rules="[validateNumBins]"
-                    ></v-text-field>
+                      <v-text-field
+                          label="Enter number of bins within bounds"
+                          v-model="editedItemDialog.histogramNumberOfBins"
+                          background-color="soft_primary"
+                          class="top-borders-radius  width50"
+                          data-test="histogramNumberOfBins"
+                          :rules="[validateNumBins]"
+                          @keyup="binEdgeBuckets"
+                      ></v-text-field>
+                      {{ equalBinBuckets }}
 
+                    </v-col>
 
-                  </v-col>
-
-                </v-row>
+                  </v-row>
+                </div>
               </v-expand-transition>
               <v-row>
                 <v-col>
@@ -128,7 +133,7 @@
                       :label="histogramOptions[BIN_EDGES]"
                       :value="BIN_EDGES"
                       :data-test="BIN_EDGES"
-                      @click="editedItemDialog.histogramNumberOfBins=null"
+                      @click="editedItemDialog.histogramNumberOfBins=null;equalBinBuckets=''"
                   ></v-radio>
                 </v-col>
               </v-row>
@@ -277,7 +282,7 @@ import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderA
 import {mapGetters, mapState} from "vuex";
 import createStatsUtils from "@/shared/createStatsUtils";
 import histogramOptions from "@/shared/histogramOptions";
-
+import analysis from "@/api/analysis";
 
 const {
   ONE_BIN_PER_VALUE,
@@ -386,6 +391,7 @@ export default {
     edgesInput: "",
     validationError: false,
     validationErrorMsg: null,
+    equalBinBuckets: "",
     editedItemDialog: {
       statistic: "",
       label: "",
@@ -414,6 +420,23 @@ export default {
     histogramOptions
   }),
   methods: {
+    binEdgeBuckets() {
+      console.log('bin edge buckets!, numberOfBins: ' + this.editedItemDialog.histogramNumberOfBins)
+      if (this.editedItemDialog.statistic == 'histogram'
+          && this.editedItemDialog.histogramBinType === EQUAL_BIN_RANGES
+          && this.editedItemDialog.histogramNumberOfBins
+          && this.isNumBinsValid(this.editedItemDialog.histogramNumberOfBins)
+      ) {
+        return analysis.getHistogramBuckets(this.variableInfo[this.editedItemDialog.variable].min,
+            this.variableInfo[this.editedItemDialog.variable].max,
+            this.editedItemDialog.histogramNumberOfBins).then((resp) => {
+
+          this.equalBinBuckets = "Equal Range Bins: " + resp.data.buckets.toString()
+        })
+      } else {
+        this.equalBinBuckets = ""
+      }
+    },
     isButtonDisabled: function () {
       let disabled = false
       let validHistogramOption = false
