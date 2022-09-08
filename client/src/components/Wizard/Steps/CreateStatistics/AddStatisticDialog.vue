@@ -89,7 +89,7 @@
                            :label="histogramOptions[ONE_BIN_PER_VALUE]"
                            :value="ONE_BIN_PER_VALUE"
                            :data-test="ONE_BIN_PER_VALUE"
-                           @click="editedItemDialog.histogramNumberOfBins=null;equalBinBuckets='';editedItemDialog.histogramBinEdges=[]"
+                           @click="editedItemDialog.histogramNumberOfBins=null;editedItemDialog.histogramBuckets='';editedItemDialog.histogramBinEdges=[]"
 
                   ></v-radio>
                 </v-col>
@@ -119,7 +119,9 @@
                           :rules="[validateNumBins]"
                           @keyup="binEdgeBuckets"
                       ></v-text-field>
-                      {{ equalBinBuckets }}
+                      <div v-if="editedItemDialog.histogramNumberOfBins">
+                        Equal range bins: {{ editedItemDialog.histogramBuckets }}
+                      </div>
 
                     </v-col>
 
@@ -133,7 +135,7 @@
                       :label="histogramOptions[BIN_EDGES]"
                       :value="BIN_EDGES"
                       :data-test="BIN_EDGES"
-                      @click="editedItemDialog.histogramNumberOfBins=null;equalBinBuckets=''"
+                      @click="editedItemDialog.histogramNumberOfBins=null;editedItemDialog.histogramBuckets=''"
                   ></v-radio>
                 </v-col>
               </v-row>
@@ -391,7 +393,6 @@ export default {
     edgesInput: "",
     validationError: false,
     validationErrorMsg: null,
-    equalBinBuckets: "",
     editedItemDialog: {
       statistic: "",
       label: "",
@@ -403,6 +404,7 @@ export default {
       histogramBinType: "",
       histogramNumberOfBins: null,
       histogramBinEdges: [],
+      histogramBuckets: "",
       handleAsFixed: true,
       fixedValue: "",
       locked: false,
@@ -421,7 +423,6 @@ export default {
   }),
   methods: {
     binEdgeBuckets() {
-      console.log('bin edge buckets!, numberOfBins: ' + this.editedItemDialog.histogramNumberOfBins)
       if (this.editedItemDialog.statistic == 'histogram'
           && this.editedItemDialog.histogramBinType === EQUAL_BIN_RANGES
           && this.editedItemDialog.histogramNumberOfBins
@@ -431,10 +432,10 @@ export default {
             this.variableInfo[this.editedItemDialog.variable].max,
             this.editedItemDialog.histogramNumberOfBins).then((resp) => {
 
-          this.equalBinBuckets = "Equal Range Bins: " + resp.data.buckets.toString()
+          this.editedItemDialog.histogramBuckets = resp.data.buckets.toString()
         })
       } else {
-        this.equalBinBuckets = ""
+        this.editedItemDialog.histogramBuckets = ""
       }
     },
     isButtonDisabled: function () {
@@ -460,7 +461,6 @@ export default {
       ) {
         disabled = true
       }
-      console.log('returning  disabled: ' + disabled)
       return disabled
     },
     removeEdgeFromList(edge) {

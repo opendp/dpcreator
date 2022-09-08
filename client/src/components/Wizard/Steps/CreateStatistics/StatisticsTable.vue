@@ -215,7 +215,7 @@ export default {
         if (item.histogramBinType === BIN_EDGES) {
           text += '.  <b>Bin edges: </b> ' + item.histogramBinEdges
         } else if (item.histogramBinType === EQUAL_BIN_RANGES) {
-          text += '. <b>Number of bins: </b>' + item.histogramNumberOfBins
+          text += '. <b>Number of bins: </b>' + item.histogramNumberOfBins + '. <b>Buckets:</b> ' + item.histogramBuckets
         }
       }
       return text
