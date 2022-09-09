@@ -11,13 +11,11 @@
 
         })
         it('Saves Histogram Options Correctly', () => {
-            const mockDVfile = 'EyeDemoMockDV.json'
             const demoDatafile = 'EyeDemoStatsTest.json'
-            cy.createMockDataset(mockDVfile)
+            let testfile = 'cypress/fixtures/Fatigue_data.csv'
+            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
+            cy.uploadFile(testfile)
             cy.fixture(demoDatafile).then((demoData) => {
-                cy.url().should('contain', 'welcome')
-                cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
-                    demoData['datasetName'])
                 cy.goToConfirmVariables(demoData.variables)
                 // select the variables we will use
                 cy.selectVariable(demoData.variables)
@@ -47,13 +45,11 @@
         })
 
         it('Updated dpStatistics Correctly', () => {
-            const mockDVfile = 'EyeDemoMockDV.json'
             const demoDatafile = 'EyeDemoStatsTest.json'
-            cy.createMockDataset(mockDVfile)
+            let testfile = 'cypress/fixtures/Fatigue_data.csv'
+            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
+            cy.uploadFile(testfile)
             cy.fixture(demoDatafile).then((demoData) => {
-                cy.url().should('contain', 'welcome')
-                cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
-                    demoData['datasetName'])
                 cy.goToConfirmVariables(demoData.variables)
                 // select the variables we will use
                 cy.selectVariable(demoData.variables)
@@ -62,17 +58,16 @@
                 // Add all the statistics in the Create Statistics Step
                 cy.createStatistics(demoData)
             })
+            cy.pause()
         })
 
         it('Displays Fixed Value Input Correctly', () => {
-            const mockDVfile = 'EyeDemoMockDV.json'
             const demoDatafile = 'EyeDemoStatsTest.json'
 
-            cy.createMockDataset(mockDVfile)
+            let testfile = 'cypress/fixtures/Fatigue_data.csv'
+            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
+            cy.uploadFile(testfile)
             cy.fixture(demoDatafile).then((demoData) => {
-                cy.url().should('contain', 'welcome')
-                cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
-                    demoData['datasetName'])
                 cy.goToConfirmVariables(demoData.variables)
                 // select the variables we will use
                 let variables = {
@@ -124,14 +119,12 @@
         })
 
         it('Validates fixed value max-min', () => {
-            const mockDVfile = 'EyeDemoMockDV.json'
             const demoDatafile = 'EyeDemoStatsTest.json'
 
-            cy.createMockDataset(mockDVfile)
+            let testfile = 'cypress/fixtures/Fatigue_data.csv'
+            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
+            cy.uploadFile(testfile)
             cy.fixture(demoDatafile).then((demoData) => {
-                cy.url().should('contain', 'welcome')
-                cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
-                    demoData['datasetName'])
                 cy.goToConfirmVariables(demoData.variables)
                 // select the variables we will use
                 let variables = {
@@ -167,14 +160,12 @@
         })
 
         it('Validates Correctly after epsilon changes', () => {
-            const mockDVfile = 'EyeDemoMockDV.json'
             const demoDatafile = 'EyeDemoStatsTest.json'
 
-            cy.createMockDataset(mockDVfile)
+            let testfile = 'cypress/fixtures/Fatigue_data.csv'
+            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
+            cy.uploadFile(testfile)
             cy.fixture(demoDatafile).then((demoData) => {
-                cy.url().should('contain', 'welcome')
-                cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
-                    demoData['datasetName'])
                 cy.goToConfirmVariables(demoData.variables)
                 // select the variables we will use
                 cy.selectVariable(demoData.variables)
@@ -222,14 +213,12 @@
         })
 
         it('Displays correct precision', () => {
-            const mockDVfile = 'EyeDemoMockDV.json'
             const demoDatafile = 'EyeDemoData.json'
 
-            cy.createMockDataset(mockDVfile)
+            let testfile = 'cypress/fixtures/Fatigue_data.csv'
+            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
+            cy.uploadFile(testfile)
             cy.fixture(demoDatafile).then((demoData) => {
-                cy.url().should('contain', 'welcome')
-                cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
-                    demoData['datasetName'])
                 cy.goToConfirmVariables(demoData.variables)
                 // select the variables we will use
                 cy.selectVariable(demoData.variables)
@@ -241,14 +230,12 @@
             })
         })
         it('Goes back to the Confirm Variables Page', () => {
-            const mockDVfile = 'EyeDemoMockDV.json'
             const demoDatafile = 'EyeDemoData.json'
 
-            cy.createMockDataset(mockDVfile)
+            let testfile = 'cypress/fixtures/Fatigue_data.csv'
+            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
+            cy.uploadFile(testfile)
             cy.fixture(demoDatafile).then((demoData) => {
-                cy.url().should('contain', 'welcome')
-                cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
-                    demoData['datasetName'])
                 cy.goToConfirmVariables(demoData.variables)
                 // select the variables we will use
                 cy.selectVariable(demoData.variables)

@@ -50,13 +50,16 @@ Cypress.Commands.add('epsilonStep', () => {
     cy.get('[data-test="Public Observations - yes"]').check({force: true})
 
 })
+import path from 'path';
+
 Cypress.Commands.add('uploadFile', (testfile) => {
     cy.get('[data-test="My Data"]').click();
     cy.url().should('contains', 'my-data')
     cy.get('[data-test="myDataUploadButton"]').click();
     cy.get('[data-test="fileInput"]').selectFile(testfile, {force: true})
+    const filename = path.basename(testfile)
     cy.get('tr').should('contain',
-        'PUMS5extract1000.csv')
+        filename)
     cy.get('tr').should('contain',
         'Uploaded')
 })
@@ -138,7 +141,7 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
     // click on the start Process button on the welcome page,
     // to navigate to the Validate Dataset step of the Wizard
 
-    cy.get('[data-test="Start Process"]').click();
+    cy.get('[data-test="continueWorkflow"]').click();
     cy.url().should('contain', 'wizard')
     cy.get('[data-test="radioPrivateInformationYes"]').check({force: true})
     cy.get('[data-test="notHarmButConfidential"]').check({force: true})
