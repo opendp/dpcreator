@@ -11,7 +11,7 @@
       >mdi-close
       </v-icon
       >
-      <v-card-title>
+      <v-card-title data-test="editNoiseDialog">
         <h2 class="title-size-2 mb-5">
           Please confirm the epsilon (&epsilon;) and delta (&delta;) values.
         </h2>
@@ -168,7 +168,7 @@ export default {
       if (this) {
         let lockedEpsilon = 0
         let unlockedCount = 0
-        if (this.analysisPlan.dpStatistics) {
+        if (this.analysisPlan && this.analysisPlan.dpStatistics) {
           this.analysisPlan.dpStatistics.forEach(stat => {
             if (stat.locked) {
               lockedEpsilon += stat.epsilon

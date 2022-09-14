@@ -10,7 +10,7 @@
       >mdi-close
       </v-icon
       >
-      <v-card-title>
+      <v-card-title data-test="editNoiseConfirm">
         <h2 class="title-size-2 mb-5">Are you sure you want to proceed?</h2>
       </v-card-title>
 

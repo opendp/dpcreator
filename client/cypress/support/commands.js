@@ -196,9 +196,11 @@ Cypress.Commands.add('createStatistics', (demoData) => {
     // On the statistics page, test edit statistics Params
     cy.get('h1').should('contain', 'Create Statistics').should('be.visible')
     cy.get('[data-test="editConfidenceIcon"]').click({force: true});
-    cy.get('h2').should('contain', 'Are you sure you want to proceed?').should('be.visible')
+    cy.get('[data-test="editNoiseConfirm"]').should('be.visible')
+    cy.get('[data-test="confirmButton"]').should('be.visible')
     cy.get('[data-test="confirmButton"]').click({force: true});
-
+    cy.get('[data-test="editNoiseDialog"]').should('be.visible')
+    cy.get('[data-test="editEpsilonInput"]').should('be.visible')
     cy.get('[data-test="editEpsilonInput"]').should('have.value', 1)
     cy.get('[data-test="editParamsCancel"]').click({force: true});
 

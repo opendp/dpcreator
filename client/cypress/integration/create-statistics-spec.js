@@ -10,6 +10,57 @@
             cy.clearData()
 
         })
+        it('Validates Correctly after epsilon changes', () => {
+            const demoDatafile = 'EyeDemoStatsTest.json'
+
+            let testfile = 'cypress/fixtures/Fatigue_data.csv'
+            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
+            cy.uploadFile(testfile)
+            cy.fixture(demoDatafile).then((demoData) => {
+                cy.goToConfirmVariables(demoData.variables)
+                // select the variables we will use
+                cy.selectVariable(demoData.variables)
+
+                // Continue to Set Epsilon Step
+                cy.epsilonStep()
+                const statsData = {
+                    "datasetName": "Eye-typing experiment",
+                    "statistics": [
+                        {
+                            "statistic": "Mean",
+                            "variable": "Trial",
+                            "fixedValue": "3",
+                            "roundedAccuracy": "0.164"
+                        }
+                    ]
+                }
+                const newAccuracy = "1.64"
+                cy.createStatistics(statsData)
+                cy.get('tr').first().get('td').should('contain', statsData.statistics[0].statistic)
+                cy.get('table').contains('td', statsData.statistics[0].statistic).should('be.visible');
+
+                const epsilonInput = '[data-test="editEpsilonInput"]'
+                cy.get('[data-test=editConfidenceIcon]').click();
+                cy.get('[data-test="confirmButton"] > .v-btn__content').click();
+                cy.get('[data-test=editEpsilonInput]').click();
+                cy.get('[data-test=editEpsilonInput]').clear()
+                cy.get('[data-test=editEpsilonInput]').type('.1');
+                cy.get('[data-test=editParamsSave]').click();
+                cy.get('table').contains('td', newAccuracy).should('be.visible')
+                cy.get('tr').first().get('td').should('contain', statsData.statistics[0].statistic)
+                cy.get('table').contains('td', statsData.statistics[0].statistic).should('be.visible');
+
+                cy.get('[data-test=editConfidenceIcon]').click();
+                cy.get('[data-test="confirmButton"] > .v-btn__content').click();
+                cy.get('[data-test=editEpsilonInput]').click();
+                cy.get('[data-test=editEpsilonInput]').clear()
+                cy.get('[data-test=editEpsilonInput]').type('1');
+                cy.get('[data-test=editParamsSave]').click();
+                cy.get('table').contains('td', statsData.statistics[0].roundedAccuracy).should('be.visible')
+
+            })
+        })
+
         it('Saves Histogram Options Correctly', () => {
             const demoDatafile = 'EyeDemoStatsTest.json'
             let testfile = 'cypress/fixtures/Fatigue_data.csv'
@@ -159,58 +210,6 @@
             })
         })
 
-        it('Validates Correctly after epsilon changes', () => {
-            const demoDatafile = 'EyeDemoStatsTest.json'
-
-            let testfile = 'cypress/fixtures/Fatigue_data.csv'
-            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
-            cy.uploadFile(testfile)
-            cy.fixture(demoDatafile).then((demoData) => {
-                cy.goToConfirmVariables(demoData.variables)
-                // select the variables we will use
-                cy.selectVariable(demoData.variables)
-
-                // Continue to Set Epsilon Step
-                cy.epsilonStep()
-                const statsData = {
-                    "datasetName": "Eye-typing experiment",
-                    "statistics": [
-                        {
-                            "statistic": "Mean",
-                            "variable": "Trial",
-                            "fixedValue": "3",
-                            "roundedAccuracy": "0.164"
-                        }
-                    ]
-                }
-                const newAccuracy = "1.64"
-                cy.createStatistics(statsData)
-                cy.get('tr').first().get('td').should('contain', statsData.statistics[0].statistic)
-                cy.get('table').contains('td', statsData.statistics[0].statistic).should('be.visible');
-
-                const epsilonInput = '[data-test="editEpsilonInput"]'
-                cy.get('[data-test=editConfidenceIcon]').click();
-                cy.get('[data-test="confirmButton"] > .v-btn__content').click();
-                cy.get('[data-test=editEpsilonInput]').click();
-                cy.get('[data-test=editEpsilonInput]').clear()
-                cy.get('[data-test=editEpsilonInput]').type('.1');
-                cy.wait(1000)
-                cy.get('[data-test=editParamsSave]').click();
-                cy.get('table').contains('td', newAccuracy).should('be.visible')
-                cy.get('tr').first().get('td').should('contain', statsData.statistics[0].statistic)
-                cy.get('table').contains('td', statsData.statistics[0].statistic).should('be.visible');
-
-                cy.get('[data-test=editConfidenceIcon]').click();
-                cy.get('[data-test="confirmButton"] > .v-btn__content').click();
-                cy.get('[data-test=editEpsilonInput]').click();
-                cy.get('[data-test=editEpsilonInput]').clear()
-                cy.get('[data-test=editEpsilonInput]').type('1');
-                cy.wait(1000)
-                cy.get('[data-test=editParamsSave]').click();
-                cy.get('table').contains('td', statsData.statistics[0].roundedAccuracy).should('be.visible')
-
-            })
-        })
 
         it('Displays correct precision', () => {
             const demoDatafile = 'EyeDemoData.json'
