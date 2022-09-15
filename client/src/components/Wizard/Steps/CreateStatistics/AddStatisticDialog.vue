@@ -128,6 +128,7 @@
                   </v-row>
                 </div>
               </v-expand-transition>
+              <!--  TODO: uncomment this when BIN EDGES is implemented
               <v-row>
                 <v-col>
                   <v-radio
@@ -181,6 +182,7 @@
 
                 </v-row>
               </v-expand-transition>
+              -->
             </v-container>
 
 
@@ -431,7 +433,7 @@ export default {
         return analysis.getHistogramBuckets(this.variableInfo[this.editedItemDialog.variable].min,
             this.variableInfo[this.editedItemDialog.variable].max,
             this.editedItemDialog.histogramNumberOfBins).then((resp) => {
-
+          //  console.log("setting buckets: "+resp.data.buckets.toString())
           this.editedItemDialog.histogramBuckets = resp.data.buckets.toString()
         })
       } else {
@@ -485,9 +487,15 @@ export default {
       }
     },
     showHistogramOptions() {
+      const allowedTypes = [
+        "Integer"
+        //  ,"Float"  TODO: enable float types
+      ]
       let retVal = this.editedItemDialog.statistic == 'histogram'
           && this.variableInfo[this.editedItemDialog.variable]
-          && ["Integer", "Float"].includes(this.variableInfo[this.editedItemDialog.variable].type)
+          && allowedTypes.includes(this.variableInfo[this.editedItemDialog.variable].type)
+
+
       return retVal
     },
     maxBins() {
