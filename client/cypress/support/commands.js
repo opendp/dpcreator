@@ -23,6 +23,17 @@ Cypress.Commands.add('clearData', () => {
 
 })
 
+//python manage.py clear_test_data --datasets-only
+Cypress.Commands.add('clearDatasetsOnly', () => {
+    cy.intercept('POST', 'rest-auth/login').as('login')
+    cy.intercept('POST', 'rest-auth/logout').as('logout')
+    cy.login('dev_admin', 'admin')
+    cy.wait('@login')
+    cy.request('/cypress-tests/clear-test-datasets/')
+        .then(() => cy.logout())
+
+})
+
 Cypress.Commands.add('logout', () => {
     cy.visit('/')
     if (sessionStorage.getItem('vuex') !== null) {

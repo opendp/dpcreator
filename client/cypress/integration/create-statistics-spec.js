@@ -1,21 +1,35 @@
 {
     describe('Create Statistics Wizard Step tests', () => {
-
-        beforeEach(() => {
+        before(() => {
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
                 console.log('runnable', runnable)
                 return false
             })
             cy.clearData()
+            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
+            cy.logout()
 
+        })
+        beforeEach(() => {
+            cy.on('uncaught:exception', (e, runnable) => {
+                console.log('error', e)
+                console.log('runnable', runnable)
+                return false
+            })
+            cy.clearDatasetsOnly()
+            cy.login('oscar', 'oscar123!')
+            let testfile = 'cypress/fixtures/Fatigue_data.csv'
+            cy.uploadFile(testfile)
+
+
+        })
+        afterEach(() => {
+            cy.logout()
         })
         it('Validates Correctly after epsilon changes', () => {
             const demoDatafile = 'EyeDemoStatsTest.json'
 
-            let testfile = 'cypress/fixtures/Fatigue_data.csv'
-            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
-            cy.uploadFile(testfile)
             cy.fixture(demoDatafile).then((demoData) => {
                 cy.goToConfirmVariables(demoData.variables)
                 // select the variables we will use
@@ -63,9 +77,6 @@
 
         it('Saves Histogram Options Correctly', () => {
             const demoDatafile = 'EyeDemoStatsTest.json'
-            let testfile = 'cypress/fixtures/Fatigue_data.csv'
-            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
-            cy.uploadFile(testfile)
             cy.fixture(demoDatafile).then((demoData) => {
                 cy.goToConfirmVariables(demoData.variables)
                 // select the variables we will use
@@ -97,9 +108,6 @@
 
         it('Updated dpStatistics Correctly', () => {
             const demoDatafile = 'EyeDemoStatsTest.json'
-            let testfile = 'cypress/fixtures/Fatigue_data.csv'
-            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
-            cy.uploadFile(testfile)
             cy.fixture(demoDatafile).then((demoData) => {
                 cy.goToConfirmVariables(demoData.variables)
                 // select the variables we will use
@@ -115,9 +123,6 @@
         it('Displays Fixed Value Input Correctly', () => {
             const demoDatafile = 'EyeDemoStatsTest.json'
 
-            let testfile = 'cypress/fixtures/Fatigue_data.csv'
-            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
-            cy.uploadFile(testfile)
             cy.fixture(demoDatafile).then((demoData) => {
                 cy.goToConfirmVariables(demoData.variables)
                 // select the variables we will use
@@ -171,10 +176,6 @@
 
         it('Validates fixed value max-min', () => {
             const demoDatafile = 'EyeDemoStatsTest.json'
-
-            let testfile = 'cypress/fixtures/Fatigue_data.csv'
-            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
-            cy.uploadFile(testfile)
             cy.fixture(demoDatafile).then((demoData) => {
                 cy.goToConfirmVariables(demoData.variables)
                 // select the variables we will use
@@ -214,9 +215,6 @@
         it('Displays correct precision', () => {
             const demoDatafile = 'EyeDemoData.json'
 
-            let testfile = 'cypress/fixtures/Fatigue_data.csv'
-            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
-            cy.uploadFile(testfile)
             cy.fixture(demoDatafile).then((demoData) => {
                 cy.goToConfirmVariables(demoData.variables)
                 // select the variables we will use
@@ -231,9 +229,6 @@
         it('Goes back to the Confirm Variables Page', () => {
             const demoDatafile = 'EyeDemoData.json'
 
-            let testfile = 'cypress/fixtures/Fatigue_data.csv'
-            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
-            cy.uploadFile(testfile)
             cy.fixture(demoDatafile).then((demoData) => {
                 cy.goToConfirmVariables(demoData.variables)
                 // select the variables we will use
@@ -259,6 +254,7 @@
                 console.log('runnable', runnable)
                 return false
             })
+            cy.logout()
             cy.login('dev_admin', 'admin')
             cy.setupStatisticsPage('datasetInfoStep600.json', 'analysisPlanStep700.json')
             cy.get('h1').should('contain', 'Create Statistics')
@@ -278,6 +274,7 @@
                 console.log('runnable', runnable)
                 return false
             })
+            cy.logout()
             cy.login('dev_admin', 'admin')
             cy.setupStatisticsPage('datasetInfoStep600.json', 'analysisPlanStep700.json')
             cy.get('h1').should('contain', 'Create Statistics')
@@ -290,6 +287,7 @@
                 console.log('runnable', runnable)
                 return false
             })
+            cy.logout()
             cy.login('dev_admin', 'admin')
             cy.setupStatisticsPage('datasetInfoStep600.json', 'analysisPlanStep700.json')
             cy.fixture('analysisPlanStep700').then((analysisFixture) => {
