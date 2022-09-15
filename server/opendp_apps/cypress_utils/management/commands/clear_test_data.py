@@ -28,7 +28,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Delete data in-between Cypress tests"""
-        print('options: ', options)
+
         # Important check!!
         if not are_cypress_settings_in_place():  # Do not remove this check
             self.stdout.write(self.style.ERROR(cystatic.MESSAGE_CLEAR_DATA_CMD_ERR))
@@ -48,6 +48,7 @@ class Command(BaseCommand):
             self.stdout.write(
                 self.style.WARNING(f'   (Option: {self.OPT_ARG_DATASETS_ONLY})'))
         else:
+            # Also delete users except for test_user and dev_admin
             models_to_clear.append(user_models)
 
         for app_name, model_names in models_to_clear:
