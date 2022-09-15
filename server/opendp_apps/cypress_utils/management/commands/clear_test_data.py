@@ -12,9 +12,23 @@ from opendp_apps.user.models import OpenDPUser, DataverseUser
 class Command(BaseCommand):
     help = "Deletes data for Cypress tests"
 
+    OPT_ARG_DATASETS_ONLY = 'datasets-only'
+    OPT_VAL_DATASETS_ONLY = 'datasets_only'
+
+    def add_arguments(self, parser):
+
+        # Named (optional) arguments
+        parser.add_argument(
+            f'-ds-only',
+            f'--{self.OPT_ARG_DATASETS_ONLY}',
+            action='store_true',
+            help=('Delete only the DatasetInfo and related objects including: '
+                  'TermsOfAccessLog, DepositorSetupInfo, AnalysisPlan, and ReleaseInfo')
+        )
+
     def handle(self, *args, **options):
         """Delete data in-between Cypress tests"""
-
+        print('options: ', options)
         # Important check!!
         if not are_cypress_settings_in_place():  # Do not remove this check
             self.stdout.write(self.style.ERROR(cystatic.MESSAGE_CLEAR_DATA_CMD_ERR))
@@ -24,10 +38,17 @@ class Command(BaseCommand):
                            ('analysis', ['AnalysisPlan', 'ReleaseInfo', 'DepositorSetupInfo']),
                            ('dataset', ['UploadFileInfo', 'DataverseFileInfo', 'DataSetInfo']),
                            ('dataverses', ['DataverseHandoff']),
-                           ('user', ['DataverseUser', 'OpenDPUser'])
+                           # ('user', ['DataverseUser', 'OpenDPUser'])
                            ]
+        user_models = ('user', ['DataverseUser', 'OpenDPUser'])
 
         self.stdout.write(self.style.WARNING('>> Preparing to delete test data'))
+
+        if options[self.OPT_VAL_DATASETS_ONLY]:
+            self.stdout.write(
+                self.style.WARNING(f'   (Option: {self.OPT_ARG_DATASETS_ONLY})'))
+        else:
+            models_to_clear.append(user_models)
 
         for app_name, model_names in models_to_clear:
             for model_name in model_names:
