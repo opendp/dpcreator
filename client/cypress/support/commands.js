@@ -10,27 +10,73 @@ Cypress.Commands.add('login', (username, password) => {
 })
 Cypress.Commands.add('loginAPI', (username, password) => {
     cy.request('POST', '/rest-auth/login/', {username, password}).then((response) => {
-        expect(response.body).to.have.property('username', 'dev_admin')
+        console.log("LOGIN RESP: " + JSON.stringify(response))
+        cy.getCookie('csrftoken').should('exist')
+        cy.getCookie('csrftoken').then((token) => {
+            console.log('token: ' + JSON.stringify(token))
+            cy.pause()
+            cy.request({
+                method: 'POST',
+                url: '/rest-auth/logout/',
+                headers: {
+                    'X-CSRFToken': token.value
+                },
+            }).then((resp) => console.log(JSON.stringify(resp)));
+        })
+
     })
+
 })
+const username = 'dev_admin'
+const password = 'admin'
 Cypress.Commands.add('clearData', () => {
-    cy.intercept('POST', 'rest-auth/login').as('login')
-    cy.intercept('POST', 'rest-auth/logout').as('logout')
-    cy.login('dev_admin', 'admin')
-    cy.wait('@login')
-    cy.request('/cypress-tests/clear-test-data/')
-        .then(() => cy.logout())
+    //   cy.visit('/')  //need to do this to initialize the vuex store
+    cy.request('POST', '/rest-auth/login/', {username, password}).then((response) => {
+        console.log("LOGIN RESP: " + JSON.stringify(response))
+        cy.request('/cypress-tests/clear-test-data/').then((resp) => {
+            console.log('CLEAR RESP: ' + JSON.stringify(resp))
+            cy.getCookie('csrftoken').should('exist')
+            cy.getCookie('csrftoken').then((token) => {
+                console.log('token: ' + JSON.stringify(token))
+                cy.request({
+                    method: 'POST',
+                    url: '/rest-auth/logout/',
+                    headers: {
+                        'X-CSRFToken': token.value
+                    },
+                }).then((resp) => {
+                    //   cy.vuex().invoke('dispatch', 'auth/logout')
+                    //   cy.vuex().its('state.auth.user').should('be.null')
+                    //   cy.vuex().its('state.dataverse.handoffId').should('be.null')
+
+                    console.log(JSON.stringify(resp))
+                })
+            })
+        })
+    })
 
 })
 
 //python manage.py clear_test_data --datasets-only
 Cypress.Commands.add('clearDatasetsOnly', () => {
-    cy.intercept('POST', 'rest-auth/login').as('login')
-    cy.intercept('POST', 'rest-auth/logout').as('logout')
-    cy.login('dev_admin', 'admin')
-    cy.wait('@login')
-    cy.request('/cypress-tests/clear-test-datasets/')
-        .then(() => cy.logout())
+
+    cy.request('POST', '/rest-auth/login/', {username, password}).then((response) => {
+        console.log("LOGIN RESP: " + JSON.stringify(response))
+        cy.request('/cypress-tests/clear-test-datasets/').then((resp) => {
+            console.log('CLEAR RESP: ' + JSON.stringify(resp))
+            cy.getCookie('csrftoken').should('exist')
+            cy.getCookie('csrftoken').then((token) => {
+                console.log('token: ' + JSON.stringify(token))
+                cy.request({
+                    method: 'POST',
+                    url: '/rest-auth/logout/',
+                    headers: {
+                        'X-CSRFToken': token.value
+                    },
+                }).then((resp) => console.log(JSON.stringify(resp)));
+            })
+        })
+    })
 
 })
 
@@ -43,6 +89,9 @@ Cypress.Commands.add('logout', () => {
             cy.get('[data-test="Logout Link"]').click()
             cy.wait('@logout')
             cy.get('[data-test="My Profile"]').should('not.exist');
+            cy.vuex().its('state.auth.user').should('be.null')
+            cy.vuex().its('state.dataverse.handoffId').should('be.null')
+
         }
     }
 })

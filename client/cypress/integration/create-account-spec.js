@@ -20,11 +20,12 @@
             cy.get('[data-test="createAccountButton"]').click({force: true, multiple: true});
             cy.url().should('contain', 'sign-up')
             cy.createAccount(username, email, password)
+            cy.visit('/welcome')
             cy.get('[data-test="My Profile"]').click();
             cy.url().should('contains', 'my-profile')
             cy.get('h2').should('contain', 'Edit account information').should('be.visible')
             cy.get('[data-test="myProfileUsername"]').should('have.value', username)
-
+            cy.logout()
 
         })
         it('Shows error message if user name is taken', () => {
@@ -43,7 +44,7 @@
                 cy.createAccount(username, email, password, waitForConfirmation)
                 cy.get('[data-test="errorMessage"]').contains('A user with that username already exists.')
             })
-
+            cy.logout()
 
         })
         it('Creates an OpenDP user with no Handoff', () => {
