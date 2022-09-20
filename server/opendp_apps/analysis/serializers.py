@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from rest_framework.relations import PrimaryKeyRelatedField
 
@@ -7,6 +8,7 @@ from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp
+from opendp_apps.utils.extra_validators import validate_min_max
 
 
 class ReleaseInfoFileDownloadSerializer(serializers.ModelSerializer):
@@ -184,3 +186,22 @@ class ReleaseValidationSerializer(serializers.ModelSerializer):
             return err_resp(user_msg)
 
         return ok_resp(validate_util.validation_info)
+
+
+class IntegerEdgeInputsSerializer(serializers.Serializer):
+    """Ensure input is a valid UUID and connected to a valid DataSetInfo object"""
+    min = serializers.IntegerField()
+    max = serializers.IntegerField()
+    number_of_bins = serializers.IntegerField(min_value=2)
+
+    def validate(self, data):
+        """
+        Validation of start and end date.
+        """
+        try:
+            validate_min_max(data['min'], data['max'])
+        except ValidationError as err_obj:
+            user_msg = f'{err_obj.message}'
+            raise serializers.ValidationError(user_msg)
+
+        return data

@@ -1,6 +1,9 @@
 {
     describe('Login', () => {
         const getStore = () => cy.window().its('app.$store')
+        it('uses login API', () => {
+            cy.loginAPI('dev_admin', 'admin')
+        })
         it('successfully updates vuex store', () => {
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)

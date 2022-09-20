@@ -10,16 +10,73 @@ Cypress.Commands.add('login', (username, password) => {
 })
 Cypress.Commands.add('loginAPI', (username, password) => {
     cy.request('POST', '/rest-auth/login/', {username, password}).then((response) => {
-        expect(response.body).to.have.property('username', 'dev_admin')
+        console.log("LOGIN RESP: " + JSON.stringify(response))
+        cy.getCookie('csrftoken').should('exist')
+        cy.getCookie('csrftoken').then((token) => {
+            console.log('token: ' + JSON.stringify(token))
+            cy.pause()
+            cy.request({
+                method: 'POST',
+                url: '/rest-auth/logout/',
+                headers: {
+                    'X-CSRFToken': token.value
+                },
+            }).then((resp) => console.log(JSON.stringify(resp)));
+        })
+
     })
+
 })
+const username = 'dev_admin'
+const password = 'admin'
 Cypress.Commands.add('clearData', () => {
-    cy.intercept('POST', 'rest-auth/login').as('login')
-    cy.intercept('POST', 'rest-auth/logout').as('logout')
-    cy.login('dev_admin', 'admin')
-    cy.wait('@login')
-    cy.request('/cypress-tests/clear-test-data/')
-        .then(() => cy.logout())
+    //   cy.visit('/')  //need to do this to initialize the vuex store
+    cy.request('POST', '/rest-auth/login/', {username, password}).then((response) => {
+        console.log("LOGIN RESP: " + JSON.stringify(response))
+        cy.request('/cypress-tests/clear-test-data/').then((resp) => {
+            console.log('CLEAR RESP: ' + JSON.stringify(resp))
+            cy.getCookie('csrftoken').should('exist')
+            cy.getCookie('csrftoken').then((token) => {
+                console.log('token: ' + JSON.stringify(token))
+                cy.request({
+                    method: 'POST',
+                    url: '/rest-auth/logout/',
+                    headers: {
+                        'X-CSRFToken': token.value
+                    },
+                }).then((resp) => {
+                    //   cy.vuex().invoke('dispatch', 'auth/logout')
+                    //   cy.vuex().its('state.auth.user').should('be.null')
+                    //   cy.vuex().its('state.dataverse.handoffId').should('be.null')
+
+                    console.log(JSON.stringify(resp))
+                })
+            })
+        })
+    })
+
+})
+
+//python manage.py clear_test_data --datasets-only
+Cypress.Commands.add('clearDatasetsOnly', () => {
+
+    cy.request('POST', '/rest-auth/login/', {username, password}).then((response) => {
+        console.log("LOGIN RESP: " + JSON.stringify(response))
+        cy.request('/cypress-tests/clear-test-datasets/').then((resp) => {
+            console.log('CLEAR RESP: ' + JSON.stringify(resp))
+            cy.getCookie('csrftoken').should('exist')
+            cy.getCookie('csrftoken').then((token) => {
+                console.log('token: ' + JSON.stringify(token))
+                cy.request({
+                    method: 'POST',
+                    url: '/rest-auth/logout/',
+                    headers: {
+                        'X-CSRFToken': token.value
+                    },
+                }).then((resp) => console.log(JSON.stringify(resp)));
+            })
+        })
+    })
 
 })
 
@@ -32,6 +89,9 @@ Cypress.Commands.add('logout', () => {
             cy.get('[data-test="Logout Link"]').click()
             cy.wait('@logout')
             cy.get('[data-test="My Profile"]').should('not.exist');
+            cy.vuex().its('state.auth.user').should('be.null')
+            cy.vuex().its('state.dataverse.handoffId').should('be.null')
+
         }
     }
 })
@@ -50,13 +110,16 @@ Cypress.Commands.add('epsilonStep', () => {
     cy.get('[data-test="Public Observations - yes"]').check({force: true})
 
 })
+import path from 'path';
+
 Cypress.Commands.add('uploadFile', (testfile) => {
     cy.get('[data-test="My Data"]').click();
     cy.url().should('contains', 'my-data')
     cy.get('[data-test="myDataUploadButton"]').click();
     cy.get('[data-test="fileInput"]').selectFile(testfile, {force: true})
+    const filename = path.basename(testfile)
     cy.get('tr').should('contain',
-        'PUMS5extract1000.csv')
+        filename)
     cy.get('tr').should('contain',
         'Uploaded')
 })
@@ -138,7 +201,7 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
     // click on the start Process button on the welcome page,
     // to navigate to the Validate Dataset step of the Wizard
 
-    cy.get('[data-test="Start Process"]').click();
+    cy.get('[data-test="continueWorkflow"]').click();
     cy.url().should('contain', 'wizard')
     cy.get('[data-test="radioPrivateInformationYes"]').check({force: true})
     cy.get('[data-test="notHarmButConfidential"]').check({force: true})
@@ -193,9 +256,11 @@ Cypress.Commands.add('createStatistics', (demoData) => {
     // On the statistics page, test edit statistics Params
     cy.get('h1').should('contain', 'Create Statistics').should('be.visible')
     cy.get('[data-test="editConfidenceIcon"]').click({force: true});
-    cy.get('h2').should('contain', 'Are you sure you want to proceed?').should('be.visible')
+    cy.get('[data-test="editNoiseConfirm"]').should('be.visible')
+    cy.get('[data-test="confirmButton"]').should('be.visible')
     cy.get('[data-test="confirmButton"]').click({force: true});
-
+    cy.get('[data-test="editNoiseDialog"]').should('be.visible')
+    cy.get('[data-test="editEpsilonInput"]').should('be.visible')
     cy.get('[data-test="editEpsilonInput"]').should('have.value', 1)
     cy.get('[data-test="editParamsCancel"]').click({force: true});
 
@@ -217,6 +282,9 @@ Cypress.Commands.add('enterStatsInPopup', (demoData) => {
         const varDataTest = '[data-test="' + demoVar + '"]'
         cy.get(varDataTest).click({force: true})
         cy.get('[data-test="Fixed value"]').type(demoStat.fixedValue)
+        if (demoStat.statistic == 'Histogram') {
+            cy.get('[data-test="onePerValue"]').click({force: true})
+        }
         cy.get('[data-test="Create Statistic Button"]').click({force: true})
         cy.get('[data-test="Create Statistics Title').should('be.visible')
         cy.get('[data-test="Add Statistic"]').should('be.visible')

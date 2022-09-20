@@ -7,7 +7,6 @@ import copy
 import io
 import json
 import logging
-import os
 import random
 import typing
 import uuid
@@ -188,7 +187,7 @@ class PDFReportMaker(BasicErrCheck):
         with open(self.pdf_output_file, "wb") as out_file_handle:
             PDF.dumps(out_file_handle, self.pdf_doc)
         logger.info(f'PDF created: {self.pdf_output_file}')
-        os.system(f'open {self.pdf_output_file}')
+        # os.system(f'open {self.pdf_output_file}')
 
     def start_new_page(self):
         """Start a new page"""

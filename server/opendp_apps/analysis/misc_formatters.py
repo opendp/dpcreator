@@ -1,6 +1,15 @@
 from datetime import datetime as dt
 
 
+def get_timestamp_str(dt_obj: dt = None) -> str:
+    """Get a timestamp as part of a filename"""
+    if not dt_obj:
+        dt_obj = dt.now()
+
+    str_pattern = '%Y-%m-%d_%H-%M-%S'
+    return dt_obj.strftime(str_pattern)
+
+
 def get_readable_datetime(dt_obj: dt) -> str:
     """
     Format a datetime object

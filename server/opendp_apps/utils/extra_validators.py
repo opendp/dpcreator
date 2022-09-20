@@ -8,6 +8,7 @@ from opendp_apps.profiler import static_vals as pstatic
 
 VALIDATE_MSG_ZERO_OR_GREATER = 'The value must be a number, zero or greater.'
 VALIDATE_MSG_ONE_OR_GREATER = 'The value must be a number, 1 or greater.'
+VALIDATE_MSG_TWO_OR_GREATER = 'The value must be an integer, 2 or greater.'
 VALIDATE_MSG_EPSILON = (f'As a rule of thumb, epsilon should not be less than'
                         f' {settings.TOTAL_EPSILON_MIN} nor greater than {settings.TOTAL_EPSILON_MAX}.')
 VALIDATE_MSG_NOT_FLOAT = 'The value must be a float.'
@@ -21,6 +22,9 @@ VALIDATE_MSG_CATEGORIES_LIST_EMPTY = 'The list of categories is empty'
 VALIDATE_MSG_CATEGORY_NOT_STRING = 'The list of categories contains a non-string'  # Only used for categorical variables
 VALIDATE_MSG_FIXED_VAL_NOT_IN_CATEGORIES = 'The fixed value is not one of the specified categories.'
 
+VALIDATE_MSG_TWO_EDGES_MINIMUM = 'At least two edges are needed to create the histogram.'
+VALIDATE_MSG_EDGES_NOT_A_LIST = 'The "edges" are not a list'
+VALIDATE_MSG_MORE_BINS_THAN_VALUES = 'There are more bins than values.'
 
 def validate_statistic(value):
     """Statistic currently supported"""
@@ -57,6 +61,28 @@ def validate_not_negative(value):
 
     if value < 0.0:
         raise ValidationError(VALIDATE_MSG_ZERO_OR_GREATER)
+
+
+def validate_edge_count_two_or_greater(value: list):
+    """Validate that the lenvalidate_min_maxgth of the list of edges is at least 2"""
+    if not isinstance(value, list):
+        raise ValidationError(VALIDATE_MSG_EDGES_NOT_A_LIST)
+
+    if len(value) >= 2:
+        pass
+    else:
+        raise ValidationError(VALIDATE_MSG_TWO_EDGES_MINIMUM)
+
+
+def validate_int_two_or_greater(value):
+    """Validate int greater >= 2"""
+    if not isinstance(value, int):
+        raise ValidationError(VALIDATE_MSG_NOT_INT)
+
+    if value >= 2:
+        pass
+    else:
+        raise ValidationError(VALIDATE_MSG_TWO_OR_GREATER)
 
 
 def validate_int_greater_than_zero(value):
@@ -133,9 +159,10 @@ def validate_float(value):
 
 
 def validate_int(value):
-    """Make sure the value is a float"""
+    """Make sure the value is an int or can be converted to an int"""
     try:
-        int(value)
+        if not int(value) == float(value):
+            raise ValidationError(VALIDATE_MSG_NOT_INT)
     except ValueError:
         raise ValidationError(VALIDATE_MSG_NOT_INT)
     except TypeError:
@@ -145,7 +172,7 @@ def validate_int(value):
 def validate_is_numeric(value: Union[int, float]):
     """Check that the value is an integer or float"""
     validate_float(value)
-    validate_int(value)
+    # validate_int(value)
 
 
 def validate_type_numeric(value: str):
@@ -165,8 +192,8 @@ def validate_type_integer(value: str):
     if not value == pstatic.VAR_TYPE_INTEGER:
         raise ValidationError(pstatic.ERR_MSG_VAR_TYPE_NOT_INTEGER)
 
-def validate_categories_as_list(categories: list):
 
+def validate_categories_as_list(categories: list):
     if not isinstance(categories, list):
         raise ValidationError(VALIDATE_MSG_CATEGORIES_NOT_A_LIST)
 
@@ -253,8 +280,8 @@ def validate_min_max(min_int: Union[int, float], max_int: Union[int, float]):
 
 
 def validate_fixed_value_against_min_max(fixed_value: Union[int, float],
-                                      min_int: Union[int, float],
-                                      max_int: Union[int, float]):
+                                         min_int: Union[int, float],
+                                         max_int: Union[int, float]):
     validate_is_numeric(fixed_value)
     validate_is_numeric(min_int)
     validate_is_numeric(max_int)
@@ -284,6 +311,6 @@ def validate_num_bins_against_min_max(histogram_number_of_bins: int, min_int: in
     potential_num_values = max_int - min_int
 
     if histogram_number_of_bins > potential_num_values:
-        user_msg = (f'There are more bins than values.'
-                    f' (hist_number_of_bins: {histogram_number_of_bins}) (# values: {potential_num_values})')
+        user_msg = (f'{VALIDATE_MSG_MORE_BINS_THAN_VALUES}'
+                    f' (hist_number_of_bins: {histogram_number_of_bins}) (value count: {potential_num_values})')
         raise ValidationError(user_msg)

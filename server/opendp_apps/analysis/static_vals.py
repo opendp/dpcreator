@@ -64,11 +64,17 @@ DP_STATS_REQUIRE_COUNTS = [DP_MEAN,
 VALID_DP_STATS_CHOICES_STR = ', '.join(DP_STATS_CHOICES)
 
 # --------------------------------------
-# Histogram bin types
+# Keys (mostly Histogram bin types)
 # --------------------------------------
-HIST_BIN_TYPE_ONE_PER_VALUE = 'one_per_value'
-HIST_BIN_TYPE_EQUAL_RANGES = 'equal_ranges'
-HIST_BIN_TYPE_BIN_EDGES = 'bin_edges'
+KEY_VARIABLE_INFO = 'variable_info'
+
+KEY_HIST_BIN_TYPE = 'histogram_bin_type'
+KEY_HIST_NUMBER_OF_BINS = 'histogram_number_of_bins'
+KEY_HIST_BIN_EDGES = 'histogram_bin_edges'
+
+HIST_BIN_TYPE_ONE_PER_VALUE = 'onePerValue'
+HIST_BIN_TYPE_EQUAL_RANGES = 'equalRanges'
+HIST_BIN_TYPE_BIN_EDGES = 'binEdges'
 HIST_VALID_BIN_TYPES = [HIST_BIN_TYPE_ONE_PER_VALUE,
                         HIST_BIN_TYPE_EQUAL_RANGES,
                         HIST_BIN_TYPE_BIN_EDGES]

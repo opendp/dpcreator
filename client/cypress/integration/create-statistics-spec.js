@@ -1,24 +1,129 @@
 {
     describe('Create Statistics Wizard Step tests', () => {
-
-        beforeEach(() => {
+        before(() => {
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
                 console.log('runnable', runnable)
                 return false
             })
             cy.clearData()
+            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
+            cy.logout()
 
         })
-        it('Displays Fixed Value Input Correctly', () => {
-            const mockDVfile = 'EyeDemoMockDV.json'
+        beforeEach(() => {
+            cy.on('uncaught:exception', (e, runnable) => {
+                console.log('error', e)
+                console.log('runnable', runnable)
+                return false
+            })
+            cy.clearDatasetsOnly()
+            cy.login('oscar', 'oscar123!')
+            let testfile = 'cypress/fixtures/Fatigue_data.csv'
+            cy.uploadFile(testfile)
+
+
+        })
+        afterEach(() => {
+            cy.logout()
+        })
+        it('Validates Correctly after epsilon changes', () => {
             const demoDatafile = 'EyeDemoStatsTest.json'
 
-            cy.createMockDataset(mockDVfile)
             cy.fixture(demoDatafile).then((demoData) => {
-                cy.url().should('contain', 'welcome')
-                cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
-                    demoData['datasetName'])
+                cy.goToConfirmVariables(demoData.variables)
+                // select the variables we will use
+                cy.selectVariable(demoData.variables)
+
+                // Continue to Set Epsilon Step
+                cy.epsilonStep()
+                const statsData = {
+                    "datasetName": "Eye-typing experiment",
+                    "statistics": [
+                        {
+                            "statistic": "Mean",
+                            "variable": "Trial",
+                            "fixedValue": "3",
+                            "roundedAccuracy": "0.164"
+                        }
+                    ]
+                }
+                const newAccuracy = "1.64"
+                cy.createStatistics(statsData)
+                cy.get('tr').first().get('td').should('contain', statsData.statistics[0].statistic)
+                cy.get('table').contains('td', statsData.statistics[0].statistic).should('be.visible');
+
+                const epsilonInput = '[data-test="editEpsilonInput"]'
+                cy.get('[data-test=editConfidenceIcon]').click();
+                cy.get('[data-test="confirmButton"] > .v-btn__content').click();
+                cy.get('[data-test=editEpsilonInput]').click();
+                cy.get('[data-test=editEpsilonInput]').clear()
+                cy.get('[data-test=editEpsilonInput]').type('.1');
+                cy.get('[data-test=editParamsSave]').click();
+                cy.get('table').contains('td', newAccuracy).should('be.visible')
+                cy.get('tr').first().get('td').should('contain', statsData.statistics[0].statistic)
+                cy.get('table').contains('td', statsData.statistics[0].statistic).should('be.visible');
+
+                cy.get('[data-test=editConfidenceIcon]').click();
+                cy.get('[data-test="confirmButton"] > .v-btn__content').click();
+                cy.get('[data-test=editEpsilonInput]').click();
+                cy.get('[data-test=editEpsilonInput]').clear()
+                cy.get('[data-test=editEpsilonInput]').type('1');
+                cy.get('[data-test=editParamsSave]').click();
+                cy.get('table').contains('td', statsData.statistics[0].roundedAccuracy).should('be.visible')
+
+            })
+        })
+
+        it('Saves Histogram Options Correctly', () => {
+            const demoDatafile = 'EyeDemoStatsTest.json'
+            cy.fixture(demoDatafile).then((demoData) => {
+                cy.goToConfirmVariables(demoData.variables)
+                // select the variables we will use
+                cy.selectVariable(demoData.variables)
+                // Continue to Set Epsilon Step
+                cy.epsilonStep()
+                //go to Create Statistics Step
+                cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
+                cy.get('h1').should('contain', 'Create Statistics').should('be.visible')
+
+                // Add all a Histogram  statistic  and  test the options
+                cy.get('[data-test="Add Statistic"]').click({force: true});
+                cy.get('[data-test="AddStatisticDialog"]').should('be.visible')
+
+                cy.get('[data-test="Histogram"]').click({force: true});
+                const varDataTest = '[data-test="Trial"]'
+                cy.get(varDataTest).click({force: true})
+                cy.get('[data-test="Fixed value"]').type('5')
+                cy.get('[data-test="onePerValue"]').click({force: true})
+                cy.get('[data-test="Create Statistic Button"]').should('be.enabled')
+                cy.get('[data-test="equalRanges"]').click({force: true})
+                cy.get('[data-test="histogramNumberOfBins"]').type('3')
+                cy.get('div').should('contain', 'Equal range bins: [0, 4],[5, 10],uncategorized')
+                cy.get('[data-test="Create Statistic Button"]').click({force: true})
+                cy.get('tr').first().get('td').should('contain', "Histogram")
+
+            })
+        })
+
+        it('Updated dpStatistics Correctly', () => {
+            const demoDatafile = 'EyeDemoStatsTest.json'
+            cy.fixture(demoDatafile).then((demoData) => {
+                cy.goToConfirmVariables(demoData.variables)
+                // select the variables we will use
+                cy.selectVariable(demoData.variables)
+                // Continue to Set Epsilon Step
+                cy.epsilonStep()
+                // Add all the statistics in the Create Statistics Step
+                cy.createStatistics(demoData)
+            })
+            cy.pause()
+        })
+
+        it('Displays Fixed Value Input Correctly', () => {
+            const demoDatafile = 'EyeDemoStatsTest.json'
+
+            cy.fixture(demoDatafile).then((demoData) => {
                 cy.goToConfirmVariables(demoData.variables)
                 // select the variables we will use
                 let variables = {
@@ -65,19 +170,13 @@
                 // The statistic should have been created
                 cy.get('tr').first().get('td').should('contain', "Mean")
 
-                cy.pause()
+
             })
         })
 
         it('Validates fixed value max-min', () => {
-            const mockDVfile = 'EyeDemoMockDV.json'
             const demoDatafile = 'EyeDemoStatsTest.json'
-
-            cy.createMockDataset(mockDVfile)
             cy.fixture(demoDatafile).then((demoData) => {
-                cy.url().should('contain', 'welcome')
-                cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
-                    demoData['datasetName'])
                 cy.goToConfirmVariables(demoData.variables)
                 // select the variables we will use
                 let variables = {
@@ -112,87 +211,11 @@
             })
         })
 
-        it('Validates Correctly after epsilon changes', () => {
-            const mockDVfile = 'EyeDemoMockDV.json'
-            const demoDatafile = 'EyeDemoStatsTest.json'
-
-            cy.createMockDataset(mockDVfile)
-            cy.fixture(demoDatafile).then((demoData) => {
-                cy.url().should('contain', 'welcome')
-                cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
-                    demoData['datasetName'])
-                cy.goToConfirmVariables(demoData.variables)
-                // select the variables we will use
-                cy.selectVariable(demoData.variables)
-
-                // Continue to Set Epsilon Step
-                cy.epsilonStep()
-                const statsData = {
-                    "datasetName": "Eye-typing experiment",
-                    "statistics": [
-                        {
-                            "statistic": "Mean",
-                            "variable": "Trial",
-                            "fixedValue": "3",
-                            "roundedAccuracy": "0.164"
-                        }
-                    ]
-                }
-                const newAccuracy = "1.64"
-                cy.createStatistics(statsData)
-                cy.get('tr').first().get('td').should('contain', statsData.statistics[0].statistic)
-                cy.get('table').contains('td', statsData.statistics[0].statistic).should('be.visible');
-
-                const epsilonInput = '[data-test="editEpsilonInput"]'
-                cy.get('[data-test=editConfidenceIcon]').click();
-                cy.get('[data-test="confirmButton"] > .v-btn__content').click();
-                cy.get('[data-test=editEpsilonInput]').click();
-                cy.get('[data-test=editEpsilonInput]').clear()
-                cy.get('[data-test=editEpsilonInput]').type('.1');
-                cy.wait(1000)
-                cy.get('[data-test=editParamsSave]').click();
-                cy.get('table').contains('td', newAccuracy).should('be.visible')
-                cy.get('tr').first().get('td').should('contain', statsData.statistics[0].statistic)
-                cy.get('table').contains('td', statsData.statistics[0].statistic).should('be.visible');
-
-                cy.get('[data-test=editConfidenceIcon]').click();
-                cy.get('[data-test="confirmButton"] > .v-btn__content').click();
-                cy.get('[data-test=editEpsilonInput]').click();
-                cy.get('[data-test=editEpsilonInput]').clear()
-                cy.get('[data-test=editEpsilonInput]').type('1');
-                cy.wait(1000)
-                cy.get('[data-test=editParamsSave]').click();
-                cy.get('table').contains('td', statsData.statistics[0].roundedAccuracy).should('be.visible')
-
-            })
-        })
-        it('Updated dpStatistics Correctly', () => {
-            const mockDVfile = 'EyeDemoMockDV.json'
-            const demoDatafile = 'EyeDemoStatsTest.json'
-            cy.createMockDataset(mockDVfile)
-            cy.fixture(demoDatafile).then((demoData) => {
-                cy.url().should('contain', 'welcome')
-                cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
-                    demoData['datasetName'])
-                cy.goToConfirmVariables(demoData.variables)
-                // select the variables we will use
-                cy.selectVariable(demoData.variables)
-                // Continue to Set Epsilon Step
-                cy.epsilonStep()
-                // Add all the statistics in the Create Statistics Step
-                cy.createStatistics(demoData)
-            })
-        })
 
         it('Displays correct precision', () => {
-            const mockDVfile = 'EyeDemoMockDV.json'
             const demoDatafile = 'EyeDemoData.json'
 
-            cy.createMockDataset(mockDVfile)
             cy.fixture(demoDatafile).then((demoData) => {
-                cy.url().should('contain', 'welcome')
-                cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
-                    demoData['datasetName'])
                 cy.goToConfirmVariables(demoData.variables)
                 // select the variables we will use
                 cy.selectVariable(demoData.variables)
@@ -204,14 +227,9 @@
             })
         })
         it('Goes back to the Confirm Variables Page', () => {
-            const mockDVfile = 'EyeDemoMockDV.json'
             const demoDatafile = 'EyeDemoData.json'
 
-            cy.createMockDataset(mockDVfile)
             cy.fixture(demoDatafile).then((demoData) => {
-                cy.url().should('contain', 'welcome')
-                cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
-                    demoData['datasetName'])
                 cy.goToConfirmVariables(demoData.variables)
                 // select the variables we will use
                 cy.selectVariable(demoData.variables)
@@ -236,6 +254,7 @@
                 console.log('runnable', runnable)
                 return false
             })
+            cy.logout()
             cy.login('dev_admin', 'admin')
             cy.setupStatisticsPage('datasetInfoStep600.json', 'analysisPlanStep700.json')
             cy.get('h1').should('contain', 'Create Statistics')
@@ -255,6 +274,7 @@
                 console.log('runnable', runnable)
                 return false
             })
+            cy.logout()
             cy.login('dev_admin', 'admin')
             cy.setupStatisticsPage('datasetInfoStep600.json', 'analysisPlanStep700.json')
             cy.get('h1').should('contain', 'Create Statistics')
@@ -267,6 +287,7 @@
                 console.log('runnable', runnable)
                 return false
             })
+            cy.logout()
             cy.login('dev_admin', 'admin')
             cy.setupStatisticsPage('datasetInfoStep600.json', 'analysisPlanStep700.json')
             cy.fixture('analysisPlanStep700').then((analysisFixture) => {

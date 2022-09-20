@@ -1,19 +1,28 @@
 import logging
+from typing import Union
 
 from django.conf import settings
 from opendp.accuracy import laplacian_scale_to_accuracy
-from opendp.meas import *
+from opendp.meas import make_base_discrete_laplace
 from opendp.mod import enable_features, binary_search_param, OpenDPException
-from opendp.trans import *
-from opendp.typing import *
+from opendp.trans import \
+    (make_cast,
+     make_count_by_categories,
+     make_find_bin,
+     make_impute_constant,
+     make_index,
+     make_select_column,
+     make_split_dataframe)
+from opendp.typing import VectorDomain, AllDomain, usize
 
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.analysis.tools.bin_edge_helper import BinEdgeHelper
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.utils.extra_validators import \
-    (validate_histogram_bin_type_equal_ranges,
-     validate_fixed_value_against_min_max,
+    (validate_fixed_value_against_min_max,
+     validate_histogram_bin_type_equal_ranges,
      validate_int,
-     validate_int_greater_than_zero,
+     validate_int_two_or_greater,
      validate_min_max,
      validate_missing_val_handlers,
      validate_num_bins_against_min_max,
@@ -37,9 +46,8 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
 
     def get_stat_specific_validators(self):
         """Set validators used for the DP Mean"""
-
         return dict(histogram_bin_type=validate_histogram_bin_type_equal_ranges,
-                    histogram_number_of_bins=validate_int_greater_than_zero,
+                    histogram_number_of_bins=validate_int_two_or_greater,
                     var_type=validate_type_integer,
                     #
                     min=validate_int,
@@ -61,13 +69,17 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
             return
 
         # validate min/max
-        if not self.validate_multi_values([self.min, self.max], validate_min_max, 'min/max'):
+        if not self.validate_multi_values([self.min, self.max],
+                                          validate_min_max,
+                                          'min/max'):
             return
 
         if not self.cast_property_to_int('histogram_number_of_bins'):
             return
 
-        if not self.validate_multi_values([self.histogram_number_of_bins, self.min, self.max],
+        if not self.validate_multi_values([self.histogram_number_of_bins,
+                                           self.min,
+                                           self.max],
                                           validate_num_bins_against_min_max,
                                           'histogram_number_of_bins/max'):
             return
@@ -79,14 +91,19 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
             if not self.cast_property_to_int('fixed_value'):
                 return
 
-            if not self.validate_multi_values([self.fixed_value, self.min, self.max],
-                                              validate_fixed_value_against_min_max,
-                                              'fixed value within min/max bounds'):
+            if not self.validate_multi_values(
+                    [self.fixed_value, self.min, self.max],
+                    validate_fixed_value_against_min_max,
+                    'fixed value within min/max bounds'):
                 return
 
-        self.histogram_bin_edges = np.histogram_bin_edges([],
-                                                          bins=self.histogram_number_of_bins,
-                                                          range=(self.min, self.max))
+        beh = BinEdgeHelper(self.min, self.max, self.histogram_number_of_bins)
+        if beh.has_error():
+            self.add_err_msg(beh.get_err_msg())
+            return
+
+        self.histogram_bin_edges = beh.bin_edges
+        self.categories = beh.buckets
 
     def run_03_custom_validation(self):
         """
@@ -104,7 +121,9 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
         if self.has_error():
             return
 
-        return preprocessor >> make_base_geometric(scale, D=VectorDomain[AllDomain[int]])
+        return preprocessor >> make_base_discrete_laplace(scale, D=VectorDomain[AllDomain[int]])
+
+        # return preprocessor >> make_base_geometric(scale, D=VectorDomain[AllDomain[int]])
 
     def get_preprocessor(self):
         """
@@ -121,34 +140,75 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
             # Yes!
             return self.preprocessor
 
+        categories_list = self.get_pseudo_categories_list()
+
+        # Note: earlier validation checks that "self.histogram_number_of_bins" is > 2
+        num_bin_edges = len(self.histogram_bin_edges)
+        null_bin = num_bin_edges - 1
+        make_idx_categories = [null_bin, *range(null_bin), null_bin]
+
         preprocessor = (
                 make_select_column(key=self.col_index, TOA=str) >>
                 make_cast(TIA=str, TOA=int) >>
                 make_impute_constant(self.fixed_value) >>
-                make_count_by_categories(categories=self.categories, MO=L1Distance[int], TIA=int)
+                make_find_bin(edges=self.histogram_bin_edges) >>
+                make_index(make_idx_categories, null_bin, TOA=usize) >>
+                make_count_by_categories(categories=categories_list,
+                                         TIA=usize)
         )
 
+        def make_histogram(scale):
+            return preprocessor >> \
+                   make_base_discrete_laplace(
+                       scale, D=VectorDomain[AllDomain[int]])
+
         self.scale = binary_search_param(
-            lambda s: self.check_scale(s, preprocessor), d_in=1, d_out=self.epsilon)
-        preprocessor = preprocessor >> make_base_geometric(scale=self.scale, D=VectorDomain[AllDomain[int]])
+            make_histogram,
+            d_in=1,
+            d_out=self.epsilon)
+
+        preprocessor = make_histogram(self.scale)
 
         # keep a pointer to the preprocessor in case it's re-used
         self.preprocessor = preprocessor
         return preprocessor
+
+    def get_pseudo_categories_list(self) -> Union[list, None]:
+        """
+        Not the actual categories, used for setting accuracy, etc
+
+        @return: Union[list, None]
+        """
+        if self.has_error():
+            return None
+
+        # Note: the make_index command in "get_preprocessor"
+        #  collapses the first bin [-inf, 0)
+        # and last bin [last edge, inf) into the last category
+        #
+        return list(range(len(self.histogram_bin_edges) - 1))
 
     def set_accuracy(self):
         """Return the accuracy measure using Laplace and the confidence level alpha"""
         if self.has_error():
             return False
 
+        self.accuracy_val = 'Made up val'
+        self.accuracy_msg = self.get_accuracy_text(template_name='analysis/dp_histogram_accuracy_default.txt')
+        return True
+
         if not self.preprocessor:
             self.preprocessor = self.get_preprocessor()
 
         # This is for histograms, so divide alpha by the number of counts
-        cl_alpha = self.get_confidence_level_alpha() / len(self.categories)
+        # we just need the length, using the number of bin edges
+        categories_list = self.get_pseudo_categories_list()
+
+        cl_alpha = self.get_confidence_level_alpha() / len(categories_list)
         if cl_alpha is None:
             # Error already saved
             return False
+
         self.accuracy_val = laplacian_scale_to_accuracy(self.scale, cl_alpha)
 
         # Note `self.accuracy_val` must bet set before using `self.get_accuracy_text()
@@ -206,11 +266,13 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
                 self.add_err_msg(f'{ex_obj} (Exception)')
             return False
 
-        fmt_categories = self.categories + ['uncategorized']
+        # print(f'histogram_bin_edges: {self.histogram_bin_edges}; No. edges: {len(self.histogram_bin_edges)}')
+        # print(f'categories: {self.categories}; No. cats: {len(self.categories)}')
+        # print(f'values: {self.value}; No. values: {len(self.value)}')
 
         # Show warning if category count doesn't match values count
-        if len(fmt_categories) > len(self.value):
-            user_msg = (f'Warning. There are more categories (n={len(fmt_categories)})'
+        if len(self.categories) > len(self.value):
+            user_msg = (f'Warning. There are more categories (n={len(self.categories)})'
                         f' than values (n={len(self.value)})')
             self.add_err_msg(user_msg)
 
@@ -219,9 +281,10 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
             logger.warning(f'Values (n={len(self.value)}): {self.value}')
             return
 
-        self.value = dict(categories=fmt_categories,
+        self.value = dict(categories=self.categories,
+                          histogram_bin_edges=self.histogram_bin_edges,
                           values=self.value,
-                          category_value_pairs=list(zip(fmt_categories, self.value)))
+                          category_value_pairs=list(zip(self.categories, self.value)))
 
         logger.info((f"Epsilon: {self.epsilon}"
                      f"\nColumn name: {self.variable}"

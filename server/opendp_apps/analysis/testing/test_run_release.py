@@ -201,7 +201,7 @@ class TestRunRelease(TestCase):
                                     content_type='application/json')
 
         jresp = response.json()
-        # print('jresp', jresp)
+        print('jresp', jresp)
         self.assertEqual(response.status_code, 400)
         self.assertFalse(jresp['success'])
         self.assertTrue(jresp['message'].find(VALIDATE_MSG_EPSILON) > -1)

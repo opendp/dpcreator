@@ -31,6 +31,7 @@
     {
       "statistic": "histogram",
       "variable": "Subject",
+      "variable_type": "Categorical",
       "result": {
         "value": {
           "categories": [
@@ -113,6 +114,7 @@
           ]
         }
       },
+      "noise_mechanism": "Geometric",
       "epsilon": 0.5,
       "delta": null,
       "categories": [
@@ -146,9 +148,11 @@
     {
       "statistic": "mean",
       "variable": "Trial",
+      "variable_type": "Float",
       "result": {
         "value": 2.944150804412047
       },
+      "noise_mechanism": "Geometric",
       "epsilon": 0.5,
       "delta": null,
       "bounds": {

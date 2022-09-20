@@ -163,6 +163,18 @@ export default {
       if (this.analysisPlan !== null && this.analysisPlan.dpStatistics !== null) {
         // make a deep copy of the Vuex state so it can be edited locally
         this.statistics = JSON.parse(JSON.stringify(this.analysisPlan.dpStatistics))
+        // add unique key for table expand
+        let id = 0;
+        this.statistics.forEach(stat => {
+          stat.id = id
+          if (stat.statistic === 'histogram') {
+
+            stat.canExpand = true
+          } else {
+            stat.canExpand = false
+          }
+          id++
+        })
       } else {
         this.statistics = []
       }
@@ -230,8 +242,10 @@ export default {
         if (!createStatsUtils.isDeltaStat(this.editedItem.statistic)) {
           this.editedItem.delta = ""
         }
+        const id = this.statistics.length
+        const canExpand = this.editedItem.statistic == 'histogram'
         this.statistics.push(
-            Object.assign({}, this.editedItem, {variable}, {cl})
+            Object.assign({}, this.editedItem, {variable}, {cl}, {id}, {canExpand})
         );
 
       }

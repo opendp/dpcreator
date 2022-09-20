@@ -18,6 +18,11 @@ export default {
             snakeProps).then(resp => camelcaseKeys(resp.data, {deep: true}))
 
     },
+    getHistogramBuckets(min, max, numberOfBins) {
+        return wrappedSession.post('/api/stat-helper/make-edges-integer/',
+            {min: min, max: max, number_of_bins: numberOfBins})
+            .then(resp => camelcaseKeys(resp.data, {deep: true}))
+    },
     createAnalysisPlan(datasetId) {
         return wrappedSession.post('/api/analyze/',
             {object_id: datasetId})

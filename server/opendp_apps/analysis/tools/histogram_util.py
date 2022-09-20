@@ -103,7 +103,7 @@ def has_integer_categories(props: dict):
         if False in all_int_check:
             return False, None
 
-        # All integers, are they continuous?
+        # They're all integers, but are they continuous?
         if sorted(cats) == list(range(min(cats), max(cats) + 1)):
             return True, (min(cats), max(cats))
 

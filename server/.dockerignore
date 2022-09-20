@@ -7,3 +7,4 @@ test_setup/
 __pycache__/
 .DS_Store
 opendp_apps/dp_reports/test_data/pdfs
+!opendp_apps/analysis/test_data/*.json
