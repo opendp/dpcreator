@@ -64,13 +64,6 @@
       <template v-slot:item.data-table-select="{ on, props }">
         <v-simple-checkbox color="green" v-bind="props" v-on="on"></v-simple-checkbox>
       </template>-->
-      <template v-slot:[`item.valid`]="{ item }">
-        <div v-if="!isValidRow(item)">
-          <v-icon color="red">mdi-alert</v-icon>
-        </div>
-
-      </template>
-
       <template v-slot:[`item.index`]="{ index }">
         <span data-test="variableRow" class="index-td grey--text">{{ index + 1 }}</span>
       </template>
@@ -173,27 +166,6 @@
               :rules="[checkMax]"
               :data-test="variable.label+':max'"
               v-model="variable.additional_information['max']"
-              class="text-center py-0"
-              v-on:click="currentRow=variable.index"
-              v-on:keyup="saveUserInput(variable)"
-          ></v-text-field>
-        </div>
-        <div v-if="variable.type==='Boolean'" class="range-input-wrapper">
-          <v-text-field
-              background-color="soft_primary mb-0"
-              label="Add true value"
-              v-model="variable.additional_information['trueValue']"
-              class="text-center py-0"
-              :data-test="variable.label+':trueValue'"
-              :rules="[checkTrueValue]"
-              v-on:click="currentRow=variable.index"
-              v-on:keyup="saveUserInput(variable)"
-          ></v-text-field>
-          <v-text-field
-              background-color="soft_primary mb-0"
-              label="Add false value"
-              :data-test="variable.label+':falseValue'"
-              v-model="variable.additional_information['falseValue']"
               class="text-center py-0"
               v-on:click="currentRow=variable.index"
               v-on:keyup="saveUserInput(variable)"
@@ -430,7 +402,6 @@ export default {
     search: "",
     categoryInput: "",
     headers: [
-      {value: "valid"},
       {value: "index"},
       {text: "Variable Name", value: "name"},
       {text: "Variable Label", value: "label"},
@@ -508,32 +479,18 @@ export default {
       return true
     },
     checkMax(value) {
-      let valid = true
       if (isNaN(value)) {
-        valid = false
+        return false
       }
       if (this.currentRow !== null) {
         if (this.variables[this.currentRow].additional_information !== undefined) {
           const currentMin = this.variables[this.currentRow].additional_information.min
           if (currentMin !== null && currentMin > Number(value)) {
-            valid = false
+            return false
           }
         }
       }
-      return valid
-    },
-    checkTrueValue(value) {
-      // If falseValue has been entered, then trueValue is required
-      let valid = true
-      if (this.currentRow !== null) {
-        if (this.variables[this.currentRow].additional_information !== undefined) {
-          const falseValue = this.variables[this.currentRow].additional_information.falseValue
-          if (falseValue !== null && (value === null || value.trim() === '')) {
-            valid = false
-          }
-        }
-      }
-      return valid
+      return true
     },
     isNumerical(type) {
       return type === 'Float' || type === 'Integer'
@@ -568,7 +525,7 @@ export default {
       } else {
         let minmaxValid = true
         let catValid = true
-        let booleanValid = true
+
         if (this.isNumerical(variable.type)) {
           if (this.isBlank(variable.additional_information.min)
               || this.isBlank(variable.additional_information.max)
@@ -578,14 +535,6 @@ export default {
             minmaxValid = (Number(variable.additional_information.min) < Number(variable.additional_information.max))
           }
         }
-        if (variable.type === 'Boolean') {
-          if (variable.additional_information !== null) {
-            if (this.isBlank(variable.additional_information.trueValue)
-                && !this.isBlank(variable.additional_information.falseValue)) {
-              booleanValid = false
-            }
-          }
-        }
         if (variable.type === 'Categorical' &&
             (variable.additional_information === 'undefined'
                 || variable.additional_information.categories === 'undefined'
@@ -593,7 +542,7 @@ export default {
                 || variable.additional_information.categories.length === 0)) {
           catValid = false
         }
-        const valid = (variable.name !== null && minmaxValid && catValid && booleanValid)
+        const valid = (variable.name !== null && minmaxValid && catValid)
         return valid
       }
     },
@@ -642,10 +591,6 @@ export default {
         if (row.type === 'Categorical') {
           // make a deep copy of the categories, so we can edit locally
           row.additional_information.categories = JSON.parse(JSON.stringify(vars[key].categories))
-        }
-        if (row.type === 'Boolean') {
-          row.additional_information.trueValue = vars[key].trueValue
-          row.additional_information.falseValue = vars[key].falseValue
         }
         row['editDisabled'] = true
         row['isSelectable'] = this.isSelectable(vars[key])
