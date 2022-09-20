@@ -4,14 +4,14 @@ from django.conf import settings
 from opendp.accuracy import laplacian_scale_to_accuracy
 from opendp.meas import make_base_geometric
 from opendp.mod import enable_features, binary_search_param, OpenDPException
-from opendp.typing import AllDomain, L1Distance, VectorDomain
 from opendp.trans import \
     (make_cast,
      make_count_by_categories,
      make_impute_constant,
-     make_clamp,
      make_split_dataframe,
      make_select_column)
+from opendp.typing import AllDomain, L1Distance, VectorDomain
+
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.utils.extra_validators import \

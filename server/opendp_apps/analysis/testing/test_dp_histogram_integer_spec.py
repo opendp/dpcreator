@@ -3,22 +3,31 @@ docker-compose run server python manage.py test opendp_apps.analysis.testing.tes
 """
 import copy
 import decimal
+import json
+import os
+import tempfile
 import unittest
 from os.path import abspath, dirname, isfile, join
 
-CURRENT_DIR = dirname(abspath(__file__))
-TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
-
-import numpy as np
 import pandas as pd
-from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
-from opendp_apps.analysis.tools.dp_histogram_int_one_per_value_spec import DPHistogramIntOnePerValueSpec
-from opendp_apps.analysis.tools.dp_histogram_int_equal_ranges_spec import DPHistogramIntEqualRangesSpec
 from opendp.accuracy import laplacian_scale_to_accuracy
 
-from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.analysis.misc_formatters import get_timestamp_str
+from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
+from opendp_apps.analysis.tools.dp_histogram_int_equal_ranges_spec import DPHistogramIntEqualRangesSpec
+from opendp_apps.analysis.tools.dp_histogram_int_one_per_value_spec import DPHistogramIntOnePerValueSpec
+from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
+from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import static_vals as pstatic
+
+CURRENT_DIR = dirname(abspath(__file__))
+TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')  # general test data
+DP_REPORTS_TEST_DIR = join(dirname(dirname(CURRENT_DIR)), 'dp_reports', 'test_data')  # has sample release
+DP_ANALYSIS_TEST_DIR = join(dirname(CURRENT_DIR), 'test_output')  # to write test PDFs (not saved)
+if not isfile(DP_ANALYSIS_TEST_DIR):
+    os.makedirs(DP_ANALYSIS_TEST_DIR, exist_ok=True)
+    print('created: ', DP_ANALYSIS_TEST_DIR)
 
 
 class HistogramIntegerStatSpecTest(StatSpecTestCase):
@@ -60,34 +69,35 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
             print(self.dp_hist_per_val.get_error_messages())
         self.assertTrue(self.dp_hist_per_val.is_chain_valid())
 
-        self.spec_props_bins =  {'variable': 'age',
-            'col_index': 1,
-            'statistic': astatic.DP_HISTOGRAM,
-            astatic.KEY_HIST_BIN_TYPE: astatic.HIST_BIN_TYPE_EQUAL_RANGES,
-            astatic.KEY_HIST_NUMBER_OF_BINS: 5,
-            astatic.KEY_HIST_BIN_EDGES: None,
-            'dataset_size': 7000,
-            'epsilon': 1,
-            'delta': 0.0,
-            'cl': astatic.CL_95,
-            astatic.KEY_FIXED_VALUE: 32,
-            astatic.KEY_MISSING_VALUES_HANDLING: astatic.MISSING_VAL_INSERT_FIXED,
-            'variable_info': {
-                # 'min': 0,
-                # 'max': 100,
-                'min': 18,
-                'max': 68,
-                'type': pstatic.VAR_TYPE_INTEGER
-            }
-        }
+        self.spec_props_bins = {'variable': 'age',
+                                'col_index': 1,
+                                'statistic': astatic.DP_HISTOGRAM,
+                                astatic.KEY_HIST_BIN_TYPE: astatic.HIST_BIN_TYPE_EQUAL_RANGES,
+                                astatic.KEY_HIST_NUMBER_OF_BINS: 5,
+                                astatic.KEY_HIST_BIN_EDGES: None,
+                                'dataset_size': 7000,
+                                'epsilon': 1,
+                                'delta': 0.0,
+                                'cl': astatic.CL_95,
+                                astatic.KEY_FIXED_VALUE: 32,
+                                astatic.KEY_MISSING_VALUES_HANDLING: astatic.MISSING_VAL_INSERT_FIXED,
+                                'variable_info': {
+                                    # 'min': 0,
+                                    # 'max': 100,
+                                    'min': 18,
+                                    'max': 68,
+                                    'type': pstatic.VAR_TYPE_INTEGER
+                                }
+                                }
 
         self.dp_hist_bins = DPHistogramIntEqualRangesSpec(self.spec_props_bins)
         if self.dp_hist_bins.has_error():
             print(self.dp_hist_bins.get_error_messages())
         else:
             print('histogram_bin_edges: ', self.dp_hist_bins.histogram_bin_edges)
-        # self.assertFalse(self.dp_hist_bins.has_error())
-        # self.assertTrue(self.dp_hist_bins.is_chain_valid())
+
+        self.assertFalse(self.dp_hist_bins.has_error())
+        self.assertTrue(self.dp_hist_bins.is_chain_valid())
 
     def test_001_valid_noise_mechanism(self):
         """(1) Check for the correct noise_mechanism"""
@@ -281,13 +291,88 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         categories = release_dict['result']['value']['categories']
         self.assertTrue(fixed_value in categories)
 
-    def test_140_run_dphist_bins(self):
-        """(140) Hist with bins"""
-        msgt(self.test_140_run_dphist_bins.__doc__)
+    def test_140_run_dphist_calculation_int_bins(self):
+        """(140) Run DP histogram calculation with 7 bins"""
+        msgt(self.test_140_run_dphist_calculation_int_bins.__doc__)
+
+        specs = copy.deepcopy(self.spec_props_bins)
+        num_bins = 5
+        specs[astatic.KEY_HIST_NUMBER_OF_BINS] = num_bins
+        specs[astatic.KEY_VARIABLE_INFO]['min'] = 18
+        specs[astatic.KEY_VARIABLE_INFO]['max'] = 80
+
+        dp_hist = DPHistogramIntEqualRangesSpec(specs)
+        self.assertTrue(dp_hist.is_chain_valid())
+
+        # ------------------------------------------------------
+        # Run the actual mean
+        # ------------------------------------------------------
+        # Column indexes - We know this data has 10 columns
+        col_indexes = [idx for idx in range(0, 10)]
+
+        # File object
+        #
+        teacher_survey_filepath = join(TEST_DATA_DIR, 'teacher_survey', 'teacher_survey.csv')
+        self.assertTrue(isfile(teacher_survey_filepath))
+
+        file_obj = open(teacher_survey_filepath, 'r')
+
+        # Call run_chain
+        #
+        dp_hist.run_chain(col_indexes, file_obj, sep_char=",")
+
+        release_dict = dp_hist.get_release_dict()
+
+        self.assertFalse(dp_hist.has_error())
+        self.assertTrue('categories' in dp_hist.value)
+        self.assertTrue('values' in dp_hist.value)
+
+        # expecting (num_bins - 1)  + (1 for uncategorized) = num_bins
+        self.assertEqual(num_bins, len(release_dict['result']['value']['categories']))
+
+        self.assertEqual(num_bins, len(release_dict['result']['value']['values']))
+
+        # check that category_value_pairs are included--and that there are "num_bins"
+        self.assertEqual(num_bins, len(release_dict['result']['value']['category_value_pairs']))
+
+        # Check that the fixed_value is in the list of categories
+        #
+        fixed_value = release_dict['missing_value_handling']['fixed_value']
+        self.assertEqual(fixed_value, specs[astatic.KEY_FIXED_VALUE])
+
+        # -----------------------------------------------
+        # PDF
+        # -----------------------------------------------
+        samp_full_release_fname = join(DP_REPORTS_TEST_DIR, 'sample_release_01.json')
+        self.assertTrue(isfile(samp_full_release_fname))
+        samp_full_release_dict = json.load(open(samp_full_release_fname, 'r'))
+
+        # Add newly made statistical release to the full release
+        samp_full_release_dict['statistics'] = [release_dict]
+
+        # print('samp_full_release_dict', json.dumps(samp_full_release_dict, indent=4))
+        # print('Creating PDF...')
+        pdf_maker = PDFReportMaker(samp_full_release_dict)
+        if pdf_maker.has_error():
+            print(pdf_maker.get_err_msg())
+        else:
+            output_fname = tempfile.NamedTemporaryFile(
+                prefix='report_' + get_timestamp_str(),
+                suffix='.pdf',
+                delete=True).name
+            pdf_maker.save_pdf_to_file(output_fname)
+            # print('file written: ', output_fname)
+            # self.assertTrue(isfile(output_fname))
+
+        self.assertFalse(pdf_maker.has_error())
+
+    def test_150_run_dphist_bins(self):
+        """(150) Hist with bins"""
+        msgt(self.test_150_run_dphist_bins.__doc__)
 
         from opendp.trans import make_count_by_categories, make_find_bin
         from opendp.meas import make_base_discrete_laplace
-        from opendp.typing import L1Distance, VectorDomain, AllDomain, usize
+        from opendp.typing import VectorDomain, AllDomain, usize
         from opendp.mod import binary_search_chain
 
         edges = [1., 3.14159, 4., 7.]
@@ -315,7 +400,7 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
 
         from opendp.trans import make_count_by_categories, make_find_bin
         from opendp.meas import make_base_discrete_laplace
-        from opendp.typing import L1Distance, VectorDomain, AllDomain, usize
+        from opendp.typing import VectorDomain, AllDomain, usize
         from opendp.mod import binary_search_chain
 
         # edges = [1., 3.14159, 4., 7.]
@@ -344,7 +429,7 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         # df['age'] = df['age'].astype(float)
 
         print(df.columns)
-        #data = np.random.uniform(self.dp_hist_bins.min,
+        # data = np.random.uniform(self.dp_hist_bins.min,
         #                         self.dp_hist_bins.max,
         #                         size=100)
         data = df['age'].tolist()
@@ -355,7 +440,6 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         data.sort()
         print('data', data)
 
-
         print('edges:', edges)
         print('\n-- DP histogram --')
         for x in range(1, 4):
@@ -365,12 +449,10 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         print('\n-- np.histogram --')
         print(np.histogram(data, bins=edges, range=(18, 68)))
 
-
     # @unittest.skip('not ready')
     def test_160_run_dphist_bins(self):
         """(160) Hist with bins"""
         msgt(self.test_160_run_dphist_bins.__doc__)
-
 
         if self.dp_hist_bins.has_error():
             print('Err messages:', self.dp_hist_bins.get_error_messages())
@@ -393,12 +475,10 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
                                     sep_char=',')
         if self.dp_hist_bins.has_error():
             print(self.dp_hist_bins.get_error_messages())
-        #self.assertFalse(self.dp_hist_bins.has_error())
+        # self.assertFalse(self.dp_hist_bins.has_error())
 
         print(self.dp_hist_bins.value)
 
-# TODO: Test 0 bin, 1 bin, etc.
-# astatic.KEY_HIST_NUMBER_OF_BINS: 5,
 """
 docker-compose run server python manage.py test opendp_apps.analysis.testing.test_dp_histogram_integer_spec.HistogramIntegerStatSpecTest.test_160_run_dphist_bins
 """

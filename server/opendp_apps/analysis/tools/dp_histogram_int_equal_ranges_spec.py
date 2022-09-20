@@ -145,15 +145,14 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
         # Note: earlier validation checks that "self.histogram_number_of_bins" is > 2
         num_bin_edges = len(self.histogram_bin_edges)
         null_bin = num_bin_edges - 1
+        make_idx_categories = [null_bin, *range(null_bin), null_bin]
 
         preprocessor = (
                 make_select_column(key=self.col_index, TOA=str) >>
                 make_cast(TIA=str, TOA=int) >>
                 make_impute_constant(self.fixed_value) >>
                 make_find_bin(edges=self.histogram_bin_edges) >>
-                make_index([null_bin, *range(null_bin), null_bin],
-                           null_bin,
-                           TOA=usize) >>
+                make_index(make_idx_categories, null_bin, TOA=usize) >>
                 make_count_by_categories(categories=categories_list,
                                          TIA=usize)
         )
@@ -183,7 +182,11 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
         if self.has_error():
             return None
 
-        return list(range(len(self.histogram_bin_edges)))
+        # Note: the make_index command in "get_preprocessor"
+        #  collapses the first bin [-inf, 0)
+        # and last bin [last edge, inf) into the last category
+        #
+        return list(range(len(self.histogram_bin_edges) - 1))
 
     def set_accuracy(self):
         """Return the accuracy measure using Laplace and the confidence level alpha"""
@@ -263,8 +266,9 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
                 self.add_err_msg(f'{ex_obj} (Exception)')
             return False
 
-        print('self.histogram_bin_edges', self.histogram_bin_edges)
-        print('self.value', self.value)
+        # print(f'histogram_bin_edges: {self.histogram_bin_edges}; No. edges: {len(self.histogram_bin_edges)}')
+        # print(f'categories: {self.categories}; No. cats: {len(self.categories)}')
+        # print(f'values: {self.value}; No. values: {len(self.value)}')
 
         # Show warning if category count doesn't match values count
         if len(self.categories) > len(self.value):
@@ -278,6 +282,7 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
             return
 
         self.value = dict(categories=self.categories,
+                          histogram_bin_edges=self.histogram_bin_edges,
                           values=self.value,
                           category_value_pairs=list(zip(self.categories, self.value)))
 

@@ -64,8 +64,10 @@ DP_STATS_REQUIRE_COUNTS = [DP_MEAN,
 VALID_DP_STATS_CHOICES_STR = ', '.join(DP_STATS_CHOICES)
 
 # --------------------------------------
-# Histogram bin types
+# Keys (mostly Histogram bin types)
 # --------------------------------------
+KEY_VARIABLE_INFO = 'variable_info'
+
 KEY_HIST_BIN_TYPE = 'histogram_bin_type'
 KEY_HIST_NUMBER_OF_BINS = 'histogram_number_of_bins'
 KEY_HIST_BIN_EDGES = 'histogram_bin_edges'
