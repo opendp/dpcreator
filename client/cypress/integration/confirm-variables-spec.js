@@ -1,26 +1,5 @@
 {
     describe('Confirm Variables Page', () => {
-        it('deletes datasets only', () => {
-            cy.on('uncaught:exception', (e, runnable) => {
-                console.log('error', e)
-                console.log('runnable', runnable)
-                return false
-            })
-            //     cy.clearData()
-            //     cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
-
-            cy.clearDatasetsOnly()
-            cy.pause()
-            /*
-            let testfile = 'cypress/fixtures/Fatigue_data.csv'
-            cy.uploadFile(testfile)
-             cy.fixture('variables').then((varsFixture) => {
-                cy.goToConfirmVariables(varsFixture)
-                cy.get('[data-test="variableRow"]').should('have.length', Object.keys(varsFixture).length)
-                cy.get('[data-test="filterCheckBox"]').click({force: true})
-                cy.get('[data-test="variableRow"]').should('not.exist')
-            }) */
-        })
 
         it('displays the correct number of rows', () => {
             cy.on('uncaught:exception', (e, runnable) => {
