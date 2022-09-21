@@ -55,14 +55,15 @@ class StatSpec:
         self.col_index = props.get('col_index')  # column index in the orig dataset
         self.epsilon = float(props.get('epsilon')) if props.get('epsilon') else None
         self.cl = props.get('cl')  # confidence level coefficient (e.g. .95, .99, etc)
-        self.variable_info = props.get('variable_info', {})  # retrieve min/max or categories, if needed
+
 
         # (1a) histogram specific
         self.histogram_bin_type = props.get('histogram_bin_type')
         self.histogram_number_of_bins = props.get('histogram_number_of_bins')
         self.histogram_bin_edges = props.get('histogram_bin_edges')
 
-        # (2) Retrieved from variable_info
+        # (2) Retrieved from variable_info - data from the Confirm Variables page
+        self.variable_info = props.get('variable_info', {})  # retrieve min/max or categories, if needed
         self.var_type = self.variable_info.get('type')  # mandatory
         self.min = self.variable_info.get('min')  # optional: depends on variable type/stat
         self.max = self.variable_info.get('max')  # optional: depends on variable type/stat

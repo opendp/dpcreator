@@ -2,6 +2,7 @@ import logging
 from typing import Union
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from opendp.accuracy import laplacian_scale_to_accuracy
 from opendp.meas import make_base_discrete_laplace
 from opendp.mod import enable_features, binary_search_param, OpenDPException
@@ -20,9 +21,9 @@ from opendp_apps.analysis.tools.bin_edge_helper import BinEdgeHelper
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.utils.extra_validators import \
     (validate_fixed_value_against_min_max,
-     validate_histogram_bin_type_equal_ranges,
+     validate_histogram_bin_type_edges,
      validate_int,
-     validate_int_two_or_greater,
+     validate_edge_count_two_or_greater,
      validate_min_max,
      validate_missing_val_handlers,
      validate_num_bins_against_min_max,
@@ -33,7 +34,7 @@ enable_features("floating-point", "contrib")
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
-class DPHistogramIntEqualRangesSpec(StatSpec):
+class DPHistogramIntBinEdgesSpec(StatSpec):
     """
     Create a Histogram using integer data
     """
@@ -46,8 +47,8 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
 
     def get_stat_specific_validators(self):
         """Set validators used for the DP Mean"""
-        return dict(histogram_bin_type=validate_histogram_bin_type_equal_ranges,
-                    histogram_number_of_bins=validate_int_two_or_greater,
+        return dict(histogram_bin_type=validate_histogram_bin_type_edges,
+                    histogram_bin_edges=validate_edge_count_two_or_greater,
                     var_type=validate_type_integer,
                     #
                     min=validate_int,
@@ -74,12 +75,49 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
                                           'min/max'):
             return
 
-        # cast self.histogram_number_of_bins to an int
-        if not self.cast_property_to_int('histogram_number_of_bins'):
+        # Check that self.histogram_bin_edges has 2 or more values
+        if not self.validate_property('histogram_bin_edges', validate_edge_count_two_or_greater):
+            return
+
+        # Cast edges to integers
+        #
+        fmt_bin_edges = []
+        for bin_edge in self.histogram_bin_edges:
+
+            # Convert this bin edge into an integer
+            try:
+                validate_int(bin_edge)
+            except ValidationError:
+                self.add_err_msg(f'This bin edge is not an integer: {bin_edge}')
+                return
+            fmt_bin_edges.append(int(bin_edge))
+        self.histogram_bin_edges = fmt_bin_edges
+
+        # Sort the bin edges
+        self.histogram_bin_edges.sort()
+
+        # Check that the bins do not repeat
+        if len(self.histogram_bin_edges) != len(list(set(self.histogram_bin_edges))):
+            self.add_err_msg('The bin edges must be unique. Found: {self.histogram_bin_edges}')
+            return
+
+        # Check that first bin edge falls within the min/max
+        if not self.validate_multi_values(
+                [self.histogram_bin_edges[0], self.min, self.max],
+                validate_fixed_value_against_min_max,
+                'fixed value within min/max bounds'):
+            return
+
+        # Check that last bin edge falls within the min/max
+        if not self.validate_multi_values(
+                [self.histogram_bin_edges[-1], self.min, self.max],
+                validate_fixed_value_against_min_max,
+                'fixed value within min/max bounds'):
             return
 
         # Validate the number of bins vs. min/max
-        if not self.validate_multi_values([self.histogram_number_of_bins,
+        est_bin_count = len(self.histogram_bin_edges) - 1  # Estimated bin count not including "uncategorized"
+        if not self.validate_multi_values([est_bin_count,
                                            self.min,
                                            self.max],
                                           validate_num_bins_against_min_max,
@@ -99,15 +137,7 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
                     'fixed value within min/max bounds'):
                 return
 
-        # Determine the edges based on the min/max and number of bins
-        #
-        beh = BinEdgeHelper(self.min, self.max, self.histogram_number_of_bins)
-        if beh.has_error():
-            self.add_err_msg(beh.get_err_msg())
-            return
-
-        self.histogram_bin_edges = beh.bin_edges
-        self.categories = beh.buckets
+        self.categories = BinEdgeHelper.get_display_bins_inclusive(self.histogram_bin_edges)
 
     def run_03_custom_validation(self):
         """
@@ -163,7 +193,8 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
 
         def make_histogram(scale):
             return preprocessor >> \
-                   make_base_discrete_laplace(scale, D=VectorDomain[AllDomain[int]])
+                   make_base_discrete_laplace(
+                       scale, D=VectorDomain[AllDomain[int]])
 
         self.scale = binary_search_param(
             make_histogram,

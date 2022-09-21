@@ -5,6 +5,7 @@ import copy
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.tools.dp_histogram_categorical_spec import DPHistogramCategoricalSpec
+from opendp_apps.analysis.tools.dp_histogram_int_bin_edges_spec import DPHistogramIntBinEdgesSpec
 from opendp_apps.analysis.tools.dp_histogram_int_equal_ranges_spec import DPHistogramIntEqualRangesSpec
 from opendp_apps.analysis.tools.dp_histogram_int_one_per_value_spec import DPHistogramIntOnePerValueSpec
 from opendp_apps.analysis.tools.dp_spec_error import DPSpecError
@@ -60,7 +61,7 @@ def get_histogram_stat_spec(props: dict) -> StatSpec:
 
         elif histogram_bin_type == astatic.HIST_BIN_TYPE_BIN_EDGES:
             # BinEdges
-            assert False, 'Histogram for Integer/Edges not available'
+            return DPHistogramIntBinEdgesSpec(props)
 
         else:
             # Unknown bin type

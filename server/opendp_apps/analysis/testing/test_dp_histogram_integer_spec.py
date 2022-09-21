@@ -17,6 +17,7 @@ from opendp_apps.analysis.misc_formatters import get_timestamp_str
 from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
 from opendp_apps.analysis.tools.dp_histogram_int_equal_ranges_spec import DPHistogramIntEqualRangesSpec
 from opendp_apps.analysis.tools.dp_histogram_int_one_per_value_spec import DPHistogramIntOnePerValueSpec
+from opendp_apps.analysis.tools.dp_histogram_int_bin_edges_spec import DPHistogramIntBinEdgesSpec
 from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import static_vals as pstatic
@@ -326,6 +327,7 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         self.assertFalse(dp_hist.has_error())
         self.assertTrue('categories' in dp_hist.value)
         self.assertTrue('values' in dp_hist.value)
+        print(dp_hist.get_success_msg_dict())
 
         # expecting (num_bins - 1)  + (1 for uncategorized) = num_bins
         self.assertEqual(num_bins, len(release_dict['result']['value']['categories']))
@@ -449,35 +451,101 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         print('\n-- np.histogram --')
         print(np.histogram(data, bins=edges, range=(18, 68)))
 
-    # @unittest.skip('not ready')
-    def test_160_run_dphist_bins(self):
-        """(160) Hist with bins"""
-        msgt(self.test_160_run_dphist_bins.__doc__)
+    def test_160_run_dphist_int_edges(self):
+        """(160) Run DP histogram calculation with edges"""
+        msgt(self.test_160_run_dphist_int_edges.__doc__)
 
-        if self.dp_hist_bins.has_error():
-            print('Err messages:', self.dp_hist_bins.get_error_messages())
-        print('test_160_run_dphist_bins 2')
-        self.assertFalse(self.dp_hist_bins.has_error())
+        spec_props = {'variable': 'age',
+                      'col_index': 1,
+                      'statistic': astatic.DP_HISTOGRAM,
+                      astatic.KEY_HIST_BIN_TYPE: astatic.HIST_BIN_TYPE_BIN_EDGES,
+                      astatic.KEY_HIST_NUMBER_OF_BINS: None,
+                      astatic.KEY_HIST_BIN_EDGES: [18, 25, 35, 45, 55, 65, 75],
+                      'dataset_size': 7000,
+                      'epsilon': 1,
+                      'delta': 0.0,
+                      'cl': astatic.CL_95,
+                      astatic.KEY_FIXED_VALUE: 32,
+                      astatic.KEY_MISSING_VALUES_HANDLING: astatic.MISSING_VAL_INSERT_FIXED,
+                      'variable_info': {
+                        'min': 18,
+                        'max': 75,
+                        'type': pstatic.VAR_TYPE_INTEGER
+                        }
+                      }
 
-        print('test_160_run_dphist_bins 3')
-        print('self.dp_hist_bins.is_chain_valid(): ', self.dp_hist_bins.is_chain_valid())
-        if self.dp_hist_bins.has_error():
-            print('get_error_messages:', self.dp_hist_bins.get_error_messages())
-        print('test_160_run_dphist_bins 4')
+        dp_hist = DPHistogramIntBinEdgesSpec(spec_props)
 
+        if not dp_hist.is_chain_valid():
+            print('Error!')
+            print(dp_hist.get_single_err_msg())
+        else:
+            print('Validated!')
+            print(dp_hist.get_success_msg_dict())
+
+        return
+        # ------------------------------------------------------
+        # Run the actual mean
+        # ------------------------------------------------------
+        # Column indexes - We know this data has 10 columns
+        col_indexes = [idx for idx in range(0, 10)]
+
+        # File object
+        #
         teacher_survey_filepath = join(TEST_DATA_DIR, 'teacher_survey', 'teacher_survey.csv')
         self.assertTrue(isfile(teacher_survey_filepath))
 
         file_obj = open(teacher_survey_filepath, 'r')
 
-        self.dp_hist_bins.run_chain(list(range(0, 10)),
-                                    file_obj,
-                                    sep_char=',')
-        if self.dp_hist_bins.has_error():
-            print(self.dp_hist_bins.get_error_messages())
-        # self.assertFalse(self.dp_hist_bins.has_error())
+        # Call run_chain
+        #
+        dp_hist.run_chain(col_indexes, file_obj, sep_char=",")
 
-        print(self.dp_hist_bins.value)
+        release_dict = dp_hist.get_release_dict()
+
+        self.assertFalse(dp_hist.has_error())
+        self.assertTrue('categories' in dp_hist.value)
+        self.assertTrue('values' in dp_hist.value)
+
+        # expecting (num_bins - 1)  + (1 for uncategorized) = num_bins
+        self.assertEqual(num_bins, len(release_dict['result']['value']['categories']))
+
+        self.assertEqual(num_bins, len(release_dict['result']['value']['values']))
+
+        # check that category_value_pairs are included--and that there are "num_bins"
+        self.assertEqual(num_bins, len(release_dict['result']['value']['category_value_pairs']))
+
+        # Check that the fixed_value is in the list of categories
+        #
+        fixed_value = release_dict['missing_value_handling']['fixed_value']
+        self.assertEqual(fixed_value, specs[astatic.KEY_FIXED_VALUE])
+
+        # -----------------------------------------------
+        # PDF
+        # -----------------------------------------------
+        samp_full_release_fname = join(DP_REPORTS_TEST_DIR, 'sample_release_01.json')
+        self.assertTrue(isfile(samp_full_release_fname))
+        samp_full_release_dict = json.load(open(samp_full_release_fname, 'r'))
+
+        # Add newly made statistical release to the full release
+        samp_full_release_dict['statistics'] = [release_dict]
+
+        # print('samp_full_release_dict', json.dumps(samp_full_release_dict, indent=4))
+        # print('Creating PDF...')
+        pdf_maker = PDFReportMaker(samp_full_release_dict)
+        if pdf_maker.has_error():
+            print(pdf_maker.get_err_msg())
+        else:
+            output_fname = tempfile.NamedTemporaryFile(
+                prefix='report_' + get_timestamp_str(),
+                suffix='.pdf',
+                delete=True).name
+            pdf_maker.save_pdf_to_file(output_fname)
+            # print('file written: ', output_fname)
+            # self.assertTrue(isfile(output_fname))
+
+        self.assertFalse(pdf_maker.has_error())
+
 
 """
 docker-compose run server python manage.py test opendp_apps.analysis.testing.test_dp_histogram_integer_spec.HistogramIntegerStatSpecTest.test_160_run_dphist_bins
