@@ -128,7 +128,6 @@
                   </v-row>
                 </div>
               </v-expand-transition>
-              <!--  TODO: uncomment this when BIN EDGES is implemented
               <v-row>
                 <v-col>
                   <v-radio
@@ -182,7 +181,7 @@
 
                 </v-row>
               </v-expand-transition>
-              -->
+
             </v-container>
 
 
