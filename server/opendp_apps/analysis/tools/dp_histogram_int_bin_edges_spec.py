@@ -227,7 +227,7 @@ class DPHistogramIntBinEdgesSpec(StatSpec):
         if self.has_error():
             return False
 
-        self.accuracy_val = '<Made up val! Fix set_accuracy!>'
+        self.accuracy_val = 'TO DO!!'
         self.accuracy_msg = self.get_accuracy_text(template_name='analysis/dp_histogram_accuracy_default.txt')
         return True
 
