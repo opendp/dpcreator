@@ -483,9 +483,8 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
             print('Validated!')
             print(dp_hist.get_success_msg_dict())
 
-        return
         # ------------------------------------------------------
-        # Run the actual mean
+        # Run the actual histogram
         # ------------------------------------------------------
         # Column indexes - We know this data has 10 columns
         col_indexes = [idx for idx in range(0, 10)]
@@ -501,24 +500,29 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         #
         dp_hist.run_chain(col_indexes, file_obj, sep_char=",")
 
+        if dp_hist.has_error():
+            print('Error: ', dp_hist.has_error())
+
         release_dict = dp_hist.get_release_dict()
+        # import json; print(json.dumps(release_dict, indent=4))
 
         self.assertFalse(dp_hist.has_error())
         self.assertTrue('categories' in dp_hist.value)
         self.assertTrue('values' in dp_hist.value)
 
+        expected_num_bins = 7
         # expecting (num_bins - 1)  + (1 for uncategorized) = num_bins
-        self.assertEqual(num_bins, len(release_dict['result']['value']['categories']))
+        self.assertEqual(expected_num_bins, len(release_dict['result']['value']['categories']))
 
-        self.assertEqual(num_bins, len(release_dict['result']['value']['values']))
+        self.assertEqual(expected_num_bins, len(release_dict['result']['value']['values']))
 
         # check that category_value_pairs are included--and that there are "num_bins"
-        self.assertEqual(num_bins, len(release_dict['result']['value']['category_value_pairs']))
+        self.assertEqual(expected_num_bins, len(release_dict['result']['value']['category_value_pairs']))
 
         # Check that the fixed_value is in the list of categories
         #
         fixed_value = release_dict['missing_value_handling']['fixed_value']
-        self.assertEqual(fixed_value, specs[astatic.KEY_FIXED_VALUE])
+        self.assertEqual(fixed_value, spec_props[astatic.KEY_FIXED_VALUE])
 
         # -----------------------------------------------
         # PDF
@@ -531,7 +535,7 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         samp_full_release_dict['statistics'] = [release_dict]
 
         # print('samp_full_release_dict', json.dumps(samp_full_release_dict, indent=4))
-        # print('Creating PDF...')
+        print('Creating test PDF...')
         pdf_maker = PDFReportMaker(samp_full_release_dict)
         if pdf_maker.has_error():
             print(pdf_maker.get_err_msg())
