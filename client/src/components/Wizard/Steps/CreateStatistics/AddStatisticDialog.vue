@@ -209,11 +209,11 @@
             color="primary"
             classes="mr-2 px-5"
             :click="save"
-            :disabled="isButtonDisabled()"
+            :disabled="isButtonDisabled"
             data-test="Create Statistic Button"
             :label="getButtonLabel"
         />
-
+        ∂
         <Button
             color="primary"
             outlined
@@ -301,6 +301,31 @@ export default {
   computed: {
     ...mapState('dataset', ['analysisPlan', "datasetInfo"]),
     ...mapGetters('dataset', ['getDepositorSetupInfo']),
+    isButtonDisabled: function () {
+      let disabled = false
+      let validHistogramOption = false
+      if (!this.showHistogramOptions()
+          || this.editedItemDialog.histogramBinType === ONE_BIN_PER_VALUE
+          || (this.editedItemDialog.histogramBinType === BIN_EDGES
+              && this.editedItemDialog.histogramBinEdges instanceof Array
+              && this.editedItemDialog.histogramBinEdges.length > 0
+              && this.isEdgesInputValid(this.editedItemDialog.histogramBinEdges))
+          || (this.editedItemDialog.histogramBinType === EQUAL_BIN_RANGES
+              && this.editedItemDialog.histogramNumberOfBins
+              && this.isNumBinsValid(this.editedItemDialog.histogramNumberOfBins)
+          )) {
+        validHistogramOption = true
+      }
+      if (this.editedItemDialog.statistic === ""
+          || this.editedItemDialog.variable === ""
+          || this.editedItemDialog.variable === undefined
+          || (this.editedItemDialog.statistic !== "count" && !this.editedItemDialog.fixedValue)
+          || (this.editedItemDialog.statistic === "histogram" && !validHistogramOption)
+      ) {
+        disabled = true
+      }
+      return disabled
+    },
     errorCount: function () {
       let count = 0;
       if (this.validationErrorMsg) {
@@ -439,31 +464,7 @@ export default {
         this.editedItemDialog.histogramBuckets = ""
       }
     },
-    isButtonDisabled: function () {
-      let disabled = false
-      let validHistogramOption = false
-      if (!this.showHistogramOptions()
-          || this.editedItemDialog.histogramBinType === ONE_BIN_PER_VALUE
-          || (this.editedItemDialog.histogramBinType === BIN_EDGES
-              && this.editedItemDialog.histogramBinEdges instanceof Array
-              && this.editedItemDialog.histogramBinEdges.length > 0
-              && this.isEdgesInputValid(this.editedItemDialog.histogramBinEdges))
-          || (this.editedItemDialog.histogramBinType === EQUAL_BIN_RANGES
-              && this.editedItemDialog.histogramNumberOfBins
-              && this.isNumBinsValid(this.editedItemDialog.histogramNumberOfBins)
-          )) {
-        validHistogramOption = true
-      }
-      if (this.editedItemDialog.statistic === ""
-          || this.editedItemDialog.variable === ""
-          || this.editedItemDialog.variable === undefined
-          || (this.editedItemDialog.statistic !== "count" && !this.editedItemDialog.fixedValue)
-          || (this.editedItemDialog.statistic === "histogram" && !validHistogramOption)
-      ) {
-        disabled = true
-      }
-      return disabled
-    },
+
     removeEdgeFromList(edge) {
       this.editedItemDialog.histogramBinEdges.splice(
           this.editedItemDialog.histogramBinEdges.indexOf(edge),
