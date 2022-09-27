@@ -330,6 +330,9 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         print(dp_hist.get_success_msg_dict())
 
         # expecting (num_bins - 1)  + (1 for uncategorized) = num_bins
+        expected_accuracy = 4.382026634673881
+        self.assertEqual(expected_accuracy, release_dict['accuracy']['value'])
+
         self.assertEqual(num_bins, len(release_dict['result']['value']['categories']))
 
         self.assertEqual(num_bins, len(release_dict['result']['value']['values']))
@@ -345,6 +348,7 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         # -----------------------------------------------
         # PDF
         # -----------------------------------------------
+        print('Creating test PDF...')
         samp_full_release_fname = join(DP_REPORTS_TEST_DIR, 'sample_release_01.json')
         self.assertTrue(isfile(samp_full_release_fname))
         samp_full_release_dict = json.load(open(samp_full_release_fname, 'r'))
@@ -368,9 +372,10 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
 
         self.assertFalse(pdf_maker.has_error())
 
-    def test_150_run_dphist_bins(self):
-        """(150) Hist with bins"""
-        msgt(self.test_150_run_dphist_bins.__doc__)
+    # @unittest.skip('not ready')
+    def test_150_run_dphist_edges(self):
+        """(150) Hist based on edges"""
+        msgt(self.test_150_run_dphist_edges.__doc__)
 
         from opendp.trans import make_count_by_categories, make_find_bin
         from opendp.meas import make_base_discrete_laplace
@@ -394,62 +399,6 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         print(noisy_histogram_from_dataframe(data))
         print(noisy_histogram_from_dataframe(data))
         print(noisy_histogram_from_dataframe(data))
-
-    @unittest.skip('not ready')
-    def test_150_run_dphist_bins(self):
-        """(150) Hist with bins"""
-        msgt(self.test_150_run_dphist_bins.__doc__)
-
-        from opendp.trans import make_count_by_categories, make_find_bin
-        from opendp.meas import make_base_discrete_laplace
-        from opendp.typing import VectorDomain, AllDomain, usize
-        from opendp.mod import binary_search_chain
-
-        # edges = [1., 3.14159, 4., 7.]
-        edges = self.dp_hist_bins.histogram_bin_edges
-        edges = [int(x) for x in edges]
-        print('edges', edges)
-
-        preprocess = (
-                make_find_bin(edges=edges) >>
-                make_count_by_categories(categories=list(range(len(edges))), TIA=usize)
-        )
-
-        noisy_histogram_from_dataframe = binary_search_chain(
-            lambda s: preprocess >> make_base_discrete_laplace(s, D=VectorDomain[AllDomain[int]]),
-            d_in=1, d_out=self.dp_hist_bins.epsilon)
-
-        print(laplacian_scale_to_accuracy(noisy_histogram_from_dataframe, .01))
-
-        assert noisy_histogram_from_dataframe.check(1, self.dp_hist_bins.epsilon)
-        import numpy as np
-        # data = np.random.uniform(0., 10., size=100)
-
-        teacher_survey_filepath = join(TEST_DATA_DIR, 'teacher_survey', 'teacher_survey.csv')
-        self.assertTrue(isfile(teacher_survey_filepath))
-        df = pd.read_csv(teacher_survey_filepath)
-        # df['age'] = df['age'].astype(float)
-
-        print(df.columns)
-        # data = np.random.uniform(self.dp_hist_bins.min,
-        #                         self.dp_hist_bins.max,
-        #                         size=100)
-        data = df['age'].tolist()
-        print('actual min: ', min(data))
-        print('actual max: ', max(data))
-
-        data = data[:50]
-        data.sort()
-        print('data', data)
-
-        print('edges:', edges)
-        print('\n-- DP histogram --')
-        for x in range(1, 4):
-            noisy_hist = noisy_histogram_from_dataframe(data)
-            print(noisy_hist, type(noisy_hist))
-
-        print('\n-- np.histogram --')
-        print(np.histogram(data, bins=edges, range=(18, 68)))
 
     def test_160_run_dphist_int_edges(self):
         """(160) Run DP histogram calculation with edges"""
@@ -510,8 +459,13 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         self.assertTrue('categories' in dp_hist.value)
         self.assertTrue('values' in dp_hist.value)
 
+
         expected_num_bins = 7
         # expecting (num_bins - 1)  + (1 for uncategorized) = num_bins
+
+        expected_accuracy = 4.787491742782046
+        self.assertEqual(expected_accuracy, release_dict['accuracy']['value'])
+
         self.assertEqual(expected_num_bins, len(release_dict['result']['value']['categories']))
 
         self.assertEqual(expected_num_bins, len(release_dict['result']['value']['values']))

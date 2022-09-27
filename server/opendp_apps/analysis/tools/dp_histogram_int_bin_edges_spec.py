@@ -227,18 +227,11 @@ class DPHistogramIntBinEdgesSpec(StatSpec):
         if self.has_error():
             return False
 
-        self.accuracy_val = 'TO DO!!'
-        self.accuracy_msg = self.get_accuracy_text(template_name='analysis/dp_histogram_accuracy_default.txt')
-        return True
-
         if not self.preprocessor:
             self.preprocessor = self.get_preprocessor()
 
-        # This is for histograms, so divide alpha by the number of counts
-        # we just need the length, using the number of bin edges
-        categories_list = self.get_pseudo_categories_list()
-
-        cl_alpha = self.get_confidence_level_alpha() / len(categories_list)
+        num_categories = len(self.histogram_bin_edges) - 1
+        cl_alpha = self.get_confidence_level_alpha() / num_categories
         if cl_alpha is None:
             # Error already saved
             return False
