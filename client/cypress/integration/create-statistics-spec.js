@@ -53,8 +53,7 @@
                 cy.get('[data-test="histogramNumberOfBins"]').type('11')
                 cy.get('div').should('contain', 'Value must').should('be.visible')
 
-                cy.pause()
-                cy.get('[data-test="histogramNumberOfBins"]').type('3')
+                cy.get('[data-test="histogramNumberOfBins"]').clear().type('3')
                 cy.get('div').should('contain', 'Equal range bins: [0, 4],[5, 10],uncategorized')
                 cy.get('[data-test="Create Statistic Button"]').click({force: true})
                 cy.get('tr').first().get('td').should('contain', "Histogram")
@@ -84,7 +83,6 @@
                 }
                 const newAccuracy = "1.64"
                 cy.createStatistics(statsData)
-                cy.pause()
                 cy.get('tr').first().get('td').should('contain', statsData.statistics[0].statistic)
                 cy.get('table').contains('td', statsData.statistics[0].statistic).should('be.visible');
 
@@ -123,7 +121,6 @@
                 // Add all the statistics in the Create Statistics Step
                 cy.createStatistics(demoData)
             })
-            cy.pause()
         })
 
         it('Displays Fixed Value Input Correctly', () => {
