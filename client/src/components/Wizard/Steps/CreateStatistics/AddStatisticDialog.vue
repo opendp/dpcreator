@@ -89,7 +89,7 @@
                            :label="histogramOptions[ONE_BIN_PER_VALUE]"
                            :value="ONE_BIN_PER_VALUE"
                            :data-test="ONE_BIN_PER_VALUE"
-                           @click="editedItemDialog.histogramNumberOfBins=null;editedItemDialog.histogramBuckets='';editedItemDialog.histogramBinEdges=[]"
+                           @click="editedItemDialog.histogramNumberOfBins='';editedItemDialog.histogramBuckets='';editedItemDialog.histogramBinEdges=[]"
 
                   ></v-radio>
                 </v-col>
@@ -119,7 +119,7 @@
                           :rules="[validateNumBins]"
                           @keyup="binEdgeBuckets"
                       ></v-text-field>
-                      <div v-if="editedItemDialog.histogramNumberOfBins">
+                      <div v-if="editedItemDialog.histogramBuckets">
                         Equal range bins: {{ editedItemDialog.histogramBuckets }}
                       </div>
 
@@ -448,13 +448,13 @@ export default {
     histogramOptions
   }),
   methods: {
-    binEdgeBuckets() {
+    binEdgeBuckets: function () {
       if (this.editedItemDialog.statistic == 'histogram'
           && this.editedItemDialog.histogramBinType === EQUAL_BIN_RANGES
           && this.editedItemDialog.histogramNumberOfBins
           && this.isNumBinsValid(this.editedItemDialog.histogramNumberOfBins)
       ) {
-        return analysis.getHistogramBuckets(this.variableInfo[this.editedItemDialog.variable].min,
+        analysis.getHistogramBuckets(this.variableInfo[this.editedItemDialog.variable].min,
             this.variableInfo[this.editedItemDialog.variable].max,
             this.editedItemDialog.histogramNumberOfBins).then((resp) => {
           //  console.log("setting buckets: "+resp.data.buckets.toString())
@@ -464,7 +464,6 @@ export default {
         this.editedItemDialog.histogramBuckets = ""
       }
     },
-
     removeEdgeFromList(edge) {
       this.editedItemDialog.histogramBinEdges.splice(
           this.editedItemDialog.histogramBinEdges.indexOf(edge),
@@ -561,13 +560,13 @@ export default {
     isNumBinsValid(v) {
       if (v !== null) {
         const num = Number(v)
-        return Number.isInteger(num) && num >= 1 && num <= this.variableRange()
+        return Number.isInteger(num) && num > 1 && num < this.variableRange()
       } else {
         return true
       }
     },
     validateNumBins(v) {
-      return this.isNumBinsValid(v) || "Value must be an integer between 1 and " + this.variableRange()
+      return this.isNumBinsValid(v) || "Value must be an integer between 2 and " + (this.variableRange() - 1)
     },
     validateBinEdges(v) {
       return this.isEdgesInputValid(v) || "Edge must be a number between "
