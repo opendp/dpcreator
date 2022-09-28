@@ -137,9 +137,9 @@ class DPHistogramIntBinEdgesSpec(StatSpec):
                     'fixed value within min/max bounds'):
                 return
 
-        # If the last edge is the max, make the last edge inclusive of the max
-        if self.histogram_bin_edges[-1] == self.max:
-            self.histogram_bin_edges[-1] = self.max + 1
+        # Make the last edge inclusive
+        last_edge_val = self.histogram_bin_edges[-1]
+        self.histogram_bin_edges[-1] = last_edge_val + 1
 
         self.categories = BinEdgeHelper.get_display_bins_inclusive(self.histogram_bin_edges)
 

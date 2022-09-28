@@ -201,7 +201,7 @@ class HistogramIntegerBinEdgesStatSpecTest(StatSpecTestCase):
             print('Error: ', dp_hist.has_error())
 
         release_dict = dp_hist.get_release_dict()
-        # import json; print(json.dumps(release_dict, indent=4))
+        # print(json.dumps(release_dict, indent=4))
 
         self.assertFalse(dp_hist.has_error())
         self.assertTrue('categories' in dp_hist.value)
