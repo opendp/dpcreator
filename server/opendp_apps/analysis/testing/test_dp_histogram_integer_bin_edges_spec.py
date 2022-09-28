@@ -1,6 +1,7 @@
 """
 docker-compose run server python manage.py test opendp_apps.analysis.testing.test_dp_histogram_integer_bin_edges_spec.HistogramIntegerBinEdgesStatSpecTest
 """
+import json
 import decimal
 import os
 import tempfile
@@ -200,8 +201,7 @@ class HistogramIntegerBinEdgesStatSpecTest(StatSpecTestCase):
             print('Error: ', dp_hist.has_error())
 
         release_dict = dp_hist.get_release_dict()
-        import json;
-        print(json.dumps(release_dict, indent=4))
+        # import json; print(json.dumps(release_dict, indent=4))
 
         self.assertFalse(dp_hist.has_error())
         self.assertTrue('categories' in dp_hist.value)
@@ -210,12 +210,21 @@ class HistogramIntegerBinEdgesStatSpecTest(StatSpecTestCase):
         expected_num_bins = 7
         # expecting (num_bins - 1)  + (1 for uncategorized) = num_bins
 
+        # check accuracy
         expected_accuracy = 4.787491742782046
         self.assertEqual(expected_accuracy, release_dict['accuracy']['value'])
 
         self.assertEqual(expected_num_bins, len(release_dict['result']['value']['categories']))
-
         self.assertEqual(expected_num_bins, len(release_dict['result']['value']['values']))
+
+        # check category text
+        expected_cats = ["[18, 24]", "[25, 34]", "[35, 44]", "[45, 54]",
+                         "[55, 64]", "[65, 75]", "uncategorized"]
+        self.assertEqual(expected_cats, release_dict['result']['value']['categories'])
+
+        # expected edges
+        histogram_bin_edges = [18, 25, 35, 45, 55, 65, 76]
+        self.assertEqual(histogram_bin_edges, release_dict['result']['value']['histogram_bin_edges'])
 
         # check that category_value_pairs are included--and that there are "num_bins"
         self.assertEqual(expected_num_bins, len(release_dict['result']['value']['category_value_pairs']))
