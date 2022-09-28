@@ -213,7 +213,7 @@
             data-test="Create Statistic Button"
             :label="getButtonLabel"
         />
-        ∂
+
         <Button
             color="primary"
             outlined
