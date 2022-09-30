@@ -3,7 +3,7 @@ docker-compose run server python manage.py test opendp_apps.analysis.testing.tes
 
 docker-compose run server python manage.py test opendp_apps.analysis.testing.test_dp_mean_spec.StatSpecTest.test_40_test_impute
 
-docker-compose run server python manage.py test opendp_apps.analysis.testing.test_dp_histogram_integer_onepervalue_spec.HistogramIntegerStatSpecTest.test_120_run_dphist_calculation_integer
+docker-compose run server python manage.py test opendp_apps.analysis.testing.test_dp_histogram_integer_spec.HistogramIntegerStatSpecTest.test_160_run_dphist_int_edges
 
 docker-compose run server python manage.py test opendp_apps.analysis.testing.test_dp_histogram_categorical_spec.HistogramCategoricalStatSpecTest.test_130_format_variable_info_categories
 

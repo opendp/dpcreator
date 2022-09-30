@@ -26,6 +26,7 @@ VALIDATE_MSG_TWO_EDGES_MINIMUM = 'At least two edges are needed to create the hi
 VALIDATE_MSG_EDGES_NOT_A_LIST = 'The "edges" are not a list'
 VALIDATE_MSG_MORE_BINS_THAN_VALUES = 'There are more bins than values.'
 
+
 def validate_statistic(value):
     """Statistic currently supported"""
     if value not in astatic.DP_STATS_CHOICES:
@@ -63,9 +64,9 @@ def validate_not_negative(value):
         raise ValidationError(VALIDATE_MSG_ZERO_OR_GREATER)
 
 
-def validate_edge_count_two_or_greater(value: list):
+def validate_edge_count_two_or_greater(value: Union[list, tuple]):
     """Validate that the lenvalidate_min_maxgth of the list of edges is at least 2"""
-    if not isinstance(value, list):
+    if not isinstance(value, (list, tuple)):
         raise ValidationError(VALIDATE_MSG_EDGES_NOT_A_LIST)
 
     if len(value) >= 2:

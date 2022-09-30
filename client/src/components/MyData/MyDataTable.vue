@@ -28,7 +28,7 @@
         <span class="index-td hidden-xs-only grey--text">{{ index + 1 }}</span>
       </template>
       <template v-slot:[`item.status`]="{ item }">
-        <StatusTag :status="getWorkflowStatus(item)"/>
+        <StatusTag data-test="table status tag" :status="getWorkflowStatus(item)"/>
       </template>
       <template v-slot:[`item.timeRemaining`]="{ item }">
         <span v-if="getWorkflowStatus(item) !== 'completed'"

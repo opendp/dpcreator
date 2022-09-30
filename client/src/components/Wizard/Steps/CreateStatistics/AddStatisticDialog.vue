@@ -89,7 +89,7 @@
                            :label="histogramOptions[ONE_BIN_PER_VALUE]"
                            :value="ONE_BIN_PER_VALUE"
                            :data-test="ONE_BIN_PER_VALUE"
-                           @click="editedItemDialog.histogramNumberOfBins=null;editedItemDialog.histogramBuckets='';editedItemDialog.histogramBinEdges=[]"
+                           @click="editedItemDialog.histogramNumberOfBins='';editedItemDialog.histogramBuckets='';editedItemDialog.histogramBinEdges=[]"
 
                   ></v-radio>
                 </v-col>
@@ -119,7 +119,7 @@
                           :rules="[validateNumBins]"
                           @keyup="binEdgeBuckets"
                       ></v-text-field>
-                      <div v-if="editedItemDialog.histogramNumberOfBins">
+                      <div v-if="editedItemDialog.histogramBuckets">
                         Equal range bins: {{ editedItemDialog.histogramBuckets }}
                       </div>
 
@@ -128,7 +128,6 @@
                   </v-row>
                 </div>
               </v-expand-transition>
-              <!--  TODO: uncomment this when BIN EDGES is implemented
               <v-row>
                 <v-col>
                   <v-radio
@@ -182,7 +181,7 @@
 
                 </v-row>
               </v-expand-transition>
-              -->
+
             </v-container>
 
 
@@ -210,7 +209,7 @@
             color="primary"
             classes="mr-2 px-5"
             :click="save"
-            :disabled="isButtonDisabled()"
+            :disabled="isButtonDisabled"
             data-test="Create Statistic Button"
             :label="getButtonLabel"
         />
@@ -302,6 +301,31 @@ export default {
   computed: {
     ...mapState('dataset', ['analysisPlan', "datasetInfo"]),
     ...mapGetters('dataset', ['getDepositorSetupInfo']),
+    isButtonDisabled: function () {
+      let disabled = false
+      let validHistogramOption = false
+      if (!this.showHistogramOptions()
+          || this.editedItemDialog.histogramBinType === ONE_BIN_PER_VALUE
+          || (this.editedItemDialog.histogramBinType === BIN_EDGES
+              && this.editedItemDialog.histogramBinEdges instanceof Array
+              && this.editedItemDialog.histogramBinEdges.length > 0
+              && this.isEdgesInputValid(this.editedItemDialog.histogramBinEdges))
+          || (this.editedItemDialog.histogramBinType === EQUAL_BIN_RANGES
+              && this.editedItemDialog.histogramNumberOfBins
+              && this.isNumBinsValid(this.editedItemDialog.histogramNumberOfBins)
+          )) {
+        validHistogramOption = true
+      }
+      if (this.editedItemDialog.statistic === ""
+          || this.editedItemDialog.variable === ""
+          || this.editedItemDialog.variable === undefined
+          || (this.editedItemDialog.statistic !== "count" && !this.editedItemDialog.fixedValue)
+          || (this.editedItemDialog.statistic === "histogram" && !validHistogramOption)
+      ) {
+        disabled = true
+      }
+      return disabled
+    },
     errorCount: function () {
       let count = 0;
       if (this.validationErrorMsg) {
@@ -424,13 +448,13 @@ export default {
     histogramOptions
   }),
   methods: {
-    binEdgeBuckets() {
+    binEdgeBuckets: function () {
       if (this.editedItemDialog.statistic == 'histogram'
           && this.editedItemDialog.histogramBinType === EQUAL_BIN_RANGES
           && this.editedItemDialog.histogramNumberOfBins
           && this.isNumBinsValid(this.editedItemDialog.histogramNumberOfBins)
       ) {
-        return analysis.getHistogramBuckets(this.variableInfo[this.editedItemDialog.variable].min,
+        analysis.getHistogramBuckets(this.variableInfo[this.editedItemDialog.variable].min,
             this.variableInfo[this.editedItemDialog.variable].max,
             this.editedItemDialog.histogramNumberOfBins).then((resp) => {
           //  console.log("setting buckets: "+resp.data.buckets.toString())
@@ -439,31 +463,6 @@ export default {
       } else {
         this.editedItemDialog.histogramBuckets = ""
       }
-    },
-    isButtonDisabled: function () {
-      let disabled = false
-      let validHistogramOption = false
-      if (!this.showHistogramOptions()
-          || this.editedItemDialog.histogramBinType === ONE_BIN_PER_VALUE
-          || (this.editedItemDialog.histogramBinType === BIN_EDGES
-              && this.editedItemDialog.histogramBinEdges instanceof Array
-              && this.editedItemDialog.histogramBinEdges.length > 0
-              && this.isEdgesInputValid(this.editedItemDialog.histogramBinEdges))
-          || (this.editedItemDialog.histogramBinType === EQUAL_BIN_RANGES
-              && this.editedItemDialog.histogramNumberOfBins
-              && this.isNumBinsValid(this.editedItemDialog.histogramNumberOfBins)
-          )) {
-        validHistogramOption = true
-      }
-      if (this.editedItemDialog.statistic === ""
-          || this.editedItemDialog.variable === ""
-          || this.editedItemDialog.variable === undefined
-          || (this.editedItemDialog.statistic !== "count" && !this.editedItemDialog.fixedValue)
-          || (this.editedItemDialog.statistic === "histogram" && !validHistogramOption)
-      ) {
-        disabled = true
-      }
-      return disabled
     },
     removeEdgeFromList(edge) {
       this.editedItemDialog.histogramBinEdges.splice(
@@ -561,13 +560,13 @@ export default {
     isNumBinsValid(v) {
       if (v !== null) {
         const num = Number(v)
-        return Number.isInteger(num) && num >= 1 && num <= this.variableRange()
+        return Number.isInteger(num) && num > 1 && num < this.variableRange()
       } else {
         return true
       }
     },
     validateNumBins(v) {
-      return this.isNumBinsValid(v) || "Value must be an integer between 1 and " + this.variableRange()
+      return this.isNumBinsValid(v) || "Value must be an integer between 2 and " + (this.variableRange() - 1)
     },
     validateBinEdges(v) {
       return this.isEdgesInputValid(v) || "Edge must be a number between "
