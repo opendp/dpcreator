@@ -391,6 +391,8 @@ const actions = {
                 const completedStepProp = {userStep: STEP_1200_PROCESS_COMPLETE}
                 const payload = {objectId: state.analysisPlan.objectId, props: completedStepProp}
                 this.dispatch('dataset/updateAnalysisPlan', payload)
+                // Also update the datasetList so that it shows the Released status for this dataset
+                this.dispatch('dataset/setDatasetList')
                 //  }, 5000);
 
 

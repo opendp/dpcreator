@@ -350,6 +350,10 @@ Cypress.Commands.add('submitStatistics', (demoData) => {
                 expect(releaseInfo.dpRelease.statistics[0].accuracy.value).to.equal(demoStat.accuracy)
             })
         })
+    cy.visit('/my-data')
+    cy.get('[data-test="table status tag"]').should('contain', 'Release Completed')
+
+
 })
 Cypress.Commands.add('setupStatisticsPage', (datasetFixture, analysisFixture) => {
     cy.fixture(datasetFixture).then(dataset => {
