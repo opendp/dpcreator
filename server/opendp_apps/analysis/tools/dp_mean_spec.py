@@ -75,7 +75,7 @@ class DPMeanSpec(StatSpec):
 
     def run_03_custom_validation(self):
         """
-        For additional checking after validation
+        There's no additional checking to do
         """
         if self.has_error():
             return

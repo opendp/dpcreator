@@ -1,3 +1,5 @@
+from typing import Union
+
 import numpy as np
 from django.core.exceptions import ValidationError
 
@@ -72,7 +74,7 @@ class BinEdgeHelper(BasicErrCheck):
             self.add_err_msg(err_obj.message)
             return
 
-        self.buckets = self.get_display_bins_inclusive()
+        self.buckets = self.get_display_bins_inclusive(self.bin_edges)
 
     def as_json(self) -> {}:
         """Return the result as JSON"""
@@ -87,10 +89,11 @@ class BinEdgeHelper(BasicErrCheck):
             },
             "edges": self.bin_edges,
             "buckets": self.buckets,
-            "buckets_right_edge_excluded": self.get_display_bins_right_edge_excluded()
+            "buckets_right_edge_excluded": self.get_display_bins_right_edge_excluded(self.bin_edges)
         }
 
-    def get_display_bins_inclusive(self) -> list:
+    @staticmethod
+    def get_display_bins_inclusive(bin_edges: Union[list, tuple]) -> list:
         """
         Convert bin edges to bins for display
         Example:
@@ -98,24 +101,25 @@ class BinEdgeHelper(BasicErrCheck):
          out: ["[1, 24]", "[25, 49]", "[50, 74]", "[75, 100]", "unknown"]  # Last number is, 101, to include max in the last range
         @return: list
         """
-        if self.has_error():
-            return None
+        if not bin_edges:
+            raise ValidationError('"bin_edges" not specified')
 
         fmt_edges = []
         last_edge = None
         cnt = 0
-        for edge in self.bin_edges:
+        for edge in bin_edges:
             cnt += 1
             if cnt > 1:
                 right_edge = edge - 1
                 fmt_edges.append(f'[{last_edge}, {right_edge}]')
             last_edge = edge
 
-        fmt_edges.append(self.UNCATEGORIZED)
+        fmt_edges.append(BinEdgeHelper.UNCATEGORIZED)
 
         return fmt_edges
 
-    def get_display_bins_right_edge_excluded(self) -> list:
+    @staticmethod
+    def get_display_bins_right_edge_excluded(bin_edges: Union[list, tuple]) -> list:
         """
         Convert bin edges to bins for display
         Example:
@@ -123,13 +127,13 @@ class BinEdgeHelper(BasicErrCheck):
          out: ["[1, 25)", "[26, 50)", "[51, 75)", "[76, 101)", "unknown"]  # Last number is, 101, to include max in the last range
         @return: list
         """
-        if self.has_error():
-            return None
+        if not bin_edges:
+            raise ValidationError('"bin_edges" not specified')
 
         fmt_edges = []
         last_edge = None
         cnt = 0
-        for edge in self.bin_edges:
+        for edge in bin_edges:
             cnt += 1
             if cnt > 1:
                 if cnt > 2:
@@ -137,7 +141,7 @@ class BinEdgeHelper(BasicErrCheck):
                 fmt_edges.append(f'[{last_edge}, {edge})')
             last_edge = edge
 
-        fmt_edges.append(self.UNCATEGORIZED)
+        fmt_edges.append(BinEdgeHelper.UNCATEGORIZED)
 
         return fmt_edges
 
