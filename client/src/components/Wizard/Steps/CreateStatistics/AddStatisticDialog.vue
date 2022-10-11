@@ -349,7 +349,7 @@ export default {
       let minMax = ""
       if (this.editedItemDialog.variable &&
           this.variableInfo[this.editedItemDialog.variable] &&
-          this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('min')
+          ['Integer', 'Float'].includes(this.variableInfo[this.editedItemDialog.variable].type)
       ) {
         minMax = "(Must be between " +
             this.variableInfo[this.editedItemDialog.variable].min + " and " +
@@ -577,7 +577,8 @@ export default {
       let valid = true
       if (this.editedItemDialog.variable &&
           this.variableInfo[this.editedItemDialog.variable] &&
-          this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('min')) {
+          this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('min') &&
+          this.variableInfo[this.editedItemDialog.variable].min !== null) {
         const val = Number(v)
         if (val < this.variableInfo[this.editedItemDialog.variable].min ||
             val > this.variableInfo[this.editedItemDialog.variable].max)
