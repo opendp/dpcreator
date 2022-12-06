@@ -83,6 +83,9 @@ class StatSpec:
         self.missing_values_handling = props.get('missing_values_handling')
         self.fixed_value = props.get('fixed_value')
 
+        # the greatest number of records that any one individual can influence in the dataset
+        self.max_influence = 1  # 1 is the default for now
+
         # (4) Set explicitly by subclass (may change in the future)
         self.noise_mechanism = None
 

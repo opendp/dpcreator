@@ -45,6 +45,10 @@ class DPHistogramBooleanSpec(StatSpec):
                     false_value=validate_not_empty_or_none,
                     missing_values_handling=validate_missing_val_handlers)
 
+    def get_unformatted_boolean_categories(self):
+        """Used for processing as well as display values"""
+        return [self.true_value, self.false_value]
+
     def run_01_initial_transforms(self):
         """
         Convert values to strings, where appropriate
@@ -69,13 +73,14 @@ class DPHistogramBooleanSpec(StatSpec):
         '''
         # Make sure true_value and false_value aren't equal to each other
         #
-        print('-- t3')
-        if not self.validate_multi_values([self.true_value, self.false_value], validate_bool_true_false):
+        if not self.validate_multi_values([self.true_value, self.false_value],
+                                          validate_bool_true_false,
+                                          'true_value'):
             return
 
         # Set the categories to the true and false values
         #
-        self.categories = [self.true_value, self.false_value]
+        self.categories = self.get_unformatted_boolean_categories()
 
         # Stringify categorical values
         #
@@ -86,7 +91,7 @@ class DPHistogramBooleanSpec(StatSpec):
             try:
                 if not isinstance(x, str):
                     x = str(x)
-                x = self._add_double_quotes(x)
+                # x = self._add_double_quotes(x)
                 updated_cats.append(x)
             except NameError as _ex_obj:
                 user_msg = 'Failed to convert category to string. (Failed category index {idx})'
@@ -106,7 +111,7 @@ class DPHistogramBooleanSpec(StatSpec):
             if not isinstance(self.fixed_value, str):
                 self.fixed_value = str(self.fixed_value)
 
-            self.fixed_value = self._add_double_quotes(self.fixed_value)
+            # self.fixed_value = self._add_double_quotes(self.fixed_value)
 
             # ** not applying this next option, the fixed_value can be neither true/false **
             # Is the fixed value one of the categories?
@@ -150,6 +155,7 @@ class DPHistogramBooleanSpec(StatSpec):
             # Yes!
             return self.preprocessor
 
+        print('self.categories:', self.categories)
         preprocessor = (
                 make_select_column(key=self.col_index, TOA=str) >>
                 make_cast(TIA=str, TOA=str) >>
@@ -158,7 +164,7 @@ class DPHistogramBooleanSpec(StatSpec):
         )
 
         self.scale = binary_search_param(
-            lambda s: self.check_scale(s, preprocessor), d_in=1, d_out=self.epsilon)
+            lambda s: self.check_scale(s, preprocessor), d_in=self.max_influence, d_out=self.epsilon)
         preprocessor = preprocessor >> make_base_geometric(scale=self.scale, D=VectorDomain[AllDomain[int]])
 
         # keep a pointer to the preprocessor in case it's re-used
@@ -242,9 +248,7 @@ class DPHistogramBooleanSpec(StatSpec):
 
         # Remove double quotes from the categories as well as fixed value
         #
-        fmt_categories = [self._remove_double_quotes(x) for x in self.categories] + ['uncategorized']
-        if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
-            self.fixed_value = self._remove_double_quotes(self.fixed_value)
+        fmt_categories = self.get_unformatted_boolean_categories() + ['uncategorized']
 
         # Show warning if category count doesn't match values count
         if len(fmt_categories) > len(self.value):

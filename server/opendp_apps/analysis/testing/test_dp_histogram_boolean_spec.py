@@ -24,19 +24,46 @@ class HistogramBooleanStatSpecTest(StatSpecTestCase):
         """Reusable properties for testing basic 'StatSpec' functionality"""
 
         self.spec_props = {'variable': 'SMOKING',
-                           'col_index': 0,
+                           'col_index': 6,
                            'statistic': astatic.DP_HISTOGRAM,
                            'dataset_size': 7000,
                            'epsilon': 1.0,
                            'delta': 0.0,
                            'cl': astatic.CL_95,
                            'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                           'fixed_value': 1,
-                           'variable_info': {'true_value': 1,
-                                             'false_value': 2,
+                           'fixed_value': 2,
+                           'variable_info': {'trueValue': 1,
+                                             'falseValue': 2,
                                              'type': pstatic.VAR_TYPE_BOOLEAN},
                            }
 
+        self.spec_props2 = {'variable': 'Havingchild',
+                           'col_index': 3,
+                           'statistic': astatic.DP_HISTOGRAM,
+                           'dataset_size': 7000,
+                           'epsilon': 1.0,
+                           'delta': 0.0,
+                           'cl': astatic.CL_95,
+                           'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+                           'fixed_value': 2,
+                           'variable_info': {'trueValue': 1,
+                                             'falseValue': 2,
+                                             'type': pstatic.VAR_TYPE_BOOLEAN},
+                           }
+
+        self.spec_props_not_boolean = {'variable': 'maritalstatus',
+                           'col_index': 2,
+                           'statistic': astatic.DP_HISTOGRAM,
+                           'dataset_size': 7000,
+                           'epsilon': 1.0,
+                           'delta': 0.0,
+                           'cl': astatic.CL_95,
+                           'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+                           'fixed_value': 2,
+                           'variable_info': {'trueValue': 1,
+                                             'falseValue': 4,
+                                             'type': pstatic.VAR_TYPE_BOOLEAN},
+                           }
         self.dp_hist = DPHistogramBooleanSpec(self.spec_props)
 
         if self.dp_hist.has_error():
@@ -50,17 +77,6 @@ class HistogramBooleanStatSpecTest(StatSpecTestCase):
 
         self.assertEqual(self.dp_hist.noise_mechanism, astatic.NOISE_GEOMETRIC_MECHANISM)
 
-    @skip('skip')
-    def test_005_get_variable_order(self):
-        """(5) Test get variable order"""
-        msgt(self.test_005_get_variable_order.__doc__)
-
-        analysis_plan = self.retrieve_new_plan()
-
-        variable_indices_info = analysis_plan.dataset.get_variable_order(as_indices=True)
-
-        self.assertTrue(variable_indices_info.success)
-        self.assertEqual(variable_indices_info.data, [x for x in range(10)])
 
     # @skip('skip')
     def test_040_test_impute(self):
@@ -74,171 +90,160 @@ class HistogramBooleanStatSpecTest(StatSpecTestCase):
             print(dp_hist.get_error_messages())
         self.assertTrue(dp_hist.is_chain_valid())
 
-    @skip('skip')
     def test_050_test_impute_unknown_fixed_value(self):
-        """(50) Test impute validation, unknown fixed value"""
+        """(50) Test impute validation, unknown fixed value is actually okay here"""
         msgt(self.test_050_test_impute_unknown_fixed_value.__doc__)
 
         spec_props = self.spec_props.copy()
         spec_props['fixed_value'] = 'not-a-known-category'
 
-        dp_hist = DPHistogramCategoricalSpec(spec_props)
+        dp_hist = DPHistogramBooleanSpec(spec_props)
+        if not dp_hist.is_chain_valid():
+            print(dp_hist.get_error_messages())
+        self.assertTrue(dp_hist.is_chain_valid())
+
+    def test_060_test_true_false_values_equal(self):
+        """(60) The true and false values should not be equal"""
+        msgt(self.test_060_test_true_false_values_equal.__doc__)
+
+        spec_props = self.spec_props.copy()
+        spec_props['variable_info']['trueValue'] = 'same-as-before'
+        spec_props['variable_info']['falseValue'] = 'same-as-before'
+
+        dp_hist = DPHistogramBooleanSpec(spec_props)
         if not dp_hist.is_chain_valid():
             print(dp_hist.get_error_messages())
         self.assertFalse(dp_hist.is_chain_valid())
-        self.assertTrue(dp_hist.get_single_err_msg().find(VALIDATE_MSG_FIXED_VAL_NOT_IN_CATEGORIES) > -1)
+        self.assertTrue(dp_hist.get_single_err_msg().find(astatic.ERR_BOOL_TRUE_FALSE_NOT_EQUAL) > -1)
 
-    @skip('skip')
-    def test_100_run_dphist_calculation_categorical(self):
+
+    def test_100_run_dphist_calculation_boolean(self):
         """(100) Run DP histogram calculation"""
-        msgt(self.test_100_run_dphist_calculation_categorical.__doc__)
+        msgt(self.test_100_run_dphist_calculation_boolean.__doc__)
 
         dp_hist = self.dp_hist
         # ------------------------------------------------------
         # Run the actual mean
         # ------------------------------------------------------
         # Column indexes - We know this data has 20 columns
-        col_indexes = [idx for idx in range(0, 20)]
+        col_indexes = [idx for idx in range(0, 10)]
 
         # File object
         #
-        eye_fatigue_filepath = join(TEST_DATA_DIR, 'Fatigue_data.tab')
-        # print('eye_fatigue_filepath', eye_fatigue_filepath)
-        self.assertTrue(isfile(eye_fatigue_filepath))
+        teacher_survey_filepath = join(TEST_DATA_DIR, 'teacher_survey', 'teacher_survey.csv')
+        self.assertTrue(isfile(teacher_survey_filepath))
 
-        file_obj = open(eye_fatigue_filepath, 'r')
+        file_obj = open(teacher_survey_filepath, 'r')
 
         # Call run_chain
         #
-        dp_hist.run_chain(col_indexes, file_obj, sep_char="\t")
+        dp_hist.run_chain(col_indexes, file_obj, sep_char=",")
         self.assertFalse(dp_hist.has_error())
         self.assertTrue('categories' in dp_hist.value)
         self.assertTrue('values' in dp_hist.value)
 
         release_dict = dp_hist.get_release_dict()
-        # import json; print(json.dumps(release_dict, indent=4))
+        import json; print(json.dumps(release_dict, indent=4))
 
         # Check that the fixed_value and list of categories are "unquoted"
         #
-        fixed_value = release_dict['missing_value_handling']['fixed_value']
-        self.assertEqual(fixed_value, DPHistogramCategoricalSpec._remove_double_quotes(fixed_value))
+        release_fixed_value = release_dict['missing_value_handling']['fixed_value']
+        self.assertEqual(release_fixed_value, dp_hist.fixed_value)
 
         categories = release_dict['result']['value']['categories']
-        for cat_name in categories:
-            self.assertEqual(cat_name, DPHistogramCategoricalSpec._remove_double_quotes(cat_name))
+        self.assertEqual(categories[:2], dp_hist.get_unformatted_boolean_categories())
 
-        # Check that the fixed_value is in the list of categories
-        #
-        self.assertTrue(fixed_value in categories)
+    def test_110_run_dphist_calculation_boolean(self):
+        """(110) Run DP histogram calculation on another column"""
+        msgt(self.test_110_run_dphist_calculation_boolean.__doc__)
 
-    @skip('skip')
-    def test_110_run_dphist_calculation_categorical2(self):
-        """(110) Run DP 2nd categorical calculation, with only 2 categories"""
-        msgt(self.test_110_run_dphist_calculation_categorical2.__doc__)
-
-        spec_props = {
-            'variable': 'Language',
-            'col_index': 1,
-            'statistic': astatic.DP_HISTOGRAM,
-            'dataset_size': 183,
-            'epsilon': 1.0,
-            'delta': 0.0,
-            'cl': astatic.CL_95,
-            'fixed_value': 'EN',
-            'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-            'variable_info': {
-                'categories': ['EN', 'DA'],
-                'type': pstatic.VAR_TYPE_CATEGORICAL
-            }
-        }
-
-        dp_hist = DPHistogramCategoricalSpec(spec_props)
-        if dp_hist.has_error():
-            print(f"get_error_messages(): {dp_hist.get_error_messages()}")
-
+        dp_hist = DPHistogramBooleanSpec(self.spec_props2)
         self.assertTrue(dp_hist.is_chain_valid())
-
-        # print('\nUI info:', json.dumps(dp_hist.get_success_msg_dict()))
-
         # ------------------------------------------------------
         # Run the actual mean
         # ------------------------------------------------------
         # Column indexes - We know this data has 20 columns
-        col_indexes = [idx for idx in range(0, 20)]
+        col_indexes = [idx for idx in range(0, 10)]
 
         # File object
         #
-        eye_fatigue_filepath = join(TEST_DATA_DIR, 'Fatigue_data.tab')
-        # print('eye_fatigue_filepath', eye_fatigue_filepath)
-        self.assertTrue(isfile(eye_fatigue_filepath))
+        teacher_survey_filepath = join(TEST_DATA_DIR, 'teacher_survey', 'teacher_survey.csv')
+        self.assertTrue(isfile(teacher_survey_filepath))
 
-        file_obj = open(eye_fatigue_filepath, 'r')
+        file_obj = open(teacher_survey_filepath, 'r')
 
         # Call run_chain
         #
-        dp_hist.run_chain(col_indexes, file_obj, sep_char="\t")
+        dp_hist.run_chain(col_indexes, file_obj, sep_char=",")
         self.assertFalse(dp_hist.has_error())
         self.assertTrue('categories' in dp_hist.value)
         self.assertTrue('values' in dp_hist.value)
 
         release_dict = dp_hist.get_release_dict()
-        # import json; print(json.dumps(release_dict, indent=4))
+        import json; print(json.dumps(release_dict, indent=4))
 
         # Check that the fixed_value and list of categories are "unquoted"
         #
-        fixed_value = release_dict['missing_value_handling']['fixed_value']
-        self.assertEqual(fixed_value, DPHistogramCategoricalSpec._remove_double_quotes(fixed_value))
+        release_fixed_value = release_dict['missing_value_handling']['fixed_value']
+        self.assertEqual(release_fixed_value, dp_hist.fixed_value)
 
         categories = release_dict['result']['value']['categories']
-        for cat_name in categories:
-            self.assertEqual(cat_name, DPHistogramCategoricalSpec._remove_double_quotes(cat_name))
+        self.assertEqual(categories[:2], dp_hist.get_unformatted_boolean_categories())
 
-        # Check that the fixed_value is in the list of categories
+    def test_120_run_dphist_boolean_on_nonbool_field(self):
+        """(120) Run DP histogram on the marriage field which has 8 possible values but force 2 values
+        Actual categories:
+            1- Single
+            2- Steady Relationship
+            3- Living with partner
+            4- Married first time
+            5- Remarried
+            6- Separated
+            7- Divorced
+            8- Widowed
+
+        Forced categories:
+            1- True
+            4- False
+            everything else - uncategorized
+        """
+        msgt(self.test_120_run_dphist_boolean_on_nonbool_field.__doc__)
+
+        dp_hist = DPHistogramBooleanSpec(self.spec_props_not_boolean)
+        self.assertTrue(dp_hist.is_chain_valid())
+        # ------------------------------------------------------
+        # Run the actual mean
+        # ------------------------------------------------------
+        # Column indexes - We know this data has 20 columns
+        col_indexes = [idx for idx in range(0, 10)]
+
+        # File object
         #
-        self.assertTrue(fixed_value in categories)
+        teacher_survey_filepath = join(TEST_DATA_DIR, 'teacher_survey', 'teacher_survey.csv')
+        self.assertTrue(isfile(teacher_survey_filepath))
 
-    @skip('skip')
-    def test_130_format_variable_info_categories(self):
-        """(130) Test the formatting of variable info categories"""
-        msgt(self.test_110_run_dphist_calculation_categorical2.__doc__)
+        file_obj = open(teacher_survey_filepath, 'r')
 
-        test_stats = {
-            "trial": {
-                "name": "Trial",
-                "type": "Integer",
-                "label": "",
-                "sortOrder": 4
-            },
-            "session": {
-                "name": "Session",
-                "type": "Boolean",
-                "label": "",
-                "sortOrder": 2,
-                "categories": []
-            },
-            "subject": {
-                "name": "Subject",
-                "type": "Categorical",
-                "label": "Subject",
-                "selected": True,
-                "sortOrder": 0,
-                "categories": [
-                    "ac",
-                    " kj",
-                    " ys",
-                    "zz",
-                    "bh1  ",
-                    " bh2    ",
-                    " jm\n",
-                    "\tmh",
-                ]
-            }
-        }
-        formatted_var_info = format_variable_info(test_stats)
+        # Call run_chain
+        #
+        dp_hist.run_chain(col_indexes, file_obj, sep_char=",")
+        self.assertFalse(dp_hist.has_error())
+        self.assertTrue('categories' in dp_hist.value)
+        self.assertTrue('values' in dp_hist.value)
 
-        expected_cats = ['ac', 'kj', 'ys', 'zz', 'bh1', 'bh2', 'jm', 'mh']
-        self.assertEqual(formatted_var_info['subject']['categories'], expected_cats)
-        print('var_info', formatted_var_info)
+        release_dict = dp_hist.get_release_dict()
+        import json; print(json.dumps(release_dict, indent=4))
 
-        self.assertEqual(format_variable_info(None), None)
-        self.assertEqual(format_variable_info({}), {})
+        # Check that the fixed_value and list of categories are "unquoted"
+        #
+        release_fixed_value = release_dict['missing_value_handling']['fixed_value']
+        self.assertEqual(release_fixed_value, dp_hist.fixed_value)
+
+        categories = release_dict['result']['value']['categories']
+        self.assertEqual(categories[:2], dp_hist.get_unformatted_boolean_categories())
+
+        # The number of uncategorized should be greater than the True value for this dataset
+        #
+        val_true = release_dict['result']['value']['values'][0]
+        val_uncategorized = release_dict['result']['value']['values'][1]
+        self.assertTrue(val_uncategorized > val_true)

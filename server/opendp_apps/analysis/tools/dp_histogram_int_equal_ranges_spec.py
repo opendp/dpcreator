@@ -167,7 +167,7 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
 
         self.scale = binary_search_param(
             make_histogram,
-            d_in=1,
+            d_in=self.max_influence,
             d_out=self.epsilon)
 
         preprocessor = make_histogram(self.scale)

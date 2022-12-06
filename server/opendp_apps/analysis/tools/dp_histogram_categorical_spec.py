@@ -143,7 +143,7 @@ class DPHistogramCategoricalSpec(StatSpec):
         )
 
         self.scale = binary_search_param(
-            lambda s: self.check_scale(s, preprocessor), d_in=1, d_out=self.epsilon)
+            lambda s: self.check_scale(s, preprocessor), d_in=self.max_influence, d_out=self.epsilon)
         preprocessor = preprocessor >> make_base_geometric(scale=self.scale, D=VectorDomain[AllDomain[int]])
 
         # keep a pointer to the preprocessor in case it's re-used

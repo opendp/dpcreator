@@ -140,7 +140,7 @@ class DPHistogramIntOnePerValueSpec(StatSpec):
 
         self.scale = binary_search_param(
                         lambda s: check_scale(s, preprocessor),
-                        d_in=1,
+                        d_in=self.max_influence,
                         d_out=self.epsilon)
 
         preprocessor = check_scale(self.scale, preprocessor)
