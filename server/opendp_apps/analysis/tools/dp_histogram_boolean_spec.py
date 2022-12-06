@@ -11,10 +11,10 @@ from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.utils.extra_validators import \
     (validate_not_none,
-     validate_type_categorical,
-     validate_categories_as_string,
-     validate_categories_list_not_empty,
+     validate_not_empty_or_none,
+     validate_type_boolean,
      validate_missing_val_handlers,
+     validate_bool_true_false,
      validate_histogram_bin_type_one_per_value,
      validate_fixed_value_in_categories)
 
@@ -23,7 +23,7 @@ enable_features("floating-point", "contrib")
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
-class DPHistogramCategoricalSpec(StatSpec):
+class DPHistogramBooleanSpec(StatSpec):
     """
     Create a Histogram using categorical (string) values.
     Requires "categories" to be specificed in the constructor
@@ -40,28 +40,44 @@ class DPHistogramCategoricalSpec(StatSpec):
         Update self.prop_validators to include validators specific to the subclass
         @return:
         """
-        return dict(histogram_bin_type=validate_histogram_bin_type_one_per_value,
-                    var_type=validate_type_categorical,
-                    categories=validate_categories_as_string,
+        return dict(var_type=validate_type_boolean,
+                    true_value=validate_not_empty_or_none,
+                    false_value=validate_not_empty_or_none,
                     missing_values_handling=validate_missing_val_handlers)
 
     def run_01_initial_transforms(self):
         """
-
         Convert values to strings, where appropriate
         """
         if self.has_error():
             return
 
-        # Categorical histograms are always bin type OnePerValue
-        # so allow a default!
-        if not self.histogram_bin_type:
-            self.histogram_bin_type = astatic.HIST_BIN_TYPE_ONE_PER_VALUE
-
-        if not self.validate_property('categories', validate_categories_list_not_empty):
+        if not self.validate_property('true_value', validate_not_empty_or_none):
             return
 
-        # Stringify categorical values (although they should be already)
+        if not self.validate_property('false_value', validate_not_empty_or_none):
+            return
+
+        '''
+        if self.true_value is None:
+            self.add_err_msg('The "true_value" must be set.')
+            return
+
+        if self.false_value is None:
+            self.add_err_msg('The "true_value" must be set.')
+            return
+        '''
+        # Make sure true_value and false_value aren't equal to each other
+        #
+        print('-- t3')
+        if not self.validate_multi_values([self.true_value, self.false_value], validate_bool_true_false):
+            return
+
+        # Set the categories to the true and false values
+        #
+        self.categories = [self.true_value, self.false_value]
+
+        # Stringify categorical values
         #
         updated_cats = []
 
@@ -70,7 +86,6 @@ class DPHistogramCategoricalSpec(StatSpec):
             try:
                 if not isinstance(x, str):
                     x = str(x)
-                # x = x.strip()  # do this earlier, before data is saved
                 x = self._add_double_quotes(x)
                 updated_cats.append(x)
             except NameError as _ex_obj:
@@ -78,8 +93,7 @@ class DPHistogramCategoricalSpec(StatSpec):
                 self.add_err_msg(user_msg)
                 return
 
-        # remove duplicate categories and sort them
-        self.categories = sorted(set(updated_cats))
+        self.categories = updated_cats
 
         # If the fixed_value is to be used, make sure it's valid
         if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
@@ -94,11 +108,12 @@ class DPHistogramCategoricalSpec(StatSpec):
 
             self.fixed_value = self._add_double_quotes(self.fixed_value)
 
+            # ** not applying this next option, the fixed_value can be neither true/false **
             # Is the fixed value one of the categories?
-            if not self.validate_multi_values([self.fixed_value, self.categories],
-                                              validate_fixed_value_in_categories,
-                                              'fixed_value'):
-                return
+            #if not self.validate_multi_values([self.fixed_value, self.categories],
+            #                                  validate_fixed_value_in_categories,
+            #                                  'fixed_value'):
+            #    return
 
     def run_03_custom_validation(self):
         """
@@ -203,7 +218,7 @@ class DPHistogramCategoricalSpec(StatSpec):
 
         if not isinstance(column_names, list):
             self.add_err_msg(
-                'DPHistogramSpecCategorical.run_chain(..): column_names must be a list. Found: (type({column_names}))')
+                'DPHistogramBooleanSpec.run_chain(..): column_names must be a list. Found: (type({column_names}))')
             return
 
         try:

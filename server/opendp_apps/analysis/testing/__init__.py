@@ -5,6 +5,9 @@ docker-compose run server python manage.py test opendp_apps.analysis.testing.tes
 
 docker-compose run server python manage.py test opendp_apps.analysis.testing.test_dp_histogram_integer_spec.HistogramIntegerStatSpecTest.test_160_run_dphist_int_edges
 
+# Histogram boolean
+docker-compose run server python manage.py test opendp_apps.analysis.testing.test_dp_histogram_boolean_spec.HistogramBooleanStatSpecTest
+
 docker-compose run server python manage.py test opendp_apps.analysis.testing.test_dp_histogram_categorical_spec.HistogramCategoricalStatSpecTest.test_130_format_variable_info_categories
 
 docker-compose run server python manage.py test opendp_apps.analysis.testing.test_histogram_util.HistogramUtilTest.test_010_test_int_valid_bins

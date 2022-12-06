@@ -148,6 +148,8 @@ ERR_MSG_DEPOSIT_NO_PDF_FILE = 'A PDF file is not avilable for deposit.'
 ERR_MSG_DEPOSIT_NOT_DATAVERSE = 'Deposit functionality is not available for a non-Dataverse file'
 ERR_MSG_DEPOSIT_NO_DV_USER = 'The Datavese user could not be for this release.'
 
+ERR_BOOL_TRUE_FALSE_NOT_EQUAL = f'The True and False values cannot be the same'
+
 # Setup Questions
 
 SETUP_Q_01_ATTR = 'radio_depend_on_private_information'

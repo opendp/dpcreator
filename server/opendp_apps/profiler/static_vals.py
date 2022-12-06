@@ -23,8 +23,8 @@ KW_MAX_NUM_FEATURES = 'max_num_features'
 # -----------------------------
 
 ERR_MSG_VAR_TYPE_NOT_NUMERIC = 'The variable type must be one of the following: %s' % (', '.join(NUMERIC_VAR_TYPES))
+ERR_MSG_VAR_TYPE_NOT_BOOLEAN = f'The variable type must be: {VAR_TYPE_BOOLEAN}'
 ERR_MSG_VAR_TYPE_NOT_CATEGORICAL = f'The variable type must be: {VAR_TYPE_CATEGORICAL}'
-
 ERR_MSG_VAR_TYPE_NOT_INTEGER = f'The variable type must be: {VAR_TYPE_INTEGER}'
 
 ERR_MSG_COLUMN_LIMIT = 'The column_limit may be "None" or an integer greater than 0.'

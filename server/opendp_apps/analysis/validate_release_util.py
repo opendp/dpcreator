@@ -412,7 +412,7 @@ class ValidateReleaseUtil(BasicErrCheck):
         stat_num = 0
         for dp_stat in self.dp_statistics:
             stat_num += 1  # not used yet...
-            # print(f'\n\n(b-{stat_num})', dp_stat)
+            print(f'\n\n(b-{stat_num})', dict(dp_stat))
             """
             We're putting together lots of properties to pass to
             statistic specific classes such as DPMeanSpec.
@@ -463,6 +463,7 @@ class ValidateReleaseUtil(BasicErrCheck):
 
             if variable_info:
                 props['variable_info'] = variable_info
+                print('>>make statSpec: variable_info', variable_info)
                 var_type = variable_info.get('type')
                 props['var_type'] = var_type
             else:
