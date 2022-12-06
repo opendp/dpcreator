@@ -51,19 +51,6 @@ class HistogramBooleanStatSpecTest(StatSpecTestCase):
                                              'type': pstatic.VAR_TYPE_BOOLEAN},
                            }
 
-        self.spec_props_not_boolean = {'variable': 'maritalstatus',
-                           'col_index': 2,
-                           'statistic': astatic.DP_HISTOGRAM,
-                           'dataset_size': 7000,
-                           'epsilon': 1.0,
-                           'delta': 0.0,
-                           'cl': astatic.CL_95,
-                           'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
-                           'fixed_value': 2,
-                           'variable_info': {'trueValue': 1,
-                                             'falseValue': 4,
-                                             'type': pstatic.VAR_TYPE_BOOLEAN},
-                           }
         self.dp_hist = DPHistogramBooleanSpec(self.spec_props)
 
         if self.dp_hist.has_error():
@@ -209,7 +196,21 @@ class HistogramBooleanStatSpecTest(StatSpecTestCase):
         """
         msgt(self.test_120_run_dphist_boolean_on_nonbool_field.__doc__)
 
-        dp_hist = DPHistogramBooleanSpec(self.spec_props_not_boolean)
+        spec_props_not_boolean = {'variable': 'maritalstatus',
+           'col_index': 2,
+           'statistic': astatic.DP_HISTOGRAM,
+           'dataset_size': 7000,
+           'epsilon': 1.0,
+           'delta': 0.0,
+           'cl': astatic.CL_95,
+           'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+           'fixed_value': 2,
+           'variable_info': {'trueValue': 1,
+                             'falseValue': 4,
+                             'type': pstatic.VAR_TYPE_BOOLEAN},
+           }
+
+        dp_hist = DPHistogramBooleanSpec(spec_props_not_boolean)
         self.assertTrue(dp_hist.is_chain_valid())
         # ------------------------------------------------------
         # Run the actual mean
@@ -247,3 +248,57 @@ class HistogramBooleanStatSpecTest(StatSpecTestCase):
         val_true = release_dict['result']['value']['values'][0]
         val_uncategorized = release_dict['result']['value']['values'][1]
         self.assertTrue(val_uncategorized > val_true)
+
+    def test_130_run_dphist_calculation_boolean_str(self):
+        """(130) Run DP histogram on boolean string data"""
+        msgt(self.test_130_run_dphist_calculation_boolean_str.__doc__)
+
+        spec_props = {'variable': 'Language',
+           'col_index': 1,
+           'statistic': astatic.DP_HISTOGRAM,
+           'dataset_size': 183,
+           'epsilon': 1.0,
+           'delta': 0.0,
+           'cl': astatic.CL_95,
+           'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+           'fixed_value': '"DA"',
+           'variable_info': {'trueValue': '"EN"',
+                             'falseValue': '"DA"',
+                             'type': pstatic.VAR_TYPE_BOOLEAN},
+           }
+
+        dp_hist = DPHistogramBooleanSpec(spec_props)
+        self.assertTrue(dp_hist.is_chain_valid())
+        # ------------------------------------------------------
+        # Run the actual mean
+        # ------------------------------------------------------
+        # Column indexes - We know this data has 20 columns
+        col_indexes = [idx for idx in range(0, 20)]
+
+        # File object
+        #
+        # File object
+        #
+        eye_fatigue_filepath = join(TEST_DATA_DIR, 'Fatigue_data.tab')
+        # print('eye_fatigue_filepath', eye_fatigue_filepath)
+        self.assertTrue(isfile(eye_fatigue_filepath))
+
+        file_obj = open(eye_fatigue_filepath, 'r')
+
+        # Call run_chain
+        #
+        dp_hist.run_chain(col_indexes, file_obj, sep_char="\t")
+        self.assertFalse(dp_hist.has_error())
+        self.assertTrue('categories' in dp_hist.value)
+        self.assertTrue('values' in dp_hist.value)
+
+        release_dict = dp_hist.get_release_dict()
+        import json; print(json.dumps(release_dict, indent=4))
+
+        # Check that the fixed_value and list of categories are "unquoted"
+        #
+        release_fixed_value = release_dict['missing_value_handling']['fixed_value']
+        self.assertEqual(release_fixed_value, dp_hist.fixed_value)
+
+        categories = release_dict['result']['value']['categories']
+        self.assertEqual(categories[:2], dp_hist.get_unformatted_boolean_categories())
