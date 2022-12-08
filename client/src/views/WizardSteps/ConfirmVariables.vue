@@ -185,7 +185,7 @@
               v-model="variable.additional_information['trueValue']"
               class="text-center py-0"
               :data-test="variable.label+':trueValue'"
-              :rules="[checkTrueValue]"
+              :ref="variable.label+':trueValue'"
               v-on:click="currentRow=variable.index"
               v-on:keyup="saveUserInput(variable)"
           ></v-text-field>
@@ -194,6 +194,7 @@
               label="Add false value"
               :data-test="variable.label+':falseValue'"
               v-model="variable.additional_information['falseValue']"
+              :ref="variable.label+':falseValue'"
               class="text-center py-0"
               v-on:click="currentRow=variable.index"
               v-on:keyup="saveUserInput(variable)"
@@ -523,13 +524,35 @@ export default {
       return valid
     },
     checkTrueValue(value) {
-      // If falseValue has been entered, then trueValue is required
+      // If falseValue has been entered, then trueValue is required, and cannot be the same as false value
       let valid = true
       if (this.currentRow !== null) {
         if (this.variables[this.currentRow].additional_information !== undefined) {
           const falseValue = this.variables[this.currentRow].additional_information.falseValue
-          if (falseValue !== null && (value === null || value.trim() === '')) {
+          if (falseValue !== undefined && falseValue !== null
+              && (value === null || value.trim() === '' || value === falseValue)) {
             valid = false
+          }
+        }
+
+      }
+
+      return valid
+    },
+
+    checkFalseValue(value) {
+      //  False value is not required, but if it is entered it cannot be the same as true value
+      let valid = true
+      if (this.currentRow !== null) {
+        if (this.variables[this.currentRow].additional_information !== undefined) {
+          const trueValue = this.variables[this.currentRow].additional_information.trueValue
+          console.log('checkFalseValue,value parameter = ' + value + ", falseValue =" + this.variables[this.currentRow].additional_information.falseValue)
+          if (trueValue !== undefined && trueValue !== null && value === trueValue) {
+            valid = false
+          }
+          if (valid) {
+            const refName = this.variables[this.currentRow].label + ':trueValue'
+            this.$refs[refName].validate()
           }
         }
       }
