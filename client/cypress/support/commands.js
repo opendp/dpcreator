@@ -366,10 +366,10 @@ Cypress.Commands.add('setupConfirmVariablesPage', (datasetFixture) => {
         cy.intercept('GET', 'rest-auth/user/', {
             body: {
                 "url": "http://localhost:8000/api/users/30/",
-                "username": "oscar",
+                "username": "test",
                 "email": "oscar@sesame.com",
                 "groups": [],
-                "object_id": "e72494ee-c067-4838-849a-d3e1da72942b",
+                "object_id": "test",
                 "handoff_id": null
             }
         })

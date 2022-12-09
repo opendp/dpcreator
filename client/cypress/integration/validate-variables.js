@@ -7,10 +7,7 @@
                 return false
             })
             cy.clearData()
-            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
-            cy.logout()
-
-
+            //
         })
         beforeEach(() => {
             cy.on('uncaught:exception', (e, runnable) => {
@@ -18,7 +15,7 @@
                 console.log('runnable', runnable)
                 return false
             })
-            cy.login('oscar', 'oscar123!')
+
             cy.setupConfirmVariablesPage('datasetInfoStep400.json')
 
         })
@@ -27,20 +24,7 @@
             cy.get('h1').should('contain', 'Confirm Variables')
 
         })
-        /*
-                it ('displays variables correctly',()=>{
 
-
-                    cy.fixture('variables').then((varsFixture) => {
-
-                        for (const key in varsFixture) {
-                            cy.get('table').contains('td', varsFixture[key].name).should('be.visible')
-                            cy.get('table').contains('tr', varsFixture[key].name).should('contain', varsFixture[key].type)
-                        }
-                    })
-             })
-
-         */
         it(' validates type integer', () => {
 
             cy.on('uncaught:exception', (e, runnable) => {
