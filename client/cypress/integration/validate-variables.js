@@ -54,11 +54,24 @@
                 return false
             })
             const booleanLabel = 'Session'
+            const trueValue = booleanLabel + ':trueValue'
+            const falseValue = booleanLabel + ':falseValue'
 
             // Select boolean variable without additional information - continueButton should be disabled
             cy.contains('td', booleanLabel).parent('tr').children().first().click()
             cy.get('[data-test="wizardContinueButton"]').should('be.disabled')
 
+            // leave falseValue blank- continueButton should be disabled
+            cy.get('[data-test="' + trueValue + '"]').type('1');
+            cy.get('[data-test="wizardContinueButton"]').should('be.disabled')
+
+            // leave use same value for both fields - continueButton should be disabled
+            cy.get('[data-test="' + falseValue + '"]').type('1');
+            cy.get('[data-test="wizardContinueButton"]').should('be.disabled')
+
+            // change true value - continueButton should be enabled
+            cy.get('[data-test="' + trueValue + '"]').type('2');
+            cy.get('[data-test="wizardContinueButton"]').should('not.be.disabled')
 
         })
 
