@@ -355,11 +355,45 @@ Cypress.Commands.add('submitStatistics', (demoData) => {
 
 
 })
+Cypress.Commands.add('setupConfirmVariablesPage', (datasetFixture) => {
+
+    cy.fixture(datasetFixture).then(dataset => {
+        dataset.created = '' + new Date()
+        dataset.depositorSetupInfo.updated = dataset.created
+        cy.intercept('GET', '/api/dataset-info/' + dataset.objectId + '/', {body: dataset})
+        cy.intercept('PATCH', '/api/deposit/' + dataset.depositorSetupInfo.objectId + '/', {body: dataset})
+
+        cy.intercept('GET', 'rest-auth/user/', {
+            body: {
+                "url": "http://localhost:8000/api/users/30/",
+                "username": "oscar",
+                "email": "oscar@sesame.com",
+                "groups": [],
+                "object_id": "e72494ee-c067-4838-849a-d3e1da72942b",
+                "handoff_id": null
+            }
+        })
+        cy.intercept('GET', '/api/dataset-info/', {
+            body: {
+                "count": 1,
+                "next": null,
+                "previous": null,
+                "results": [dataset]
+            }
+        })
+        cy.visit('/my-data')
+        cy.get('tr').should('contain',
+            'Fatigue_data')
+        cy.get('[data-test="continueWorkflow"]').click({force: true})
+        //  cy.visit('/wizard')
+    })
+})
 Cypress.Commands.add('setupStatisticsPage', (datasetFixture, analysisFixture) => {
     cy.fixture(datasetFixture).then(dataset => {
         dataset.created = '' + new Date()
         dataset.depositorSetupInfo.updated = dataset.created
         cy.intercept('GET', '/api/dataset-info/' + dataset.objectId + '/', {body: dataset})
+
         cy.intercept('GET', '/api/dataset-info/', {
             body: {
                 "count": 1,
