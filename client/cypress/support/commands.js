@@ -240,7 +240,11 @@ Cypress.Commands.add('selectVariable',(demoVariables)=> {
         } else if (demoVar.type === 'Categorical') {
             const catDataTest = '[data-test="' + demoVar.name + ':categories"]'
             cy.get(catDataTest).type(demoVar.categories, {force: true})
-            cy.pause()
+        } else if (demoVar.type === 'Boolean') {
+            const trueDataTest = '[data-test="' + demoVar.name + ':trueValue"]'
+            cy.get(trueDataTest).type(demoVar.trueValue, {force: true})
+            const falseDataTest = '[data-test="' + demoVar.name + ':falseValue"]'
+            cy.get(falseDataTest).type(demoVar.falseValue, {force: true})
         }
         // TODO: add handling of Categorical vars
     })
