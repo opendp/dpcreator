@@ -602,13 +602,15 @@ export default {
           }
         }
         if (variable.type === 'Boolean') {
-          if (variable.additional_information !== null) {
-            if (this.isBlank(variable.additional_information.trueValue)
-                && !this.isBlank(variable.additional_information.falseValue)) {
-              booleanValid = false
-            }
+          if (variable.additional_information == null
+              || variable.additional_information !== null && (
+                  (this.isBlank(variable.additional_information.trueValue) || this.isBlank(variable.additional_information.falseValue))
+                  || (variable.additional_information.trueValue === variable.additional_information.falseValue))
+          ) {
+            booleanValid = false
           }
         }
+
         if (variable.type === 'Categorical' &&
             (variable.additional_information === 'undefined'
                 || variable.additional_information.categories === 'undefined'
