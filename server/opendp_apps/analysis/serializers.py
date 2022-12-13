@@ -110,6 +110,9 @@ class DPStatisticSerializer(serializers.Serializer):
     # e.g. ['drop', 'insert_random', 'insert_fixed']
     missing_values_handling = serializers.ChoiceField(choices=astatic.MISSING_VAL_HANDLING_TYPES)
 
+    histogram_bin_type = serializers.ChoiceField(choices=astatic.HIST_VALID_BIN_TYPES, required=False)
+    histogram_number_of_bins = serializers.IntegerField(required=False)
+    # histogram_bin_edges = serializers.CharField(required=False)
 
 class AnalysisPlanPKRelatedField(PrimaryKeyRelatedField):
 

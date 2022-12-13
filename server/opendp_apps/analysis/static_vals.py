@@ -72,10 +72,12 @@ KEY_HIST_BIN_TYPE = 'histogram_bin_type'
 KEY_HIST_NUMBER_OF_BINS = 'histogram_number_of_bins'
 KEY_HIST_BIN_EDGES = 'histogram_bin_edges'
 
+HIST_BIN_TYPE_BOOLEAN = 'binTypeBoolean'
 HIST_BIN_TYPE_ONE_PER_VALUE = 'onePerValue'
 HIST_BIN_TYPE_EQUAL_RANGES = 'equalRanges'
 HIST_BIN_TYPE_BIN_EDGES = 'binEdges'
-HIST_VALID_BIN_TYPES = [HIST_BIN_TYPE_ONE_PER_VALUE,
+HIST_VALID_BIN_TYPES = [HIST_BIN_TYPE_BOOLEAN,
+                        HIST_BIN_TYPE_ONE_PER_VALUE,
                         HIST_BIN_TYPE_EQUAL_RANGES,
                         HIST_BIN_TYPE_BIN_EDGES]
 VALID_HIST_BIN_TYPE_CHOICES_STR = ', '.join(HIST_VALID_BIN_TYPES)

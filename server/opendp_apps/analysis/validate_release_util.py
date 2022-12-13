@@ -412,7 +412,7 @@ class ValidateReleaseUtil(BasicErrCheck):
         stat_num = 0
         for dp_stat in self.dp_statistics:
             stat_num += 1  # not used yet...
-            print(f'\n\n(b-{stat_num})', dict(dp_stat))
+            print(f'\n\n20 (b-{stat_num})', dict(dp_stat))
             """
             We're putting together lots of properties to pass to
             statistic specific classes such as DPMeanSpec.
