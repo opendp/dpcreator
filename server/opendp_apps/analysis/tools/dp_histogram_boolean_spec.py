@@ -57,6 +57,9 @@ class DPHistogramBooleanSpec(StatSpec):
         if self.has_error():
             return
 
+        # temp til front end updated
+        self.histogram_bin_type = astatic.HIST_BIN_TYPE_ONE_PER_VALUE
+
         if not self.validate_property('true_value', validate_not_empty_or_none):
             return
 
