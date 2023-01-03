@@ -1,7 +1,7 @@
 """
 docker-compose run server python manage.py test opendp_apps.analysis.testing.test_analysis_plan.AnalysisPlanTest.test_15_create_plan_via_api
 
-docker-compose run server python manage.py test opendp_apps.analysis.testing.test_dp_mean_spec.StatSpecTest.test_40_test_impute
+docker-compose run server python manage.py test opendp_apps.analysis.testing.test_dp_mean_spec.DPMeanStatSpecTest
 
 # Histogram integer
 docker-compose run server python manage.py test opendp_apps.analysis.testing.test_dp_histogram_integer_spec.HistogramIntegerStatSpecTest.test_160_run_dphist_int_edges

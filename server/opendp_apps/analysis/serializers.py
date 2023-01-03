@@ -104,7 +104,6 @@ class DPStatisticSerializer(serializers.Serializer):
     # Optional field for boolean stats
     # true_value = serializers.CharField(required=False)
     # false_value = serializers.CharField(required=False)
-
     handle_as_fixed = serializers.BooleanField()
 
     # e.g. ['drop', 'insert_random', 'insert_fixed']
@@ -112,7 +111,7 @@ class DPStatisticSerializer(serializers.Serializer):
 
     histogram_bin_type = serializers.ChoiceField(choices=astatic.HIST_VALID_BIN_TYPES, required=False, allow_blank=True)
 
-    histogram_number_of_bins = serializers.IntegerField(allow_null=True)
+    histogram_number_of_bins = serializers.IntegerField(allow_null=True, required=False)
 
     histogram_bin_edges = serializers.ListField(child=serializers.IntegerField(), required=False)
 
