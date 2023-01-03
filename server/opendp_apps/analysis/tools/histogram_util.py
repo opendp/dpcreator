@@ -25,7 +25,7 @@ def get_histogram_stat_spec(props: dict) -> StatSpec:
     Categorical        X (c)            na             na
     Integer	           X (c)            X (e)          X (e)
     Float		       na               X (e)          X (e)*
-    Boolean            na               na             na
+    Boolean            X (c)            na             na
 
     @param props:
     @return: StatSpec of the correct Histogram type
@@ -35,7 +35,7 @@ def get_histogram_stat_spec(props: dict) -> StatSpec:
     histogram_bin_type = props.get(astatic.KEY_HIST_BIN_TYPE, astatic.HIST_BIN_TYPE_ONE_PER_VALUE)
 
     # Boolean
-    if var_type == pstatic.VAR_TYPE_BOOLEAN:
+    if var_type == pstatic.VAR_TYPE_BOOLEAN and histogram_bin_type == astatic.HIST_BIN_TYPE_ONE_PER_VALUE:
         return DPHistogramBooleanSpec(props)
 
     elif var_type == pstatic.VAR_TYPE_CATEGORICAL:

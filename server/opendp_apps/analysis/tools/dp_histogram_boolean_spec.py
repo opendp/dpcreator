@@ -40,7 +40,8 @@ class DPHistogramBooleanSpec(StatSpec):
         Update self.prop_validators to include validators specific to the subclass
         @return:
         """
-        return dict(var_type=validate_type_boolean,
+        return dict(histogram_bin_type=validate_histogram_bin_type_one_per_value,
+                    var_type=validate_type_boolean,
                     true_value=validate_not_empty_or_none,
                     false_value=validate_not_empty_or_none,
                     missing_values_handling=validate_missing_val_handlers)
