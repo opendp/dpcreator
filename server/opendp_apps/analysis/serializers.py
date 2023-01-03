@@ -111,7 +111,7 @@ class DPStatisticSerializer(serializers.Serializer):
 
     histogram_bin_type = serializers.ChoiceField(choices=astatic.HIST_VALID_BIN_TYPES, required=False, allow_blank=True)
 
-    histogram_number_of_bins = serializers.IntegerField(allow_null=True, required=False)
+    histogram_number_of_bins = serializers.CharField(allow_blank=True, allow_null=True, required=False)
 
     histogram_bin_edges = serializers.ListField(child=serializers.IntegerField(), required=False)
 
