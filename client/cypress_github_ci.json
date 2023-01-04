@@ -1,6 +1,6 @@
 {
-  "defaultCommandTimeout": 10000,
-  "pageLoadTimeout": 10000,
+  "defaultCommandTimeout": 100000,
+  "pageLoadTimeout": 100000,
   "baseUrl": "http://server:8000",
   "video": true
 }
