@@ -15,8 +15,7 @@ from opendp_apps.utils.extra_validators import \
      validate_type_boolean,
      validate_missing_val_handlers,
      validate_bool_true_false,
-     validate_histogram_bin_type_one_per_value,
-     validate_fixed_value_in_categories)
+     validate_histogram_bin_type_one_per_value)
 
 enable_features("floating-point", "contrib")
 
@@ -66,15 +65,6 @@ class DPHistogramBooleanSpec(StatSpec):
         if not self.validate_property('false_value', validate_not_empty_or_none):
             return
 
-        '''
-        if self.true_value is None:
-            self.add_err_msg('The "true_value" must be set.')
-            return
-
-        if self.false_value is None:
-            self.add_err_msg('The "true_value" must be set.')
-            return
-        '''
         # Make sure true_value and false_value aren't equal to each other
         #
         if not self.validate_multi_values([self.true_value, self.false_value],
@@ -119,7 +109,7 @@ class DPHistogramBooleanSpec(StatSpec):
 
             # ** not applying this next option, the fixed_value can be neither true/false **
             # Is the fixed value one of the categories?
-            #if not self.validate_multi_values([self.fixed_value, self.categories],
+            # if not self.validate_multi_values([self.fixed_value, self.categories],
             #                                  validate_fixed_value_in_categories,
             #                                  'fixed_value'):
             #    return
@@ -159,7 +149,6 @@ class DPHistogramBooleanSpec(StatSpec):
             # Yes!
             return self.preprocessor
 
-        print('self.categories:', self.categories)
         preprocessor = (
                 make_select_column(key=self.col_index, TOA=str) >>
                 make_cast(TIA=str, TOA=str) >>

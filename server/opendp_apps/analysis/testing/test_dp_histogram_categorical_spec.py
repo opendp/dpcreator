@@ -12,6 +12,7 @@ from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.utils.extra_validators import VALIDATE_MSG_FIXED_VAL_NOT_IN_CATEGORIES
 from opendp_apps.utils.variable_info_formatter import format_variable_info
 
+
 class HistogramCategoricalStatSpecTest(StatSpecTestCase):
     fixtures = ['test_dataset_data_001.json', ]
 
@@ -38,8 +39,8 @@ class HistogramCategoricalStatSpecTest(StatSpecTestCase):
 
         self.dp_hist = DPHistogramCategoricalSpec(self.spec_props)
 
-        if self.dp_hist.has_error():
-            print(self.dp_hist.get_error_messages())
+        # if self.dp_hist.has_error():
+        #    print(self.dp_hist.get_error_messages())
         self.assertFalse(self.dp_hist.has_error())
         self.assertTrue(self.dp_hist.is_chain_valid())
 
@@ -67,23 +68,21 @@ class HistogramCategoricalStatSpecTest(StatSpecTestCase):
         spec_props = self.spec_props.copy()
 
         for epsilon_val in [0.1, .25, .65, .431, 1.0]:
-            print(f'> Valid epsilon val: {epsilon_val}')
+            # print(f'> Valid epsilon val: {epsilon_val}')
             spec_props['epsilon'] = epsilon_val
             dp_hist = DPHistogramCategoricalSpec(spec_props)
             self.assertTrue(dp_hist.is_chain_valid())
 
-        print('   --------')
         for cl_val in [x[0] for x in astatic.CL_CHOICES]:
-            print(f'> Valid cl val: {cl_val}')
+            # print(f'> Valid cl val: {cl_val}')
             spec_props['cl'] = cl_val
             dp_hist = DPHistogramCategoricalSpec(spec_props)
             self.assertTrue(dp_hist.is_chain_valid())
 
-        print('   --------')
         for good_ds in [1, 2, 10, 100, 56 ** 3, ]:
             spec_props['dataset_size'] = good_ds
             dp_hist = DPHistogramCategoricalSpec(spec_props)
-            print(f'> Valid dataset_size: {good_ds}')
+            # print(f'> Valid dataset_size: {good_ds}')
             self.assertTrue(dp_hist.is_chain_valid())
 
     def test_030_bad_confidence_levels(self):
@@ -97,14 +96,15 @@ class HistogramCategoricalStatSpecTest(StatSpecTestCase):
                 yield float(start)
                 start += decimal.Decimal(step)
 
-        for cl_val in list(float_range(-1, 0, '0.1')) + ['alphabet', 'soup']:
+        cl_vals = list(float_range(-1, 0, '0.1')) + ['alphabet', 'soup']
+        for cl_val in cl_vals:
             # print(f'> Invalid ci val: {ci_val}')
             spec_props['cl'] = cl_val
             dp_hist = DPHistogramCategoricalSpec(spec_props)
             # print(dp_hist.is_chain_valid())
             valid = dp_hist.is_chain_valid()
-            print(dp_hist.error_messages)
-            print(cl_val)
+            # print(dp_hist.error_messages)
+            # print(cl_val)
             self.assertFalse(valid)
 
     def test_040_test_impute(self):
@@ -112,10 +112,11 @@ class HistogramCategoricalStatSpecTest(StatSpecTestCase):
         msgt(self.test_040_test_impute.__doc__)
 
         spec_props = self.spec_props.copy()
+        spec_props['fixed_value'] = 'unknown-one'
 
         dp_hist = DPHistogramCategoricalSpec(spec_props)
-        if not dp_hist.is_chain_valid():
-            print(dp_hist.get_error_messages())
+        #if not dp_hist.is_chain_valid():
+        #    print(dp_hist.get_error_messages())
         self.assertTrue(dp_hist.is_chain_valid())
 
     def test_050_test_impute_unknown_fixed_value(self):
@@ -126,8 +127,8 @@ class HistogramCategoricalStatSpecTest(StatSpecTestCase):
         spec_props['fixed_value'] = 'not-a-known-category'
 
         dp_hist = DPHistogramCategoricalSpec(spec_props)
-        if not dp_hist.is_chain_valid():
-            print(dp_hist.get_error_messages())
+        #if not dp_hist.is_chain_valid(): print(dp_hist.get_error_messages())
+
         self.assertFalse(dp_hist.is_chain_valid())
         self.assertTrue(dp_hist.get_single_err_msg().find(VALIDATE_MSG_FIXED_VAL_NOT_IN_CATEGORIES) > -1)
 
@@ -198,7 +199,6 @@ class HistogramCategoricalStatSpecTest(StatSpecTestCase):
             print(f"get_error_messages(): {dp_hist.get_error_messages()}")
 
         self.assertTrue(dp_hist.is_chain_valid())
-
         # print('\nUI info:', json.dumps(dp_hist.get_success_msg_dict()))
 
         # ------------------------------------------------------
@@ -278,7 +278,7 @@ class HistogramCategoricalStatSpecTest(StatSpecTestCase):
 
         expected_cats = ['ac', 'kj', 'ys', 'zz', 'bh1', 'bh2', 'jm', 'mh']
         self.assertEqual(formatted_var_info['subject']['categories'], expected_cats)
-        print('var_info', formatted_var_info)
+        # print('var_info', formatted_var_info)
 
         self.assertEqual(format_variable_info(None), None)
         self.assertEqual(format_variable_info({}), {})
