@@ -4,6 +4,7 @@ docker-compose run server python manage.py test opendp_apps.analysis.testing.tes
 """
 import copy
 import decimal
+import json
 import os
 import tempfile
 from os.path import abspath, dirname, isfile, join
@@ -58,7 +59,8 @@ class HistogramIntegerEqualRangeStatSpecTest(StatSpecTestCase):
         if self.dp_hist_bins.has_error():
             print(self.dp_hist_bins.get_error_messages())
         else:
-            print('histogram_bin_edges: ', self.dp_hist_bins.histogram_bin_edges)
+            pass
+            # print('histogram_bin_edges: ', self.dp_hist_bins.histogram_bin_edges)
 
         self.assertFalse(self.dp_hist_bins.has_error())
         self.assertTrue(self.dp_hist_bins.is_chain_valid())
@@ -87,23 +89,21 @@ class HistogramIntegerEqualRangeStatSpecTest(StatSpecTestCase):
         spec_props = self.spec_props_bins.copy()
 
         for epsilon_val in [0.1, .25, .65, .431, 1.0]:
-            print(f'> Valid epsilon val: {epsilon_val}')
+            # print(f'> Valid epsilon val: {epsilon_val}')
             spec_props['epsilon'] = epsilon_val
             dp_hist = DPHistogramIntEqualRangesSpec(spec_props)
             self.assertTrue(dp_hist.is_chain_valid())
 
-        print('   --------')
         for cl_val in [x[0] for x in astatic.CL_CHOICES]:
-            print(f'> Valid cl val: {cl_val}')
+            # print(f'> Valid cl val: {cl_val}')
             spec_props['cl'] = cl_val
             dp_hist = DPHistogramIntEqualRangesSpec(spec_props)
             self.assertTrue(dp_hist.is_chain_valid())
 
-        print('   --------')
         for good_ds in [1, 2, 10, 100, 56 ** 3, ]:
             spec_props['dataset_size'] = good_ds
             dp_hist = DPHistogramIntEqualRangesSpec(spec_props)
-            print(f'> Valid dataset_size: {good_ds}')
+            # print(f'> Valid dataset_size: {good_ds}')
             self.assertTrue(dp_hist.is_chain_valid())
 
     def test_030_bad_confidence_levels(self):
@@ -123,8 +123,8 @@ class HistogramIntegerEqualRangeStatSpecTest(StatSpecTestCase):
             dp_hist = DPHistogramIntEqualRangesSpec(spec_props)
             # print(dp_hist.is_chain_valid())
             valid = dp_hist.is_chain_valid()
-            print(dp_hist.error_messages)
-            print(cl_val)
+            # print(dp_hist.error_messages)
+            # print(cl_val)
             self.assertFalse(valid)
 
     def test_040_test_impute(self):
@@ -136,13 +136,13 @@ class HistogramIntegerEqualRangeStatSpecTest(StatSpecTestCase):
         bad_impute_info = [(-10, astatic.ERR_IMPUTE_PHRASE_MIN)]
 
         for bad_impute, stat_err_msg in bad_impute_info:
-            print(f'> bad impute: {bad_impute}')
+            # print(f'> bad impute: {bad_impute}')
             new_props['fixed_value'] = bad_impute
             dp_hist2 = DPHistogramIntEqualRangesSpec(new_props)
 
             self.assertFalse(dp_hist2.is_chain_valid())
             err_dict = dp_hist2.get_error_msg_dict()
-            print(f"  - {err_dict['message']}")
+            # print(f"  - {err_dict['message']}")
             self.assertTrue(err_dict['message'].find(stat_err_msg) > -1)
 
     def test_050_check_bin_errors(self):
@@ -165,7 +165,7 @@ class HistogramIntegerEqualRangeStatSpecTest(StatSpecTestCase):
         specs = copy.deepcopy(self.spec_props_bins)
         num_bins = specs[astatic.KEY_VARIABLE_INFO]['max'] - specs[astatic.KEY_VARIABLE_INFO]['min']
         specs[astatic.KEY_HIST_NUMBER_OF_BINS] = num_bins + 1
-        print('num_bins', num_bins)
+        # print('num_bins', num_bins)
         dp_hist = DPHistogramIntEqualRangesSpec(specs)
         self.assertTrue(dp_hist.has_error())
         self.assertTrue(dp_hist.get_single_err_msg().find(VALIDATE_MSG_MORE_BINS_THAN_VALUES) > -1)
@@ -180,8 +180,8 @@ class HistogramIntegerEqualRangeStatSpecTest(StatSpecTestCase):
                          ['[18, 29]', '[30, 42]', '[43, 55]', '[56, 68]', 'uncategorized'])
         self.assertEqual(dp_hist.histogram_bin_edges, [18, 30, 43, 56, 69])
 
-        print('categories', dp_hist.categories)
-        print('err:', dp_hist.get_single_err_msg())
+        # print('categories', dp_hist.categories)
+        # print('err:', dp_hist.get_single_err_msg())
 
     def test_070_run_dphist_calculation_int_bins(self):
         """(070) Run DP histogram calculation with 5 bins"""
@@ -222,8 +222,7 @@ class HistogramIntegerEqualRangeStatSpecTest(StatSpecTestCase):
         self.assertFalse(dp_hist.has_error())
         self.assertTrue('categories' in dp_hist.value)
         self.assertTrue('values' in dp_hist.value)
-        import json;
-        print(json.dumps(release_dict, indent=4))
+        # import json; print(json.dumps(release_dict, indent=4))
 
         # Accuracy
         expected_accuracy = 4.382026634673881

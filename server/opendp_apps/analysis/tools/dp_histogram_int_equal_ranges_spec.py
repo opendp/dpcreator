@@ -202,7 +202,7 @@ class DPHistogramIntEqualRangesSpec(StatSpec):
         # This is for histograms, so divide alpha by the number of counts
         # we just need the length, using the number of bin edges
         categories_list = self.get_pseudo_categories_list()
-        print('categories_list', categories_list)
+        # print('categories_list', categories_list)
         cl_alpha = self.get_confidence_level_alpha() / len(categories_list)
         if cl_alpha is None:
             # Error already saved
