@@ -108,27 +108,25 @@ class DPVarianceStatSpecTest(StatSpecTestCase):
                       }
 
         dp_variance = DPVarianceSpec(spec_props)
-        print(dp_variance.error_messages)
+        # print(dp_variance.error_messages)
         self.assertTrue(dp_variance.is_chain_valid())
 
         for epsilon_val in [0.1, .25, .65, .431, 1.0]:
-            print(f'> Valid epsilon val: {epsilon_val}')
+            # print(f'> Valid epsilon val: {epsilon_val}')
             spec_props['epsilon'] = epsilon_val
             dp_variance = DPVarianceSpec(spec_props)
             self.assertTrue(dp_variance.is_chain_valid())
 
-        print('   --------')
         for cl_val in [x[0] for x in astatic.CL_CHOICES]:
-            print(f'> Valid CL val: {cl_val}')
+            # print(f'> Valid CL val: {cl_val}')
             spec_props['cl'] = cl_val
             dp_variance = DPVarianceSpec(spec_props)
             self.assertTrue(dp_variance.is_chain_valid())
 
-        print('   --------')
         for good_ds in [10, 100, 56 ** 3, ]:
             spec_props['dataset_size'] = good_ds
             dp_variance = DPVarianceSpec(spec_props)
-            print(f'> Valid dataset_size: {good_ds}')
+            # print(f'> Valid dataset_size: {good_ds}')
             self.assertTrue(dp_variance.is_chain_valid())
 
     # @skip

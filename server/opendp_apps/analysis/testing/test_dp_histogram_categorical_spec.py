@@ -112,12 +112,18 @@ class HistogramCategoricalStatSpecTest(StatSpecTestCase):
         msgt(self.test_040_test_impute.__doc__)
 
         spec_props = self.spec_props.copy()
-        spec_props['fixed_value'] = 'unknown-one'
+        spec_props['fixed_value'] = 'ac'  # known category
 
         dp_hist = DPHistogramCategoricalSpec(spec_props)
+        self.assertTrue(dp_hist.is_chain_valid())
+
         #if not dp_hist.is_chain_valid():
         #    print(dp_hist.get_error_messages())
-        self.assertTrue(dp_hist.is_chain_valid())
+        spec_props2 = self.spec_props.copy()
+        spec_props2['fixed_value'] = '--unknown-category--'  # known category
+
+        dp_hist2 = DPHistogramCategoricalSpec(spec_props2)
+        self.assertFalse(dp_hist2.is_chain_valid())
 
     def test_050_test_impute_unknown_fixed_value(self):
         """(50) Test impute validation, unknown fixed value"""

@@ -105,10 +105,10 @@ class DPHistogramIntOnePerValueSpec(StatSpec):
         :return:
         """
         return
-        #if self.has_error():
+        # if self.has_error():
         #    return
 
-        #return preprocessor >> make_base_geometric(scale, D=VectorDomain[AllDomain[int]])
+        # return preprocessor >> make_base_geometric(scale, D=VectorDomain[AllDomain[int]])
 
     def get_preprocessor(self):
         """
@@ -126,22 +126,22 @@ class DPHistogramIntOnePerValueSpec(StatSpec):
             return self.preprocessor
 
         preprocessor = (
-            make_select_column(key=self.col_index, TOA=str) >>
-            make_cast(TIA=str, TOA=int) >>
-            make_impute_constant(self.fixed_value) >>
-            make_count_by_categories(categories=self.categories,
-                                     MO=L1Distance[int], TIA=int)
+                make_select_column(key=self.col_index, TOA=str) >>
+                make_cast(TIA=str, TOA=int) >>
+                make_impute_constant(self.fixed_value) >>
+                make_count_by_categories(categories=self.categories,
+                                         MO=L1Distance[int], TIA=int)
         )
 
         def check_scale(ye_scale, the_preprocessor):
             return the_preprocessor >> make_base_geometric(
-                                        ye_scale,
-                                        D=VectorDomain[AllDomain[int]])
+                ye_scale,
+                D=VectorDomain[AllDomain[int]])
 
         self.scale = binary_search_param(
-                        lambda s: check_scale(s, preprocessor),
-                        d_in=self.max_influence,
-                        d_out=self.epsilon)
+            lambda s: check_scale(s, preprocessor),
+            d_in=self.max_influence,
+            d_out=self.epsilon)
 
         preprocessor = check_scale(self.scale, preprocessor)
         # preprocessor = preprocessor >> make_base_geometric(scale=self.scale, D=VectorDomain[AllDomain[int]])
