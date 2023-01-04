@@ -13,6 +13,10 @@ docker-compose run server python manage.py test opendp_apps.analysis.testing.tes
 
 docker-compose run server python manage.py test opendp_apps.analysis.testing.test_dp_histogram_integer_bin_edges_spec.HistogramIntegerBinEdgesStatSpecTest
 
+docker-compose run server python manage.py test opendp_apps.analysis.testing.test_dp_histogram_integer_equal_range_spec.HistogramIntegerEqualRangeStatSpecTest
+
+docker-compose run server python manage.py test opendp_apps.analysis.testing.test_dp_histogram_integer_spec.HistogramIntegerStatSpecTest
+
 
 
 docker-compose run server python manage.py test opendp_apps.analysis.testing.test_dp_histogram_categorical_spec.HistogramCategoricalStatSpecTest.test_130_format_variable_info_categories
