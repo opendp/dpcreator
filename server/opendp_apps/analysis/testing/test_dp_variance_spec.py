@@ -257,20 +257,20 @@ class DPVarianceStatSpecTest(StatSpecTestCase):
             , (5.2, astatic.ERR_IMPUTE_PHRASE_MAX)]
 
         for bad_impute, stat_err_msg in bad_impute_info:
-            print(f'> bad impute: {bad_impute}')
+            # print(f'> bad impute: {bad_impute}')
             new_props = spec_props.copy()
             new_props['fixed_value'] = bad_impute
             dp_variance2 = DPVarianceSpec(new_props)
 
             self.assertFalse(dp_variance2.is_chain_valid())
             err_dict = dp_variance2.get_error_msg_dict()
-            print(f"  - {err_dict['message']}")
+            # print(f"  - {err_dict['message']}")
             self.assertTrue(err_dict['message'].find(stat_err_msg) > -1)
 
         good_impute_info = [-8, 5, '-8.0', '5.0000', -7, 0, '0.0']
 
         for good_impute in good_impute_info:
-            print(f'> good impute: {good_impute}')
+            # print(f'> good impute: {good_impute}')
             new_props = spec_props.copy()
             new_props['fixed_value'] = good_impute
             dp_variance = DPVarianceSpec(new_props)

@@ -96,8 +96,8 @@ class HistogramBooleanStatSpecTest(StatSpecTestCase):
         spec_props['variable_info']['falseValue'] = 'same-as-before'
 
         dp_hist = DPHistogramBooleanSpec(spec_props)
-        if not dp_hist.is_chain_valid():
-            print(dp_hist.get_error_messages())
+        # if not dp_hist.is_chain_valid(): print(dp_hist.get_error_messages())
+
         self.assertFalse(dp_hist.is_chain_valid())
         self.assertTrue(dp_hist.get_single_err_msg().find(astatic.ERR_BOOL_TRUE_FALSE_NOT_EQUAL) > -1)
 
