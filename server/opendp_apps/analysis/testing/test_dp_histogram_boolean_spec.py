@@ -1,13 +1,18 @@
+import json
+import tempfile
 from os.path import abspath, dirname, isfile, join
+from opendp_apps.analysis.misc_formatters import get_timestamp_str
+
+from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
+from opendp_apps.analysis.tools.dp_histogram_boolean_spec import DPHistogramBooleanSpec
+from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
+from opendp_apps.model_helpers.msg_util import msgt
+from opendp_apps.profiler import static_vals as pstatic
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
-
-from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
-from opendp_apps.analysis.tools.dp_histogram_boolean_spec import DPHistogramBooleanSpec
-from opendp_apps.model_helpers.msg_util import msgt
-from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.profiler import static_vals as pstatic
+DP_REPORTS_TEST_DIR = join(dirname(dirname(CURRENT_DIR)), 'dp_reports', 'test_data')  # has sample release
 
 
 class HistogramBooleanStatSpecTest(StatSpecTestCase):
@@ -260,6 +265,34 @@ class HistogramBooleanStatSpecTest(StatSpecTestCase):
         val_true = release_dict['result']['value']['values'][0]
         val_uncategorized = release_dict['result']['value']['values'][1]
         self.assertTrue(val_uncategorized > val_true)
+
+        # ----------------------------------
+        # PDF
+        # ----------------------------------
+        samp_full_release_fname = join(DP_REPORTS_TEST_DIR,
+                                       'sample_histogram_release.json')
+        self.assertTrue(isfile(samp_full_release_fname))
+        samp_full_release_dict = json.load(open(samp_full_release_fname, 'r'))
+
+        # Add newly made statistical release to the full release
+        samp_full_release_dict['statistics'] = [release_dict]
+
+        # print('samp_full_release_dict', json.dumps(samp_full_release_dict, indent=4))
+        print('Creating test PDF...')
+        pdf_maker = PDFReportMaker(samp_full_release_dict)
+        if pdf_maker.has_error():
+            print(pdf_maker.get_err_msg())
+        else:
+            # _output_fname = 'hist01.pdf'
+            output_fname = tempfile.NamedTemporaryFile(
+                prefix='report_' + get_timestamp_str(),
+                suffix='.pdf',
+                delete=True).name
+            pdf_maker.save_pdf_to_file(output_fname)
+            # print('file written: ', output_fname)
+            self.assertTrue(isfile(output_fname))
+
+        self.assertFalse(pdf_maker.has_error())
 
     def test_130_run_dphist_calculation_boolean_str(self):
         """(130) Run DP histogram on boolean string data"""
