@@ -282,8 +282,13 @@ Cypress.Commands.add('enterStatsInPopup', (demoData) => {
         const varDataTest = '[data-test="' + demoVar + '"]'
         cy.get(varDataTest).click({force: true})
         cy.get('[data-test="Fixed value"]').type(demoStat.fixedValue)
-        if (demoStat.statistic == 'Histogram') {
-            cy.get('[data-test="onePerValue"]').click({force: true})
+        if (demoStat.statistic == 'Histogram' && demoStat.hasOwnProperty('histogramBinType')) {
+            cy.get('[data-test="' + demoStat.histogramBinType + '"]').click({force: true})
+            if (demoStat.histogramBinType === 'binEdges') {
+                cy.get('[data-test="histogramBinEdges"]').type(demoStat.histogramBinEdges, {force: true})
+            } else if (demoStat.histogramBinType === 'equalRanges') {
+                cy.get('[data-test="histogramNumberOfBins"]').type(demoStat.histogramNumberOfBins)
+            }
         }
         cy.get('[data-test="Create Statistic Button"]').click({force: true})
         cy.get('[data-test="Create Statistics Title').should('be.visible')
@@ -344,11 +349,10 @@ Cypress.Commands.add('submitStatistics', (demoData) => {
             //    expect($p).to.contain('Release Completed')
             const sessionObj = JSON.parse(sessionStorage.getItem('vuex'))
             const releaseInfo = sessionObj.dataset.analysisPlan.releaseInfo
-
-            demoData.statistics.forEach((demoStat) => {
-                expect(releaseInfo.dpRelease.statistics[0].statistic).to.equal(demoStat.statistic.toLowerCase())
-                expect(releaseInfo.dpRelease.statistics[0].accuracy.value).to.equal(demoStat.accuracy)
-            })
+            for (let i = 0; i < demoData.statistics.length; i++) {
+                expect(releaseInfo.dpRelease.statistics[i].statistic).to.equal(demoData.statistics[i].statistic.toLowerCase())
+                expect(releaseInfo.dpRelease.statistics[i].accuracy.value).to.equal(demoData.statistics[i].accuracy)
+            }
         })
     cy.visit('/my-data')
     cy.get('[data-test="table status tag"]').should('contain', 'Release Completed')

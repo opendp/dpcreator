@@ -1,14 +1,40 @@
 {
   "datasetName": "Eye-typing experiment",
-  "statistics":  [
+  "statistics": [
     {
       "statistic": "Histogram",
       "variable": "Trial",
-      "roundedAccuracy": "5.39",
-      "accuracy": 5.393627546352361,
-      "fixedValue": "5"
+      "fixedValue": "5",
+      "histogramBinType": "binEdges",
+      "histogramBinEdges": "2,6,",
+      "roundedAccuracy": "12.0",
+      "accuracy": 11.982929094215963
+    },
+    {
+      "statistic": "Histogram",
+      "variable": "Trial",
+      "fixedValue": "5",
+      "histogramBinType": "onePerValue",
+      "roundedAccuracy": "21.6",
+      "accuracy": 21.574510185409444
+    },
+    {
+      "statistic": "Histogram",
+      "variable": "Trial",
+      "fixedValue": "5",
+      "histogramBinType": "equalRanges",
+      "histogramNumberOfBins": "3",
+      "roundedAccuracy": "14.8",
+      "accuracy": 14.755517816455745
+    },
+    {
+      "statistic": "Histogram",
+      "variable": "Session",
+      "fixedValue": "1",
+      "roundedAccuracy": "14.8",
+      "accuracy": 14.755517816455745
     }
-    ],
+  ],
   "variables": {
     "Trial": {
       "name": "Trial",
@@ -16,7 +42,26 @@
       "type": "Integer",
       "min": "0",
       "max": "10"
+    },
+    "TypingSpeed": {
+      "name": "TypingSpeed",
+      "label": "",
+      "type": "Float",
+      "min": "0.0",
+      "max": "100.0"
+    },
+    "Subject": {
+      "name": "Subject",
+      "label": "",
+      "type": "Categorical",
+      "categories": "ac,af,aq"
+    },
+    "Session": {
+      "name": "Session",
+      "label": "",
+      "type": "Boolean",
+      "trueValue": "1",
+      "falseValue": "2"
     }
   }
 }
-
