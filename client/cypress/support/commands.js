@@ -90,7 +90,6 @@ Cypress.Commands.add('logout', () => {
             cy.wait('@logout')
             cy.get('[data-test="My Profile"]').should('not.exist');
             cy.vuex().its('state.auth.user').should('be.null')
-            cy.vuex().its('state.dataverse.handoffId').should('be.null')
 
         }
     }
@@ -240,7 +239,11 @@ Cypress.Commands.add('selectVariable',(demoVariables)=> {
         } else if (demoVar.type === 'Categorical') {
             const catDataTest = '[data-test="' + demoVar.name + ':categories"]'
             cy.get(catDataTest).type(demoVar.categories, {force: true})
-            cy.pause()
+        } else if (demoVar.type === 'Boolean') {
+            const trueDataTest = '[data-test="' + demoVar.name + ':trueValue"]'
+            cy.get(trueDataTest).type(demoVar.trueValue, {force: true})
+            const falseDataTest = '[data-test="' + demoVar.name + ':falseValue"]'
+            cy.get(falseDataTest).type(demoVar.falseValue, {force: true})
         }
         // TODO: add handling of Categorical vars
     })
@@ -273,7 +276,7 @@ Cypress.Commands.add('enterStatsInPopup', (demoData) => {
     cy.get('[data-test="Add Statistic"]').should('be.visible')
     let count = 0
     demoData.statistics.forEach((demoStat) => {
-        count++
+
         let demoVar = demoStat.variable
         cy.get('[data-test="Add Statistic"]').click({force: true});
         cy.get('[data-test="AddStatisticDialog"]').should('be.visible')
@@ -289,13 +292,18 @@ Cypress.Commands.add('enterStatsInPopup', (demoData) => {
         cy.get('[data-test="Create Statistics Title').should('be.visible')
         cy.get('[data-test="Add Statistic"]').should('be.visible')
         // The statistic should have been created
-        // cy.get('[data-test="statistic"]').should('contain', 'Mean')
         cy.get('tr').first().get('td').should('contain', demoStat.statistic)
-        //  cy.get('tr').children().should('be.at.least',count)
+
         cy.get('table').contains('td', demoStat.statistic).should('be.visible');
-        // Statistic should contain correct accuracy value
+        const rowLabel = 'statistic' + count
+        cy.get('[data-test="' + rowLabel + '"]').should('be.visible')
+        count++
+        // wait until the vuex store is updated before adding the next statistic
+        cy.vuex().its('state.dataset.analysisPlan.dpStatistics.length').should('be.equal', count)
+
 
     })
+    // wait till all statistics have been added to check accuracy values
     demoData.statistics.forEach((demoStat) => {
         cy.get('table').contains('td', demoStat.roundedAccuracy).should('be.visible')
     })
@@ -355,11 +363,45 @@ Cypress.Commands.add('submitStatistics', (demoData) => {
 
 
 })
+Cypress.Commands.add('setupConfirmVariablesPage', (datasetFixture) => {
+
+    cy.fixture(datasetFixture).then(dataset => {
+        dataset.created = '' + new Date()
+        dataset.depositorSetupInfo.updated = dataset.created
+        cy.intercept('GET', '/api/dataset-info/' + dataset.objectId + '/', {body: dataset})
+        cy.intercept('PATCH', '/api/deposit/' + dataset.depositorSetupInfo.objectId + '/', {body: dataset})
+
+        cy.intercept('GET', 'rest-auth/user/', {
+            body: {
+                "url": "http://localhost:8000/api/users/30/",
+                "username": "test",
+                "email": "oscar@sesame.com",
+                "groups": [],
+                "object_id": "test",
+                "handoff_id": null
+            }
+        })
+        cy.intercept('GET', '/api/dataset-info/', {
+            body: {
+                "count": 1,
+                "next": null,
+                "previous": null,
+                "results": [dataset]
+            }
+        })
+        cy.visit('/my-data')
+        cy.get('tr').should('contain',
+            'Fatigue_data')
+        cy.get('[data-test="continueWorkflow"]').click({force: true})
+        //  cy.visit('/wizard')
+    })
+})
 Cypress.Commands.add('setupStatisticsPage', (datasetFixture, analysisFixture) => {
     cy.fixture(datasetFixture).then(dataset => {
         dataset.created = '' + new Date()
         dataset.depositorSetupInfo.updated = dataset.created
         cy.intercept('GET', '/api/dataset-info/' + dataset.objectId + '/', {body: dataset})
+
         cy.intercept('GET', '/api/dataset-info/', {
             body: {
                 "count": 1,
@@ -370,6 +412,42 @@ Cypress.Commands.add('setupStatisticsPage', (datasetFixture, analysisFixture) =>
         })
         cy.fixture(analysisFixture).then(analysisPlan => {
             cy.intercept('GET', '/api/analyze/' + analysisPlan.objectId + '/', {body: analysisPlan})
+        })
+        cy.visit('/my-data')
+        cy.get('tr').should('contain',
+            'Replication Data for: Eye-typing experiment')
+        cy.get('[data-test="continueWorkflow"]').click({force: true})
+    })
+})
+Cypress.Commands.add('setupStatisticsPageFixtures', (datasetFixture, analysisFixture) => {
+    cy.fixture(datasetFixture).then(dataset => {
+        dataset.created = '' + new Date()
+        dataset.depositorSetupInfo.updated = dataset.created
+        cy.intercept('GET', '/api/dataset-info/' + dataset.objectId + '/', {body: dataset})
+        cy.intercept('PATCH', '/api/deposit/' + dataset.depositorSetupInfo.objectId + '/', {body: dataset})
+
+        cy.intercept('GET', '/api/dataset-info/', {
+            body: {
+                "count": 1,
+                "next": null,
+                "previous": null,
+                "results": [dataset]
+            }
+        })
+        cy.intercept('GET', 'rest-auth/user/', {
+            body: {
+                "url": "http://localhost:8000/api/users/30/",
+                "username": "test",
+                "email": "oscar@sesame.com",
+                "groups": [],
+                "object_id": "test",
+                "handoff_id": null
+            }
+        })
+        cy.fixture(analysisFixture).then(analysisPlan => {
+            cy.intercept('GET', '/api/analyze/' + analysisPlan.objectId + '/', {body: analysisPlan})
+            cy.intercept('PATCH', '/api/analyze/' + analysisPlan.objectId + '/', {body: analysisPlan})
+
         })
         cy.visit('/my-data')
         cy.get('tr').should('contain',

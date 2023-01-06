@@ -105,7 +105,6 @@ class ValidationView(viewsets.ViewSet):
             }
 
         """
-
         release_info_serializer = ReleaseValidationSerializer(data=request.data)
         if not release_info_serializer.is_valid():
             logger.error('ValidationView: release_info_serializer.errors %s', release_info_serializer.errors)

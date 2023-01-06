@@ -191,7 +191,7 @@
 <script>
 import Button from "../components/DesignSystem/Button.vue";
 import NETWORK_CONSTANTS from "../router/NETWORK_CONSTANTS";
-import {mapState, mapActions} from "vuex";
+import {mapActions, mapState} from "vuex";
 import ColoredBorderAlert from "@/components/DynamicHelpResources/ColoredBorderAlert";
 
 export default {
@@ -231,7 +231,6 @@ export default {
           .catch((error) => {
             let msg = []
             Object.keys(error).forEach(function (k) {
-              // console.log(k + ' - ' + error[k]);
               msg.push('' + error[k])
             });
             this.errorMessage = msg

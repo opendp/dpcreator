@@ -4,6 +4,7 @@ Return the correct Histogram StatSpec depending on the input properties
 import copy
 
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.analysis.tools.dp_histogram_boolean_spec import DPHistogramBooleanSpec
 from opendp_apps.analysis.tools.dp_histogram_categorical_spec import DPHistogramCategoricalSpec
 from opendp_apps.analysis.tools.dp_histogram_int_bin_edges_spec import DPHistogramIntBinEdgesSpec
 from opendp_apps.analysis.tools.dp_histogram_int_equal_ranges_spec import DPHistogramIntEqualRangesSpec
@@ -18,22 +19,27 @@ def get_histogram_stat_spec(props: dict) -> StatSpec:
     Make sure that the variable type is appropriate for the histogram settings.
         (e) = edges
         (c) = categories
+        na = not applicable
 
     Data Type	    onePerValue	    equalRanges	    binEdges
-    Categorical        X (c)
+    Categorical        X (c)            na             na
     Integer	           X (c)            X (e)          X (e)
-    Float		                        X (e)          X (e)*
+    Float		       na               X (e)          X (e)*
+    Boolean            X (c)            na             na
 
     @param props:
     @return: StatSpec of the correct Histogram type
     """
+    print('>> (30) get_histogram_stat_spec / props: ', dict(props))
     var_type = props.get('var_type')
+    histogram_bin_type = props.get(astatic.KEY_HIST_BIN_TYPE, astatic.HIST_BIN_TYPE_ONE_PER_VALUE)
 
-    # TODO: Remove when integrated with frontend--in this branch the UI doesn't have bin types
-    histogram_bin_type = props.get('histogram_bin_type', astatic.HIST_BIN_TYPE_ONE_PER_VALUE)
+    # Boolean
+    if var_type == pstatic.VAR_TYPE_BOOLEAN and histogram_bin_type == astatic.HIST_BIN_TYPE_ONE_PER_VALUE:
+        return DPHistogramBooleanSpec(props)
 
-    # Categorical
-    if var_type == pstatic.VAR_TYPE_CATEGORICAL:
+    elif var_type == pstatic.VAR_TYPE_CATEGORICAL:
+        # Categorical
         # Technically, can only have bin type OnePerValue
         # 4/12/2022 - temp hack to distinguish numeric categories
         #   - need updated UI, etc.

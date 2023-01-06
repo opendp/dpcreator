@@ -1,8 +1,8 @@
 """
 docker-compose run server python manage.py test opendp_apps.analysis.testing.test_dp_histogram_integer_bin_edges_spec.HistogramIntegerBinEdgesStatSpecTest
 """
-import json
 import decimal
+import json
 import os
 import tempfile
 from os.path import abspath, dirname, isfile, join
@@ -85,23 +85,21 @@ class HistogramIntegerBinEdgesStatSpecTest(StatSpecTestCase):
         spec_props = self.spec_props.copy()
 
         for epsilon_val in [0.1, .25, .65, .431, 1.0]:
-            print(f'> Valid epsilon val: {epsilon_val}')
+            # print(f'> Valid epsilon val: {epsilon_val}')
             spec_props['epsilon'] = epsilon_val
             dp_hist = DPHistogramIntBinEdgesSpec(spec_props)
             self.assertTrue(dp_hist.is_chain_valid())
 
-        print('   --------')
         for cl_val in [x[0] for x in astatic.CL_CHOICES]:
-            print(f'> Valid cl val: {cl_val}')
+            # print(f'> Valid cl val: {cl_val}')
             spec_props['cl'] = cl_val
             dp_hist = DPHistogramIntBinEdgesSpec(spec_props)
             self.assertTrue(dp_hist.is_chain_valid())
 
-        print('   --------')
         for good_ds in [1, 2, 10, 100, 56 ** 3, ]:
             spec_props['dataset_size'] = good_ds
             dp_hist = DPHistogramIntBinEdgesSpec(spec_props)
-            print(f'> Valid dataset_size: {good_ds}')
+            # print(f'> Valid dataset_size: {good_ds}')
             self.assertTrue(dp_hist.is_chain_valid())
 
     def test_030_bad_confidence_levels(self):
@@ -119,8 +117,8 @@ class HistogramIntegerBinEdgesStatSpecTest(StatSpecTestCase):
             dp_hist = DPHistogramIntBinEdgesSpec(self.spec_props)
             # print(dp_hist.is_chain_valid())
             valid = dp_hist.is_chain_valid()
-            print(dp_hist.error_messages)
-            print(cl_val)
+            # print(dp_hist.error_messages)
+            # print(cl_val)
             self.assertFalse(valid)
 
     def test_040_test_impute(self):
@@ -131,13 +129,13 @@ class HistogramIntegerBinEdgesStatSpecTest(StatSpecTestCase):
         bad_impute_info = [(-10, astatic.ERR_IMPUTE_PHRASE_MIN)]
 
         for bad_impute, stat_err_msg in bad_impute_info:
-            print(f'> bad impute: {bad_impute}')
+            # print(f'> bad impute: {bad_impute}')
             new_props['fixed_value'] = bad_impute
             dp_hist2 = DPHistogramIntBinEdgesSpec(new_props)
 
             self.assertFalse(dp_hist2.is_chain_valid())
             err_dict = dp_hist2.get_error_msg_dict()
-            print(f"  - {err_dict['message']}")
+            # print(f"  - {err_dict['message']}")
             self.assertTrue(err_dict['message'].find(stat_err_msg) > -1)
 
     def test_050_run_dphist_edges(self):
@@ -163,9 +161,13 @@ class HistogramIntegerBinEdgesStatSpecTest(StatSpecTestCase):
         import numpy as np
         data = np.random.uniform(0., 10., size=100)
 
-        print(noisy_histogram_from_dataframe(data))
-        print(noisy_histogram_from_dataframe(data))
-        print(noisy_histogram_from_dataframe(data))
+        noisy_hist1 = noisy_histogram_from_dataframe(data)
+        noisy_hist2 = noisy_histogram_from_dataframe(data)
+        noisy_hist3 = noisy_histogram_from_dataframe(data)
+
+        self.assertEqual(len(noisy_hist1), 5)
+        self.assertEqual(len(noisy_hist2), 5)
+        self.assertEqual(len(noisy_hist3), 5)
 
     def test_060_run_dphist_int_edges(self):
         """(60) Run DP histogram calculation with edges"""
@@ -175,10 +177,10 @@ class HistogramIntegerBinEdgesStatSpecTest(StatSpecTestCase):
 
         if not dp_hist.is_chain_valid():
             print('Error!')
-            print(dp_hist.get_single_err_msg())
+            # print(dp_hist.get_single_err_msg())
         else:
             print('Validated!')
-            print(dp_hist.get_success_msg_dict())
+            # print(dp_hist.get_success_msg_dict())
 
         # ------------------------------------------------------
         # Run the actual histogram

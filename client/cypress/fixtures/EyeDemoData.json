@@ -40,6 +40,8 @@
       "type": "Boolean",
       "label": "Language",
       "selected": true,
+      "trueValue": "1",
+      "falseValue": "0",
       "categories": [],
       "sortOrder": 1
     },
@@ -55,6 +57,8 @@
       "type": "Boolean",
       "label": "",
       "categories": [],
+      "trueValue": 1,
+      "falseValue": 0,
       "sortOrder": 3
     },
     "blinkFrequency": {

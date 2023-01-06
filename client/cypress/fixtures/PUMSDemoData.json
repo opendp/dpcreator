@@ -18,7 +18,9 @@
     },
     "married": {
       "name": "married",
-      "type": "Boolean"
+      "type": "Boolean",
+      "trueValue": 1,
+      "falseValue": 0
     }
   }
 }
