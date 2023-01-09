@@ -28,8 +28,11 @@ from opendp_apps.utils.extra_validators import \
     (validate_confidence_level,
      validate_statistic,
      validate_epsilon_not_null,
+     validate_not_empty_or_none,
      validate_int_not_negative,
-     validate_fixed_value_in_categories)
+     validate_fixed_value_in_categories,
+     # validate_bool_true_false,
+     )
 
 
 class StatSpec:
@@ -68,6 +71,9 @@ class StatSpec:
         self.min = self.variable_info.get('min')  # optional: depends on variable type/stat
         self.max = self.variable_info.get('max')  # optional: depends on variable type/stat
         self.categories = self.variable_info.get('categories')  # optional: depends on variable type/stat
+        # optional: for variable type boolean
+        self.true_value = self.variable_info.get('trueValue')
+        self.false_value = self.variable_info.get('falseValue')
 
         # (3) Usage depends on the statistic
         #
@@ -76,6 +82,9 @@ class StatSpec:
         # Missing values handling
         self.missing_values_handling = props.get('missing_values_handling')
         self.fixed_value = props.get('fixed_value')
+
+        # the greatest number of records that any one individual can influence in the dataset
+        self.max_influence = 1  # 1 is the default for now
 
         # (4) Set explicitly by subclass (may change in the future)
         self.noise_mechanism = None
@@ -554,6 +563,12 @@ class StatSpec:
         if 'min' in self.get_prop_validator_keys():
             final_info['bounds'] = OrderedDict({'min': self.min, 'max': self.max})
 
+        # True/False for Boolean
+        #
+        if 'true_value' in self.get_prop_validator_keys():
+            final_info['boolean_values'] = OrderedDict({'true_value': self.true_value,
+                                                'false_value': self.false_value})
+
         # Missing values
         #
         final_info['missing_value_handling'] = OrderedDict({"type": self.missing_values_handling})
@@ -642,3 +657,33 @@ class StatSpec:
     def add_error_message(self, err_msg: str):
         """Add an error message -- same as "add_err_msg" """
         self.add_err_msg(err_msg)
+
+    @staticmethod
+    def _add_double_quotes(value):
+        """
+        Categories and values need to be enclosed by double
+        quotes in order to be handled by OpenDP
+        :return:
+        """
+        # Don't add double quotes if they're already there
+        if value.startswith('"') and value.endswith('"'):
+            return value
+
+        return f'"{value}"'
+
+    @staticmethod
+    def _remove_double_quotes(value):
+        """
+        Remove double quotes after the DP process
+        :return:
+        """
+        if len(value) < 2:
+            return
+
+        # Only remove outermost set of double quotes--may conflict with _add_double_quotes
+        #   if the value is supposed to be double_quoted
+        #
+        if value.startswith('"') and value.endswith('"'):
+            value = value[1:-1]
+
+        return value

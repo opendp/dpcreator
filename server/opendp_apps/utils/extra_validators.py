@@ -26,6 +26,9 @@ VALIDATE_MSG_TWO_EDGES_MINIMUM = 'At least two edges are needed to create the hi
 VALIDATE_MSG_EDGES_NOT_A_LIST = 'The "edges" are not a list'
 VALIDATE_MSG_MORE_BINS_THAN_VALUES = 'There are more bins than values.'
 
+VALIDATE_MSG_BOOL_NO_TRUE_VALUE = 'The "True" value must be set.'
+VALIDATE_MSG_BOOL_NO_FALSE_VALUE = 'The "False" value must be set.'
+
 
 def validate_statistic(value):
     """Statistic currently supported"""
@@ -183,13 +186,19 @@ def validate_type_numeric(value: str):
 
 
 def validate_type_categorical(value: str):
-    """Make sure the variable type is integer or float"""
+    """Make sure the variable type is VAR_TYPE_CATEGORICAL"""
     if not value == pstatic.VAR_TYPE_CATEGORICAL:
         raise ValidationError(pstatic.ERR_MSG_VAR_TYPE_NOT_CATEGORICAL)
 
 
+def validate_type_boolean(value: str):
+    """Make sure the variable type is VAR_TYPE_BOOLEAN"""
+    if not value == pstatic.VAR_TYPE_BOOLEAN:
+        raise ValidationError(pstatic.ERR_MSG_VAR_TYPE_NOT_BOOLEAN)
+
+
 def validate_type_integer(value: str):
-    """Make sure the variable type is integer or float"""
+    """Make sure the variable type is VAR_TYPE_INTEGER"""
     if not value == pstatic.VAR_TYPE_INTEGER:
         raise ValidationError(pstatic.ERR_MSG_VAR_TYPE_NOT_INTEGER)
 
@@ -277,6 +286,19 @@ def validate_min_max(min_int: Union[int, float], max_int: Union[int, float]):
 
     if not max_int > min_int:
         user_msg = f'{astatic.ERR_MAX_NOT_GREATER_THAN_MIN} (max: {max_int}, min: {min_int})'
+        raise ValidationError(user_msg)
+
+
+def validate_bool_true_false(true_value, false_value):
+    """
+    If it applies, validate the min/max relationship
+    """
+    validate_not_empty_or_none(true_value)
+    validate_not_empty_or_none(false_value)
+
+    if true_value == false_value:
+        user_msg = (f'{astatic.ERR_BOOL_TRUE_FALSE_NOT_EQUAL}'
+                    f' (true: {true_value}, false: {false_value})')
         raise ValidationError(user_msg)
 
 

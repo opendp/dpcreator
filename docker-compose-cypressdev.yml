@@ -52,9 +52,9 @@ services:
     #
     environment:
       - DJANGO_SETTINGS_MODULE=opendp_project.settings.cypress_settings
-      - VUE_APP_GOOGLE_CLIENT_ID=TEST. Set in docker-compose-cypressdev.yml
-      - VUE_APP_ADOBE_PDF_CLIENT_ID=TEST. Set in docker-compose-cypressdev.yml
-      - SKIP_PDF_CREATION_FOR_TESTS=True
+      - VUE_APP_GOOGLE_CLIENT_ID=TEST. Set in docker-compose-ci-step2.yml
+      - VUE_APP_ADOBE_PDF_CLIENT_ID=TEST. Set in docker-compose-ci-step2.yml
+      - SKIP_PDF_CREATION_FOR_TESTS=False
       - SKIP_EMAIL_RELEASE_FOR_TESTS=True
       - VUE_APP_WEBSOCKET_PREFIX=ws://
     env_file:

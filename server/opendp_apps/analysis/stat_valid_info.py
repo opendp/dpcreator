@@ -20,6 +20,7 @@ class StatValidInfo:
         self.valid = valid
         self.message = message
         self.value = value
+
         self.accuracy_val = accuracy_val
         self.accuracy_msg = accuracy_msg
 

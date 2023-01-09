@@ -391,8 +391,6 @@ const actions = {
                 const completedStepProp = {userStep: STEP_1200_PROCESS_COMPLETE}
                 const payload = {objectId: state.analysisPlan.objectId, props: completedStepProp}
                 this.dispatch('dataset/updateAnalysisPlan', payload)
-                // Also update the datasetList so that it shows the Released status for this dataset
-                this.dispatch('dataset/setDatasetList')
                 //  }, 5000);
 
 
@@ -408,7 +406,10 @@ const helperMethods = {
         targetVar.label = variableInput.label
         targetVar.type = variableInput.type
         targetVar.selected = variableInput.selected
-
+        if (variableInput.type === 'Boolean') {
+            targetVar.trueValue = variableInput.additional_information.trueValue
+            targetVar.falseValue = variableInput.additional_information.falseValue
+        }
         if (variableInput.type === 'Integer' || variableInput.type === 'Float') {
             targetVar.min = Number(variableInput.additional_information.min)
             targetVar.max = Number(variableInput.additional_information.max)

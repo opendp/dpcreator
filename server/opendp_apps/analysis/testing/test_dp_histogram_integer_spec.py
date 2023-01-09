@@ -86,23 +86,21 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         spec_props = self.spec_props_per_val.copy()
 
         for epsilon_val in [0.1, .25, .65, .431, 1.0]:
-            print(f'> Valid epsilon val: {epsilon_val}')
+            # print(f'> Valid epsilon val: {epsilon_val}')
             spec_props['epsilon'] = epsilon_val
             dp_hist = DPHistogramIntOnePerValueSpec(spec_props)
             self.assertTrue(dp_hist.is_chain_valid())
 
-        print('   --------')
         for cl_val in [x[0] for x in astatic.CL_CHOICES]:
-            print(f'> Valid cl val: {cl_val}')
+            # print(f'> Valid cl val: {cl_val}')
             spec_props['cl'] = cl_val
             dp_hist = DPHistogramIntOnePerValueSpec(spec_props)
             self.assertTrue(dp_hist.is_chain_valid())
 
-        print('   --------')
         for good_ds in [1, 2, 10, 100, 56 ** 3, ]:
             spec_props['dataset_size'] = good_ds
             dp_hist = DPHistogramIntOnePerValueSpec(spec_props)
-            print(f'> Valid dataset_size: {good_ds}')
+            # print(f'> Valid dataset_size: {good_ds}')
             self.assertTrue(dp_hist.is_chain_valid())
 
     def test_030_bad_confidence_levels(self):
@@ -135,13 +133,13 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         bad_impute_info = [(-10, astatic.ERR_IMPUTE_PHRASE_MIN)]
 
         for bad_impute, stat_err_msg in bad_impute_info:
-            print(f'> bad impute: {bad_impute}')
+            # print(f'> bad impute: {bad_impute}')
             new_props['fixed_value'] = bad_impute
             dp_hist2 = DPHistogramIntOnePerValueSpec(new_props)
 
             self.assertFalse(dp_hist2.is_chain_valid())
             err_dict = dp_hist2.get_error_msg_dict()
-            print(f"  - {err_dict['message']}")
+            # print(f"  - {err_dict['message']}")
             self.assertTrue(err_dict['message'].find(stat_err_msg) > -1)
 
     def test_050_run_dphist_calculation_integer(self):

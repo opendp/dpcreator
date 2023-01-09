@@ -72,10 +72,12 @@ KEY_HIST_BIN_TYPE = 'histogram_bin_type'
 KEY_HIST_NUMBER_OF_BINS = 'histogram_number_of_bins'
 KEY_HIST_BIN_EDGES = 'histogram_bin_edges'
 
+HIST_BIN_TYPE_BOOLEAN = 'binTypeBoolean'
 HIST_BIN_TYPE_ONE_PER_VALUE = 'onePerValue'
 HIST_BIN_TYPE_EQUAL_RANGES = 'equalRanges'
 HIST_BIN_TYPE_BIN_EDGES = 'binEdges'
-HIST_VALID_BIN_TYPES = [HIST_BIN_TYPE_ONE_PER_VALUE,
+HIST_VALID_BIN_TYPES = [HIST_BIN_TYPE_BOOLEAN,
+                        HIST_BIN_TYPE_ONE_PER_VALUE,
                         HIST_BIN_TYPE_EQUAL_RANGES,
                         HIST_BIN_TYPE_BIN_EDGES]
 VALID_HIST_BIN_TYPE_CHOICES_STR = ', '.join(HIST_VALID_BIN_TYPES)
@@ -147,6 +149,8 @@ ERR_MSG_DEPOSIT_NO_JSON_FILE = 'A JSON file is not avilable for deposit.'
 ERR_MSG_DEPOSIT_NO_PDF_FILE = 'A PDF file is not avilable for deposit.'
 ERR_MSG_DEPOSIT_NOT_DATAVERSE = 'Deposit functionality is not available for a non-Dataverse file'
 ERR_MSG_DEPOSIT_NO_DV_USER = 'The Datavese user could not be for this release.'
+
+ERR_BOOL_TRUE_FALSE_NOT_EQUAL = f'The True and False values cannot be the same'
 
 # Setup Questions
 

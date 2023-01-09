@@ -40,7 +40,6 @@ class StatHelperView(viewsets.ViewSet):
         Given a min, max, and # of bins, construct a list of edges.
         Example input: {"min": 1, "max": 100, "number_of_bins": 5}
         """
-
         serializer = IntegerEdgeInputsSerializer(data=request.data)
         if not serializer.is_valid():
             logger.error(serializer.errors)

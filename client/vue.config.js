@@ -6,9 +6,7 @@ module.exports = {
 
   "indexPath": "../../templates/base-vue.html",
 
-  "devServer": {
-    "progress": false
-  },
+
 
   chainWebpack: config => {
       /*
@@ -23,10 +21,8 @@ module.exports = {
       https://webpack.js.org/configuration/dev-server/#devserverwritetodisk-
       */
     config.devServer
-        .public('http://127.0.0.1:8080')
-        .hotOnly(true)
-        .headers({"Access-Control-Allow-Origin": "*"})
-        .writeToDisk(filePath => filePath.endsWith('index.html'));
+
+        .headers({"Access-Control-Allow-Origin": "*"});
   },
 
   "transpileDependencies": [

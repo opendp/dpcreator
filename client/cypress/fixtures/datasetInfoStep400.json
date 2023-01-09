@@ -1,259 +1,155 @@
 {
-  "objectId": "09f77a2f-d348-4462-8381-0e1196b17de0",
-  "name": "Replication Data for: Eye-typing experiment",
-  "created": "2021-08-23T12:36:01.178381Z",
-  "creator": "dev_admin",
-  "installationName": "Mock Local Dataverse",
-  "dataverseFileId": 4164587,
-  "datasetDoi": "doi:10.7910/DVN/PUXVDH",
-  "fileDoi": "doi:10.7910/DVN/PUXVDH",
-  "status": "step_400",
+  "objectId": "4b7f0ba2-7d87-4797-a99a-f816cc8fac62",
+  "name": "Fatigue_data_5dUStWR.csv",
+  "created": "2022-12-08T19:51:28.918511Z",
+  "creator": "oscar",
   "depositorSetupInfo": {
-    "id": 33,
-    "created": "2021-08-23T12:36:01.175649Z",
-    "updated": "2021-08-23T12:44:34.826792Z",
-    "objectId": "fc3d8877-b82f-498a-8bb4-e6e1f665ba28",
+    "objectId": "7cffe7fb-f6aa-44d9-b1a7-dd6820f121dd",
+    "id": 37,
+    "created": "2022-12-08T19:51:28.912151Z",
+    "updated": "2022-12-08T19:51:37.918883Z",
     "isComplete": false,
     "userStep": "step_400",
-    "epsilon": null,
     "datasetQuestions": {
       "radioBestDescribes": "notHarmButConfidential",
       "radioOnlyOneIndividualPerRow": "yes",
       "radioDependOnPrivateInformation": "yes"
     },
+    "epsilonQuestions": null,
+    "datasetSize": 183,
     "variableInfo": {
       "trial": {
         "name": "Trial",
-        "type": "Categorical",
+        "type": "Integer",
         "label": "",
-        "categories": null
+        "sortOrder": 4
       },
       "session": {
         "name": "Session",
         "type": "Boolean",
-        "label": ""
+        "label": "",
+        "categories": [],
+        "sortOrder": 2
       },
       "subject": {
         "name": "Subject",
         "type": "Categorical",
         "label": "",
-        "categories": null
+        "categories": [],
+        "sortOrder": 0
       },
       "language": {
         "name": "Language",
         "type": "Boolean",
-        "label": ""
+        "label": "",
+        "categories": [],
+        "sortOrder": 1
       },
       "eyeHeight": {
-        "max": null,
-        "min": null,
         "name": "EyeHeight",
-        "type": "Numerical",
-        "label": ""
+        "type": "Float",
+        "label": "",
+        "sortOrder": 19
       },
       "typingSpeed": {
-        "max": null,
-        "min": null,
         "name": "TypingSpeed",
-        "type": "Numerical",
-        "label": ""
+        "type": "Float",
+        "label": "",
+        "sortOrder": 5
       },
       "blinkDuration": {
-        "max": null,
-        "min": null,
         "name": "BlinkDuration",
-        "type": "Numerical",
-        "label": ""
+        "type": "Float",
+        "label": "",
+        "sortOrder": 12
       },
       "blinkInterval": {
-        "max": null,
-        "min": null,
         "name": "BlinkInterval",
-        "type": "Numerical",
-        "label": ""
+        "type": "Float",
+        "label": "",
+        "sortOrder": 13
       },
       "blinkFrequency": {
-        "max": null,
-        "min": null,
         "name": "BlinkFrequency",
-        "type": "Numerical",
-        "label": ""
+        "type": "Float",
+        "label": "",
+        "sortOrder": 11
       },
       "correctedError": {
-        "max": null,
-        "min": null,
         "name": "CorrectedError",
-        "type": "Numerical",
-        "label": ""
-      },
-      "saccadeDuration": {
-        "max": null,
-        "min": null,
-        "name": "SaccadeDuration",
-        "type": "Numerical",
-        "label": ""
-      },
-      "saccadeVelocity": {
-        "max": null,
-        "min": null,
-        "name": "SaccadeVelocity",
-        "type": "Numerical",
-        "label": ""
+        "type": "Float",
+        "label": "",
+        "sortOrder": 6
       },
       "blinkBurstRatio": {
-        "max": null,
-        "min": null,
         "name": "BlinkBurstRatio",
-        "type": "Numerical",
-        "label": ""
+        "type": "Float",
+        "label": "",
+        "sortOrder": 14
+      },
+      "saccadeDuration": {
+        "name": "SaccadeDuration",
+        "type": "Float",
+        "label": "",
+        "sortOrder": 16
+      },
+      "saccadeVelocity": {
+        "name": "SaccadeVelocity",
+        "type": "Float",
+        "label": "",
+        "sortOrder": 17
       },
       "saccadeAmplitude": {
-        "max": null,
-        "min": null,
         "name": "SaccadeAmplitude",
-        "type": "Numerical",
-        "label": ""
-      },
-      "saccadePeakVelocity": {
-        "max": null,
-        "min": null,
-        "name": "SaccadePeakVelocity",
-        "type": "Numerical",
-        "label": ""
+        "type": "Float",
+        "label": "",
+        "sortOrder": 15
       },
       "readTextEventsRatio": {
-        "max": null,
-        "min": null,
         "name": "ReadTextEventsRatio",
-        "type": "Numerical",
-        "label": ""
+        "type": "Float",
+        "label": "",
+        "sortOrder": 7
+      },
+      "saccadePeakVelocity": {
+        "name": "SaccadePeakVelocity",
+        "type": "Float",
+        "label": "",
+        "sortOrder": 18
       },
       "uncorrectedErrorRate": {
-        "max": null,
-        "min": null,
         "name": "UncorrectedErrorRate",
-        "type": "Numerical",
-        "label": ""
+        "type": "Float",
+        "label": "",
+        "sortOrder": 9
       },
       "baselinePupilDiameter": {
-        "max": null,
-        "min": null,
         "name": "BaselinePupilDiameter",
-        "type": "Numerical",
-        "label": ""
+        "type": "Float",
+        "label": "",
+        "sortOrder": 10
       },
       "objectiveTaskDifficulty": {
         "name": "ObjectiveTaskDifficulty",
         "type": "Boolean",
-        "label": ""
+        "label": "",
+        "categories": [],
+        "sortOrder": 3
       },
       "attendedButNotSelectedRate": {
-        "max": null,
-        "min": null,
         "name": "AttendedButNotSelectedRate",
-        "type": "Numerical",
-        "label": ""
+        "type": "Float",
+        "label": "",
+        "sortOrder": 8
       }
     },
-    "creator": 1
+    "defaultEpsilon": 1,
+    "epsilon": 1,
+    "defaultDelta": 0.00001,
+    "delta": 0.00001,
+    "confidenceLevel": 0.95
   },
-  "datasetSchemaInfo": {
-    "@id": "https://doi.org/10.7910/DVN/PUXVDH",
-    "name": "Replication Data for: Eye-typing experiment",
-    "@type": "Dataset",
-    "author": [
-      {
-        "name": "Bafna, Tanya",
-        "affiliation": "Danmarks Tekniske Universitet"
-      }
-    ],
-    "creator": [
-      {
-        "name": "Bafna, Tanya",
-        "affiliation": "Danmarks Tekniske Universitet"
-      }
-    ],
-    "license": {
-      "url": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "text": "CC0",
-      "@type": "Dataset"
-    },
-    "version": "1",
-    "@context": "http://schema.org",
-    "keywords": [
-      "Engineering",
-      "Medicine, Health and Life Sciences",
-      "eye-tracking, eye-typing, mental fatigue"
-    ],
-    "provider": {
-      "name": "Harvard Dataverse",
-      "@type": "Organization"
-    },
-    "publisher": {
-      "name": "Harvard Dataverse",
-      "@type": "Organization"
-    },
-    "identifier": "https://doi.org/10.7910/DVN/PUXVDH",
-    "description": [
-      "The data consists of performance and eye-tracking features obtained during an eye-typing experiment conducted over 4 days, 2 sessions on each day, with 18 participants."
-    ],
-    "dateModified": "2020-11-04",
-    "distribution": [
-      {
-        "name": "Fatigue_data.tab",
-        "@type": "DataDownload",
-        "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/4164587",
-        "fileFormat": "text/tab-separated-values",
-        "contentSize": 36399,
-        "description": "Fatigue level (taken from trials 1,5 and 10 on each day) and eye-tracking and performance data from trials that correlate to the corresponding fatigue level. (For all sessions where the correlation between left and right pupil size was greater or equal to 0.75)"
-      },
-      {
-        "name": "Fatigue_difference_consecutive_subjScore.tab",
-        "@type": "DataDownload",
-        "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/4164586",
-        "fileFormat": "text/tab-separated-values",
-        "contentSize": 2795,
-        "description": "Difference between intermediate fatigue level (obtained after session 1) and initial fatigue level (obtained before experiment) and between  terminal fatigue level (obtained after session 2) and intermediate fatigue level (obtained after session 1) "
-      },
-      {
-        "name": "Fatigue_difference_terminal_initial_subjScore.tab",
-        "@type": "DataDownload",
-        "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/4164589",
-        "fileFormat": "text/tab-separated-values",
-        "contentSize": 2712,
-        "description": "Difference between  terminal fatigue level (obtained after session 2) and initial fatigue level (obtained before experiment)"
-      },
-      {
-        "name": "PerceivedEffort_data.tab",
-        "@type": "DataDownload",
-        "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/4164588",
-        "fileFormat": "text/tab-separated-values",
-        "contentSize": 123290,
-        "description": "Eye-tracking and performance data for every trial, and the perceived effort for every trial (For all sessions where the correlation between left and right pupil size was greater or equal to 0.75)"
-      },
-      {
-        "name": "PerceivedEffort_subjScore.tab",
-        "@type": "DataDownload",
-        "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/4164590",
-        "fileFormat": "text/tab-separated-values",
-        "contentSize": 17053,
-        "description": "Perceived effort for every trial "
-      }
-    ],
-    "datePublished": "2020-11-04",
-    "includedInDataCatalog": {
-      "url": "https://dataverse.harvard.edu",
-      "name": "Harvard Dataverse",
-      "@type": "DataCatalog"
-    }
-  },
-  "fileSchemaInfo": {
-    "name": "Fatigue_data.tab",
-    "@type": "DataDownload",
-    "contentUrl": "https://dataverse.harvard.edu/api/access/datafile/4164587",
-    "fileFormat": "text/tab-separated-values",
-    "contentSize": 36399,
-    "description": "Fatigue level (taken from trials 1,5 and 10 on each day) and eye-tracking and performance data from trials that correlate to the corresponding fatigue level. (For all sessions where the correlation between left and right pupil size was greater or equal to 0.75)"
-  },
-  "resourcetype": "DataverseFileInfo"
+  "status": "step_400",
+  "analysisPlans": [],
+  "resourcetype": "UploadFileInfo"
 }

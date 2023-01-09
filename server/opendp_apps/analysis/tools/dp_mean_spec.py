@@ -119,7 +119,7 @@ class DPMeanSpec(StatSpec):
                 make_sized_bounded_mean(self.dataset_size, self.get_bounds())
         )
 
-        self.scale = binary_search(lambda s: self.check_scale(s, preprocessor, 1, self.epsilon), bounds=(0.0, 1000.0))
+        self.scale = binary_search(lambda s: self.check_scale(s, preprocessor, self.max_influence, self.epsilon), bounds=(0.0, 1000.0))
         preprocessor = preprocessor >> make_base_laplace(self.scale)
 
         # keep a pointer to the preprocessor to re-use for .run_chain(...)

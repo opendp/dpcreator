@@ -52,7 +52,7 @@ from opendp_apps.dp_reports import pdf_preset_text
 from opendp_apps.dp_reports import pdf_utils as putil
 from opendp_apps.dp_reports import static_vals as pdf_static
 from opendp_apps.analysis.models import ReleaseInfo
-from opendp_apps.profiler.static_vals import VAR_TYPE_CATEGORICAL
+from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.utils.randname import random_with_n_digits
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
@@ -455,14 +455,20 @@ class PDFReportMaker(BasicErrCheck):
         # Create table for parameters
         # --------------------------------------
         skip_bounds = False
+        include_bool_vals = False
         is_dp_count = False
+
         if stat_info['statistic'] == astatic.DP_COUNT:
             is_dp_count = True
             skip_bounds = True
             num_param_table_rows = 4
-        elif stat_info['variable_type'] == VAR_TYPE_CATEGORICAL:
+        elif stat_info['variable_type'] == pstatic.VAR_TYPE_CATEGORICAL:
             skip_bounds = True
             num_param_table_rows = 7
+        elif stat_info['variable_type'] == pstatic.VAR_TYPE_BOOLEAN:
+            skip_bounds = True
+            include_bool_vals = True
+            num_param_table_rows = 10
         else:
             num_param_table_rows = 10
 
@@ -505,6 +511,15 @@ class PDFReportMaker(BasicErrCheck):
 
             table_001.add(putil.get_tbl_cell_lft_pad("Max", padding=40))
             table_001.add(putil.get_tbl_cell_align_rt(f"{stat_info['bounds']['max']}"))
+
+        if include_bool_vals:
+            table_001.add(putil.get_tbl_cell_ital("Boolean values", col_span=2, padding=20))
+
+            table_001.add(putil.get_tbl_cell_lft_pad("True value", padding=40))
+            table_001.add(putil.get_tbl_cell_align_rt(f"{stat_info['boolean_values']['true_value']}"))
+
+            table_001.add(putil.get_tbl_cell_lft_pad("False value", padding=40))
+            table_001.add(putil.get_tbl_cell_align_rt(f"{stat_info['boolean_values']['false_value']}"))
 
         # table_001.add(putil.get_tbl_cell_lft_pad("Confidence Level", padding=20))
         # table_001.add(putil.get_tbl_cell_align_rt(f"{stat_info['confidence_level']}"))
