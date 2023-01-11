@@ -31,6 +31,7 @@
         })
         it('handles delete action', () => {
             // Test Cancel Delete
+            cy.get('[data-test="delete"]').should('be.visible')
             cy.get('[data-test="delete"]').click({force: true})
             cy.get('[data-test="deleteDatasetCancel"]').click({force: true})
             cy.url().should('contain', 'my-data-details')
