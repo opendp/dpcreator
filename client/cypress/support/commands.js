@@ -448,6 +448,47 @@ Cypress.Commands.add('setupStatisticsPageFixtures', (datasetFixture, analysisFix
                 "handoff_id": null
             }
         })
+        let validationResponse = {
+            "success": true,
+            "message": "validation results returned",
+            "data": [{
+                "variable": "trial",
+                "statistic": "histogram",
+                "valid": true,
+                "message": null,
+                "accuracy": {
+                    "value": 5.393627546352361,
+                    "message": "There is a probability of 95.0% that a count in the  DP Histogram will differ from the count in the true Histogram by at most 5.393627546352361 units. Here the units are the same units the variable trial has in the dataset."
+                }
+            }]
+        }
+        let edgesResponse = {
+            "message": "We have data!",
+            "data": {
+                "inputs": {
+                    "min": 0,
+                    "max": 45,
+                    "number_of_bins": 3
+                },
+                "edges": [
+                    0,
+                    22,
+                    46
+                ],
+                "buckets": [
+                    "[0, 21]",
+                    "[22, 45]",
+                    "uncategorized"
+                ],
+                "buckets_right_edge_excluded": [
+                    "[0, 22)",
+                    "[23, 46)",
+                    "uncategorized"
+                ]
+            }
+        }
+        cy.intercept('POST', '/api/validation', {body: validationResponse})
+        cy.intercept('POST', '/api/stat-helper/make-edges-integer', {body: edgesResponse})
         cy.fixture(analysisFixture).then(analysisPlan => {
             cy.intercept('GET', '/api/analyze/' + analysisPlan.objectId + '/', {body: analysisPlan})
             cy.intercept('PATCH', '/api/analyze/' + analysisPlan.objectId + '/', {body: analysisPlan})

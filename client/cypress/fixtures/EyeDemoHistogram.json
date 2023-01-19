@@ -5,19 +5,20 @@
       "statistic": "Histogram",
       "variable": "Trial",
       "fixedValue": "5",
-      "histogramBinType": "binEdges",
-      "histogramBinEdges": "2,6,",
-      "roundedAccuracy": "12.0",
-      "accuracy": 11.982929094215963
+      "histogramBinType": "onePerValue",
+      "roundedAccuracy": "21.6",
+      "accuracy": 21.574510185409444
     },
     {
       "statistic": "Histogram",
       "variable": "Trial",
       "fixedValue": "5",
-      "histogramBinType": "onePerValue",
-      "roundedAccuracy": "21.6",
-      "accuracy": 21.574510185409444
+      "histogramBinType": "binEdges",
+      "histogramBinEdges": "2,6,",
+      "roundedAccuracy": "12.0",
+      "accuracy": 11.982929094215963
     },
+
     {
       "statistic": "Histogram",
       "variable": "Trial",
