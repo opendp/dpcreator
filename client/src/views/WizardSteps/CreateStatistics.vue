@@ -142,7 +142,7 @@ export default {
       error: "",
       missingValuesHandling: "",
       handleAsFixed: false,
-      fixedValue: "0",
+      fixedValue: "",
       locked: false,
       accuracy: {value: 0, message: 'not calculated'}
     },
@@ -153,7 +153,7 @@ export default {
       error: "",
       missingValuesHandling: "",
       handleAsFixed: false,
-      fixedValue: "0",
+      fixedValue: "",
       locked: false,
       accuracy: {value: 0, message: 'not calculated'}
     }
@@ -333,7 +333,16 @@ export default {
       this.resetEditedItem();
     },
     resetEditedItem() {
-      this.editedItem = Object.assign({}, this.defaultItem);
+      this.editedItem.statistic = "",
+          this.editedItem.variable = "",
+          this.editedItem.epsilon = "",
+          this.editedItem.error = "",
+          this.editedItem.missingValuesHandling = "",
+          this.editedItem.handleAsFixed = false,
+          this.editedItem.fixedValue = "",
+          this.editedItem.locked = false,
+          this.editedItem.accuracy = {value: 0, message: 'not calculated'}
+
       this.editedIndex = -1;
     },
 
