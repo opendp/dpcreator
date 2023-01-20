@@ -31,40 +31,20 @@
         <StatusTag data-test="table status tag" :status="getWorkflowStatus(item)"/>
       </template>
       <template v-slot:[`item.timeRemaining`]="{ item }">
-        <span v-if="getWorkflowStatus(item) !== 'completed'"
-              :class="{
-            'error_status__color--text': item.timeRemaining === 'Expired'
-          }"
-        >{{ item.timeRemaining }}</span
-        >
-        <div v-if="getWorkflowStatus(item) == 'completed'">
-          NA
+        <div v-if="getWorkflowStatus(item) !== 'completed'">
+           <span v-if="isExpired(item)" class='error_status__color--text'>
+             Time has expired
+           </span>
+          <span v-else>
+             {{ item.timeRemaining }}
+           </span>
+        </div>
+        <div v-else>
+          Release Generated on {{ new Date(item.datasetInfo.created).toDateString() }}
         </div>
       </template>
       <template v-slot:[`item.options`]="{ item }">
-        <!--
-        <Button
-            :data-test="action"
-            v-for="(action, index) in statusInformation[stepInformation[item.userStep].workflowStatus]
-            .availableActions"
-            :key="action + '-' + index"
-            small
-            :outlined="action !== CONTINUE_WORKFLOW"
-            :disabled="
-            (action === CONTINUE_WORKFLOW &&
-              item.remainingTime === 'Expired') ||
-              (action === CONTINUE_WORKFLOW && $vuetify.breakpoint.xsOnly)
-          "
-            color="primary"
-            :class="{
-            'width100 d-block': $vuetify.breakpoint.xsOnly,
-            'mr-2': $vuetify.breakpoint.smAndUp
-          }"
-            :classes="`my-2 ${action}`"
-            :click="() => handleButtonClick(action, item)"
-            :label="actionsInformation[action]"
-        />
-        -->
+
       </template>
       <template v-slot:footer="{ props }">
         <div
@@ -97,7 +77,7 @@
         </div>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
-        <div class="d-flex justify-space-between">
+        <div v-if="!isExpired(item)" class="d-flex justify-space-between">
 
           <v-tooltip
 
@@ -290,6 +270,12 @@ export default {
 
     delete(item) {
       this.deleteItem(item)
+    },
+    isExpired(item) {
+      return item.timeRemaining === 0 && this.getWorkflowStatus(item) !== 'completed'
+    },
+    formatCreatedTime(created) {
+
     },
     viewDetails(item) {
       this.goToPage(item, `${NETWORK_CONSTANTS.MY_DATA_DETAILS.PATH}`)
