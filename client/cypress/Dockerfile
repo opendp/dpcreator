@@ -14,4 +14,4 @@ RUN chmod +x /wait
 
 ## Launch the wait tool and then Cypress
 ## (The server to wait for is set as an environment variable)
-CMD /wait && cypress run --config-file cypress_github_ci.json
+CMD /wait && cypress run --config-file cypress_github_ci.config.js
