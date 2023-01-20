@@ -8,7 +8,7 @@
       </v-icon
       >
       <v-card-title>
-        <h2 class="title-size-2 mb-5 font-weight-bold">
+        <h2 data-test="deleteDatasetDialogTitle" class="title-size-2 mb-5 font-weight-bold">
           Are you sure?
         </h2>
       </v-card-title>
