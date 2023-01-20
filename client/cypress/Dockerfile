@@ -1,5 +1,5 @@
 ## Start with Cypress base image
-FROM cypress/included:9.7.0
+FROM cypress/included:12.3.0
 
 
 # docker-compose-wait: Set env variable to wait 60 seconds for the server to be ready
