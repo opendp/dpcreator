@@ -21,10 +21,10 @@
                                 cy.vuex().invoke('dispatch', 'dataset/runProfiler', payload)
                                 // Test that vuex store has been updated with variableInfo
                                 cy.vuex().its('state.dataset.datasetInfo.depositorSetupInfo.variableInfo').should('exist')
-                            cy.fixture('profiler').then((varsFixture) => {
-                                cy.vuex().its('state.dataset.datasetInfo.depositorSetupInfo.variableInfo')
-                                    .should('deep.equal', varsFixture)
-                            })
+                                cy.fixture('profiler').then((varsFixture) => {
+                                    cy.vuex().its('state.dataset.datasetInfo.depositorSetupInfo.variableInfo')
+                                        .should('deep.equal', varsFixture)
+                                })
 
 
                             }
