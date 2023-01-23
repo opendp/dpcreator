@@ -175,11 +175,13 @@ class HistogramCategoricalStatSpecTest(StatSpecTestCase):
         # Check that the fixed_value and list of categories are "unquoted"
         #
         fixed_value = release_dict['missing_value_handling']['fixed_value']
-        self.assertEqual(fixed_value, DPHistogramCategoricalSpec._remove_double_quotes(fixed_value))
+        self.assertEqual(fixed_value, self.spec_props['fixed_value'])
 
         categories = release_dict['result']['value']['categories']
+        spec_categories = self.spec_props['variable_info']['categories']
+        spec_categories.append('uncategorized')
         for cat_name in categories:
-            self.assertEqual(cat_name, DPHistogramCategoricalSpec._remove_double_quotes(cat_name))
+            self.assertIn(cat_name, spec_categories)
 
         # Check that the fixed_value is in the list of categories
         #
@@ -239,11 +241,13 @@ class HistogramCategoricalStatSpecTest(StatSpecTestCase):
         # Check that the fixed_value and list of categories are "unquoted"
         #
         fixed_value = release_dict['missing_value_handling']['fixed_value']
-        self.assertEqual(fixed_value, DPHistogramCategoricalSpec._remove_double_quotes(fixed_value))
+        self.assertEqual(fixed_value, spec_props['fixed_value'])
 
         categories = release_dict['result']['value']['categories']
+        spec_categories = spec_props['variable_info']['categories']
+        spec_categories.append('uncategorized')
         for cat_name in categories:
-            self.assertEqual(cat_name, DPHistogramCategoricalSpec._remove_double_quotes(cat_name))
+            self.assertIn(cat_name, spec_categories)
 
         # Check that the fixed_value is in the list of categories
         #

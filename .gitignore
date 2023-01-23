@@ -181,6 +181,8 @@ server/scripts_dev/dv_test_creds.py
 !server/opendp_apps/content_pages/fixtures/*.json
 !server/test_data/pdfs/*.pdf
 !server/test_data/deposit/*.json
+server/test_data/deposit/*.json
+!server/test_data/*.tab
 !dev_notes/api_example_analysis_plan.json
 .env
 !deploy/dataverse/*.json
