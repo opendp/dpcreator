@@ -14,7 +14,6 @@ Cypress.Commands.add('loginAPI', (username, password) => {
         cy.getCookie('csrftoken').should('exist')
         cy.getCookie('csrftoken').then((token) => {
             console.log('token: ' + JSON.stringify(token))
-            cy.pause()
             cy.request({
                 method: 'POST',
                 url: '/rest-auth/logout/',
@@ -205,15 +204,18 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
     cy.get('[data-test="radioPrivateInformationYes"]').check({force: true})
     cy.get('[data-test="notHarmButConfidential"]').check({force: true})
     cy.get('[data-test="radioOnlyOneIndividualPerRowYes"]').check({force: true})
+    cy.intercept('/api/profile/run-async-profile/').as('runAsync')
 
     // click on continue to go to trigger the profiler and go to the Confirm Variables Page
     cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
-    cy.get('h1').should('contain', 'Confirm Variables')
-    for (const key in variableData) {
-        const val = variableData[key]
-        cy.get('table').contains('td', val.name).should('be.visible')
-        cy.get('table').contains('tr', val.name).should('contain', val.type)
-    }
+    cy.wait('@runAsync').then(() => {
+        cy.get('h1').should('contain', 'Confirm Variables')
+        for (const key in variableData) {
+            const val = variableData[key]
+            cy.get('table').contains('td', val.name).should('be.visible')
+            cy.get('table').contains('tr', val.name).should('contain', val.type)
+        }
+    })
 
 
 })
