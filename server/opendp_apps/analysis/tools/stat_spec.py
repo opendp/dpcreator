@@ -678,7 +678,7 @@ class StatSpec:
         :return:
         """
         if len(value) < 2:
-            return
+            return value
 
         # Only remove outermost set of double quotes--may conflict with _add_double_quotes
         #   if the value is supposed to be double_quoted
