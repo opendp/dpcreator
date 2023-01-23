@@ -22,7 +22,7 @@
         :statistics="statistics"
         :total-epsilon="epsilon"
         :total-delta="delta"
-        v-on:newStatisticButtonPressed="dialogAddStatistic = true"
+        v-on:newStatisticButtonPressed="createStatistic"
         v-on:editStatistic="editItem"
         v-on:editEpsilon="editEpsilon"
         v-on:editDelta="editDelta"
@@ -309,6 +309,11 @@ export default {
       this.editedItem = Object.assign({}, item);
       this.dialogAddStatistic = true;
     },
+    createStatistic() {
+
+      this.resetEditedItem()
+      this.dialogAddStatistic = true;
+    },
     changeLockStatus(item) {
       item.locked = !item.locked;
       this.saveUserInput()
@@ -333,6 +338,7 @@ export default {
       this.resetEditedItem();
     },
     resetEditedItem() {
+      console.log('resetting editedItem')
       this.editedItem.statistic = "",
           this.editedItem.variable = "",
           this.editedItem.epsilon = "",

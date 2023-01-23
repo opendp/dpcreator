@@ -351,8 +351,7 @@ export default {
     minMax: function () {
       let minMax = ""
       if (this.editedItemDialog.variable &&
-          this.variableInfo[this.editedItemDialog.variable] &&
-          this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('min')
+          this.isNumeric(this.editedItemDialog.variable)
       ) {
         minMax = "(Must be between " +
             this.variableInfo[this.editedItemDialog.variable].min + " and " +
@@ -378,18 +377,8 @@ export default {
       return displayVars
     }
   },
-  watch: {/*
-    editedItemDialog: function(newValue, oldValue) {
-      console.log("EDITED ITEM DIALOG CHANGE")
-      console.log('new value: ' +JSON.stringify(newValue))
-      console.log('old Value: ' + JSON.stringify(oldValue))
-    },
-    'editedItemDialog.histogramBinEdges': function(newValue, oldValue) {
-      console.log('NEW BIN EDGES VALUE: '+JSON.stringify(newValue)+', oldValue:' + oldValue)
-    },
-    'editedItemDialog.histogramBinType': function(newValue, oldValue) {
-      console.log('NEW BIN TYPE VALUE: '+JSON.stringify(newValue)+', oldValue:' + oldValue)
-    },*/
+  watch: {
+
     editedItem: function (newEditedItem) {
       /*
        Check the value of statistic coming from the CreateStatistics page.
@@ -472,7 +461,6 @@ export default {
         analysis.getHistogramBuckets(this.variableInfo[this.editedItemDialog.variable].min,
             this.variableInfo[this.editedItemDialog.variable].max,
             event.target.value).then((resp) => {
-          //  console.log("setting buckets: "+resp.data.buckets.toString())
           this.editedItemDialog.histogramBuckets = resp.data.buckets.toString()
         })
       } else {
@@ -514,11 +502,14 @@ export default {
 
       return retVal
     },
+    isNumeric(variable) {
+      const type = this.variableInfo[variable].type
+      return (type === 'Integer' || type === 'Float')
+    },
     maxBins() {
       let maxBins = 0
-      if (this.editedItemDialog.variable &&
-          this.variableInfo[this.editedItemDialog.variable] &&
-          this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('min')) {
+      if (this.editedItemDialog.variable && this.isNumeric(this.editedItemDialog.variable)
+      ) {
         maxBins = Number(this.variableInfo[this.editedItemDialog.variable].max) - Number(this.variableInfo[this.editedItemDialog.variable].min)
       }
       return maxBins
@@ -526,8 +517,7 @@ export default {
     minEdge() {
       let minEdge = 0
       if (this.editedItemDialog.variable &&
-          this.variableInfo[this.editedItemDialog.variable] &&
-          this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('min')) {
+          this.isNumeric(this.editedItemDialog.variable)) {
         minEdge = Number(this.variableInfo[this.editedItemDialog.variable].min)
       }
       return minEdge
@@ -535,8 +525,7 @@ export default {
     variableRange() {
       let range = 0;
       if (this.editedItemDialog.variable &&
-          this.variableInfo[this.editedItemDialog.variable] &&
-          this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('max')) {
+          this.isNumeric(this.editedItemDialog.variable)) {
         range = Number(this.variableInfo[this.editedItemDialog.variable].max)
             - Number(this.variableInfo[this.editedItemDialog.variable].min) + 1
       }
@@ -545,8 +534,7 @@ export default {
     maxEdge() {
       let maxEdge = 0
       if (this.editedItemDialog.variable &&
-          this.variableInfo[this.editedItemDialog.variable] &&
-          this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('max')) {
+          this.isNumeric(this.editedItemDialog.variable)) {
         maxEdge = Number(this.variableInfo[this.editedItemDialog.variable].max)
       }
       return maxEdge
@@ -572,7 +560,6 @@ export default {
             valid = this.isValidEdge(edge)
           }
       )
-      console.log('isEdgesInputValid returning ' + valid)
       return valid
     },
     isNumBinsValid(v) {
@@ -583,7 +570,6 @@ export default {
       } else {
         valid = true
       }
-      console.log('isNumBinsValid,v =' + v + ', returning: ' + valid)
       return valid
     },
     validateNumBins(v) {
@@ -598,14 +584,12 @@ export default {
     validateFixedValue(v) {
       let valid = true
       if (this.editedItemDialog.variable &&
-          this.variableInfo[this.editedItemDialog.variable] &&
-          this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('min')) {
+          this.isNumeric(this.editedItemDialog.variable)) {
         const val = Number(v)
         if (val < this.variableInfo[this.editedItemDialog.variable].min ||
             val > this.variableInfo[this.editedItemDialog.variable].max)
           valid = false
       }
-      console.log('validateFixedValue, returning ' + valid)
       return valid || "Value must be between " +
           this.variableInfo[this.editedItemDialog.variable].min +
           " and " + this.variableInfo[this.editedItemDialog.variable].max
@@ -703,7 +687,23 @@ export default {
       this.validationError = false
       this.validationErrorMsg = ""
       this.selectedStatistic = null
+      this.resetEditedItemDialog()
       this.$emit("close");
+    },
+    resetEditedItemDialog() {
+      this.editedItemDialog.statistic = ""
+      this.editedItemDialog.variable = ""
+      this.editedItemDialog.epsilon = ""
+      this.editedItemDialog.error = ""
+      this.editedItemDialog.missingValuesHandling = ""
+      this.editedItemDialog.handleAsFixed = false
+      this.editedItemDialog.fixedValue = ""
+      this.editedItemDialog.locked = false
+      this.editedItemDialog.accuracy = {value: 0, message: 'not calculated'}
+      this.editedItemDialog.histogramBinType = ""
+      this.editedItemDialog.histogramNumberOfBins = null,
+          this.editedItemDialog.histogramBinEdges = []
+      this.editedItemDialog.histogramBuckets = ""
     },
     updateSelectedVariable(variable, index) {
       if (this.editedItemDialog.variable.includes(variable)) {
