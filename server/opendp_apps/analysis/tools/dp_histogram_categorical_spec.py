@@ -71,7 +71,7 @@ class DPHistogramCategoricalSpec(StatSpec):
                 if not isinstance(x, str):
                     x = str(x)
                 # x = x.strip()  # do this earlier, before data is saved
-                x = self._add_double_quotes(x)
+                # x = self._add_double_quotes(x)  # removing, initially added b/c of test data file
                 updated_cats.append(x)
             except NameError as _ex_obj:
                 user_msg = 'Failed to convert category to string. (Failed category index {idx})'
@@ -88,11 +88,11 @@ class DPHistogramCategoricalSpec(StatSpec):
             if not self.validate_property('fixed_value', validate_not_none):
                 return
 
-            # Double quote the fixed value and make sure it's a string
+            # Make sure the value is a string
             if not isinstance(self.fixed_value, str):
                 self.fixed_value = str(self.fixed_value)
 
-            self.fixed_value = self._add_double_quotes(self.fixed_value)
+            # self.fixed_value = self._add_double_quotes(self.fixed_value)
 
             # Is the fixed value one of the categories?
             if not self.validate_multi_values([self.fixed_value, self.categories],
@@ -225,11 +225,12 @@ class DPHistogramCategoricalSpec(StatSpec):
                 self.add_err_msg(f'{ex_obj} (Exception)')
             return False
 
-        # Remove double quotes from the categories as well as fixed value
+        # Format the categories
         #
-        fmt_categories = [self._remove_double_quotes(x) for x in self.categories] + ['uncategorized']
-        if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
-            self.fixed_value = self._remove_double_quotes(self.fixed_value)
+        fmt_categories = [x for x in self.categories] + ['uncategorized']
+        #fmt_categories = [self._remove_double_quotes(x) for x in self.categories] + ['uncategorized']
+        # if self.missing_values_handling == astatic.MISSING_VAL_INSERT_FIXED:
+        #    self.fixed_value = self._remove_double_quotes(self.fixed_value)
 
         # Show warning if category count doesn't match values count
         if len(fmt_categories) > len(self.value):
