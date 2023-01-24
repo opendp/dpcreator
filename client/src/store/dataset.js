@@ -530,11 +530,10 @@ function getTimeRemaining(created) {
     const millisInMin = 1000 * 60
     const createdDate = new Date(created)
     const expirationDate = createdDate.getTime() + (3 * millisInDay)
-
-    const diffTime = expirationDate - (new Date().getTime())
-
-    if (diffTime < 0) {
-        return ('Time has expired')
+    const currentTime = new Date().getTime()
+    const diffTime = expirationDate - currentTime
+    if (diffTime <= 0) {
+        return (0)
     } else {
         const diffDays = Math.floor(diffTime / (millisInDay))
         const diffHours = Math.floor((diffTime - (diffDays * millisInDay)) / millisInHour)

@@ -1,5 +1,3 @@
-
-
 {
     describe('Multiple Partial Updates', () => {
         it('saves the vuex state correctly', () => {

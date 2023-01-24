@@ -2,6 +2,7 @@ Cypress.Commands.add('login', (username, password) => {
     Cypress.Cookies.debug(true)
     cy.visit('/log-in')
     cy.get('[data-test="username"]').type(username);
+    cy.get('[data-test="password"]').should('be.enabled')
     cy.get('[data-test="password"]').type(password);
     cy.get('[data-test="Log in"]').click();
     // to force the login click, test that the browser went to the next  page
@@ -14,7 +15,6 @@ Cypress.Commands.add('loginAPI', (username, password) => {
         cy.getCookie('csrftoken').should('exist')
         cy.getCookie('csrftoken').then((token) => {
             console.log('token: ' + JSON.stringify(token))
-            cy.pause()
             cy.request({
                 method: 'POST',
                 url: '/rest-auth/logout/',
@@ -205,15 +205,22 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
     cy.get('[data-test="radioPrivateInformationYes"]').check({force: true})
     cy.get('[data-test="notHarmButConfidential"]').check({force: true})
     cy.get('[data-test="radioOnlyOneIndividualPerRowYes"]').check({force: true})
+    cy.intercept('/api/profile/run-async-profile/').as('runAsync')
 
     // click on continue to go to trigger the profiler and go to the Confirm Variables Page
     cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
-    cy.get('h1').should('contain', 'Confirm Variables')
-    for (const key in variableData) {
-        const val = variableData[key]
-        cy.get('table').contains('td', val.name).should('be.visible')
-        cy.get('table').contains('tr', val.name).should('contain', val.type)
-    }
+    cy.wait('@runAsync').then(() => {
+        cy.get('h1').should('contain', 'Confirm Variables')
+        const getStore = () => cy.window().its('app.$store')
+        getStore().its('state.dataset.profilerStatus').should('deep.equal', true)
+
+        //   dataset.profilerStatus
+        for (const key in variableData) {
+            const val = variableData[key]
+            cy.get('table').contains('td', val.name).should('be.visible')
+            cy.get('table').contains('tr', val.name).should('contain', val.type)
+        }
+    })
 
 
 })
@@ -285,8 +292,13 @@ Cypress.Commands.add('enterStatsInPopup', (demoData) => {
         const varDataTest = '[data-test="' + demoVar + '"]'
         cy.get(varDataTest).click({force: true})
         cy.get('[data-test="Fixed value"]').type(demoStat.fixedValue)
-        if (demoStat.statistic == 'Histogram') {
-            cy.get('[data-test="onePerValue"]').click({force: true})
+        if (demoStat.statistic == 'Histogram' && demoStat.hasOwnProperty('histogramBinType')) {
+            cy.get('[data-test="' + demoStat.histogramBinType + '"]').click({force: true})
+            if (demoStat.histogramBinType === 'binEdges') {
+                cy.get('[data-test="histogramBinEdges"]').type(demoStat.histogramBinEdges, {force: true})
+            } else if (demoStat.histogramBinType === 'equalRanges') {
+                cy.get('[data-test="histogramNumberOfBins"]').type(demoStat.histogramNumberOfBins)
+            }
         }
         cy.get('[data-test="Create Statistic Button"]').click({force: true})
         cy.get('[data-test="Create Statistics Title').should('be.visible')
@@ -352,11 +364,10 @@ Cypress.Commands.add('submitStatistics', (demoData) => {
             //    expect($p).to.contain('Release Completed')
             const sessionObj = JSON.parse(sessionStorage.getItem('vuex'))
             const releaseInfo = sessionObj.dataset.analysisPlan.releaseInfo
-
-            demoData.statistics.forEach((demoStat) => {
-                expect(releaseInfo.dpRelease.statistics[0].statistic).to.equal(demoStat.statistic.toLowerCase())
-                expect(releaseInfo.dpRelease.statistics[0].accuracy.value).to.equal(demoStat.accuracy)
-            })
+            for (let i = 0; i < demoData.statistics.length; i++) {
+                expect(releaseInfo.dpRelease.statistics[i].statistic).to.equal(demoData.statistics[i].statistic.toLowerCase())
+                expect(releaseInfo.dpRelease.statistics[i].accuracy.value).to.equal(demoData.statistics[i].accuracy)
+            }
         })
     cy.visit('/my-data')
     cy.get('[data-test="table status tag"]').should('contain', 'Release Completed')
@@ -444,6 +455,47 @@ Cypress.Commands.add('setupStatisticsPageFixtures', (datasetFixture, analysisFix
                 "handoff_id": null
             }
         })
+        let validationResponse = {
+            "success": true,
+            "message": "validation results returned",
+            "data": [{
+                "variable": "trial",
+                "statistic": "histogram",
+                "valid": true,
+                "message": null,
+                "accuracy": {
+                    "value": 5.393627546352361,
+                    "message": "There is a probability of 95.0% that a count in the  DP Histogram will differ from the count in the true Histogram by at most 5.393627546352361 units. Here the units are the same units the variable trial has in the dataset."
+                }
+            }]
+        }
+        let edgesResponse = {
+            "message": "We have data!",
+            "data": {
+                "inputs": {
+                    "min": 0,
+                    "max": 45,
+                    "number_of_bins": 3
+                },
+                "edges": [
+                    0,
+                    22,
+                    46
+                ],
+                "buckets": [
+                    "[0, 21]",
+                    "[22, 45]",
+                    "uncategorized"
+                ],
+                "buckets_right_edge_excluded": [
+                    "[0, 22)",
+                    "[23, 46)",
+                    "uncategorized"
+                ]
+            }
+        }
+        cy.intercept('POST', '/api/validation', {body: validationResponse})
+        cy.intercept('POST', '/api/stat-helper/make-edges-integer', {body: edgesResponse})
         cy.fixture(analysisFixture).then(analysisPlan => {
             cy.intercept('GET', '/api/analyze/' + analysisPlan.objectId + '/', {body: analysisPlan})
             cy.intercept('PATCH', '/api/analyze/' + analysisPlan.objectId + '/', {body: analysisPlan})

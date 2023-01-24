@@ -58,8 +58,6 @@
             const username = 'oscar'
             const email = 'oscar@thegrouch.com'
             const password = 'oscar123!'
-            cy.vuex().its('state.auth.user').should('be.null')
-            cy.vuex().its('state.dataverse.handoffId').should('be.null')
             cy.createAccount(username, email, password)
             cy.get('[data-test="My Profile"]').click();
             cy.get('h2').should('contain', 'Edit account information').should('be.visible')

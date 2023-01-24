@@ -13,7 +13,8 @@
       "variable": "Trial",
       "roundedAccuracy": "16.2",
       "accuracy": 16.18088267924274,
-      "fixedValue": "5"
+      "fixedValue": "5",
+      "histogramBinType": "onePerValue"
     },
     {
       "statistic": "Mean",

@@ -31,7 +31,10 @@
         })
         it('handles delete action', () => {
             // Test Cancel Delete
-            cy.get('[data-test="delete"]').click({force: true})
+            cy.get('[data-test="deleteButton"]').should('be.visible')
+            cy.get('[data-test="deleteButton"]').click({force: true})
+            cy.get('[data-test="deleteDatasetDialogTitle"]').should('be.visible')
+
             cy.get('[data-test="deleteDatasetCancel"]').click({force: true})
             cy.url().should('contain', 'my-data-details')
             cy.get('h1').should('contain', 'Data File')
@@ -39,7 +42,7 @@
                 'PUMS5extract1000.csv')
 
             // Test Confirm Delete
-            cy.get('[data-test="delete"]').click({force: true})
+            cy.get('[data-test="deleteButton"]').click({force: true})
             cy.get('[data-test="deleteDatasetConfirm"]').click({force: true})
             cy.url().should('contain', 'my-data')
             cy.get('tr').should('not.contain',

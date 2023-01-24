@@ -30,7 +30,7 @@
                 "max": 44,
                 "min": 0,
                 "name": "Trial",
-                "type": "Float",
+                "type": "Integer",
                 "label": "Trial",
                 "selected": true,
                 "categories": [],
@@ -283,7 +283,7 @@
             "variableInfo": {
                 "trial": {
                     "name": "Trial",
-                    "type": "Categorical",
+                    "type": "Integer",
                     "label": "",
                     "categories": null
                 },
