@@ -607,6 +607,7 @@ export default {
           if (valid) {
             this.validationError = false
             this.$emit("saveConfirmed", this.editedItemDialog)
+            this.selectedStatistic = null
           } else {
             this.validationError = true
           }
@@ -704,6 +705,7 @@ export default {
       this.editedItemDialog.histogramNumberOfBins = null,
           this.editedItemDialog.histogramBinEdges = []
       this.editedItemDialog.histogramBuckets = ""
+      this.selectedStatistic = null
     },
     updateSelectedVariable(variable, index) {
       if (this.editedItemDialog.variable.includes(variable)) {
