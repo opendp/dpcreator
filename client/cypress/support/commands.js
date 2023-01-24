@@ -2,6 +2,7 @@ Cypress.Commands.add('login', (username, password) => {
     Cypress.Cookies.debug(true)
     cy.visit('/log-in')
     cy.get('[data-test="username"]').type(username);
+    cy.get('[data-test="password"]').should('be.enabled')
     cy.get('[data-test="password"]').type(password);
     cy.get('[data-test="Log in"]').click();
     // to force the login click, test that the browser went to the next  page
@@ -210,6 +211,10 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
     cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
     cy.wait('@runAsync').then(() => {
         cy.get('h1').should('contain', 'Confirm Variables')
+        const getStore = () => cy.window().its('app.$store')
+        getStore().its('state.dataset.profilerStatus').should('deep.equal', true)
+
+        //   dataset.profilerStatus
         for (const key in variableData) {
             const val = variableData[key]
             cy.get('table').contains('td', val.name).should('be.visible')
