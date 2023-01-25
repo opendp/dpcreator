@@ -8,9 +8,7 @@
             })
             //     cy.clearData()
             //     cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
-
             cy.clearDatasetsOnly()
-            cy.pause()
             /*
             let testfile = 'cypress/fixtures/Fatigue_data.csv'
             cy.uploadFile(testfile)
@@ -28,6 +26,8 @@
                 console.log('runnable', runnable)
                 return false
             })
+            cy.spy(win.console, "log");
+            cy.spy(win.console, "error")
             cy.clearData()
             let testfile = 'cypress/fixtures/Fatigue_data.csv'
             cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
@@ -51,20 +51,21 @@
             cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
             cy.uploadFile(testfile)
             cy.fixture('variables').then((varsFixture) => {
-                cy.goToConfirmVariables(varsFixture)
-                cy.pause()
-                for (const key in varsFixture) {
-                    cy.get('table').contains('td', varsFixture[key].name).should('be.visible')
-                    cy.get('table').contains('tr', varsFixture[key].name).should('contain', varsFixture[key].type)
-                }
-                const label = 'Subject'
-                const name = 'subject'
-                const catInput = label + ':categories'
-                const catDataTest = '[data-test="' + catInput + '"]'
-                cy.get(catDataTest).type(varsFixture[name].categories, {force: true})
-                varsFixture[name].categoryChips.forEach(category => {
-                    cy.get('[data-test="categoryChip"]').should('contain', category)
+                cy.goToConfirmVariables(varsFixture).then(() => {
+                    for (const key in varsFixture) {
+                        cy.get('table').contains('td', varsFixture[key].name).should('be.visible')
+                        cy.get('table').contains('tr', varsFixture[key].name).should('contain', varsFixture[key].type)
+                    }
+                    const label = 'Subject'
+                    const name = 'subject'
+                    const catInput = label + ':categories'
+                    const catDataTest = '[data-test="' + catInput + '"]'
+                    cy.get(catDataTest).type(varsFixture[name].categories, {force: true})
+                    varsFixture[name].categoryChips.forEach(category => {
+                        cy.get('[data-test="categoryChip"]').should('contain', category)
+                    })
                 })
+
 
             })
         })
