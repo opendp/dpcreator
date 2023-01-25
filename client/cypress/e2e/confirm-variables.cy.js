@@ -26,8 +26,10 @@
                 console.log('runnable', runnable)
                 return false
             })
-            cy.spy(win.console, "log");
-            cy.spy(win.console, "error")
+            cy.on("window:before:load", (win) => {
+                cy.spy(win.console, "log");
+                cy.spy(win.console, "error")
+            })
             cy.clearData()
             let testfile = 'cypress/fixtures/Fatigue_data.csv'
             cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
