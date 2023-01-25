@@ -99,7 +99,7 @@
             ].availableActions.filter(action => action !== VIEW_DETAILS)"
               :key="action + '-' + index"
               color="primary"
-              :data-test="action"
+              :data-test="action+'Button'"
               :click="() => handleButtonClick(action, datasetTitle)"
               :label="actionsInformation[action]"
               :class="{

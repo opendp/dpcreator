@@ -55,6 +55,7 @@
                 :label="variable['label']"
                 :value="variable['key']"
                 :data-test="variable['label']"
+                @click="() => updateSelectedVariable(variable, index)"
                 on-icon="mdi-check"
             ></v-radio>
           </v-radio-group>
@@ -96,18 +97,19 @@
               </v-row>
               <v-row>
                 <v-col>
-                  <v-radio
-                      :key="EQUAL_BIN_RANGES"
-                      :label="histogramOptions[EQUAL_BIN_RANGES]+' ('+ minEdge()+','+maxEdge()+')'"
-                      :value="EQUAL_BIN_RANGES"
-                      :data-test="EQUAL_BIN_RANGES"
-                      @click="editedItemDialog.histogramBinEdges=[]"
+                  <v-radio v-if="this.variableInfo[this.editedItemDialog.variable]
+                  &&  this.variableInfo[this.editedItemDialog.variable].type ==  'Integer'"
+                           :key="EQUAL_BIN_RANGES"
+                           :label="histogramOptions[EQUAL_BIN_RANGES]+' ('+ minEdge()+','+maxEdge()+')'"
+                           :value="EQUAL_BIN_RANGES"
+                           :data-test="EQUAL_BIN_RANGES"
+                           @click="editedItemDialog.histogramBinEdges=[]"
                   ></v-radio>
                 </v-col>
               </v-row>
               <v-expand-transition>
                 <div>
-                  <v-row v-show="editedItemDialog.histogramBinType == EQUAL_BIN_RANGES">
+                  <v-row v-if="editedItemDialog.histogramBinType == EQUAL_BIN_RANGES">
                     <v-col>
 
                       <v-text-field
@@ -130,17 +132,18 @@
               </v-expand-transition>
               <v-row>
                 <v-col>
-                  <v-radio
-                      :key="BIN_EDGES"
-                      :label="histogramOptions[BIN_EDGES]"
-                      :value="BIN_EDGES"
-                      :data-test="BIN_EDGES"
-                      @click="editedItemDialog.histogramNumberOfBins=null;editedItemDialog.histogramBuckets=''"
+                  <v-radio v-if="this.variableInfo[this.editedItemDialog.variable]
+                  &&  this.variableInfo[this.editedItemDialog.variable].type ==  'Integer'"
+                           :key="BIN_EDGES"
+                           :label="histogramOptions[BIN_EDGES]"
+                           :value="BIN_EDGES"
+                           :data-test="BIN_EDGES"
+                           @click="editedItemDialog.histogramBinEdges=[];editedItemDialog.histogramNumberOfBins=null;editedItemDialog.histogramBuckets=''"
                   ></v-radio>
                 </v-col>
               </v-row>
               <v-expand-transition>
-                <v-row align-content="center" v-show="editedItemDialog.histogramBinType == BIN_EDGES">
+                <v-row align-content="center" v-if="editedItemDialog.histogramBinType == BIN_EDGES">
                   <v-col cols="3">
                     {{ 'Min: ' + minEdge() }}
                   </v-col>
@@ -348,8 +351,7 @@ export default {
     minMax: function () {
       let minMax = ""
       if (this.editedItemDialog.variable &&
-          this.variableInfo[this.editedItemDialog.variable] &&
-          this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('min')
+          this.isNumeric(this.editedItemDialog.variable)
       ) {
         minMax = "(Must be between " +
             this.variableInfo[this.editedItemDialog.variable].min + " and " +
@@ -376,6 +378,7 @@ export default {
     }
   },
   watch: {
+
     editedItem: function (newEditedItem) {
       /*
        Check the value of statistic coming from the CreateStatistics page.
@@ -448,16 +451,16 @@ export default {
     histogramOptions
   }),
   methods: {
-    binEdgeBuckets: function () {
+
+    binEdgeBuckets: function (event) {
       if (this.editedItemDialog.statistic == 'histogram'
           && this.editedItemDialog.histogramBinType === EQUAL_BIN_RANGES
           && this.editedItemDialog.histogramNumberOfBins
-          && this.isNumBinsValid(this.editedItemDialog.histogramNumberOfBins)
+          && this.isNumBinsValid(event.target.value)
       ) {
         analysis.getHistogramBuckets(this.variableInfo[this.editedItemDialog.variable].min,
             this.variableInfo[this.editedItemDialog.variable].max,
-            this.editedItemDialog.histogramNumberOfBins).then((resp) => {
-          //  console.log("setting buckets: "+resp.data.buckets.toString())
+            event.target.value).then((resp) => {
           this.editedItemDialog.histogramBuckets = resp.data.buckets.toString()
         })
       } else {
@@ -486,22 +489,27 @@ export default {
       }
     },
     showHistogramOptions() {
-      const allowedTypes = [
-        "Integer"
+      // We only need to show options for Integer and Float,
+      // because the other variables (Boolean and Categorical) are
+      // always the same type - oneBinPerValue
+      const showTypes = [
+        "Integer",
         //  ,"Float"  TODO: enable float types
       ]
       let retVal = this.editedItemDialog.statistic == 'histogram'
           && this.variableInfo[this.editedItemDialog.variable]
-          && allowedTypes.includes(this.variableInfo[this.editedItemDialog.variable].type)
-
+          && showTypes.includes(this.variableInfo[this.editedItemDialog.variable].type)
 
       return retVal
     },
+    isNumeric(variable) {
+      const type = this.variableInfo[variable].type
+      return (type === 'Integer' || type === 'Float')
+    },
     maxBins() {
       let maxBins = 0
-      if (this.editedItemDialog.variable &&
-          this.variableInfo[this.editedItemDialog.variable] &&
-          this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('min')) {
+      if (this.editedItemDialog.variable && this.isNumeric(this.editedItemDialog.variable)
+      ) {
         maxBins = Number(this.variableInfo[this.editedItemDialog.variable].max) - Number(this.variableInfo[this.editedItemDialog.variable].min)
       }
       return maxBins
@@ -509,8 +517,7 @@ export default {
     minEdge() {
       let minEdge = 0
       if (this.editedItemDialog.variable &&
-          this.variableInfo[this.editedItemDialog.variable] &&
-          this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('min')) {
+          this.isNumeric(this.editedItemDialog.variable)) {
         minEdge = Number(this.variableInfo[this.editedItemDialog.variable].min)
       }
       return minEdge
@@ -518,8 +525,7 @@ export default {
     variableRange() {
       let range = 0;
       if (this.editedItemDialog.variable &&
-          this.variableInfo[this.editedItemDialog.variable] &&
-          this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('max')) {
+          this.isNumeric(this.editedItemDialog.variable)) {
         range = Number(this.variableInfo[this.editedItemDialog.variable].max)
             - Number(this.variableInfo[this.editedItemDialog.variable].min) + 1
       }
@@ -528,8 +534,7 @@ export default {
     maxEdge() {
       let maxEdge = 0
       if (this.editedItemDialog.variable &&
-          this.variableInfo[this.editedItemDialog.variable] &&
-          this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('max')) {
+          this.isNumeric(this.editedItemDialog.variable)) {
         maxEdge = Number(this.variableInfo[this.editedItemDialog.variable].max)
       }
       return maxEdge
@@ -558,14 +563,17 @@ export default {
       return valid
     },
     isNumBinsValid(v) {
-      if (v !== null) {
+      let valid = true
+      if (v !== null && this.editedItemDialog.histogramBinType === EQUAL_BIN_RANGES) {
         const num = Number(v)
-        return Number.isInteger(num) && num > 1 && num < this.variableRange()
+        valid = Number.isInteger(num) && num > 1 && num < this.variableRange()
       } else {
-        return true
+        valid = true
       }
+      return valid
     },
     validateNumBins(v) {
+
       return this.isNumBinsValid(v) || "Value must be an integer between 2 and " + (this.variableRange() - 1)
     },
     validateBinEdges(v) {
@@ -576,8 +584,7 @@ export default {
     validateFixedValue(v) {
       let valid = true
       if (this.editedItemDialog.variable &&
-          this.variableInfo[this.editedItemDialog.variable] &&
-          this.variableInfo[this.editedItemDialog.variable].hasOwnProperty('min')) {
+          this.isNumeric(this.editedItemDialog.variable)) {
         const val = Number(v)
         if (val < this.variableInfo[this.editedItemDialog.variable].min ||
             val > this.variableInfo[this.editedItemDialog.variable].max)
@@ -590,10 +597,17 @@ export default {
     save() {
       try {
         this.editedItemDialog.label = this.selectedStatistic.label
+        if (this.editedItemDialog.statistic == 'histogram'
+            && (this.variableInfo[this.editedItemDialog.variable].type == 'Boolean' ||
+                this.variableInfo[this.editedItemDialog.variable].type == 'Categorical')) {
+
+          this.editedItemDialog.histogramBinType = ONE_BIN_PER_VALUE
+        }
         this.validate().then((valid) => {
           if (valid) {
             this.validationError = false
             this.$emit("saveConfirmed", this.editedItemDialog)
+            this.selectedStatistic = null
           } else {
             this.validationError = true
           }
@@ -674,7 +688,24 @@ export default {
       this.validationError = false
       this.validationErrorMsg = ""
       this.selectedStatistic = null
+      this.resetEditedItemDialog()
       this.$emit("close");
+    },
+    resetEditedItemDialog() {
+      this.editedItemDialog.statistic = ""
+      this.editedItemDialog.variable = ""
+      this.editedItemDialog.epsilon = ""
+      this.editedItemDialog.error = ""
+      this.editedItemDialog.missingValuesHandling = ""
+      this.editedItemDialog.handleAsFixed = false
+      this.editedItemDialog.fixedValue = ""
+      this.editedItemDialog.locked = false
+      this.editedItemDialog.accuracy = {value: 0, message: 'not calculated'}
+      this.editedItemDialog.histogramBinType = ""
+      this.editedItemDialog.histogramNumberOfBins = null,
+          this.editedItemDialog.histogramBinEdges = []
+      this.editedItemDialog.histogramBuckets = ""
+      this.selectedStatistic = null
     },
     updateSelectedVariable(variable, index) {
       if (this.editedItemDialog.variable.includes(variable)) {
