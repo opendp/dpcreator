@@ -1,8 +1,10 @@
 """
 Profile a data file
 """
+import logging
 from collections import OrderedDict
 
+from django.conf import settings
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler.csv_reader import CsvReader
 from opendp_apps.profiler.static_vals import \
@@ -13,7 +15,7 @@ from opendp_apps.profiler.static_vals import \
      VAR_TYPE_INTEGER,
      VAR_TYPE_NUMERICAL)
 
-
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 class VariableInfoHandler(BasicErrCheck):
 
     def __init__(self, df, **kwargs):
@@ -70,6 +72,7 @@ class VariableInfoHandler(BasicErrCheck):
             # category_limit = 5
             # Use type checking to filter out numpy Nan
             # Comment out categories for now
+            logger.info('********** processing column: ' + col_name)
             if column.unique().shape[0] == 2:
                 column_info['categories'] = []
                 column_info['type'] = VAR_TYPE_BOOLEAN

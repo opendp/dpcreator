@@ -1,10 +1,11 @@
 """
 Read and Profile a File.
 """
+import logging
 import os
 
+from django.conf import settings
 from django.db.models.fields.files import FieldFile
-
 from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataset.models import DataSetInfo
@@ -14,6 +15,7 @@ from opendp_apps.profiler.csv_reader import CsvReader
 from opendp_apps.profiler.dataset_info_updater import DataSetInfoUpdater
 from opendp_apps.profiler.variable_info import VariableInfoHandler
 
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 class ProfileRunner(BasicErrCheck):
     """Given a filepath and optional DataSetInfo object id """
@@ -127,6 +129,7 @@ class ProfileRunner(BasicErrCheck):
         """
         Run through the setup and profile process
         """
+        logger.info('********* run_profile_process')
         if self.has_error():
             return
 
@@ -142,6 +145,7 @@ class ProfileRunner(BasicErrCheck):
         # (2) Open the dataframe
         #
         try:
+            logger.info('********* Open the dataframe')
             self.dataframe = CsvReader(self.ds_pointer_for_pandas, column_limit=self.max_num_features).read()
         except UnicodeDecodeError as ex_obj:
             user_msg = f'Failed to open file due to UnicodeDecodeError. ({ex_obj})'
@@ -164,6 +168,8 @@ class ProfileRunner(BasicErrCheck):
             # Run the profile
             params = {pstatic.KEY_SAVE_ROW_COUNT: self.save_row_count}
             variable_info_handler = VariableInfoHandler(self.dataframe, **params)
+            print('********* variable_info_handler.run_profile_process()')
+
             variable_info_handler.run_profile_process()
 
             # Get profiler values
