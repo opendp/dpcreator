@@ -5,8 +5,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
-    matrix:
-      job: [ 0, 1, 2, 3, 4 ]
+      matrix:
+        job: [ 0, 1, 2, 3, 4 ]
     steps:
       - uses: actions/checkout@v2
       - name: Build the client static files
