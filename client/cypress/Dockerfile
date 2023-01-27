@@ -14,4 +14,4 @@ RUN chmod +x /wait
 
 ## Launch the wait tool and then Cypress
 ## (The server to wait for is set as an environment variable)
-CMD /wait && cypress run --config-file cypress_github_ci.config.js --parallel --ci-build-id $PARALLEL_RUN_ID  --record --key 0a9658f9-4279-488b-8f65-29a6ca0c2d76
+CMD /wait && cypress run --config-file cypress_github_ci.config.js --parallel --ci-build-id $PARALLEL_RUN_ID
