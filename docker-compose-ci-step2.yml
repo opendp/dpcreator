@@ -80,6 +80,7 @@ services:
     volumes:
       - ./client:/e2e
     environment:
+      PARALLEL_RUN_ID: test1234
       WAIT_HOSTS: server:8000
   #latex:
   #  build: "./latex_service"
