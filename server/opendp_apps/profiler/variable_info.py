@@ -76,6 +76,7 @@ class VariableInfoHandler(BasicErrCheck):
             # category_limit = 5
             # Use type checking to filter out numpy Nan
             # Comment out categories for now
+            logger.info(f'column num vals %s' % column.unique().shape)
             if column.unique().shape[0] == 2:
                 column_info['categories'] = []
                 column_info['type'] = VAR_TYPE_BOOLEAN

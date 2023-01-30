@@ -30,6 +30,8 @@ class ProfileRunner(BasicErrCheck):
         dataset_object_id : DataSetInfo object_id. Save the profile to this object's data_profile attribute
         """
         #
+        logger.info(f'Init ProfileRunner dataset_pointer: {dataset_pointer}')
+
         self.dataset_pointer = dataset_pointer  # Either a filepath or Django FileField object
         self.max_num_features = max_num_features  # None indicates no limit
 
