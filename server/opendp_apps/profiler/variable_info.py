@@ -1,7 +1,10 @@
 """
 Profile a data file
 """
+import logging
 from collections import OrderedDict
+
+from django.conf import settings
 
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler.csv_reader import CsvReader
@@ -12,6 +15,8 @@ from opendp_apps.profiler.static_vals import \
      VAR_TYPE_FLOAT,
      VAR_TYPE_INTEGER,
      VAR_TYPE_NUMERICAL)
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class VariableInfoHandler(BasicErrCheck):
@@ -61,6 +66,7 @@ class VariableInfoHandler(BasicErrCheck):
         sort_order = -1
         for col_name in self.df.columns:
             sort_order += 1
+            logger.info(f'profiling column {sort_order}: {col_name}')
             column = self.df[col_name]
             column_info = OrderedDict({
                 "name": col_name,

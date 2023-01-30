@@ -1,8 +1,10 @@
 """
 Read and Profile a File.
 """
+import logging
 import os
 
+from django.conf import settings
 from django.db.models.fields.files import FieldFile
 
 from opendp_apps.analysis.models import DepositorSetupInfo
@@ -13,6 +15,8 @@ from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.profiler.csv_reader import CsvReader
 from opendp_apps.profiler.dataset_info_updater import DataSetInfoUpdater
 from opendp_apps.profiler.variable_info import VariableInfoHandler
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class ProfileRunner(BasicErrCheck):
@@ -56,7 +60,9 @@ class ProfileRunner(BasicErrCheck):
         # Set to 'True' for a Django FileField object
         # self.dataset_is_django_filefield = kwargs.get(pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD, False)
 
+        logger.info('Run basic checks...')
         self.run_basic_checks()
+        logger.info('Basic checks complete!')
         self.run_profile_process()
 
     def add_err_msg(self, err_msg):
@@ -127,40 +133,51 @@ class ProfileRunner(BasicErrCheck):
         """
         Run through the setup and profile process
         """
+        logger.info('-- run_profile_process --')
+
         if self.has_error():
             return
 
         # (1) Does the profile already exist? Yes, then stop here
         #
+        logger.info('(1) Does the profile already exist?')
         if self.dataset_info and self.dataset_info.data_profile and \
                 self.dataset_info.profile_variables:
             #
             # Profile is already done! Return!
             self.data_profile = self.dataset_info.data_profile
+            logger.info('Profile exists. All done.')
             return
+
+        logger.info('No profile. Go make one')
 
         # (2) Open the dataframe
         #
+        logger.info('(2) Read the data')
         try:
             self.dataframe = CsvReader(self.ds_pointer_for_pandas, column_limit=self.max_num_features).read()
         except UnicodeDecodeError as ex_obj:
             user_msg = f'Failed to open file due to UnicodeDecodeError. ({ex_obj})'
             self.add_err_msg(user_msg)
+            logger.info(f'Failed to open file {user_msg}')
             return
         except Exception as ex:
             user_msg = f'File reading error. {ex}'
             self.add_err_msg(user_msg)
+            logger.info(f'Failed to open file {user_msg}')
             return
 
         # (3) Run the profiler
         #
-
+        logger.info('(2) Run the profiler')
         # Pre-profile: update user_step
         if self.dataset_info:
             if self.dataset_info.depositor_setup_info.user_step < DepositorSetupInfo.DepositorSteps.STEP_0300_PROFILING_PROCESSING:
                 self.set_depositor_info_status(DepositorSetupInfo.DepositorSteps.STEP_0300_PROFILING_PROCESSING)
+                logger.info('(2a) Update the profiler status')
 
         try:
+            logger.info('(2b) It\'s running!')
             # Run the profile
             params = {pstatic.KEY_SAVE_ROW_COUNT: self.save_row_count}
             variable_info_handler = VariableInfoHandler(self.dataframe, **params)
@@ -174,42 +191,12 @@ class ProfileRunner(BasicErrCheck):
             # Profiling failed: add error message
             user_msg = f'Profile runner error. {ex}'
             self.add_err_msg(user_msg)
+            logger.info(f'(2c) !Profile failed!: {user_msg}')
             return
 
         # Profiling success: update DataSetInfo profile and user_step
+        logger.info(f'(3) Profile complete!')
         if self.dataset_info:
             self.dataset_info_updater.save_data_profile(variable_info_handler.data_profile)
             if self.dataset_info.depositor_setup_info.user_step < DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE:
                 self.set_depositor_info_status(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
-
-    def xrun_profile(self, df, dataset_info_object_id):
-        """
-        Process dataframe for variable profiling, while updating the DatasetInfo object at each step
-        :param df:
-        :param dataset_info_object_id:
-        :return: VariableInfoHandler
-        """
-        dataset_info = None
-        dataset_info_updater = None
-
-        if dataset_info_object_id:
-            dataset_info = DataSetInfo.objects.get(object_id=dataset_info_object_id)
-            dataset_info_updater = DataSetInfoUpdater(dataset_info)
-
-        try:
-            ph = VariableInfoHandler(df)
-            if dataset_info:
-                if dataset_info.depositor_setup_info.user_step < DepositorSetupInfo.DepositorSteps.STEP_0300_PROFILING_PROCESSING:
-                    dataset_info_updater.update_step(DepositorSetupInfo.DepositorSteps.STEP_0300_PROFILING_PROCESSING)
-            ph.run_profile_process()
-
-        except Exception as ex:
-            if dataset_info:
-                dataset_info_updater.update_step(DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
-            raise ex
-        if dataset_info:
-            dataset_info_updater.save_data_profile(ph.data_profile)
-            if dataset_info.depositor_setup_info.user_step < DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE:
-                dataset_info_updater.update_step(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
-
-        return ph
