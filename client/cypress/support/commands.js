@@ -367,6 +367,12 @@ Cypress.Commands.add('submitStatistics', (demoData) => {
             for (let i = 0; i < demoData.statistics.length; i++) {
                 expect(releaseInfo.dpRelease.statistics[i].statistic).to.equal(demoData.statistics[i].statistic.toLowerCase())
                 expect(releaseInfo.dpRelease.statistics[i].accuracy.value).to.equal(demoData.statistics[i].accuracy)
+                if (demoData.statistics[i].result) {
+                    const mean = .59
+                    expect(releaseInfo.dpRelease.statistics[i].result.value).to.be.lessThan(mean + (demoData.statistics[i].accuracy))
+                    expect(releaseInfo.dpRelease.statistics[i].result.value).to.be.greaterThan(mean - (demoData.statistics[i].accuracy))
+                }
+
             }
         })
     cy.visit('/my-data')
