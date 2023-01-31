@@ -21,12 +21,12 @@ logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 class VariableInfoHandler(BasicErrCheck):
 
-    def __init__(self, df, **kwargs):
+    def __init__(self, dataframe, **kwargs):
         """
         Given a dataframe, create a variable profile dictionary
         :param df: Dataframe
         """
-        self.df = df
+        self.df = dataframe
         self.num_variables = None
         self.data_profile = None
 
@@ -76,6 +76,8 @@ class VariableInfoHandler(BasicErrCheck):
             # category_limit = 5
             # Use type checking to filter out numpy Nan
             # Comment out categories for now
+            #unique_vals = column.unique()
+
             if column.unique().shape[0] == 2:
                 column_info['categories'] = []
                 column_info['type'] = VAR_TYPE_BOOLEAN
@@ -87,16 +89,10 @@ class VariableInfoHandler(BasicErrCheck):
                     'categories'] = []  # list([x for x in column.dtypes.categories if type(x) == str])[:category_limit]
                 column_info['type'] = VAR_TYPE_CATEGORICAL
             elif 'int' in str(column.dtype):
-                # column_info['min'] = int(column.min()) if not np.isnan(column.min()) else None
-                # column_info['max'] = int(column.max()) if not np.isnan(column.max()) else None
                 column_info['type'] = VAR_TYPE_INTEGER
             elif 'float' in str(column.dtype):
-                # column_info['min'] = float(column.min()) if not np.isnan(column.min()) else None
-                # column_info['max'] = float(column.max()) if not np.isnan(column.max()) else None
                 column_info['type'] = VAR_TYPE_FLOAT
             elif str(column.dtypes) != 'object':
-                # column_info['min'] = float(column.min()) if not np.isnan(column.min()) else None
-                # column_info['max'] = float(column.max()) if not np.isnan(column.max()) else None
                 column_info['type'] = VAR_TYPE_NUMERICAL
             profile_dict['variables'][col_name] = column_info
 
@@ -109,10 +105,10 @@ if __name__ == '__main__':
     from pprint import pprint
     from server.opendp_project.settings.base import BASE_DIR
 
-    fname = 'Fatigue_data.tab'
-    # fname = 'teacher_climate_survey_lwd.csv'
-    csv_reader = CsvReader(os.path.join(BASE_DIR, 'test_data', 'teacher_climate_survey_lwd.csv'))
+    # fname = 'Fatigue_data.tab'
+    fname = 'teacher_climate_survey_lwd.csv'
+    csv_reader = CsvReader(os.path.join(BASE_DIR, 'test_data', fname))
     df = csv_reader.read()
     v = VariableInfoHandler(df)
-    profile_dict = v.run_profile_process()
-    pprint(profile_dict)
+    profile_info = v.run_profile_process()
+    pprint(profile_info)
