@@ -33,7 +33,7 @@
          ],
          [
             7,
-            "optimisim"
+            "optimism"
          ],
          [
             8,
@@ -60,15 +60,15 @@
       },
       "smoking":{
          "name":"smoking",
-         "type":"Categorical",
+         "type":"Boolean",
          "label":"",
          "categories":[
 
          ],
          "sort_order":6
       },
-      "optimisim":{
-         "name":"optimisim",
+      "optimism":{
+         "name":"optimism",
          "type":"Categorical",
          "label":"",
          "categories":[
@@ -87,7 +87,7 @@
       },
       "Havingchild":{
          "name":"Havingchild",
-         "type":"Categorical",
+         "type":"Boolean",
          "label":"",
          "categories":[
 

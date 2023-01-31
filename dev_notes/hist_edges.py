@@ -1,6 +1,6 @@
 """Compute binned histogram with known category set"""
-from opendp.trans import make_count_by_categories, make_find_bin
-from opendp.meas import make_base_discrete_laplace
+from opendp.transformations import make_count_by_categories, make_find_bin
+from opendp.measurements import make_base_discrete_laplace
 from opendp.typing import L1Distance, VectorDomain, AllDomain, usize
 from opendp.mod import binary_search_chain
 edges = [1., 3.14159, 4., 7.]
@@ -25,8 +25,8 @@ print(noisy_histogram_from_dataframe(data))
 print('-- test_histogram --')
 #
 import numpy as np
-from opendp.trans import make_count_by_categories, make_find_bin
-from opendp.meas import make_base_discrete_laplace
+from opendp.transformations import make_count_by_categories, make_find_bin
+from opendp.measurements import make_base_discrete_laplace
 from opendp.typing import L1Distance, VectorDomain, AllDomain, usize
 from opendp.mod import binary_search_chain
 #

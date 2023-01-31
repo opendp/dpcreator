@@ -288,7 +288,7 @@ class DPMeanStatSpecTest(StatSpecTestCase):
 
     # @skip
     def test_100_run_dpmean_calculation(self):
-        """(100) Run DP mean calculation"""
+        """(100) Run DP mean calculation on Fatigue_data.tab"""
         msgt(self.test_100_run_dpmean_calculation.__doc__)
 
         spec_props = self.spec_props
@@ -319,6 +319,22 @@ class DPMeanStatSpecTest(StatSpecTestCase):
         dp_mean.run_chain(col_indexes, file_obj, sep_char="\t")
 
         final_dict = dp_mean.get_release_dict()
+        dp_val = final_dict['result']['value']
+        accuracy = final_dict['accuracy']['value']
+
+        print('\n-- DP val --')
+        print(f'Mean: {dp_val}')
+        print(f'Accuracy: {accuracy}')
+
+        actual_accuracy = 0.21281158227441255  # on local Docker run
+        accuracy_extra_leeway = 0.4  # lot of extra leeway for these tests
+
+        self.assertTrue(accuracy <= (actual_accuracy + accuracy_extra_leeway))
+        self.assertTrue(accuracy >= (actual_accuracy - accuracy_extra_leeway))
+
+        self.assertTrue(dp_val <= (dp_val + accuracy + accuracy_extra_leeway))
+        self.assertTrue(dp_val > (dp_val - accuracy - accuracy_extra_leeway))
+
         self.assertIn('description', final_dict)
         self.assertIn('text', final_dict['description'])
         self.assertIn('html', final_dict['description'])
@@ -326,7 +342,7 @@ class DPMeanStatSpecTest(StatSpecTestCase):
         print('Actual mean: -0.9503854412185792')
 
     def test_110_run_dpmean_calculation(self):
-        """(110) Run another DP mean calculation"""
+        """(110) Run another DP mean calculation on PUMS5extract10000.csv"""
         msgt(self.test_110_run_dpmean_calculation.__doc__)
 
         spec_props = self.spec_props_income
@@ -364,11 +380,106 @@ class DPMeanStatSpecTest(StatSpecTestCase):
         json_str = json.dumps(final_dict, indent=4)
         print(json_str)
 
-        print('-- actual vals --')
-        print(('mean: 30,943.4566'
-               '\nmin: -10,000.0'
-               '\nmax: 713,000.0'))
+        print('\n-- Actual vals --')
+        print(('Mean: 30,943.4566'
+               '\nMin: -10,000.0'
+               '\nMax: 713,000.0'))
 
+        dp_val = final_dict['result']['value']
+        accuracy = final_dict['accuracy']['value']
+
+        print('\n-- DP val --')
+        print(f'Mean: {dp_val}')
+        print(f'Accuracy: {accuracy}')
+
+        actual_accuracy = 498.8934368457095  # on local Docker run
+        accuracy_extra_leeway = 1.  # lot of extra leeway for these tests
+
+        self.assertTrue(accuracy <= (actual_accuracy + accuracy_extra_leeway))
+        self.assertTrue(accuracy >= (actual_accuracy - accuracy_extra_leeway))
+
+        self.assertTrue(dp_val <= (dp_val + accuracy + accuracy_extra_leeway))
+        self.assertTrue(dp_val > (dp_val - accuracy - accuracy_extra_leeway))
+
+        self.assertIn('description', final_dict)
+        self.assertIn('text', final_dict['description'])
+        self.assertIn('html', final_dict['description'])
+
+    def test_120_run_dpmean_calculation(self):
+        """(120) Run another DP mean calculation on teacher_survey.csv"""
+        msgt(self.test_120_run_dpmean_calculation.__doc__)
+
+        spec_props_age = {'variable': 'age',
+                          'col_index': 1,
+                          'statistic': astatic.DP_MEAN,
+                          'dataset_size': 7000,
+                          'epsilon': 0.6,
+                          'delta': 0.0,
+                          'cl': astatic.CL_99,
+                          'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+                          'fixed_value': 25,
+                          'variable_info': {'min': 20,
+                                            'max': 75,
+                                            'type': 'Integer', },
+                          }
+
+        dp_mean = DPMeanSpec(spec_props_age)
+        print('Is this spec valid?', dp_mean.is_chain_valid())
+        if dp_mean.has_error():
+            print(dp_mean.get_error_messages())
+            print(dp_mean.get_error_msg_dict())
+            return
+        self.assertTrue(dp_mean.is_chain_valid())
+
+        # ------------------------------------------------------
+        # Run the actual mean
+        # ------------------------------------------------------
+        # Column indexes - We know this data has 10 columns
+        col_indexes = [idx for idx in range(0, 10)]
+
+        # File object
+        #
+        survey_filepath = join(TEST_DATA_DIR, 'teacher_survey', 'teacher_survey.csv')
+        self.assertTrue(isfile(survey_filepath))
+
+        file_like_obj = open(survey_filepath, 'r')
+
+        # Call run_chain
+        #
+        dp_mean.run_chain(col_indexes, file_like_obj)
+        if dp_mean.has_error():
+            print(dp_mean.get_error_messages())
+            return
+
+        final_dict = dp_mean.get_release_dict()
+
+        json_str = json.dumps(final_dict, indent=4)
+        print(json_str)
+
+        print('\n-- Actual vals (not clamped) --')
+        print(('Mean: 37.44'
+               '\nMin: 18'
+               '\nMax: 82'))
+
+        dp_val = final_dict['result']['value']
+        accuracy = final_dict['accuracy']['value']
+
+        print('\n-- DP vals --')
+        print(f'Mean: {dp_val}')
+        print(f'Accuracy: {accuracy}')
+
+        actual_accuracy = 0.060305800057980356  # on local Docker run
+        accuracy_extra_leeway = 0.5  # lot of extra leeway for these tests
+
+        self.assertTrue(accuracy <= (actual_accuracy + accuracy_extra_leeway))
+        self.assertTrue(accuracy >= (actual_accuracy - accuracy_extra_leeway))
+
+        self.assertTrue(dp_val <= (dp_val + accuracy + accuracy_extra_leeway))
+        self.assertTrue(dp_val > (dp_val - accuracy - accuracy_extra_leeway))
+
+        self.assertIn('description', final_dict)
+        self.assertIn('text', final_dict['description'])
+        self.assertIn('html', final_dict['description'])
         self.assertIn('description', final_dict)
         self.assertIn('text', final_dict['description'])
         self.assertIn('html', final_dict['description'])

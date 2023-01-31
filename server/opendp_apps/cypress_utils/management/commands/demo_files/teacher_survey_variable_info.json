@@ -26,21 +26,19 @@
         "max": 0,
         "min": 0,
         "name": "smoking",
-        "type": "Categorical",
+        "type": "Boolean",
         "label": "smoking",
         "selected": true,
         "sortOrder": 6,
-        "categories": [
-            1,
-            2
-        ]
+        "trueValue": 1,
+        "falseValue": 2
     },
-    "optimisim": {
+    "optimism": {
         "max": 30,
         "min": 6,
-        "name": "optimisim",
+        "name": "optimism",
         "type": "Integer",
-        "label": "optimisim",
+        "label": "optimism",
         "selected": true,
         "sortOrder": 7,
         "categories": []
@@ -57,14 +55,12 @@
     },
     "havingchild": {
         "name": "Havingchild",
-        "type": "Categorical",
+        "type": "Boolean",
         "label": "Havingchild",
         "selected": true,
         "sortOrder": 3,
-        "categories": [
-            1,
-            2
-        ]
+        "trueValue": 1,
+        "falseValue": 2
     },
     "maritalstatus": {
         "max": 8,

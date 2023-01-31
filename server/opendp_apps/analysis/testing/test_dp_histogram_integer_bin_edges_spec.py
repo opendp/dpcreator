@@ -142,8 +142,8 @@ class HistogramIntegerBinEdgesStatSpecTest(StatSpecTestCase):
         """(50) Hist based on edges"""
         msgt(self.test_050_run_dphist_edges.__doc__)
 
-        from opendp.trans import make_count_by_categories, make_find_bin
-        from opendp.meas import make_base_discrete_laplace
+        from opendp.transformations import make_count_by_categories, make_find_bin
+        from opendp.measurements import make_base_discrete_laplace
         from opendp.typing import VectorDomain, AllDomain, usize
         from opendp.mod import binary_search_chain
 
