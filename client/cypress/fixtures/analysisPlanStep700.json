@@ -46,7 +46,8 @@
     "eyeHeight": {
       "name": "EyeHeight",
       "type": "Float",
-      "label": "",
+      "selected": true,
+      "label": "EyeHeight",
       "sortOrder": 19
     },
     "typingSpeed": {

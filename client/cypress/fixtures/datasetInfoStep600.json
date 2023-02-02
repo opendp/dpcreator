@@ -64,9 +64,12 @@
                 "sortOrder": 1
             },
             "eyeHeight": {
+                "max": 10,
+                "min": 0,
                 "name": "EyeHeight",
                 "type": "Float",
                 "label": "",
+                "selected": true,
                 "sortOrder": 19
             },
             "typingSpeed": {
