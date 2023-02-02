@@ -78,6 +78,7 @@
             cy.get('[data-test="Fixed value"]').type('22')
             cy.get('[data-test="Create Statistic Button"]').click({force: true})
             cy.get('[data-test="Create Statistics Title').should('be.visible')
+            cy.vuex().its('state.dataset.analysisPlan.dpStatistics.length').should('be.equal', 1)
             cy.get('[data-test="Add Statistic"]').should('be.visible')
 
             cy.get('[data-test="Add Statistic"]').click({force: true});
