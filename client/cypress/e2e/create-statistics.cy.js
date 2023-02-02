@@ -6,9 +6,6 @@
                 console.log('runnable', runnable)
                 return false
             })
-            cy.clearData()
-            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
-            cy.logout()
 
         })
         beforeEach(() => {
@@ -17,92 +14,77 @@
                 console.log('runnable', runnable)
                 return false
             })
-            cy.on("window:before:load", (win) => {
-                cy.spy(win.console, "log");
-                cy.spy(win.console, "error")
+            cy.login('dev_admin', 'admin')
+            cy.request('/cypress-tests/clear-test-data/').then((resp) => {
+                console.log('CLEAR RESP: ' + JSON.stringify(resp))
             })
-            cy.clearDatasetsOnly()
-            cy.login('oscar', 'oscar123!')
-            let testfile = 'cypress/fixtures/Fatigue_data.csv'
-            cy.uploadFile(testfile)
+            cy.request('/cypress-tests/setup-demo-data/').then(() => {
+                cy.logout()
+                cy.login('dp_analyst', 'Test-for-2022')
+                cy.visit('/my-data')
+                cy.get('[data-test="continueWorkflow"]').click({force: true})
 
 
+            })
         })
+
+        it('Goes back to the Confirm Variables Page', () => {
+            const meanAge = {
+                "statistics": [
+                    {
+                        "statistic": "Mean",
+                        "variable": "age",
+                        "fixedValue": "35",
+                        "roundedAccuracy": "0.0235",
+                    }
+                ]
+
+            }
+
+            cy.enterStatsInPopup(meanAge)
+            cy.get('[data-test="Add Statistic"]').should('be.visible')
+            cy.get('[data-test="Add Statistic"]').click({force: true});
+            cy.get('[data-test="confirmVariablesLink"]').click({force: true});
+            cy.get('h1').should('contain', 'Confirm Variables').should('be.visible')
+            // The checkbox for variable that was used to create a statistic should be disabled
+            // on the confirm variables page
+            cy.contains('td', meanAge.statistics[0].variable).parent('tr').children()
+                .first().children().get(":has(.v-simple-checkbox--disabled)").should('be.visible')
+        })
+
         afterEach(() => {
             cy.logout()
         })
 
         it('Validates fixed value max-min', () => {
-            const demoDatafile = 'EyeDemoStatsTest.json'
-            cy.fixture(demoDatafile).then((demoData) => {
-                cy.goToConfirmVariables(demoData.variables)
-                // select the variables we will use
-                let variables = {
-                    "Trial": {
-                        "name": "Trial",
-                        "label": "",
-                        "type": "Integer",
-                        "min": "0",
-                        "max": "10"
-                    },
-                }
-                cy.selectVariable(variables)
+            const varMax = 75
+            const varMin = 20
+            const testMax = Number(varMax + 1)
+            const testMin = Number(varMin - 1)
+            const varName = "age"
+            cy.get('[data-test="Add Statistic"]').click({force: true});
+            cy.get('[data-test="AddStatisticDialog"]').should('be.visible')
 
-                // Continue to Set Epsilon Step
-                cy.epsilonStep()
+            cy.get('[data-test="Mean"]').click({force: true});
+            const varDataTest = '[data-test="' + varName + '"]'
+            cy.get(varDataTest).click({force: true})
+            cy.get('[data-test="Fixed value"]').type(testMax)
+            cy.get('div').should('contain', 'Value must be between')
+            cy.get('[data-test="Fixed value"]').clear()
+            cy.get('[data-test="Fixed value"]').type(testMin)
+            cy.get('div').should('contain', 'Value must be between')
+            cy.get('[data-test="Fixed value"]').clear()
+            cy.get('[data-test="Fixed value"]').type(varMax)
+            cy.get('div').should('not.contain', 'Value must be between')
 
-                // cy.createStatistics(statsData)
-                cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
-                cy.get('[data-test="Add Statistic"]').click({force: true});
-                cy.get('[data-test="AddStatisticDialog"]').should('be.visible')
-
-                cy.get('[data-test="Histogram"]').click({force: true});
-                const varDataTest = '[data-test="Trial"]'
-                cy.get(varDataTest).click({force: true})
-                cy.get('[data-test="Fixed value"]').type((Number(variables.Trial.max) + 1))
-                cy.get('div').should('contain', 'Value must be between')
-                cy.get('[data-test="Fixed value"]').clear()
-                cy.get('[data-test="Fixed value"]').type((Number(variables.Trial.max) - 1))
-                cy.get('div').should('not.contain', 'Value must be between')
-
-
-            })
         })
-        it('Displays correct precision', () => {
-            const demoDatafile = 'EyeDemoData.json'
-
-            cy.fixture(demoDatafile).then((demoData) => {
-                cy.goToConfirmVariables(demoData.variables)
-                // select the variables we will use
-                cy.selectVariable(demoData.variables)
-
-                // Continue to Set Epsilon Step
-                cy.epsilonStep()
-                // Add all the statistics in the Create Statistics Step
-                cy.createStatistics(demoData)
+        it('Goes to the correct wizard step', () => {
+            cy.on('uncaught:exception', (e, runnable) => {
+                console.log('error', e)
+                console.log('runnable', runnable)
+                return false
             })
-        })
-        it('Goes back to the Confirm Variables Page', () => {
-            const demoDatafile = 'EyeDemoData.json'
-
-            cy.fixture(demoDatafile).then((demoData) => {
-                cy.goToConfirmVariables(demoData.variables)
-                // select the variables we will use
-                cy.selectVariable(demoData.variables)
-
-                // Continue to Set Epsilon Step
-                cy.epsilonStep()
-                // Add all the statistics in the Create Statistics Step
-                cy.createStatistics(demoData)
-                cy.get('[data-test="Add Statistic"]').should('be.visible')
-                cy.get('[data-test="Add Statistic"]').click({force: true});
-                cy.get('[data-test="confirmVariablesLink"]').click({force: true});
-                cy.get('h1').should('contain', 'Confirm Variables').should('be.visible')
-                cy.contains('td', demoData.variables[demoData.statistics[0].variable].name).parent('tr').children()
-                    .first().children().get(":has(.v-simple-checkbox--disabled)").should('be.visible')
-
-
-            })
+            cy.get('h1').should('contain', 'Create Statistics')
         })
         it('Populates Edit Noise Param Dialog', () => {
             cy.on('uncaught:exception', (e, runnable) => {
@@ -110,9 +92,6 @@
                 console.log('runnable', runnable)
                 return false
             })
-            cy.logout()
-            cy.login('dev_admin', 'admin')
-            cy.setupStatisticsPage('datasetInfoStep600.json', 'analysisPlanStep700.json')
             cy.get('h1').should('contain', 'Create Statistics')
             cy.get('[data-test="editConfidenceIcon"]').click({force: true});
             cy.get('h2').should('contain', 'Are you sure you want to proceed?').should('be.visible')
@@ -122,27 +101,13 @@
             cy.get('[data-test="editParamsCancel"]').click({force: true});
 
         })
-        it('Goes to the correct wizard step', () => {
-            cy.on('uncaught:exception', (e, runnable) => {
-                console.log('error', e)
-                console.log('runnable', runnable)
-                return false
-            })
-            cy.logout()
-            cy.login('dev_admin', 'admin')
-            cy.setupStatisticsPage('datasetInfoStep600.json', 'analysisPlanStep700.json')
-            cy.get('h1').should('contain', 'Create Statistics')
-        })
         it('Contains correct variables in the Add Statistics dialog ', () => {
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
                 console.log('runnable', runnable)
                 return false
             })
-            cy.logout()
-            cy.login('dev_admin', 'admin')
-            cy.setupStatisticsPage('datasetInfoStep600.json', 'analysisPlanStep700.json')
-            cy.fixture('analysisPlanStep700').then((analysisFixture) => {
+            cy.fixture('TeacherSurveyVariableInfo').then((analysisFixture) => {
                 // Create your statistic
                 cy.get('[data-test="Add Statistic"]').click({force: true});
                 for (const key in analysisFixture.variableInfo) {
@@ -164,6 +129,7 @@
             })
 
         })
+
 
     })
 }
