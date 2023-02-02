@@ -23,6 +23,7 @@ logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 def send_websocket_profiler_err_msg(user_msg, websocket_id):
     """Send a websocket error message of type WS_MSG_TYPE_PROFILER"""
+    logger.info(f'Sending websocket error message: {user_msg}')
     ws_msg = WebsocketMessage.get_fail_message( \
         async_static.WS_MSG_TYPE_PROFILER,
         user_msg)
@@ -30,6 +31,7 @@ def send_websocket_profiler_err_msg(user_msg, websocket_id):
 
 
 def send_websocket_success_msg(user_msg, websocket_id, profile_str=None):
+    logger.info(f'Sending websocket success message: {user_msg}')
     if profile_str:
         data_dict = dict(profile_str=profile_str)
     else:
@@ -55,6 +57,7 @@ def profile_dataset_info(dataset_object_id: DataSetInfo.object_id, websocket_id=
         If websocket_id is defined, this function returns a dict:
          {'success': True/False, 'message': "A user message"}
     """
+    logger.info(f'Profile in progress. dataset_object_id: {dataset_object_id}')
     dp_util = DownloadAndProfileUtil(dataset_object_id, websocket_id)
     if dp_util.has_error():
         logger.error("profile_dataset_info: ", dp_util.get_err_msg())
@@ -66,7 +69,6 @@ def profile_dataset_info(dataset_object_id: DataSetInfo.object_id, websocket_id=
         logger.info(f'Profile in progress. dataset_object_id: {dataset_object_id} websocket_id: {websocket_id}')
         return dict(success=True, messsage='Profile in process')
 
-    logger.info(f'Profile in progress. dataset_object_id: {dataset_object_id}')
     return ok_resp(dp_util)
 
 

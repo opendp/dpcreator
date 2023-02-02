@@ -2,6 +2,7 @@ import csv
 
 import pandas as pd
 
+from opendp_apps.model_helpers.basic_response import err_resp
 from opendp_apps.profiler import static_vals as pstatic
 
 

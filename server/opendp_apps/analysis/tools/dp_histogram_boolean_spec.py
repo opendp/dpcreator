@@ -2,9 +2,9 @@ import logging
 
 from django.conf import settings
 from opendp.accuracy import laplacian_scale_to_accuracy
-from opendp.meas import *
+from opendp.measurements import *
 from opendp.mod import enable_features, binary_search_param, OpenDPException
-from opendp.trans import *
+from opendp.transformations import *
 from opendp.typing import *
 
 from opendp_apps.analysis import static_vals as astatic

@@ -4,10 +4,10 @@ Wrapper class for DP Variance functionality
 
 """
 from opendp.accuracy import laplacian_scale_to_accuracy
-from opendp.meas import make_base_laplace
+from opendp.measurements import make_base_laplace
 from opendp.mod import OpenDPException
 from opendp.mod import binary_search, enable_features
-from opendp.trans import \
+from opendp.transformations import \
     (make_bounded_resize,
      make_cast,
      make_clamp,

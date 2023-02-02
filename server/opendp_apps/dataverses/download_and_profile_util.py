@@ -12,6 +12,7 @@ Basic workflow:
         - If an error, has an error message available
 """
 import json
+import logging
 
 from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -23,6 +24,8 @@ from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadHandler
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler.tasks import run_profile_by_filefield
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class DownloadAndProfileUtil(BasicErrCheck):
@@ -52,6 +55,7 @@ class DownloadAndProfileUtil(BasicErrCheck):
 
     def send_websocket_profiler_err_msg(self, user_msg):
         """Send a websocket error message of type WS_MSG_TYPE_PROFILER"""
+        logger.info(f'Sending websocket error message: {user_msg}')
         if not self.websocket_id:
             return
 
@@ -62,6 +66,7 @@ class DownloadAndProfileUtil(BasicErrCheck):
 
     def send_websocket_success_msg(self, user_msg, profile_str=None):
         """Send a websocket success message of type WS_MSG_TYPE_PROFILER"""
+        logger.info(f'Sending websocket success message: {user_msg}')
         if not self.websocket_id:
             return
 

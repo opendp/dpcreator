@@ -2,9 +2,9 @@ import logging
 
 from django.conf import settings
 from opendp.accuracy import laplacian_scale_to_accuracy
-from opendp.meas import make_base_geometric
+from opendp.measurements import make_base_geometric
 from opendp.mod import enable_features, binary_search_param, OpenDPException
-from opendp.trans import \
+from opendp.transformations import \
     (make_cast,
      make_count_by_categories,
      make_impute_constant,
