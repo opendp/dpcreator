@@ -9,23 +9,10 @@
 
         })
         beforeEach(() => {
-            cy.on('uncaught:exception', (e, runnable) => {
-                console.log('error', e)
-                console.log('runnable', runnable)
-                return false
-            })
-            cy.login('dev_admin', 'admin')
-            cy.request('/cypress-tests/clear-test-data/').then((resp) => {
-                console.log('CLEAR RESP: ' + JSON.stringify(resp))
-            })
-            cy.request('/cypress-tests/setup-demo-data/').then(() => {
-                cy.logout()
-                cy.login('dp_analyst', 'Test-for-2022')
-                cy.visit('/my-data')
-                cy.get('[data-test="continueWorkflow"]').click({force: true})
-
-
-            })
+            cy.loadTeacherSurveyDemo()
+        })
+        afterEach(() => {
+            cy.logout()
         })
 
         it('Goes back to the Confirm Variables Page', () => {

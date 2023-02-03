@@ -1,3 +1,23 @@
+Cypress.Commands.add('loadTeacherSurveyDemo', () => {
+    cy.on('uncaught:exception', (e, runnable) => {
+        console.log('error', e)
+        console.log('runnable', runnable)
+        return false
+    })
+    cy.login('dev_admin', 'admin')
+    cy.request('/cypress-tests/clear-test-data/').then((resp) => {
+        console.log('CLEAR RESP: ' + JSON.stringify(resp))
+    })
+    cy.request('/cypress-tests/setup-demo-data/').then(() => {
+        cy.logout()
+        cy.login('dp_analyst', 'Test-for-2022')
+        cy.visit('/my-data')
+        cy.get('[data-test="continueWorkflow"]').click({force: true})
+
+
+    })
+})
+
 Cypress.Commands.add('login', (username, password) => {
     Cypress.Cookies.debug(true)
     cy.visit('/log-in')
@@ -221,7 +241,7 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
         const val = variableData[key]
         cy.get('table').contains('td', val.name).should('be.visible')
         cy.get('table').contains('tr', val.name).should('contain', val.type)
-        }
+    }
 
 
 })
