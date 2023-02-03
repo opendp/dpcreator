@@ -327,11 +327,13 @@ class DPMeanStatSpecTest(StatSpecTestCase):
         print(f'Accuracy: {accuracy}')
 
         actual_accuracy = 0.21281158227441255  # on local Docker run
-        self.assertTrue(accuracy <= (actual_accuracy + 1.))
-        self.assertTrue(accuracy >= (actual_accuracy - 1.))
+        accuracy_extra_leeway = 0.4  # lot of extra leeway for these tests
 
-        self.assertTrue(dp_val <= (dp_val + accuracy + 1.))
-        self.assertTrue(dp_val > (dp_val - accuracy - 1.))
+        self.assertTrue(accuracy <= (actual_accuracy + accuracy_extra_leeway))
+        self.assertTrue(accuracy >= (actual_accuracy - accuracy_extra_leeway))
+
+        self.assertTrue(dp_val <= (dp_val + accuracy + accuracy_extra_leeway))
+        self.assertTrue(dp_val > (dp_val - accuracy - accuracy_extra_leeway))
 
         self.assertIn('description', final_dict)
         self.assertIn('text', final_dict['description'])
@@ -391,11 +393,13 @@ class DPMeanStatSpecTest(StatSpecTestCase):
         print(f'Accuracy: {accuracy}')
 
         actual_accuracy = 498.8934368457095  # on local Docker run
-        self.assertTrue(accuracy <= (actual_accuracy + 1.))
-        self.assertTrue(accuracy >= (actual_accuracy - 1.))
+        accuracy_extra_leeway = 1.  # lot of extra leeway for these tests
 
-        self.assertTrue(dp_val <= (dp_val + accuracy + 1.))
-        self.assertTrue(dp_val > (dp_val - accuracy - 1.))
+        self.assertTrue(accuracy <= (actual_accuracy + accuracy_extra_leeway))
+        self.assertTrue(accuracy >= (actual_accuracy - accuracy_extra_leeway))
+
+        self.assertTrue(dp_val <= (dp_val + accuracy + accuracy_extra_leeway))
+        self.assertTrue(dp_val > (dp_val - accuracy - accuracy_extra_leeway))
 
         self.assertIn('description', final_dict)
         self.assertIn('text', final_dict['description'])
@@ -452,11 +456,30 @@ class DPMeanStatSpecTest(StatSpecTestCase):
         json_str = json.dumps(final_dict, indent=4)
         print(json_str)
 
-        #print('-- actual vals --')
-        #print(('mean: 30,943.4566'
-        #       '\nmin: -10,000.0'
-        #      '\nmax: 713,000.0'))
+        print('\n-- Actual vals (not clamped) --')
+        print(('Mean: 37.44'
+               '\nMin: 18'
+               '\nMax: 82'))
 
+        dp_val = final_dict['result']['value']
+        accuracy = final_dict['accuracy']['value']
+
+        print('\n-- DP vals --')
+        print(f'Mean: {dp_val}')
+        print(f'Accuracy: {accuracy}')
+
+        actual_accuracy = 0.060305800057980356  # on local Docker run
+        accuracy_extra_leeway = 0.5  # lot of extra leeway for these tests
+
+        self.assertTrue(accuracy <= (actual_accuracy + accuracy_extra_leeway))
+        self.assertTrue(accuracy >= (actual_accuracy - accuracy_extra_leeway))
+
+        self.assertTrue(dp_val <= (dp_val + accuracy + accuracy_extra_leeway))
+        self.assertTrue(dp_val > (dp_val - accuracy - accuracy_extra_leeway))
+
+        self.assertIn('description', final_dict)
+        self.assertIn('text', final_dict['description'])
+        self.assertIn('html', final_dict['description'])
         self.assertIn('description', final_dict)
         self.assertIn('text', final_dict['description'])
         self.assertIn('html', final_dict['description'])

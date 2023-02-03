@@ -6,7 +6,8 @@
       "variable": "EyeHeight",
       "roundedAccuracy": "1.64",
       "accuracy": 1.6370121713420214,
-      "fixedValue": "10"
+      "fixedValue": "10",
+      "result": 0.59
     }
   ],
   "variables": {
