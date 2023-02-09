@@ -4,12 +4,12 @@
       v-model="dialog"
       @click:outside="close"
   >
-    <v-card elevation="2" class="px-10 py-12 add-statistic-dialog">
+    <v-card ref="addStatCard" elevation="2" class="px-10 py-12 add-statistic-dialog">
       <v-icon data-test="Add Statistic Close" style="position: absolute; right: 40px" @click="close"
       >mdi-close
       </v-icon
       >
-      <v-card-title>
+      <v-card-title ref="addStatTitle">
         <h2 data-test='AddStatisticDialog' class="title-size-2 mb-5">{{ formTitle }}</h2>
       </v-card-title>
       <v-card-text class="text--primary">
@@ -608,6 +608,7 @@ export default {
             this.validationError = false
             this.$emit("saveConfirmed", this.editedItemDialog)
             this.selectedStatistic = null
+            this.scrollUp()
           } else {
             this.validationError = true
           }
@@ -684,12 +685,18 @@ export default {
       this.close()
       this.$emit("addVariable")
     },
+    // Reset the Dialog for the next time it is shown
+    scrollUp() {
+      this.$refs.addStatTitle.scrollIntoView()
+    },
     close() {
       this.validationError = false
       this.validationErrorMsg = ""
       this.selectedStatistic = null
       this.resetEditedItemDialog()
       this.$emit("close");
+      this.scrollUp()
+
     },
     resetEditedItemDialog() {
       this.editedItemDialog.statistic = ""
