@@ -11,7 +11,11 @@ ENV WAIT_TIMEOUT=60
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait /wait
 RUN chmod +x /wait
 
+ENV GITHUB_RUN_ID=$RANDOM
 
 ## Launch the wait tool and then Cypress
 ## (The server to wait for is set as an environment variable)
+
+# turn Cypress record for now
+# CMD /wait && cypress run --config-file cypress_github_ci.config.js  --record --key 0a9658f9-4279-488b-8f65-29a6ca0c2d76
 CMD /wait && cypress run --config-file cypress_github_ci.config.js  --record --key 0a9658f9-4279-488b-8f65-29a6ca0c2d76

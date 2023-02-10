@@ -13,6 +13,8 @@ jobs:
       - name: Archive Cypress test results
         if: ${{ always() }}
         uses: actions/upload-artifact@v2
+        env:
+          GITHUB_RUN_ID: test12345
         with:
           name: cypress-videos
           path: client/cypress/videos
