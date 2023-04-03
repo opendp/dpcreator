@@ -1,3 +1,23 @@
+Cypress.Commands.add('loadTeacherSurveyDemo', () => {
+    cy.on('uncaught:exception', (e, runnable) => {
+        console.log('error', e)
+        console.log('runnable', runnable)
+        return false
+    })
+    cy.login('dev_admin', 'admin')
+    cy.request('/cypress-tests/clear-test-data/').then((resp) => {
+        console.log('CLEAR RESP: ' + JSON.stringify(resp))
+    })
+    cy.request('/cypress-tests/setup-demo-data/').then(() => {
+        cy.logout()
+        cy.login('dp_analyst', 'Test-for-2022')
+        cy.visit('/my-data')
+        cy.get('[data-test="continueWorkflow"]').click({force: true})
+
+
+    })
+})
+
 Cypress.Commands.add('login', (username, password) => {
     Cypress.Cookies.debug(true)
     cy.visit('/log-in')
@@ -206,21 +226,22 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
     cy.get('[data-test="notHarmButConfidential"]').check({force: true})
     cy.get('[data-test="radioOnlyOneIndividualPerRowYes"]').check({force: true})
     cy.intercept('/api/profile/run-async-profile/').as('runAsync')
-
+    cy.intercept('/api/dataset-info/*').as('getDatasetInfo')
     // click on continue to go to trigger the profiler and go to the Confirm Variables Page
     cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
-    cy.wait('@runAsync').then(() => {
-        cy.get('h1').should('contain', 'Confirm Variables')
-        const getStore = () => cy.window().its('app.$store')
-        getStore().its('state.dataset.profilerStatus').should('deep.equal', true)
+    cy.wait('@runAsync')
+    cy.wait('@getDatasetInfo')
 
-        //   dataset.profilerStatus
-        for (const key in variableData) {
-            const val = variableData[key]
-            cy.get('table').contains('td', val.name).should('be.visible')
-            cy.get('table').contains('tr', val.name).should('contain', val.type)
-        }
-    })
+    cy.get('h1').should('contain', 'Confirm Variables')
+    const getStore = () => cy.window().its('app.$store')
+    getStore().its('state.dataset.profilerStatus').should('deep.equal', true)
+
+    //   dataset.profilerStatus
+    for (const key in variableData) {
+        const val = variableData[key]
+        cy.get('table').contains('td', val.name).should('be.visible')
+        cy.get('table').contains('tr', val.name).should('contain', val.type)
+    }
 
 
 })
@@ -368,7 +389,7 @@ Cypress.Commands.add('submitStatistics', (demoData) => {
                 expect(releaseInfo.dpRelease.statistics[i].statistic).to.equal(demoData.statistics[i].statistic.toLowerCase())
                 expect(releaseInfo.dpRelease.statistics[i].accuracy.value).to.equal(demoData.statistics[i].accuracy)
                 if (demoData.statistics[i].result) {
-                    const mean = .59
+                    const mean = demoData.statistics[i].result
                     expect(releaseInfo.dpRelease.statistics[i].result.value).to.be.lessThan(mean + (demoData.statistics[i].accuracy))
                     expect(releaseInfo.dpRelease.statistics[i].result.value).to.be.greaterThan(mean - (demoData.statistics[i].accuracy))
                 }
