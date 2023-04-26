@@ -29,6 +29,9 @@ CRYPTOGRAPHY_KEY = os.getenv('CRYPTOGRAPHY_KEY', 'CRYPTOGRAPHY_KEY!-ADD-REAL-KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Added with Django 3.2.18
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'
+
 # Application definition
 
 INSTALLED_APPS = [

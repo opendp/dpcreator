@@ -5,7 +5,6 @@ import uuid as uuid
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django_cryptography.fields import encrypt
 
 from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.models import TimestampedModelWithUUID
@@ -77,7 +76,7 @@ class DataverseUser(TimestampedModelWithUUID):
     first_name = models.CharField(max_length=255, blank=True)
     last_name = models.CharField(max_length=255, blank=True)
 
-    dv_general_token = encrypt(models.CharField(max_length=255, blank=True))
+    dv_general_token = models.CharField(max_length=255, blank=True)
 
     class Meta:
         verbose_name = 'Dataverse User'

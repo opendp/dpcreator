@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class ModelHelpersConfig(AppConfig):
-    name = 'model_helpers'
+    name = 'opendp_apps.model_helpers'

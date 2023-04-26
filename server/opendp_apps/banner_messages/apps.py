@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class BannerMessagesConfig(AppConfig):
-    name = 'banner_messages'
+    name = 'opendp_apps.banner_messages'

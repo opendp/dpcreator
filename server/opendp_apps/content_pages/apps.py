@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class ContentPagesConfig(AppConfig):
-    name = 'content_pages'
+    name = 'opendp_apps.content_pages'

@@ -8,7 +8,6 @@ from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from django_cryptography.fields import encrypt
 from rest_framework.reverse import reverse as drf_reverse
 
 from opendp_apps.dataverses import static_vals as dv_static
@@ -117,7 +116,7 @@ class DataverseParams(TimestampedModelWithUUID):
                                blank=True,
                                help_text='File DOI')
 
-    apiGeneralToken = encrypt(models.CharField(max_length=255))
+    apiGeneralToken = models.CharField(max_length=255)
 
     class Meta:
         abstract = True

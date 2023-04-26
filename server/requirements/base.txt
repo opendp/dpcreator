@@ -2,12 +2,12 @@
 opendp==0.6.1
 
 # Web application
-asgiref==3.2.10
+Django==3.2.18
+asgiref>=3.3.2
 bleach==3.3.0
 certifi==2020.6.20
 chardet==3.0.4
-Django==3.1.13
-django-cryptography==1.0
+# django-cryptography==1.0
 django-extensions==3.0.9
 django-polymorphic==3.0.0
 dj-rest-auth==2.1.3

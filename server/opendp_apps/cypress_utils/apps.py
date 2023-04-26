@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class CypressUtilsConfig(AppConfig):
-    name = 'cypress_utils'
+    name = 'opendp_apps.cypress_utils'

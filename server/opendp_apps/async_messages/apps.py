@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class AsyncMessagesConfig(AppConfig):
-    name = 'async_messages'
+    name = 'opendp_apps.async_messages'
