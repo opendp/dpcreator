@@ -5,7 +5,7 @@
 docker-compose run server python manage.py dumpdata dataverses.registereddataverse \
     user \
     dataset.datasetinfo \
-    analysis.depositorsetupinfo \
+    dataset.depositorsetupinfo \
     dataset.dataversefileinfo \
     --indent=4 \
     > server/opendp_apps/dataset/fixtures/test_dataset_001.json

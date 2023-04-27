@@ -88,8 +88,7 @@
       "persistent_id": "persistent_id1",
       "email": "dv_user@mock.edu",
       "first_name": "Fname",
-      "last_name": "Lname",
-      "dv_general_token": ""
+      "last_name": "Lname"
     }
   },
   {
@@ -104,8 +103,7 @@
       "persistent_id": "https://fed.some-it.some.edu/idp/shibboleth|92459eabc12ec34@some.edu",
       "email": "mock_user@some.edu",
       "first_name": "Mock",
-      "last_name": "User",
-      "dv_general_token": "shoefly-dont-bother-m3"
+      "last_name": "User"
     }
   },
   {
@@ -120,8 +118,7 @@
       "persistent_id": "https://fed.huit.harvard.edu/idp/shibboleth|0e459e6d562ec7e5@harvard.edu",
       "email": "raman_prasad@harvard.edu",
       "first_name": "Raman",
-      "last_name": "Prasad",
-      "dv_general_token": "some-old-token"
+      "last_name": "Prasad"
     }
   },
   {
@@ -957,7 +954,7 @@
     }
   },
   {
-    "model": "analysis.depositorsetupinfo",
+    "model": "dataset",
     "pk": 1,
     "fields": {
       "created": "2021-03-23T17:22:50.889Z",
@@ -972,7 +969,7 @@
     }
   },
   {
-    "model": "analysis.depositorsetupinfo",
+    "model": "dataset",
     "pk": 3,
     "fields": {
       "created": "2021-07-19T19:16:46.533Z",
@@ -987,7 +984,7 @@
     }
   },
   {
-    "model": "analysis.depositorsetupinfo",
+    "model": "dataset",
     "pk": 4,
     "fields": {
       "created": "2021-08-19T21:44:39.488Z",

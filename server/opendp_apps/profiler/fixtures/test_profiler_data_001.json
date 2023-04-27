@@ -80,7 +80,7 @@
     }
   },
   {
-    "model": "analysis.depositorsetupinfo",
+    "model": "dataset",
     "pk": 1,
     "fields": {
       "creator": 1,

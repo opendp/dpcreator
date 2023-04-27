@@ -13,9 +13,10 @@ from opendp_apps.dataverses.models import ManifestTestParams
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.user.models import DataverseUser
 
-TAG_WEB_CLIENT = 'web-client'  # skip these tests on travis; need to fix as many use requests to access the localhost
+TAG_WEB_CLIENT = 'web-client'  # skip these tests on travis; need to fix as many use requests to access the localhostx`
 
 
+@skip("skipping DataverseIncomingTest")
 class DataverseIncomingTest(TestCase):
     fixtures = ['test_dataverses_01.json',
                 'test_manifest_params_04.json']

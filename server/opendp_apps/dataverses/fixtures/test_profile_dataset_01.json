@@ -48,7 +48,7 @@
     }
   },
   {
-    "model": "analysis.depositorsetupinfo",
+    "model": "dataset",
     "pk": 3,
     "fields": {
       "created": "2021-07-19T19:16:46.533Z",

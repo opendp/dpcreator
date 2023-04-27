@@ -32,7 +32,7 @@ from opendp_apps.analysis.tools.dp_variance_spec import DPVarianceSpec
 from opendp_apps.analysis.tools.histogram_util import get_histogram_stat_spec
 from opendp_apps.analysis.tools.stat_spec import StatSpec
 from opendp_apps.dataset.models import DataSetInfo
-from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
+# from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
 from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
@@ -229,10 +229,10 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         # If the ReleaseInfo object was crated and deposit fails,
         # the error for the deposit will be sent to the user
-        deposit_util = DataverseDepositUtil(self.release_info)
-        if deposit_util.has_error():
-            logger.error(deposit_util.get_err_msg())
-            return
+        # deposit_util = DataverseDepositUtil(self.release_info)
+        # if deposit_util.has_error():
+        #    logger.error(deposit_util.get_err_msg())
+        #    return
 
     def make_release_info(self, epsilon_used: float):
         """

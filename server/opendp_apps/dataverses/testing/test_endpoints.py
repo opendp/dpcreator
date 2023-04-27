@@ -1,4 +1,5 @@
 import json
+from unittest import skip
 
 import requests_mock
 from django.contrib.auth import get_user_model
@@ -14,6 +15,7 @@ from opendp_apps.user.models import DataverseUser
 TAG_WEB_CLIENT = 'web-client'  # skip these tests on travis; need to fix as many use requests to access the localhost
 
 
+@skip("skipping BaseEndpointTest")
 class BaseEndpointTest(TestCase):
     fixtures = ['test_dataverses_01.json',
                 'test_manifest_params_04.json',

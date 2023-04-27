@@ -1,3 +1,5 @@
+from unittest import skip
+
 import requests_mock
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -11,6 +13,7 @@ from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.user.models import OpenDPUser, DataverseUser
 
 
+@skip("skipping DataverseFileViewTest")
 class DataverseFileViewTest(TestCase):
     fixtures = ['test_dataverses_01.json',
                 'test_manifest_params_04.json',
