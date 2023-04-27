@@ -5,7 +5,7 @@ from rest_framework.serializers import raise_errors_on_nested_writes
 from rest_framework.utils import model_meta
 from rest_polymorphic.serializers import PolymorphicSerializer
 
-from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.analysis.serializers import AnalysisPlanSerializer
 from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataset.models import DataSetInfo, DataverseFileInfo, UploadFileInfo

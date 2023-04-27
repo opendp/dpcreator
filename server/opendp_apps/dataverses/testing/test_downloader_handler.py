@@ -8,7 +8,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.test import TestCase
 from rest_framework.test import APIClient
 
-from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.dataverses.dataverse_download_handler import DataverseDownloadHandler

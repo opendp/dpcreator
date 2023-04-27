@@ -7,7 +7,7 @@ import os
 from django.conf import settings
 from django.db.models.fields.files import FieldFile
 
-from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck

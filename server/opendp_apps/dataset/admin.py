@@ -5,7 +5,25 @@ from django.http import HttpResponseRedirect
 from django.urls import path
 
 from .models import \
-    (DataSetInfo, DataverseFileInfo, UploadFileInfo)
+    (DepositorSetupInfo, DataSetInfo, DataverseFileInfo, UploadFileInfo)
+
+
+class DepositorSetupInfoAdmin(admin.ModelAdmin):
+    save_on_top = True
+    search_fields = ('dataset__name',)
+    list_filter = ('is_complete',)
+    list_display = ('name',
+                    'user_step',
+                    'epsilon',
+                    'updated',
+                    'created',)
+    readonly_fields = ('id',
+                       'name',
+                       'object_id',
+                       'is_complete',
+                       'variable_info_display',
+                       'created',
+                       'updated',)
 
 
 class DataSetInfoAdmin(admin.ModelAdmin):
@@ -68,9 +86,6 @@ class DataSetInfoAdmin(admin.ModelAdmin):
         return HttpResponseRedirect("../")
 
 
-admin.site.register(DataSetInfo, DataSetInfoAdmin)
-
-
 class DataverseFileInfoAdmin(admin.ModelAdmin):
     save_on_top = True
     search_fields = ('name',)
@@ -87,9 +102,6 @@ class DataverseFileInfoAdmin(admin.ModelAdmin):
     readonly_fields = ('id', 'object_id', 'source', 'created', 'updated',)
 
 
-admin.site.register(DataverseFileInfo, DataverseFileInfoAdmin)
-
-
 class UploadFileInfoAdmin(admin.ModelAdmin):
     save_on_top = True
     search_fields = ('name',)
@@ -102,4 +114,7 @@ class UploadFileInfoAdmin(admin.ModelAdmin):
     readonly_fields = ('id', 'source', 'created', 'updated',)
 
 
+admin.site.register(DataSetInfo, DataSetInfoAdmin)
+admin.site.register(DataverseFileInfo, DataverseFileInfoAdmin)
 admin.site.register(UploadFileInfo, UploadFileInfoAdmin)
+admin.site.register(DepositorSetupInfo, DepositorSetupInfoAdmin)

@@ -20,7 +20,7 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 
 from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 
 

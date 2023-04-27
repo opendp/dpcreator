@@ -5,8 +5,8 @@ from django.db import transaction
 from rest_framework import permissions, status
 from rest_framework.response import Response
 
-from opendp_apps.analysis.models import AnalysisPlan, DepositorSetupInfo, ReleaseInfo
-from opendp_apps.dataset.models import DataSetInfo, UploadFileInfo
+from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
+from opendp_apps.dataset.models import DepositorSetupInfo, DataSetInfo, UploadFileInfo
 from opendp_apps.dataset.permissions import IsOwnerOrBlocked
 from opendp_apps.dataset.serializers import \
     (DataSetInfoPolymorphicSerializer,

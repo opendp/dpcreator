@@ -7,7 +7,7 @@ from django.core.files import File
 from django.core.serializers.json import DjangoJSONEncoder
 from django.test import TestCase
 
-from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.dataverses.models import RegisteredDataverse

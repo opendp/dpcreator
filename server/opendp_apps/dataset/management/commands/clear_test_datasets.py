@@ -3,7 +3,7 @@ Allow deletion of data in between cypress tests
 """
 from django.core.management.base import BaseCommand
 
-from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.dataverses.models import DataverseHandoff
 
 

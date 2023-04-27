@@ -4,7 +4,7 @@ Test of epsilon addition and offsetting floating point anomaly
 from django.test import TestCase
 
 from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.analysis.setup_question_formatter import SetupQuestionFormatter
 from opendp_apps.model_helpers.msg_util import msgt
 

@@ -13,7 +13,10 @@ from django.dispatch import receiver
 from django.utils.safestring import mark_safe
 from polymorphic.models import PolymorphicModel
 
-from opendp_apps.analysis.models import DepositorSetupInfo
+# from opendp_apps.dataset.models import DepositorSetupInfo
+from opendp_apps.utils.extra_validators import validate_not_negative, validate_epsilon_or_none
+from opendp_apps.analysis import static_vals as astatic
+
 from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp, BasicResponse
 from opendp_apps.model_helpers.models import \
@@ -27,6 +30,164 @@ logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 UPLOADED_FILE_STORAGE = FileSystemStorage(location=settings.UPLOADED_FILE_STORAGE_ROOT)
 
+
+class DepositorSetupInfo(TimestampedModelWithUUID):
+    """
+    Metadata and aggregate data about potential release of Dataset
+    """
+
+    class DepositorSteps(models.TextChoices):
+        """
+        Enumeration for different statuses during depositor process
+        """
+        STEP_0100_UPLOADED = 'step_100', 'Step 1: Uploaded'
+        STEP_0200_VALIDATED = 'step_200', 'Step 2: Validated'  # done automatically for Dataverse use case
+        STEP_0300_PROFILING_PROCESSING = 'step_300', 'Step 3: Profiling Processing'
+        STEP_0400_PROFILING_COMPLETE = 'step_400', 'Step 4: Profiling Complete'
+        STEP_0500_VARIABLE_DEFAULTS_CONFIRMED = 'step_500', 'Step 5: Variable Defaults Confirmed'
+        STEP_0600_EPSILON_SET = 'step_600', 'Step 6: Epsilon Set'
+        # Error statuses should begin with 9
+        STEP_9100_VALIDATION_FAILED = 'error_9100', 'Error 1: Validation Failed'
+        STEP_9200_DATAVERSE_DOWNLOAD_FAILED = 'error_9200', 'Error 2: Dataverse Download Failed'
+        STEP_9300_PROFILING_FAILED = 'error_9300', 'Error 3: Profiling Failed'
+        STEP_9400_CREATE_RELEASE_FAILED = 'error_9400', 'Error 4: Create Release Failed'
+
+    # User who initially added/uploaded data
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                on_delete=models.PROTECT)
+
+    # Set on save
+    is_complete = models.BooleanField(default=False,
+                                      help_text='auto-populated on save')
+
+    # Track workflow based on DepositorSteps
+    user_step = models.CharField(max_length=128,
+                                 choices=DepositorSteps.choices,
+                                 default=DepositorSteps.STEP_0100_UPLOADED)
+
+    # Populated from the UI
+    dataset_questions = models.JSONField(null=True, blank=True)
+    epsilon_questions = models.JSONField(null=True, blank=True)
+
+    # Includes variable ranges and categories
+    variable_info = models.JSONField(null=True, blank=True)
+
+    #
+    # Epsilon related fields
+    #
+    default_epsilon = models.FloatField(null=True,
+                                        blank=True,
+                                        help_text='Default based on answers to epsilon_questions.',
+                                        validators=[validate_epsilon_or_none])
+
+    epsilon = models.FloatField(null=True, blank=True,
+                                help_text=('Used for OpenDP operations, starts as the "default_epsilon"'
+                                           ' value but may be overridden by the user.'),
+                                validators=[validate_epsilon_or_none])
+
+    #
+    # Delta related fields
+    #
+    default_delta = models.FloatField(null=True,
+                                      blank=True,
+                                      default=astatic.DELTA_0,
+                                      help_text='Default based on answers to epsilon_questions.',
+                                      validators=[validate_not_negative])
+
+    delta = models.FloatField(null=True,
+                              blank=True,
+                              default=astatic.DELTA_0,
+                              help_text=('Used for OpenDP operations, starts as the "default_delta"'
+                                         ' value but may be overridden by the user.'),
+                              validators=[validate_not_negative])
+
+    confidence_level = models.FloatField( \
+        choices=astatic.CL_CHOICES,
+        default=astatic.CL_95,
+        help_text=('Used for OpenDP operations, starts as the "default_delta"'
+                   ' value but may be overridden by the user.'))
+
+    @property
+    def dataset_size(self):
+        """Return the dataset_size from the DataSetInfo.variable_info"""
+        ds_info = self.get_dataset_info()
+
+        dataset_size_info = ds_info.get_dataset_size()
+
+        if dataset_size_info.success:
+            return dataset_size_info.data
+
+        return None
+
+    class Meta:
+        verbose_name = 'Depositor Setup Data'
+        verbose_name_plural = 'Depositor Setup Data'
+        ordering = ('-created',)
+
+    def __str__(self):
+        if hasattr(self, 'dataversefileinfo'):
+            return f'{self.dataversefileinfo} - {self.user_step}'
+        elif hasattr(self, 'uploadfileinfo'):
+            return f'{self.uploadfileinfo} - {self.user_step}'
+        else:
+            return f'{self.object_id} - {self.user_step}'
+
+    @mark_safe
+    def name(self):
+        return str(self)
+
+    def get_dataset_info(self):
+        """
+        Access a DataSetInfo object, either dataversefileinfo or uploadfileinfo
+        # Workaround for https://github.com/opendp/dpcreator/issues/257
+        """
+        if hasattr(self, 'dataversefileinfo'):
+            return self.dataversefileinfo
+        elif hasattr(self, 'uploadfileinfo'):
+            return self.uploadfileinfo
+
+        raise AttributeError('DepositorSetupInfo does not have access to a DataSetInfo instance')
+
+    def set_user_step(self, new_step: DepositorSteps) -> bool:
+        """Set a new user step. Does *not* save the object."""
+        assert isinstance(new_step, DepositorSetupInfo.DepositorSteps), \
+            "new_step must be a valid choice in DepositorSteps"
+        self.user_step = new_step
+        return True
+
+    def save(self, *args, **kwargs):
+        # Future: is_complete can be auto-filled based on either field values or the STEP
+        #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
+        #       depending on the data
+        #
+        # This ensures that `is_complete` gets added to update_fields or else the process cannot proceed
+        # from the frontend
+        if self.variable_info and self.epsilon \
+                and self.user_step == self.DepositorSteps.STEP_0600_EPSILON_SET:
+            self.is_complete = True
+        else:
+            self.is_complete = False
+
+        if self.variable_info:
+            self.variable_info = format_variable_info(self.variable_info)
+
+        # Specifically for this model, we are overriding the update method with an explicit list of
+        # update_fields, so we need to set the updated field manually.
+        # All other models will be updated without this step due to the auto_now option from the parent class.
+        self.updated = timezone.now()
+        super(DepositorSetupInfo, self).save(*args, **kwargs)
+
+    @mark_safe
+    def variable_info_display(self):
+        """For admin display of the variable info"""
+        if not self.variable_info:
+            return 'n/a'
+
+        try:
+            info_str = json.dumps(self.variable_info, indent=4)
+            return f'<pre>{info_str}</pre>'
+        except Exception as ex_obj:
+            return f'Failed to convert to JSON string {ex_obj}'
 
 class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     """
@@ -324,7 +485,7 @@ class DataverseFileInfo(DataSetInfo):
     file_doi = models.CharField(max_length=255, blank=True)
     dataset_schema_info = models.JSONField(null=True, blank=True)
     file_schema_info = models.JSONField(null=True, blank=True)
-    depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo',
+    depositor_setup_info = models.OneToOneField(DepositorSetupInfo,
                                                 on_delete=models.CASCADE,
                                                 null=True)
 
@@ -409,7 +570,7 @@ class UploadFileInfo(DataSetInfo):
     """
     Refers to a file uploaded independently of DV
     """
-    depositor_setup_info = models.OneToOneField('analysis.DepositorSetupInfo',
+    depositor_setup_info = models.OneToOneField(DepositorSetupInfo,
                                                 on_delete=models.CASCADE,
                                                 null=True)
 

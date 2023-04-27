@@ -9,7 +9,7 @@ from urllib.parse import urlsplit
 import requests
 from django.core.files import File
 
-from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.dataset.models import DataverseFileInfo
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
