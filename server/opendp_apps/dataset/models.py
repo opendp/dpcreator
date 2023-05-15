@@ -10,13 +10,11 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 from polymorphic.models import PolymorphicModel
 
-# from opendp_apps.dataset.models import DepositorSetupInfo
-from opendp_apps.utils.extra_validators import validate_not_negative, validate_epsilon_or_none
 from opendp_apps.analysis import static_vals as astatic
-
 from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp, BasicResponse
 from opendp_apps.model_helpers.models import \
@@ -25,6 +23,9 @@ from opendp_apps.profiler.static_vals_mime_types import get_mime_type
 # Temp workaround!!! See Issue #300
 # https://github.com/opendp/dpcreator/issues/300
 from opendp_apps.utils.camel_to_snake import camel_to_snake
+# from opendp_apps.dataset.models import DepositorSetupInfo
+from opendp_apps.utils.extra_validators import validate_not_negative, validate_epsilon_or_none
+from opendp_apps.utils.variable_info_formatter import format_variable_info
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -188,6 +189,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
             return f'<pre>{info_str}</pre>'
         except Exception as ex_obj:
             return f'Failed to convert to JSON string {ex_obj}'
+
 
 class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     """

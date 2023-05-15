@@ -26,6 +26,8 @@ for app_name in app_names:
 
 - Initial output:
 ```
+python manage.py test --settings=opendp_project.settings.development_test
+
 python manage.py makemigrations model_helpers --settings=opendp_project.settings.development_test
 python manage.py makemigrations content_pages --settings=opendp_project.settings.development_test
 python manage.py makemigrations dataverses --settings=opendp_project.settings.development_test

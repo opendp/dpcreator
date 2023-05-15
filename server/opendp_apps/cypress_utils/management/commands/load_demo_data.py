@@ -9,7 +9,8 @@ from allauth.account.models import EmailAddress as VerifyEmailAddress
 from django.core.files import File
 from django.core.management.base import BaseCommand
 
-from opendp_apps.analysis.models import AnalysisPlan, DepositorSetupInfo
+from opendp_apps.analysis.models import AnalysisPlan
+from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.cypress_utils.management.commands.demo_loading_decorator import check_allow_demo_loading
 from opendp_apps.dataset.models import UploadFileInfo
 from opendp_apps.user.models import OpenDPUser

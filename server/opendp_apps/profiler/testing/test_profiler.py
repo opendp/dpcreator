@@ -2,42 +2,103 @@ import json
 from collections import OrderedDict
 from os.path import abspath, dirname, isfile, join
 
+from allauth.account.models import EmailAddress as VerifyEmailAddress
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.files import File
 from django.core.serializers.json import DjangoJSONEncoder
 from django.test import TestCase
 
-from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.dataset import static_vals as dstatic
-from opendp_apps.dataset.models import DataSetInfo
-from opendp_apps.dataverses.models import RegisteredDataverse
+from opendp_apps.dataset.models import DataSetInfo, UploadFileInfo
+from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.profiler import tasks as profiler_tasks
 from opendp_apps.profiler.profile_runner import ProfileRunner
+from opendp_apps.user.models import OpenDPUser
 from opendp_apps.utils.camel_to_snake import camel_to_snake
+from opendp_apps.utils.randname import get_rand_alphanumeric
 
 CURRENT_DIR = dirname(abspath(__file__))
-TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
+TEST_DATA_DIR = join(CURRENT_DIR, 'test_files')
 PROFILER_FIXTURES_DIR = join(dirname(CURRENT_DIR), 'fixtures')
 
 
 class ProfilerTest(TestCase):
-    fixtures = ['test_profiler_data_001.json']
+    # fixtures = ['test_profiler_data_002.json']
 
     def setUp(self):
         """Used for multiple tests"""
-        self.ds_01_object_id = "9255c067-e435-43bd-8af1-33a6987ffc9b"
-        """
-        # test client
-        self.client = Client()
 
-        self.user_obj, _created = get_user_model().objects.get_or_create(username='dv_depositor')
+        # Create OpenDP user
+        #
+        self.depositor_username = 'dp_depositor'
+        self.depositor_password = f'p_{get_rand_alphanumeric(10)}'
+        depositor_user = get_user_model().objects.create(username=self.depositor_username,
+                                                         first_name='DP',
+                                                         last_name='Depositor',
+                                                         email='test_depositor@opendp.org')
+        depositor_user.set_password(self.depositor_password)
+        depositor_user.save()
+        self.depositor_user_object_id = str(depositor_user.object_id)
 
-        self.client.force_login(self.user_obj)
+        verify_depositor = VerifyEmailAddress(user=depositor_user,
+                                              email=depositor_user.email,
+                                              primary=True,
+                                              verified=True)
+        verify_depositor.save()
 
-        self.mock_params = ManifestTestParams.objects.filter(use_mock_dv_api=True).first()
-        """
+        # Create UploadFileInfo
+        #
+        depositor_setup = self.get_depositor_setup_info(depositor_user)
+
+        self.test_file_info = UploadFileInfo.objects.create(
+            name='Teacher Survey',
+            creator=depositor_user,
+            # data_profile=self.get_data_profile(),
+            # profile_variables=self.get_data_profile(),
+            depositor_setup_info=depositor_setup,
+        )
+        self.test_file_info.save()
+
+        # Add File to UploadFileInfo
+        #
+        filename = 'teacher_survey.csv'
+        filepath = join(TEST_DATA_DIR, filename)
+        assert isfile(filepath), f'Failed to find test data file: {filepath}'
+
+        django_file = File(open(filepath, 'rb'))
+        self.test_file_info.source_file.save(filename, django_file)
+        self.test_file_info.save()
+
+    def get_depositor_setup_info(self, opendp_user: OpenDPUser) -> DepositorSetupInfo:
+        """Create and return a DepositorSetupInfo object"""
+
+        dataset_questions = {"radio_best_describes": "notHarmButConfidential",
+                             "radio_only_one_individual_per_row": "yes",
+                             "radio_depend_on_private_information": "yes"}
+
+        epsilon_questions = {"secret_sample": "no",
+                             "population_size": "",
+                             "observations_number_can_be_public": "yes"}
+
+        depositor_setup = DepositorSetupInfo.objects.create(
+            creator=opendp_user,
+            user_step=DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED,
+            dataset_questions=dataset_questions,
+            epsilon_questions=epsilon_questions,
+            # variable_info=self.get_variable_info(),
+            default_epsilon=1.0,
+            epsilon=1.0,
+            default_delta=1e-05,
+            delta=1e-05,
+            confidence_level=0.95
+        )
+
+        depositor_setup.save()
+
+        return depositor_setup
 
     def profile_good_file(self, filename, num_features_profile, num_rows, **kwargs):
         """Used by multiple tests...."""
@@ -109,6 +170,7 @@ class ProfilerTest(TestCase):
         params = {pstatic.KEY_SAVE_ROW_COUNT: False}
         self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 1500, **params)
 
+    # @skip('test_010_profile_good_file')
     def test_010_profile_good_file(self):
         """(10) Profile file directory"""
         msgt(self.test_010_profile_good_file.__doc__)
@@ -121,7 +183,7 @@ class ProfilerTest(TestCase):
 
         # Retrieve DataSetInfo, save the file to this object
         #
-        dsi = DataSetInfo.objects.get(object_id=self.ds_01_object_id)
+        dsi = DataSetInfo.objects.get(object_id=self.test_file_info.object_id)
         self.assertEqual(dsi.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
 
@@ -195,11 +257,14 @@ class ProfilerTest(TestCase):
 
         # Retrieve DataSetInfo
         #
-        dsi = DataSetInfo.objects.get(object_id=self.ds_01_object_id)
+        dsi = DataSetInfo.objects.get(object_id=self.test_file_info.object_id)
         self.assertEqual(dsi.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
 
-        # Try to profile and empty Django FileField
+        # Try to profile an empty Django FileField
+        #
+        dsi.source_file.delete()
+        dsi.save()
         profiler = profiler_tasks.run_profile_by_filefield(dsi.object_id)
 
         # Error!
@@ -207,7 +272,7 @@ class ProfilerTest(TestCase):
         self.assertTrue(pstatic.ERR_MSG_SOURCE_FILE_DOES_NOT_EXIST in profiler.get_err_msg())
 
         # Retrieve the saved DataSetInfo, the DepositorSetupInfo should have a new status
-        dsi2 = DataSetInfo.objects.get(object_id=self.ds_01_object_id)
+        dsi2 = DataSetInfo.objects.get(object_id=self.test_file_info.object_id)
         self.assertEqual(dsi2.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
 
@@ -215,7 +280,7 @@ class ProfilerTest(TestCase):
         """(35) Not a Django FieldFile"""
         msgt(self.test_35_not_filefield.__doc__)
 
-        dsi = DataSetInfo.objects.get(object_id=self.ds_01_object_id)
+        dsi = DataSetInfo.objects.get(object_id=self.test_file_info.object_id)
 
         params = {pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD: True,
                   pstatic.KEY_DATASET_OBJECT_ID: dsi.object_id,
@@ -228,7 +293,7 @@ class ProfilerTest(TestCase):
         self.assertTrue(pstatic.ERR_MSG_DATASET_POINTER_NOT_FIELDFILE in profiler.get_err_msg())
 
         # Retrieve the saved DataSetInfo, the DepositorSetupInfo should have a new status
-        dsi2 = DataSetInfo.objects.get(object_id=self.ds_01_object_id)
+        dsi2 = DataSetInfo.objects.get(object_id=self.test_file_info.object_id)
         self.assertEqual(dsi2.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
 
@@ -238,7 +303,7 @@ class ProfilerTest(TestCase):
 
         # Retrieve DataSetInfo
         #
-        dsi = DataSetInfo.objects.get(object_id=self.ds_01_object_id)
+        dsi = DataSetInfo.objects.get(object_id=self.test_file_info.object_id)
         self.assertEqual(dsi.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
 
@@ -264,7 +329,7 @@ class ProfilerTest(TestCase):
 
         # Re-retrieve DataSetInfo
         #
-        dsi2 = DataSetInfo.objects.get(object_id=self.ds_01_object_id)
+        dsi2 = DataSetInfo.objects.get(object_id=self.test_file_info.object_id)
 
         info = dsi2.data_profile_as_dict()
 
@@ -296,9 +361,7 @@ class ProfilerTest(TestCase):
 
         # Get a real but incorrect object_id
         #
-        reg_dv = RegisteredDataverse.objects.first()
-        self.assertIsNotNone(reg_dv)
-        bad_dataset_object_id = reg_dv.object_id
+        bad_dataset_object_id = self.depositor_user_object_id
 
         # Run the profile using the Django file field
         profiler = profiler_tasks.run_profile_by_filefield(bad_dataset_object_id, settings.PROFILER_COLUMN_LIMIT)
