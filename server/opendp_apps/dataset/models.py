@@ -34,13 +34,14 @@ UPLOADED_FILE_STORAGE = FileSystemStorage(location=settings.UPLOADED_FILE_STORAG
 
 class DepositorSetupInfo(TimestampedModelWithUUID):
     """
-    Metadata and aggregate data about potential release of Dataset
+    Variable related to the Depositor Setup process
     """
 
     class DepositorSteps(models.TextChoices):
         """
         Enumeration for different statuses during depositor process
         """
+        STEP_0000_INITIALIZED = 'step_000', 'Step 0: Initialized'
         STEP_0100_UPLOADED = 'step_100', 'Step 1: Uploaded'
         STEP_0200_VALIDATED = 'step_200', 'Step 2: Validated'  # done automatically for Dataverse use case
         STEP_0300_PROFILING_PROCESSING = 'step_300', 'Step 3: Profiling Processing'
@@ -64,7 +65,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     # Track workflow based on DepositorSteps
     user_step = models.CharField(max_length=128,
                                  choices=DepositorSteps.choices,
-                                 default=DepositorSteps.STEP_0100_UPLOADED)
+                                 default=DepositorSteps.STEP_0000_INITIALIZED)
 
     # Populated from the UI
     dataset_questions = models.JSONField(null=True, blank=True)
@@ -102,11 +103,22 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
                                          ' value but may be overridden by the user.'),
                               validators=[validate_not_negative])
 
-    confidence_level = models.FloatField( \
-        choices=astatic.CL_CHOICES,
-        default=astatic.CL_95,
-        help_text=('Used for OpenDP operations, starts as the "default_delta"'
-                   ' value but may be overridden by the user.'))
+    confidence_level = models.FloatField(choices=astatic.CL_CHOICES,
+                                         default=astatic.CL_95,
+                                         help_text=('Used for OpenDP operations, starts as the "default_delta"'
+                                                    ' value but may be overridden by the user.'))
+
+    class WizardSteps(models.TextChoices):
+        """
+        Enumeration for different statuses during depositor process
+        """
+        STEP_0100_DATASET_QUESTIONS = 'step_100', 'Step 1: Dataset Questions'
+        STEP_0200_CONFIRM_VARIABLES = 'step_200', 'Step 2: Confirm Variables'
+        STEP_0300_SET_EPSILON = 'step_300', 'Step 3: Set Epsilon'
+
+    wizard_step = models.CharField(max_length=128,
+                                   choices=WizardSteps.choices,
+                                   default=WizardSteps.STEP_0100_DATASET_QUESTIONS)
 
     @property
     def dataset_size(self):
@@ -137,6 +149,35 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     def name(self):
         return str(self)
 
+    def set_user_step_based_on_data(self):
+        """Based on the data, update the "user_step" field
+        @rtype: object
+        """
+        self.is_complete = False
+
+        # These error states are should not be changed
+        if self.user_step == DepositorSetupInfo.DepositorSteps.STEP_9200_DATAVERSE_DOWNLOAD_FAILED:
+            return
+        if self.user_step == DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED:
+            return
+        if self.user_step == DepositorSetupInfo.DepositorSteps.STEP_9400_CREATE_RELEASE_FAILED:
+            return
+
+        # Keep updating the user step based on the data available. A bit inefficient, but should
+        # stop where data available for that step
+        self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0000_INITIALIZED)
+        if self.get_dataset_info().source_file:
+            self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
+        if self.dataset_questions and self.epsilon_questions:
+            self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0200_VALIDATED)
+        if self.get_dataset_info().data_profile:
+            self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
+        elif self.variable_info:
+            self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0500_VARIABLE_DEFAULTS_CONFIRMED)
+        elif self.epsilon:
+            self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0600_EPSILON_SET)
+            self.is_complete = True
+
     def get_dataset_info(self):
         """
         Access a DataSetInfo object, either dataversefileinfo or uploadfileinfo
@@ -157,20 +198,11 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         return True
 
     def save(self, *args, **kwargs):
-        # Future: is_complete can be auto-filled based on either field values or the STEP
-        #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
-        #       depending on the data
-        #
-        # This ensures that `is_complete` gets added to update_fields or else the process cannot proceed
-        # from the frontend
-        if self.variable_info and self.epsilon \
-                and self.user_step == self.DepositorSteps.STEP_0600_EPSILON_SET:
-            self.is_complete = True
-        else:
-            self.is_complete = False
-
+        """Override the save method to set the user_step based on the data"""
         if self.variable_info:
             self.variable_info = format_variable_info(self.variable_info)
+
+        self.set_user_step_based_on_data()
 
         # Specifically for this model, we are overriding the update method with an explicit list of
         # update_fields, so we need to set the updated field manually.
@@ -210,14 +242,18 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     source = models.CharField(max_length=128,
                               choices=SourceChoices.choices)
 
-    # Switch to encryption!
-    #
-    data_profile = models.JSONField(default=None,
+    depositor_setup_info = models.OneToOneField(DepositorSetupInfo,
+                                                on_delete=models.CASCADE,
+                                                null=True)
+
+    data_profile = models.JSONField(help_text='Unverified data profile',
+                                    default=None,
                                     null=True,
                                     blank=True,
                                     encoder=DjangoJSONEncoder)
 
-    profile_variables = models.JSONField(default=None,
+    profile_variables = models.JSONField(help_text='Deprecated! Do not use',
+                                         default=None,
                                          null=True, blank=True,
                                          encoder=DjangoJSONEncoder)
 
@@ -271,10 +307,44 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
         return info
 
+    def save(self, *args, **kwargs):
+        """Make sure there is a DepositorSetupInfo object"""
+        if not self.depositor_setup_info:
+            # Set default DepositorSetupInfo object
+            dsi = DepositorSetupInfo.objects.create(creator=self.creator)
+            self.depositor_setup_info = dsi
+
+        # Specifically for this model, we are overriding the update method with an explicit list of
+        # update_fields, so we need to set the updated field manually.
+        # All other models will be updated without this step due to the auto_now option from the parent class.
+        self.updated = timezone.now()
+
+        super(DepositorSetupInfo, self).save(*args, **kwargs)
+
     @property
-    def depositor_setup_info(self):
-        """shortcut to access the DepositorSetupInfo"""
-        return self.get_depositor_setup_info()
+    def status(self):
+        """
+        Return the user_step object
+        """
+        try:
+            return self.depositor_setup_info.user_step
+        except DepositorSetupInfo.DoesNotExist:
+            return DepositorSetupInfo.DepositorSteps.STEP_0000_INITIALIZED
+
+    @property
+    def status_name(self):
+        """
+        Return the user_step label
+        """
+        try:
+            return self.depositor_setup_info.user_step.label
+        except DepositorSetupInfo.DoesNotExist:
+            return DepositorSetupInfo.DepositorSteps.STEP_0000_INITIALIZED.label
+
+    # @property
+    # def depositor_setup_info(self):
+    #    """shortcut to access the DepositorSetupInfo"""
+    #    return self.get_depositor_setup_info()
 
     def is_dataverse_file_info(self):
         """Is this an instance of a DataverseFileInfo object?"""
@@ -290,19 +360,19 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
         return isinstance(self.get_real_instance(), UploadFileInfo)
 
-    def get_depositor_setup_info(self):
-        """Hack; need to address https://github.com/opendp/dpcreator/issues/257"""
-        try:
-            return self.get_real_instance().depositor_setup_info
-        except AttributeError as err_obj:
-            user_msg = (f'Unknown DataSetinfo type. No access to depositor_setup_info.'
-                        f' depositor_setup_info. class:'
-                        f' {self.get_real_instance().__class__}. err: {err_obj}')
-            logger.error(user_msg)
-            raise AttributeError(user_msg)
+    # def get_depositor_setup_info(self):
+    #    """Hack; need to address https://github.com/opendp/dpcreator/issues/257"""
+    #    try:
+    #        return self.get_real_instance().depositor_setup_info
+    #    except AttributeError as err_obj:
+    #        user_msg = (f'Unknown DataSetinfo type. No access to depositor_setup_info.'
+    #                    f' depositor_setup_info. class:'
+    #                    f' {self.get_real_instance().__class__}. err: {err_obj}')
+    #        logger.error(user_msg)
+    #       raise AttributeError(user_msg)
 
     def get_dataset_size(self) -> BasicResponse:
-        """Retrieve the rowCount index from the data_profile -- not always avaiable"""
+        """Retrieve the rowCount index from the data_profile -- not always available"""
         if not self.data_profile:
             return err_resp('Data profile not available')
 
@@ -402,17 +472,17 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         return err_resp(f'Index not found for variable "{var_name}"')
 
     def get_profile_variables(self):
-        """Return the profile_variables and DataSetInfo object_id as an OrderedDict or None."""
-        if not self.profile_variables:
+        """Return the data profile and DataSetInfo object_id as an OrderedDict or None."""
+        if not self.data_profile:
             return None
 
         od = OrderedDict(dict(object_id=self.object_id))
-        od.update(self.profile_variables)
+        od.update(self.data_profile)
 
         return od
 
     def data_profile_as_dict(self):
-        """Return the dataprofile as a dict or None. Messy in that this is an encrypted JSONField"""
+        """Return the dataprofile as a dict or None."""
         if not self.data_profile:
             return None
 
@@ -434,7 +504,6 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     def data_profile_as_json_str(self):
         """
         Return the dataprofile as a dict or None.
-        Messy in that this is an encrypted JSONField
         """
         if not self.data_profile:
             return None
@@ -487,9 +556,6 @@ class DataverseFileInfo(DataSetInfo):
     file_doi = models.CharField(max_length=255, blank=True)
     dataset_schema_info = models.JSONField(null=True, blank=True)
     file_schema_info = models.JSONField(null=True, blank=True)
-    depositor_setup_info = models.OneToOneField(DepositorSetupInfo,
-                                                on_delete=models.CASCADE,
-                                                null=True)
 
     class Meta:
         verbose_name = 'Dataverse File Information'
@@ -509,36 +575,12 @@ class DataverseFileInfo(DataSetInfo):
         Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
               depending on the data
         """
-        if not self.depositor_setup_info:
-            dsi = DepositorSetupInfo.objects.create(creator=self.creator)
-            self.depositor_setup_info = dsi
-
         if not self.name:
             self.name = f'{self.dataset_doi} ({self.dv_installation})'
 
         self.source = DataSetInfo.SourceChoices.Dataverse
 
         super(DataverseFileInfo, self).save(*args, **kwargs)
-
-    @property
-    def status(self):
-        """
-        Return the user_step object
-        """
-        try:
-            return self.depositor_setup_info.user_step
-        except DepositorSetupInfo.DoesNotExist:
-            return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED
-
-    @property
-    def status_name(self):
-        """
-        Return the user_step label
-        """
-        try:
-            return self.depositor_setup_info.user_step.label
-        except DepositorSetupInfo.DoesNotExist:
-            return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED.label
 
     def as_dict(self):
         """
@@ -569,12 +611,7 @@ class DataverseFileInfo(DataSetInfo):
 
 
 class UploadFileInfo(DataSetInfo):
-    """
-    Refers to a file uploaded independently of DV
-    """
-    depositor_setup_info = models.OneToOneField(DepositorSetupInfo,
-                                                on_delete=models.CASCADE,
-                                                null=True)
+    """Used to handle files uploaded by the user"""
 
     def get_file_type(self):
         """
@@ -590,11 +627,6 @@ class UploadFileInfo(DataSetInfo):
         #       depending on the data
         #
         self.source = DataSetInfo.SourceChoices.UserUpload
-
-        if not self.depositor_setup_info:
-            # Set default DepositorSetupInfo object
-            dsi = DepositorSetupInfo.objects.create(creator=self.creator)
-            self.depositor_setup_info = dsi
 
         super(UploadFileInfo, self).save(*args, **kwargs)
 
@@ -619,26 +651,6 @@ class UploadFileInfo(DataSetInfo):
                     object_id=self.object_id.hex)
 
         return info
-
-    @property
-    def status(self):
-        """
-        Return the user_step object
-        """
-        try:
-            return self.depositor_setup_info.user_step
-        except DepositorSetupInfo.DoesNotExist:
-            return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED
-
-    @property
-    def status_name(self):
-        """
-        Return the user_step label
-        """
-        try:
-            return self.depositor_setup_info.user_step.label
-        except DepositorSetupInfo.DoesNotExist:
-            return DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED.label
 
 
 # ----------------------------------------------------------------------

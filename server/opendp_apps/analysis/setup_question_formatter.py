@@ -41,8 +41,8 @@ class SetupQuestionFormatter(BasicErrCheck):
         if self.dsetup_info.dataset_questions:
             setup_questions = dict(setup_questions, **self.dsetup_info.dataset_questions)
 
-        if self.dsetup_info.epsilon_questions:
-            setup_questions = dict(setup_questions, **self.dsetup_info.epsilon_questions)
+        #if self.dsetup_info.epsilon_questions:
+        #   setup_questions = dict(setup_questions, **self.dsetup_info.epsilon_questions)
 
         qnum = 0
         for qattr in astatic.SETUP_QUESTION_LIST:
