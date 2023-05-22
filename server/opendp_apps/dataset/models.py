@@ -71,8 +71,15 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     dataset_questions = models.JSONField(null=True, blank=True)
     epsilon_questions = models.JSONField(null=True, blank=True)
 
+
+    unverified_data_profile = models.JSONField(help_text='Unverified data profile',
+                                               default=None,
+                                               null=True,
+                                               blank=True,
+                                               encoder=DjangoJSONEncoder)
+
     # Includes variable ranges and categories
-    variable_info = models.JSONField(null=True, blank=True)
+    data_profile = models.JSONField(null=True, blank=True)
 
     #
     # Epsilon related fields
@@ -112,9 +119,11 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         """
         Enumeration for different statuses during depositor process
         """
-        STEP_0100_DATASET_QUESTIONS = 'step_100', 'Step 1: Dataset Questions'
-        STEP_0200_CONFIRM_VARIABLES = 'step_200', 'Step 2: Confirm Variables'
-        STEP_0300_SET_EPSILON = 'step_300', 'Step 3: Set Epsilon'
+        STEP_0100_DATASET_QUESTIONS = 'step_100', 'Step 1: New Dataset Info'
+        STEP_0200_DATASET_QUESTIONS = 'step_200', 'Step 2: File Upload'
+        STEP_0300_DATASET_QUESTIONS = 'step_300', 'Step 3: Dataset Questions'
+        STEP_0400_CONFIRM_VARIABLES = 'step_400', 'Step 4: Confirm Variables'
+        STEP_0500_SET_EPSILON = 'step_500', 'Step 5: Set Epsilon'
 
     wizard_step = models.CharField(max_length=128,
                                    choices=WizardSteps.choices,
@@ -138,12 +147,11 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         ordering = ('-created',)
 
     def __str__(self):
-        if hasattr(self, 'dataversefileinfo'):
-            return f'{self.dataversefileinfo} - {self.user_step}'
-        elif hasattr(self, 'uploadfileinfo'):
-            return f'{self.uploadfileinfo} - {self.user_step}'
-        else:
-            return f'{self.object_id} - {self.user_step}'
+        ds_info = self.get_dataset_info()
+        if ds_info:
+            return f'{ds_info} - {self.user_step}'
+
+        return f'{self.object_id} - {self.user_step}'
 
     @mark_safe
     def name(self):
@@ -166,13 +174,15 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         # Keep updating the user step based on the data available. A bit inefficient, but should
         # stop where data available for that step
         self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0000_INITIALIZED)
+        if not self.get_dataset_info():
+            return
         if self.get_dataset_info().source_file:
             self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
         if self.dataset_questions and self.epsilon_questions:
             self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0200_VALIDATED)
         if self.get_dataset_info().data_profile:
             self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
-        elif self.variable_info:
+        elif self.data_profile:
             self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0500_VARIABLE_DEFAULTS_CONFIRMED)
         elif self.epsilon:
             self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0600_EPSILON_SET)
@@ -183,12 +193,15 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         Access a DataSetInfo object, either dataversefileinfo or uploadfileinfo
         # Workaround for https://github.com/opendp/dpcreator/issues/257
         """
-        if hasattr(self, 'dataversefileinfo'):
-            return self.dataversefileinfo
-        elif hasattr(self, 'uploadfileinfo'):
-            return self.uploadfileinfo
+        if hasattr(self, 'ds_info'):
+            if hasattr(self.ds_info, 'uploadfileinfo'):
+                return self.ds_info.uploadfileinfo
+            elif hasattr(self.ds_info, 'dataversefileinfo'):
+                return self.ds_info.dataversefileinfo
+            else:
+                return self.ds_info
 
-        raise AttributeError('DepositorSetupInfo does not have access to a DataSetInfo instance')
+        return None
 
     def set_user_step(self, new_step: DepositorSteps) -> bool:
         """Set a new user step. Does *not* save the object."""
@@ -199,8 +212,8 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
 
     def save(self, *args, **kwargs):
         """Override the save method to set the user_step based on the data"""
-        if self.variable_info:
-            self.variable_info = format_variable_info(self.variable_info)
+        if self.data_profile:
+            self.data_profile = format_variable_info(self.data_profile)
 
         self.set_user_step_based_on_data()
 
@@ -211,13 +224,13 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         super(DepositorSetupInfo, self).save(*args, **kwargs)
 
     @mark_safe
-    def variable_info_display(self):
+    def data_profile_view(self):
         """For admin display of the variable info"""
-        if not self.variable_info:
+        if not self.data_profile:
             return 'n/a'
 
         try:
-            info_str = json.dumps(self.variable_info, indent=4)
+            info_str = json.dumps(self.data_profile, indent=4)
             return f'<pre>{info_str}</pre>'
         except Exception as ex_obj:
             return f'Failed to convert to JSON string {ex_obj}'
@@ -228,6 +241,9 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     Base type for table that either holds DV data
     or a file upload
     """
+    # user who initially added/uploaded data
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                on_delete=models.PROTECT)
 
     class SourceChoices(models.TextChoices):
         UserUpload = 'upload', 'Upload'
@@ -235,33 +251,18 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
     name = models.CharField(max_length=128)
 
-    # user who initially added/uploaded data
-    creator = models.ForeignKey(settings.AUTH_USER_MODEL,
-                                on_delete=models.PROTECT)
-
     source = models.CharField(max_length=128,
                               choices=SourceChoices.choices)
 
-    depositor_setup_info = models.OneToOneField(DepositorSetupInfo,
-                                                on_delete=models.CASCADE,
-                                                null=True)
-
-    data_profile = models.JSONField(help_text='Unverified data profile',
-                                    default=None,
-                                    null=True,
-                                    blank=True,
-                                    encoder=DjangoJSONEncoder)
-
-    profile_variables = models.JSONField(help_text='Deprecated! Do not use',
-                                         default=None,
-                                         null=True, blank=True,
-                                         encoder=DjangoJSONEncoder)
-
-    # Switch to encryption!
-    #
     source_file = models.FileField(storage=UPLOADED_FILE_STORAGE,
                                    upload_to='source-file/%Y/%m/%d/',
                                    blank=True, null=True)
+
+    depositor_setup_info = models.OneToOneField(DepositorSetupInfo,
+                                                related_name='ds_info',
+                                                null=True,
+                                                #blank=True,
+                                                on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Dataset Information'
@@ -309,9 +310,11 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
     def save(self, *args, **kwargs):
         """Make sure there is a DepositorSetupInfo object"""
+        print('DataSetInfo.save()')
         if not self.depositor_setup_info:
             # Set default DepositorSetupInfo object
             dsi = DepositorSetupInfo.objects.create(creator=self.creator)
+            dsi.save()
             self.depositor_setup_info = dsi
 
         # Specifically for this model, we are overriding the update method with an explicit list of
@@ -319,7 +322,7 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         # All other models will be updated without this step due to the auto_now option from the parent class.
         self.updated = timezone.now()
 
-        super(DepositorSetupInfo, self).save(*args, **kwargs)
+        super(DataSetInfo, self).save(*args, **kwargs)
 
     @property
     def status(self):
@@ -536,14 +539,10 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     @mark_safe
     def data_profile_display(self):
         """For admin display of the variable info"""
-        if not self.data_profile:
+        if not self.depositor_setup_info:
             return 'n/a'
 
-        try:
-            info_str = json.dumps(self.data_profile, indent=4)
-            return f'<pre>{info_str}</pre>'
-        except Exception as ex_obj:
-            return f'Failed to convert to JSON string {ex_obj}'
+        return self.depositor_setup_info.data_profile_display()
 
 
 class DataverseFileInfo(DataSetInfo):
@@ -622,6 +621,8 @@ class UploadFileInfo(DataSetInfo):
         return get_mime_type(file_extension, '(unknown file type)')
 
     def save(self, *args, **kwargs):
+        print('UploadFileInfo.save()')
+
         # Future: is_complete can be auto-filled based on either field values or the STEP
         #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
         #       depending on the data
@@ -656,25 +657,29 @@ class UploadFileInfo(DataSetInfo):
 # ----------------------------------------------------------------------
 # post_delete used for removing depositor_setup_info OneToOneField's
 # ----------------------------------------------------------------------
-@receiver(post_delete, sender=DataverseFileInfo)
-def post_delete_depositor_info_from_dv_file_info(sender, instance, *args, **kwargs):
+@receiver(post_delete, sender=DataSetInfo)
+def post_delete_depositor_info_from_dataset_info(sender, instance, *args, **kwargs):
     # Delete the DepositorSetupInfo object -- a OneToOneField
-    DepositorSetupModel = apps.get_model(app_label='analysis', model_name='DepositorSetupInfo')
-
     try:
         if instance.depositor_setup_info:
             instance.depositor_setup_info.delete()
-    except DepositorSetupModel.DoesNotExist:
+    except DepositorSetupInfo.DoesNotExist:
         print('Does not exist. Already deleted.')
 
+@receiver(post_delete, sender=DataverseFileInfo)
+def post_delete_depositor_info_from_dv_file_info(sender, instance, *args, **kwargs):
+    # Delete the DepositorSetupInfo object -- a OneToOneField
+    try:
+        if instance.depositor_setup_info:
+            instance.depositor_setup_info.delete()
+    except DepositorSetupInfo.DoesNotExist:
+        print('Does not exist. Already deleted.')
 
 @receiver(post_delete, sender=UploadFileInfo)
 def post_delete_depositor_info_from_upload_file_info(sender, instance, *args, **kwargs):
     # Delete the DepositorSetupInfo object -- a OneToOneField
-    DepositorSetupModel = apps.get_model(app_label='analysis', model_name='DepositorSetupInfo')
-
     try:
         if instance.depositor_setup_info:  # just in case user is not specified
             instance.depositor_setup_info.delete()
-    except DepositorSetupModel.DoesNotExist:
+    except DepositorSetupInfo.DoesNotExist:
         print('Does not exist. Already deleted.')

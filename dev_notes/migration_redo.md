@@ -13,5 +13,10 @@ rm -rf opendp_apps/analysis/migrations \
     opendp_apps/user/migrations 
 
 
-python manage.py makemigrations dataverses user dataset terms_of_access content_pages analysis communication profiler
+python manage.py makemigrations dataverses user dataset terms_of_access content_pages analysis profiler
+# communication
+
+export DJANGO_SETTINGS_MODULE=opendp_project.settings.development_test
+
+python manage.py makemigrations dataset
 ```

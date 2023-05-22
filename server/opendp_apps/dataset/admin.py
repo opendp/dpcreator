@@ -21,7 +21,7 @@ class DepositorSetupInfoAdmin(admin.ModelAdmin):
                        'name',
                        'object_id',
                        'is_complete',
-                       'variable_info_display',
+                       'data_profile_view',
                        'created',
                        'updated',)
 
@@ -41,6 +41,7 @@ class DataSetInfoAdmin(admin.ModelAdmin):
     readonly_fields = ('id',
                        'object_id',
                        'source',
+                       'depositor_setup_info',
                        'data_profile_display',
                        'created', 'updated',)
 
@@ -99,7 +100,12 @@ class DataverseFileInfoAdmin(admin.ModelAdmin):
                     'updated',
                     'created',)
     list_display_links = ('id', 'name')
-    readonly_fields = ('id', 'object_id', 'source', 'created', 'updated',)
+    readonly_fields = ('id',
+                       'object_id',
+                       'source',
+                       'depositor_setup_info',
+                       'created',
+                       'updated',)
 
 
 class UploadFileInfoAdmin(admin.ModelAdmin):
@@ -111,7 +117,11 @@ class UploadFileInfoAdmin(admin.ModelAdmin):
                     'creator',
                     'updated',
                     'created',)
-    readonly_fields = ('id', 'source', 'created', 'updated',)
+    readonly_fields = ('id',
+                       'source',
+                       'depositor_setup_info',
+                       'created',
+                       'updated',)
 
 
 admin.site.register(DataSetInfo, DataSetInfoAdmin)
