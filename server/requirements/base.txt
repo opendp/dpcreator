@@ -30,7 +30,7 @@ python-dotenv==0.15.0
 pyparsing==2.4.7
 pytz==2020.1
 redis==3.5.3
-requests==2.25.1
+requests==2.31.0
 scipy==1.7.2
 sendgrid==6.4.7
 simplejson==3.17.5
