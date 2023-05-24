@@ -51,10 +51,10 @@ router.register(r'analyze', AnalysisPlanViewSet, basename='analyze')
 router.register(r'banner-messages', BannerMessageViewSet, basename='banner-messages')
 
 router.register(r'dataset-info', DataSetInfoViewSet)
-router.register(r'dv-user', DataverseUserView, basename='dv-user')
+# router.register(r'dv-user', DataverseUserView, basename='dv-user')
 router.register(r'deposit', DepositorSetupViewSet, basename='deposit')
 
-router.register(r'dv-handoff', DataverseHandoffView, basename='dv-handoff')
+# router.register(r'dv-handoff', DataverseHandoffView, basename='dv-handoff')
 router.register(r'dv-file', DataverseFileView, basename='dv-file')
 router.register(r'direct-upload', UploadFileSetupViewSet, basename='direct-upload')
 

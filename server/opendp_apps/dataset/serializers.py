@@ -8,7 +8,7 @@ from rest_polymorphic.serializers import PolymorphicSerializer
 from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.analysis.serializers import AnalysisPlanSerializer
 from opendp_apps.dataset import static_vals as dstatic
-from opendp_apps.dataset.models import DataSetInfo, DataverseFileInfo, UploadFileInfo
+from opendp_apps.dataset.models import DepositorSetupInfo, DataSetInfo, DataverseFileInfo, UploadFileInfo
 from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.basic_response import BasicResponse, ok_resp, err_resp
 from opendp_apps.user.models import OpenDPUser
@@ -82,14 +82,22 @@ class DepositorSetupInfoSerializer(serializers.ModelSerializer):
         fields = ['object_id', 'id', 'created', 'updated',
                   'is_complete',
                   'user_step',
+                  # 'user_step_label',
+                  'wizard_step',
                   'dataset_questions',
                   'epsilon_questions',
                   'dataset_size',
-                  'variable_info',
+                  'unverified_data_profile',
+                  'data_profile',
                   'default_epsilon', 'epsilon',
                   'default_delta', 'delta',
                   'confidence_level']
-        read_only_fields = ['object_id', 'id', 'created', 'updated', 'is_complete']
+        read_only_fields = ['object_id',
+                            'id',
+                            'user_step',
+                            'created',
+                            'updated',
+                            'is_complete']
 
     def update(self, instance, validated_data):
         """
@@ -199,8 +207,10 @@ class UploadFileInfoCreationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UploadFileInfo
-        fields = ['object_id', 'name', 'source_file', 'creator']
+        fields = ['object_id', 'name', 'source_file', 'creator',]
 
+    def save(self, **kwargs):
+        return super().save(**kwargs)
 
 class DataSetInfoPolymorphicSerializer(PolymorphicSerializer):
     model_serializer_mapping = {

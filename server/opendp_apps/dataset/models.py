@@ -153,6 +153,20 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
 
         return f'{self.object_id} - {self.user_step}'
 
+
+    def save(self, *args, **kwargs):
+        """Override the save method to set the user_step based on the data"""
+        if self.data_profile:
+            self.data_profile = format_variable_info(self.data_profile)
+
+        self.set_user_step_based_on_data()
+
+        # Specifically for this model, we are overriding the update method with an explicit list of
+        # update_fields, so we need to set the updated field manually.
+        # All other models will be updated without this step due to the auto_now option from the parent class.
+        self.updated = timezone.now()
+        super(DepositorSetupInfo, self).save(*args, **kwargs)
+
     @mark_safe
     def name(self):
         return str(self)
@@ -178,15 +192,24 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
             return
         if self.get_dataset_info().source_file:
             self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
+        else:
+            return
+
         if self.dataset_questions and self.epsilon_questions:
             self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0200_VALIDATED)
-        if self.get_dataset_info().data_profile:
+        else:
+            return
+
+        if self.data_profile:
             self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
-        elif self.data_profile:
-            self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0500_VARIABLE_DEFAULTS_CONFIRMED)
-        elif self.epsilon:
+        else:
+            return
+
+        if self.epsilon:
             self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0600_EPSILON_SET)
             self.is_complete = True
+        else:
+            return
 
     def get_dataset_info(self):
         """
@@ -210,19 +233,6 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         self.user_step = new_step
         return True
 
-    def save(self, *args, **kwargs):
-        """Override the save method to set the user_step based on the data"""
-        if self.data_profile:
-            self.data_profile = format_variable_info(self.data_profile)
-
-        self.set_user_step_based_on_data()
-
-        # Specifically for this model, we are overriding the update method with an explicit list of
-        # update_fields, so we need to set the updated field manually.
-        # All other models will be updated without this step due to the auto_now option from the parent class.
-        self.updated = timezone.now()
-        super(DepositorSetupInfo, self).save(*args, **kwargs)
-
     @mark_safe
     def data_profile_view(self):
         """For admin display of the variable info"""
@@ -235,6 +245,10 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         except Exception as ex_obj:
             return f'Failed to convert to JSON string {ex_obj}'
 
+    @mark_safe
+    def user_step_label(self) -> str:
+        """Return the label for the user step"""
+        return self.user_step.get_user_step_display()
 
 class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     """
@@ -311,10 +325,11 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     def save(self, *args, **kwargs):
         """Make sure there is a DepositorSetupInfo object"""
         print('DataSetInfo.save()')
+        initial_link_of_depositor_setup_info = False
         if not self.depositor_setup_info:
             # Set default DepositorSetupInfo object
+            initial_link_of_depositor_setup_info = True
             dsi = DepositorSetupInfo.objects.create(creator=self.creator)
-            dsi.save()
             self.depositor_setup_info = dsi
 
         # Specifically for this model, we are overriding the update method with an explicit list of
@@ -323,6 +338,11 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         self.updated = timezone.now()
 
         super(DataSetInfo, self).save(*args, **kwargs)
+
+        if initial_link_of_depositor_setup_info is True:
+            # Save again to correct set the user_step on the DepositorSetupInfo object
+            self.depositor_setup_info.save()
+
 
     @property
     def status(self):
@@ -664,7 +684,8 @@ def post_delete_depositor_info_from_dataset_info(sender, instance, *args, **kwar
         if instance.depositor_setup_info:
             instance.depositor_setup_info.delete()
     except DepositorSetupInfo.DoesNotExist:
-        print('Does not exist. Already deleted.')
+        pass
+        # print('Does not exist. Already deleted.')
 
 @receiver(post_delete, sender=DataverseFileInfo)
 def post_delete_depositor_info_from_dv_file_info(sender, instance, *args, **kwargs):
@@ -673,6 +694,7 @@ def post_delete_depositor_info_from_dv_file_info(sender, instance, *args, **kwar
         if instance.depositor_setup_info:
             instance.depositor_setup_info.delete()
     except DepositorSetupInfo.DoesNotExist:
+        pass
         print('Does not exist. Already deleted.')
 
 @receiver(post_delete, sender=UploadFileInfo)
@@ -682,4 +704,5 @@ def post_delete_depositor_info_from_upload_file_info(sender, instance, *args, **
         if instance.depositor_setup_info:  # just in case user is not specified
             instance.depositor_setup_info.delete()
     except DepositorSetupInfo.DoesNotExist:
-        print('Does not exist. Already deleted.')
+        pass
+        # print('Does not exist. Already deleted.')

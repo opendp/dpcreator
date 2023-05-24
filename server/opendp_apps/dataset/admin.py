@@ -19,6 +19,7 @@ class DepositorSetupInfoAdmin(admin.ModelAdmin):
                     'created',)
     readonly_fields = ('id',
                        'name',
+                       'user_step',
                        'object_id',
                        'is_complete',
                        'data_profile_view',
