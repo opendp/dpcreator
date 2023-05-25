@@ -8,7 +8,9 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
+from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.dataset.models import DepositorSetupInfo
+from opendp_apps.dataset.serializers import DepositorSetupInfoSerializer
 from opendp_apps.model_helpers.msg_util import msgt
 
 CURRENT_DIR = dirname(abspath(__file__))
@@ -64,6 +66,10 @@ class TestFileUpload(TestCase):
         jresp = resp.json()
         self.assertTrue('depositor_setup_info' in jresp)
         self.assertTrue('object_id' in jresp['depositor_setup_info'])
+
+        self.assertEqual(jresp['depositor_setup_info']['is_complete'], False)
+        self.assertEqual(jresp['depositor_setup_info']['user_step'],
+                         str(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED))
 
         return jresp
 
@@ -132,10 +138,6 @@ class TestFileUpload(TestCase):
         ds_info = self.get_dataset_info_via_api(ds_object_id)
         # print('ds_info', ds_info)
 
-        self.assertEqual(ds_info['depositor_setup_info']['is_complete'], False)
-        self.assertEqual(ds_info['depositor_setup_info']['user_step'],
-                         str(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED))
-
         # (3) Update depositor info: epsilon questions, dataset_questions
         #
 
@@ -164,8 +166,6 @@ class TestFileUpload(TestCase):
         self.assertEqual(update_resp_json['dataset_questions'], new_dataset_questions)
         self.assertEqual(update_resp_json['user_step'],
                          str(DepositorSetupInfo.DepositorSteps.STEP_0200_VALIDATED))
-
-        print('update_resp_json', update_resp_json)
 
         # (4) Update depositor info: default_epsilon, epsilon
         #
@@ -211,3 +211,64 @@ class TestFileUpload(TestCase):
                          str(DepositorSetupInfo.DepositorSteps.STEP_0600_EPSILON_SET))
 
         # print('update_resp_json', update_resp_json)
+
+    #     new_dataset_questions = {"radio_best_describes": "notHarmButConfidential",
+    #                              "radio_only_one_individual_per_row": "yes",
+    #                              "radio_depend_on_private_information": "yes"}
+
+    def test_60_epsilon_question_serializer(self):
+        """(60) Test epsilon question serializer"""
+        msgt(self.test_60_epsilon_question_serializer.__doc__)
+
+        new_epsilon_questions = {"secret_sample": "yes",
+                                 "population_size": -7000,
+                                 astatic.SETUP_Q_05_ATTR: "no"}
+
+        # Cannot have a negative population size
+        #
+        serializer = DepositorSetupInfoSerializer(data=dict(epsilon_questions=new_epsilon_questions, ))
+
+        self.assertFalse(serializer.is_valid())
+        self.assertTrue('epsilon_questions' in serializer.errors)
+
+        _epsilon_err_msg = str(serializer.errors['epsilon_questions'][0])
+        _expected_err = astatic.ERR_MSG_POPULATION_CANNOT_BE_NEGATIVE.format(pop_size=-7000)
+        self.assertEqual(_epsilon_err_msg, _expected_err)
+
+        # Should have a yes or no value
+        #
+        _bad_val_yes_or_no = "should-be-yes-or-no"
+        new_epsilon_questions = {astatic.SETUP_Q_05_ATTR: _bad_val_yes_or_no}
+        serializer = DepositorSetupInfoSerializer(data=dict(epsilon_questions=new_epsilon_questions, ))
+
+        self.assertFalse(serializer.is_valid())
+        self.assertTrue('epsilon_questions' in serializer.errors)
+
+        _epsilon_err_msg = str(serializer.errors['epsilon_questions'][0])
+        _expected_err = astatic.ERR_MSG_DATASET_YES_NO_QUESTIONS_INVALID_VALUE.format(
+                            key=astatic.SETUP_Q_05_ATTR,
+                            value=_bad_val_yes_or_no)
+        self.assertEqual(_epsilon_err_msg, _expected_err)
+
+        # Unknown attribute
+        #
+        new_epsilon_questions = {'bad_attribute': 'why is it here?'}
+        serializer = DepositorSetupInfoSerializer(data=dict(epsilon_questions=new_epsilon_questions, ))
+
+        self.assertFalse(serializer.is_valid())
+        self.assertTrue('epsilon_questions' in serializer.errors)
+
+        _epsilon_err_msg = str(serializer.errors['epsilon_questions'][0])
+        _expected_err = astatic.ERR_MSG_DATASET_QUESTIONS_INVALID_KEY.format(key='bad_attribute')
+        self.assertEqual(_epsilon_err_msg, _expected_err)
+
+        # No values: also valid
+        #
+        serializer = DepositorSetupInfoSerializer(data=dict(epsilon_questions=None))
+        self.assertTrue(serializer.is_valid())
+
+        serializer = DepositorSetupInfoSerializer(data=dict(epsilon_questions={}))
+        self.assertTrue(serializer.is_valid())
+
+        serializer = DepositorSetupInfoSerializer(data=dict(epsilon_questions=''))
+        self.assertTrue(serializer.is_valid())

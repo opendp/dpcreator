@@ -119,15 +119,14 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         """
         Enumeration for different statuses during depositor process
         """
-        STEP_0100_DATASET_QUESTIONS = 'step_100', 'Step 1: New Dataset Info'
-        STEP_0200_DATASET_QUESTIONS = 'step_200', 'Step 2: File Upload'
-        STEP_0300_DATASET_QUESTIONS = 'step_300', 'Step 3: Dataset Questions'
-        STEP_0400_CONFIRM_VARIABLES = 'step_400', 'Step 4: Confirm Variables'
-        STEP_0500_SET_EPSILON = 'step_500', 'Step 5: Set Epsilon'
+        STEP_0100_FILE_UPLOAD = 'step_100', 'Step 1: File Upload'
+        STEP_0200_DATASET_QUESTIONS = 'step_200', 'Step 2: Dataset Questions'
+        STEP_0300_CONFIRM_VARIABLES = 'step_300', 'Step 3: Confirm Variables'
+        STEP_0400_SET_EPSILON = 'step_400', 'Step 4: Set Epsilon'
 
     wizard_step = models.CharField(max_length=128,
                                    choices=WizardSteps.choices,
-                                   default=WizardSteps.STEP_0100_DATASET_QUESTIONS)
+                                   default=WizardSteps.STEP_0100_FILE_UPLOAD)
 
     @property
     def dataset_size(self):
@@ -188,20 +187,24 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         # Keep updating the user step based on the data available. A bit inefficient, but should
         # stop where data available for that step
         self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0000_INITIALIZED)
+        self.set_wizard_step(DepositorSetupInfo.WizardSteps.STEP_0100_FILE_UPLOAD)
         if not self.get_dataset_info():
             return
         if self.get_dataset_info().source_file:
             self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
+            self.set_wizard_step(DepositorSetupInfo.WizardSteps.STEP_0200_DATASET_QUESTIONS)
         else:
             return
 
         if self.dataset_questions and self.epsilon_questions:
             self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0200_VALIDATED)
+            self.set_wizard_step(DepositorSetupInfo.WizardSteps.STEP_0300_CONFIRM_VARIABLES)
         else:
             return
 
         if self.data_profile:
             self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
+            self.set_wizard_step(DepositorSetupInfo.WizardSteps.STEP_0400_SET_EPSILON)
         else:
             return
 
@@ -231,6 +234,13 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         assert isinstance(new_step, DepositorSetupInfo.DepositorSteps), \
             "new_step must be a valid choice in DepositorSteps"
         self.user_step = new_step
+        return True
+
+    def set_wizard_step(self, new_wizard_step: WizardSteps) -> bool:
+        """Set a new user step. Does *not* save the object."""
+        assert isinstance(new_wizard_step, DepositorSetupInfo.WizardSteps), \
+            "new_step must be a valid choice in DepositorSteps"
+        self.wizard_step = new_wizard_step
         return True
 
     @mark_safe

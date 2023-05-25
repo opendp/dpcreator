@@ -180,10 +180,12 @@ SETUP_Q_02_ANSWERS = dict(
                            ' recommended.'),
                           None),
 )
+SETUP_Q_02_CHOICES = SETUP_Q_02_ANSWERS.keys()
 
 SETUP_Q_03_ATTR = 'radio_only_one_individual_per_row'
 SETUP_Q_03_TEXT = ('Does each individual appear in only one row?',
                    'Used to help determine dataset distance.')
+
 
 SETUP_Q_04_ATTR = 'secret_sample'
 SETUP_Q_04_TEXT = ('Is your data a secret and simple random sample from a larger population?',
@@ -198,6 +200,11 @@ SETUP_Q_05_TEXT = ('Can the number of observations in your data file be made pub
                    ('If the data file size can be made public, we don\'t need to spend a portion'
                     ' of your privacy budget to estimate it.'))
 
+YES_VALUE = 'yes'
+NO_VALUE = 'no'
+YES_NO_VALUES = [YES_VALUE, NO_VALUE]
+YES_NO_QUESTIONS = [SETUP_Q_01_ATTR, SETUP_Q_03_ATTR, SETUP_Q_04_ATTR, SETUP_Q_05_ATTR]
+
 SETUP_QUESTION_LOOKUP = {
     SETUP_Q_01_ATTR: SETUP_Q_01_TEXT,
     SETUP_Q_02_ATTR: SETUP_Q_02_TEXT,
@@ -207,6 +214,19 @@ SETUP_QUESTION_LOOKUP = {
 }
 SETUP_QUESTION_LIST = [SETUP_Q_01_ATTR,
                        SETUP_Q_02_ATTR,
-                       SETUP_Q_03_ATTR,
-                       SETUP_Q_04_ATTR,
-                       SETUP_Q_05_ATTR]
+                       SETUP_Q_03_ATTR,]
+                       #SETUP_Q_04_ATTR,
+                       #SETUP_Q_05_ATTR]
+
+EPSILON_QUESTION_LIST = [SETUP_Q_04_ATTR,
+                         SETUP_Q_04a_ATTR,
+                         SETUP_Q_05_ATTR]
+
+ERR_MSG_DATASET_QUESTIONS_NOT_DICT = 'Dataset questions must be a dictionary'
+ERR_MSG_DATASET_QUESTIONS_INVALID_KEY= 'Invalid key for dataset questions: "{key}"'
+ERR_MSG_DATASET_QUESTIONS_INVALID_VALUE = 'Invalid value ("{value}") for dataset question {"{key}"}'
+ERR_MSG_DATASET_YES_NO_QUESTIONS_INVALID_VALUE = ('Dataset question "{key}" should have'
+                                                  ' a "yes" or "no" answer, not "{value}"')
+ERR_MSG_POPULATION_SIZE_MISSING = ('If this is a sample from a population, the population size'
+                                   ' must be an integer. Currently, it is: {pop_size}')
+ERR_MSG_POPULATION_CANNOT_BE_NEGATIVE = ('The population must be a positive integer. Currently, it is: {pop_size}')

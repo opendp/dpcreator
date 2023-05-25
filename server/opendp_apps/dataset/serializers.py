@@ -8,6 +8,7 @@ from rest_polymorphic.serializers import PolymorphicSerializer
 from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.analysis.serializers import AnalysisPlanSerializer
 from opendp_apps.dataset import static_vals as dstatic
+from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.dataset.models import DepositorSetupInfo, DataSetInfo, DataverseFileInfo, UploadFileInfo
 from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.basic_response import BasicResponse, ok_resp, err_resp
@@ -99,8 +100,79 @@ class DepositorSetupInfoSerializer(serializers.ModelSerializer):
                             'updated',
                             'is_complete']
 
+    def validate_dataset_questions(self, value):
+        """
+        Check that the object_id belongs to an existing DataSetInfo object
+        """
+        # blank/null values are okay
+        if not value:
+            return None
+
+        # Is it a dict?
+        if not isinstance(value, dict):
+            raise serializers.ValidationError(astatic.ERR_MSG_DATASET_QUESTIONS_NOT_DICT)
+
+        question_keys = astatic.SETUP_QUESTION_LOOKUP.keys()
+        for qkey, qval in value.items():
+            # Is the question key valid?
+            if qkey not in question_keys:
+                raise serializers.ValidationError(astatic.ERR_MSG_DATASET_QUESTIONS_INVALID_KEY.format(key=qkey))
+
+            # Is the question #2 answer valid?
+            if qkey == astatic.SETUP_Q_02_ATTR:
+                if not qval in astatic.SETUP_Q_02_CHOICES:
+                    _err_msg = astatic.ERR_MSG_DATASET_QUESTIONS_INVALID_VALUE.format(key=qkey, value=qval)
+                    raise serializers.ValidationError(_err_msg)
+
+            if qkey in astatic.YES_NO_QUESTIONS:
+                if qval not in astatic.YES_NO_VALUES:
+                    _err_msg = astatic.ERR_MSG_DATASET_YES_NO_QUESTIONS_INVALID_VALUE.format(key=qkey, value=qval)
+                    raise serializers.ValidationError(_err_msg)
+
+        return value
+
+    def validate_epsilon_questions(self, value):
+        """
+        Check that the object_id belongs to an existing DataSetInfo object
+        """
+        # blank/null values are okay
+        if not value:
+            return None
+
+        # Is it a dict?
+        if not isinstance(value, dict):
+            raise serializers.ValidationError(astatic.ERR_MSG_DATASET_QUESTIONS_NOT_DICT)
+
+        question_keys = astatic.EPSILON_QUESTION_LIST
+        for qkey, qval in value.items():
+            # Is the question key valid?
+            if qkey not in question_keys:
+                raise serializers.ValidationError(astatic.ERR_MSG_DATASET_QUESTIONS_INVALID_KEY.format(key=qkey))
+
+            # Is the question #4 yes?
+            if qkey == astatic.SETUP_Q_04_ATTR and qval == astatic.YES_VALUE:
+                if not astatic.SETUP_Q_04a_ATTR in value:
+                    _err_msg = astatic.ERR_MSG_POPULATION_SIZE_MISSING.format(pop_size=None)
+                    raise serializers.ValidationError(_err_msg)
+
+                pop_size = value.get(astatic.SETUP_Q_04a_ATTR)
+                if not isinstance(value.get(astatic.SETUP_Q_04a_ATTR), int):
+                    _err_msg = astatic.ERR_MSG_POPULATION_SIZE_MISSING.format(pop_size=pop_size)
+                    raise serializers.ValidationError(_err_msg)
+                elif pop_size < 1:
+                    _err_msg = astatic.ERR_MSG_POPULATION_CANNOT_BE_NEGATIVE.format(pop_size=pop_size)
+                    raise serializers.ValidationError(_err_msg)
+
+            if qkey in astatic.YES_NO_QUESTIONS:
+                if qval not in astatic.YES_NO_VALUES:
+                    _err_msg = astatic.ERR_MSG_DATASET_YES_NO_QUESTIONS_INVALID_VALUE.format(key=qkey, value=qval)
+                    raise serializers.ValidationError(_err_msg)
+
+        return value
+
     def update(self, instance, validated_data):
         """
+        (Is this still valid? Why was there a race condition? RP, 5/24/2023
         Override default update method to counteract race conditions.
         (See https://github.com/encode/django-rest-framework/issues/5897)
         :param instance:
