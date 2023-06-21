@@ -8,7 +8,8 @@ if not os.path.isdir(USER_UPLOADED_DATA_DIR):
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(LOCAL_SETUP_DIR, 'db_opendp_app.db3')
+        'NAME': os.path.join(LOCAL_SETUP_DIR, 'db_opendp_app.db3'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
     }
 }
 

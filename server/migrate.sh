@@ -37,7 +37,7 @@ python /code/server/manage.py loaddata opendp_apps/dataverses/fixtures/admin_ema
   opendp_apps/dataverses/fixtures/test_dataverses_01.json \
   opendp_apps/dataverses/fixtures/test_user_emailaddress.json \
   opendp_apps/banner_messages/fixtures/*.json
-#   opendp_apps/dataset/fixtures/*.json 
+#   opendp_apps/dataset/fixtures/*.json
 echo "------------------------------"
 echo "| Clear several test fixtures |"
 echo "| (for dev)                   |"

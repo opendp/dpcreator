@@ -4,14 +4,15 @@ from http import HTTPStatus
 from os.path import abspath, dirname, join
 
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.dataset.models import DepositorSetupInfo
-from opendp_apps.dataset.serializers import DepositorSetupInfoSerializer
 from opendp_apps.model_helpers.msg_util import msgt
+from opendp_apps.utils.extra_validators import VALIDATE_MSG_EPSILON
 
 CURRENT_DIR = dirname(abspath(__file__))
 FIXTURE_DATA_DIR = join(dirname(CURRENT_DIR), 'fixtures')
@@ -74,7 +75,7 @@ class TestFileUpload(TestCase):
         return jresp
 
     def get_depositor_setup_info_via_api(self, dataset_object_id: str) -> DepositorSetupInfo:
-        """Convenience method to get a dataset info object via the API"""
+        """Convenience method to get a depositor info object via the API"""
         assert dataset_object_id, "dataset_object_id cannot be None"
 
         setup_info_url = f'/api/dataset-info/{dataset_object_id}/'
@@ -85,7 +86,6 @@ class TestFileUpload(TestCase):
         self.assertTrue('object_id' in jresp['depositor_setup_info'])
 
         return DepositorSetupInfo.objects.get(object_id=jresp['depositor_setup_info']['object_id'])
-
 
     def test_10_file_upload_api(self):
         """(10) Test File Upload API"""
@@ -161,6 +161,7 @@ class TestFileUpload(TestCase):
         new_epsilon_questions = {"secret_sample": "no",
                                  "population_size": "not applicable",
                                  "observations_number_can_be_public": "no"}
+
         new_dataset_questions = {"radio_best_describes": "notHarmButConfidential",
                                  "radio_only_one_individual_per_row": "yes",
                                  "radio_depend_on_private_information": "yes"}
@@ -182,7 +183,6 @@ class TestFileUpload(TestCase):
 
         # (4) Update depositor info: default_epsilon, epsilon
         #
-        update_resp = update_resp_json = None
         new_data_profile = json.load(open(join(FIXTURE_DATA_DIR, 'test_data_profile_teacher_survey.json'), 'r'))
 
         update_payload = dict(data_profile=new_data_profile)
@@ -203,7 +203,6 @@ class TestFileUpload(TestCase):
 
         # (5) Update depositor info: default_epsilon, epsilon
         #
-        update_resp = update_resp_json = None
         new_default_epsilon = 0.5
         new_epsilon = 0.75
 
@@ -230,72 +229,73 @@ class TestFileUpload(TestCase):
         ds_info_json = self.upload_file_via_api()
         print('ds_info_json', ds_info_json)
         depositor_info = self.get_depositor_setup_info_via_api(ds_info_json['object_id'])
-        print('depositor_info', depositor_info.epsilon)
 
+        # (a) Trigger validation error for:
+        #   - invalid population size
+        #   - invalid epsilon
+        #
         new_epsilon_questions = {"secret_sample": "yes",
                                  "population_size": -7000,
                                  astatic.SETUP_Q_05_ATTR: "no"}
 
         depositor_info.epsilon_questions = new_epsilon_questions
         depositor_info.epsilon = -1.0
-        depositor_info.full_clean()
-        depositor_info.save()
-        print('depositor_info', depositor_info.epsilon_questions)
 
-        # print(depositor_info.)
+        with self.assertRaises(ValidationError) as context:
+            depositor_info.full_clean()
+        err_dict = context.exception.error_dict
 
-        return
-        # Cannot have a negative population size
+        self.assertTrue('epsilon_questions' in err_dict)
+        self.assertEqual(err_dict['epsilon_questions'][0].message,
+                         astatic.ERR_MSG_POPULATION_CANNOT_BE_NEGATIVE.format(pop_size=-7000))
+
+        self.assertTrue('epsilon' in err_dict)
+        self.assertEqual(err_dict['epsilon'][0].message, VALIDATE_MSG_EPSILON)
+
+        # (b) Trigger validation error for:
+        #   - invalid "yes" or "no" value
         #
-        serializer = DepositorSetupInfoSerializer(data=dict(epsilon_questions=new_epsilon_questions, ))
-        dinfo = DepositorSetupInfo(**dict(epsilon_questions=new_epsilon_questions, ))
-        dinfo.save()
-        #print('serializer', serializer.is_valid())
-        return
-        self.assertFalse(serializer.is_valid())
-        self.assertTrue('epsilon_questions' in serializer.errors)
+        depositor_info = self.get_depositor_setup_info_via_api(ds_info_json['object_id'])
 
-        _epsilon_err_msg = str(serializer.errors['epsilon_questions'][0])
-        _expected_err = astatic.ERR_MSG_POPULATION_CANNOT_BE_NEGATIVE.format(pop_size=-7000)
-        self.assertEqual(_epsilon_err_msg, _expected_err)
-
-        # Should have a yes or no value
-        #
         _bad_val_yes_or_no = "should-be-yes-or-no"
-        new_epsilon_questions = {astatic.SETUP_Q_05_ATTR: _bad_val_yes_or_no}
-        serializer = DepositorSetupInfoSerializer(data=dict(epsilon_questions=new_epsilon_questions, ))
+        depositor_info.epsilon_questions = {astatic.SETUP_Q_05_ATTR: _bad_val_yes_or_no}
 
-        self.assertFalse(serializer.is_valid())
-        self.assertTrue('epsilon_questions' in serializer.errors)
+        with self.assertRaises(ValidationError) as context:
+            depositor_info.full_clean()
+        err_dict = context.exception.error_dict
 
-        _epsilon_err_msg = str(serializer.errors['epsilon_questions'][0])
+        self.assertTrue('epsilon_questions' in err_dict)
+
         _expected_err = astatic.ERR_MSG_DATASET_YES_NO_QUESTIONS_INVALID_VALUE.format(
-                            key=astatic.SETUP_Q_05_ATTR,
-                            value=_bad_val_yes_or_no)
-        self.assertEqual(_epsilon_err_msg, _expected_err)
+            key=astatic.SETUP_Q_05_ATTR,
+            value=_bad_val_yes_or_no)
+        self.assertEqual(err_dict['epsilon_questions'][0].message, _expected_err)
 
-        # Unknown attribute
+        # (c) Trigger validation error for:
+        #   - Unknown attribute
         #
-        new_epsilon_questions = {'bad_attribute': 'why is it here?'}
-        serializer = DepositorSetupInfoSerializer(data=dict(epsilon_questions=new_epsilon_questions, ))
+        depositor_info = self.get_depositor_setup_info_via_api(ds_info_json['object_id'])
+        depositor_info.epsilon_questions = {'unknown_attribute': 'why is it here?'}
+        with self.assertRaises(ValidationError) as context:
+            depositor_info.full_clean()
 
-        self.assertFalse(serializer.is_valid())
-        self.assertTrue('epsilon_questions' in serializer.errors)
+        err_dict = context.exception.error_dict
+        self.assertTrue('epsilon_questions' in err_dict)
 
-        _epsilon_err_msg = str(serializer.errors['epsilon_questions'][0])
-        _expected_err = astatic.ERR_MSG_DATASET_QUESTIONS_INVALID_KEY.format(key='bad_attribute')
-        self.assertEqual(_epsilon_err_msg, _expected_err)
+        _expected_err = astatic.ERR_MSG_DATASET_QUESTIONS_INVALID_KEY.format(key='unknown_attribute')
+        self.assertEqual(err_dict['epsilon_questions'][0].message, _expected_err)
 
-        # No values: also valid
+        # Make sure that NOT setting the "epsilon_questions" value IS valid:
+        #   - epsilon_questions
         #
-        serializer = DepositorSetupInfoSerializer(data=dict(epsilon_questions=None))
-        self.assertTrue(serializer.is_valid())
-
-        serializer = DepositorSetupInfoSerializer(data=dict(epsilon_questions={}))
-        self.assertTrue(serializer.is_valid())
-
-        serializer = DepositorSetupInfoSerializer(data=dict(epsilon_questions=''))
-        self.assertTrue(serializer.is_valid())
+        possible_vals = [None, {}, '']
+        for pval in possible_vals:
+            depositor_info.epsilon_questions = pval
+            try:
+                depositor_info.full_clean()
+            except ValidationError as _err_obj:
+                user_msg = f'ValidationError raised when "epsilon_questions" set to "{pval}"'
+                self.fail(user_msg)
 
     def test_70_update_depositor_info_bad_epsilon(self):
         """(70) Test bad epsilon API update"""
@@ -320,6 +320,7 @@ class TestFileUpload(TestCase):
         new_epsilon_questions = {"secret_sample": "no",
                                  "population_size": "7000",
                                  "observations_number_can_be_public": "no"}
+
         new_dataset_questions = {"radio_best_describes": "notHarmButConfidential",
                                  "radio_only_one_individual_per_row": "yes",
                                  "radio_depend_on_private_information": "yes"}
@@ -341,7 +342,6 @@ class TestFileUpload(TestCase):
 
         # (4) Update depositor info: default_epsilon, epsilon
         #
-        update_resp = update_resp_json = None
         new_data_profile = json.load(open(join(FIXTURE_DATA_DIR, 'test_data_profile_teacher_survey.json'), 'r'))
 
         update_payload = dict(data_profile=new_data_profile)
@@ -362,7 +362,6 @@ class TestFileUpload(TestCase):
 
         # (5) Update depositor info: default_epsilon, epsilon
         #
-        update_resp = update_resp_json = None
         new_default_epsilon = 0.5
         new_epsilon = 0.75
 
