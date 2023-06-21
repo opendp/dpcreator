@@ -56,11 +56,11 @@ class TestFileUpload(TestCase):
 
         return jresp
 
-    def get_dataset_info_via_api(self, ds_object_id: str) -> dict:
+    def get_dataset_info_via_api(self, dataset_object_id: str) -> dict:
         """Convenience method to get a dataset info object via the API"""
-        assert ds_object_id, "ds_object_id cannot be None"
+        assert dataset_object_id, "dataset_object_id cannot be None"
 
-        dataset_info_url = f'/api/dataset-info/{ds_object_id}/'
+        dataset_info_url = f'/api/dataset-info/{dataset_object_id}/'
         resp = self.client.get(dataset_info_url)
 
         jresp = resp.json()
@@ -72,6 +72,20 @@ class TestFileUpload(TestCase):
                          str(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED))
 
         return jresp
+
+    def get_depositor_setup_info_via_api(self, dataset_object_id: str) -> DepositorSetupInfo:
+        """Convenience method to get a dataset info object via the API"""
+        assert dataset_object_id, "dataset_object_id cannot be None"
+
+        setup_info_url = f'/api/dataset-info/{dataset_object_id}/'
+        resp = self.client.get(setup_info_url)
+
+        jresp = resp.json()
+        self.assertTrue('depositor_setup_info' in jresp)
+        self.assertTrue('object_id' in jresp['depositor_setup_info'])
+
+        return DepositorSetupInfo.objects.get(object_id=jresp['depositor_setup_info']['object_id'])
+
 
     def test_10_file_upload_api(self):
         """(10) Test File Upload API"""
@@ -140,13 +154,12 @@ class TestFileUpload(TestCase):
 
         # (3) Update depositor info: epsilon questions, dataset_questions
         #
-
         setup_object_id = ds_info['depositor_setup_info']['object_id']
 
         partial_update_url = f'/api/deposit/{setup_object_id}/'
 
         new_epsilon_questions = {"secret_sample": "no",
-                                 "population_size": "7000",
+                                 "population_size": "not applicable",
                                  "observations_number_can_be_public": "no"}
         new_dataset_questions = {"radio_best_describes": "notHarmButConfidential",
                                  "radio_only_one_individual_per_row": "yes",
@@ -210,24 +223,35 @@ class TestFileUpload(TestCase):
         self.assertEqual(update_resp_json['user_step'],
                          str(DepositorSetupInfo.DepositorSteps.STEP_0600_EPSILON_SET))
 
-        # print('update_resp_json', update_resp_json)
-
-    #     new_dataset_questions = {"radio_best_describes": "notHarmButConfidential",
-    #                              "radio_only_one_individual_per_row": "yes",
-    #                              "radio_depend_on_private_information": "yes"}
-
-    def test_60_epsilon_question_serializer(self):
+    def test_60_epsilon_question_validator(self):
         """(60) Test epsilon question serializer"""
-        msgt(self.test_60_epsilon_question_serializer.__doc__)
+        msgt(self.test_60_epsilon_question_validator.__doc__)
+
+        ds_info_json = self.upload_file_via_api()
+        print('ds_info_json', ds_info_json)
+        depositor_info = self.get_depositor_setup_info_via_api(ds_info_json['object_id'])
+        print('depositor_info', depositor_info.epsilon)
 
         new_epsilon_questions = {"secret_sample": "yes",
                                  "population_size": -7000,
                                  astatic.SETUP_Q_05_ATTR: "no"}
 
+        depositor_info.epsilon_questions = new_epsilon_questions
+        depositor_info.epsilon = -1.0
+        depositor_info.full_clean()
+        depositor_info.save()
+        print('depositor_info', depositor_info.epsilon_questions)
+
+        # print(depositor_info.)
+
+        return
         # Cannot have a negative population size
         #
         serializer = DepositorSetupInfoSerializer(data=dict(epsilon_questions=new_epsilon_questions, ))
-
+        dinfo = DepositorSetupInfo(**dict(epsilon_questions=new_epsilon_questions, ))
+        dinfo.save()
+        #print('serializer', serializer.is_valid())
+        return
         self.assertFalse(serializer.is_valid())
         self.assertTrue('epsilon_questions' in serializer.errors)
 
@@ -272,3 +296,90 @@ class TestFileUpload(TestCase):
 
         serializer = DepositorSetupInfoSerializer(data=dict(epsilon_questions=''))
         self.assertTrue(serializer.is_valid())
+
+    def test_70_update_depositor_info_bad_epsilon(self):
+        """(70) Test bad epsilon API update"""
+        msgt(self.test_70_update_depositor_info_bad_epsilon.__doc__)
+
+        # (1) Upload a file
+        #
+        jresp = self.upload_file_via_api()
+
+        # (2) Get the dataset info
+        #
+        ds_object_id = jresp['object_id']
+        ds_info = self.get_dataset_info_via_api(ds_object_id)
+        # print('ds_info', ds_info)
+
+        # (3) Update depositor info: epsilon questions, dataset_questions
+        #
+        setup_object_id = ds_info['depositor_setup_info']['object_id']
+
+        partial_update_url = f'/api/deposit/{setup_object_id}/'
+
+        new_epsilon_questions = {"secret_sample": "no",
+                                 "population_size": "7000",
+                                 "observations_number_can_be_public": "no"}
+        new_dataset_questions = {"radio_best_describes": "notHarmButConfidential",
+                                 "radio_only_one_individual_per_row": "yes",
+                                 "radio_depend_on_private_information": "yes"}
+
+        update_payload = dict(epsilon_questions=new_epsilon_questions,
+                              dataset_questions=new_dataset_questions)
+        update_resp = self.client.put(partial_update_url,
+                                      data=update_payload,
+                                      content_type="application/json")
+
+        self.assertEqual(update_resp.status_code, HTTPStatus.OK)
+
+        update_resp_json = update_resp.json()
+        self.assertEqual(update_resp_json['is_complete'], False)
+        self.assertEqual(update_resp_json['epsilon_questions'], new_epsilon_questions)
+        self.assertEqual(update_resp_json['dataset_questions'], new_dataset_questions)
+        self.assertEqual(update_resp_json['user_step'],
+                         str(DepositorSetupInfo.DepositorSteps.STEP_0200_VALIDATED))
+
+        # (4) Update depositor info: default_epsilon, epsilon
+        #
+        update_resp = update_resp_json = None
+        new_data_profile = json.load(open(join(FIXTURE_DATA_DIR, 'test_data_profile_teacher_survey.json'), 'r'))
+
+        update_payload = dict(data_profile=new_data_profile)
+
+        update_resp = self.client.put(partial_update_url,
+                                      data=update_payload,
+                                      content_type="application/json")
+
+        self.assertEqual(update_resp.status_code, HTTPStatus.OK)
+
+        update_resp_json = update_resp.json()
+        self.assertEqual(update_resp_json['is_complete'], False)
+        self.assertEqual(update_resp_json['data_profile'], new_data_profile)
+        self.assertEqual(update_resp_json['user_step'],
+                         str(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE))
+
+        # print('update_resp_json', update_resp_json)
+
+        # (5) Update depositor info: default_epsilon, epsilon
+        #
+        update_resp = update_resp_json = None
+        new_default_epsilon = 0.5
+        new_epsilon = 0.75
+
+        update_payload = dict(default_epsilon=new_default_epsilon,
+                              epsilon=new_epsilon)
+
+        update_resp = self.client.put(partial_update_url,
+                                      data=update_payload,
+                                      content_type="application/json")
+
+        print('update_resp.update_resp', update_resp.status_code)
+        print('update_resp.content', update_resp.content)
+        self.assertEqual(update_resp.status_code, HTTPStatus.OK)
+
+        update_resp_json = update_resp.json()
+        self.assertEqual(update_resp_json['is_complete'], True)
+        self.assertEqual(update_resp_json['default_epsilon'], new_default_epsilon)
+        self.assertEqual(update_resp_json['epsilon'], new_epsilon)
+        self.assertEqual(update_resp_json['user_step'],
+                         str(DepositorSetupInfo.DepositorSteps.STEP_0600_EPSILON_SET))

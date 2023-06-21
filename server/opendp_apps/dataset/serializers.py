@@ -5,10 +5,13 @@ from rest_framework.serializers import raise_errors_on_nested_writes
 from rest_framework.utils import model_meta
 from rest_polymorphic.serializers import PolymorphicSerializer
 
-from opendp_apps.dataset.models import DepositorSetupInfo
+from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.serializers import AnalysisPlanSerializer
 from opendp_apps.dataset import static_vals as dstatic
-from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.dataset.dataset_question_validators import \
+    (validate_dataset_questions,
+     validate_epsilon_questions)
+from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.dataset.models import DepositorSetupInfo, DataSetInfo, DataverseFileInfo, UploadFileInfo
 from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.basic_response import BasicResponse, ok_resp, err_resp
@@ -100,7 +103,7 @@ class DepositorSetupInfoSerializer(serializers.ModelSerializer):
                             'updated',
                             'is_complete']
 
-    def validate_dataset_questions(self, value):
+    def xvalidate_dataset_questions(self, value):
         """
         Check that the object_id belongs to an existing DataSetInfo object
         """
@@ -131,7 +134,7 @@ class DepositorSetupInfoSerializer(serializers.ModelSerializer):
 
         return value
 
-    def validate_epsilon_questions(self, value):
+    def xvalidate_epsilon_questions(self, value):
         """
         Check that the object_id belongs to an existing DataSetInfo object
         """
@@ -172,7 +175,7 @@ class DepositorSetupInfoSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """
-        (Is this still valid? Why was there a race condition? RP, 5/24/2023
+        (Is this still valid? Why was there a race condition? RP, 5/24/2023)
         Override default update method to counteract race conditions.
         (See https://github.com/encode/django-rest-framework/issues/5897)
         :param instance:
@@ -279,10 +282,11 @@ class UploadFileInfoCreationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UploadFileInfo
-        fields = ['object_id', 'name', 'source_file', 'creator',]
+        fields = ['object_id', 'name', 'source_file', 'creator', ]
 
     def save(self, **kwargs):
         return super().save(**kwargs)
+
 
 class DataSetInfoPolymorphicSerializer(PolymorphicSerializer):
     model_serializer_mapping = {

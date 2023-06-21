@@ -25,6 +25,9 @@ from opendp_apps.profiler.static_vals_mime_types import get_mime_type
 from opendp_apps.utils.camel_to_snake import camel_to_snake
 # from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.utils.extra_validators import validate_not_negative, validate_epsilon_or_none
+from opendp_apps.dataset.dataset_question_validators import \
+    (validate_dataset_questions,
+     validate_epsilon_questions)
 from opendp_apps.utils.variable_info_formatter import format_variable_info
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
@@ -68,9 +71,13 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
                                  default=DepositorSteps.STEP_0000_INITIALIZED)
 
     # Populated from the UI
-    dataset_questions = models.JSONField(null=True, blank=True)
-    epsilon_questions = models.JSONField(null=True, blank=True)
+    dataset_questions = models.JSONField(null=True,
+                                         blank=True,
+                                         validators=[validate_dataset_questions])
 
+    epsilon_questions = models.JSONField(null=True,
+                                         blank=True,
+                                         validators=[validate_epsilon_questions])
 
     unverified_data_profile = models.JSONField(help_text='Unverified data profile',
                                                default=None,
@@ -177,6 +184,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         self.is_complete = False
 
         # These error states are should not be changed
+        #
         if self.user_step == DepositorSetupInfo.DepositorSteps.STEP_9200_DATAVERSE_DOWNLOAD_FAILED:
             return
         if self.user_step == DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED:
@@ -187,24 +195,24 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         # Keep updating the user step based on the data available. A bit inefficient, but should
         # stop where data available for that step
         self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0000_INITIALIZED)
-        self.set_wizard_step(DepositorSetupInfo.WizardSteps.STEP_0100_FILE_UPLOAD)
+        # self.set_wizard_step(DepositorSetupInfo.WizardSteps.STEP_0100_FILE_UPLOAD)
         if not self.get_dataset_info():
             return
         if self.get_dataset_info().source_file:
             self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
-            self.set_wizard_step(DepositorSetupInfo.WizardSteps.STEP_0200_DATASET_QUESTIONS)
+            # self.set_wizard_step(DepositorSetupInfo.WizardSteps.STEP_0200_DATASET_QUESTIONS)
         else:
             return
 
         if self.dataset_questions and self.epsilon_questions:
             self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0200_VALIDATED)
-            self.set_wizard_step(DepositorSetupInfo.WizardSteps.STEP_0300_CONFIRM_VARIABLES)
+            # self.set_wizard_step(DepositorSetupInfo.WizardSteps.STEP_0300_CONFIRM_VARIABLES)
         else:
             return
 
         if self.data_profile:
             self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
-            self.set_wizard_step(DepositorSetupInfo.WizardSteps.STEP_0400_SET_EPSILON)
+            # self.set_wizard_step(DepositorSetupInfo.WizardSteps.STEP_0400_SET_EPSILON)
         else:
             return
 
