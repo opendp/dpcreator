@@ -212,11 +212,12 @@ SETUP_QUESTION_LOOKUP = {
     SETUP_Q_04_ATTR: SETUP_Q_04_TEXT,
     SETUP_Q_05_ATTR: SETUP_Q_05_TEXT,
 }
-SETUP_QUESTION_LIST = [SETUP_Q_01_ATTR,
-                       SETUP_Q_02_ATTR,
-                       SETUP_Q_03_ATTR,]
-                       #SETUP_Q_04_ATTR,
-                       #SETUP_Q_05_ATTR]
+
+SETUP_QUESTION_LIST_FOR_FORMATTING = [SETUP_Q_01_ATTR,
+                                      SETUP_Q_02_ATTR,
+                                      SETUP_Q_03_ATTR,
+                                      SETUP_Q_04_ATTR,
+                                      SETUP_Q_05_ATTR]
 
 EPSILON_QUESTION_LIST = [SETUP_Q_04_ATTR,
                          SETUP_Q_04a_ATTR,
