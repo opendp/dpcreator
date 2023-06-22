@@ -43,6 +43,7 @@ services:
   #  - Built from "server/Dockerfile"
   # ---------------------------------
   server:
+    platform: linux/amd64
     build: "./server"
     # For production we will need to set
     # these variables to point to a standalone instance
