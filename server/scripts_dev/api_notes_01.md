@@ -82,8 +82,20 @@ This includes depositor setup info.
 - **Method**: `PUT`
 - **Auth**: username/password
 - **Params**: Any or all of these params may be updated
-  - **epsilon_questions**: json
-  - **dataset_questions**: json
+  - **dataset_questions**: JSON, with the following keys and potential values:
+    - **radio_best_describes**: "public", "notHarmButConfidential", "couldCauseHarm", "wouldLikelyCauseHarm", "wouldCauseSevereHarm"
+       - empty string ("") returns an error
+    - **radio_only_one_individual_per_row**: "yes", "no"
+       - maybe be an empty string ("") in API call if not answered
+    - **radio_depend_on_private_information**: "yes", "no"
+       - maybe be an empty string ("") in API call if not answered
+  - **epsilon_questions**: JSON, with the following keys and potential values:
+    - **secret_sample**: "yes", "no"
+       - maybe be an empty string ("") in API call if not answered
+    - **population_size**: positive integer
+       - Must be positive integer if secret_sample is "yes". Otherwise, population_size is not checked.
+    - **observations_number_can_be_public**: "yes", "no"
+       - maybe be an empty string ("") in API call if not answered
   - **data_profile**: json
     - Updated from the confirm variables page
   - **epsilon**: boolean
