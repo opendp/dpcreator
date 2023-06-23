@@ -46,8 +46,8 @@ class TestFileUpload(TestCase):
         resp = self.client.post(upload_url,
                                 data=payload)
 
-        print('resp', resp.json())
-        print('status code', resp.status_code)
+        # print('resp', resp.json())
+        # print('status code', resp.status_code)
 
         self.assertEqual(resp.status_code, HTTPStatus.CREATED)
 
@@ -109,8 +109,8 @@ class TestFileUpload(TestCase):
         resp = self.client.post(upload_url,
                                 data=payload)
 
-        print('resp', resp.json())
-        print('status code', resp.status_code)
+        # print('resp', resp.json())
+        # print('status code', resp.status_code)
 
         self.assertEqual(resp.status_code, HTTPStatus.BAD_REQUEST)
 
@@ -217,7 +217,7 @@ class TestFileUpload(TestCase):
 
         update_resp_json = update_resp.json()
         self.assertEqual(update_resp_json['is_complete'], True)
-        self.assertEqual(update_resp_json['default_epsilon'], new_default_epsilon)
+        self.assertEqual(update_resp_json['default_epsilon'], None) # shouldn't be set
         self.assertEqual(update_resp_json['epsilon'], new_epsilon)
         self.assertEqual(update_resp_json['user_step'],
                          str(DepositorSetupInfo.DepositorSteps.STEP_0600_EPSILON_SET))
@@ -376,8 +376,8 @@ class TestFileUpload(TestCase):
                                       data=update_payload,
                                       content_type="application/json")
 
-        print('update_resp.update_resp', update_resp.status_code)
-        print('update_resp.content', update_resp.content)
+        # print('update_resp.update_resp', update_resp.status_code)
+        # print('update_resp.content', update_resp.content)
         self.assertEqual(update_resp.status_code, HTTPStatus.OK)
 
         update_resp_json = update_resp.json()
@@ -393,10 +393,12 @@ class TestFileUpload(TestCase):
         self.assertEqual(update_resp_json['user_step'],
                          str(DepositorSetupInfo.DepositorSteps.STEP_0600_EPSILON_SET))
 
-        print(json.dumps(update_resp_json, indent=4))
+        # print(json.dumps(update_resp_json, indent=4))
 
     def test_80_update_depositor_info(self):
-        """(80) Test that epsilon/dataset questions can have empty string values and that epsilon/delta may be null"""
+        """(80) Test that epsilon/dataset questions can have empty string values
+        and that epsilon/delta may be null. Note, the API calls are okay but do not advance
+        the user_step."""
         msgt(self.test_80_update_depositor_info.__doc__)
 
         # (1) Upload a file
@@ -437,7 +439,7 @@ class TestFileUpload(TestCase):
         self.assertEqual(update_resp_json['epsilon_questions'], new_epsilon_questions)
         self.assertEqual(update_resp_json['dataset_questions'], new_dataset_questions)
         self.assertEqual(update_resp_json['user_step'],
-                         str(DepositorSetupInfo.DepositorSteps.STEP_0200_VALIDATED))
+                         str(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED))
 
         # (4) Update depositor info: default_epsilon, epsilon
         #
@@ -455,7 +457,7 @@ class TestFileUpload(TestCase):
         self.assertEqual(update_resp_json['is_complete'], False)
         self.assertEqual(update_resp_json['data_profile'], new_data_profile)
         self.assertEqual(update_resp_json['user_step'],
-                         str(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE))
+                         str(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED))
 
         # print('update_resp_json', update_resp_json)
 
@@ -476,8 +478,8 @@ class TestFileUpload(TestCase):
                                       data=update_payload,
                                       content_type="application/json")
 
-        print('update_resp.update_resp', update_resp.status_code)
-        print('update_resp.content', update_resp.content)
+        # print('update_resp.update_resp', update_resp.status_code)
+        # print('update_resp.content', update_resp.content)
         self.assertEqual(update_resp.status_code, HTTPStatus.OK)
 
         update_resp_json = update_resp.json()
@@ -485,6 +487,5 @@ class TestFileUpload(TestCase):
         self.assertEqual(update_resp_json['delta'], new_delta)
         self.assertEqual(update_resp_json['epsilon'], new_epsilon)
         self.assertEqual(update_resp_json['user_step'],
-                         str(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE))
+                         str(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED))
 
-        print(json.dumps(update_resp_json, indent=4))

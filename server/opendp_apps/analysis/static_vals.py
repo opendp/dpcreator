@@ -225,7 +225,7 @@ EPSILON_QUESTION_LIST = [SETUP_Q_04_ATTR,
 
 ERR_MSG_DATASET_QUESTIONS_NOT_DICT = 'Dataset questions must be a dictionary'
 ERR_MSG_DATASET_QUESTIONS_INVALID_KEY= 'Invalid key for dataset questions: "{key}"'
-ERR_MSG_DATASET_QUESTIONS_INVALID_VALUE = 'Invalid value ("{value}") for dataset question {"{key}"}'
+ERR_MSG_DATASET_QUESTIONS_INVALID_VALUE = 'Invalid value ("{value}") for dataset question ("{key}")'
 ERR_MSG_DATASET_YES_NO_QUESTIONS_INVALID_VALUE = ('Dataset question "{key}" should have'
                                                   ' a "yes" or "no" answer, not "{value}"')
 ERR_MSG_POPULATION_SIZE_MISSING = ('If this is a sample from a population, the population size'

@@ -13,6 +13,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from polymorphic.models import PolymorphicModel
+from django.core.exceptions import ValidationError
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.dataverses.models import RegisteredDataverse
@@ -204,11 +205,29 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         else:
             return
 
-        if self.dataset_questions and self.epsilon_questions:
-            self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0200_VALIDATED)
-            # self.set_wizard_step(DepositorSetupInfo.WizardSteps.STEP_0300_CONFIRM_VARIABLES)
+        if self.dataset_questions:
+            # Dataset questions set, are they valid?
+            try:
+                validate_dataset_questions(self.dataset_questions, to_set_user_step=True)
+            except ValidationError as e:
+                # They're not valid, don't proceed to the next step
+                return
+        else:
+            # Dataset questions not set, don't proceed to the next step
+            return
+
+        if self.epsilon_questions:
+            # Epsilon questions set, are they valid?
+            try:
+                validate_epsilon_questions(self.epsilon_questions, to_set_user_step=True)
+            except ValidationError as e:
+                # They're not valid, don't proceed to the next step
+                return
         else:
             return
+
+        # Dataset questions and epsilon questions are valid, proceed to the next step
+        self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0200_VALIDATED)
 
         if self.data_profile:
             self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
@@ -342,7 +361,7 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
     def save(self, *args, **kwargs):
         """Make sure there is a DepositorSetupInfo object"""
-        print('DataSetInfo.save()')
+        # print('DataSetInfo.save()')
         initial_link_of_depositor_setup_info = False
         if not self.depositor_setup_info:
             # Set default DepositorSetupInfo object
@@ -659,7 +678,7 @@ class UploadFileInfo(DataSetInfo):
         return get_mime_type(file_extension, '(unknown file type)')
 
     def save(self, *args, **kwargs):
-        print('UploadFileInfo.save()')
+        # print('UploadFileInfo.save()')
 
         # Future: is_complete can be auto-filled based on either field values or the STEP
         #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.

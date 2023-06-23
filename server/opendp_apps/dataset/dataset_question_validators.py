@@ -7,7 +7,7 @@ from typing import Union
 from opendp_apps.analysis import static_vals as astatic
 
 
-def validate_dataset_questions(value: Union[dict, None, str]):
+def validate_dataset_questions(value: Union[dict, None, str], to_set_user_step=False):
     """
     Check that the dataset_questions, if specified, are valid
     """
@@ -25,8 +25,10 @@ def validate_dataset_questions(value: Union[dict, None, str]):
         if qkey not in question_keys:
             raise ValidationError(astatic.ERR_MSG_DATASET_QUESTIONS_INVALID_KEY.format(key=qkey))
 
-        # allow empty strings
-        if qval == "":
+        # Allow empty strings for API calls, but not for setting the user step on save
+        if to_set_user_step is True:
+            pass
+        elif qval == "":
             continue
 
         if qkey == astatic.SETUP_Q_02_ATTR:
@@ -42,9 +44,12 @@ def validate_dataset_questions(value: Union[dict, None, str]):
     return
 
 
-def validate_epsilon_questions(value: Union[dict, None, str]):
+def validate_epsilon_questions(value: Union[dict, None, str], to_set_user_step=False):
     """
     Check that the object_id belongs to an existing DataSetInfo object
+    @param value: dict of epsilon questions
+    @param to_set_user_step: boolean, if True, then values may not include empty strings
+
     """
     # blank/null values are okay
     # print('>>> validate_epsilon_questions', value)
@@ -61,8 +66,10 @@ def validate_epsilon_questions(value: Union[dict, None, str]):
         if qkey not in question_keys:
             raise ValidationError(astatic.ERR_MSG_DATASET_QUESTIONS_INVALID_KEY.format(key=qkey))
 
-        # allow empty strings
-        if qval == "":
+        # Allow empty strings for API calls, but not for setting the user step on save
+        if to_set_user_step is True:
+            pass
+        elif qval == "":
             continue
 
         # Is the question #4 yes?
