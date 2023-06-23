@@ -1,7 +1,8 @@
 <template>
   <v-dialog
-      v-model="dialog"
-      :width="$vuetify.breakpoint.smAndDown ? '90%' : '50%'"
+          :modelValue="dialog"
+          @update:modelValue="dialog = $event"
+          :width="$vuetify.breakpoint.smAndDown ? '90%' : '50%'"
   >
     <v-card elevation="2" class="px-10 py-12">
       <v-icon

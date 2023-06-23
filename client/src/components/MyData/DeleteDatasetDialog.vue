@@ -1,5 +1,6 @@
 <template>
-  <v-dialog v-model="dialogDelete" max-width="500px">
+  <v-dialog  :modelValue="dialogDelete"
+             @update:modelValue="dialogDelete = $event"  max-width="500px">
     <v-card elevation="2" class="px-10 py-12">
       <v-icon
           style="position: absolute; right: 40px"

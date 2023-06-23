@@ -1,6 +1,8 @@
 <template>
   <v-stepper-header class="wizard_navigator rounded">
-    <template v-for="(step, i) in steps">
+      <!-- eslint-disable-next-line vue/no-v-for-template-key -->
+    <template>
+        <div  v-for="(step, i) in steps">
       <v-stepper-step
           :editable="isEditable(i)"
           :data-test="'step' + i"
@@ -12,6 +14,7 @@
         {{ step.title }}
       </v-stepper-step>
       <v-divider :key="i + '-v2'" v-if="i !== steps.length - 1"></v-divider>
+        </div>
     </template>
   </v-stepper-header>
 </template>

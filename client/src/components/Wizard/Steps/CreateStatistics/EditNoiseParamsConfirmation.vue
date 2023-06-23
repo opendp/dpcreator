@@ -1,12 +1,13 @@
 <template>
   <v-dialog
-      v-model="dialog"
-      :width="$vuetify.breakpoint.smAndDown ? '90%' : '50%'"
+          :modelValue="dialog"
+          @update:modelValue="dialog = $event"
+          :width="$vuetify.breakpoint.smAndDown ? '90%' : '50%'"
   >
     <v-card elevation="2" class="px-10 py-12">
       <v-icon
           style="position: absolute; right: 40px"
-          @click="() => $emit('update:dialog', false)"
+          @click="() => $emit('update:dialog', fØalse)"
       >mdi-close
       </v-icon
       >

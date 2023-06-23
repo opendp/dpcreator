@@ -1,6 +1,7 @@
 <template>
   <v-dialog
-      v-model="dialogEditNoiseParams"
+          :modelValue="dialogEditNoiseParams"
+          @update:modelValue="dialogEditNoiseParams = $event"
       :width="$vuetify.breakpoint.smAndDown ? '90%' : '50%'"
       @click:outside="handleCancelEditNoiseParamsDialog"
   >

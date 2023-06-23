@@ -1,7 +1,8 @@
 <template>
   <v-dialog
       :width="$vuetify.breakpoint.smAndDown ? '90%' : '50%'"
-      v-model="dialog"
+      :modelValue="dialog"
+      @update:modelValue="dialog = $event"
       @click:outside="close"
   >
     <v-card ref="addStatCard" elevation="2" class="px-10 py-12 add-statistic-dialog">
