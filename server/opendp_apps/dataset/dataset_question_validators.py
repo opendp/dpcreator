@@ -25,7 +25,10 @@ def validate_dataset_questions(value: Union[dict, None, str]):
         if qkey not in question_keys:
             raise ValidationError(astatic.ERR_MSG_DATASET_QUESTIONS_INVALID_KEY.format(key=qkey))
 
-        # Is the question #2 answer valid?
+        # allow empty strings
+        if qval == "":
+            continue
+
         if qkey == astatic.SETUP_Q_02_ATTR:
             if not qval in astatic.SETUP_Q_02_CHOICES:
                 _err_msg = astatic.ERR_MSG_DATASET_QUESTIONS_INVALID_VALUE.format(key=qkey, value=qval)
@@ -57,6 +60,10 @@ def validate_epsilon_questions(value: Union[dict, None, str]):
         # Is the question key valid?
         if qkey not in question_keys:
             raise ValidationError(astatic.ERR_MSG_DATASET_QUESTIONS_INVALID_KEY.format(key=qkey))
+
+        # allow empty strings
+        if qval == "":
+            continue
 
         # Is the question #4 yes?
         if qkey == astatic.SETUP_Q_04_ATTR and qval == astatic.YES_VALUE:

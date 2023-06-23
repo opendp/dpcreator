@@ -1,9 +1,14 @@
 
 
-[click on this link](#direct-file-upload)
+### API Endpoints
+DRF link: http://localhost:8000/api/
 
-[click on this linkz](#get-dataset-info)
+**Contents**
+- [Direct File Upload](#direct-file-upload)
+- [Get Dataset info (including depositor setup info)](#get-dataset-info)
 
+
+--- 
 
 ## Direct File Upload
 
@@ -28,7 +33,7 @@
 }
 ```
 
-## Get Dataset Info 
+## Get Dataset info
 
 This includes depositor setup info.
 
@@ -66,4 +71,26 @@ This includes depositor setup info.
     "analysis_plans": [],
     "resourcetype": "UploadFileInfo"
 }
+```
+
+## Update Depositor Info
+
+This includes depositor setup info.
+
+- **API endpoint**: `/api/deposit/{depositor_setup_object_id}/`
+  - **Example**: `/api/deposit/b01377e1-eec0-43cc-9f7f-631f87dd4108/`
+- **Method**: `PUT`
+- **Auth**: username/password
+- **Params**: Any or all of these params may be updated
+  - **epsilon_questions**: json
+  - **dataset_questions**: json
+  - **data_profile**: json
+    - Updated from the confirm variables page
+  - **epsilon**: boolean
+  - **delta**: boolean
+  - **confidence_level**: choices
+  - **is_complete**: boolean
+- **DRF link**: http://localhost:8000/api/deposit/
+- Response example:
+```json
 ```

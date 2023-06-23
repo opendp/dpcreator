@@ -243,7 +243,9 @@ class AnalysisPlan(TimestampedModelWithUUID):
 
     dataset = models.ForeignKey('dataset.DataSetInfo',
                                 on_delete=models.CASCADE)
+
     is_complete = models.BooleanField(default=False)
+
     user_step = models.CharField(max_length=128,
                                  choices=AnalystSteps.choices)
 

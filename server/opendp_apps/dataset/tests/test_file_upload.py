@@ -297,9 +297,10 @@ class TestFileUpload(TestCase):
                 user_msg = f'ValidationError raised when "epsilon_questions" set to "{pval}"'
                 self.fail(user_msg)
 
-    def test_70_update_depositor_info_bad_epsilon(self):
-        """(70) Test bad epsilon API update"""
-        msgt(self.test_70_update_depositor_info_bad_epsilon.__doc__)
+    def test_70_update_depositor_info(self):
+        """(70) Update depositor info including epsilon questions, dataset questions,
+            epsilon, delta, etc."""
+        msgt(self.test_70_update_depositor_info.__doc__)
 
         # (1) Upload a file
         #
@@ -319,10 +320,10 @@ class TestFileUpload(TestCase):
 
         new_epsilon_questions = {"secret_sample": "no",
                                  "population_size": "7000",
-                                 "observations_number_can_be_public": "no"}
+                                 "observations_number_can_be_public": ''}
 
         new_dataset_questions = {"radio_best_describes": "notHarmButConfidential",
-                                 "radio_only_one_individual_per_row": "yes",
+                                 "radio_only_one_individual_per_row": "",
                                  "radio_depend_on_private_information": "yes"}
 
         update_payload = dict(epsilon_questions=new_epsilon_questions,
@@ -331,6 +332,7 @@ class TestFileUpload(TestCase):
                                       data=update_payload,
                                       content_type="application/json")
 
+        # print(update_resp.json())
         self.assertEqual(update_resp.status_code, HTTPStatus.OK)
 
         update_resp_json = update_resp.json()
@@ -339,7 +341,7 @@ class TestFileUpload(TestCase):
         self.assertEqual(update_resp_json['dataset_questions'], new_dataset_questions)
         self.assertEqual(update_resp_json['user_step'],
                          str(DepositorSetupInfo.DepositorSteps.STEP_0200_VALIDATED))
-
+        
         # (4) Update depositor info: default_epsilon, epsilon
         #
         new_data_profile = json.load(open(join(FIXTURE_DATA_DIR, 'test_data_profile_teacher_survey.json'), 'r'))
@@ -382,3 +384,5 @@ class TestFileUpload(TestCase):
         self.assertEqual(update_resp_json['epsilon'], new_epsilon)
         self.assertEqual(update_resp_json['user_step'],
                          str(DepositorSetupInfo.DepositorSteps.STEP_0600_EPSILON_SET))
+
+        print(json.dumps(update_resp_json, indent=4))
