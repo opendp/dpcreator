@@ -320,10 +320,10 @@ class TestFileUpload(TestCase):
 
         new_epsilon_questions = {"secret_sample": "no",
                                  "population_size": "7000",
-                                 "observations_number_can_be_public": ''}
+                                 "observations_number_can_be_public": 'yes'}
 
         new_dataset_questions = {"radio_best_describes": "notHarmButConfidential",
-                                 "radio_only_one_individual_per_row": "",
+                                 "radio_only_one_individual_per_row": "yes",
                                  "radio_depend_on_private_information": "yes"}
 
         update_payload = dict(epsilon_questions=new_epsilon_questions,
@@ -341,7 +341,7 @@ class TestFileUpload(TestCase):
         self.assertEqual(update_resp_json['dataset_questions'], new_dataset_questions)
         self.assertEqual(update_resp_json['user_step'],
                          str(DepositorSetupInfo.DepositorSteps.STEP_0200_VALIDATED))
-        
+
         # (4) Update depositor info: default_epsilon, epsilon
         #
         new_data_profile = json.load(open(join(FIXTURE_DATA_DIR, 'test_data_profile_teacher_survey.json'), 'r'))
@@ -365,10 +365,12 @@ class TestFileUpload(TestCase):
         # (5) Update depositor info: default_epsilon, epsilon
         #
         new_default_epsilon = 0.5
+        new_default_delta = 0.02
         new_epsilon = 0.75
 
         update_payload = dict(default_epsilon=new_default_epsilon,
-                              epsilon=new_epsilon)
+                              epsilon=new_epsilon,
+                              default_delta=new_default_delta)
 
         update_resp = self.client.put(partial_update_url,
                                       data=update_payload,
@@ -380,9 +382,109 @@ class TestFileUpload(TestCase):
 
         update_resp_json = update_resp.json()
         self.assertEqual(update_resp_json['is_complete'], True)
-        self.assertEqual(update_resp_json['default_epsilon'], new_default_epsilon)
+
+        # Should not be able to update the default epsilon or default delta!
+        #
+        self.assertNotEqual(update_resp_json['default_epsilon'], new_default_epsilon)
+        self.assertNotEqual(update_resp_json['default_delta'], new_default_delta)
+
+
         self.assertEqual(update_resp_json['epsilon'], new_epsilon)
         self.assertEqual(update_resp_json['user_step'],
                          str(DepositorSetupInfo.DepositorSteps.STEP_0600_EPSILON_SET))
+
+        print(json.dumps(update_resp_json, indent=4))
+
+    def test_80_update_depositor_info(self):
+        """(80) Test that epsilon/dataset questions can have empty string values and that epsilon/delta may be null"""
+        msgt(self.test_80_update_depositor_info.__doc__)
+
+        # (1) Upload a file
+        #
+        jresp = self.upload_file_via_api()
+
+        # (2) Get the dataset info
+        #
+        ds_object_id = jresp['object_id']
+        ds_info = self.get_dataset_info_via_api(ds_object_id)
+        # print('ds_info', ds_info)
+
+        # (3) Update depositor info: epsilon questions, dataset_questions
+        #
+        setup_object_id = ds_info['depositor_setup_info']['object_id']
+
+        partial_update_url = f'/api/deposit/{setup_object_id}/'
+
+        new_epsilon_questions = {"secret_sample": "",
+                                 "population_size": "7000",
+                                 "observations_number_can_be_public": ''}
+
+        new_dataset_questions = {"radio_best_describes": "",
+                                 "radio_only_one_individual_per_row": "",
+                                 "radio_depend_on_private_information": ""}
+
+        update_payload = dict(epsilon_questions=new_epsilon_questions,
+                              dataset_questions=new_dataset_questions)
+        update_resp = self.client.put(partial_update_url,
+                                      data=update_payload,
+                                      content_type="application/json")
+
+        # print(update_resp.json())
+        self.assertEqual(update_resp.status_code, HTTPStatus.OK)
+
+        update_resp_json = update_resp.json()
+        self.assertEqual(update_resp_json['is_complete'], False)
+        self.assertEqual(update_resp_json['epsilon_questions'], new_epsilon_questions)
+        self.assertEqual(update_resp_json['dataset_questions'], new_dataset_questions)
+        self.assertEqual(update_resp_json['user_step'],
+                         str(DepositorSetupInfo.DepositorSteps.STEP_0200_VALIDATED))
+
+        # (4) Update depositor info: default_epsilon, epsilon
+        #
+        new_data_profile = json.load(open(join(FIXTURE_DATA_DIR, 'test_data_profile_teacher_survey.json'), 'r'))
+
+        update_payload = dict(data_profile=new_data_profile)
+
+        update_resp = self.client.put(partial_update_url,
+                                      data=update_payload,
+                                      content_type="application/json")
+
+        self.assertEqual(update_resp.status_code, HTTPStatus.OK)
+
+        update_resp_json = update_resp.json()
+        self.assertEqual(update_resp_json['is_complete'], False)
+        self.assertEqual(update_resp_json['data_profile'], new_data_profile)
+        self.assertEqual(update_resp_json['user_step'],
+                         str(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE))
+
+        # print('update_resp_json', update_resp_json)
+
+        # (5) Update depositor info: default_epsilon, epsilon
+        #
+        depositor_setup_obj = DepositorSetupInfo.objects.get(object_id=setup_object_id)
+        depositor_setup_obj.epsilon = 0.5
+        depositor_setup_obj.delta = 0.00001
+        depositor_setup_obj.save()
+
+        new_epsilon = None
+        new_delta = None
+
+        update_payload = dict(epsilon=new_epsilon,
+                              delta=new_delta)
+
+        update_resp = self.client.put(partial_update_url,
+                                      data=update_payload,
+                                      content_type="application/json")
+
+        print('update_resp.update_resp', update_resp.status_code)
+        print('update_resp.content', update_resp.content)
+        self.assertEqual(update_resp.status_code, HTTPStatus.OK)
+
+        update_resp_json = update_resp.json()
+        self.assertEqual(update_resp_json['is_complete'], False)
+        self.assertEqual(update_resp_json['delta'], new_delta)
+        self.assertEqual(update_resp_json['epsilon'], new_epsilon)
+        self.assertEqual(update_resp_json['user_step'],
+                         str(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE))
 
         print(json.dumps(update_resp_json, indent=4))
