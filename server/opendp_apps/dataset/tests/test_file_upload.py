@@ -217,7 +217,9 @@ class TestFileUpload(TestCase):
 
         update_resp_json = update_resp.json()
         self.assertEqual(update_resp_json['is_complete'], True)
-        self.assertEqual(update_resp_json['default_epsilon'], None) # shouldn't be set
+        self.assertEqual(update_resp_json['default_epsilon'], 1.0) # set via dataset_questions
+        self.assertEqual(update_resp_json['default_delta'], astatic.DELTA_10_NEG_5) # set via dataset_questions
+
         self.assertEqual(update_resp_json['epsilon'], new_epsilon)
         self.assertEqual(update_resp_json['user_step'],
                          str(DepositorSetupInfo.DepositorSteps.STEP_0600_EPSILON_SET))
@@ -365,7 +367,7 @@ class TestFileUpload(TestCase):
         # (5) Update depositor info: default_epsilon, epsilon
         #
         new_default_epsilon = 0.5
-        new_default_delta = 0.02
+        new_default_delta = astatic.DELTA_10_NEG_7
         new_epsilon = 0.75
 
         update_payload = dict(default_epsilon=new_default_epsilon,
@@ -393,7 +395,7 @@ class TestFileUpload(TestCase):
         self.assertEqual(update_resp_json['user_step'],
                          str(DepositorSetupInfo.DepositorSteps.STEP_0600_EPSILON_SET))
 
-        # print(json.dumps(update_resp_json, indent=4))
+        print(json.dumps(update_resp_json, indent=4))
 
     def test_80_update_depositor_info(self):
         """(80) Test that epsilon/dataset questions can have empty string values
@@ -417,16 +419,17 @@ class TestFileUpload(TestCase):
 
         partial_update_url = f'/api/deposit/{setup_object_id}/'
 
-        new_epsilon_questions = {"secret_sample": "",
-                                 "population_size": "7000",
-                                 "observations_number_can_be_public": ''}
-
         new_dataset_questions = {"radio_best_describes": "",
                                  "radio_only_one_individual_per_row": "",
                                  "radio_depend_on_private_information": ""}
 
-        update_payload = dict(epsilon_questions=new_epsilon_questions,
-                              dataset_questions=new_dataset_questions)
+        new_epsilon_questions = {"secret_sample": "",
+                                 "population_size": "7000",
+                                 "observations_number_can_be_public": ''}
+
+        update_payload = dict(dataset_questions=new_dataset_questions,
+                              epsilon_questions=new_epsilon_questions,)
+
         update_resp = self.client.put(partial_update_url,
                                       data=update_payload,
                                       content_type="application/json")
