@@ -13,9 +13,14 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from polymorphic.models import PolymorphicModel
-from django.core.exceptions import ValidationError
 
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.dataset.dataset_question_validators import \
+    (validate_dataset_questions,
+     validate_epsilon_questions)
+from opendp_apps.dataset.depositor_setup_helpers import \
+    (set_user_step_based_on_data,
+     set_default_epsilon_delta_from_questions)
 from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp, BasicResponse
 from opendp_apps.model_helpers.models import \
@@ -26,9 +31,6 @@ from opendp_apps.profiler.static_vals_mime_types import get_mime_type
 from opendp_apps.utils.camel_to_snake import camel_to_snake
 # from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.utils.extra_validators import validate_not_negative, validate_epsilon_or_none
-from opendp_apps.dataset.dataset_question_validators import \
-    (validate_dataset_questions,
-     validate_epsilon_questions)
 from opendp_apps.utils.variable_info_formatter import format_variable_info
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
@@ -160,13 +162,13 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
 
         return f'{self.object_id} - {self.user_step}'
 
-
     def save(self, *args, **kwargs):
         """Override the save method to set the user_step based on the data"""
         if self.data_profile:
             self.data_profile = format_variable_info(self.data_profile)
 
-        self.set_user_step_based_on_data()
+        set_user_step_based_on_data(self)
+        set_default_epsilon_delta_from_questions(self)
 
         # Specifically for this model, we are overriding the update method with an explicit list of
         # update_fields, so we need to set the updated field manually.
@@ -177,69 +179,6 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     @mark_safe
     def name(self):
         return str(self)
-
-    def set_user_step_based_on_data(self):
-        """Based on the data, update the "user_step" field
-        @rtype: object
-        """
-        self.is_complete = False
-
-        # These error states are should not be changed
-        #
-        if self.user_step == DepositorSetupInfo.DepositorSteps.STEP_9200_DATAVERSE_DOWNLOAD_FAILED:
-            return
-        if self.user_step == DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED:
-            return
-        if self.user_step == DepositorSetupInfo.DepositorSteps.STEP_9400_CREATE_RELEASE_FAILED:
-            return
-
-        # Keep updating the user step based on the data available. A bit inefficient, but should
-        # stop where data available for that step
-        self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0000_INITIALIZED)
-        # self.set_wizard_step(DepositorSetupInfo.WizardSteps.STEP_0100_FILE_UPLOAD)
-        if not self.get_dataset_info():
-            return
-        if self.get_dataset_info().source_file:
-            self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
-            # self.set_wizard_step(DepositorSetupInfo.WizardSteps.STEP_0200_DATASET_QUESTIONS)
-        else:
-            return
-
-        if self.dataset_questions:
-            # Dataset questions set, are they valid?
-            try:
-                validate_dataset_questions(self.dataset_questions, to_set_user_step=True)
-            except ValidationError as e:
-                # They're not valid, don't proceed to the next step
-                return
-        else:
-            # Dataset questions not set, don't proceed to the next step
-            return
-
-        if self.epsilon_questions:
-            # Epsilon questions set, are they valid?
-            try:
-                validate_epsilon_questions(self.epsilon_questions, to_set_user_step=True)
-            except ValidationError as e:
-                # They're not valid, don't proceed to the next step
-                return
-        else:
-            return
-
-        # Dataset questions and epsilon questions are valid, proceed to the next step
-        self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0200_VALIDATED)
-
-        if self.data_profile:
-            self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
-            # self.set_wizard_step(DepositorSetupInfo.WizardSteps.STEP_0400_SET_EPSILON)
-        else:
-            return
-
-        if self.epsilon:
-            self.set_user_step(DepositorSetupInfo.DepositorSteps.STEP_0600_EPSILON_SET)
-            self.is_complete = True
-        else:
-            return
 
     def get_dataset_info(self):
         """
@@ -287,6 +226,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         """Return the label for the user step"""
         return self.user_step.get_user_step_display()
 
+
 class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     """
     Base type for table that either holds DV data
@@ -312,7 +252,7 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     depositor_setup_info = models.OneToOneField(DepositorSetupInfo,
                                                 related_name='ds_info',
                                                 null=True,
-                                                #blank=True,
+                                                # blank=True,
                                                 on_delete=models.CASCADE)
 
     class Meta:
@@ -379,7 +319,6 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         if initial_link_of_depositor_setup_info is True:
             # Save again to correct set the user_step on the DepositorSetupInfo object
             self.depositor_setup_info.save()
-
 
     @property
     def status(self):
@@ -724,6 +663,7 @@ def post_delete_depositor_info_from_dataset_info(sender, instance, *args, **kwar
         pass
         # print('Does not exist. Already deleted.')
 
+
 @receiver(post_delete, sender=DataverseFileInfo)
 def post_delete_depositor_info_from_dv_file_info(sender, instance, *args, **kwargs):
     # Delete the DepositorSetupInfo object -- a OneToOneField
@@ -733,6 +673,7 @@ def post_delete_depositor_info_from_dv_file_info(sender, instance, *args, **kwar
     except DepositorSetupInfo.DoesNotExist:
         pass
         print('Does not exist. Already deleted.')
+
 
 @receiver(post_delete, sender=UploadFileInfo)
 def post_delete_depositor_info_from_upload_file_info(sender, instance, *args, **kwargs):

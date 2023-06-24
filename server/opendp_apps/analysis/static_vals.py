@@ -164,17 +164,17 @@ SETUP_Q_02_TEXT = ('Which of the following best describes your data file?',
                    ' which may be changed later in the process.')
 
 SETUP_Q_02_ANSWERS = dict(
-    public=('Public Information', None),
+    public=('Public Information', {'epsilon': None, 'delta': None}),
     notHarmButConfidential=(('Information that, if disclosed,'
                              ' would not cause material harm,'
                              ' but which the organization has chosen to keep confidential'),
-                            {'epsilon': 1, 'delta': 10 - 5}),
+                            {'epsilon': 1, 'delta': DELTA_10_NEG_5}),
     couldCauseHarm=(('Information that could cause risk of material harm to individuals'
                      ' or the organization if disclosed'),
-                    {'epsilon': .25, 'delta': 10e-6}),
+                    {'epsilon': .25, 'delta': DELTA_10_NEG_6}),
     wouldLikelyCauseHarm=(('Information that would likely cause serious harm to individuals'
                            ' or the organization if disclosed'),
-                          {'epsilon': .05, 'delta': 10e-7}),
+                          {'epsilon': .05, 'delta': DELTA_10_NEG_7}),
     wouldCauseSevereHarm=(('Information that would cause severe harm to individuals or the'
                            ' organization if disclosed. Use of this application is not'
                            ' recommended.'),
