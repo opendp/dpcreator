@@ -62,7 +62,7 @@ def set_user_step_based_on_data(depositor_setup_info) -> None:
     # Dataset questions and epsilon questions are valid, proceed to the next step
     depositor_setup_info.set_user_step(depositor_setup_info.DepositorSteps.STEP_0200_VALIDATED)
 
-    if depositor_setup_info.data_profile:
+    if depositor_setup_info.variable_info:
         depositor_setup_info.set_user_step(depositor_setup_info.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
         # depositor_setup_info.set_wizard_step(DepositorSetupInfo.WizardSteps.STEP_0400_SET_EPSILON)
     else:

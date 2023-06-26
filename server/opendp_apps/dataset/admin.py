@@ -22,7 +22,7 @@ class DepositorSetupInfoAdmin(admin.ModelAdmin):
                        'user_step',
                        'object_id',
                        'is_complete',
-                       'data_profile_view',
+                       'variable_info_view',
                        'created',
                        'updated',)
 
@@ -43,7 +43,7 @@ class DataSetInfoAdmin(admin.ModelAdmin):
                        'object_id',
                        'source',
                        'depositor_setup_info',
-                       'data_profile_display',
+                       'variable_info_display',
                        'created', 'updated',)
 
     def changelist_view(self, request, extra_context=None):

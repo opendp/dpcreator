@@ -86,7 +86,7 @@ class DepositorSetupInfoSerializer(serializers.ModelSerializer):
                   'epsilon_questions',
                   'dataset_size',
                   'unverified_data_profile',
-                  'data_profile',
+                  'variable_info',
                   'default_epsilon', 'epsilon',
                   'default_delta', 'delta',
                   'confidence_level']
@@ -97,7 +97,7 @@ class DepositorSetupInfoSerializer(serializers.ModelSerializer):
                             'default_epsilon',
                             'default_delta',
                             'created',
-                            'updated',]
+                            'updated', ]
 
     def update(self, instance, validated_data):
         """

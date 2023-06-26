@@ -204,7 +204,7 @@ class ProfilerTest(TestCase):
 
         # Re-retrieve object and data profile
         dsi = DataSetInfo.objects.get(object_id=dsi.object_id)
-        info = dsi.data_profile_as_dict()
+        info = dsi.variable_info_as_dict()
         print('end step:', dsi.depositor_setup_info.user_step)
         self.assertEqual(dsi.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
@@ -331,7 +331,7 @@ class ProfilerTest(TestCase):
         #
         dsi2 = DataSetInfo.objects.get(object_id=self.test_file_info.object_id)
 
-        info = dsi2.data_profile_as_dict()
+        info = dsi2.variable_info_as_dict()
 
         # print('-- Profiler reads only first 20 features')
         self.assertTrue('variables' in info)

@@ -12,6 +12,8 @@ rm -rf opendp_apps/analysis/migrations \
     opendp_apps/terms_of_access/migrations \
     opendp_apps/user/migrations 
 
+# From GitHub directory dpcreator/server
+rm test_setup/db_opendp_app.db3
 
 python manage.py makemigrations dataverses user dataset terms_of_access content_pages analysis profiler
 # communication

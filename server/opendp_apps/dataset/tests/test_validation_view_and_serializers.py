@@ -21,7 +21,7 @@ TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
 
 class TestValidationViewAndSerializers(TestCase):
-    fixtures = ['test_dataset_data_001.json', ]
+    fixtures = ['test_dataset_data_002.json', ]
 
     def setUp(self):
         # test client
@@ -711,8 +711,8 @@ class TestValidationViewAndSerializers(TestCase):
         analysis_plan = self.analysis_plan
 
         dataset_info_1 = analysis_plan.dataset
-        dataset_info_1.data_profile = None
-        dataset_info_1.profile_variables = None
+        dataset_info_1.variable_info = None
+        # dataset_info_1.profile_variables = None
         dataset_info_1.save()
 
         dataset_info_updated = self.add_source_file(analysis_plan.dataset, 'Fatigue_data.tab', True)

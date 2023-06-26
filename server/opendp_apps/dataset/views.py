@@ -49,12 +49,15 @@ class DepositorSetupViewSet(BaseModelViewSet):
         """
         Update DepositorSetupInfo fields
         """
-        acceptable_fields = ['user_step',
-                             'dataset_questions', 'epsilon_questions',
+        acceptable_fields = ['dataset_questions',
+                             'epsilon_questions',
                              'variable_info',
-                             'default_epsilon', 'epsilon',
-                             'default_delta', 'delta',
-                             'confidence_level']
+                             'epsilon',
+                             'delta',
+                             'default_epsilon',
+                             'default_delta',
+                             'confidence_level'
+                             'wizrard_step',]
         problem_fields = []
         for field in request.data.keys():
             if field not in acceptable_fields:

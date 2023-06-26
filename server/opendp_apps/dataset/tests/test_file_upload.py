@@ -168,7 +168,7 @@ class TestFileUpload(TestCase):
 
         update_payload = dict(epsilon_questions=new_epsilon_questions,
                               dataset_questions=new_dataset_questions)
-        update_resp = self.client.put(partial_update_url,
+        update_resp = self.client.patch(partial_update_url,
                                       data=update_payload,
                                       content_type="application/json")
 
@@ -183,11 +183,12 @@ class TestFileUpload(TestCase):
 
         # (4) Update depositor info: default_epsilon, epsilon
         #
-        new_data_profile = json.load(open(join(FIXTURE_DATA_DIR, 'test_data_profile_teacher_survey.json'), 'r'))
+        new_variable_info = json.load(open(join(FIXTURE_DATA_DIR,
+                                                'test_data_profile_teacher_survey.json'), 'r'))
 
-        update_payload = dict(data_profile=new_data_profile)
+        update_payload = dict(variable_info=new_variable_info)
 
-        update_resp = self.client.put(partial_update_url,
+        update_resp = self.client.patch(partial_update_url,
                                       data=update_payload,
                                       content_type="application/json")
 
@@ -195,7 +196,7 @@ class TestFileUpload(TestCase):
 
         update_resp_json = update_resp.json()
         self.assertEqual(update_resp_json['is_complete'], False)
-        self.assertEqual(update_resp_json['data_profile'], new_data_profile)
+        self.assertEqual(update_resp_json['variable_info'], new_variable_info)
         self.assertEqual(update_resp_json['user_step'],
                          str(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE))
 
@@ -209,7 +210,7 @@ class TestFileUpload(TestCase):
         update_payload = dict(default_epsilon=new_default_epsilon,
                               epsilon=new_epsilon)
 
-        update_resp = self.client.put(partial_update_url,
+        update_resp = self.client.patch(partial_update_url,
                                       data=update_payload,
                                       content_type="application/json")
 
@@ -217,8 +218,8 @@ class TestFileUpload(TestCase):
 
         update_resp_json = update_resp.json()
         self.assertEqual(update_resp_json['is_complete'], True)
-        self.assertEqual(update_resp_json['default_epsilon'], 1.0) # set via dataset_questions
-        self.assertEqual(update_resp_json['default_delta'], astatic.DELTA_10_NEG_5) # set via dataset_questions
+        self.assertEqual(update_resp_json['default_epsilon'], 1.0)  # set via dataset_questions
+        self.assertEqual(update_resp_json['default_delta'], astatic.DELTA_10_NEG_5)  # set via dataset_questions
 
         self.assertEqual(update_resp_json['epsilon'], new_epsilon)
         self.assertEqual(update_resp_json['user_step'],
@@ -330,7 +331,7 @@ class TestFileUpload(TestCase):
 
         update_payload = dict(epsilon_questions=new_epsilon_questions,
                               dataset_questions=new_dataset_questions)
-        update_resp = self.client.put(partial_update_url,
+        update_resp = self.client.patch(partial_update_url,
                                       data=update_payload,
                                       content_type="application/json")
 
@@ -346,11 +347,11 @@ class TestFileUpload(TestCase):
 
         # (4) Update depositor info: default_epsilon, epsilon
         #
-        new_data_profile = json.load(open(join(FIXTURE_DATA_DIR, 'test_data_profile_teacher_survey.json'), 'r'))
+        new_variable_info = json.load(open(join(FIXTURE_DATA_DIR, 'test_data_profile_teacher_survey.json'), 'r'))
 
-        update_payload = dict(data_profile=new_data_profile)
+        update_payload = dict(variable_info=new_variable_info)
 
-        update_resp = self.client.put(partial_update_url,
+        update_resp = self.client.patch(partial_update_url,
                                       data=update_payload,
                                       content_type="application/json")
 
@@ -358,7 +359,7 @@ class TestFileUpload(TestCase):
 
         update_resp_json = update_resp.json()
         self.assertEqual(update_resp_json['is_complete'], False)
-        self.assertEqual(update_resp_json['data_profile'], new_data_profile)
+        self.assertEqual(update_resp_json['variable_info'], new_variable_info)
         self.assertEqual(update_resp_json['user_step'],
                          str(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE))
 
@@ -374,7 +375,7 @@ class TestFileUpload(TestCase):
                               epsilon=new_epsilon,
                               default_delta=new_default_delta)
 
-        update_resp = self.client.put(partial_update_url,
+        update_resp = self.client.patch(partial_update_url,
                                       data=update_payload,
                                       content_type="application/json")
 
@@ -389,7 +390,6 @@ class TestFileUpload(TestCase):
         #
         self.assertNotEqual(update_resp_json['default_epsilon'], new_default_epsilon)
         self.assertNotEqual(update_resp_json['default_delta'], new_default_delta)
-
 
         self.assertEqual(update_resp_json['epsilon'], new_epsilon)
         self.assertEqual(update_resp_json['user_step'],
@@ -428,9 +428,9 @@ class TestFileUpload(TestCase):
                                  "observations_number_can_be_public": ''}
 
         update_payload = dict(dataset_questions=new_dataset_questions,
-                              epsilon_questions=new_epsilon_questions,)
+                              epsilon_questions=new_epsilon_questions, )
 
-        update_resp = self.client.put(partial_update_url,
+        update_resp = self.client.patch(partial_update_url,
                                       data=update_payload,
                                       content_type="application/json")
 
@@ -446,11 +446,11 @@ class TestFileUpload(TestCase):
 
         # (4) Update depositor info: default_epsilon, epsilon
         #
-        new_data_profile = json.load(open(join(FIXTURE_DATA_DIR, 'test_data_profile_teacher_survey.json'), 'r'))
+        new_variable_info = json.load(open(join(FIXTURE_DATA_DIR, 'test_data_profile_teacher_survey.json'), 'r'))
 
-        update_payload = dict(data_profile=new_data_profile)
+        update_payload = dict(variable_info=new_variable_info)
 
-        update_resp = self.client.put(partial_update_url,
+        update_resp = self.client.patch(partial_update_url,
                                       data=update_payload,
                                       content_type="application/json")
 
@@ -458,7 +458,7 @@ class TestFileUpload(TestCase):
 
         update_resp_json = update_resp.json()
         self.assertEqual(update_resp_json['is_complete'], False)
-        self.assertEqual(update_resp_json['data_profile'], new_data_profile)
+        self.assertEqual(update_resp_json['variable_info'], new_variable_info)
         self.assertEqual(update_resp_json['user_step'],
                          str(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED))
 
@@ -477,7 +477,7 @@ class TestFileUpload(TestCase):
         update_payload = dict(epsilon=new_epsilon,
                               delta=new_delta)
 
-        update_resp = self.client.put(partial_update_url,
+        update_resp = self.client.patch(partial_update_url,
                                       data=update_payload,
                                       content_type="application/json")
 
@@ -491,4 +491,3 @@ class TestFileUpload(TestCase):
         self.assertEqual(update_resp_json['epsilon'], new_epsilon)
         self.assertEqual(update_resp_json['user_step'],
                          str(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED))
-

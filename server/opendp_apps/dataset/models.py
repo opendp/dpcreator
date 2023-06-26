@@ -89,7 +89,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
                                                encoder=DjangoJSONEncoder)
 
     # Includes variable ranges and categories
-    data_profile = models.JSONField(null=True, blank=True)
+    variable_info = models.JSONField(null=True, blank=True)
 
     #
     # Epsilon related fields
@@ -164,8 +164,8 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
 
     def save(self, *args, **kwargs):
         """Override the save method to set the user_step based on the data"""
-        if self.data_profile:
-            self.data_profile = format_variable_info(self.data_profile)
+        if self.variable_info:
+            self.variable_info = format_variable_info(self.variable_info)
 
         set_user_step_based_on_data(self)
         set_default_epsilon_delta_from_questions(self)
@@ -210,13 +210,13 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         return True
 
     @mark_safe
-    def data_profile_view(self):
+    def variable_info_view(self):
         """For admin display of the variable info"""
-        if not self.data_profile:
+        if not self.variable_info:
             return 'n/a'
 
         try:
-            info_str = json.dumps(self.data_profile, indent=4)
+            info_str = json.dumps(self.variable_info, indent=4)
             return f'<pre>{info_str}</pre>'
         except Exception as ex_obj:
             return f'Failed to convert to JSON string {ex_obj}'
@@ -371,25 +371,25 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     #       raise AttributeError(user_msg)
 
     def get_dataset_size(self) -> BasicResponse:
-        """Retrieve the rowCount index from the data_profile -- not always available"""
-        if not self.data_profile:
-            return err_resp('Data profile not available')
+        """Retrieve the rowCount index from the variable_info -- not always available"""
+        if not self.variable_info:
+            return err_resp('Variable info not available')
 
-        if 'dataset' not in self.data_profile:
+        if 'dataset' not in self.variable_info:
             return err_resp('Dataset information not available in profile')
 
-        if 'rowCount' not in self.data_profile['dataset']:
+        if 'rowCount' not in self.variable_info['dataset']:
             return err_resp('"rowCount" information not available in profile.')
 
-        row_count = self.data_profile['dataset']['rowCount']
+        row_count = self.variable_info['dataset']['rowCount']
         if row_count is None:
             return err_resp('"rowCount" information not available in profile (id:2')
 
-        return ok_resp(self.data_profile['dataset']['rowCount'])
+        return ok_resp(self.variable_info['dataset']['rowCount'])
 
     def get_variable_order(self, as_indices=False) -> BasicResponse:
         """
-        Retrieve the variableOrder list from the data_profile
+        Retrieve the variableOrder list from the variable_info
          Example data structure:
           {"dataset":{
               "rowCount":6610,
@@ -405,16 +405,16 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
         :param as_indices, if True, return [0, 1, 2], etc.
         """
-        if not self.data_profile:
-            return err_resp('Data profile not available')
+        if not self.variable_info:
+            return err_resp('Profile not available. (variable_info:1)')
 
-        if 'dataset' not in self.data_profile:
-            return err_resp('Dataset information not available in profile')
+        if 'dataset' not in self.variable_info:
+            return err_resp('Dataset information not available in profile. (variable_info:2)')
 
-        if 'variableOrder' not in self.data_profile['dataset']:
-            return err_resp('"variableOrder" information not available in profile (id:2')
+        if 'variableOrder' not in self.variable_info['dataset']:
+            return err_resp('"variableOrder" information not available in profile (variable_info:3')
 
-        variable_order = self.data_profile['dataset']['variableOrder']
+        variable_order = self.variable_info['dataset']['variableOrder']
 
         if as_indices:
             try:
@@ -427,7 +427,7 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         return ok_resp(variable_order)
 
     def get_variable_index(self, var_name: str) -> BasicResponse:
-        """Retrieve the variable index from the data_profile for a specific variable name
+        """Retrieve the variable index from the variable_info for a specific variable name
          Example data structure:
           {"dataset":{
               "rowCount":6610,
@@ -443,21 +443,21 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
         :param var_name - variable name, e.g. "cname" would return 1
         """
-        if not self.data_profile:
+        if not self.variable_info:
             return err_resp('Data profile not available')
 
-        if 'dataset' not in self.data_profile:
+        if 'dataset' not in self.variable_info:
             return err_resp('Dataset information not available in profile')
 
-        if 'variableOrder' not in self.data_profile['dataset']:
+        if 'variableOrder' not in self.variable_info['dataset']:
             return err_resp('"variableOrder" information not available in profile (id:2')
 
-        variable_order = self.data_profile['dataset']['variableOrder']
+        variable_order = self.variable_info['dataset']['variableOrder']
         if not variable_order:
             return err_resp('Bad "variableOrder" information in profile.')
 
         try:
-            for idx, feature in self.data_profile['dataset']['variableOrder']:
+            for idx, feature in self.variable_info['dataset']['variableOrder']:
                 if feature == var_name:
                     return ok_resp(idx)
                 elif feature == camel_to_snake(var_name):  # Temp workaround!!!
@@ -472,25 +472,25 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
     def get_profile_variables(self):
         """Return the data profile and DataSetInfo object_id as an OrderedDict or None."""
-        if not self.data_profile:
+        if not self.variable_info:
             return None
 
         od = OrderedDict(dict(object_id=self.object_id))
-        od.update(self.data_profile)
+        od.update(self.variable_info)
 
         return od
 
-    def data_profile_as_dict(self):
-        """Return the dataprofile as a dict or None."""
-        if not self.data_profile:
+    def variable_info_as_dict(self):
+        """Return the variable_info as a dict or None."""
+        if not self.variable_info:
             return None
 
         try:
-            if isinstance(self.data_profile, str):  # messy; decode escaped string to JSON string
-                load1 = json.loads(self.data_profile,
+            if isinstance(self.variable_info, str):  # messy; decode escaped string to JSON string
+                load1 = json.loads(self.variable_info,
                                    object_pairs_hook=OrderedDict)
             else:
-                load1 = self.data_profile
+                load1 = self.variable_info
 
             if isinstance(load1, dict):
                 return load1
@@ -500,15 +500,15 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         except json.JSONDecodeError:
             return None
 
-    def data_profile_as_json_str(self):
+    def variable_info_as_json_str(self):
         """
-        Return the dataprofile as a dict or None.
+        Return the variable_info as a dict or None.
         """
-        if not self.data_profile:
+        if not self.variable_info:
             return None
 
         try:
-            return json.loads(self.data_profile)
+            return json.loads(self.variable_info)
         except json.JSONDecodeError:
             return None
 
@@ -533,12 +533,12 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         return None
 
     @mark_safe
-    def data_profile_display(self):
+    def variable_info_display(self):
         """For admin display of the variable info"""
         if not self.depositor_setup_info:
             return 'n/a'
 
-        return self.depositor_setup_info.data_profile_display()
+        return self.depositor_setup_info.variable_info_view()
 
 
 class DataverseFileInfo(DataSetInfo):
