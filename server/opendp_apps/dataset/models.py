@@ -82,11 +82,11 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
                                          blank=True,
                                          validators=[validate_epsilon_questions])
 
-    unverified_data_profile = models.JSONField(help_text='Unverified data profile',
-                                               default=None,
-                                               null=True,
-                                               blank=True,
-                                               encoder=DjangoJSONEncoder)
+    data_profile = models.JSONField(help_text='Unverified data profile',
+                                    default=None,
+                                    null=True,
+                                    blank=True,
+                                    encoder=DjangoJSONEncoder)
 
     # Includes variable ranges and categories
     variable_info = models.JSONField(null=True, blank=True)
@@ -258,17 +258,17 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         except json.JSONDecodeError:
             return None
 
-    def unverified_data_profile_as_dict(self):
-        """Return the unverified_data_profile as a dict or None."""
-        if not self.unverified_data_profile:
+    def data_profile_as_dict(self):
+        """Return the data_profile as a dict or None."""
+        if not self.data_profile:
             return None
 
         try:
-            if isinstance(self.unverified_data_profile, str):  # messy; decode escaped string to JSON string
-                load1 = json.loads(self.unverified_data_profile,
+            if isinstance(self.data_profile, str):  # messy; decode escaped string to JSON string
+                load1 = json.loads(self.data_profile,
                                    object_pairs_hook=OrderedDict)
             else:
-                load1 = self.unverified_data_profile
+                load1 = self.data_profile
 
             if isinstance(load1, dict):
                 return load1
@@ -278,15 +278,15 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         except json.JSONDecodeError:
             return None
 
-    def unverified_data_profile_as_json_str(self):
+    def data_profile_as_json_str(self):
         """
-        Return the variable_info as a dict or None.
+        Return the data_profile as a dict or None.
         """
-        if not self.unverified_data_profile:
+        if not self.data_profile:
             return None
 
         try:
-            return json.loads(self.unverified_data_profile)
+            return json.loads(self.data_profile)
         except json.JSONDecodeError:
             return None
 

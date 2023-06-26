@@ -60,7 +60,7 @@ This includes depositor setup info.
         "wizard_step": "step_100",
         "dataset_questions": null,
         "epsilon_questions": null,
-        "unverified_data_profile": null,
+        "data_profile": null,
         "data_profile": null,
         "default_epsilon": null,
         "epsilon": null,
@@ -128,7 +128,7 @@ This includes depositor setup info.
         "population_size": "",
         "observations_number_can_be_public": "yes"
     },
-    "unverified_data_profile": null,
+    "data_profile": null,
     "variable_info": {
         "dataset": {
             "rowCount": 7000,

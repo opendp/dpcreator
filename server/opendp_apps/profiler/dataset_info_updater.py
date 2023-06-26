@@ -28,7 +28,7 @@ class DataSetInfoUpdater:
 
         # Save the profile to DataSetInfo.depositor_setup_info
         #
-        self.dataset_info.depositor_setup_info.unverified_data_profile = data_profile
+        self.dataset_info.depositor_setup_info.data_profile = data_profile
         if 'variables' in data_profile:
             self.dataset_info.depositor_setup_info.variable_info = data_profile['variables']
         self.dataset_info.depositor_setup_info.save()

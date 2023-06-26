@@ -207,7 +207,7 @@ class ProfilerTest(TestCase):
 
         # Re-retrieve object and data profile
         dsi = DataSetInfo.objects.get(object_id=dsi.object_id)
-        info = dsi.depositor_setup_info.unverified_data_profile_as_dict()
+        info = dsi.depositor_setup_info.data_profile_as_dict()
         print('end step:', dsi.depositor_setup_info.user_step)
         self.assertEqual(dsi.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_0600_EPSILON_SET)
@@ -224,13 +224,13 @@ class ProfilerTest(TestCase):
         # self.assertEqual(dsi.profile_variables['dataset']['variableCount'],
         #                  settings.PROFILER_COLUMN_LIMIT)
 
-        self.assertEqual(dsi.depositor_setup_info.unverified_data_profile['dataset']['variableCount'],
-                         len(dsi.depositor_setup_info.unverified_data_profile['dataset']['variableOrder']))
+        self.assertEqual(dsi.depositor_setup_info.data_profile['dataset']['variableCount'],
+                         len(dsi.depositor_setup_info.data_profile['dataset']['variableOrder']))
 
         # make the sure the "dataset.variableOrder" column names are in the "variables" dict
         #
-        for idx, colname in dsi.depositor_setup_info.unverified_data_profile['dataset']['variableOrder']:
-            self.assertTrue(colname in dsi.depositor_setup_info.unverified_data_profile['variables'])
+        for idx, colname in dsi.depositor_setup_info.data_profile['dataset']['variableOrder']:
+            self.assertTrue(colname in dsi.depositor_setup_info.data_profile['variables'])
 
     def test_020_bad_files(self):
         """(20) Test bad file type"""
@@ -335,7 +335,7 @@ class ProfilerTest(TestCase):
         #
         dsi2 = DataSetInfo.objects.get(object_id=self.test_file_info.object_id)
 
-        info = dsi2.depositor_setup_info.unverified_data_profile_as_dict()
+        info = dsi2.depositor_setup_info.data_profile_as_dict()
 
         # print('-- Profiler reads only first 20 features')
         self.assertTrue('variables' in info)
@@ -351,13 +351,13 @@ class ProfilerTest(TestCase):
         # self.assertEqual(dsi2.profile_variables['dataset']['variableCount'],
         #                  settings.PROFILER_COLUMN_LIMIT)
 
-        self.assertEqual(dsi2.depositor_setup_info.unverified_data_profile['dataset']['variableCount'],
-                         len(dsi2.depositor_setup_info.unverified_data_profile['dataset']['variableOrder']))
+        self.assertEqual(dsi2.depositor_setup_info.data_profile['dataset']['variableCount'],
+                         len(dsi2.depositor_setup_info.data_profile['dataset']['variableOrder']))
 
         # make the sure the "dataset.variableOrder" column names are in the "variables" dict
         #
-        for idx, colname in dsi2.depositor_setup_info.unverified_data_profile['dataset']['variableOrder']:
-            self.assertTrue(colname in dsi2.depositor_setup_info.unverified_data_profile['variables'])
+        for idx, colname in dsi2.depositor_setup_info.data_profile['dataset']['variableOrder']:
+            self.assertTrue(colname in dsi2.depositor_setup_info.data_profile['variables'])
 
     def test_45_bad_dataset_id(self):
         """(45) Test using bad DatasetInfo object id"""
