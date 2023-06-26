@@ -48,6 +48,7 @@ class ProfileRunner(BasicErrCheck):
         # ------------------------------
         # Used if a DataSetInfo object is specified
         self.dataset_info = None
+        # self.depositor_setup_info = None # from the dataset_info object above
         self.dataset_info_updater = None
         self.ds_pointer_for_pandas = None
 
@@ -97,6 +98,7 @@ class ProfileRunner(BasicErrCheck):
                 self.add_err_msg(dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND)
                 return
 
+            # self.depositor_setup_info = self.dataset_info.depositor_setup_info
             self.dataset_info_updater = DataSetInfoUpdater(self.dataset_info)
 
         # Is the dataset_pointer correct?
@@ -143,8 +145,8 @@ class ProfileRunner(BasicErrCheck):
         # (1) Does the profile already exist? Yes, then stop here
         #
         logger.info('(1) Does the profile already exist?')
-        if self.dataset_info and self.dataset_info.variable_info and \
-                self.dataset_info.profile_variables:
+        if self.dataset_info and self.dataset_info.depositor_setup_info.data_profile and \
+                self.dataset_info.variable_info:
             #
             # Profile is already done! Return!
             self.data_profile = self.dataset_info.variable_info
@@ -173,7 +175,7 @@ class ProfileRunner(BasicErrCheck):
         #
         logger.info('(2) Run the profiler')
         # Pre-profile: update user_step
-        if self.dataset_info:
+        if self.dataset_info and self.dataset_info.depositor_setup_info:
             if self.dataset_info.depositor_setup_info.user_step < DepositorSetupInfo.DepositorSteps.STEP_0300_PROFILING_PROCESSING:
                 self.set_depositor_info_status(DepositorSetupInfo.DepositorSteps.STEP_0300_PROFILING_PROCESSING)
                 logger.info('(2a) Update the profiler status')
@@ -200,5 +202,6 @@ class ProfileRunner(BasicErrCheck):
         logger.info(f'(3) Profile complete!')
         if self.dataset_info:
             self.dataset_info_updater.save_data_profile(variable_info_handler.data_profile)
-            if self.dataset_info.depositor_setup_info.user_step < DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE:
+            if self.dataset_info.depositor_setup_info.user_step < \
+                DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE:
                 self.set_depositor_info_status(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)

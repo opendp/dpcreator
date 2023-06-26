@@ -82,11 +82,11 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
                                          blank=True,
                                          validators=[validate_epsilon_questions])
 
-    unverified_data_profile = models.JSONField(help_text='Unverified data profile',
-                                               default=None,
-                                               null=True,
-                                               blank=True,
-                                               encoder=DjangoJSONEncoder)
+    data_profile = models.JSONField(help_text='Unverified data profile',
+                                    default=None,
+                                    null=True,
+                                    blank=True,
+                                    encoder=DjangoJSONEncoder)
 
     # Includes variable ranges and categories
     variable_info = models.JSONField(null=True, blank=True)
@@ -226,6 +226,69 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         """Return the label for the user step"""
         return self.user_step.get_user_step_display()
 
+    def variable_info_as_dict(self):
+        """Return the variable_info as a dict or None."""
+        if not self.variable_info:
+            return None
+
+        try:
+            if isinstance(self.variable_info, str):  # messy; decode escaped string to JSON string
+                load1 = json.loads(self.variable_info,
+                                   object_pairs_hook=OrderedDict)
+            else:
+                load1 = self.variable_info
+
+            if isinstance(load1, dict):
+                return load1
+
+            return json.loads(load1, object_pairs_hook=OrderedDict)  # JSON string to OrderedDict
+
+        except json.JSONDecodeError:
+            return None
+
+    def variable_info_as_json_str(self):
+        """
+        Return the variable_info as a dict or None.
+        """
+        if not self.variable_info:
+            return None
+
+        try:
+            return json.loads(self.variable_info)
+        except json.JSONDecodeError:
+            return None
+
+    def data_profile_as_dict(self):
+        """Return the data_profile as a dict or None."""
+        if not self.data_profile:
+            return None
+
+        try:
+            if isinstance(self.data_profile, str):  # messy; decode escaped string to JSON string
+                load1 = json.loads(self.data_profile,
+                                   object_pairs_hook=OrderedDict)
+            else:
+                load1 = self.data_profile
+
+            if isinstance(load1, dict):
+                return load1
+
+            return json.loads(load1, object_pairs_hook=OrderedDict)  # JSON string to OrderedDict
+
+        except json.JSONDecodeError:
+            return None
+
+    def data_profile_as_json_str(self):
+        """
+        Return the data_profile as a dict or None.
+        """
+        if not self.data_profile:
+            return None
+
+        try:
+            return json.loads(self.data_profile)
+        except json.JSONDecodeError:
+            return None
 
 class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     """
@@ -480,7 +543,7 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
         return od
 
-    def variable_info_as_dict(self):
+    def xvariable_info_as_dict(self):
         """Return the variable_info as a dict or None."""
         if not self.variable_info:
             return None
@@ -500,7 +563,7 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         except json.JSONDecodeError:
             return None
 
-    def variable_info_as_json_str(self):
+    def xvariable_info_as_json_str(self):
         """
         Return the variable_info as a dict or None.
         """
