@@ -7,7 +7,7 @@
     <v-card elevation="2" class="px-10 py-12">
       <v-icon
           style="position: absolute; right: 40px"
-          @click="() => $emit('update:dialog', fØalse)"
+          @click="() => $emit('update:dialog', false)"
       >mdi-close
       </v-icon
       >
