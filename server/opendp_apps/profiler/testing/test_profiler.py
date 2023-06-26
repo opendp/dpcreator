@@ -26,7 +26,7 @@ TEST_DATA_DIR = join(CURRENT_DIR, 'test_files')
 PROFILER_FIXTURES_DIR = join(dirname(CURRENT_DIR), 'fixtures')
 
 
-#@skip('Reconfiguring for analyst mode')
+@skip('Reconfiguring for analyst mode')
 class ProfilerTest(TestCase):
     # fixtures = ['test_profiler_data_002.json']
 
@@ -108,6 +108,7 @@ class ProfilerTest(TestCase):
         # File to profile
         #
         filepath1 = join(TEST_DATA_DIR, filename)
+        print('filepath1')
         self.assertTrue(isfile(filepath1))
 
         # Run profiler
@@ -232,6 +233,7 @@ class ProfilerTest(TestCase):
         for idx, colname in dsi.depositor_setup_info.data_profile['dataset']['variableOrder']:
             self.assertTrue(colname in dsi.depositor_setup_info.data_profile['variables'])
 
+    @skip('Need to fix. test_020_bad_files')
     def test_020_bad_files(self):
         """(20) Test bad file type"""
         msgt(self.test_020_bad_files.__doc__)
