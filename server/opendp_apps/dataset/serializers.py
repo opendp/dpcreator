@@ -92,6 +92,7 @@ class DepositorSetupInfoSerializer(serializers.ModelSerializer):
                   'confidence_level']
         read_only_fields = ['object_id',
                             'id',
+                            'is_complete',
                             'user_step',
                             'unverified_data_profile',
                             'default_epsilon',

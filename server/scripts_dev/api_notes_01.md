@@ -6,6 +6,7 @@ DRF link: http://localhost:8000/api/
 **Contents**
 - [Direct File Upload](#direct-file-upload)
 - [Get Dataset info (including depositor setup info)](#get-dataset-info)
+- [Update Depositor Setup Info](#update-depositor-setup-info)
 
 
 --- 
@@ -73,7 +74,7 @@ This includes depositor setup info.
 }
 ```
 
-## Update Depositor Info
+## Update Depositor Setup Info
 
 This includes depositor setup info.
 
@@ -96,13 +97,158 @@ This includes depositor setup info.
        - Must be positive integer if secret_sample is "yes". Otherwise, population_size is not checked.
     - **observations_number_can_be_public**: "yes", "no"
        - maybe be an empty string ("") in API call if not answered
-  - **data_profile**: json
+  - **variable_info**: JSON
     - Updated from the confirm variables page
-  - **epsilon**: boolean
-  - **delta**: boolean
-  - **confidence_level**: choices
-  - **is_complete**: boolean
+  - **epsilon**: float field or null
+  - **delta**: float field or null
+  - **confidence_level**: choices in UI (0.90, 0.95, 0.99) 
+- Note: Params that CANNOT be updated via API  
+  - **is_complete
+  - **user_step**
+  - **default_epsilon**
+  - **default_delta**
 - **DRF link**: http://localhost:8000/api/deposit/
 - Response example:
 ```json
+{
+    "object_id": "ab0dd16d-01d6-4aa8-90f1-b897aeef8746",
+    "id": 1,
+    "created": "2023-06-26T12:53:53.960872Z",
+    "updated": "2023-06-26T12:53:54.012436Z",
+    "is_complete": true,
+    "user_step": "step_600",
+    "wizard_step": "step_100",
+    "dataset_questions": {
+        "radio_best_describes": "notHarmButConfidential",
+        "radio_only_one_individual_per_row": "yes",
+        "radio_depend_on_private_information": "yes"
+    },
+    "epsilon_questions": {
+        "secret_sample": "no",
+        "population_size": "",
+        "observations_number_can_be_public": "yes"
+    },
+    "unverified_data_profile": null,
+    "variable_info": {
+        "dataset": {
+            "rowCount": 7000,
+            "variableCount": 10,
+            "variableOrder": [
+                [
+                    0,
+                    "sex"
+                ],
+                [
+                    1,
+                    "age"
+                ],
+                [
+                    2,
+                    "maritalstatus"
+                ],
+                [
+                    3,
+                    "Havingchild"
+                ],
+                [
+                    4,
+                    "highesteducationlevel"
+                ],
+                [
+                    5,
+                    "sourceofstress"
+                ],
+                [
+                    6,
+                    "smoking"
+                ],
+                [
+                    7,
+                    "optimism"
+                ],
+                [
+                    8,
+                    "lifesattisfaction"
+                ],
+                [
+                    9,
+                    "selfesteem"
+                ]
+            ]
+        },
+        "variables": {
+            "age": {
+                "name": "age",
+                "type": "Integer",
+                "label": "",
+                "sort_order": 1
+            },
+            "sex": {
+                "name": "sex",
+                "type": "Integer",
+                "label": "",
+                "sort_order": 0
+            },
+            "smoking": {
+                "name": "smoking",
+                "type": "Categorical",
+                "label": "",
+                "categories": [],
+                "sort_order": 6
+            },
+            "optimism": {
+                "name": "optimism",
+                "type": "Categorical",
+                "label": "",
+                "categories": [],
+                "sort_order": 7
+            },
+            "selfesteem": {
+                "name": "selfesteem",
+                "type": "Categorical",
+                "label": "",
+                "categories": [],
+                "sort_order": 9
+            },
+            "Havingchild": {
+                "name": "Havingchild",
+                "type": "Categorical",
+                "label": "",
+                "categories": [],
+                "sort_order": 3
+            },
+            "maritalstatus": {
+                "name": "maritalstatus",
+                "type": "Integer",
+                "label": "",
+                "sort_order": 2
+            },
+            "sourceofstress": {
+                "name": "sourceofstress",
+                "type": "Categorical",
+                "label": "",
+                "categories": [],
+                "sort_order": 5
+            },
+            "lifesattisfaction": {
+                "name": "lifesattisfaction",
+                "type": "Categorical",
+                "label": "",
+                "categories": [],
+                "sort_order": 8
+            },
+            "highesteducationlevel": {
+                "name": "highesteducationlevel",
+                "type": "Integer",
+                "label": "",
+                "sort_order": 4
+            }
+        }
+    },
+    "default_epsilon": 1.0,
+    "epsilon": 0.75,
+    "default_delta": 1e-05,
+    "delta": 0.0,
+    "confidence_level": 0.95
+}
 ```
