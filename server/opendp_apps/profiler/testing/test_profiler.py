@@ -26,7 +26,7 @@ TEST_DATA_DIR = join(CURRENT_DIR, 'test_files')
 PROFILER_FIXTURES_DIR = join(dirname(CURRENT_DIR), 'fixtures')
 
 
-@skip('Reconfiguring for analyst mode')
+#@skip('Reconfiguring for analyst mode')
 class ProfilerTest(TestCase):
     # fixtures = ['test_profiler_data_002.json']
 
@@ -172,7 +172,7 @@ class ProfilerTest(TestCase):
         params = {pstatic.KEY_SAVE_ROW_COUNT: False}
         self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 1500, **params)
 
-    # @skip('test_010_profile_good_file')
+    #@skip('test_010_profile_good_file')
     def test_010_profile_good_file(self):
         """(10) Profile file directory"""
         msgt(self.test_010_profile_good_file.__doc__)
@@ -203,13 +203,14 @@ class ProfilerTest(TestCase):
         self.assertEqual(profiler.num_variables, settings.PROFILER_COLUMN_LIMIT)
 
         profile_json_str1 = json.dumps(profiler.data_profile, cls=DjangoJSONEncoder, indent=4)
+        # print(profile_json_str1)
 
         # Re-retrieve object and data profile
         dsi = DataSetInfo.objects.get(object_id=dsi.object_id)
-        info = dsi.variable_info_as_dict()
+        info = dsi.depositor_setup_info.unverified_data_profile_as_dict()
         print('end step:', dsi.depositor_setup_info.user_step)
         self.assertEqual(dsi.depositor_setup_info.user_step,
-                         DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
+                         DepositorSetupInfo.DepositorSteps.STEP_0600_EPSILON_SET)
 
         # print('-- Profiler reads only first 20 features')
         self.assertTrue('variables' in info)
@@ -218,18 +219,18 @@ class ProfilerTest(TestCase):
         print('-- Profiler output is the same as the output saved to the DataSetInfo object')
         profile_json_str2 = json.dumps(info, cls=DjangoJSONEncoder, indent=4)
         self.assertTrue(profile_json_str1, profile_json_str2)
-        # print(profile_json_str2)
-
+        print(profile_json_str2)
+        # return
         # self.assertEqual(dsi.profile_variables['dataset']['variableCount'],
         #                  settings.PROFILER_COLUMN_LIMIT)
 
-        self.assertEqual(dsi.profile_variables['dataset']['variableCount'],
-                         len(dsi.profile_variables['dataset']['variableOrder']))
+        self.assertEqual(dsi.depositor_setup_info.unverified_data_profile['dataset']['variableCount'],
+                         len(dsi.depositor_setup_info.unverified_data_profile['dataset']['variableOrder']))
 
         # make the sure the "dataset.variableOrder" column names are in the "variables" dict
         #
-        for idx, colname in dsi.profile_variables['dataset']['variableOrder']:
-            self.assertTrue(colname in dsi.profile_variables['variables'])
+        for idx, colname in dsi.depositor_setup_info.unverified_data_profile['dataset']['variableOrder']:
+            self.assertTrue(colname in dsi.depositor_setup_info.unverified_data_profile['variables'])
 
     def test_020_bad_files(self):
         """(20) Test bad file type"""
@@ -299,6 +300,7 @@ class ProfilerTest(TestCase):
         self.assertEqual(dsi2.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
 
+    # @skip('test_40_filefield_correct: Reconfiguring for analyst mode')
     def test_40_filefield_correct(self):
         """(40) Test using filefield with legit file"""
         msgt(self.test_40_filefield_correct.__doc__)
@@ -333,14 +335,14 @@ class ProfilerTest(TestCase):
         #
         dsi2 = DataSetInfo.objects.get(object_id=self.test_file_info.object_id)
 
-        info = dsi2.variable_info_as_dict()
+        info = dsi2.depositor_setup_info.unverified_data_profile_as_dict()
 
         # print('-- Profiler reads only first 20 features')
         self.assertTrue('variables' in info)
         self.assertEqual(len(info['variables'].keys()), settings.PROFILER_COLUMN_LIMIT)
 
         self.assertEqual(dsi2.depositor_setup_info.user_step,
-                         DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
+                         DepositorSetupInfo.DepositorSteps.STEP_0600_EPSILON_SET)
 
         # print('dsi2.profile_variables', dsi2.profile_variables)
         # self.assertEqual(len(dsi2.profile_variables['variables'].keys()),
@@ -349,13 +351,13 @@ class ProfilerTest(TestCase):
         # self.assertEqual(dsi2.profile_variables['dataset']['variableCount'],
         #                  settings.PROFILER_COLUMN_LIMIT)
 
-        self.assertEqual(dsi2.profile_variables['dataset']['variableCount'],
-                         len(dsi2.profile_variables['dataset']['variableOrder']))
+        self.assertEqual(dsi2.depositor_setup_info.unverified_data_profile['dataset']['variableCount'],
+                         len(dsi2.depositor_setup_info.unverified_data_profile['dataset']['variableOrder']))
 
         # make the sure the "dataset.variableOrder" column names are in the "variables" dict
         #
-        for idx, colname in dsi2.profile_variables['dataset']['variableOrder']:
-            self.assertTrue(colname in dsi2.profile_variables['variables'])
+        for idx, colname in dsi2.depositor_setup_info.unverified_data_profile['dataset']['variableOrder']:
+            self.assertTrue(colname in dsi2.depositor_setup_info.unverified_data_profile['variables'])
 
     def test_45_bad_dataset_id(self):
         """(45) Test using bad DatasetInfo object id"""

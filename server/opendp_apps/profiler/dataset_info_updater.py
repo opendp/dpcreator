@@ -26,18 +26,11 @@ class DataSetInfoUpdater:
         :return:
         """
 
-        # Save the profile to DataSetInfo
-        # TODO: redundant; remove one field
-        self.dataset_info.data_profile = data_profile
-        self.dataset_info.profile_variables = data_profile
+        # Save the profile to DataSetInfo.depositor_setup_info
+        #
+        self.dataset_info.depositor_setup_info.unverified_data_profile = data_profile
+        if 'variables' in data_profile:
+            self.dataset_info.depositor_setup_info.variable_info = data_profile['variables']
+        self.dataset_info.depositor_setup_info.save()
         self.dataset_info.save()
 
-        # Save the profile "variables" section to DepositorSetupInfo
-        #
-        dsi = self.dataset_info.depositor_setup_info
-        if not dsi:
-            return
-
-        if 'variables' in data_profile:
-            dsi.variable_info =  data_profile['variables']
-            dsi.save()
