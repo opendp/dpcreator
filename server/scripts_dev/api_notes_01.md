@@ -84,29 +84,34 @@ This includes depositor setup info.
 - **Auth**: username/password
 - **Params**: Any or all of these params may be updated
   - **dataset_questions**: JSON, with the following keys and potential values:
-    - **radio_best_describes**: "public", "notHarmButConfidential", "couldCauseHarm", "wouldLikelyCauseHarm", "wouldCauseSevereHarm"
-       - empty string ("") returns an error
-    - **radio_only_one_individual_per_row**: "yes", "no"
-       - maybe be an empty string ("") in API call if not answered
-    - **radio_depend_on_private_information**: "yes", "no"
-       - maybe be an empty string ("") in API call if not answered
+    - `radio_best_describes`
+      - values: "public", "notHarmButConfidential", "couldCauseHarm", "wouldLikelyCauseHarm", "wouldCauseSevereHarm"
+         - empty string ("") returns an error
+    - `radio_only_one_individual_per_row`
+      - values: "yes", "no"
+         - an empty string ("") is allowed in the API call if the question as not been answered
+    - `radio_depend_on_private_information`
+      - values: "yes", "no"
+      - an empty string ("") is allowed in the API call if the question as not been answered  
   - **epsilon_questions**: JSON, with the following keys and potential values:
-    - **secret_sample**: "yes", "no"
-       - maybe be an empty string ("") in API call if not answered
-    - **population_size**: positive integer
+    - `secret_sample`
+      - values: "yes", "no"
+      - an empty string ("") is allowed in the API call if the question as not been answered  
+    - `population_size`: positive integer
        - Must be positive integer if secret_sample is "yes". Otherwise, population_size is not checked.
-    - **observations_number_can_be_public**: "yes", "no"
-       - maybe be an empty string ("") in API call if not answered
+    - `observations_number_can_be_public`
+      - values: "yes", "no"
+      - an empty string ("") is allowed in the API call if the question as not been answered  
   - **variable_info**: JSON
     - Updated from the confirm variables page
   - **epsilon**: float field or null
   - **delta**: float field or null
   - **confidence_level**: choices in UI (0.90, 0.95, 0.99) 
-- Note: Params that CANNOT be updated via API  
-  - **is_complete
-  - **user_step**
-  - **default_epsilon**
-  - **default_delta**
+- **Params that CANNOT be updated via API**  
+  - `is_complete`
+  - `user_step`
+  - `default_epsilon`
+  - `default_delta`
 - **DRF link**: http://localhost:8000/api/deposit/
 - Response example:
 ```json
