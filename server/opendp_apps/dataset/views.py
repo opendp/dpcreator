@@ -57,7 +57,7 @@ class DepositorSetupViewSet(BaseModelViewSet):
                              'default_epsilon',
                              'default_delta',
                              'confidence_level'
-                             'wizrard_step',]
+                             'wizard_step']
         problem_fields = []
         for field in request.data.keys():
             if field not in acceptable_fields:
