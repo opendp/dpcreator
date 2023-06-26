@@ -143,11 +143,11 @@ class ProfileRunner(BasicErrCheck):
         # (1) Does the profile already exist? Yes, then stop here
         #
         logger.info('(1) Does the profile already exist?')
-        if self.dataset_info and self.dataset_info.data_profile and \
+        if self.dataset_info and self.dataset_info.variable_info and \
                 self.dataset_info.profile_variables:
             #
             # Profile is already done! Return!
-            self.data_profile = self.dataset_info.data_profile
+            self.data_profile = self.dataset_info.variable_info
             logger.info('Profile exists. All done.')
             return
 
