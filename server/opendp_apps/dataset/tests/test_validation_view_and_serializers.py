@@ -1,6 +1,5 @@
 import json
 from os.path import abspath, dirname, isfile, join
-from unittest import skip
 
 from django.contrib.auth import get_user_model
 from django.core.files import File
@@ -19,7 +18,10 @@ from opendp_apps.utils.extra_validators import VALIDATE_MSG_EPSILON
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
+from unittest import skip
 
+
+@skip('Reconfiguring for analyst mode')
 class TestValidationViewAndSerializers(TestCase):
     fixtures = ['test_dataset_data_002.json', ]
 

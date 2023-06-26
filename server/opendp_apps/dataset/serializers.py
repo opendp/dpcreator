@@ -93,7 +93,7 @@ class DepositorSetupInfoSerializer(serializers.ModelSerializer):
         read_only_fields = ['object_id',
                             'id',
                             'is_complete',
-                            'user_step',
+                            # 'user_step',
                             'unverified_data_profile',
                             'default_epsilon',
                             'default_delta',

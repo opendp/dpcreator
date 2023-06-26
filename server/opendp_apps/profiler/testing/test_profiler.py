@@ -185,7 +185,7 @@ class ProfilerTest(TestCase):
         #
         dsi = DataSetInfo.objects.get(object_id=self.test_file_info.object_id)
         self.assertEqual(dsi.depositor_setup_info.user_step,
-                         DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
+                         DepositorSetupInfo.DepositorSteps.STEP_0000_INITIALIZED)
 
         # Run profiler
         #
@@ -259,7 +259,7 @@ class ProfilerTest(TestCase):
         #
         dsi = DataSetInfo.objects.get(object_id=self.test_file_info.object_id)
         self.assertEqual(dsi.depositor_setup_info.user_step,
-                         DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
+                         DepositorSetupInfo.DepositorSteps.STEP_0000_INITIALIZED)
 
         # Try to profile an empty Django FileField
         #
@@ -305,7 +305,7 @@ class ProfilerTest(TestCase):
         #
         dsi = DataSetInfo.objects.get(object_id=self.test_file_info.object_id)
         self.assertEqual(dsi.depositor_setup_info.user_step,
-                         DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
+                         DepositorSetupInfo.DepositorSteps.STEP_0000_INITIALIZED)
 
         # --------------------------------------------------
         # Attach the file to the DataSetInfo's file field

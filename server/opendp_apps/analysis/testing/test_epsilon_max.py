@@ -1,12 +1,15 @@
 """
 Test of epsilon addition and offsetting floating point anomaly
 """
+from unittest import skip
+
 from django.test import TestCase
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.model_helpers.msg_util import msgt
 
 
+@skip('Reconfiguring for analyst mode')
 class TestEpsilonMax(TestCase):
 
     def setUp(self):

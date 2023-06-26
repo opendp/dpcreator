@@ -45,6 +45,6 @@ class TestSetupQuestionFormatter(TestCase):
         self.assertEqual(fmt_dict[1]['attribute'], astatic.SETUP_Q_02_ATTR)
 
         self.assertEqual(fmt_dict[1]['privacy_params'],
-                         {"epsilon": 1, "delta": 5})
+                         {"epsilon": 1, "delta": astatic.DELTA_10_NEG_5})
 
         self.assertEqual(fmt_dict[3]['population_size'], 1000000)

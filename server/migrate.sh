@@ -32,11 +32,12 @@ echo "-----------------------"
 echo "| Load fixtures       |"
 echo "| (for dev)           |"
 echo "-----------------------"
-python /code/server/manage.py loaddata opendp_apps/dataverses/fixtures/admin_emailaddress.json \
-  opendp_apps/dataverses/fixtures/terms.json \
-  opendp_apps/dataverses/fixtures/test_dataverses_01.json \
-  opendp_apps/dataverses/fixtures/test_user_emailaddress.json \
-  opendp_apps/banner_messages/fixtures/*.json
+python /code/server/manage.py loaddata opendp_apps/dataverses/fixtures/admin_emailaddress.json
+python /code/server/manage.py loaddata opendp_apps/dataverses/fixtures/terms.json
+python /code/server/manage.py loaddata opendp_apps/dataverses/fixtures/test_dataverses_01.json
+# python /code/server/manage.py loaddata opendp_apps/dataverses/fixtures/test_user_emailaddress.json
+python /code/server/manage.py loaddata opendp_apps/banner_messages/fixtures/*.json
+#  opendp_apps/banner_messages/fixtures/*.json
 #   opendp_apps/dataset/fixtures/*.json
 echo "------------------------------"
 echo "| Clear several test fixtures |"

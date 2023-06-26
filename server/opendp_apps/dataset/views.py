@@ -51,11 +51,12 @@ class DepositorSetupViewSet(BaseModelViewSet):
         """
         acceptable_fields = ['dataset_questions',
                              'epsilon_questions',
+                             'user_step', # TODO: Remove this
                              'variable_info',
                              'epsilon',
                              'delta',
-                             'default_epsilon',
-                             'default_delta',
+                             'default_epsilon', # TODO: Remove this
+                             'default_delta', # TODO: Remove this
                              'confidence_level'
                              'wizard_step']
         problem_fields = []

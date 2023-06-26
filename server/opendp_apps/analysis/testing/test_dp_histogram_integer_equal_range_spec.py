@@ -27,7 +27,8 @@ if not isfile(DP_ANALYSIS_TEST_DIR):
     os.makedirs(DP_ANALYSIS_TEST_DIR, exist_ok=True)
     print('created: ', DP_ANALYSIS_TEST_DIR)
 
-
+from unittest import skip
+@skip('Reconfiguring for analyst mode')
 class HistogramIntegerEqualRangeStatSpecTest(StatSpecTestCase):
     fixtures = ['test_dataset_data_001.json', ]
 

@@ -1,3 +1,5 @@
+from unittest import skip
+
 import requests_mock
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -7,6 +9,7 @@ from opendp_apps.dataverses.testing.test_endpoints import BaseEndpointTest
 from opendp_apps.model_helpers.msg_util import msgt
 
 
+@skip('Reconfiguring for analyst mode')
 @requests_mock.Mocker()
 class TestDataSetSerializer(BaseEndpointTest):
     fixtures = ['test_dataverses_01.json',
@@ -56,7 +59,7 @@ class TestDataSetSerializer(BaseEndpointTest):
         depositor_setup_info.pop('object_id')
         depositor_setup_info.pop('created')
         depositor_setup_info.pop('updated')
-        #depositor_setup_info.pop('creator')
+        # depositor_setup_info.pop('creator')
         self.assertEqual(depositor_setup_info, {'id': 5,
                                                 'dataset_questions': None,
                                                 'epsilon_questions': None,

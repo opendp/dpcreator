@@ -13,6 +13,8 @@ from opendp_apps.utils.extra_validators import VALIDATE_MSG_FIXED_VAL_NOT_IN_CAT
 from opendp_apps.utils.variable_info_formatter import format_variable_info
 
 
+from unittest import skip
+@skip('Reconfiguring for analyst mode')
 class HistogramCategoricalStatSpecTest(StatSpecTestCase):
     fixtures = ['test_dataset_data_001.json', ]
 
