@@ -74,6 +74,7 @@ services:
   #   running tasks
   # ---------------------------------
   celery-queue:
+    platform: linux/amd64
     build: "./server"
     environment:
       - DJANGO_SETTINGS_MODULE=opendp_project.settings.cypress_settings
