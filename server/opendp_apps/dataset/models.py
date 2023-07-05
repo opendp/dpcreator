@@ -132,8 +132,11 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         STEP_0100_FILE_UPLOAD = 'step_100', 'Step 1: File Upload'
         STEP_0200_DATASET_QUESTIONS = 'step_200', 'Step 2: Dataset Questions'
         STEP_0300_CONFIRM_VARIABLES = 'step_300', 'Step 3: Confirm Variables'
-        STEP_0400_SET_EPSILON = 'step_400', 'Step 4: Set Epsilon'
+        STEP_0400_PROFILING_COMPLETE = 'step_400', 'Step 4: Profiling Complete'
+        STEP_0500_VARIABLE_DEFAULTS_CONFIRMED = 'step_500', 'Step 5: Variable Defaults Confirmed'
+        STEP_0600_EPSILON_SET = 'step_600', 'Step 6: Epsilon Set'
 
+        # Error statuses should begin with 9
     wizard_step = models.CharField(max_length=128,
                                    choices=WizardSteps.choices,
                                    default=WizardSteps.STEP_0100_FILE_UPLOAD)
