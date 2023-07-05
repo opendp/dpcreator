@@ -6,6 +6,7 @@ const camelcaseKeys = require('camelcase-keys');
 
 export default {
 
+
     /**
      *  Updates a DepositSetupInfo object with the properties
      * @param objectId DepositorSetupInfo identifier
@@ -13,9 +14,15 @@ export default {
      * @returns {Promise<AxiosResponse<any>>} the updated object
      */
     patchDepositorSetup(objectId, props) {
+        if (props.userStep) {
+            props.wizardStep = props.userStep
+        }
         const snakeProps = caseConversion.customSnakecaseKeys(props)
         return wrappedSession.patch('/api/deposit/' + objectId + '/',
-            snakeProps).then(resp => camelcaseKeys(resp.data, {deep: true}))
+            snakeProps).then(resp => {
+                 resp.data.wizard_step = resp.data.user_step
+                camelcaseKeys(resp.data, {deep: true})
+            })
 
     },
     getHistogramBuckets(min, max, numberOfBins) {
