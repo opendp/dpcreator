@@ -35,6 +35,25 @@ export default {
             {object_id: datasetId})
             .then(resp => camelcaseKeys(resp.data, {deep: true}))
     },
+    getUserAnalysisPlans() {
+        return wrappedSession.get('/api/analyze/')
+           /* .then(resp => {
+
+                if (resp.data.results) {
+                    const modifiedResults = resp.data.results.map((obj) => {
+                        // copy wizard_step into user_step
+                        obj.depositor_setup_info.user_step = obj.depositor_setup_info.wizard_step;
+                        console.log('setting status to ' + obj.depositor_setup_info.wizard_step)
+                        obj.status = obj.depositor_setup_info.wizard_step;
+                        return obj;
+                    });
+                    resp.data.results = modifiedResults
+                }
+                return resp;
+            }) */
+            .then(resp => camelcaseKeys(resp, {deep: true}))
+
+    },
     getAnalysisPlan(analysisId) {
         return wrappedSession.get('/api/analyze/' + analysisId + '/')
             .then(resp => camelcaseKeys(resp.data, {deep: true}))

@@ -6,6 +6,7 @@ import {
     REMOVE_ANALYSIS_PLAN,
     REMOVE_DATASET,
     SET_ANALYSIS_PLAN,
+    SET_ANALYSIS_PLAN_LIST,
     SET_DATASET_INFO,
     SET_DATASET_LIST,
     SET_MYDATA_LIST,
@@ -27,6 +28,7 @@ const camelcaseKeys = require('camelcase-keys');
 
 const initialState = {
     datasetList: null,
+    analysisPlanList: null,
     datasetInfo: null,
     profilerStatus: null,
     profilerMsg: null,
@@ -56,6 +58,9 @@ const getters = {
 
     getMyDataList: state => {
         return state.myDataList
+    },
+    getAnalysisPlanList: state => {
+        return state.analysisPlanList
     },
     getUpdatedTime: state => {
         if (state.analysisPlan) {
@@ -220,6 +225,14 @@ const actions = {
             .then((resp) => {
                 commit(SET_DATASET_LIST, resp.data.results)
                 commit(SET_MYDATA_LIST, resp.data.results)
+            })
+    },
+    setAnalysisPlanList({commit, state}) {
+        return analysis.getUserAnalysisPlans()
+            .then((resp) => {
+                console.log('committing: ' +JSON.stringify(resp.data.results))
+                commit(SET_ANALYSIS_PLAN_LIST, resp.data.results)
+
             })
     },
     setDatasetInfo({commit, state}, objectId) {
@@ -486,6 +499,9 @@ const mutations = {
     },
     [SET_DATASET_LIST](state, datasetList) {
         state.datasetList = datasetList
+    },
+    [SET_ANALYSIS_PLAN_LIST](state, analysisPlanList) {
+        state.analysisPlanList = analysisPlanList
     },
     [SET_PROFILER_MSG](state, msg) {
         state.profilerMsg = msg

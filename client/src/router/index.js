@@ -8,6 +8,7 @@ const {
   HOME,
   WELCOME,
   MY_DATA,
+  MY_ANALYSIS_PLANS,
   MY_DATA_DETAILS,
   WIZARD,
   SIGN_UP,
@@ -41,7 +42,14 @@ const routes = [
       requiresDataset: true
     }
   },
-
+  {
+    path: MY_ANALYSIS_PLANS.PATH,
+    name: MY_ANALYSIS_PLANS.NAME,
+    component: () => import("../views/MyAnalysisPlans.vue"),
+    meta: {
+      requiresAuth: true,
+    }
+  },
   {
     path: MY_DATA.PATH,
     name: MY_DATA.NAME,
