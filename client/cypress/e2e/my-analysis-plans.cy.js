@@ -34,9 +34,13 @@
                         "results": analysisPlanList.plans
                     }
                 })
-            })
-            cy.visit('/my-plans')
+                cy.visit('/my-plans')
 
+                cy.get('[data-test="my-plans-table"]').should('be.visible')
+                analysisPlanList.plans.forEach(plan => {
+                    cy.get('[data-test="my-plans-table"]').should('contain.text', plan.datasetName)
+                })
+            })
 
         })
 
