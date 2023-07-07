@@ -30,9 +30,10 @@ export default {
             {min: min, max: max, number_of_bins: numberOfBins})
             .then(resp => camelcaseKeys(resp.data, {deep: true}))
     },
-    createAnalysisPlan(datasetId) {
+    // For analysisPlan, we need to add new params to API
+    createAnalysisPlan(datasetId, analystId, budget, name, expirationDate) {
         return wrappedSession.post('/api/analyze/',
-            {object_id: datasetId})
+            {object_id: datasetId, analyst_id: an})
             .then(resp => camelcaseKeys(resp.data, {deep: true}))
     },
     getUserAnalysisPlans() {

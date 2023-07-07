@@ -206,7 +206,10 @@ export default {
         {text: "Dataset Name", value: "datasetName"},
         {text: "Plan Name", value: "planName"},
         {text: "Analyst", value: "analyst"},
-        {text: "Budget", value: "budget"}
+        {text: "Budget", value: "budget"},
+        {text: "Status", value: "status"},
+        {text: "Options", value: "actions", align: "end"}
+
       ],
   //    statusInformation,
   //    actionsInformation,

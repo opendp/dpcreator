@@ -25,24 +25,32 @@
 
             cy.createAccount(username, email, password)
             cy.fixture('analysisPlanList.json').then(analysisPlanList => {
+                cy.fixture('analysisPlansDatasetList.json').then(dataset => {
+                    cy.intercept('GET', '/api/dataset-info/', {
+                        body: {
+                            "count": 1,
+                            "next": null,
+                            "previous": null,
+                            "results": [dataset]
+                        }
+                    })
+                    cy.intercept('GET', '/api/analyze/', {
+                        body: {
+                            "count": 1,
+                            "next": null,
+                            "previous": null,
+                            "results": analysisPlanList.plans
+                        }
+                    })
+                    cy.visit('/my-plans')
 
-                cy.intercept('GET', '/api/analyze/', {
-                    body: {
-                        "count": 1,
-                        "next": null,
-                        "previous": null,
-                        "results": analysisPlanList.plans
-                    }
+                    cy.get('[data-test="my-plans-table"]').should('be.visible')
+                    analysisPlanList.plans.forEach(plan => {
+                        cy.get('[data-test="my-plans-table"]').should('contain.text', plan.datasetName)
+                    })
                 })
-                cy.visit('/my-plans')
 
-                cy.get('[data-test="my-plans-table"]').should('be.visible')
-                analysisPlanList.plans.forEach(plan => {
-                    cy.get('[data-test="my-plans-table"]').should('contain.text', plan.datasetName)
-                })
             })
-
         })
-
     })
 }
