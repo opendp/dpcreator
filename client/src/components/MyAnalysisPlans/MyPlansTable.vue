@@ -27,7 +27,47 @@
       <template v-slot:[`item.num`]="{ index }">
         <span class="index-td hidden-xs-only grey--text">{{ index + 1 }}</span>
       </template>
+        <template v-slot:[`item.status`]="{ item }">
+            <StatusTag data-test="table status tag" :status="getWorkflowStatus(item)"/>
+        </template>
+        <template v-slot:[`item.timeRemaining`]="{ item }">
+            <div v-if="getWorkflowStatus(item) !== 'completed'">
+           <span v-if="isExpired(item)" class='error_status__color--text'>
+             Time has expired
+           </span>
+                <span v-else>
+             {{ item.timeRemaining }}
+           </span>
+            </div>
+            <div v-else>
+                Release Generated on {{ new Date(item.datasetInfo.created).toDateString() }}
+            </div>
+        </template>
+        <template v-slot:[`item.actions`]="{ item }">
+            <div v-if="!isExpired(item)" class="d-flex justify-space-between">
 
+                <v-tooltip
+
+                        v-for="(action, index) in statusInformation[stepInformation[item.userStep].workflowStatus]
+            .availableActions"
+                        bottom max-width="220px">
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-icon
+                                :data-test="action"
+                                v-bind="attrs"
+                                v-on="on"
+                                class="mr-2"
+                                @click="handleButtonClick(action, item)"
+                        >
+                            {{ actionsInformation.icons[action] }}
+
+                        </v-icon>
+                    </template>
+                    <span>{{ actionsInformation[action] }}</span>
+                </v-tooltip>
+
+            </div>
+        </template>
 
 
       <template v-slot:footer="{ props }">
@@ -155,7 +195,7 @@
 </style>
 
 <script>
-/*
+
 import statusInformation from "../../data/statusInformation";
 import actionsInformation from "../../data/actionsInformation";
 import stepInformation from "@/data/stepInformation";
@@ -169,10 +209,10 @@ const {
   CONTINUE_WORKFLOW,
   CANCEL_EXECUTION
 } = actionsInformation.actions;
-*/
+
 export default {
   name: "MyPlansTable",
- // components: {StatusTag, Button, DeleteDatasetDialog},
+  components: {StatusTag, Button, DeleteDatasetDialog},
   props: {
     plans: {
       type: Array
@@ -207,16 +247,17 @@ export default {
         {text: "Plan Name", value: "planName"},
         {text: "Analyst", value: "analyst"},
         {text: "Budget", value: "budget"},
+        {text: "Remaining time to complete release", value: "timeRemaining"},
         {text: "Status", value: "status"},
         {text: "Options", value: "actions", align: "end"}
 
       ],
-  //    statusInformation,
-  //    actionsInformation,
-  //    stepInformation,
-  //    VIEW_DETAILS,
-  //    CONTINUE_WORKFLOW,
- //     CANCEL_EXECUTION
+      statusInformation,
+      actionsInformation,
+      stepInformation,
+      VIEW_DETAILS,
+      CONTINUE_WORKFLOW,
+      CANCEL_EXECUTION
     };
   },
   methods: {
@@ -249,7 +290,9 @@ export default {
       this.goToPage(item, `${NETWORK_CONSTANTS.WIZARD.PATH}`)
     },
     getWorkflowStatus(item) {
-      return stepInformation[item.userStep].workflowStatus
+        const workflowStatus= stepInformation[item.userStep].workflowStatus
+        console.log('returning workflowStatus: '+ workflowStatus)
+        return workflowStatus
     },
     goToPage(item, path) {
       this.$store.dispatch('dataset/setDatasetInfo', item.datasetInfo.objectId)

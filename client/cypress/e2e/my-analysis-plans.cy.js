@@ -1,5 +1,5 @@
 {
-    describe('My Data Page', () => {
+    describe('My Analysis Plans Page', () => {
         beforeEach(() => {
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
@@ -26,7 +26,23 @@
             cy.createAccount(username, email, password)
             cy.fixture('analysisPlanList.json').then(analysisPlanList => {
                 cy.fixture('analysisPlansDatasetList.json').then(dataset => {
-                    cy.intercept('GET', '/api/dataset-info/', {
+                    // set Expiration Date and Time Remaining
+                    analysisPlanList.plans.map(plan =>{
+                        const millisInDay = 1000 * 60 * 60 * 24
+                        const millisInHour = 1000 * 60 * 60
+                        const millisInMin = 1000 * 60
+                        const createdDate = new Date()
+                        const expirationDate = createdDate.getTime() + (3 * millisInDay)
+                        const diffTime = expirationDate - createdDate
+                        const diffDays = Math.floor(diffTime / (millisInDay))
+                        const diffHours = Math.floor((diffTime - (diffDays * millisInDay)) / millisInHour)
+                        const diffMin = Math.floor((diffTime - (diffDays * millisInDay + diffHours * millisInHour)) / millisInMin)
+                        const timeRemaining= '' + diffDays + 'd ' + diffHours + 'h ' + diffMin + 'min'
+                        plan.timeRemaining = timeRemaining
+                        plan.expirationDate = expirationDate
+
+                    })
+                       cy.intercept('GET', '/api/dataset-info/', {
                         body: {
                             "count": 1,
                             "next": null,
