@@ -192,7 +192,7 @@ export default {
     isDrawerActive: false,
     items: [
       {
-        title: "My Datasets",
+        title: "My Data",
         link: NETWORK_CONSTANTS.MY_DATA.PATH,
         icon: "mdi-database"
       },
