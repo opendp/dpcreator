@@ -55,7 +55,7 @@ export const wizardUserSteps = [
 // Maps Wizard StepperPosition (the index of this array)
 // to the userStep to be assigned when the wizard step is completed.
 export const wizardNextSteps = [
-    STEP_0200_VALIDATED,  //stepperPos 0
+    STEP_0400_PROFILING_COMPLETE,  //stepperPos 0
     STEP_0500_VARIABLE_DEFAULTS_CONFIRMED,//stepperPos 1
     STEP_0600_EPSILON_SET, //stepperPos 2
     STEP_0800_STATISTICS_CREATED, //stepperPos 3
