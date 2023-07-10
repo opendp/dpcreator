@@ -47,7 +47,7 @@
             id="populationSize"
             placeholder="E.g. 5,000,000"
             type="number"
-            hide-spin-buttons="true"
+            :hide-spin-buttons=true
             background-color="soft_primary"
             :rules="[populationSizeRule]"
             v-on:change="saveUserInput"
@@ -145,6 +145,8 @@ export default {
           || "Population size must greater than sample size."
     },
     populationSizeIsValid(pop) {
+        // problem - don't know the dataset size until after the profiler is run
+      return true
       let valid = this.secretSample !== 'yes' || pop > this.datasetInfo.depositorSetupInfo.datasetSize
       return valid
     },

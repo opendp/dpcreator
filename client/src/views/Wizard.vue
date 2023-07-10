@@ -19,17 +19,6 @@
               <v-stepper-content :complete="stepperPosition > 1" step="1">
                 <ConfirmVariables :stepperPosition="stepperPosition" v-on:stepCompleted="updateStepStatus"/>
               </v-stepper-content>
-              <v-stepper-content :complete="stepperPosition > 2" step="2">
-                <SetEpsilonValue :stepperPosition="stepperPosition" v-on:stepCompleted="updateStepStatus"/>
-              </v-stepper-content>
-              <v-stepper-content :complete="stepperPosition > 3" step="3">
-                <CreateStatistics v-on:addVariable="gotoStep(1)" ref="createStatComponent"
-                                  :stepperPosition="stepperPosition.sync"
-                                  v-on:stepCompleted="updateStepStatus"/>
-              </v-stepper-content>
-              <v-stepper-content :complete="stepperPosition > 4" step="4">
-                <GenerateDPRelease v-on:addStatistic="gotoStep(3)" v-on:stepCompleted="updateStepStatus"/>
-              </v-stepper-content>
             </v-stepper-items>
           </v-stepper>
           <WizardNavigationButtons

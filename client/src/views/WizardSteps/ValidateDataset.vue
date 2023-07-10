@@ -1,4 +1,5 @@
 <template>
+    <div>
   <div class="validateDatasetStep">
     <h1 class="title-size-1">Validate Data File</h1>
     <p>
@@ -213,6 +214,8 @@
       </v-card>
     </v-dialog>
   </div>
+  <SetEpsilonValue></SetEpsilonValue>
+  </div>
 </template>
 
 <script>
@@ -223,9 +226,11 @@ import ColoredBorderAlert from "../../components/DynamicHelpResources/ColoredBor
 import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
 
 import {mapState, mapGetters} from "vuex";
+import SetEpsilonValue from "@/views/WizardSteps/SetEpsilonValue.vue";
 
 export default {
   components: {
+      SetEpsilonValue,
     AdditionalInformationAlert,
     ColoredBorderAlert,
     RadioItem,

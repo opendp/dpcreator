@@ -121,6 +121,8 @@ export default {
     ...mapGetters('dataset', ['getUpdatedTime', 'getTimeRemaining']),
 
     isContinueDisabled: function () {
+        console.log('isContinueDisabled, this.stepperPosistion: '+this.stepperPosition)
+        console.log('completed: '+this.steps[this.stepperPosition].completed)
       return !this.steps[this.stepperPosition].completed;
     }
   }
