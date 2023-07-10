@@ -15,6 +15,7 @@ from django.utils.safestring import mark_safe
 from polymorphic.models import PolymorphicModel
 
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataset.dataset_question_validators import \
     (validate_dataset_questions,
      validate_epsilon_questions)
@@ -125,21 +126,9 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
                                          help_text=('Used for OpenDP operations, starts as the "default_delta"'
                                                     ' value but may be overridden by the user.'))
 
-    class WizardSteps(models.TextChoices):
-        """
-        Enumeration for different statuses during depositor process
-        """
-        STEP_0100_FILE_UPLOAD = 'step_100', 'Step 1: File Upload'
-        STEP_0200_DATASET_QUESTIONS = 'step_200', 'Step 2: Dataset Questions'
-        STEP_0300_CONFIRM_VARIABLES = 'step_300', 'Step 3: Confirm Variables'
-        STEP_0400_PROFILING_COMPLETE = 'step_400', 'Step 4: Profiling Complete'
-        STEP_0500_VARIABLE_DEFAULTS_CONFIRMED = 'step_500', 'Step 5: Variable Defaults Confirmed'
-        STEP_0600_EPSILON_SET = 'step_600', 'Step 6: Epsilon Set'
-
-        # Error statuses should begin with 9
     wizard_step = models.CharField(max_length=128,
-                                   choices=WizardSteps.choices,
-                                   default=WizardSteps.STEP_0100_FILE_UPLOAD)
+                                   default=dstatic.WIZARD_STEP_DEFAULT_VAL,
+                                   help_text='Used by the UI to track the wizard step')
 
     @property
     def dataset_size(self):
@@ -205,11 +194,13 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
         self.user_step = new_step
         return True
 
-    def set_wizard_step(self, new_wizard_step: WizardSteps) -> bool:
+    def set_wizard_step(self, wizard_val: str) -> bool:
         """Set a new user step. Does *not* save the object."""
-        assert isinstance(new_wizard_step, DepositorSetupInfo.WizardSteps), \
-            "new_step must be a valid choice in DepositorSteps"
-        self.wizard_step = new_wizard_step
+        assert isinstance(wizard_val, str), \
+            "wizard_val must be a string"
+        assert len(wizard_val) > 0, "wizard_val must be a non-empty string"
+
+        self.wizard_step = wizard_val
         return True
 
     @mark_safe
@@ -292,6 +283,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
             return json.loads(self.data_profile)
         except json.JSONDecodeError:
             return None
+
 
 class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
     """

@@ -10,3 +10,5 @@ ERR_MSG_DATASET_POINTER_NOT_SET = 'In order to profile the data, the "dataset_po
 ERR_MSG_DATASET_LOCKED_BY_ANOTHER_USER = 'This Dataverse file is locked by another user.'
 
 MSG_VAL_NOT_SPECIFIED = '(not specified)'
+
+WIZARD_STEP_DEFAULT_VAL = 'wizard_step_not_set'
