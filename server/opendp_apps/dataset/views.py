@@ -61,15 +61,15 @@ class DepositorSetupViewSet(BaseModelViewSet):
                              'wizard_step']
         problem_fields = []
         for field in request.data.keys():
-            logger.info('wizard_step' in acceptable_fields)
             if field not in acceptable_fields:
                 logger.info('not acceptable')
                 problem_fields.append(field)
 
-     #   if len(problem_fields) > 0:
-      #      logger.error(f"Failed to update DepositorSetupInfo with fields {problem_fields}")
-      #      return Response({'message': 'These fields are not updatable', 'fields': problem_fields},
-       #                     status=status.HTTP_400_BAD_REQUEST)
+        if len(problem_fields) > 0:
+            logger.error(f"Failed to update DepositorSetupInfo with fields {problem_fields}")
+            return Response({'message': 'These fields are not updatable',
+                             'fields': problem_fields},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         # -----------------------------------------------------------------
         # Allow a depositor to return to the "Confirm Variables" page

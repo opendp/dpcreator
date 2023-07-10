@@ -169,8 +169,8 @@ class TestFileUpload(TestCase):
         update_payload = dict(epsilon_questions=new_epsilon_questions,
                               dataset_questions=new_dataset_questions)
         update_resp = self.client.patch(partial_update_url,
-                                      data=update_payload,
-                                      content_type="application/json")
+                                        data=update_payload,
+                                        content_type="application/json")
 
         self.assertEqual(update_resp.status_code, HTTPStatus.OK)
 
@@ -189,8 +189,8 @@ class TestFileUpload(TestCase):
         update_payload = dict(variable_info=new_variable_info)
 
         update_resp = self.client.patch(partial_update_url,
-                                      data=update_payload,
-                                      content_type="application/json")
+                                        data=update_payload,
+                                        content_type="application/json")
 
         self.assertEqual(update_resp.status_code, HTTPStatus.OK)
 
@@ -211,8 +211,8 @@ class TestFileUpload(TestCase):
                               epsilon=new_epsilon)
 
         update_resp = self.client.patch(partial_update_url,
-                                      data=update_payload,
-                                      content_type="application/json")
+                                        data=update_payload,
+                                        content_type="application/json")
 
         self.assertEqual(update_resp.status_code, HTTPStatus.OK)
 
@@ -335,8 +335,8 @@ class TestFileUpload(TestCase):
                               user_step=DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE)
 
         update_resp = self.client.patch(partial_update_url,
-                                      data=update_payload,
-                                      content_type="application/json")
+                                        data=update_payload,
+                                        content_type="application/json")
 
         print(update_resp.json())
         self.assertEqual(update_resp.status_code, HTTPStatus.OK)
@@ -355,8 +355,8 @@ class TestFileUpload(TestCase):
         update_payload = dict(variable_info=new_variable_info)
 
         update_resp = self.client.patch(partial_update_url,
-                                      data=update_payload,
-                                      content_type="application/json")
+                                        data=update_payload,
+                                        content_type="application/json")
 
         self.assertEqual(update_resp.status_code, HTTPStatus.OK)
 
@@ -379,8 +379,8 @@ class TestFileUpload(TestCase):
                               default_delta=new_default_delta)
 
         update_resp = self.client.patch(partial_update_url,
-                                      data=update_payload,
-                                      content_type="application/json")
+                                        data=update_payload,
+                                        content_type="application/json")
 
         # print('update_resp.update_resp', update_resp.status_code)
         # print('update_resp.content', update_resp.content)
@@ -431,13 +431,15 @@ class TestFileUpload(TestCase):
                                  "observations_number_can_be_public": ''}
 
         update_payload = dict(dataset_questions=new_dataset_questions,
-                              epsilon_questions=new_epsilon_questions, )
+                              epsilon_questions=new_epsilon_questions,
+                              wizard_step='step_300')
 
         update_resp = self.client.patch(partial_update_url,
-                                      data=update_payload,
-                                      content_type="application/json")
+                                        data=update_payload,
+                                        content_type="application/json")
 
         # print(update_resp.json())
+
         self.assertEqual(update_resp.status_code, HTTPStatus.OK)
 
         update_resp_json = update_resp.json()
@@ -454,8 +456,8 @@ class TestFileUpload(TestCase):
         update_payload = dict(variable_info=new_variable_info)
 
         update_resp = self.client.patch(partial_update_url,
-                                      data=update_payload,
-                                      content_type="application/json")
+                                        data=update_payload,
+                                        content_type="application/json")
 
         self.assertEqual(update_resp.status_code, HTTPStatus.OK)
 
@@ -481,8 +483,8 @@ class TestFileUpload(TestCase):
                               delta=new_delta)
 
         update_resp = self.client.patch(partial_update_url,
-                                      data=update_payload,
-                                      content_type="application/json")
+                                        data=update_payload,
+                                        content_type="application/json")
 
         # print('update_resp.update_resp', update_resp.status_code)
         # print('update_resp.content', update_resp.content)
@@ -494,3 +496,70 @@ class TestFileUpload(TestCase):
         self.assertEqual(update_resp_json['epsilon'], new_epsilon)
         self.assertEqual(update_resp_json['user_step'],
                          str(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED))
+
+    def test_90_update_wizard_step(self):
+        """(90) Test wizard step updates"""
+        msgt(self.test_90_update_wizard_step.__doc__)
+
+        # (1) Upload a file
+        #
+        jresp = self.upload_file_via_api()
+
+        # (2) Get the dataset info
+        #
+        ds_object_id = jresp['object_id']
+        ds_info = self.get_dataset_info_via_api(ds_object_id)
+        # print('ds_info', ds_info)
+
+        setup_object_id = ds_info['depositor_setup_info']['object_id']
+
+        partial_update_url = f'/api/deposit/{setup_object_id}/'
+
+        # --------------------------------------------
+        # (3) Update wizard step 1: success
+        # --------------------------------------------
+        new_wizard_step = 'step_400'
+        update_payload = dict(wizard_step=new_wizard_step)
+
+        update_resp = self.client.patch(partial_update_url,
+                                        data=update_payload,
+                                        content_type="application/json")
+
+        # print(update_resp.json())
+        self.assertEqual(update_resp.status_code, HTTPStatus.OK)
+
+        update_resp_json = update_resp.json()
+        self.assertEqual(update_resp_json['wizard_step'], new_wizard_step)
+        self.assertEqual(update_resp_json['is_complete'], False)
+
+        # --------------------------------------------
+        # (4) Update wizard step 2: success
+        # --------------------------------------------
+        new_wizard_step2 = 'step_200'
+        update_payload = dict(wizard_step=new_wizard_step2)
+
+        update_resp = self.client.patch(partial_update_url,
+                                        data=update_payload,
+                                        content_type="application/json")
+
+        # print(update_resp.json())
+        self.assertEqual(update_resp.status_code, HTTPStatus.OK)
+
+        update_resp_json = update_resp.json()
+        self.assertEqual(update_resp_json['wizard_step'], new_wizard_step2)
+        self.assertEqual(update_resp_json['is_complete'], False)
+
+        # --------------------------------------------
+        # (5) Update wizard step 4: success
+        # --------------------------------------------
+        new_wizard_step_number = 100
+        update_payload = dict(wizard_step=new_wizard_step_number)
+
+        update_resp = self.client.patch(partial_update_url,
+                                        data=update_payload,
+                                        content_type="application/json")
+
+        # print(update_resp.json())
+        self.assertEqual(update_resp.status_code, HTTPStatus.OK)
+        update_resp_json = update_resp.json()
+        self.assertEqual(update_resp_json['wizard_step'], str(new_wizard_step_number))
