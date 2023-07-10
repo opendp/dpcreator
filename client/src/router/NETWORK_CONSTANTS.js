@@ -11,6 +11,10 @@ export default {
         PATH: "/my-data",
         NAME: "MyData"
     },
+    MY_ANALYSIS_PLANS: {
+        PATH: "/my-plans",
+        NAME: "MyAnalysisPlans"
+    },
     MY_DATA_DETAILS: {
         PATH: "/my-data-details",
         NAME: "MyDataDetails"
