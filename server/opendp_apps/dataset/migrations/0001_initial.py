@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                 ('default_delta', models.FloatField(blank=True, default=0.0, help_text='Default based on answers to epsilon_questions.', null=True, validators=[opendp_apps.utils.extra_validators.validate_not_negative])),
                 ('delta', models.FloatField(blank=True, default=0.0, help_text='Used for OpenDP operations, starts as the "default_delta" value but may be overridden by the user.', null=True, validators=[opendp_apps.utils.extra_validators.validate_not_negative])),
                 ('confidence_level', models.FloatField(choices=[(0.9, '90% CL'), (0.95, '95% CL'), (0.99, '99% CL')], default=0.95, help_text='Used for OpenDP operations, starts as the "default_delta" value but may be overridden by the user.')),
-                ('wizard_step', models.CharField(default='wizard_step_not_set', help_text='Used by the UI to track the wizard step', max_length=128)),
+                ('wizard_step', models.CharField(default='step_100', help_text='Used by the UI to track the wizard step', max_length=128)),
             ],
             options={
                 'verbose_name': 'Depositor Setup Data',

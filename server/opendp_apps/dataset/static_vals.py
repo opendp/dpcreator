@@ -11,4 +11,4 @@ ERR_MSG_DATASET_LOCKED_BY_ANOTHER_USER = 'This Dataverse file is locked by anoth
 
 MSG_VAL_NOT_SPECIFIED = '(not specified)'
 
-WIZARD_STEP_DEFAULT_VAL = 'wizard_step_not_set'
+WIZARD_STEP_DEFAULT_VAL = 'step_100'
