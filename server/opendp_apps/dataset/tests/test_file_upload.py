@@ -10,6 +10,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.utils.extra_validators import VALIDATE_MSG_EPSILON
@@ -230,7 +231,7 @@ class TestFileUpload(TestCase):
         msgt(self.test_60_epsilon_question_validator.__doc__)
 
         ds_info_json = self.upload_file_via_api()
-        print('ds_info_json', ds_info_json)
+        # print('ds_info_json', ds_info_json)
         depositor_info = self.get_depositor_setup_info_via_api(ds_info_json['object_id'])
 
         # (a) Trigger validation error for:
@@ -563,3 +564,111 @@ class TestFileUpload(TestCase):
         self.assertEqual(update_resp.status_code, HTTPStatus.OK)
         update_resp_json = update_resp.json()
         self.assertEqual(update_resp_json['wizard_step'], str(new_wizard_step_number))
+
+    def test_100_epsilon_question(self):
+        """
+        (100) Test population sample question--an epsilon question.
+        Updated to allow population_size to be empty. Some test are redundant with test_60_epsilon_question
+        """
+        msgt(self.test_100_epsilon_question.__doc__)
+
+        # (1) Upload a file
+        #
+        jresp = self.upload_file_via_api()
+
+        # (2) Get the dataset info
+        #
+        ds_object_id = jresp['object_id']
+        ds_info = self.get_dataset_info_via_api(ds_object_id)
+
+        # --------------------------------------------
+        # (3) Epsilon questions, secret_sample is "yes", but population_size is empty -- which is okay
+        # --------------------------------------------
+        setup_object_id = ds_info['depositor_setup_info']['object_id']
+
+        partial_update_url = f'/api/deposit/{setup_object_id}/'
+
+        new_epsilon_questions = {"secret_sample": "yes",
+                                 "population_size": "",
+                                 "observations_number_can_be_public": ''}
+
+        update_payload = dict(epsilon_questions=new_epsilon_questions)
+
+        update_resp = self.client.patch(partial_update_url,
+                                        data=update_payload,
+                                        content_type="application/json")
+
+        self.assertEqual(update_resp.status_code, HTTPStatus.OK)
+
+        update_resp_json = update_resp.json()
+        self.assertEqual(update_resp_json['is_complete'], False)
+        self.assertEqual(update_resp_json['epsilon_questions'], new_epsilon_questions)
+        self.assertEqual(update_resp_json['user_step'],
+                         str(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED))
+
+        # --------------------------------------------
+        # (4) Epsilon questions, secret_sample is "yes",
+        #   but population_size is a string
+        # --------------------------------------------
+        new_epsilon_questions = {"secret_sample": "yes",
+                                 "population_size": "9000",
+                                 "observations_number_can_be_public": ''}
+
+        update_payload = dict(epsilon_questions=new_epsilon_questions)
+
+        update_resp = self.client.patch(partial_update_url,
+                                        data=update_payload,
+                                        content_type="application/json")
+
+        self.assertEqual(update_resp.status_code, HTTPStatus.BAD_REQUEST)
+
+        update_resp_json = update_resp.json()
+
+        expected_err = astatic.ERR_MSG_POPULATION_SIZE_MISSING.format(val_type=str)
+        self.assertEqual(update_resp_json['epsilon_questions'][0], expected_err)
+
+        # --------------------------------------------
+        # (5) Epsilon questions, secret_sample is "yes",
+        #   but population_size is negative
+        # --------------------------------------------
+        new_epsilon_questions = {"secret_sample": "yes",
+                                 "population_size": -9000,
+                                 "observations_number_can_be_public": ''}
+
+        update_payload = dict(epsilon_questions=new_epsilon_questions)
+
+        update_resp = self.client.patch(partial_update_url,
+                                        data=update_payload,
+                                        content_type="application/json")
+
+        self.assertEqual(update_resp.status_code, HTTPStatus.BAD_REQUEST)
+
+        update_resp_json = update_resp.json()
+
+        expected_err = astatic.ERR_MSG_POPULATION_CANNOT_BE_NEGATIVE.format(pop_size=-9000)
+        self.assertEqual(update_resp_json['epsilon_questions'][0], expected_err)
+
+        # --------------------------------------------
+        # (6) Epsilon questions, secret_sample is "yes" and population_size is positive
+        # --------------------------------------------
+        setup_object_id = ds_info['depositor_setup_info']['object_id']
+
+        partial_update_url = f'/api/deposit/{setup_object_id}/'
+
+        new_epsilon_questions = {"secret_sample": "yes",
+                                 "population_size": 17000,
+                                 "observations_number_can_be_public": ''}
+
+        update_payload = dict(epsilon_questions=new_epsilon_questions)
+
+        update_resp = self.client.patch(partial_update_url,
+                                        data=update_payload,
+                                        content_type="application/json")
+
+        self.assertEqual(update_resp.status_code, HTTPStatus.OK)
+
+        update_resp_json = update_resp.json()
+        self.assertEqual(update_resp_json['is_complete'], False)
+        self.assertEqual(update_resp_json['epsilon_questions'], new_epsilon_questions)
+        self.assertEqual(update_resp_json['user_step'],
+                         str(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED))
