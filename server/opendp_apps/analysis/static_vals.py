@@ -229,5 +229,5 @@ ERR_MSG_DATASET_QUESTIONS_INVALID_VALUE = 'Invalid value ("{value}") for dataset
 ERR_MSG_DATASET_YES_NO_QUESTIONS_INVALID_VALUE = ('Dataset question "{key}" should have'
                                                   ' a "yes" or "no" answer, not "{value}"')
 ERR_MSG_POPULATION_SIZE_MISSING = ('If this is a sample from a population, the population size'
-                                   ' must be an integer. Currently, it is: {pop_size}')
+                                   ' must be an integer. Currently, it is type: {val_type}')
 ERR_MSG_POPULATION_CANNOT_BE_NEGATIVE = ('The population must be a positive integer. Currently, it is: {pop_size}')
