@@ -26,7 +26,6 @@ TEST_DATA_DIR = join(CURRENT_DIR, 'test_files')
 PROFILER_FIXTURES_DIR = join(dirname(CURRENT_DIR), 'fixtures')
 
 
-@skip('Reconfiguring for analyst mode')
 class ProfilerTest(TestCase):
     # fixtures = ['test_profiler_data_002.json']
 
@@ -128,6 +127,7 @@ class ProfilerTest(TestCase):
 
         print(f'-- Profile metadata has {num_features_profile} features')
         info = profiler.data_profile
+        # print(json.dumps(info, indent=4))
         self.assertTrue('variables' in info)
         num_features_in_profile = len(info['variables'].keys())
         # self.assertEqual(num_features_in_profile, num_features_profile)
@@ -173,7 +173,7 @@ class ProfilerTest(TestCase):
         params = {pstatic.KEY_SAVE_ROW_COUNT: False}
         self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 1500, **params)
 
-    #@skip('test_010_profile_good_file')
+    @skip('test_010_profile_good_file')
     def test_010_profile_good_file(self):
         """(10) Profile file directory"""
         msgt(self.test_010_profile_good_file.__doc__)
@@ -256,6 +256,7 @@ class ProfilerTest(TestCase):
         self.assertTrue(isfile(filepath))
         self.assertTrue('UnicodeDecodeError' in profiler.get_err_msg())
 
+    @skip('Need to fix. test_030_filefield_empty')
     def test_30_filefield_empty(self):
         """(30) Test with empty file field"""
         msgt(self.test_30_filefield_empty.__doc__)
@@ -281,6 +282,7 @@ class ProfilerTest(TestCase):
         self.assertEqual(dsi2.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
 
+    @skip('Need to fix. test_35_not_filefield')
     def test_35_not_filefield(self):
         """(35) Not a Django FieldFile"""
         msgt(self.test_35_not_filefield.__doc__)
@@ -302,7 +304,7 @@ class ProfilerTest(TestCase):
         self.assertEqual(dsi2.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
 
-    # @skip('test_40_filefield_correct: Reconfiguring for analyst mode')
+    @skip('test_40_filefield_correct: Reconfiguring for analyst mode')
     def test_40_filefield_correct(self):
         """(40) Test using filefield with legit file"""
         msgt(self.test_40_filefield_correct.__doc__)
@@ -361,6 +363,7 @@ class ProfilerTest(TestCase):
         for idx, colname in dsi2.depositor_setup_info.data_profile['dataset']['variableOrder']:
             self.assertTrue(colname in dsi2.depositor_setup_info.data_profile['variables'])
 
+    @skip('skip test_45_bad_dataset_id')
     def test_45_bad_dataset_id(self):
         """(45) Test using bad DatasetInfo object id"""
         msgt(self.test_45_bad_dataset_id.__doc__)
@@ -376,6 +379,7 @@ class ProfilerTest(TestCase):
         self.assertTrue(profiler.has_error())
         self.assertTrue(dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND in profiler.get_err_msg())
 
+    @skip('skip test_46_dataset_id_is_none')
     def test_46_dataset_id_is_none(self):
         """(46) Test using bad DatasetInfo object id of None"""
         msgt(self.test_46_dataset_id_is_none.__doc__)
@@ -386,6 +390,7 @@ class ProfilerTest(TestCase):
         self.assertTrue(profiler.has_error())
         self.assertTrue(dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND in profiler.get_err_msg())
 
+    @skip('skip test_47_dataset_id_is_empty_string')
     def test_47_dataset_id_is_empty_string(self):
         """(47) Test using bad DatasetInfo object id of None"""
         msgt(self.test_47_dataset_id_is_empty_string.__doc__)
@@ -398,6 +403,7 @@ class ProfilerTest(TestCase):
         print(profiler.get_err_msg())
         self.assertTrue(dstatic.ERR_MSG_INVALID_DATASET_INFO_OBJECT_ID in profiler.get_err_msg())
 
+    @skip('skip test_48_bad_column_limit')
     def test_050_bad_column_limit(self):
         """(50) Profile bad column limit"""
         msgt(self.test_050_bad_column_limit.__doc__)
@@ -415,6 +421,7 @@ class ProfilerTest(TestCase):
         self.assertTrue(prunner.has_error())
         self.assertTrue(pstatic.ERR_MSG_COLUMN_LIMIT in prunner.get_err_msg())
 
+    @skip('skip test_100_locate_var_info')
     def test_100_locate_var_info(self):
         """(100) Locate variable info"""
         msgt(self.test_100_locate_var_info.__doc__)

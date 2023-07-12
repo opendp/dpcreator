@@ -10,7 +10,6 @@ from django.test import TestCase
 from django.urls import reverse
 
 from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.utils.extra_validators import VALIDATE_MSG_EPSILON
@@ -169,6 +168,7 @@ class TestFileUpload(TestCase):
 
         update_payload = dict(epsilon_questions=new_epsilon_questions,
                               dataset_questions=new_dataset_questions)
+
         update_resp = self.client.patch(partial_update_url,
                                         data=update_payload,
                                         content_type="application/json")
@@ -339,7 +339,7 @@ class TestFileUpload(TestCase):
                                         data=update_payload,
                                         content_type="application/json")
 
-        print(update_resp.json())
+        # print(update_resp.json())
         self.assertEqual(update_resp.status_code, HTTPStatus.OK)
 
         update_resp_json = update_resp.json()
@@ -670,5 +670,50 @@ class TestFileUpload(TestCase):
         update_resp_json = update_resp.json()
         self.assertEqual(update_resp_json['is_complete'], False)
         self.assertEqual(update_resp_json['epsilon_questions'], new_epsilon_questions)
+        self.assertEqual(update_resp_json['user_step'],
+                         str(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED))
+
+    def test_110_dataset_question(self):
+        """(110) Test dataset question -- troubleshooting"""
+        msgt(self.test_110_dataset_question.__doc__)
+
+        # (1) Upload a file
+        #
+        jresp = self.upload_file_via_api()
+
+        # (2) Get the dataset info
+        #
+        ds_object_id = jresp['object_id']
+        ds_info = self.get_dataset_info_via_api(ds_object_id)
+
+        # --------------------------------------------
+        # (3) Epsilon questions, secret_sample is "yes", but population_size is empty -- which is okay
+        # --------------------------------------------
+        setup_object_id = ds_info['depositor_setup_info']['object_id']
+
+        partial_update_url = f'/api/deposit/{setup_object_id}/'
+
+        update_payload = {
+            "dataset_questions": {
+                "radio_depend_on_private_information": "yes",
+                "radio_best_describes": "",
+                "radio_only_one_individual_per_row": ""
+            },
+            "default_epsilon": None,
+            "default_delta": None,
+            "epsilon": None,
+            "delta": None
+        }
+
+        update_resp = self.client.patch(partial_update_url,
+                                        data=update_payload,
+                                        content_type="application/json")
+
+        # print('update_resp_json', update_resp.json())
+        self.assertEqual(update_resp.status_code, HTTPStatus.OK)
+
+        update_resp_json = update_resp.json()
+        self.assertEqual(update_resp_json['is_complete'], False)
+        self.assertEqual(update_resp_json['dataset_questions'], update_payload['dataset_questions'])
         self.assertEqual(update_resp_json['user_step'],
                          str(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED))
