@@ -175,9 +175,11 @@ class DownloadAndProfileUtil(BasicErrCheck):
             self.send_websocket_profiler_err_msg(user_msg)
             return
 
-        # self.data_profile = ph.get_data_profile()
         self.profile_variables = prunner.data_profile
         profile_str = json.dumps(self.profile_variables, cls=DjangoJSONEncoder, indent=4)
+
+        # self.data_profile = ph.get_data_profile()
+        self.data_profile = prunner.data_profile
 
         self.send_websocket_success_msg('Profile complete!',
                                         profile_str=profile_str)

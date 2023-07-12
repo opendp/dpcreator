@@ -1,7 +1,7 @@
 import json
 from collections import OrderedDict
+from http import HTTPStatus
 from os.path import abspath, dirname, isfile, join
-from unittest import skip
 
 from allauth.account.models import EmailAddress as VerifyEmailAddress
 from django.conf import settings
@@ -27,7 +27,7 @@ PROFILER_FIXTURES_DIR = join(dirname(CURRENT_DIR), 'fixtures')
 
 
 class ProfilerTest(TestCase):
-    # fixtures = ['test_profiler_data_002.json']
+    """Test the Profiler"""
 
     def setUp(self):
         """Used for multiple tests"""
@@ -72,6 +72,8 @@ class ProfilerTest(TestCase):
         django_file = File(open(filepath, 'rb'))
         self.test_file_info.source_file.save(filename, django_file)
         self.test_file_info.save()
+
+        self.client.force_login(depositor_user)
 
     def get_depositor_setup_info(self, opendp_user: OpenDPUser) -> DepositorSetupInfo:
         """Create and return a DepositorSetupInfo object"""
@@ -154,7 +156,7 @@ class ProfilerTest(TestCase):
                     self.assertEqual(info['variables'][colname][key_name], idx)
 
     def test_005_profile_good_files(self):
-        """(05) Profile several good files"""
+        """(05) Use the profiler directly on several "good files" w/o interacting with the rest of the system"""
         msgt(self.test_005_profile_good_files.__doc__)
 
         msgt('-- Profile gking-crisis.tab')
@@ -173,7 +175,6 @@ class ProfilerTest(TestCase):
         params = {pstatic.KEY_SAVE_ROW_COUNT: False}
         self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 1500, **params)
 
-    @skip('test_010_profile_good_file')
     def test_010_profile_good_file(self):
         """(10) Profile file directory"""
         msgt(self.test_010_profile_good_file.__doc__)
@@ -220,7 +221,7 @@ class ProfilerTest(TestCase):
         print('-- Profiler output is the same as the output saved to the DataSetInfo object')
         profile_json_str2 = json.dumps(info, cls=DjangoJSONEncoder, indent=4)
         self.assertTrue(profile_json_str1, profile_json_str2)
-        print(profile_json_str2)
+        # print(profile_json_str2)
         # return
         # self.assertEqual(dsi.profile_variables['dataset']['variableCount'],
         #                  settings.PROFILER_COLUMN_LIMIT)
@@ -233,7 +234,6 @@ class ProfilerTest(TestCase):
         for idx, colname in dsi.depositor_setup_info.data_profile['dataset']['variableOrder']:
             self.assertTrue(colname in dsi.depositor_setup_info.data_profile['variables'])
 
-    @skip('Need to fix. test_020_bad_files')
     def test_020_bad_files(self):
         """(20) Test bad file type"""
         msgt(self.test_020_bad_files.__doc__)
@@ -256,7 +256,6 @@ class ProfilerTest(TestCase):
         self.assertTrue(isfile(filepath))
         self.assertTrue('UnicodeDecodeError' in profiler.get_err_msg())
 
-    @skip('Need to fix. test_030_filefield_empty')
     def test_30_filefield_empty(self):
         """(30) Test with empty file field"""
         msgt(self.test_30_filefield_empty.__doc__)
@@ -282,7 +281,6 @@ class ProfilerTest(TestCase):
         self.assertEqual(dsi2.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
 
-    @skip('Need to fix. test_35_not_filefield')
     def test_35_not_filefield(self):
         """(35) Not a Django FieldFile"""
         msgt(self.test_35_not_filefield.__doc__)
@@ -304,7 +302,6 @@ class ProfilerTest(TestCase):
         self.assertEqual(dsi2.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
 
-    @skip('test_40_filefield_correct: Reconfiguring for analyst mode')
     def test_40_filefield_correct(self):
         """(40) Test using filefield with legit file"""
         msgt(self.test_40_filefield_correct.__doc__)
@@ -363,7 +360,6 @@ class ProfilerTest(TestCase):
         for idx, colname in dsi2.depositor_setup_info.data_profile['dataset']['variableOrder']:
             self.assertTrue(colname in dsi2.depositor_setup_info.data_profile['variables'])
 
-    @skip('skip test_45_bad_dataset_id')
     def test_45_bad_dataset_id(self):
         """(45) Test using bad DatasetInfo object id"""
         msgt(self.test_45_bad_dataset_id.__doc__)
@@ -379,7 +375,6 @@ class ProfilerTest(TestCase):
         self.assertTrue(profiler.has_error())
         self.assertTrue(dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND in profiler.get_err_msg())
 
-    @skip('skip test_46_dataset_id_is_none')
     def test_46_dataset_id_is_none(self):
         """(46) Test using bad DatasetInfo object id of None"""
         msgt(self.test_46_dataset_id_is_none.__doc__)
@@ -390,7 +385,6 @@ class ProfilerTest(TestCase):
         self.assertTrue(profiler.has_error())
         self.assertTrue(dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND in profiler.get_err_msg())
 
-    @skip('skip test_47_dataset_id_is_empty_string')
     def test_47_dataset_id_is_empty_string(self):
         """(47) Test using bad DatasetInfo object id of None"""
         msgt(self.test_47_dataset_id_is_empty_string.__doc__)
@@ -403,7 +397,6 @@ class ProfilerTest(TestCase):
         print(profiler.get_err_msg())
         self.assertTrue(dstatic.ERR_MSG_INVALID_DATASET_INFO_OBJECT_ID in profiler.get_err_msg())
 
-    @skip('skip test_48_bad_column_limit')
     def test_050_bad_column_limit(self):
         """(50) Profile bad column limit"""
         msgt(self.test_050_bad_column_limit.__doc__)
@@ -421,7 +414,6 @@ class ProfilerTest(TestCase):
         self.assertTrue(prunner.has_error())
         self.assertTrue(pstatic.ERR_MSG_COLUMN_LIMIT in prunner.get_err_msg())
 
-    @skip('skip test_100_locate_var_info')
     def test_100_locate_var_info(self):
         """(100) Locate variable info"""
         msgt(self.test_100_locate_var_info.__doc__)
@@ -453,3 +445,27 @@ class ProfilerTest(TestCase):
                         (varname_snakecase in plan_var_info)
             print(f'> Check: {orig_varname}/{varname_snakecase} -> {var_found}')
             self.assertTrue(var_found)
+
+    def test_110_profile_good_file_via_api(self):
+        """(110) Profile a file via API"""
+        msgt(self.test_110_profile_good_file_via_api.__doc__)
+
+        ds_object_id = self.test_file_info.object_id
+
+        payload = dict(object_id=str(ds_object_id))
+        print('payload', payload)
+
+        run_profiler_url = '/api/profile/run-direct-profile-no-async/'
+
+        profile_resp = self.client.post(run_profiler_url,
+                                        data=payload,
+                                        content_type='application/json')
+
+        #print('resp', profile_resp.json())
+        self.assertEqual(profile_resp.status_code, HTTPStatus.OK)
+
+        resp_json = profile_resp.json()
+        self.assertEqual(resp_json['data']['dataset']['rowCount'], 7000)
+        self.assertEqual(resp_json['data']['dataset']['variableCount'], 10)
+        self.assertEqual(len(resp_json['data']['dataset']['variableOrder']), 10)
+        self.assertTrue('variables' in resp_json['data'])
