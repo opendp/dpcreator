@@ -461,7 +461,36 @@ class ProfilerTest(TestCase):
                                         data=payload,
                                         content_type='application/json')
 
-        #print('resp', profile_resp.json())
+        print('resp', json.dumps(profile_resp.json(), indent=2))
+        self.assertEqual(profile_resp.status_code, HTTPStatus.OK)
+
+        resp_json = profile_resp.json()
+        self.assertEqual(resp_json['data']['dataset']['rowCount'], 7000)
+        self.assertEqual(resp_json['data']['dataset']['variableCount'], 10)
+        self.assertEqual(len(resp_json['data']['dataset']['variableOrder']), 10)
+        self.assertTrue('variables' in resp_json['data'])
+
+
+    def test_120_bad_file_via_api(self):
+        """(120) Profile a bad file via API"""
+        msgt(self.test_120_bad_file_via_api.__doc__)
+
+        self.test_file_info.source_file.delete()
+
+        ds_object_id = self.test_file_info.object_id
+
+        payload = dict(object_id=str(ds_object_id))
+        print('payload', payload)
+
+        run_profiler_url = '/api/profile/run-direct-profile-no-async/'
+
+        profile_resp = self.client.post(run_profiler_url,
+                                        data=payload,
+                                        content_type='application/json')
+
+        print(profile_resp.status_code)
+        print('resp', json.dumps(profile_resp.json(), indent=2))
+        return
         self.assertEqual(profile_resp.status_code, HTTPStatus.OK)
 
         resp_json = profile_resp.json()
