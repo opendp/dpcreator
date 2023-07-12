@@ -1,0 +1,19 @@
+{
+  "plans": [{
+    "objectId": "1",
+    "datasetName": "dataset name 1",
+    "planName": "plan name 1",
+    "analyst": "Ellen K",
+    "budget": ".5",
+    "userStep": "step_600",
+    "timeRemaining": 60000
+  },
+    {
+      "objectId": "2",
+      "datasetName": "dataset name 2",
+      "planName": "plan name 2",
+      "analyst": "Raman P",
+      "budget": ".25",
+      "userStep": "step_600",
+      "timeRemaining": 60000
+    }]}
