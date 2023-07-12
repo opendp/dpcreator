@@ -490,11 +490,7 @@ class ProfilerTest(TestCase):
 
         print(profile_resp.status_code)
         print('resp', json.dumps(profile_resp.json(), indent=2))
-        return
-        self.assertEqual(profile_resp.status_code, HTTPStatus.OK)
+        self.assertEqual(profile_resp.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertTrue(profile_resp.json()['message'].find('The DataSetInfo source file is not available') > -1)
+        
 
-        resp_json = profile_resp.json()
-        self.assertEqual(resp_json['data']['dataset']['rowCount'], 7000)
-        self.assertEqual(resp_json['data']['dataset']['variableCount'], 10)
-        self.assertEqual(len(resp_json['data']['dataset']['variableOrder']), 10)
-        self.assertTrue('variables' in resp_json['data'])
