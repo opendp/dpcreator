@@ -214,7 +214,7 @@
       </v-card>
     </v-dialog>
   </div>
-  <SetEpsilonValue></SetEpsilonValue>
+  <SetEpsilonValue v-on:stepCompleted="updateEpsilonStatus" ></SetEpsilonValue>
   </div>
 </template>
 
@@ -238,6 +238,7 @@ export default {
   },
   name: "ValidateDataset",
   data: () => ({
+      epsilonCompleted: false,
     radioDependOnPrivateInformation: "",
     radioBestDescribes: "",
     radioOnlyOneIndividualPerRow: "",
@@ -284,6 +285,12 @@ export default {
     }
   },
   methods: {
+      updateEpsilonStatus: function (stepNumber, completedStatus) {
+          this.epsilonCompleted=completedStatus
+          if (this.radioOnlyOneIndividualPerRow == 'yes' && this.epsilonCompleted) {
+              this.$emit("stepCompleted", 0, true);
+          }
+      },
     saveUserInput() {
       const userInput = {
         datasetQuestions: {
@@ -302,7 +309,7 @@ export default {
       const payload = {objectId: this.getDepositorSetupInfo.objectId, props: userInput}
       this.$store.dispatch('dataset/updateDepositorSetupInfo',
           payload)
-      if (this.radioOnlyOneIndividualPerRow == 'yes') {
+      if (this.radioOnlyOneIndividualPerRow == 'yes' && this.epsilonCompleted) {
         this.$emit("stepCompleted", 0, true);
       }
 

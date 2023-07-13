@@ -33,8 +33,8 @@
             cy.get('[data-test="radioOnlyOneIndividualPerRowYes"]').check({force: true})
             cy.get('[data-test="Larger Population - yes"]').click({force: true})
 
-            cy.get('[data-test="populationSizeInput"]').type('45')
-            cy.get('div').should('contain', 'Population size must greater than sample size')
+            cy.get('[data-test="populationSizeInput"]').clear().type('0')
+            cy.get('div').should('contain', 'Population size must greater than 0')
             cy.get('[data-test="populationSizeInput"]').clear()
             cy.get('[data-test="populationSizeInput"]').type('200')
             cy.get('div').should('not.contain', 'Population size must greater than sample size')

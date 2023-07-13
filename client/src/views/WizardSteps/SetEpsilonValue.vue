@@ -50,7 +50,7 @@
             :hide-spin-buttons=true
             background-color="soft_primary"
             :rules="[populationSizeRule]"
-            v-on:change="saveUserInput"
+            v-on:keyup="saveUserInput"
         />
         <strong>people</strong>
       </div>
@@ -116,7 +116,7 @@ export default {
   data: () => ({
     secretSample: "",
     observationsNumberCanBePublic: "",
-    populationSize: ""
+    populationSize: 0
   }),
   created() {
     // Initialize questions with previously input values,
@@ -142,12 +142,11 @@ export default {
   methods: {
     populationSizeRule(n) {
       return (this.populationSizeIsValid(n))
-          || "Population size must greater than sample size."
+          || "Population size must greater than 0."
     },
     populationSizeIsValid(pop) {
-        // problem - don't know the dataset size until after the profiler is run
-      return true
-      let valid = this.secretSample !== 'yes' || pop > this.datasetInfo.depositorSetupInfo.datasetSize
+
+      let valid = this.secretSample !== 'yes' || pop > 0
       return valid
     },
 
@@ -155,7 +154,7 @@ export default {
       const userInput = {
         epsilonQuestions: {
           secretSample: this.secretSample,
-          populationSize: this.populationSize,
+          populationSize: Number(this.populationSize),
           observationsNumberCanBePublic: this.observationsNumberCanBePublic,
         }
       }
@@ -174,7 +173,7 @@ export default {
       }
     },
     populationSize: function (newValue, oldValue) {
-      if (this.observationsNumberCanBePublic !== "" && this.secretSample !== "" && this.populationSizeIsValid(this.populationSize)) {
+      if (this.observationsNumberCanBePublic !== "" && this.secretSample !== "" && this.populationSizeIsValid(newValue)) {
         this.$emit("stepCompleted", 2, true);
       } else {
         this.$emit("stepCompleted", 2, false);
