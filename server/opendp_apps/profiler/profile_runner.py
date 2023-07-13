@@ -20,7 +20,7 @@ logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class ProfileRunner(BasicErrCheck):
-    """Given a filepath and optional DataSetInfo object id """
+    """Run the profiler on a file"""
 
     def __init__(self, dataset_pointer, max_num_features=None, **kwargs):
         """
@@ -159,6 +159,12 @@ class ProfileRunner(BasicErrCheck):
         #
         logger.info('(2) Read the data')
         try:
+            file_stats = os.stat(self.ds_pointer_for_pandas)
+            if file_stats.st_size < 5:
+                user_msg = f'File is empty: {self.ds_pointer_for_pandas}'
+                self.add_err_msg(user_msg)
+                logger.info(f'Failed to open file {user_msg}')
+                return
             self.dataframe = CsvReader(self.ds_pointer_for_pandas, column_limit=self.max_num_features).read()
         except UnicodeDecodeError as ex_obj:
             user_msg = f'Failed to open file due to UnicodeDecodeError. ({ex_obj})'

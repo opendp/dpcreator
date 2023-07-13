@@ -225,16 +225,10 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
     cy.get('[data-test="radioPrivateInformationYes"]').check({force: true})
     cy.get('[data-test="notHarmButConfidential"]').check({force: true})
     cy.get('[data-test="radioOnlyOneIndividualPerRowYes"]').check({force: true})
-    cy.intercept('/api/profile/run-async-profile/').as('runAsync')
-    cy.intercept('/api/dataset-info/*').as('getDatasetInfo')
-    // click on continue to go to trigger the profiler and go to the Confirm Variables Page
+     // click on continue to go to trigger the profiler and go to the Confirm Variables Page
     cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
-    cy.wait('@runAsync')
-    cy.wait('@getDatasetInfo')
 
     cy.get('h1').should('contain', 'Confirm Variables')
-    const getStore = () => cy.window().its('app.$store')
-    getStore().its('state.dataset.profilerStatus').should('deep.equal', true)
 
     //   dataset.profilerStatus
     for (const key in variableData) {

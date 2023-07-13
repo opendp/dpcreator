@@ -1,7 +1,7 @@
 import json
 from collections import OrderedDict
+from http import HTTPStatus
 from os.path import abspath, dirname, isfile, join
-from unittest import skip
 
 from allauth.account.models import EmailAddress as VerifyEmailAddress
 from django.conf import settings
@@ -26,9 +26,8 @@ TEST_DATA_DIR = join(CURRENT_DIR, 'test_files')
 PROFILER_FIXTURES_DIR = join(dirname(CURRENT_DIR), 'fixtures')
 
 
-@skip('Reconfiguring for analyst mode')
 class ProfilerTest(TestCase):
-    # fixtures = ['test_profiler_data_002.json']
+    """Test the Profiler"""
 
     def setUp(self):
         """Used for multiple tests"""
@@ -73,6 +72,8 @@ class ProfilerTest(TestCase):
         django_file = File(open(filepath, 'rb'))
         self.test_file_info.source_file.save(filename, django_file)
         self.test_file_info.save()
+
+        self.client.force_login(depositor_user)
 
     def get_depositor_setup_info(self, opendp_user: OpenDPUser) -> DepositorSetupInfo:
         """Create and return a DepositorSetupInfo object"""
@@ -128,6 +129,7 @@ class ProfilerTest(TestCase):
 
         print(f'-- Profile metadata has {num_features_profile} features')
         info = profiler.data_profile
+        # print(json.dumps(info, indent=4))
         self.assertTrue('variables' in info)
         num_features_in_profile = len(info['variables'].keys())
         # self.assertEqual(num_features_in_profile, num_features_profile)
@@ -154,7 +156,7 @@ class ProfilerTest(TestCase):
                     self.assertEqual(info['variables'][colname][key_name], idx)
 
     def test_005_profile_good_files(self):
-        """(05) Profile several good files"""
+        """(05) Use the profiler directly on several "good files" w/o interacting with the rest of the system"""
         msgt(self.test_005_profile_good_files.__doc__)
 
         msgt('-- Profile gking-crisis.tab')
@@ -173,7 +175,6 @@ class ProfilerTest(TestCase):
         params = {pstatic.KEY_SAVE_ROW_COUNT: False}
         self.profile_good_file('teacher_climate_survey_lwd.csv', 132, 1500, **params)
 
-    #@skip('test_010_profile_good_file')
     def test_010_profile_good_file(self):
         """(10) Profile file directory"""
         msgt(self.test_010_profile_good_file.__doc__)
@@ -220,7 +221,7 @@ class ProfilerTest(TestCase):
         print('-- Profiler output is the same as the output saved to the DataSetInfo object')
         profile_json_str2 = json.dumps(info, cls=DjangoJSONEncoder, indent=4)
         self.assertTrue(profile_json_str1, profile_json_str2)
-        print(profile_json_str2)
+        # print(profile_json_str2)
         # return
         # self.assertEqual(dsi.profile_variables['dataset']['variableCount'],
         #                  settings.PROFILER_COLUMN_LIMIT)
@@ -233,7 +234,6 @@ class ProfilerTest(TestCase):
         for idx, colname in dsi.depositor_setup_info.data_profile['dataset']['variableOrder']:
             self.assertTrue(colname in dsi.depositor_setup_info.data_profile['variables'])
 
-    @skip('Need to fix. test_020_bad_files')
     def test_020_bad_files(self):
         """(20) Test bad file type"""
         msgt(self.test_020_bad_files.__doc__)
@@ -302,7 +302,6 @@ class ProfilerTest(TestCase):
         self.assertEqual(dsi2.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
 
-    # @skip('test_40_filefield_correct: Reconfiguring for analyst mode')
     def test_40_filefield_correct(self):
         """(40) Test using filefield with legit file"""
         msgt(self.test_40_filefield_correct.__doc__)
@@ -446,3 +445,52 @@ class ProfilerTest(TestCase):
                         (varname_snakecase in plan_var_info)
             print(f'> Check: {orig_varname}/{varname_snakecase} -> {var_found}')
             self.assertTrue(var_found)
+
+    def test_110_profile_good_file_via_api(self):
+        """(110) Profile a file via API"""
+        msgt(self.test_110_profile_good_file_via_api.__doc__)
+
+        ds_object_id = self.test_file_info.object_id
+
+        payload = dict(object_id=str(ds_object_id))
+        print('payload', payload)
+
+        run_profiler_url = '/api/profile/run-direct-profile-no-async/'
+
+        profile_resp = self.client.post(run_profiler_url,
+                                        data=payload,
+                                        content_type='application/json')
+
+        print('resp', json.dumps(profile_resp.json(), indent=2))
+        self.assertEqual(profile_resp.status_code, HTTPStatus.OK)
+
+        resp_json = profile_resp.json()
+        self.assertEqual(resp_json['data']['dataset']['rowCount'], 7000)
+        self.assertEqual(resp_json['data']['dataset']['variableCount'], 10)
+        self.assertEqual(len(resp_json['data']['dataset']['variableOrder']), 10)
+        self.assertTrue('variables' in resp_json['data'])
+
+
+    def test_120_bad_file_via_api(self):
+        """(120) Profile a bad file via API"""
+        msgt(self.test_120_bad_file_via_api.__doc__)
+
+        self.test_file_info.source_file.delete()
+
+        ds_object_id = self.test_file_info.object_id
+
+        payload = dict(object_id=str(ds_object_id))
+        print('payload', payload)
+
+        run_profiler_url = '/api/profile/run-direct-profile-no-async/'
+
+        profile_resp = self.client.post(run_profiler_url,
+                                        data=payload,
+                                        content_type='application/json')
+
+        print(profile_resp.status_code)
+        print('resp', json.dumps(profile_resp.json(), indent=2))
+        self.assertEqual(profile_resp.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertTrue(profile_resp.json()['message'].find('The DataSetInfo source file is not available') > -1)
+        
+

@@ -42,7 +42,7 @@ export default {
             .then(resp => camelcaseKeys(resp, {deep: true}))
     },
     runProfiler(datasetId, userId) {
-        wrappedSession.post('/api/profile/run-async-profile/',
+        return wrappedSession.post('/api/profile/run-direct-profile-no-async/',
             {object_id: datasetId})
             .then(resp => camelcaseKeys(resp, {deep: true}))
 

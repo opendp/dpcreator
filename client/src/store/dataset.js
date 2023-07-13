@@ -323,69 +323,14 @@ const actions = {
      * @param userId used for websocket URL
      */
     runProfiler({commit, state, rootState}, {userId}) {
-        dataset.runProfiler(state.datasetInfo.objectId)
+        dataset.runProfiler(state.datasetInfo.objectId).then(() => {
+            // when profiler returns, it has saved the variables in the database,
+            // so call setDatasetInfo to refresh the store with the latest datasetInfo object
+            this.dispatch('dataset/setDatasetInfo', state.datasetInfo.objectId)
 
-        const prefix = rootState.settings.vueSettings['VUE_APP_WEBSOCKET_PREFIX']
-        const websocketId = 'ws_' + userId
-        const chatSocket = new WebSocket(
-            prefix + window.location.host + '/async_messages/ws/profile/' + websocketId + '/'
-        );
-
-        /* ---------------------------------------------- */
-        /* Add a handler for incoming websocket messages  */
-        /* ---------------------------------------------- */
-
-        chatSocket.onmessage = (e) => {
-            // parse the incoming JSON to a .js object
-
-            const wsData = camelcaseKeys(JSON.parse(e.data), {deep: true});
-
-            /* "wsMsg" attributes are the defined in the Python WebsocketMessage object
-                 msgType (str): expected "PROFILER_MESSAGE"
-                 success (boolean):  error detected?
-                 userMessage (str): description of what happened
-                 msgCnt (int): Not used for the profiler
-                 data: Profile data, if it exists, JSON
-                 timestamp: timestamp
-
-                - reference: opendp_apps/async_messages/websocket_message.py
-            */
-            const wsMsg = wsData.message
-            // "wsMsg.msgType": should be 'PROFILER_MESSAGE'
-            if (wsMsg.msgType !== 'PROFILER_MESSAGE') {
-                console.log('unknown msgType: ' + wsMsg.msgType);
-            } else {
-                // ---------------------------------------
-                // "ws_msg.success": Did it work?
-                // ---------------------------------------
-                if (wsMsg.success === true) {
-                    console.log('-- success message');
-                } else if (wsMsg.success === false) {
-                    console.log('-- error message');
-                    alert(wsMsg.userMessage);
-                } else {
-                    console.log('-- error occurred!')
-                    return;
-                }
-                commit(SET_PROFILER_MSG, wsMsg.userMessage)
-                commit(SET_PROFILER_STATUS, wsMsg.success)
-                console.log('ws_msg.user_message: ' + wsMsg.userMessage);
-                this.dispatch('dataset/setDatasetInfo', state.datasetInfo.objectId)
+        })
 
 
-                return (wsMsg.userMessage)
-
-
-            }
-
-        };
-
-        chatSocket.onclose = function (e) {
-            console.error('Chat socket closed unexpectedly');
-        };
-        chatSocket.onerror = function (e) {
-            console.error('onerror: ' + e);
-        };
     },
     generateRelease({commit, state}, objectId) {
         // submit statistics openDP release().
