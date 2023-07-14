@@ -53,7 +53,7 @@
                         bottom max-width="220px">
                     <template v-slot:activator="{ on, attrs }">
                         <v-icon
-                                :data-test="action"
+                                :data-test="action+item.planName"
                                 v-bind="attrs"
                                 v-on="on"
                                 class="mr-2"
@@ -103,11 +103,10 @@
 
 
     </v-data-table>
-    <DeleteDatasetDialog
+    <DeleteAnalysisPlanDialog
         v-if="selectedItem"
         :dialogDelete="dialogDelete"
-        :datasetInfo="selectedItem.datasetInfo"
-        :analysisPlan="selectedItem.analysisPlan"
+        :analysisPlan="selectedItem"
         v-on:cancel="closeDelete"
         v-on:close="closeDelete"
     />
@@ -203,6 +202,7 @@ import StatusTag from "../DesignSystem/StatusTag.vue";
 import Button from "../DesignSystem/Button.vue";
 import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
 import DeleteDatasetDialog from "@/components/MyData/DeleteDatasetDialog";
+import DeleteAnalysisPlanDialog from "@/components/MyAnalysisPlans/DeleteAnalysisPlanDialog.vue";
 
 const {
   VIEW_DETAILS,
@@ -212,7 +212,7 @@ const {
 
 export default {
   name: "MyPlansTable",
-  components: {StatusTag, Button, DeleteDatasetDialog},
+  components: {DeleteAnalysisPlanDialog, StatusTag, Button, DeleteDatasetDialog},
   props: {
     plans: {
       type: Array
