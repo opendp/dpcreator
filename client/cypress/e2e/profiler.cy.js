@@ -7,7 +7,9 @@
                 return false
             })
             cy.clearData()
-            cy.createMockDataset('EyeDemoMockDV.json')
+            let testfile = 'cypress/fixtures/Fatigue_data.csv'
+            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
+            cy.uploadFile(testfile)
 
             cy.request('/api/dataset-info/').then((data) => {
                 // Update Vuex store with the dataset to be profiled

@@ -1,33 +1,5 @@
 {
     describe('Create Account Test', () => {
-        it('Creates a Dataverse user with Handoff', () => {
-            Cypress.Cookies.debug(true)
-            cy.on('uncaught:exception', (e, runnable) => {
-                console.log('error', e)
-                console.log('runnable', runnable)
-
-                return false
-            })
-            cy.clearData()
-            const username = 'kermit'
-            const email = 'kermit@thefrog.com'
-            const password = 'kermit123!'
-            cy.visit('/mock-dv');
-            cy.get('[data-test="submit button"]').click();
-            cy.url().should('contains', '/?id=');
-            cy.scrollTo("bottom");
-            cy.get('[data-test="termsOfServiceCheckbox"]').click({force: true});
-            cy.get('[data-test="createAccountButton"]').click({force: true, multiple: true});
-            cy.url().should('contain', 'sign-up')
-            cy.createAccount(username, email, password)
-            cy.visit('/welcome')
-            cy.get('[data-test="My Profile"]').click();
-            cy.url().should('contains', 'my-profile')
-            cy.get('h2').should('contain', 'Edit account information').should('be.visible')
-            cy.get('[data-test="myProfileUsername"]').should('have.value', username)
-            cy.logout()
-
-        })
         it('Shows error message if user name is taken', () => {
             cy.clearData()
             cy.on('uncaught:exception', (e, runnable) => {

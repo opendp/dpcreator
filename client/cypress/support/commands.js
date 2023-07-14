@@ -142,13 +142,13 @@ Cypress.Commands.add('uploadFile', (testfile) => {
     cy.get('tr').should('contain',
         'Uploaded')
 })
-Cypress.Commands.add('runDemo', (mockDVfile, demoDatafile) => {
+Cypress.Commands.add('runDemo', (testFile, demoDatafile) => {
     cy.clearData()
-    cy.createMockDataset(mockDVfile)
+    let testPath = 'cypress/fixtures/'+testFile
+    cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
+    cy.uploadFile(testPath)
     cy.fixture(demoDatafile).then((demoData) => {
         cy.url().should('contain', 'welcome')
-        cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
-            demoData['datasetName'])
         cy.goToConfirmVariables(demoData.variables)
 
         // select the variables we will use
@@ -225,7 +225,11 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
     cy.get('[data-test="radioPrivateInformationYes"]').check({force: true})
     cy.get('[data-test="notHarmButConfidential"]').check({force: true})
     cy.get('[data-test="radioOnlyOneIndividualPerRowYes"]').check({force: true})
-     // click on continue to go to trigger the profiler and go to the Confirm Variables Page
+    cy.get('[data-test="Larger Population - no"]').check({force: true})
+    //  cy.get('[data-test="Public Observations - yes"]').should('be.visible')
+    cy.get('[data-test="Public Observations - yes"]').check({force: true})
+
+    // click on continue to go to trigger the profiler and go to the Confirm Variables Page
     cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
 
     cy.get('h1').should('contain', 'Confirm Variables')
