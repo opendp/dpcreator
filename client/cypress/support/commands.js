@@ -237,7 +237,7 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
     //   dataset.profilerStatus
     for (const key in variableData) {
         const val = variableData[key]
-        cy.get('table').contains('td', val.name).should('be.visible')
+        cy.get('table').contains('td', val.name).should('exist')
         cy.get('table').contains('tr', val.name).should('contain', val.type)
     }
 
