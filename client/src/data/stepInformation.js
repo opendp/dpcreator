@@ -85,7 +85,7 @@ export default {
         label: 'Profiling Complete',
     },
     [STEP_0500_VARIABLE_DEFAULTS_CONFIRMED]: {
-        workflowStatus: statusInformation.statuses.IN_PROGRESS,
+        workflowStatus: statusInformation.statuses.SETUP_COMPLETE,
         wizardStepper: 2,
         label: 'Variable Defaults Confirmed',
     },

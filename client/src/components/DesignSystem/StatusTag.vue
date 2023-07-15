@@ -9,6 +9,7 @@ import statusInformation from "../../data/statusInformation";
 
 const {
   IN_PROGRESS,
+  SETUP_COMPLETE,
   IN_EXECUTION,
   ERROR,
   COMPLETED
@@ -30,7 +31,10 @@ export default {
           return "error_status__bg error_status__color--text";
         case COMPLETED:
           return "completed_status__bg completed_status__color--text";
-        default:
+        case SETUP_COMPLETE:
+            return "completed_status__bg completed_status__color--text";
+
+          default:
           return "";
       }
     }

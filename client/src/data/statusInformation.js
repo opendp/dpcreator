@@ -23,6 +23,12 @@ export default {
         icon: "mdi-alert",
         availableActions: ["viewDetails", "delete"]
     },
+    setup_complete: {
+        label: "Setup Complete",
+        color: "light-green lighten-3",
+        icon: "",
+        availableActions: ["viewDetails", "delete"]
+    },
     completed: {
         label: "Release Completed",
         color: "light-green lighten-3",
@@ -32,6 +38,7 @@ export default {
     statuses: {
         UPLOADED: "uploaded",
         IN_PROGRESS: "in_progress",
+        SETUP_COMPLETE: "setup_complete",
         IN_EXECUTION: "in_execution",
         ERROR: "error",
         COMPLETED: "completed"

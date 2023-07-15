@@ -23,6 +23,10 @@ export default {
         PATH: "/wizard",
         NAME: "Wizard"
     },
+    DEPOSITOR_WIZARD: {
+        PATH: "/depositor-wizard",
+        NAME: "DepositorWizard"
+    },
     MY_PROFILE: {
         PATH: "/my-profile",
         NAME: "MyProfile"

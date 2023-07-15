@@ -282,7 +282,7 @@ export default {
       //  this.$router.push(`${NETWORK_CONSTANTS.MY_DATA.PATH}/${item.datasetId}`)
     },
     continueWorkflow(item) {
-      this.goToPage(item, `${NETWORK_CONSTANTS.WIZARD.PATH}`)
+      this.goToPage(item, `${NETWORK_CONSTANTS.DEPOSITOR_WIZARD.PATH}`)
     },
     getWorkflowStatus(item) {
       return stepInformation[item.userStep].workflowStatus
