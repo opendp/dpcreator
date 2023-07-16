@@ -148,7 +148,7 @@ Cypress.Commands.add('runDemo', (testFile, demoDatafile) => {
     cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
     cy.uploadFile(testPath)
     cy.fixture(demoDatafile).then((demoData) => {
-        cy.url().should('contain', 'welcome')
+        cy.url().should('contain', 'my-data')
         cy.goToConfirmVariables(demoData.variables)
 
         // select the variables we will use
@@ -199,7 +199,7 @@ Cypress.Commands.add('createMockDataset', (fixture, createAccount = true) => {
         cy.get('[data-test="username"]').type(mockForm['user']);
         cy.get('[data-test="password"]').type(mockForm['password']);
         cy.get('[data-test="Log in"]').click();
-        cy.url().should('contain', 'welcome')
+        cy.url().should('contain', 'my-data')
     })
 })
 

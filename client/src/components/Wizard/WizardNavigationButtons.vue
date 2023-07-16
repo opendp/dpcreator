@@ -15,7 +15,7 @@
 
 
         <Button
-                data-test="wizardContinueButton"
+                data-test="wizardCompleteButton"
                 v-if="stepperPosition === 1 && workflow==='depositor'"
                 classes="d-block"
                 :class="{

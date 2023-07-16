@@ -8,7 +8,7 @@
                 return false
             })
             cy.on("window:before:load", (win) => {
-                cy.spy(win.console, "log");
+              //  cy.spy(win.console, "log");
                 cy.spy(win.console, "error")
             })
             cy.clearData()
@@ -22,7 +22,29 @@
                 cy.get('[data-test="variableRow"]').should('not.exist')
             })
         })
+        it('goes back to My Data from Complete button', () => {
+            cy.on('uncaught:exception', (e, runnable) => {
+                console.log('error', e)
+                console.log('runnable', runnable)
+                return false
+            })
 
+            cy.clearData()
+            let testfile = 'cypress/fixtures/Fatigue_data.csv'
+            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
+            cy.uploadFile(testfile)
+            cy.fixture('EyeDemoData.json').then((demoData) => {
+                cy.url().should('contain', 'my-data')
+                cy.goToConfirmVariables(demoData.variables)
+                cy.pause()
+                // select the variables we will use
+                cy.selectVariable(demoData.variables)
+                cy.get('[data-test="wizardCompleteButton"]').click({force:true})
+                cy.url().should('contain','my-data')
+                cy.get('[data-test="table status tag"]').should('contain', "Setup Complete")
+
+            })
+        })
         it('saves categories correctly', () => {
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
