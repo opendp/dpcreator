@@ -11,6 +11,7 @@ const {
   MY_ANALYSIS_PLANS,
   MY_DATA_DETAILS,
   WIZARD,
+  DEPOSITOR_WIZARD,
   SIGN_UP,
   LOGIN,
   VERIFY_EMAIL,
@@ -37,6 +38,16 @@ const routes = [
     name: WIZARD.NAME,
     // dynamic segments start with a colon
     component: () => import("../views/Wizard.vue"),
+    meta: {
+      requiresAuth: true,
+      requiresDataset: true
+    }
+  },
+  {
+    path: `${DEPOSITOR_WIZARD.PATH}/`,
+    name: DEPOSITOR_WIZARD.NAME,
+    // dynamic segments start with a colon
+    component: () => import("../views/DepositorWizard.vue"),
     meta: {
       requiresAuth: true,
       requiresDataset: true

@@ -4,8 +4,10 @@ const camelcaseKeys = require('camelcase-keys');
 
 function convertWizardStep(resp) {
     // convert the wizard_step stored in the server side back to user_step
-    resp.data.depositor_setup_info.user_step = resp.data.depositor_setup_info.wizard_step;
-    resp.data.status = resp.data.depositor_setup_info.wizard_step;
+    if (resp.data.depositor_setup_info) {
+        resp.data.depositor_setup_info.user_step = resp.data.depositor_setup_info.wizard_step;
+        resp.data.status = resp.data.depositor_setup_info.wizard_step;
+    }
     // Return the modified resp object
     return resp;
 }
@@ -23,9 +25,11 @@ export default {
                 if (resp.data.results) {
                     const modifiedResults = resp.data.results.map((obj) => {
                         // copy wizard_step into user_step
-                        obj.depositor_setup_info.user_step = obj.depositor_setup_info.wizard_step;
-                        console.log('setting status to ' + obj.depositor_setup_info.wizard_step)
-                        obj.status = obj.depositor_setup_info.wizard_step;
+                        if (obj.depositor_setup_info) {
+                            obj.depositor_setup_info.user_step = obj.depositor_setup_info.wizard_step;
+                            console.log('setting status to ' + obj.depositor_setup_info.wizard_step)
+                            obj.status = obj.depositor_setup_info.wizard_step;
+                        }
                         return obj;
                     });
                     resp.data.results = modifiedResults
