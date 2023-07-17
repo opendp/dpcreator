@@ -207,6 +207,7 @@ client/.idea/aws.xml
 server/templates/base-vue.html
 !server/opendp_apps/dp_reports/test_data/*.json
 !server/opendp_apps/analysis/test_data/*.json
+!server/opendp_apps/analysis/fixtures/*.json
 .python-version
 deploy/dataverse/scripts/bad_delete.html
 deploy/dataverse/scripts/failed_delete_resp.html
