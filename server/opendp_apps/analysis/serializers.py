@@ -72,6 +72,10 @@ class AnalysisPlanSerializer(serializers.ModelSerializer):
     dataset = serializers.SlugRelatedField(slug_field='object_id', read_only=True)
     release_info = ReleaseInfoSerializer(read_only=True)
 
+    dataset_name = serializers.CharField(source='dataset.name', read_only=True)
+    dataset_owner_name = serializers.CharField(source='dataset.creator', read_only=True)
+
+
     class Meta:
         model = AnalysisPlan
         fields = ['object_id',
@@ -79,15 +83,17 @@ class AnalysisPlanSerializer(serializers.ModelSerializer):
                   'description',
                   'analyst',
                   'dataset',
+                  'dataset_name',
+                  'dataset_owner_name',
                   'epsilon',
                   'delta',
                   'is_complete',
                   'user_step',
                   'wizard_step',
                   'expiration_date',
-                  'variable_info',
-                  'dp_statistics',
                   'release_info',
+                  'dp_statistics',
+                  'variable_info',
                   'created',
                   'updated']
 

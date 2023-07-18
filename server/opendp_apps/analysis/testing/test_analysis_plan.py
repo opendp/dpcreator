@@ -32,6 +32,7 @@ class AnalysisPlanTest(TestCase):
         #
         self.user_obj, _created = get_user_model().objects.get_or_create(username='dp_depositor')
         self.analyst_user_obj, _created = get_user_model().objects.get_or_create(username='dp_analyst')
+        self.another_user, _created = get_user_model().objects.get_or_create(username='another_user')
 
         self.client = APIClient()
         self.client.force_login(self.user_obj)
@@ -267,7 +268,6 @@ class AnalysisPlanTest(TestCase):
         #
         plan_object_id = plan_creator.analysis_plan.object_id
 
-        self.client = APIClient()
         self.client.force_login(self.analyst_user_obj)
 
         # note: not checking **validity** of dp_statistics or variable_info here
@@ -312,7 +312,6 @@ class AnalysisPlanTest(TestCase):
         # -------------------------------------------------------------------
         plan_object_id = plan_creator.analysis_plan.object_id
 
-        self.client = APIClient()
         self.client.force_login(self.user_obj)
 
         # note: not checking **validity** of dp_statistics or variable_info here
@@ -333,9 +332,7 @@ class AnalysisPlanTest(TestCase):
         # (c) Have another user, not the assigned analyst update the plan!
         #    - should fail
         # -------------------------------------------------------------------
-        another_user, _created = get_user_model().objects.get_or_create(username='another_user')
-        self.client = APIClient()
-        self.client.force_login(another_user)
+        self.client.force_login(self.another_user)
 
         response = self.client.patch(f'{self.API_PREFIX}{plan_object_id}/',
                                      json.dumps(update_data),
@@ -347,7 +344,6 @@ class AnalysisPlanTest(TestCase):
         # -------------------------------------------------------------------
         # (d) Finally, have the assigned analyst update the plan!
         # -------------------------------------------------------------------
-        self.client = APIClient()
         self.client.force_login(self.analyst_user_obj)
 
         response = self.client.patch(f'{self.API_PREFIX}{plan_object_id}/',
@@ -482,11 +478,51 @@ class AnalysisPlanTest(TestCase):
         #
         plan_object_id = plan_util.analysis_plan.object_id
 
-        another_user, _created = get_user_model().objects.get_or_create(username='another_user')
-        self.client = APIClient()
-        self.client.force_login(another_user)
+        self.client.force_login(self.another_user)
 
         response = self.client.delete(f'{self.API_PREFIX}{plan_object_id}/')
 
         # AnalysisPlan not found, HTTP 404
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+
+    def test_140_list_plans(self):
+        """(140) List AnalysisPlans using different users w/ varying permissions"""
+        msgt(self.test_140_list_plans.__doc__)
+
+        # Create two AnalysisPlans
+        #
+        plan1 = self.working_plan_info.copy()
+        plan_util = AnalysisPlanCreator(self.user_obj, plan1)
+        self.assertTrue(plan_util.has_error() is False)
+        analysis_plan1 = plan_util.analysis_plan
+
+        plan2 = self.working_plan_info.copy()
+        plan2['analyst_id'] = str(self.analyst_user_obj.object_id)
+        plan2['name'] = 'Plan 2'
+        plan_util2 = AnalysisPlanCreator(self.user_obj, plan2)
+        self.assertTrue(plan_util2.has_error() is False)
+        analysis_plan2 = plan_util2.analysis_plan
+
+        # List the plans w/ call by the dataset owner
+        #
+        response = self.client.get(f'{self.API_PREFIX}')
+        self.assertTrue(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.json()['count'], 2)
+        self.assertEqual(response.json()['results'][0]['object_id'], str(analysis_plan1.object_id))
+
+        # List the plans w/ call by the analyst
+        #
+        self.client.force_login(self.analyst_user_obj)
+        response = self.client.get(f'{self.API_PREFIX}')
+        self.assertTrue(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.json()['count'], 1)
+        self.assertEqual(response.json()['results'][0]['object_id'], str(analysis_plan2.object_id))
+        self.assertEqual(response.json()['results'][0]['name'], 'Plan 2')
+
+        print(json.dumps(response.json(), indent=4))
+        # List the plans w/ call by user with no permission
+        #
+        self.client.force_login(self.another_user)
+        response = self.client.get(f'{self.API_PREFIX}')
+        self.assertTrue(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.json()['count'], 0)
