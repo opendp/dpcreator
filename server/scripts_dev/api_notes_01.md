@@ -7,6 +7,8 @@ DRF link: http://localhost:8000/api/
 - [Direct File Upload](#direct-file-upload)
 - [Get Dataset info (including depositor setup info)](#get-dataset-info)
 - [Update Depositor Setup Info](#update-depositor-setup-info)
+- [Create Analysis Plan](#create-analysis-plan)
+- [Update Analysis Plan](#update-analysis-plan)
 
 
 --- 
@@ -374,3 +376,28 @@ Create an Analysis Plan using a DataSetInfo object.
   "updated": "2023-07-18T16:05:38.587586Z"
 }
 ```
+
+## Update Analysis Plan 
+
+- **API endpoint**: `/api/analysis-plan/{analysis_plan_object_id}`
+- **Method**: `PATCH`
+- **Auth**: username/password
+- **Params**: Sent as a JSON payload. Only a single field is needed for the patch. This example shows all updateable fields:
+  ```json
+  {
+  "dp_statistics": ... "updates from the create statistics page" ...,
+  },
+  "variable_info": ... "updates from the confirm variables page" ...
+  },
+  "name": "Teacher survey plan, version 2a",
+  "description": "A new description",
+  "wizard_step": "yellow brick road"
+  }
+  ```
+    - **dp_statistics**: (optional) JSON object, updates to the DP Statistics. Send all of the `dp_statistics` each time, it doesn't update partial `dp_statistics`..
+    - **variable_info**: (optional) JSON object, updates to the variable_info. Send all of the `variable_info` each time--it doesn't update partial `variable_inf`.
+    - **name**: (optional) The AnalysisPlan may be renamed at any time.
+    - **description**: (optional) The AnalysisPlan description be changed at any time.
+    - **wizard_step**: (optional) Update  `wizard_step`. There is no server-side validation for this field--except that's an non-empty string
+- Response example:
+  - The response will be the same as that for Create Analysis Plan (above), with the field updates reflected.

@@ -2,7 +2,6 @@ import json
 import uuid
 from datetime import timedelta, datetime
 from os.path import abspath, dirname, join
-from unittest import skip
 
 from django.contrib.auth import get_user_model
 from django.core.files import File as DjangoFileObject
@@ -11,7 +10,6 @@ from rest_framework.test import APIClient
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.analysis_plan_creator import AnalysisPlanCreator
-from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.models import AnalysisPlan
 from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataset.models import DataSetInfo
@@ -19,7 +17,6 @@ from opendp_apps.model_helpers.msg_util import msgt
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
-# print('TEST_DATA_DIR', TEST_DATA_DIR)
 
 
 class AnalysisPlanTest(TestCase):
@@ -281,6 +278,8 @@ class AnalysisPlanTest(TestCase):
         self.assertEqual(response.status_code, 200)
         jresp = response.json()
 
+        # print(json.dumps(jresp, indent=2))
+
         self.assertEqual(jresp['dp_statistics'], update_data['dp_statistics'])
         self.assertEqual(jresp['variable_info'], update_data['variable_info'])
         self.assertEqual(jresp['name'], update_data['name'])
@@ -327,5 +326,5 @@ class AnalysisPlanTest(TestCase):
 
         self.assertEqual(response.status_code, 400)
         user_msg = astatic.ERR_MSG_FIELDS_NOT_UPDATEABLE.format(
-                        problem_field_str='epsilon, user_step, zebra')
+            problem_field_str='epsilon, user_step, zebra')
         self.assertEqual(response.json()['message'], user_msg)
