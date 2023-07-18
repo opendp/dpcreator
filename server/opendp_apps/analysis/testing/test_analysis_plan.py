@@ -1,8 +1,8 @@
 import json
 import uuid
 from datetime import timedelta, datetime
-from os.path import abspath, dirname, join
 from http import HTTPStatus
+from os.path import abspath, dirname, join
 
 from django.contrib.auth import get_user_model
 from django.core.files import File as DjangoFileObject
@@ -429,3 +429,64 @@ class AnalysisPlanTest(TestCase):
         user_msg = astatic.ERR_MSG_FIELDS_NOT_UPDATEABLE.format(
             problem_field_str='epsilon, user_step, zebra')
         self.assertEqual(response.json()['message'], user_msg)
+
+    def test_110_test_delete_no_release(self):
+        """(110) Delete AnalysisPlan w/ no ReleaseInfo"""
+        msgt(self.test_110_test_delete_no_release.__doc__)
+
+        # Create the AnalysisPlan
+        #
+        plan_util = AnalysisPlanCreator(self.user_obj, self.working_plan_info)
+        self.assertTrue(plan_util.has_error() is False)
+
+        # Delete the plan!
+        #
+        plan_object_id = plan_util.analysis_plan.object_id
+
+        response = self.client.delete(f'{self.API_PREFIX}{plan_object_id}/')
+
+        # Works fine, HTTP 204
+        self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT)
+
+    def test_120_test_delete_dataset_owner(self):
+        """(120) Delete AnalysisPlan by the dataset owner"""
+        msgt(self.test_120_test_delete_dataset_owner.__doc__)
+
+        # Create the AnalysisPlan
+        #
+        self.working_plan_info['analyst_id'] = str(self.analyst_user_obj.object_id)
+        plan_util = AnalysisPlanCreator(self.user_obj, self.working_plan_info)
+        self.assertTrue(plan_util.has_error() is False)
+
+        # Delete the plan!
+        #
+        plan_object_id = plan_util.analysis_plan.object_id
+
+        response = self.client.delete(f'{self.API_PREFIX}{plan_object_id}/')
+
+        # AnalysisPlan not found, HTTP 204
+        self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT)
+
+    def test_130_test_delete_user_no_perms(self):
+        """(130) Delete AnalysisPlan by user w/o permission"""
+        msgt(self.test_130_test_delete_user_no_perms.__doc__)
+
+        # Create the AnalysisPlan
+        #
+        self.working_plan_info['analyst_id'] = str(self.analyst_user_obj.object_id)
+        plan_util = AnalysisPlanCreator(self.user_obj, self.working_plan_info)
+        self.assertTrue(plan_util.has_error() is False)
+
+        # Delete the plan!
+        #   Logged in user is the self.opendp_user_obj, not self.analyst_user_obj so AnalysisPlan not found
+        #
+        plan_object_id = plan_util.analysis_plan.object_id
+
+        another_user, _created = get_user_model().objects.get_or_create(username='another_user')
+        self.client = APIClient()
+        self.client.force_login(another_user)
+
+        response = self.client.delete(f'{self.API_PREFIX}{plan_object_id}/')
+
+        # AnalysisPlan not found, HTTP 404
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)

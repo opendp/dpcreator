@@ -404,3 +404,15 @@ Note: This endpoint may only be used by the user who is specified as the `analys
     - **wizard_step**: (optional) Update  `wizard_step`. There is no server-side validation for this field--except that's an non-empty string
 - Response example:
   - The response will be the same as that for Create Analysis Plan (above), with the field updates reflected.
+
+## Delete Analysis Plan 
+
+Both the `AnalysisPlan.analyst` and `DatasetInfo.creator` have permission to delete an AnalysisPlan.
+
+**Note**: Delete is NOT allowed if a ReleaseInfo object has been created for this AnalysisPlan.
+
+
+- **API endpoint**: `/api/analysis-plan/{analysis_plan_object_id}/`
+- **Method**: `DELETE`
+- **Auth**: username/password
+- **Expected response**: `204 No Content`
