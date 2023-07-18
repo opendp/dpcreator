@@ -6,7 +6,7 @@
         "password": "pbkdf2_sha256$320000$YRom5cF80OGhOsMVP6TD5b$Bap5EcfUUJKREkN/+hhE1h3WBch8bMUHPT/+TzZyFNs=",
         "last_login": "2023-07-17T15:14:08.694Z",
         "is_superuser": true,
-        "username": "dp_analyst",
+        "username": "dp_depositor",
         "first_name": "Jameela",
         "last_name": "Baker",
         "email": "dp_analyst@some.edu",

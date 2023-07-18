@@ -257,7 +257,8 @@ This includes depositor setup info.
 
 ## Create Analysis Plan 
 
-Create an Analysis Plan using a DataSetInfo object. 
+Create an Analysis Plan using a DataSetInfo object. This endpoint may only be used by the user who is specified as the `creator` of the DataSetInfo object.
+ 
 
 - **API endpoint**: `/api/analysis-plan/`
 - **Method**: `POST`
@@ -266,6 +267,7 @@ Create an Analysis Plan using a DataSetInfo object.
   ```json
   {
     "object_id": "bbc5bd52-7c1e-4cf2-9938-28fd4745b5b1",
+    "analyst_id": "0681867b-1ce8-46c9-adfb-df83b8efff24",
     "name": "Teacher survey plan",
     "description": "Release DP Statistics for the teacher survey, version 1",
     "epsilon": 0.25,
@@ -273,6 +275,7 @@ Create an Analysis Plan using a DataSetInfo object.
   }
   ```
   - **object_id**: UUID of the DataSetInfo object
+  - **analyst_id**: (optional) UUID of the Analyst, an OpenDP user. If not specified, the `creator` of the DatasetInfo object will be used as the Analyst
   - **name**: string, name of the new AnalysisPlan
   - **description**: (optional) string, description of the new AnalysisPlan
   - **epsilon**: float, allotted privacy budget for the new AnalysisPlan
@@ -378,6 +381,8 @@ Create an Analysis Plan using a DataSetInfo object.
 ```
 
 ## Update Analysis Plan 
+
+Note: This endpoint may only be used by the user who is specified as the `analyst` of the AnalysisPlan.
 
 - **API endpoint**: `/api/analysis-plan/{analysis_plan_object_id}/`
 - **Method**: `PATCH`

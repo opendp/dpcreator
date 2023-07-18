@@ -2,6 +2,7 @@ import json
 import uuid
 from datetime import timedelta, datetime
 from os.path import abspath, dirname, join
+from http import HTTPStatus
 
 from django.contrib.auth import get_user_model
 from django.core.files import File as DjangoFileObject
@@ -29,7 +30,8 @@ class AnalysisPlanTest(TestCase):
 
         # Create a OpenDP User object
         #
-        self.user_obj, _created = get_user_model().objects.get_or_create(username='dp_analyst')
+        self.user_obj, _created = get_user_model().objects.get_or_create(username='dp_depositor')
+        self.analyst_user_obj, _created = get_user_model().objects.get_or_create(username='dp_analyst')
 
         self.client = APIClient()
         self.client.force_login(self.user_obj)
@@ -134,7 +136,7 @@ class AnalysisPlanTest(TestCase):
 
         # print('response.json', json.dumps(response.json(), indent=2))
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, HTTPStatus.CREATED)
         self.assertEqual(response.json()['name'], payload['name'])
         self.assertEqual(response.json()['description'], payload['description'])
         self.assertEqual(response.json()['epsilon'], payload['epsilon'])
@@ -155,7 +157,7 @@ class AnalysisPlanTest(TestCase):
         response = self.client.get(f'{self.API_PREFIX}{new_plan_object_id}/',
                                    content_type='application/json')
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         the_plan2 = response.json()
         # print('the_plan2', json.dumps(the_plan2, indent=2))
 
@@ -193,7 +195,7 @@ class AnalysisPlanTest(TestCase):
         """(40) Fail b/c bad dataset id"""
         msgt(self.test_40_fail_bad_dataset_id.__doc__)
 
-        nonsense_dataset_id = uuid.uuid4()
+        nonsense_dataset_id = str(uuid.uuid4())
         plan_util = AnalysisPlanCreator(self.user_obj, {'object_id': nonsense_dataset_id})
 
         self.assertTrue(plan_util.has_error())
@@ -225,7 +227,7 @@ class AnalysisPlanTest(TestCase):
                                     payload,
                                     content_type='application/json')
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
         self.assertEqual(response.json()['success'], False)
         self.assertTrue(response.json()['message'].find('Must be a valid UUID') > -1)
 
@@ -235,14 +237,14 @@ class AnalysisPlanTest(TestCase):
 
         dataset_info = DataSetInfo.objects.get(id=2)
 
-        nonsense_dataset_id = uuid.uuid4()
+        nonsense_dataset_id = str(uuid.uuid4())
 
         payload = json.dumps({"object_id": str(nonsense_dataset_id)})
         response = self.client.post(self.API_PREFIX,
                                     payload,
                                     content_type='application/json')
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
         jresp = response.json()
         self.assertEqual(jresp['success'], False)
         self.assertTrue(jresp['message'].find(dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND) > -1)
@@ -254,15 +256,19 @@ class AnalysisPlanTest(TestCase):
         # (a) Create a plan
         #
         payload = self.working_plan_info
+        payload['analyst_id'] = str(self.analyst_user_obj.object_id)
 
         plan_creator = AnalysisPlanCreator(self.user_obj, payload)
 
         # did plan creation work?
         self.assertTrue(plan_creator.has_error() is False)
 
-        # (b) Update the plan!
+        # (b) Have the Analyst update the plan!
         #
         plan_object_id = plan_creator.analysis_plan.object_id
+
+        self.client = APIClient()
+        self.client.force_login(self.analyst_user_obj)
 
         # note: not checking **validity** of dp_statistics or variable_info here
         update_data = {'dp_statistics': {'hi': 'there'},
@@ -275,7 +281,7 @@ class AnalysisPlanTest(TestCase):
                                      json.dumps(update_data),
                                      content_type='application/json')
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK)
         jresp = response.json()
 
         # print(json.dumps(jresp, indent=2))
@@ -286,11 +292,106 @@ class AnalysisPlanTest(TestCase):
         self.assertEqual(jresp['description'], update_data['description'])
         self.assertEqual(jresp['wizard_step'], update_data['wizard_step'])
 
+    def test_82_update_plan_wrong_analyst(self):
+        """(82) Update plan where user isn't the assigned analyst"""
+        msgt(self.test_82_update_plan_wrong_analyst.__doc__)
+
+        # (a) Create a plan
+        #
+        payload = self.working_plan_info
+        payload['analyst_id'] = str(self.analyst_user_obj.object_id)
+
+        plan_creator = AnalysisPlanCreator(self.user_obj, payload)
+
+        # did plan creation work?
+        self.assertTrue(plan_creator.has_error() is False)
+
+        # -------------------------------------------------------------------
+        # (b) Have the Depositor, not the assigned analyst update the plan!
+        #   - should fail!
+        # -------------------------------------------------------------------
+        plan_object_id = plan_creator.analysis_plan.object_id
+
+        self.client = APIClient()
+        self.client.force_login(self.user_obj)
+
+        # note: not checking **validity** of dp_statistics or variable_info here
+        update_data = {'dp_statistics': {'hi': 'there'},
+                       'variable_info': {'age': {'type': 'Integer'}},
+                       'name': 'Teacher survey plan, version 2a',
+                       'description': 'A new description',
+                       'wizard_step': 'yellow brick road'}
+
+        response = self.client.patch(f'{self.API_PREFIX}{plan_object_id}/',
+                                     json.dumps(update_data),
+                                     content_type='application/json')
+
+        # Should not be found!
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+
+        # -------------------------------------------------------------------
+        # (c) Have another user, not the assigned analyst update the plan!
+        #    - should fail
+        # -------------------------------------------------------------------
+        another_user, _created = get_user_model().objects.get_or_create(username='another_user')
+        self.client = APIClient()
+        self.client.force_login(another_user)
+
+        response = self.client.patch(f'{self.API_PREFIX}{plan_object_id}/',
+                                     json.dumps(update_data),
+                                     content_type='application/json')
+
+        # Again, should not be found!
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+
+        # -------------------------------------------------------------------
+        # (d) Finally, have the assigned analyst update the plan!
+        # -------------------------------------------------------------------
+        self.client = APIClient()
+        self.client.force_login(self.analyst_user_obj)
+
+        response = self.client.patch(f'{self.API_PREFIX}{plan_object_id}/',
+                                     json.dumps(update_data),
+                                     content_type='application/json')
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        jresp = response.json()
+        self.assertEqual(jresp['dp_statistics'], update_data['dp_statistics'])
+        self.assertEqual(jresp['variable_info'], update_data['variable_info'])
+        self.assertEqual(jresp['name'], update_data['name'])
+        self.assertEqual(jresp['description'], update_data['description'])
+        self.assertEqual(jresp['wizard_step'], update_data['wizard_step'])
+
+    def test_84_create_plan_bad_analyst_id(self):
+        """(84) Update plan where user isn't the assigned analyst"""
+        msgt(self.test_84_create_plan_bad_analyst_id.__doc__)
+
+        payload = self.working_plan_info
+        payload['analyst_id'] = str(uuid.uuid4())
+
+        plan_creator = AnalysisPlanCreator(self.user_obj, payload)
+
+        # -------------------------------------------------------------------
+        # (a) plan creation should fail
+        # -------------------------------------------------------------------
+        self.assertTrue(plan_creator.has_error() is True)
+        self.assertEqual(plan_creator.get_err_msg(), astatic.ERR_MSG_PLAN_INFO_ANALYST_ID_INVALID)
+
+        # -------------------------------------------------------------------
+        # (b) do it again via API, should also fail
+        # -------------------------------------------------------------------
+        response = self.client.post(self.API_PREFIX,
+                                    json.dumps(payload),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertEqual(response.json()['message'], astatic.ERR_MSG_PLAN_INFO_ANALYST_ID_INVALID)
+
     def test_90_update_plan_fail_bad_id(self):
         """(90) Update AnalysisPlan, fail w/ bad id"""
         msgt(self.test_90_update_plan_fail_bad_id.__doc__)
 
-        nonsense_dataset_id = uuid.uuid4()
+        nonsense_dataset_id = str(uuid.uuid4())
 
         payload = json.dumps(dict(dp_statistics=dict(hi='there')))
 

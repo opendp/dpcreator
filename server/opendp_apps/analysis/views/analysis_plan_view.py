@@ -105,7 +105,7 @@ class AnalysisPlanViewSet(BaseModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
 
         partial_update_result = super(AnalysisPlanViewSet, self).partial_update(request, *args, **kwargs)
-        logger.info("Analysis update with request " + json.dumps(request.data))
+        # logger.info("Analysis update with request " + json.dumps(request.data))
 
         return partial_update_result
 

@@ -16,16 +16,23 @@ class AnalysisPlanCreator(BasicErrCheck):
     def __init__(self, opendp_user: get_user_model(), plan_info: dict):
         """Create an AnalysisPlan object"""
 
-        self.dataset_object_id = plan_info.get('object_id') # DataSetInfo.object_id (not AnalysisPlan.object_id)
+        # DataSetInfo.object_id (not AnalysisPlan.object_id)
+        #
+        self.dataset_object_id = plan_info.get('object_id')
         self.opendp_user = opendp_user
-        self.plan_info = plan_info # dict w/ name, epsilon, expiration_date, description for new AnalysisPlan
+
+        # dict w/ analyst_id, name, epsilon, expiration_date, description for new AnalysisPlan
+        #
+        self.plan_info = plan_info
 
         # Variables to format/create
+        self.new_analyst_id = None  # object_id of the OpenDPUser who will be the analyst
         self.new_name = None
         self.new_epsilon = None
         self.new_expiration_date = None
         self.new_description = None
 
+        self.analyst_user_obj = None
         self.dataset_info = None
         self.available_epsilon = None
         self.analysis_plan = None
@@ -69,6 +76,31 @@ class AnalysisPlanCreator(BasicErrCheck):
         if not isinstance(self.plan_info, dict):
             self.add_err_msg(astatic.ERR_MSG_PLAN_INFO_REQUIRED)
             return
+
+        # ---------------------------------
+        # check analyst_id
+        # ---------------------------------
+
+        # Is the analyst_id set?
+        #
+        self.new_analyst_id = self.plan_info.get('analyst_id')
+        if self.new_analyst_id is None:
+            # No analyst_id specified, default to the current user
+            #
+            self.new_analyst_id = self.opendp_user.object_id
+            self.analyst_user_obj = self.opendp_user
+
+        elif self.new_analyst_id == self.opendp_user.object_id:
+            # The analyst_id is the same as the current user
+            self.analyst_user_obj = self.opendp_user
+
+        else:
+            # There's an analyst_id, make sure it's a valid user
+            try:
+                self.analyst_user_obj = get_user_model().objects.get(object_id=self.new_analyst_id)
+            except get_user_model().DoesNotExist:
+                self.add_err_msg(astatic.ERR_MSG_PLAN_INFO_ANALYST_ID_INVALID)
+                return
 
         # check epsilon
         self.new_epsilon = self.plan_info.get('epsilon')
@@ -116,7 +148,7 @@ class AnalysisPlanCreator(BasicErrCheck):
         if self.has_error():
             return
 
-        params = dict(analyst=self.opendp_user,
+        params = dict(analyst=self.analyst_user_obj,
                       dataset=self.dataset_info,
                       variable_info=self.dataset_info.depositor_setup_info.variable_info,
                       name=self.new_name,
