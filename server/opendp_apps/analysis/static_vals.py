@@ -128,7 +128,7 @@ ERR_MSG_NO_DATASET = 'DataSetInfo object not found for this object_id and creato
 ERR_MSG_SETUP_INCOMPLETE = 'Depositor setup is not complete'
 
 ERR_MSG_NO_ANALYSIS_PLAN = 'AnalysisPlan object not found for this object_id and creator'
-ERR_MSG_FIELDS_NOT_UPDATEABLE = 'These fields are not updatable'
+ERR_MSG_FIELDS_NOT_UPDATEABLE = 'These fields are not updatable: {problem_field_str}'
 
 ERR_MSG_BAD_TOTAL_EPSILON = 'The depositor setup info has an invalid epsilon value'
 ERR_MSG_BAD_TOTAL_DELTA = 'The depositor setup info has an invalid delta value'

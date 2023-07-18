@@ -54,6 +54,12 @@ class AnalysisPlanTest(TestCase):
 
         self.dataset_object_id = str(self.dataset_info.object_id)
 
+        self.working_plan_info = dict(object_id=self.dataset_object_id,
+                                      name='Teacher survey plan',
+                                      description='Release DP Statistics for the teacher survey, version 1',
+                                      epsilon=0.25,
+                                      expiration_date=self.expiration_date_str)
+
     def test_10_create_plan(self):
         """(10) Create AnalysisPlan using AnalysisPlanUtil"""
         msgt(self.test_10_create_plan.__doc__)
@@ -61,14 +67,9 @@ class AnalysisPlanTest(TestCase):
         # --------------------------------------------------
         # Create plan 1 with .25 epsilon
         # --------------------------------------------------
-        plan_info = dict(name='Teacher survey plan',
-                         description='Release DP Statistics for the teacher survey, version 1',
-                         epsilon=0.25,
-                         expiration_date=self.expiration_date_str)
+        plan_info = self.working_plan_info.copy()
 
-        plan_util = AnalysisPlanCreator(self.dataset_object_id,
-                                        self.user_obj,
-                                        plan_info)
+        plan_util = AnalysisPlanCreator(self.user_obj, plan_info)
 
         self.assertEqual(plan_util.has_error(), False)
         if plan_util.has_error():
@@ -87,25 +88,23 @@ class AnalysisPlanTest(TestCase):
         # --------------------------------------------------
         # Create plan 2 with .50 epsilon
         # --------------------------------------------------
-        plan_info2 = dict(name='Teacher survey plan 2',
-                          description='Release DP Statistics for the teacher survey, version 2',
-                          epsilon=0.50,
-                          expiration_date=self.expiration_date_str)
+        plan_info['name'] = 'Teacher survey plan 2'
+        plan_info['description'] = 'Release DP Statistics for the teacher survey, version 2'
+        plan_info['epsilon'] = 0.50
 
-        plan_util = AnalysisPlanCreator(self.dataset_object_id,
-                                        self.user_obj,
-                                        plan_info2)
+        plan_util = AnalysisPlanCreator(self.user_obj,
+                                        plan_info)
 
         if plan_util.has_error():
             print('ERRORS', plan_util.get_error_message())
             return
 
         self.assertEqual(plan_util.has_error(), False)
-        self.assertEqual(plan_util.analysis_plan.name, plan_info2['name'])
-        self.assertEqual(plan_util.analysis_plan.description, plan_info2['description'])
-        self.assertEqual(plan_util.analysis_plan.epsilon, plan_info2['epsilon'])
+        self.assertEqual(plan_util.analysis_plan.name, plan_info['name'])
+        self.assertEqual(plan_util.analysis_plan.description, plan_info['description'])
+        self.assertEqual(plan_util.analysis_plan.epsilon, plan_info['epsilon'])
         self.assertEqual(plan_util.analysis_plan.expiration_date.strftime('%Y-%m-%d'),
-                         plan_info2['expiration_date'])
+                         plan_info['expiration_date'])
 
         remaining_epsilon = AnalysisPlanCreator.get_available_epsilon(self.dataset_info)
         self.assertEqual(remaining_epsilon, 0.25)
@@ -113,14 +112,11 @@ class AnalysisPlanTest(TestCase):
         # --------------------------------------------------
         # Create plan 3 with .50 epsilon -- should exceed epsilon
         # --------------------------------------------------
-        plan_info3 = dict(name='Teacher survey plan 3',
-                          description='Release DP Statistics for the teacher survey, version 3',
-                          epsilon=0.50,
-                          expiration_date=self.expiration_date_str)
+        plan_info['name'] = 'Teacher survey plan 3'
+        plan_info['description'] = 'Release DP Statistics for the teacher survey, version 3'
+        plan_info['epsilon'] = 0.50
 
-        plan_util = AnalysisPlanCreator(self.dataset_object_id,
-                                        self.user_obj,
-                                        plan_info3)
+        plan_util = AnalysisPlanCreator(self.user_obj, plan_info)
 
         self.assertEqual(plan_util.has_error(), True)
 
@@ -132,11 +128,7 @@ class AnalysisPlanTest(TestCase):
         """(15) Create AnalysisPlan using the API"""
         msgt(self.test_15_create_plan_via_api.__doc__)
 
-        payload = dict(object_id=self.dataset_object_id,
-                       name='Teacher survey plan',
-                       description='Release DP Statistics for the teacher survey, version 1',
-                       epsilon=0.25,
-                       expiration_date=self.expiration_date_str)
+        payload = self.working_plan_info.copy()
 
         response = self.client.post(self.API_PREFIX,
                                     json.dumps(payload),
@@ -185,7 +177,7 @@ class AnalysisPlanTest(TestCase):
         """(20) Fail b/c no dataset id"""
         msgt(self.test_20_fail_no_dataset_id.__doc__)
 
-        plan_util = AnalysisPlanCreator(None, self.user_obj, {})
+        plan_util = AnalysisPlanCreator(self.user_obj, {})
 
         self.assertTrue(plan_util.has_error())
         self.assertEqual(plan_util.get_error_message(), astatic.ERR_MSG_DATASET_ID_REQUIRED)
@@ -194,9 +186,7 @@ class AnalysisPlanTest(TestCase):
         """(30) Fail b/c no user"""
         msgt(self.test_30_fail_no_user.__doc__)
 
-        dataset_info = DataSetInfo.objects.get(id=2)
-
-        plan_util = AnalysisPlanCreator(dataset_info.object_id, None, {})
+        plan_util = AnalysisPlanCreator(None, {'object_id': self.dataset_object_id})
 
         self.assertTrue(plan_util.has_error())
         self.assertEqual(plan_util.get_error_message(), astatic.ERR_MSG_USER_REQUIRED)
@@ -206,7 +196,7 @@ class AnalysisPlanTest(TestCase):
         msgt(self.test_40_fail_bad_dataset_id.__doc__)
 
         nonsense_dataset_id = uuid.uuid4()
-        plan_util = AnalysisPlanCreator(nonsense_dataset_id, self.user_obj, {})
+        plan_util = AnalysisPlanCreator(self.user_obj, {'object_id': nonsense_dataset_id})
 
         self.assertTrue(plan_util.has_error())
         self.assertEqual(plan_util.get_error_message(), astatic.ERR_MSG_NO_DATASET)
@@ -221,7 +211,8 @@ class AnalysisPlanTest(TestCase):
 
         self.assertEqual(dataset_info.depositor_setup_info.variable_info, None)
 
-        plan_util = AnalysisPlanCreator(dataset_info.object_id, self.user_obj, {})
+        plan_util = AnalysisPlanCreator(self.user_obj,
+                                        {'object_id': self.dataset_object_id})
 
         # Plan should fail with error message
         self.assertTrue(plan_util.has_error())
@@ -256,37 +247,45 @@ class AnalysisPlanTest(TestCase):
         self.assertEqual(response.status_code, 400)
         jresp = response.json()
         self.assertEqual(jresp['success'], False)
-        self.assertTrue(jresp['message'].find( \
-            dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND) > -1)
+        self.assertTrue(jresp['message'].find(dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND) > -1)
 
-    @skip('TODO: Fix this test')
     def test_80_update_plan(self):
         """(80) Update AnalysisPlan"""
         msgt(self.test_80_update_plan.__doc__)
 
-        dataset_info = DataSetInfo.objects.get(id=2)
+        # (a) Create a plan
+        #
+        payload = self.working_plan_info
 
-        plan_util = AnalysisPlanUtil.create_plan(dataset_info.object_id,
-                                                 self.user_obj)
+        plan_creator = AnalysisPlanCreator(self.user_obj, payload)
 
         # did plan creation work?
-        self.assertTrue(plan_util.success)
+        self.assertTrue(plan_creator.has_error() is False)
 
+        # (b) Update the plan!
         #
-        # Update the plan!
-        #
-        plan_object_id = plan_util.data.object_id
-        payload = json.dumps(dict(dp_statistics=dict(hi='there')))
+        plan_object_id = plan_creator.analysis_plan.object_id
+
+        # note: not checking **validity** of dp_statistics or variable_info here
+        update_data = {'dp_statistics': {'hi': 'there'},
+                       'variable_info': {'age': {'type': 'Integer'}},
+                       'name': 'Teacher survey plan, version 2a',
+                       'description': 'A new description',
+                       'wizard_step': 'yellow brick road'}
+
         response = self.client.patch(f'{self.API_PREFIX}{plan_object_id}/',
-                                     payload,
+                                     json.dumps(update_data),
                                      content_type='application/json')
 
         self.assertEqual(response.status_code, 200)
         jresp = response.json()
 
-        self.assertEqual(jresp['dp_statistics'], dict(hi='there'))
+        self.assertEqual(jresp['dp_statistics'], update_data['dp_statistics'])
+        self.assertEqual(jresp['variable_info'], update_data['variable_info'])
+        self.assertEqual(jresp['name'], update_data['name'])
+        self.assertEqual(jresp['description'], update_data['description'])
+        self.assertEqual(jresp['wizard_step'], update_data['wizard_step'])
 
-    @skip('TODO: Fix this test')
     def test_90_update_plan_fail_bad_id(self):
         """(90) Update AnalysisPlan, fail w/ bad id"""
         msgt(self.test_90_update_plan_fail_bad_id.__doc__)
@@ -294,36 +293,38 @@ class AnalysisPlanTest(TestCase):
         nonsense_dataset_id = uuid.uuid4()
 
         payload = json.dumps(dict(dp_statistics=dict(hi='there')))
-        response = self.client.patch(f'/api/analyze/{nonsense_dataset_id}/',
+
+        response = self.client.patch(f'{self.API_PREFIX}{nonsense_dataset_id}/',
                                      payload,
                                      content_type='application/json')
 
         self.assertEqual(response.status_code, 404)
 
-    @skip('TODO: Fix this test')
     def test_100_update_plan_bad_fields(self):
         """(100) Update AnalysisPlan, fail w/ bad fields"""
         msgt(self.test_100_update_plan_bad_fields.__doc__)
 
-        dataset_info = DataSetInfo.objects.get(id=4)
+        payload = self.working_plan_info
 
-        plan_util = AnalysisPlanUtil.create_plan(dataset_info.object_id,
-                                                 self.user_obj)
+        plan_util = AnalysisPlanCreator(self.user_obj, payload)
 
         # did plan creation work?
-        self.assertTrue(plan_util.success)
+        self.assertTrue(plan_util.has_error() is False)
 
         #
         # Update the plan!
         #
-        plan_object_id = plan_util.data.object_id
+        plan_object_id = plan_util.analysis_plan.object_id
 
-        payload = json.dumps(dict(name='haha'))
-        response = self.client.patch(f'/api/analyze/{plan_object_id}/',
-                                     payload,
+        payload = dict(epsilon=2.0,
+                       user_step=AnalysisPlan.AnalystSteps.STEP_0700_VARIABLES_CONFIRMED,
+                       zebra='stripes')
+
+        response = self.client.patch(f'{self.API_PREFIX}{plan_object_id}/',
+                                     json.dumps(payload),
                                      content_type='application/json')
 
         self.assertEqual(response.status_code, 400)
-
-        jresp = response.json()
-        self.assertTrue(jresp['message'].find(astatic.ERR_MSG_FIELDS_NOT_UPDATEABLE) > -1)
+        user_msg = astatic.ERR_MSG_FIELDS_NOT_UPDATEABLE.format(
+                        problem_field_str='epsilon, user_step, zebra')
+        self.assertEqual(response.json()['message'], user_msg)

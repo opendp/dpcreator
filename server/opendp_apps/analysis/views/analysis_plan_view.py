@@ -69,8 +69,7 @@ class AnalysisPlanViewSet(BaseModelViewSet):
         # Use the AnalysisPlanUtil to create an AnalysisPlan
         #   with default values
         #
-        plan_creator = AnalysisPlanCreator(ois.get_object_id(),
-                                           request.user,
+        plan_creator = AnalysisPlanCreator(request.user,
                                            request.data)
 
         # Did AnalysisPlan creation work?
@@ -86,7 +85,7 @@ class AnalysisPlanViewSet(BaseModelViewSet):
 
     def partial_update(self, request, *args, **kwargs):
         """Make updates to the AnalysisPlan object"""
-        acceptable_fields = ['variable_info', 'dp_statistics', 'user_step', 'wizard_step']
+        acceptable_fields = ['name', 'description', 'variable_info', 'dp_statistics', 'wizard_step']
         problem_fields = []
         fields_to_update = []
         for field in request.data.keys():
@@ -94,9 +93,10 @@ class AnalysisPlanViewSet(BaseModelViewSet):
                 problem_fields.append(field)
             else:
                 fields_to_update.append(field)
+
         if problem_fields:
-            problem_field_list = ', '.join([str(f) for f in problem_fields])
-            user_msg = f'{astatic.ERR_MSG_FIELDS_NOT_UPDATEABLE}: {problem_field_list}'
+            problem_field_str = ', '.join([str(f) for f in problem_fields])
+            user_msg = astatic.ERR_MSG_FIELDS_NOT_UPDATEABLE.format(problem_field_str=problem_field_str)
             return Response(get_json_error(user_msg),
                             status=status.HTTP_400_BAD_REQUEST)
 

@@ -13,11 +13,12 @@ from django.utils.timezone import make_aware
 class AnalysisPlanCreator(BasicErrCheck):
     """Create an AnalysisPlan object"""
 
-    def __init__(self, dataset_object_id: str, opendp_user: get_user_model(), plan_info: dict):
+    def __init__(self, opendp_user: get_user_model(), plan_info: dict):
         """Create an AnalysisPlan object"""
-        self.dataset_object_id = dataset_object_id
+
+        self.dataset_object_id = plan_info.get('object_id') # DataSetInfo.object_id (not AnalysisPlan.object_id)
         self.opendp_user = opendp_user
-        self.plan_info = plan_info
+        self.plan_info = plan_info # dict w/ name, epsilon, expiration_date, description for new AnalysisPlan
 
         # Variables to format/create
         self.new_name = None
