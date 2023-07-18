@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
+from opendp_apps.analysis.analysis_plan_creator import AnalysisPlanCreator
 from opendp_apps.analysis.models import AnalysisPlan
 from opendp_apps.analysis.serializers import \
     AnalysisPlanSerializer
@@ -43,10 +43,9 @@ class AnalysisPlanViewSet(BaseModelViewSet):
 
     @csrf_exempt
     def create(self, request, *args, **kwargs):
-        """
-        Create an AnalysisPlan object with default values
-        """
-        # Is this a object_id a valid UUID?
+        """Create an AnalysisPlan object with default values"""
+
+        # Is this object_id a valid UUID?
         #
         ois = DatasetObjectIdSerializer(data=request.data)
         if not ois.is_valid():
@@ -70,26 +69,23 @@ class AnalysisPlanViewSet(BaseModelViewSet):
         # Use the AnalysisPlanUtil to create an AnalysisPlan
         #   with default values
         #
-        plan_util = AnalysisPlanUtil.create_plan(ois.get_object_id(), request.user)
+        plan_creator = AnalysisPlanCreator(request.user,
+                                           request.data)
 
         # Did AnalysisPlan creation work?
-        if plan_util.success:
-            # Yes, it worked!
-            new_plan = plan_util.data  # "data" holds the AnalysisPlan object
-            serializer = AnalysisPlanSerializer(new_plan)  # serialize the data
-            logger.info(f"AnalysisPlan created: {serializer.data}")
+        if plan_creator.has_error():
+            return Response(get_json_error(plan_creator.get_err_msg()),
+                            status=status.HTTP_400_BAD_REQUEST)
 
-            # Return it
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # Yes, it worked!
+        serializer = AnalysisPlanSerializer(plan_creator.analysis_plan)  # serialize the data
+        logger.info(f"AnalysisPlan created: {serializer.data}")
 
-        # Nope! Error encountered!
-        logger.error(plan_util.message)
-        return Response(get_json_error(plan_util.message),
-                        status=plan_util.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
         """Make updates to the AnalysisPlan object"""
-        acceptable_fields = ['variable_info', 'dp_statistics', 'user_step']
+        acceptable_fields = ['name', 'description', 'variable_info', 'dp_statistics', 'wizard_step']
         problem_fields = []
         fields_to_update = []
         for field in request.data.keys():
@@ -97,9 +93,10 @@ class AnalysisPlanViewSet(BaseModelViewSet):
                 problem_fields.append(field)
             else:
                 fields_to_update.append(field)
+
         if problem_fields:
-            problem_field_list = ', '.join([str(f) for f in problem_fields])
-            user_msg = f'{astatic.ERR_MSG_FIELDS_NOT_UPDATEABLE}: {problem_field_list}'
+            problem_field_str = ', '.join([str(f) for f in problem_fields])
+            user_msg = astatic.ERR_MSG_FIELDS_NOT_UPDATEABLE.format(problem_field_str=problem_field_str)
             return Response(get_json_error(user_msg),
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -108,7 +105,7 @@ class AnalysisPlanViewSet(BaseModelViewSet):
                             status=status.HTTP_400_BAD_REQUEST)
 
         partial_update_result = super(AnalysisPlanViewSet, self).partial_update(request, *args, **kwargs)
-        logger.info("Analysis update with request " + json.dumps(request.data))
+        # logger.info("Analysis update with request " + json.dumps(request.data))
 
         return partial_update_result
 

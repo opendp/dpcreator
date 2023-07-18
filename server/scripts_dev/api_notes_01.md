@@ -7,6 +7,8 @@ DRF link: http://localhost:8000/api/
 - [Direct File Upload](#direct-file-upload)
 - [Get Dataset info (including depositor setup info)](#get-dataset-info)
 - [Update Depositor Setup Info](#update-depositor-setup-info)
+- [Create Analysis Plan](#create-analysis-plan)
+- [Update Analysis Plan](#update-analysis-plan)
 
 
 --- 
@@ -80,7 +82,7 @@ This includes depositor setup info.
 
 - **API endpoint**: `/api/deposit/{depositor_setup_object_id}/`
   - **Example**: `/api/deposit/b01377e1-eec0-43cc-9f7f-631f87dd4108/`
-- **Method**: `PUT`
+- **Method**: `PATCH`
 - **Auth**: username/password
 - **Params**: Any or all of these params may be updated
   - **dataset_questions**: JSON, with the following keys and potential values:
@@ -103,7 +105,7 @@ This includes depositor setup info.
   - **delta**: float field or null
   - **confidence_level**: choices in UI (0.90, 0.95, 0.99) 
 - Note: Params that CANNOT be updated via API  
-  - **is_complete
+  - **is_complete**
   - **user_step**
   - **default_epsilon**
   - **default_delta**
@@ -252,3 +254,153 @@ This includes depositor setup info.
     "confidence_level": 0.95
 }
 ```
+
+## Create Analysis Plan 
+
+Create an Analysis Plan using a DataSetInfo object. This endpoint may only be used by the user who is specified as the `creator` of the DataSetInfo object.
+ 
+
+- **API endpoint**: `/api/analysis-plan/`
+- **Method**: `POST`
+- **Auth**: username/password
+- **Params**: Sent as a JSON payload. Example:
+  ```json
+  {
+    "object_id": "bbc5bd52-7c1e-4cf2-9938-28fd4745b5b1",
+    "analyst_id": "0681867b-1ce8-46c9-adfb-df83b8efff24",
+    "name": "Teacher survey plan",
+    "description": "Release DP Statistics for the teacher survey, version 1",
+    "epsilon": 0.25,
+    "expiration_date": "2023-07-23"
+  }
+  ```
+  - **object_id**: UUID of the DataSetInfo object
+  - **analyst_id**: (optional) UUID of the Analyst, an OpenDP user. If not specified, the `creator` of the DatasetInfo object will be used as the Analyst
+  - **name**: string, name of the new AnalysisPlan
+  - **description**: (optional) string, description of the new AnalysisPlan
+  - **epsilon**: float, allotted privacy budget for the new AnalysisPlan
+  - **expiration_date**: string, expiration date of the new AnalysisPlan in YYYY-MM-DD format
+- Response example:
+  - Notes:
+    - `object_id` is the UUID of the new AnalysisPlan
+    - `variable_info` has been copied from `DataSetInfo.DepositorSetupInfo.variable_info`
+    - `dp_statistics` is empty
+    - `release_info` is empty
+```json
+{
+  "object_id": "74526f03-7d6b-4205-b03e-da2131cd5a91",
+  "name": "Teacher survey plan",
+  "description": "Release DP Statistics for the teacher survey, version 1",
+  "analyst": "549a4c94-2f85-4687-8205-94d7947f17e4",
+  "dataset": "bbc5bd52-7c1e-4cf2-9938-28fd4745b5b1",
+  "epsilon": 0.25,
+  "delta": 0.0,
+  "is_complete": false,
+  "user_step": "step_100",
+  "wizard_step": "step_100",
+  "expiration_date": "2023-07-23T00:00:00Z",
+  "variable_info": {
+    "age": {
+      "max": 55,
+      "min": 5,
+      "name": "age",
+      "type": "Integer",
+      "label": "age",
+      "selected": true,
+      "sortOrder": 1
+    },
+    "sex": {
+      "max": null,
+      "min": null,
+      "name": "sex",
+      "type": "Integer",
+      "label": "sex",
+      "selected": false,
+      "sortOrder": 0
+    },
+    "smoking": {
+      "name": "smoking",
+      "type": "Categorical",
+      "label": "",
+      "sortOrder": 6,
+      "categories": []
+    },
+    "optimism": {
+      "name": "optimism",
+      "type": "Categorical",
+      "label": "",
+      "sortOrder": 7,
+      "categories": []
+    },
+    "selfesteem": {
+      "name": "selfesteem",
+      "type": "Categorical",
+      "label": "",
+      "sortOrder": 9,
+      "categories": []
+    },
+    "havingchild": {
+      "name": "Havingchild",
+      "type": "Categorical",
+      "label": "",
+      "sortOrder": 3,
+      "categories": []
+    },
+    "maritalstatus": {
+      "name": "maritalstatus",
+      "type": "Integer",
+      "label": "",
+      "sortOrder": 2
+    },
+    "sourceofstress": {
+      "name": "sourceofstress",
+      "type": "Categorical",
+      "label": "",
+      "sortOrder": 5,
+      "categories": []
+    },
+    "lifesattisfaction": {
+      "name": "lifesattisfaction",
+      "type": "Categorical",
+      "label": "",
+      "sortOrder": 8,
+      "categories": []
+    },
+    "highesteducationlevel": {
+      "name": "highesteducationlevel",
+      "type": "Integer",
+      "label": "",
+      "sortOrder": 4
+    }
+  },
+  "dp_statistics": null,
+  "release_info": null,
+  "created": "2023-07-18T16:05:38.587556Z",
+  "updated": "2023-07-18T16:05:38.587586Z"
+}
+```
+
+## Update Analysis Plan 
+
+Note: This endpoint may only be used by the user who is specified as the `analyst` of the AnalysisPlan.
+
+- **API endpoint**: `/api/analysis-plan/{analysis_plan_object_id}/`
+- **Method**: `PATCH`
+- **Auth**: username/password
+- **Params**: Sent as a JSON payload. Only a single field is needed for the patch. This example shows all updateable fields:
+  ```json
+  {
+  "dp_statistics": "...JSON update from the create statistics page...",
+  "variable_info": "...JSON update from the create variables page...",
+  "name": "Teacher survey plan, version 2a",
+  "description": "A new description",
+  "wizard_step": "yellow brick road"
+  }
+  ```
+    - **dp_statistics**: (optional) JSON object, updates to the DP Statistics. Send all of the `dp_statistics` each time, it doesn't update partial `dp_statistics`..
+    - **variable_info**: (optional) JSON object, updates to the variable_info. Send all of the `variable_info` each time--it doesn't update partial `variable_inf`.
+    - **name**: (optional) The AnalysisPlan may be renamed at any time.
+    - **description**: (optional) The AnalysisPlan description be changed at any time.
+    - **wizard_step**: (optional) Update  `wizard_step`. There is no server-side validation for this field--except that's an non-empty string
+- Response example:
+  - The response will be the same as that for Create Analysis Plan (above), with the field updates reflected.

@@ -18,6 +18,7 @@ from opendp_apps.utils.variable_info_formatter import format_variable_info
 
 RELEASE_FILE_STORAGE = FileSystemStorage(location=settings.RELEASE_FILE_STORAGE_ROOT)
 
+from opendp_apps.dataset import static_vals as dstatic
 
 class ReleaseInfo(TimestampedModelWithUUID):
     """
@@ -45,11 +46,11 @@ class ReleaseInfo(TimestampedModelWithUUID):
                                               null=True,
                                               help_text='Only applies to Dataverse files')
 
-    dv_json_deposit_complete = models.BooleanField( \
+    dv_json_deposit_complete = models.BooleanField(
         default=False,
         help_text='Only applies to Dataverse datasets')
 
-    dv_pdf_deposit_complete = models.BooleanField( \
+    dv_pdf_deposit_complete = models.BooleanField(
         default=False,
         help_text='Only applies to Dataverse datasets')
 
@@ -226,6 +227,7 @@ class AnalysisPlan(TimestampedModelWithUUID):
         """
         Enumeration for statuses during the analysis process
         """
+        STEP_0000_INITIALIZED = 'step_100', 'Step 0: Initialized'
         STEP_0700_VARIABLES_CONFIRMED = 'step_700', 'Step 7: Variables Confirmed'
         STEP_0800_STATISTICS_CREATED = 'step_800', 'Step 8: Statistics Created'
         STEP_0900_STATISTICS_SUBMITTED = 'step_900', 'Step 9: Statistics Submitted'
@@ -239,7 +241,11 @@ class AnalysisPlan(TimestampedModelWithUUID):
     analyst = models.ForeignKey(settings.AUTH_USER_MODEL,
                                 on_delete=models.PROTECT)
 
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255,
+                            help_text='Name of the analysis plan')
+
+    description = models.TextField(blank=True, null=True,
+                                   help_text='Description of the analysis plan')
 
     dataset = models.ForeignKey('dataset.DataSetInfo',
                                 on_delete=models.CASCADE)
@@ -247,12 +253,16 @@ class AnalysisPlan(TimestampedModelWithUUID):
     is_complete = models.BooleanField(default=False)
 
     user_step = models.CharField(max_length=128,
-                                 choices=AnalystSteps.choices)
+                                 choices=AnalystSteps.choices,
+                                 default=AnalystSteps.STEP_0000_INITIALIZED)
 
     # Includes variable ranges and categories
-    variable_info = models.JSONField(null=True, blank=True)
+    variable_info = models.JSONField(blank=True,
+                                     null=True,
+                                     help_text='Default value taken from DepositorSetupInfo')
 
-    dp_statistics = models.JSONField(null=True)
+    dp_statistics = models.JSONField(blank=True,
+                                     null=True)
 
     release_info = models.ForeignKey(ReleaseInfo,
                                      on_delete=models.SET_NULL,
@@ -260,8 +270,28 @@ class AnalysisPlan(TimestampedModelWithUUID):
                                      null=True,
                                      blank=True)
 
+    wizard_step = models.CharField(max_length=128,
+                                   default=dstatic.WIZARD_STEP_DEFAULT_VAL,
+                                   help_text='Used by the UI to track the wizard step')
+
+    epsilon = models.FloatField(null=True, blank=True,
+                                help_text=('Used for OpenDP operations, starts as the "default_epsilon"'
+                                           ' value but may be overridden by the user.'),
+                                validators=[validate_epsilon_or_none])
+
+    delta = models.FloatField(null=True,
+                              blank=True,
+                              default=astatic.DELTA_0,
+                              help_text=('Used for OpenDP operations, starts as the "default_delta"'
+                                         ' value but may be overridden by the user.'),
+                              validators=[validate_not_negative])
+
+    expiration_date = models.DateTimeField(null=True, blank=True,
+                                           help_text='The date the analysis plan expires')
+
+
     def __str__(self):
-        return f'{self.dataset}'  # - {self.user_step}'
+        return f'{self.name} - {self.dataset}'
 
     def is_editable(self) -> bool:
         """
