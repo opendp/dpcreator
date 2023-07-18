@@ -19,7 +19,7 @@ from opendp_apps.model_helpers.msg_util import msgt
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
-print('TEST_DATA_DIR', TEST_DATA_DIR)
+# print('TEST_DATA_DIR', TEST_DATA_DIR)
 
 
 class AnalysisPlanTest(TestCase):
@@ -59,6 +59,7 @@ class AnalysisPlanTest(TestCase):
                                       description='Release DP Statistics for the teacher survey, version 1',
                                       epsilon=0.25,
                                       expiration_date=self.expiration_date_str)
+        # print(json.dumps(self.working_plan_info, indent=4))
 
     def test_10_create_plan(self):
         """(10) Create AnalysisPlan using AnalysisPlanUtil"""
@@ -134,7 +135,7 @@ class AnalysisPlanTest(TestCase):
                                     json.dumps(payload),
                                     content_type='application/json')
 
-        print('response.json', json.dumps(response.json(), indent=2))
+        # print('response.json', json.dumps(response.json(), indent=2))
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json()['name'], payload['name'])

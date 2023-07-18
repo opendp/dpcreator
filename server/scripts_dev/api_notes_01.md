@@ -80,7 +80,7 @@ This includes depositor setup info.
 
 - **API endpoint**: `/api/deposit/{depositor_setup_object_id}/`
   - **Example**: `/api/deposit/b01377e1-eec0-43cc-9f7f-631f87dd4108/`
-- **Method**: `PUT`
+- **Method**: `PATCH`
 - **Auth**: username/password
 - **Params**: Any or all of these params may be updated
   - **dataset_questions**: JSON, with the following keys and potential values:
@@ -103,7 +103,7 @@ This includes depositor setup info.
   - **delta**: float field or null
   - **confidence_level**: choices in UI (0.90, 0.95, 0.99) 
 - Note: Params that CANNOT be updated via API  
-  - **is_complete
+  - **is_complete**
   - **user_step**
   - **default_epsilon**
   - **default_delta**
@@ -250,5 +250,127 @@ This includes depositor setup info.
     "default_delta": 1e-05,
     "delta": 0.0,
     "confidence_level": 0.95
+}
+```
+
+## Create Analysis Plan 
+
+Create an Analysis Plan using a DataSetInfo object. 
+
+- **API endpoint**: `/api/analysis-plan/`
+- **Method**: `POST`
+- **Auth**: username/password
+- **Params**: Sent as a JSON payload. Example:
+  ```json
+  {
+    "object_id": "bbc5bd52-7c1e-4cf2-9938-28fd4745b5b1",
+    "name": "Teacher survey plan",
+    "description": "Release DP Statistics for the teacher survey, version 1",
+    "epsilon": 0.25,
+    "expiration_date": "2023-07-23"
+  }
+  ```
+  - **object_id**: UUID of the DataSetInfo object
+  - **name**: string, name of the new AnalysisPlan
+  - **description**: (optional) string, description of the new AnalysisPlan
+  - **epsilon**: float, allotted privacy budget for the new AnalysisPlan
+  - **expiration_date**: string, expiration date of the new AnalysisPlan in YYYY-MM-DD format
+- Response example:
+  - Notes:
+    - `object_id` is the UUID of the new AnalysisPlan
+    - `variable_info` has been copied from `DataSetInfo.DepositorSetupInfo.variable_info`
+    - `dp_statistics` is empty
+    - `release_info` is empty
+```json
+{
+  "object_id": "74526f03-7d6b-4205-b03e-da2131cd5a91",
+  "name": "Teacher survey plan",
+  "description": "Release DP Statistics for the teacher survey, version 1",
+  "analyst": "549a4c94-2f85-4687-8205-94d7947f17e4",
+  "dataset": "bbc5bd52-7c1e-4cf2-9938-28fd4745b5b1",
+  "epsilon": 0.25,
+  "delta": 0.0,
+  "is_complete": false,
+  "user_step": "step_100",
+  "wizard_step": "step_100",
+  "expiration_date": "2023-07-23T00:00:00Z",
+  "variable_info": {
+    "age": {
+      "max": 55,
+      "min": 5,
+      "name": "age",
+      "type": "Integer",
+      "label": "age",
+      "selected": true,
+      "sortOrder": 1
+    },
+    "sex": {
+      "max": null,
+      "min": null,
+      "name": "sex",
+      "type": "Integer",
+      "label": "sex",
+      "selected": false,
+      "sortOrder": 0
+    },
+    "smoking": {
+      "name": "smoking",
+      "type": "Categorical",
+      "label": "",
+      "sortOrder": 6,
+      "categories": []
+    },
+    "optimism": {
+      "name": "optimism",
+      "type": "Categorical",
+      "label": "",
+      "sortOrder": 7,
+      "categories": []
+    },
+    "selfesteem": {
+      "name": "selfesteem",
+      "type": "Categorical",
+      "label": "",
+      "sortOrder": 9,
+      "categories": []
+    },
+    "havingchild": {
+      "name": "Havingchild",
+      "type": "Categorical",
+      "label": "",
+      "sortOrder": 3,
+      "categories": []
+    },
+    "maritalstatus": {
+      "name": "maritalstatus",
+      "type": "Integer",
+      "label": "",
+      "sortOrder": 2
+    },
+    "sourceofstress": {
+      "name": "sourceofstress",
+      "type": "Categorical",
+      "label": "",
+      "sortOrder": 5,
+      "categories": []
+    },
+    "lifesattisfaction": {
+      "name": "lifesattisfaction",
+      "type": "Categorical",
+      "label": "",
+      "sortOrder": 8,
+      "categories": []
+    },
+    "highesteducationlevel": {
+      "name": "highesteducationlevel",
+      "type": "Integer",
+      "label": "",
+      "sortOrder": 4
+    }
+  },
+  "dp_statistics": null,
+  "release_info": null,
+  "created": "2023-07-18T16:05:38.587556Z",
+  "updated": "2023-07-18T16:05:38.587586Z"
 }
 ```
