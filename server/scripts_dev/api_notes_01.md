@@ -385,10 +385,8 @@ Create an Analysis Plan using a DataSetInfo object.
 - **Params**: Sent as a JSON payload. Only a single field is needed for the patch. This example shows all updateable fields:
   ```json
   {
-  "dp_statistics": ... "updates from the create statistics page" ...,
-  },
-  "variable_info": ... "updates from the confirm variables page" ...
-  },
+  "dp_statistics": "...JSON update from the create statistics page...",
+  "variable_info": "...JSON update from the create variables page...",
   "name": "Teacher survey plan, version 2a",
   "description": "A new description",
   "wizard_step": "yellow brick road"
