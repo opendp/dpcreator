@@ -379,7 +379,7 @@ Create an Analysis Plan using a DataSetInfo object.
 
 ## Update Analysis Plan 
 
-- **API endpoint**: `/api/analysis-plan/{analysis_plan_object_id}`
+- **API endpoint**: `/api/analysis-plan/{analysis_plan_object_id}/`
 - **Method**: `PATCH`
 - **Auth**: username/password
 - **Params**: Sent as a JSON payload. Only a single field is needed for the patch. This example shows all updateable fields:
