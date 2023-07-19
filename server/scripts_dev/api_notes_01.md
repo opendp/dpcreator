@@ -289,10 +289,14 @@ Create an Analysis Plan using a DataSetInfo object. This endpoint may only be us
 ```json
 {
   "object_id": "74526f03-7d6b-4205-b03e-da2131cd5a91",
+  "analysis_id": "74526f03-7d6b-4205-b03e-da2131cd5a91",
   "name": "Teacher survey plan",
   "description": "Release DP Statistics for the teacher survey, version 1",
-  "analyst": "549a4c94-2f85-4687-8205-94d7947f17e4",
-  "dataset": "bbc5bd52-7c1e-4cf2-9938-28fd4745b5b1",
+  "analyst_name": "dp_analyst",
+  "dataset_id": "bbc5bd52-7c1e-4cf2-9938-28fd4745b5b1",
+  "dataset_name": "teacher_survey.csv",
+  "dataset_owner_id": "549a4c94-2f85-4687-8205-94d7947f17e4",
+  "dataset_owner_name": "dp_depositor", 
   "epsilon": 0.25,
   "delta": 0.0,
   "is_complete": false,
@@ -404,3 +408,15 @@ Note: This endpoint may only be used by the user who is specified as the `analys
     - **wizard_step**: (optional) Update  `wizard_step`. There is no server-side validation for this field--except that's an non-empty string
 - Response example:
   - The response will be the same as that for Create Analysis Plan (above), with the field updates reflected.
+
+## Delete Analysis Plan 
+
+Both the `AnalysisPlan.analyst` and `DatasetInfo.creator` have permission to delete an AnalysisPlan.
+
+**Note**: Delete is NOT allowed if a ReleaseInfo object has been created for this AnalysisPlan.
+
+
+- **API endpoint**: `/api/analysis-plan/{analysis_plan_object_id}/`
+- **Method**: `DELETE`
+- **Auth**: username/password
+- **Expected response**: `204 No Content`
