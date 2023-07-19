@@ -1,5 +1,6 @@
 import logging
-
+from django.utils.timezone import make_aware
+from datetime import datetime
 from django.conf import settings
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
@@ -39,8 +40,9 @@ class AnalysisPlanViewSet(BaseModelViewSet):
         AnalysisPlans for the currently authenticated user.
         """
         logger.info(f"Getting AnalysisPlans for user {self.request.user.object_id}")
-        return AnalysisPlan.objects.filter(Q(analyst=self.request.user) |
-                                           Q(dataset__creator=self.request.user))
+        return AnalysisPlan.objects.select_related('dataset'
+                                                   ).filter(Q(analyst=self.request.user) |
+                                                            Q(dataset__creator=self.request.user))
 
     @csrf_exempt
     def create(self, request, *args, **kwargs):
@@ -93,6 +95,16 @@ class AnalysisPlanViewSet(BaseModelViewSet):
         if analysis_plan.analyst != request.user:
             return Response({'detail': 'Not found.'},
                             status=status.HTTP_404_NOT_FOUND)
+
+        # Does the AnalysisPlan already have a release?
+        if analysis_plan.release_info:
+            return Response(get_json_error(astatic.ERR_MSG_RELEASES_EXISTS),
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        # Is the AnalysisPlan expired?
+        if make_aware(datetime.now()) > analysis_plan.expiration_date:
+            return Response(get_json_error(astatic.ERR_MSG_ANALYSIS_PLAN_EXPIRED),
+                            status=status.HTTP_400_BAD_REQUEST)
 
         # Check that only the allowed fields are being updated
         #

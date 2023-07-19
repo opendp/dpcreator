@@ -244,3 +244,6 @@ ERR_MSG_PLAN_INFO_NAME_MISSING = '"name" is required to create an AnalysisPlan a
 ERR_MSG_PLAN_INFO_EXPIRATION_DATE_INVALID = ('"expiration_date" is required to create an'
                                                         ' AnalysisPlan and should be a date string in the'
                                                         ' format "YYYY-MM-DD". (found: "{expiration_date}")')
+
+ERR_MSG_RELEASES_EXISTS = 'A Release has been created from this AnalysisPlan. Changes are not allowed.'
+ERR_MSG_ANALYSIS_PLAN_EXPIRED = 'This AnalysisPlan has expired.'
