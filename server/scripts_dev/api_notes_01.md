@@ -289,10 +289,14 @@ Create an Analysis Plan using a DataSetInfo object. This endpoint may only be us
 ```json
 {
   "object_id": "74526f03-7d6b-4205-b03e-da2131cd5a91",
+  "analysis_id": "74526f03-7d6b-4205-b03e-da2131cd5a91",
   "name": "Teacher survey plan",
   "description": "Release DP Statistics for the teacher survey, version 1",
-  "analyst": "549a4c94-2f85-4687-8205-94d7947f17e4",
-  "dataset": "bbc5bd52-7c1e-4cf2-9938-28fd4745b5b1",
+  "analyst_name": "dp_analyst",
+  "dataset_id": "bbc5bd52-7c1e-4cf2-9938-28fd4745b5b1",
+  "dataset_name": "teacher_survey.csv",
+  "dataset_owner_id": "549a4c94-2f85-4687-8205-94d7947f17e4",
+  "dataset_owner_name": "dp_depositor", 
   "epsilon": 0.25,
   "delta": 0.0,
   "is_complete": false,
