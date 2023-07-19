@@ -1,12 +1,13 @@
 import json
 import uuid
 from datetime import timedelta, datetime
-from os.path import abspath, dirname, join
 from http import HTTPStatus
+from os.path import abspath, dirname, join
 
 from django.contrib.auth import get_user_model
 from django.core.files import File as DjangoFileObject
 from django.test import TestCase
+from django.utils.timezone import make_aware
 from rest_framework.test import APIClient
 
 from opendp_apps.analysis import static_vals as astatic
@@ -32,6 +33,7 @@ class AnalysisPlanTest(TestCase):
         #
         self.user_obj, _created = get_user_model().objects.get_or_create(username='dp_depositor')
         self.analyst_user_obj, _created = get_user_model().objects.get_or_create(username='dp_analyst')
+        self.another_user, _created = get_user_model().objects.get_or_create(username='another_user')
 
         self.client = APIClient()
         self.client.force_login(self.user_obj)
@@ -123,6 +125,132 @@ class AnalysisPlanTest(TestCase):
         expected_msg = astatic.ERR_MSG_NOT_ENOUGH_EPSILON_AVAILABLE.format(available_epsilon=0.25,
                                                                            requested_epsilon=0.50)
         self.assertEqual(plan_util.get_error_message(), expected_msg)
+
+
+    def test_10_create_plan(self):
+        """(10) Create 3 AnalysisPlan objects; 1st two use exactly all the epsilon; 3rd uses more than remaining epsilon and produces an error"""
+        msgt(self.test_10_create_plan.__doc__)
+
+        # --------------------------------------------------
+        # Create plan 1 with .25 epsilon
+        # --------------------------------------------------
+        plan_info = self.working_plan_info.copy()
+
+        plan_util = AnalysisPlanCreator(self.user_obj, plan_info)
+
+        self.assertEqual(plan_util.has_error(), False)
+        if plan_util.has_error():
+            print('ERRORS', plan_util.get_error_message())
+            return
+
+        self.assertEqual(plan_util.analysis_plan.name, plan_info['name'])
+        self.assertEqual(plan_util.analysis_plan.description, plan_info['description'])
+        self.assertEqual(plan_util.analysis_plan.epsilon, plan_info['epsilon'])
+        self.assertEqual(plan_util.analysis_plan.expiration_date.strftime('%Y-%m-%d'),
+                         plan_info['expiration_date'])
+
+        remaining_epsilon = AnalysisPlanCreator.get_available_epsilon(self.dataset_info)
+        self.assertEqual(remaining_epsilon, 0.75)
+
+        # --------------------------------------------------
+        # Create plan 2 with .50 epsilon
+        # --------------------------------------------------
+        plan_info['name'] = 'Teacher survey plan 2'
+        plan_info['description'] = 'Release DP Statistics for the teacher survey, version 2'
+        plan_info['epsilon'] = 0.50
+
+        plan_util = AnalysisPlanCreator(self.user_obj,
+                                        plan_info)
+
+        if plan_util.has_error():
+            print('ERRORS', plan_util.get_error_message())
+            return
+
+        self.assertEqual(plan_util.has_error(), False)
+        self.assertEqual(plan_util.analysis_plan.name, plan_info['name'])
+        self.assertEqual(plan_util.analysis_plan.description, plan_info['description'])
+        self.assertEqual(plan_util.analysis_plan.epsilon, plan_info['epsilon'])
+        self.assertEqual(plan_util.analysis_plan.expiration_date.strftime('%Y-%m-%d'),
+                         plan_info['expiration_date'])
+
+        remaining_epsilon = AnalysisPlanCreator.get_available_epsilon(self.dataset_info)
+        self.assertEqual(remaining_epsilon, 0.25)
+
+        # --------------------------------------------------
+        # Create plan 3 with .50 epsilon -- should exceed epsilon
+        # --------------------------------------------------
+        plan_info['name'] = 'Teacher survey plan 3'
+        plan_info['description'] = 'Release DP Statistics for the teacher survey, version 3'
+        plan_info['epsilon'] = 0.50
+
+        plan_util = AnalysisPlanCreator(self.user_obj, plan_info)
+
+        self.assertEqual(plan_util.has_error(), True)
+
+        expected_msg = astatic.ERR_MSG_NOT_ENOUGH_EPSILON_AVAILABLE.format(available_epsilon=0.25,
+                                                                           requested_epsilon=0.50)
+        self.assertEqual(plan_util.get_error_message(), expected_msg)
+
+    def test_12_create_plan_use_all_epsilon(self):
+        """(12) Create 3 AnalysisPlan objects; 1st two use exactly all the epsilon; error on the 3rd"""
+        msgt(self.test_12_create_plan_use_all_epsilon.__doc__)
+
+        # --------------------------------------------------
+        # Create plan 1 with .25 epsilon
+        # --------------------------------------------------
+        plan_info = self.working_plan_info.copy()
+
+        plan_util = AnalysisPlanCreator(self.user_obj, plan_info)
+
+        self.assertEqual(plan_util.has_error(), False)
+        if plan_util.has_error():
+            print('ERRORS', plan_util.get_error_message())
+            return
+
+        self.assertEqual(plan_util.analysis_plan.name, plan_info['name'])
+        self.assertEqual(plan_util.analysis_plan.description, plan_info['description'])
+        self.assertEqual(plan_util.analysis_plan.epsilon, plan_info['epsilon'])
+        self.assertEqual(plan_util.analysis_plan.expiration_date.strftime('%Y-%m-%d'),
+                         plan_info['expiration_date'])
+
+        remaining_epsilon = AnalysisPlanCreator.get_available_epsilon(self.dataset_info)
+        self.assertEqual(remaining_epsilon, 0.75)
+
+        # --------------------------------------------------
+        # Create plan 2 with .75 epsilon
+        # --------------------------------------------------
+        plan_info['name'] = 'Teacher survey plan 2'
+        plan_info['description'] = 'Release DP Statistics for the teacher survey, version 2'
+        plan_info['epsilon'] = 0.75
+
+        plan_util = AnalysisPlanCreator(self.user_obj,
+                                        plan_info)
+
+        if plan_util.has_error():
+            print('ERRORS', plan_util.get_error_message())
+            return
+
+        self.assertEqual(plan_util.has_error(), False)
+        self.assertEqual(plan_util.analysis_plan.name, plan_info['name'])
+        self.assertEqual(plan_util.analysis_plan.description, plan_info['description'])
+        self.assertEqual(plan_util.analysis_plan.epsilon, plan_info['epsilon'])
+        self.assertEqual(plan_util.analysis_plan.expiration_date.strftime('%Y-%m-%d'),
+                         plan_info['expiration_date'])
+
+        remaining_epsilon = AnalysisPlanCreator.get_available_epsilon(self.dataset_info)
+        self.assertEqual(remaining_epsilon, 0.0)
+
+        # --------------------------------------------------
+        # Create plan 3 with .50 epsilon -- should exceed epsilon
+        # --------------------------------------------------
+        plan_info['name'] = 'Teacher survey plan 3'
+        plan_info['description'] = 'Release DP Statistics for the teacher survey, version 3'
+        plan_info['epsilon'] = 0.50
+
+        plan_util = AnalysisPlanCreator(self.user_obj, plan_info)
+
+        self.assertEqual(plan_util.has_error(), True)
+        self.assertEqual(plan_util.get_error_message(), astatic.ERR_MSG_NO_EPSILON_AVAILABLE)
 
     def test_15_create_plan_via_api(self):
         """(15) Create AnalysisPlan using the API"""
@@ -267,7 +395,6 @@ class AnalysisPlanTest(TestCase):
         #
         plan_object_id = plan_creator.analysis_plan.object_id
 
-        self.client = APIClient()
         self.client.force_login(self.analyst_user_obj)
 
         # note: not checking **validity** of dp_statistics or variable_info here
@@ -312,7 +439,6 @@ class AnalysisPlanTest(TestCase):
         # -------------------------------------------------------------------
         plan_object_id = plan_creator.analysis_plan.object_id
 
-        self.client = APIClient()
         self.client.force_login(self.user_obj)
 
         # note: not checking **validity** of dp_statistics or variable_info here
@@ -333,9 +459,7 @@ class AnalysisPlanTest(TestCase):
         # (c) Have another user, not the assigned analyst update the plan!
         #    - should fail
         # -------------------------------------------------------------------
-        another_user, _created = get_user_model().objects.get_or_create(username='another_user')
-        self.client = APIClient()
-        self.client.force_login(another_user)
+        self.client.force_login(self.another_user)
 
         response = self.client.patch(f'{self.API_PREFIX}{plan_object_id}/',
                                      json.dumps(update_data),
@@ -347,7 +471,6 @@ class AnalysisPlanTest(TestCase):
         # -------------------------------------------------------------------
         # (d) Finally, have the assigned analyst update the plan!
         # -------------------------------------------------------------------
-        self.client = APIClient()
         self.client.force_login(self.analyst_user_obj)
 
         response = self.client.patch(f'{self.API_PREFIX}{plan_object_id}/',
@@ -401,6 +524,36 @@ class AnalysisPlanTest(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_95_update_expired_analysis_plan(self):
+        """(95) Update an expired AnalysisPlan -- should fail"""
+        msgt(self.test_95_update_expired_analysis_plan.__doc__)
+
+        # Create the AnalysisPlan
+        #
+        plan_util = AnalysisPlanCreator(self.user_obj, self.working_plan_info)
+        self.assertTrue(plan_util.has_error() is False)
+
+        # Make the expiration date yesterday
+        #
+        analysis_plan = plan_util.analysis_plan
+        analysis_plan.expiration_date = make_aware(datetime.now() + timedelta(microseconds=-1))
+        analysis_plan.save()
+
+        # Try to make an update w/ valid data but a bad expiration date
+        #
+        self.client.force_login(self.user_obj)
+
+        # note: not checking **validity** of dp_statistics or variable_info here
+        update_data = {'description': 'A new description',
+                       'wizard_step': 'yellow brick road'}
+
+        response = self.client.patch(f'{self.API_PREFIX}{analysis_plan.object_id}/',
+                                     json.dumps(update_data),
+                                     content_type='application/json')
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertEqual(response.json()['message'], astatic.ERR_MSG_ANALYSIS_PLAN_EXPIRED)
+
     def test_100_update_plan_bad_fields(self):
         """(100) Update AnalysisPlan, fail w/ bad fields"""
         msgt(self.test_100_update_plan_bad_fields.__doc__)
@@ -429,3 +582,176 @@ class AnalysisPlanTest(TestCase):
         user_msg = astatic.ERR_MSG_FIELDS_NOT_UPDATEABLE.format(
             problem_field_str='epsilon, user_step, zebra')
         self.assertEqual(response.json()['message'], user_msg)
+
+    def test_110_test_delete_no_release(self):
+        """(110) Delete AnalysisPlan w/ no ReleaseInfo"""
+        msgt(self.test_110_test_delete_no_release.__doc__)
+
+        # Create the AnalysisPlan
+        #
+        plan_util = AnalysisPlanCreator(self.user_obj, self.working_plan_info)
+        self.assertTrue(plan_util.has_error() is False)
+
+        # Delete the plan!
+        #
+        plan_object_id = plan_util.analysis_plan.object_id
+
+        response = self.client.delete(f'{self.API_PREFIX}{plan_object_id}/')
+
+        # Works fine, HTTP 204
+        self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT)
+
+    def test_120_test_delete_dataset_owner(self):
+        """(120) Delete AnalysisPlan by the dataset owner"""
+        msgt(self.test_120_test_delete_dataset_owner.__doc__)
+
+        # Create the AnalysisPlan
+        #
+        self.working_plan_info['analyst_id'] = str(self.analyst_user_obj.object_id)
+        plan_util = AnalysisPlanCreator(self.user_obj, self.working_plan_info)
+        self.assertTrue(plan_util.has_error() is False)
+
+        # Delete the plan!
+        #
+        plan_object_id = plan_util.analysis_plan.object_id
+
+        response = self.client.delete(f'{self.API_PREFIX}{plan_object_id}/')
+
+        # AnalysisPlan not found, HTTP 204
+        self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT)
+
+    def test_130_test_delete_user_no_perms(self):
+        """(130) Delete AnalysisPlan by user w/o permission"""
+        msgt(self.test_130_test_delete_user_no_perms.__doc__)
+
+        # Create the AnalysisPlan
+        #
+        self.working_plan_info['analyst_id'] = str(self.analyst_user_obj.object_id)
+        plan_util = AnalysisPlanCreator(self.user_obj, self.working_plan_info)
+        self.assertTrue(plan_util.has_error() is False)
+
+        # Delete the plan!
+        # Logged in user is the self.opendp_user_obj, not self.analyst_user_obj so AnalysisPlan not found
+        #
+        plan_object_id = plan_util.analysis_plan.object_id
+
+        self.client.force_login(self.another_user)
+
+        response = self.client.delete(f'{self.API_PREFIX}{plan_object_id}/')
+
+        # AnalysisPlan not found, HTTP 404
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+
+    def test_140_list_plans(self):
+        """(140) List AnalysisPlans using different users w/ varying permissions"""
+        msgt(self.test_140_list_plans.__doc__)
+
+        # Create two AnalysisPlans
+        #
+        plan1 = self.working_plan_info.copy()
+        plan_util = AnalysisPlanCreator(self.user_obj, plan1)
+        self.assertTrue(plan_util.has_error() is False)
+        analysis_plan1 = plan_util.analysis_plan
+
+        plan2 = self.working_plan_info.copy()
+        plan2['analyst_id'] = str(self.analyst_user_obj.object_id)
+        plan2['name'] = 'Plan 2'
+        plan_util2 = AnalysisPlanCreator(self.user_obj, plan2)
+        self.assertTrue(plan_util2.has_error() is False)
+        analysis_plan2 = plan_util2.analysis_plan
+
+        # List the plans w/ call by the dataset owner
+        #
+        response = self.client.get(f'{self.API_PREFIX}')
+        self.assertTrue(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.json()['count'], 2)
+
+        analysis_plans_ids = [response.json()['results'][0]['object_id'],
+                              response.json()['results'][1]['object_id']]
+        for plan_object_id in [analysis_plan1.object_id, analysis_plan2.object_id]:
+            self.assertTrue(str(plan_object_id) in analysis_plans_ids)
+
+        # List the plans w/ call by the analyst
+        #
+        self.client.force_login(self.analyst_user_obj)
+        response = self.client.get(f'{self.API_PREFIX}')
+        self.assertTrue(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.json()['count'], 1)
+        self.assertEqual(response.json()['results'][0]['object_id'], str(analysis_plan2.object_id))
+        self.assertEqual(response.json()['results'][0]['name'], 'Plan 2')
+
+        # List the plans w/ call by user with no permission
+        #
+        self.client.force_login(self.another_user)
+        response = self.client.get(f'{self.API_PREFIX}')
+        self.assertTrue(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.json()['count'], 0)
+
+    def test_150_get_plans(self):
+        """(150) Get AnalysisPlans using different users w/ varying permissions"""
+        msgt(self.test_150_get_plans.__doc__)
+
+        # Create two AnalysisPlans
+        #
+
+        # AnalysisPlan owned by the user_obj and expired
+        #
+        plan1 = self.working_plan_info.copy()
+        plan1['expiration_date'] = (datetime.now() + timedelta(days=-1)).strftime('%Y-%m-%d')
+        plan_util = AnalysisPlanCreator(self.user_obj, plan1)
+        self.assertTrue(plan_util.has_error() is False)
+        analysis_plan1 = plan_util.analysis_plan
+
+        # AnalysisPlan owned by the analyst_user_obj
+        #
+        plan2 = self.working_plan_info.copy()
+        plan2['analyst_id'] = str(self.analyst_user_obj.object_id)
+        plan2['name'] = 'Plan 2'
+        plan_util2 = AnalysisPlanCreator(self.user_obj, plan2)
+        self.assertTrue(plan_util2.has_error() is False)
+        analysis_plan2 = plan_util2.analysis_plan
+
+        # -------------------------------
+        # Get each plan via the user_obj
+        # -------------------------------
+        self.client.force_login(self.user_obj)
+
+        # Plan 1 returned successfully
+        response = self.client.get(f'{self.API_PREFIX}{analysis_plan1.object_id}/')
+        self.assertTrue(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.json()['object_id'], str(analysis_plan1.object_id))
+        self.assertEqual(response.json()['is_expired'], True)
+
+        # Plan 2 not found
+        response = self.client.get(f'{self.API_PREFIX}{analysis_plan2.object_id}/')
+        self.assertTrue(response.status_code, HTTPStatus.NOT_FOUND)
+
+        # -------------------------------
+        # Get each plan via the analyst_user_obj
+        # -------------------------------
+        self.client.force_login(self.analyst_user_obj)
+
+        # Plan 1 not found
+        response = self.client.get(f'{self.API_PREFIX}{analysis_plan1.object_id}/')
+        self.assertTrue(response.status_code, HTTPStatus.NOT_FOUND)
+
+        # Plan 2 returned successfully
+        response = self.client.get(f'{self.API_PREFIX}{analysis_plan2.object_id}/')
+        self.assertTrue(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.json()['object_id'], str(analysis_plan2.object_id))
+        self.assertEqual(response.json()['is_expired'], False)
+        print('response.json()', json.dumps(response.json(), indent=4))
+        return
+
+        # -------------------------------
+        # Get each plan via a user with no permission
+        # -------------------------------
+        self.client.force_login(self.another_user)
+
+        # Plan 1 not found
+        response = self.client.get(f'{self.API_PREFIX}{analysis_plan1.object_id}/')
+        self.assertTrue(response.status_code, HTTPStatus.NOT_FOUND)
+
+        # Plan 2 not found
+        response = self.client.get(f'{self.API_PREFIX}{analysis_plan2.object_id}/')
+        self.assertTrue(response.status_code, HTTPStatus.NOT_FOUND)

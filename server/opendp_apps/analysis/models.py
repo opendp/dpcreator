@@ -289,9 +289,11 @@ class AnalysisPlan(TimestampedModelWithUUID):
     expiration_date = models.DateTimeField(null=True, blank=True,
                                            help_text='The date the analysis plan expires')
 
+    class Meta:
+        ordering = ['dataset', 'name', '-created']
 
     def __str__(self):
-        return f'{self.name} - {self.dataset}'
+        return f'{self.name}'
 
     def is_editable(self) -> bool:
         """

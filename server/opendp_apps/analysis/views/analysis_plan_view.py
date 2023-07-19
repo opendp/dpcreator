@@ -1,7 +1,8 @@
-import json
 import logging
-
+from django.utils.timezone import make_aware
+from datetime import datetime
 from django.conf import settings
+from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.response import Response
@@ -39,7 +40,9 @@ class AnalysisPlanViewSet(BaseModelViewSet):
         AnalysisPlans for the currently authenticated user.
         """
         logger.info(f"Getting AnalysisPlans for user {self.request.user.object_id}")
-        return AnalysisPlan.objects.filter(analyst=self.request.user)
+        return AnalysisPlan.objects.select_related('dataset'
+                                                   ).filter(Q(analyst=self.request.user) |
+                                                            Q(dataset__creator=self.request.user))
 
     @csrf_exempt
     def create(self, request, *args, **kwargs):
@@ -84,7 +87,27 @@ class AnalysisPlanViewSet(BaseModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
-        """Make updates to the AnalysisPlan object"""
+        """Allows the AnalysisPlan.analyst to make updates to the AnalysisPlan object."""
+
+        # Make sure this is the AnalysisPlan.analyst!
+        #   The AnalysisPlan.dataset.creator cannot make changes via API
+        analysis_plan = self.get_object()
+        if analysis_plan.analyst != request.user:
+            return Response({'detail': 'Not found.'},
+                            status=status.HTTP_404_NOT_FOUND)
+
+        # Does the AnalysisPlan already have a release?
+        if analysis_plan.release_info:
+            return Response(get_json_error(astatic.ERR_MSG_RELEASES_EXISTS),
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        # Is the AnalysisPlan expired?
+        if make_aware(datetime.now()) > analysis_plan.expiration_date:
+            return Response(get_json_error(astatic.ERR_MSG_ANALYSIS_PLAN_EXPIRED),
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        # Check that only the allowed fields are being updated
+        #
         acceptable_fields = ['name', 'description', 'variable_info', 'dp_statistics', 'wizard_step']
         problem_fields = []
         fields_to_update = []
@@ -94,27 +117,39 @@ class AnalysisPlanViewSet(BaseModelViewSet):
             else:
                 fields_to_update.append(field)
 
+        # If there are any problem fields, return an error
+        #
         if problem_fields:
             problem_field_str = ', '.join([str(f) for f in problem_fields])
             user_msg = astatic.ERR_MSG_FIELDS_NOT_UPDATEABLE.format(problem_field_str=problem_field_str)
             return Response(get_json_error(user_msg),
                             status=status.HTTP_400_BAD_REQUEST)
 
+        # If there are no fields to update, return an error
+        #
         if not fields_to_update:
             return Response(get_json_error(f'There are no fields to update'),
                             status=status.HTTP_400_BAD_REQUEST)
 
+        # Make the partial update
+        #
         partial_update_result = super(AnalysisPlanViewSet, self).partial_update(request, *args, **kwargs)
         # logger.info("Analysis update with request " + json.dumps(request.data))
 
         return partial_update_result
 
     def delete(self, request, *args, **kwargs):
+        """
+        Allow the Analyst or DataSetInfo.creator to delete an AnalysisPlan object.
+        If an associated ReleaseInfo exists, delete is not allowed
+        """
         analysis_plan = self.get_object()
         if analysis_plan.release_info.exists():
             if not settings.ALLOW_RELEASE_DELETION:
-                return Response(get_json_error('Deleting AnalysisPlan with an associated ReleaseInfo is not allowed'),
+                return Response(get_json_error(('Deleting AnalysisPlan with an associated '
+                                                'ReleaseInfo is not allowed')),
                                 status=status.HTTP_400_BAD_REQUEST)
             else:
                 analysis_plan.release_info.delete()
+
         return super().destroy(request, *args, **kwargs)
