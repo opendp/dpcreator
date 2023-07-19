@@ -74,12 +74,22 @@ class AnalysisPlanSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AnalysisPlan
-        fields = ['name', 'object_id',
-                  'analyst', 'dataset',
-                  'is_complete', 'user_step',
-                  'variable_info', 'dp_statistics',
+        fields = ['object_id',
+                  'name',
+                  'description',
+                  'analyst',
+                  'dataset',
+                  'epsilon',
+                  'delta',
+                  'is_complete',
+                  'user_step',
+                  'wizard_step',
+                  'expiration_date',
+                  'variable_info',
+                  'dp_statistics',
                   'release_info',
-                  'created', 'updated']
+                  'created',
+                  'updated']
 
 
 class DPStatisticSerializer(serializers.Serializer):
