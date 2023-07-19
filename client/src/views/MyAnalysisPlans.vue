@@ -83,6 +83,7 @@
                         label="Dataset Name"
                         item-text="name"
                         item-value="objectId"
+                        v-on:change="setMaxBudget()"
                     ></v-select>
                     <v-text-field v-model="newPlan.planName" label="Plan Name"></v-text-field>
                     <v-select
@@ -92,7 +93,12 @@
                         item-text="username"
                         item-value="objectId"
                     ></v-select>
-                    <v-text-field v-model="newPlan.budget" label="Budget"></v-text-field>
+                    <div class="budget-row">
+                        <v-text-field  :rules="[validateBudgetRule]" v-model="newPlan.budget" label="Budget"></v-text-field>
+                        <div class="max-budget" v-if="maxBudget > 0">
+                            <span class="help-text">(Max Budget: {{maxBudget}})</span>
+                        </div>
+                    </div>
                     <v-text-field v-model="newPlan.expirationDate" label="ExpirationDate"></v-text-field>
                     <v-date-picker v-model="newPlan.expirationDate" no-title></v-date-picker>
 
@@ -106,6 +112,20 @@
         </v-dialog>
     </div>
 </template>
+<style>
+.budget-row {
+    display: flex;
+    align-items: center;
+}
+.help-text {
+    font-size: 14px;
+    color: #888;
+    margin-top: 4px;
+}
+.max-budget {
+    margin-left: 16px;
+}
+</style>
 
 <script>
 
@@ -145,23 +165,9 @@ export default {
         loading: true,
         search: "",
         users: null,
-        plans: [{
-            analysisPlanId: "1",
-            datasetName: "dataset name 1",
-            planName: "plan name 1",
-            analyst: "Ellen K",
-            budget: ".5",
-        },
-            {
-                analysisPlanId: "2",
-                datasetName: "dataset name 2",
-                planName: "plan name 2",
-                analyst: "Raman P",
-                budget: ".25",
-            },
-        ],
+        plans: [],
+        maxBudget: 0,
         createDialogVisible: false,
-
         newPlan: {
             datasetId: null, // Store the selected dataset ID
             planName: "",
@@ -172,6 +178,10 @@ export default {
 
     }),
     methods: {
+        validateBudgetRule(value) {
+            return (value && value <= this.maxBudget) ||
+             "Budget must be less than Max Budget." // Invalid budget input
+        },
         openDialog() {
             console.log('openDialog')
             this.createDialogVisible = true;
@@ -189,7 +199,19 @@ export default {
                 budget: "",
             };
         },
-
+        setMaxBudget( ) {
+            let selectedDatasetBudget = 0;
+            let spentBudget = 0
+            this.datasetList.forEach(dataset => {
+                if (dataset.objectId === this.newPlan.datasetId){
+                    selectedDatasetBudget = dataset.depositorSetupInfo.epsilon
+                    dataset.analysisPlans.forEach(plan =>{
+                        spentBudget += plan.epsilon
+                    })
+                }
+            })
+            this.maxBudget = selectedDatasetBudget - spentBudget
+        },
         createPlan() {
             // Perform your create action here with the newPlan data
             // You can access the new plan details from `this.newPlan`
