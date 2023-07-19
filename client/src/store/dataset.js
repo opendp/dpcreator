@@ -191,8 +191,17 @@ const actions = {
             }
         }
     },
-    createAnalysisPlan({commit, state}, datasetId) {
-        return analysis.createAnalysisPlan(datasetId)
+    /*
+      this.$store.dispatch('dataset/createAnalysisPlan',
+                this.newPlan.datasetId,
+                this.newPlan.analystId,
+                this.newPlan.budget,
+                this.newPlan.planName
+            this.newPlan.expirationDate)
+     */
+    createAnalysisPlan({commit, state}, props ) {
+        console.log('store/dataset.js createAnalysisPlan, props = ' + JSON.stringify(props))
+        return analysis.createAnalysisPlan(props.datasetId,props.analystId, props.budget, props.description, props.planName, props.expirationDate)
             .then((resp) => {
                 commit('SET_ANALYSIS_PLAN', resp)
             }).catch((error) => {

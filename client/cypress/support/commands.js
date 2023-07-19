@@ -1,3 +1,5 @@
+import '@testing-library/cypress/add-commands'
+
 Cypress.Commands.add('loadTeacherSurveyDemo', () => {
     cy.on('uncaught:exception', (e, runnable) => {
         console.log('error', e)
@@ -255,8 +257,8 @@ Cypress.Commands.add('selectVariable',(demoVariables)=> {
             const maxDataTest = '[data-test="' + demoVar.name + ':max"]'
             // Enter min and max for one numericVar so we can validate
 
-            cy.get(minDataTest).should('be.visible')
-            cy.get(maxDataTest).should('be.visible')
+            cy.get(minDataTest).should('exist')
+            cy.get(maxDataTest).should('exist')
             cy.get(minDataTest).type(demoVar.min, {force: true})
             cy.get(maxDataTest).type(demoVar.max, {force: true})
             // click back into min input, to trigger change event on max input

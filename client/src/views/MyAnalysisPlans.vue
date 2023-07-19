@@ -71,13 +71,14 @@
             </v-sheet>
         </v-container>
         <!-- Add Analysis Plan Dialog -->
-        <v-dialog v-model="createDialogVisible" max-width="500px">
-            <v-card>
+        <v-dialog  v-model="createDialogVisible" max-width="500px">
+            <v-card data-test="createPlanDialog" >
                 <v-card-title>
                     <span class="headline">Add Analysis Plan</span>
                 </v-card-title>
                 <v-card-text>
                     <v-select
+                        data-test="selectPlanDataset"
                         v-model="newPlan.datasetId"
                         :items="datasetList"
                         label="Dataset Name"
@@ -85,8 +86,9 @@
                         item-value="objectId"
                         v-on:change="setMaxBudget()"
                     ></v-select>
-                    <v-text-field v-model="newPlan.planName" label="Plan Name"></v-text-field>
+                    <v-text-field data-test="inputPlanName" v-model="newPlan.planName" label="Plan Name"></v-text-field>
                     <v-select
+                        data-test="selectPlanAnalyst"
                         v-model="newPlan.analystId"
                         :items="users"
                         label="Analyst Name"
@@ -94,7 +96,7 @@
                         item-value="objectId"
                     ></v-select>
                     <div class="budget-row">
-                        <v-text-field  :rules="[validateBudgetRule]" v-model="newPlan.budget" label="Budget"></v-text-field>
+                        <v-text-field data-test="inputPlanBudget"  :rules="[validateBudgetRule]" v-model="newPlan.budget" label="Budget"></v-text-field>
                         <div class="max-budget" v-if="maxBudget > 0">
                             <span class="help-text">(Max Budget: {{maxBudget}})</span>
                         </div>
@@ -105,7 +107,7 @@
                 </v-card-text>
 
                 <v-card-actions>
-                    <v-btn color="primary" @click="createPlan">Create</v-btn>
+                    <v-btn data-test="createPlanSubmitButton" color="primary" @click="createPlan">Create</v-btn>
                     <v-btn color="secondary" @click="closeDialog">Cancel</v-btn>
                 </v-card-actions>
             </v-card>
@@ -170,8 +172,9 @@ export default {
         createDialogVisible: false,
         newPlan: {
             datasetId: null, // Store the selected dataset ID
+            description: "",
             planName: "",
-            analyst: "",
+            analystId: "",
             budget: "",
             expirationDate: getDefaultExpirationDate()
         }
@@ -194,7 +197,7 @@ export default {
                 datasetId: "",
                 datasetName: "",
                 planName: "",
-                analyst: "",
+                analystId: "",
                 expirationDate: getDefaultExpirationDate(),
                 budget: "",
             };
@@ -213,21 +216,13 @@ export default {
             this.maxBudget = selectedDatasetBudget - spentBudget
         },
         createPlan() {
-            // Perform your create action here with the newPlan data
-            // You can access the new plan details from `this.newPlan`
+            console.log("calling create plan  with newPlan = " + JSON.stringify(this.newPlan))
+            console.log('this.newPlan.budget: ' + this.newPlan.budget)
+            this.newPlan.description = 'my description'
+            this.newPlan.planName = 'my plan name'
+            this.$store.dispatch('dataset/createAnalysisPlan',
+               this.newPlan)
 
-            // After successful creation, close the dialog
-            // Retrieve the selected dataset name
-            const selectedDataset = this.datasetList.find(
-                (dataset) => dataset.objectId === this.newPlan.datasetId
-            );
-            const datasetName = selectedDataset ? selectedDataset.name : "";
-
-            // Perform your create action here with the newPlan data
-            // You can access the new plan details from `this.newPlan`
-            // and use `datasetName` for the dataset name
-            console.log("create plan called with newPlan = " + JSON.stringify(this.newPlan))
-            // After successful creation, close the dialog
             this.closeDialog();
         },
 

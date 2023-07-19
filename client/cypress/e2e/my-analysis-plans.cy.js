@@ -10,7 +10,63 @@
 
 
         })
-        it('deletes analysis plan', () => {
+        it('creates new Analysis Plan (e2e test)', () => {
+            cy.on('uncaught:exception', (e, runnable) => {
+                console.log('error', e)
+                console.log('runnable', runnable)
+                return false
+            })
+
+            cy.clearData()
+            let testFile = 'cypress/fixtures/Fatigue_data.csv'
+            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
+            cy.uploadFile(testFile)
+            const selectVariables =  {
+                "typingSpeed": {
+                    "max": 25,
+                    "min": 10,
+                    "name": "TypingSpeed",
+                    "type": "Float",
+                    "label": "TypingSpeed",
+                    "selected": true,
+                    "sortOrder": 5
+                },
+                "blinkDuration": {
+                    "max": 35,
+                    "min": 10,
+                    "name": "BlinkDuration",
+                    "type": "Float",
+                    "label": "",
+                    "sortOrder": 12
+                }}
+            cy.fixture('EyeDemoData.json').then((demoData) => {
+                cy.url().should('contain', 'my-data')
+                cy.goToConfirmVariables(selectVariables)
+                // select the variables we will use
+                cy.selectVariable(selectVariables)
+                cy.get('[data-test="wizardCompleteButton"]').click({force:true})
+                cy.url().should('contain','my-data')
+                cy.visit('/my-plans')
+                //createPlanButton
+                cy.get('[data-test="createPlanButton"]').click({force:true})
+                cy.get('[data-test="selectPlanDataset"]').click();
+
+                // Find and click the desired dataset option within the dropdown
+                cy.findByText('Fatigue_data.csv').click();
+
+
+                cy.get('[data-test="selectPlanAnalyst"]').click()
+                cy.findByText('oscar').click();
+                cy.get('[data-test="inputPlanBudget"]').type('0.1')
+                cy.get('[data-test="createPlanSubmitButton"]').click({force:true})
+                cy.pause()
+
+
+
+
+            })
+        })
+        it('calls delete analysis plan API', () => {
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
                 console.log('runnable', runnable)
@@ -77,7 +133,6 @@
 
                 return false
             })
-            let testfile = 'cypress/fixtures/PUMS5extract1000.csv'
             const username = 'kermit'
             const email = 'kermit@thefrog.com'
             const password = 'kermit123!'

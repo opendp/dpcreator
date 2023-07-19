@@ -31,9 +31,29 @@ export default {
             .then(resp => camelcaseKeys(resp.data, {deep: true}))
     },
     // For analysisPlan, we need to add new params to API
-    createAnalysisPlan(datasetId, analystId, budget, name, expirationDate) {
-        return wrappedSession.post('/api/analyze/',
-            {object_id: datasetId, analyst_id: an})
+    /*
+    {
+  "object_id": "bbc5bd52-7c1e-4cf2-9938-28fd4745b5b1",
+  "analyst_id": "0681867b-1ce8-46c9-adfb-df83b8efff24",
+  "name": "Teacher survey plan",
+  "description": "Release DP Statistics for the teacher survey, version 1",
+  "epsilon": 0.25,
+  "expiration_date": "2023-07-23"
+}
+     */
+    createAnalysisPlan(datasetId, analystId, budget,description, name, expirationDate) {
+        console.log('budget: ' + budget)
+        const params = {object_id: datasetId,
+            analyst_id: analystId,
+            name: name,
+            epsilon: budget,
+            expiration_date: expirationDate,
+            description: description
+
+        }
+        console.log('posting to analysis plan, params = '+JSON.stringify(params))
+        return wrappedSession.post('/api/analysis-plan/',
+            params)
             .then(resp => camelcaseKeys(resp.data, {deep: true}))
     },
     getUserAnalysisPlans() {
