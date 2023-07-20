@@ -555,8 +555,8 @@ class ValidateReleaseUtil(BasicErrCheck):
             return False
 
         # Make sure the total epsilon is valid
-        self.max_epsilon = self.analysis_plan.dataset.get_depositor_setup_info().epsilon
-        self.max_delta = self.analysis_plan.dataset.get_depositor_setup_info().delta
+        self.max_epsilon = self.analysis_plan.dataset.depositor_setup_info.epsilon
+        self.max_delta = self.analysis_plan.dataset.depositor_setup_info.delta
 
         epsilon_ok, _err_msg_or_None = self.is_epsilon_valid(self.max_epsilon)
         if not epsilon_ok:

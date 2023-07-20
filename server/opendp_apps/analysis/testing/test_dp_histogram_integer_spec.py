@@ -3,16 +3,16 @@ docker-compose run server python manage.py test opendp_apps.analysis.testing.tes
 """
 import decimal
 import os
-from os.path import abspath, dirname, isfile, join
 import tempfile
+from os.path import abspath, dirname, isfile, join
 
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.analysis.misc_formatters import get_timestamp_str
 from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
 from opendp_apps.analysis.tools.dp_histogram_int_one_per_value_spec import DPHistogramIntOnePerValueSpec
+from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import static_vals as pstatic
-from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
-from opendp_apps.analysis.misc_formatters import get_timestamp_str
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')  # general test data
@@ -22,10 +22,9 @@ if not isfile(DP_ANALYSIS_TEST_DIR):
     os.makedirs(DP_ANALYSIS_TEST_DIR, exist_ok=True)
     print('created: ', DP_ANALYSIS_TEST_DIR)
 
-from unittest import skip
-@skip('Reconfiguring for analyst mode')
+
 class HistogramIntegerStatSpecTest(StatSpecTestCase):
-    fixtures = ['test_dataset_data_001.json', ]
+    """Test the 'DPHistogramIntOnePerValueSpec' class"""
 
     def setUp(self):
 
@@ -238,7 +237,8 @@ class HistogramIntegerStatSpecTest(StatSpecTestCase):
         dp_hist.run_chain(col_indexes, file_obj, sep_char=",")
 
         release_dict = dp_hist.get_release_dict()
-        import json; print(json.dumps(release_dict, indent=4))
+        import json;
+        print(json.dumps(release_dict, indent=4))
 
         self.assertFalse(dp_hist.has_error())
         self.assertTrue('categories' in dp_hist.value)

@@ -1,17 +1,16 @@
 import json
 from os.path import abspath, dirname, isfile, join
 
-from django.contrib.auth import get_user_model
 from django.core import mail
 from django.core.files import File
-from django.test import TestCase, override_settings
+from django.test import override_settings
 from rest_framework.reverse import reverse as drf_reverse
 from rest_framework.test import APIClient
 
 from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.models import AnalysisPlan, AuxiliaryFileDepositRecord, ReleaseEmailRecord
 from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
+from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
 from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
 from opendp_apps.dataset.dataset_formatter import DataSetFormatter
 from opendp_apps.dataset.models import DataSetInfo
@@ -27,28 +26,31 @@ from unittest import skip
 
 
 @skip('Reconfiguring for analyst mode')
-class TestRunRelease(TestCase):
-    fixtures = ['test_dataset_data_001.json']
+class TestRunRelease(StatSpecTestCase):
+    # fixtures = ['test_dataset_data_001.json']
 
     def setUp(self):
+        super().setUp()
+
         # test client
         self.client = APIClient()
 
-        self.user_obj, _created = get_user_model().objects.get_or_create(username='dev_admin')
+        # self.user_obj, _created = get_user_model().objects.get_or_create(username='dev_admin')
 
         self.client.force_login(self.user_obj)
 
-        dataset_info = DataSetInfo.objects.get(id=4)
-        self.add_source_file(dataset_info, 'Fatigue_data.tab', True)
+        # dataset_info = DataSetInfo.objects.get(id=4)
+        # self.add_source_file(dataset_info, 'Fatigue_data.tab', True)
 
-        plan_info = AnalysisPlanUtil.create_plan(dataset_info.object_id, self.user_obj)
-        self.assertTrue(plan_info.success)
-        orig_plan = plan_info.data
+        # plan_info = AnalysisPlanUtil.create_plan(dataset_info.object_id, self.user_obj)
+        # self.assertTrue(plan_info.success)
+        # orig_plan = plan_info.data
 
+        # plan_info = self.get_release_plan()
         # Retrieve it
         #
-        self.analysis_plan = AnalysisPlan.objects.first()
-        self.assertEqual(orig_plan.object_id, self.analysis_plan.object_id)
+        self.analysis_plan = self.retrieve_new_plan()
+        # self.assertEqual(orig_plan.object_id, self.analysis_plan.object_id)
 
         self.analysis_plan.variable_info['EyeHeight']['min'] = -8.01
         self.analysis_plan.variable_info['EyeHeight']['max'] = 5
@@ -171,6 +173,7 @@ class TestRunRelease(TestCase):
             print('release_util:', release_util.get_err_msg())
         self.assertFalse(release_util.has_error())
         return
+
         release_info_object = release_util.get_new_release_info_object()
         dp_release = release_info_object.dp_release
 
