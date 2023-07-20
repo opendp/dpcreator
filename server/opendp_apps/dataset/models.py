@@ -447,7 +447,7 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
     def get_variable_order(self, as_indices=False) -> BasicResponse:
         """
-        Retrieve the variableOrder list from the variable_info
+        Retrieve the variableOrder list from depositor_setup_info.data_profile
          Example data structure:
           {"dataset":{
               "rowCount":6610,
@@ -463,16 +463,18 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
         :param as_indices, if True, return [0, 1, 2], etc.
         """
-        if not self.variable_info:
-            return err_resp('Profile not available. (variable_info:1)')
+        if not self.depositor_setup_info or not self.depositor_setup_info.data_profile:
+            return err_resp('Profile not available. (data_profile:1)')
 
-        if 'dataset' not in self.variable_info:
+        data_profile = self.depositor_setup_info.data_profile
+
+        if 'dataset' not in data_profile:
             return err_resp('Dataset information not available in profile. (variable_info:2)')
 
-        if 'variableOrder' not in self.variable_info['dataset']:
+        if 'variableOrder' not in data_profile['dataset']:
             return err_resp('"variableOrder" information not available in profile (variable_info:3')
 
-        variable_order = self.variable_info['dataset']['variableOrder']
+        variable_order = data_profile['dataset']['variableOrder']
 
         if as_indices:
             try:

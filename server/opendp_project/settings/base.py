@@ -305,7 +305,7 @@ assert PROFILER_COLUMN_LIMIT >= 1, 'PROFILER_COLUMN_LIMIT must be at least 1'
 # Epsilon Parameters
 # ---------------------------
 TOTAL_EPSILON_MIN = float(os.environ.get('TOTAL_EPSILON_MIN', '0.001'))
-TOTAL_EPSILON_MAX = float(os.environ.get('TOTAL_EPSILON_MIN', '1.0'))
+TOTAL_EPSILON_MAX = float(os.environ.get('TOTAL_EPSILON_MIN', '3.0'))
 assert TOTAL_EPSILON_MIN > 0, \
     f"The TOTAL_EPSILON_MIN must be greater than 0.0. Found: {TOTAL_EPSILON_MIN}"
 assert TOTAL_EPSILON_MAX > 0, \

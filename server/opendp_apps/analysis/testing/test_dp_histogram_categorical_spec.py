@@ -13,10 +13,8 @@ from opendp_apps.utils.extra_validators import VALIDATE_MSG_FIXED_VAL_NOT_IN_CAT
 from opendp_apps.utils.variable_info_formatter import format_variable_info
 
 
-from unittest import skip
-@skip('Reconfiguring for analyst mode')
 class HistogramCategoricalStatSpecTest(StatSpecTestCase):
-    fixtures = ['test_dataset_data_001.json', ]
+    """Test the DPHistogramCategoricalSpec class"""
 
     def setUp(self):
 
@@ -129,7 +127,7 @@ class HistogramCategoricalStatSpecTest(StatSpecTestCase):
         dp_hist2 = DPHistogramCategoricalSpec(spec_props2)
         self.assertFalse(dp_hist2.is_chain_valid())
 
-        #if not dp_hist.is_chain_valid():
+        # if not dp_hist.is_chain_valid():
         #    print(dp_hist.get_error_messages())
 
     def test_050_test_impute_unknown_fixed_value(self):
@@ -140,7 +138,7 @@ class HistogramCategoricalStatSpecTest(StatSpecTestCase):
         spec_props['fixed_value'] = 'not-a-known-category'
 
         dp_hist = DPHistogramCategoricalSpec(spec_props)
-        #if not dp_hist.is_chain_valid(): print(dp_hist.get_error_messages())
+        # if not dp_hist.is_chain_valid(): print(dp_hist.get_error_messages())
 
         self.assertFalse(dp_hist.is_chain_valid())
         self.assertTrue(dp_hist.get_single_err_msg().find(VALIDATE_MSG_FIXED_VAL_NOT_IN_CATEGORIES) > -1)

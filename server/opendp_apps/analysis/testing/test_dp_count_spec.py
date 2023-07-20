@@ -1,6 +1,5 @@
 import json
 from os.path import abspath, dirname, isfile, join
-from unittest import skip
 
 from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
 from opendp_apps.analysis.tools.dp_count_spec import DPCountSpec
@@ -11,9 +10,8 @@ CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
 
-@skip('Reconfiguring for analyst mode')
 class DPCountStatSpecTest(StatSpecTestCase):
-    fixtures = ['test_dataset_data_001.json', ]
+    """Test the DPCountSpec class"""
 
     def test_05_valid_noise_mechanism(self):
         """Check for the correct noise_mechanism"""
