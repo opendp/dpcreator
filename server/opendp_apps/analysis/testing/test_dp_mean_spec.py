@@ -10,13 +10,12 @@ from opendp_apps.utils.extra_validators import *
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
-from unittest import skip
-@skip('Reconfiguring for analyst mode')
+
 class DPMeanStatSpecTest(StatSpecTestCase):
-    fixtures = ['test_dataset_data_001.json', ]
+    """Test the DPMeanSpec class"""
 
     def setUp(self):
-
+        """Set up for the tests"""
         super().setUp()
 
         self.spec_props = {'variable': 'EyeHeight',
@@ -148,7 +147,8 @@ class DPMeanStatSpecTest(StatSpecTestCase):
 
         spec_props = self.spec_props
 
-        for epsilon_val in [1.01, -0.01, 10]:
+        epsilon_too_high = settings.TOTAL_EPSILON_MAX + 0.1
+        for epsilon_val in [epsilon_too_high, -0.01, 10]:
             print(f'> Bad epsilon val: {epsilon_val}')
             spec_props['epsilon'] = epsilon_val
             dp_mean = DPMeanSpec(spec_props)

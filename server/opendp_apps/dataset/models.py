@@ -430,20 +430,22 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
     def get_dataset_size(self) -> BasicResponse:
         """Retrieve the rowCount index from the variable_info -- not always available"""
-        if not self.variable_info:
+        if (not self.depositor_setup_info) or (not self.depositor_setup_info.data_profile):
             return err_resp('Variable info not available')
 
-        if 'dataset' not in self.variable_info:
+        data_profile = self.depositor_setup_info.data_profile
+
+        if 'dataset' not in data_profile:
             return err_resp('Dataset information not available in profile')
 
-        if 'rowCount' not in self.variable_info['dataset']:
+        if 'rowCount' not in data_profile['dataset']:
             return err_resp('"rowCount" information not available in profile.')
 
-        row_count = self.variable_info['dataset']['rowCount']
+        row_count = data_profile['dataset']['rowCount']
         if row_count is None:
             return err_resp('"rowCount" information not available in profile (id:2')
 
-        return ok_resp(self.variable_info['dataset']['rowCount'])
+        return ok_resp(data_profile['dataset']['rowCount'])
 
     def get_variable_order(self, as_indices=False) -> BasicResponse:
         """
@@ -503,21 +505,23 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
         :param var_name - variable name, e.g. "cname" would return 1
         """
-        if not self.variable_info:
+        if not self.depositor_setup_info or not self.depositor_setup_info.data_profile:
             return err_resp('Data profile not available')
 
-        if 'dataset' not in self.variable_info:
+        data_profile = self.depositor_setup_info.data_profile
+
+        if 'dataset' not in data_profile:
             return err_resp('Dataset information not available in profile')
 
-        if 'variableOrder' not in self.variable_info['dataset']:
+        if 'variableOrder' not in data_profile['dataset']:
             return err_resp('"variableOrder" information not available in profile (id:2')
 
-        variable_order = self.variable_info['dataset']['variableOrder']
+        variable_order = data_profile['dataset']['variableOrder']
         if not variable_order:
             return err_resp('Bad "variableOrder" information in profile.')
 
         try:
-            for idx, feature in self.variable_info['dataset']['variableOrder']:
+            for idx, feature in data_profile['dataset']['variableOrder']:
                 if feature == var_name:
                     return ok_resp(idx)
                 elif feature == camel_to_snake(var_name):  # Temp workaround!!!
