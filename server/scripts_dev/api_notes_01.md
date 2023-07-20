@@ -257,7 +257,7 @@ This includes depositor setup info.
 
 ## Create Analysis Plan 
 
-Create an Analysis Plan using a DataSetInfo object. This endpoint may only be used by the user who is specified as the `creator` of the DataSetInfo object.
+Create an Analysis Plan using a DatasetInfo object. This endpoint may only be used by the user who is specified as the `creator` of the DatasetInfo object.
  
 
 - **API endpoint**: `/api/analysis-plan/`
@@ -274,7 +274,7 @@ Create an Analysis Plan using a DataSetInfo object. This endpoint may only be us
     "expiration_date": "2023-07-23"
   }
   ```
-  - **object_id**: UUID of the DataSetInfo object
+  - **object_id**: UUID of the DatasetInfo object
   - **analyst_id**: (optional) UUID of the Analyst, an OpenDP user. If not specified, the `creator` of the DatasetInfo object will be used as the Analyst
   - **name**: string, name of the new AnalysisPlan
   - **description**: (optional) string, description of the new AnalysisPlan
@@ -283,7 +283,7 @@ Create an Analysis Plan using a DataSetInfo object. This endpoint may only be us
 - Response example:
   - Notes:
     - `object_id` is the UUID of the new AnalysisPlan
-    - `variable_info` has been copied from `DataSetInfo.DepositorSetupInfo.variable_info`
+    - `variable_info` has been copied from `DatasetInfo.DepositorSetupInfo.variable_info`
     - `dp_statistics` is empty
     - `release_info` is empty
 ```json

@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.urls import path
 
 from .models import \
-    (DepositorSetupInfo, DataSetInfo, DataverseFileInfo, UploadFileInfo)
+    (DepositorSetupInfo, DatasetInfo, DataverseFileInfo, UploadFileInfo)
 
 
 class DepositorSetupInfoAdmin(admin.ModelAdmin):
@@ -27,7 +27,7 @@ class DepositorSetupInfoAdmin(admin.ModelAdmin):
                        'updated',)
 
 
-class DataSetInfoAdmin(admin.ModelAdmin):
+class DatasetInfoAdmin(admin.ModelAdmin):
     change_list_template = "admin/dataset/datasetinfo_change_list.html"
 
     save_on_top = True
@@ -125,7 +125,7 @@ class UploadFileInfoAdmin(admin.ModelAdmin):
                        'updated',)
 
 
-admin.site.register(DataSetInfo, DataSetInfoAdmin)
+admin.site.register(DatasetInfo, DatasetInfoAdmin)
 admin.site.register(DataverseFileInfo, DataverseFileInfoAdmin)
 admin.site.register(UploadFileInfo, UploadFileInfoAdmin)
 admin.site.register(DepositorSetupInfo, DepositorSetupInfoAdmin)

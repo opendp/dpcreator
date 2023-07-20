@@ -60,8 +60,8 @@ class AnalysisPlanViewSet(BaseModelViewSet):
             return Response(get_json_error(user_msg),
                             status=status.HTTP_400_BAD_REQUEST)
 
-        # Is there a related DataSetInfo where the logged in user is the
-        #   DataSetInfo creator?
+        # Is there a related DatasetInfo where the logged in user is the
+        #   DatasetInfo creator?
         #
         dsi_info = ois.get_dataset_info_with_user_check(request.user)
         if not dsi_info.success:
@@ -140,7 +140,7 @@ class AnalysisPlanViewSet(BaseModelViewSet):
 
     def delete(self, request, *args, **kwargs):
         """
-        Allow the Analyst or DataSetInfo.creator to delete an AnalysisPlan object.
+        Allow the Analyst or DatasetInfo.creator to delete an AnalysisPlan object.
         If an associated ReleaseInfo exists, delete is not allowed
         """
         analysis_plan = self.get_object()

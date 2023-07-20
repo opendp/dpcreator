@@ -36,7 +36,7 @@ class Command(BaseCommand):
 
         models_to_clear = [('terms_of_access', ['TermsOfAccessLog']),
                            ('analysis', ['AnalysisPlan', 'ReleaseInfo', ]),
-                           ('dataset', ['DepositorSetupInfo', 'UploadFileInfo', 'DataverseFileInfo', 'DataSetInfo']),
+                           ('dataset', ['DepositorSetupInfo', 'UploadFileInfo', 'DataverseFileInfo', 'DatasetInfo']),
                            ('dataverses', ['DataverseHandoff']),
                            ]
         user_models = ('user', ['DataverseUser', 'OpenDPUser'])

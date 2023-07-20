@@ -132,7 +132,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
 
     @property
     def dataset_size(self):
-        """Return the dataset_size from the DataSetInfo.variable_info"""
+        """Return the dataset_size from the DatasetInfo.variable_info"""
         ds_info = self.get_dataset_info()
 
         dataset_size_info = ds_info.get_dataset_size()
@@ -174,7 +174,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
 
     def get_dataset_info(self):
         """
-        Access a DataSetInfo object, either dataversefileinfo or uploadfileinfo
+        Access a DatasetInfo object, either dataversefileinfo or uploadfileinfo
         # Workaround for https://github.com/opendp/dpcreator/issues/257
         """
         if hasattr(self, 'ds_info'):
@@ -285,7 +285,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
             return None
 
 
-class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
+class DatasetInfo(TimestampedModelWithUUID, PolymorphicModel):
     """
     Base type for table that either holds DV data
     or a file upload
@@ -359,7 +359,7 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
     def save(self, *args, **kwargs):
         """Make sure there is a DepositorSetupInfo object"""
-        # print('DataSetInfo.save()')
+        # print('DatasetInfo.save()')
         initial_link_of_depositor_setup_info = False
         if not self.depositor_setup_info:
             # Set default DepositorSetupInfo object
@@ -372,7 +372,7 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         # All other models will be updated without this step due to the auto_now option from the parent class.
         self.updated = timezone.now()
 
-        super(DataSetInfo, self).save(*args, **kwargs)
+        super(DatasetInfo, self).save(*args, **kwargs)
 
         if initial_link_of_depositor_setup_info is True:
             # Save again to correct set the user_step on the DepositorSetupInfo object
@@ -417,21 +417,10 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
         return isinstance(self.get_real_instance(), UploadFileInfo)
 
-    # def get_depositor_setup_info(self):
-    #    """Hack; need to address https://github.com/opendp/dpcreator/issues/257"""
-    #    try:
-    #        return self.get_real_instance().depositor_setup_info
-    #    except AttributeError as err_obj:
-    #        user_msg = (f'Unknown DataSetinfo type. No access to depositor_setup_info.'
-    #                    f' depositor_setup_info. class:'
-    #                    f' {self.get_real_instance().__class__}. err: {err_obj}')
-    #        logger.error(user_msg)
-    #       raise AttributeError(user_msg)
-
     def get_dataset_size(self) -> BasicResponse:
         """Retrieve the rowCount index from the variable_info -- not always available"""
         if (not self.depositor_setup_info) or (not self.depositor_setup_info.data_profile):
-            return err_resp('Variable info not available')
+            return err_resp('depositor_setup_info.data_profile info not available')
 
         data_profile = self.depositor_setup_info.data_profile
 
@@ -535,7 +524,7 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         return err_resp(f'Index not found for variable "{var_name}"')
 
     def get_profile_variables(self):
-        """Return the data profile and DataSetInfo object_id as an OrderedDict or None."""
+        """Return the data profile and DatasetInfo object_id as an OrderedDict or None."""
         if not self.variable_info:
             return None
 
@@ -578,7 +567,7 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
     def is_dataverse_dataset(self) -> bool:
         """Shortcut to check if it's a Dataverse dataset"""
-        return self.source == DataSetInfo.SourceChoices.Dataverse
+        return self.source == DatasetInfo.SourceChoices.Dataverse
 
     def get_dataverse_user(self):
         """
@@ -605,7 +594,7 @@ class DataSetInfo(TimestampedModelWithUUID, PolymorphicModel):
         return self.depositor_setup_info.variable_info_view()
 
 
-class DataverseFileInfo(DataSetInfo):
+class DataverseFileInfo(DatasetInfo):
     """
     Refers to a DV file from within a DV dataset
     """
@@ -637,7 +626,7 @@ class DataverseFileInfo(DataSetInfo):
         if not self.name:
             self.name = f'{self.dataset_doi} ({self.dv_installation})'
 
-        self.source = DataSetInfo.SourceChoices.Dataverse
+        self.source = DatasetInfo.SourceChoices.Dataverse
 
         super(DataverseFileInfo, self).save(*args, **kwargs)
 
@@ -669,7 +658,7 @@ class DataverseFileInfo(DataSetInfo):
             return None
 
 
-class UploadFileInfo(DataSetInfo):
+class UploadFileInfo(DatasetInfo):
     """Used to handle files uploaded by the user"""
 
     def get_file_type(self):
@@ -687,7 +676,7 @@ class UploadFileInfo(DataSetInfo):
         #   Note: it's possible for either variable_ranges or variable_categories to be empty, e.g.
         #       depending on the data
         #
-        self.source = DataSetInfo.SourceChoices.UserUpload
+        self.source = DatasetInfo.SourceChoices.UserUpload
 
         super(UploadFileInfo, self).save(*args, **kwargs)
 
@@ -717,7 +706,7 @@ class UploadFileInfo(DataSetInfo):
 # ----------------------------------------------------------------------
 # post_delete used for removing depositor_setup_info OneToOneField's
 # ----------------------------------------------------------------------
-@receiver(post_delete, sender=DataSetInfo)
+@receiver(post_delete, sender=DatasetInfo)
 def post_delete_depositor_info_from_dataset_info(sender, instance, *args, **kwargs):
     # Delete the DepositorSetupInfo object -- a OneToOneField
     try:

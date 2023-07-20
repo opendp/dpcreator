@@ -5,7 +5,7 @@ from django.test.testcases import TestCase
 
 from rest_framework.test import APIClient
 
-from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dataset.models import DatasetInfo
 from opendp_apps.model_helpers.msg_util import msgt
 
 from borb.pdf.document import Document
@@ -31,7 +31,7 @@ class TestRunRelease(TestCase):
 
         self.client.force_login(self.user_obj)
 
-        dataset_info = DataSetInfo.objects.get(id=4)
+        dataset_info = DatasetInfo.objects.get(id=4)
         # self.add_source_file(dataset_info, 'Fatigue_data.tab', True)
 
     def test_10_compute_stats(self):
@@ -53,7 +53,7 @@ class TestRunRelease(TestCase):
                              font_color=HexColor("#86CD82")))
 
         # ----------------------------------
-        dataset_info = DataSetInfo.objects.get(id=4)
+        dataset_info = DatasetInfo.objects.get(id=4)
 
         import io
         from django.core.files.base import ContentFile

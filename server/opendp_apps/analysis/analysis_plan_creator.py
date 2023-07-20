@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.exceptions import EpsilonNotSetException, AllottedEpsilonExceedsLimit
 from opendp_apps.analysis.models import AnalysisPlan
-from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dataset.models import DatasetInfo
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from django.utils.timezone import make_aware
 
@@ -16,7 +16,7 @@ class AnalysisPlanCreator(BasicErrCheck):
     def __init__(self, opendp_user: get_user_model(), plan_info: dict):
         """Create an AnalysisPlan object"""
 
-        # DataSetInfo.object_id (not AnalysisPlan.object_id)
+        # DatasetInfo.object_id (not AnalysisPlan.object_id)
         #
         self.dataset_object_id = plan_info.get('object_id')
         self.opendp_user = opendp_user
@@ -59,12 +59,12 @@ class AnalysisPlanCreator(BasicErrCheck):
             return
 
         # -------------------------------
-        # Retrieve the DataSetInfo object and make sure setup is complete
+        # Retrieve the DatasetInfo object and make sure setup is complete
         # -------------------------------
         try:
-            self.dataset_info = DataSetInfo.objects.get(object_id=self.dataset_object_id,
+            self.dataset_info = DatasetInfo.objects.get(object_id=self.dataset_object_id,
                                                         creator=self.opendp_user)
-        except DataSetInfo.DoesNotExist:
+        except DatasetInfo.DoesNotExist:
             self.add_err_msg(astatic.ERR_MSG_NO_DATASET)
             return
 
@@ -162,7 +162,7 @@ class AnalysisPlanCreator(BasicErrCheck):
         self.analysis_plan.save()
 
     @staticmethod
-    def get_available_epsilon(dataset: DataSetInfo) -> float:
+    def get_available_epsilon(dataset: DatasetInfo) -> float:
         """
         Get the available epsilon for a dataset by totaling epsilon allotted to AnalysisPlans
         """

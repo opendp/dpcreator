@@ -11,7 +11,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.test import TestCase
 
 from opendp_apps.dataset import static_vals as dstatic
-from opendp_apps.dataset.models import DataSetInfo, UploadFileInfo
+from opendp_apps.dataset.models import DatasetInfo, UploadFileInfo
 from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import static_vals as pstatic
@@ -185,9 +185,9 @@ class ProfilerTest(TestCase):
         print('-- filepath is readable', filepath)
         self.assertTrue(isfile(filepath))
 
-        # Retrieve DataSetInfo, save the file to this object
+        # Retrieve DatasetInfo, save the file to this object
         #
-        dsi = DataSetInfo.objects.get(object_id=self.test_file_info.object_id)
+        dsi = DatasetInfo.objects.get(object_id=self.test_file_info.object_id)
         self.assertEqual(dsi.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_0000_INITIALIZED)
 
@@ -208,7 +208,7 @@ class ProfilerTest(TestCase):
         # print(profile_json_str1)
 
         # Re-retrieve object and data profile
-        dsi = DataSetInfo.objects.get(object_id=dsi.object_id)
+        dsi = DatasetInfo.objects.get(object_id=dsi.object_id)
         info = dsi.depositor_setup_info.data_profile_as_dict()
         print('end step:', dsi.depositor_setup_info.user_step)
         self.assertEqual(dsi.depositor_setup_info.user_step,
@@ -218,7 +218,7 @@ class ProfilerTest(TestCase):
         self.assertTrue('variables' in info)
         self.assertEqual(len(info['variables'].keys()), settings.PROFILER_COLUMN_LIMIT)
 
-        print('-- Profiler output is the same as the output saved to the DataSetInfo object')
+        print('-- Profiler output is the same as the output saved to the DatasetInfo object')
         profile_json_str2 = json.dumps(info, cls=DjangoJSONEncoder, indent=4)
         self.assertTrue(profile_json_str1, profile_json_str2)
         # print(profile_json_str2)
@@ -260,9 +260,9 @@ class ProfilerTest(TestCase):
         """(30) Test with empty file field"""
         msgt(self.test_30_filefield_empty.__doc__)
 
-        # Retrieve DataSetInfo
+        # Retrieve DatasetInfo
         #
-        dsi = DataSetInfo.objects.get(object_id=self.test_file_info.object_id)
+        dsi = DatasetInfo.objects.get(object_id=self.test_file_info.object_id)
         self.assertEqual(dsi.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_0000_INITIALIZED)
 
@@ -276,8 +276,8 @@ class ProfilerTest(TestCase):
         self.assertTrue(profiler.has_error())
         self.assertTrue(pstatic.ERR_MSG_SOURCE_FILE_DOES_NOT_EXIST in profiler.get_err_msg())
 
-        # Retrieve the saved DataSetInfo, the DepositorSetupInfo should have a new status
-        dsi2 = DataSetInfo.objects.get(object_id=self.test_file_info.object_id)
+        # Retrieve the saved DatasetInfo, the DepositorSetupInfo should have a new status
+        dsi2 = DatasetInfo.objects.get(object_id=self.test_file_info.object_id)
         self.assertEqual(dsi2.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
 
@@ -285,7 +285,7 @@ class ProfilerTest(TestCase):
         """(35) Not a Django FieldFile"""
         msgt(self.test_35_not_filefield.__doc__)
 
-        dsi = DataSetInfo.objects.get(object_id=self.test_file_info.object_id)
+        dsi = DatasetInfo.objects.get(object_id=self.test_file_info.object_id)
 
         params = {pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD: True,
                   pstatic.KEY_DATASET_OBJECT_ID: dsi.object_id,
@@ -297,8 +297,8 @@ class ProfilerTest(TestCase):
         self.assertTrue(profiler.has_error())
         self.assertTrue(pstatic.ERR_MSG_DATASET_POINTER_NOT_FIELDFILE in profiler.get_err_msg())
 
-        # Retrieve the saved DataSetInfo, the DepositorSetupInfo should have a new status
-        dsi2 = DataSetInfo.objects.get(object_id=self.test_file_info.object_id)
+        # Retrieve the saved DatasetInfo, the DepositorSetupInfo should have a new status
+        dsi2 = DatasetInfo.objects.get(object_id=self.test_file_info.object_id)
         self.assertEqual(dsi2.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_9300_PROFILING_FAILED)
 
@@ -306,14 +306,14 @@ class ProfilerTest(TestCase):
         """(40) Test using filefield with legit file"""
         msgt(self.test_40_filefield_correct.__doc__)
 
-        # Retrieve DataSetInfo
+        # Retrieve DatasetInfo
         #
-        dsi = DataSetInfo.objects.get(object_id=self.test_file_info.object_id)
+        dsi = DatasetInfo.objects.get(object_id=self.test_file_info.object_id)
         self.assertEqual(dsi.depositor_setup_info.user_step,
                          DepositorSetupInfo.DepositorSteps.STEP_0000_INITIALIZED)
 
         # --------------------------------------------------
-        # Attach the file to the DataSetInfo's file field
+        # Attach the file to the DatasetInfo's file field
         # --------------------------------------------------
         filename = 'fearonLaitin.csv'
         filepath = join(TEST_DATA_DIR, filename)
@@ -332,9 +332,9 @@ class ProfilerTest(TestCase):
         self.assertTrue(profiler.has_error() is False)
         self.assertEqual(profiler.num_variables, settings.PROFILER_COLUMN_LIMIT)
 
-        # Re-retrieve DataSetInfo
+        # Re-retrieve DatasetInfo
         #
-        dsi2 = DataSetInfo.objects.get(object_id=self.test_file_info.object_id)
+        dsi2 = DatasetInfo.objects.get(object_id=self.test_file_info.object_id)
 
         info = dsi2.depositor_setup_info.data_profile_as_dict()
 
@@ -491,6 +491,6 @@ class ProfilerTest(TestCase):
         print(profile_resp.status_code)
         print('resp', json.dumps(profile_resp.json(), indent=2))
         self.assertEqual(profile_resp.status_code, HTTPStatus.BAD_REQUEST)
-        self.assertTrue(profile_resp.json()['message'].find('The DataSetInfo source file is not available') > -1)
+        self.assertTrue(profile_resp.json()['message'].find('The DatasetInfo source file is not available') > -1)
         
 

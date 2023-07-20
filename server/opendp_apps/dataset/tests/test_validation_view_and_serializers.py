@@ -10,7 +10,7 @@ from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.analysis_plan_util import AnalysisPlanUtil
 from opendp_apps.analysis.models import AnalysisPlan
 from opendp_apps.analysis.serializers import ReleaseValidationSerializer
-from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dataset.models import DatasetInfo
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.profiler import tasks as profiler_tasks
 from opendp_apps.utils.extra_validators import VALIDATE_MSG_EPSILON
@@ -33,7 +33,7 @@ class TestValidationViewAndSerializers(TestCase):
 
         self.client.force_login(self.user_obj)
 
-        dataset_info = DataSetInfo.objects.get(id=4)
+        dataset_info = DatasetInfo.objects.get(id=4)
 
         plan_info = AnalysisPlanUtil.create_plan(dataset_info.object_id, self.user_obj)
         self.assertTrue(plan_info.success)
@@ -57,7 +57,7 @@ class TestValidationViewAndSerializers(TestCase):
                                   "label": "EyeHeight"
                                   }
 
-    def add_source_file(self, dataset_info: DataSetInfo, filename: str, add_profile: bool = False) -> DataSetInfo:
+    def add_source_file(self, dataset_info: DatasetInfo, filename: str, add_profile: bool = False) -> DatasetInfo:
         """Add a source file -- example...
         - filepath - file under dpcreator/test_data
         """
@@ -86,14 +86,14 @@ class TestValidationViewAndSerializers(TestCase):
             self.assertTrue(profile_handler.has_error() is False)
 
         # re-retrieve it...
-        return DataSetInfo.objects.get(object_id=dataset_info.object_id)
+        return DatasetInfo.objects.get(object_id=dataset_info.object_id)
 
     def test_05_api_fail_not_logged_in(self):
         """(5) Test API fail, not logged in"""
         msgt(self.test_05_api_fail_not_logged_in.__doc__)
 
         client = APIClient()
-        dataset_info = DataSetInfo.objects.get(id=4)
+        dataset_info = DatasetInfo.objects.get(id=4)
         AnalysisPlanUtil.create_plan(dataset_info.object_id, self.user_obj)
         analysis_plan = AnalysisPlan.objects.first()
 
@@ -115,7 +115,7 @@ class TestValidationViewAndSerializers(TestCase):
         other_user_obj, _created = get_user_model().objects.get_or_create(username='test_user')
         new_client.force_login(other_user_obj)
 
-        dataset_info = DataSetInfo.objects.get(id=4)
+        dataset_info = DatasetInfo.objects.get(id=4)
         AnalysisPlanUtil.create_plan(dataset_info.object_id, self.user_obj)
         analysis_plan = AnalysisPlan.objects.first()
 
@@ -707,7 +707,7 @@ class TestValidationViewAndSerializers(TestCase):
 
     @skip
     def test_70_show_add_file(self):
-        """(70) Sample of attaching file to a DataSetInfo object"""
+        """(70) Sample of attaching file to a DatasetInfo object"""
         msgt(self.test_70_show_add_file.__doc__)
 
         analysis_plan = self.analysis_plan

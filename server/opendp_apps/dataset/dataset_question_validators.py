@@ -1,5 +1,5 @@
 """
-Validators used by DataSetInfo fields
+Validators used by DatasetInfo fields
 """
 from django.core.exceptions import ValidationError
 from typing import Union
@@ -46,7 +46,7 @@ def validate_dataset_questions(value: Union[dict, None, str], to_set_user_step=F
 
 def validate_epsilon_questions(value: Union[dict, None, str], to_set_user_step=False):
     """
-    Check that the object_id belongs to an existing DataSetInfo object
+    Check that the object_id belongs to an existing DatasetInfo object
     @param value: dict of epsilon questions
     @param to_set_user_step: boolean, if True, then values may not include empty strings
 
