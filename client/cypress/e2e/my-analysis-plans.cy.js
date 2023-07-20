@@ -57,10 +57,13 @@
 
                 cy.get('[data-test="selectPlanAnalyst"]').click()
                 cy.findByText('oscar').click();
+                cy.get('[data-test="inputPlanName"]').type('my cypress test plan')
+                cy.get('[data-test="inputPlanName"]').type('my cypress test desc')
                 cy.get('[data-test="inputPlanBudget"]').type('0.1')
                 cy.get('[data-test="createPlanSubmitButton"]').click({force:true})
-                cy.pause()
+                cy.get('td').should('contain', 'Fatigue_data.csv')
 
+                cy.pause()
 
 
 
@@ -97,7 +100,7 @@
 
                     })
 
-                    cy.intercept('GET', '/api/analyze/', {
+                    cy.intercept('GET', '/api/analysis-plan/', {
                         body: {
                             "count": 1,
                             "next": null,
@@ -105,7 +108,7 @@
                             "results": analysisPlanList.plans
                         }
                     })
-                cy.intercept('DELETE', '/api/analyze/'+ analysisPlanList.plans[0].objectId, {
+                cy.intercept('DELETE', '/api/analysis-plan/'+ analysisPlanList.plans[0].objectId, {
                   statusCode: 200
                 }).as('deletePlan')
                     cy.visit('/my-plans')
@@ -114,7 +117,7 @@
                     analysisPlanList.plans.forEach(plan => {
                         cy.get('[data-test="my-plans-table"]').should('contain.text', plan.datasetName)
                     })
-                const deleteId = 'delete' + analysisPlanList.plans[0].planName
+                const deleteId = 'delete' + analysisPlanList.plans[0].name
                 cy.get('[data-test="'+deleteId+'"]').click({force: true})
                 cy.get('[data-test="deleteAnalysisConfirm"]').click({force: true})
                 cy.wait('@deletePlan').its('response.statusCode').should('eq', 200)
@@ -164,7 +167,7 @@
                             "results": [dataset]
                         }
                     })
-                    cy.intercept('GET', '/api/analyze/', {
+                    cy.intercept('GET', '/api/analysis-plan/', {
                         body: {
                             "count": 1,
                             "next": null,

@@ -1,5 +1,6 @@
 import {wrappedSession} from './session';
 import caseConversion from "@/shared/caseConversion";
+import {STEP_1300_EXPIRED} from "@/data/stepInformation";
 
 
 const camelcaseKeys = require('camelcase-keys');
@@ -57,35 +58,43 @@ export default {
             .then(resp => camelcaseKeys(resp.data, {deep: true}))
     },
     getUserAnalysisPlans() {
-        return wrappedSession.get('/api/analyze/')
-           /* .then(resp => {
+        return wrappedSession.get('/api/analysis-plan/')
+            .then(resp => {
 
                 if (resp.data.results) {
                     const modifiedResults = resp.data.results.map((obj) => {
                         // copy wizard_step into user_step
-                        obj.depositor_setup_info.user_step = obj.depositor_setup_info.wizard_step;
-                        console.log('setting status to ' + obj.depositor_setup_info.wizard_step)
-                        obj.status = obj.depositor_setup_info.wizard_step;
+                        if (obj.isExpired && !obj.isCompleted) {
+                            obj.user_step = STEP_1300_EXPIRED
+                        }
+                        else if( obj.wizard_step) {
+                            obj.user_step = obj.wizard_step;
+                            console.log('setting status to ' + obj.wizard_step)
+                            obj.status = obj.wizard_step;
+                        }
                         return obj;
                     });
                     resp.data.results = modifiedResults
                 }
                 return resp;
-            }) */
+            })
             .then(resp => camelcaseKeys(resp, {deep: true}))
 
     },
     getAnalysisPlan(analysisId) {
-        return wrappedSession.get('/api/analyze/' + analysisId + '/')
+        return wrappedSession.get('/api/analysis-plan/' + analysisId + '/')
             .then(resp => camelcaseKeys(resp.data, {deep: true}))
     },
     patchAnalysisPlan(objectId, props) {
+        if (props.userStep) {
+            props.wizardStep = props.userStep
+        }
         const snakeProps = caseConversion.customSnakecaseKeys(props)
-        return wrappedSession.patch('/api/analyze/' + objectId + '/',
+        return wrappedSession.patch('/api/analysis-plan/' + objectId + '/',
             snakeProps)
     },
     deleteAnalysisPlan(analysisId) {
-        return wrappedSession.delete('/api/analyze/' + analysisId + '/')
+        return wrappedSession.delete('/api/analysis-plan/' + analysisId + '/')
     }
 
 };

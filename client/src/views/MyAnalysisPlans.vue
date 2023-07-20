@@ -87,6 +87,7 @@
                         v-on:change="setMaxBudget()"
                     ></v-select>
                     <v-text-field data-test="inputPlanName" v-model="newPlan.planName" label="Plan Name"></v-text-field>
+                    <v-text-field data-test="inputPlanDescription" v-model="newPlan.description" label="Description"></v-text-field>
                     <v-select
                         data-test="selectPlanAnalyst"
                         v-model="newPlan.analystId"
@@ -96,7 +97,11 @@
                         item-value="objectId"
                     ></v-select>
                     <div class="budget-row">
-                        <v-text-field data-test="inputPlanBudget"  :rules="[validateBudgetRule]" v-model="newPlan.budget" label="Budget"></v-text-field>
+                        <v-text-field
+                            data-test="inputPlanBudget"
+                            :rules="[validateBudgetRule]"
+                            v-model="newPlan.budget"
+                            label="Budget"></v-text-field>
                         <div class="max-budget" v-if="maxBudget > 0">
                             <span class="help-text">(Max Budget: {{maxBudget}})</span>
                         </div>
@@ -107,7 +112,7 @@
                 </v-card-text>
 
                 <v-card-actions>
-                    <v-btn data-test="createPlanSubmitButton" color="primary" @click="createPlan">Create</v-btn>
+                    <v-btn :disabled="isSubmitDisabled" data-test="createPlanSubmitButton" color="primary" @click="createPlan">Create</v-btn>
                     <v-btn color="secondary" @click="closeDialog">Cancel</v-btn>
                 </v-card-actions>
             </v-card>
@@ -161,6 +166,16 @@ export default {
 
     computed: {
         ...mapState('dataset', ['analysisPlanList',"datasetList"]),
+        isSubmitDisabled() {
+            return (
+                !this.newPlan.datasetId ||
+                !this.newPlan.planName ||
+                !this.newPlan.analystId ||
+                !this.newPlan.budget ||
+                !this.newPlan.expirationDate
+            );
+        },
+
 
     },
     data: () => ({
@@ -171,36 +186,42 @@ export default {
         maxBudget: 0,
         createDialogVisible: false,
         newPlan: {
-            datasetId: null, // Store the selected dataset ID
-            description: "",
-            planName: "",
-            analystId: "",
-            budget: "",
-            expirationDate: getDefaultExpirationDate()
+            datasetId: null,
+            planName: null,
+            description: null,
+            analystId: null,
+            expirationDate: getDefaultExpirationDate(),
+            budget: null,
         }
 
     }),
     methods: {
+        resetPlan() {
+            this.newPlan.datasetId = null
+            this.newPlan.planName = null
+            this.newPlan.analystId = null
+            this.newPlan.budget = null
+            this.newPlan.description =null
+            this.newPlan.expirationDate = getDefaultExpirationDate()
+        },
         validateBudgetRule(value) {
-            return (value && value <= this.maxBudget) ||
+            console.log('newPlan.datasetId: ' + this.newPlan.datasetId)
+            console.log('value:' + value)
+            console.log('this.maxBudget:'+ this.maxBudget)
+            return (this.newPlan.datasetId == null  ||( value  && value <= this.maxBudget)) ||
              "Budget must be less than Max Budget." // Invalid budget input
         },
         openDialog() {
             console.log('openDialog')
+            this.resetPlan()
             this.createDialogVisible = true;
         },
 
         closeDialog() {
+            this.resetPlan()
             this.createDialogVisible = false;
             // Reset newPlan object
-            this.newPlan = {
-                datasetId: "",
-                datasetName: "",
-                planName: "",
-                analystId: "",
-                expirationDate: getDefaultExpirationDate(),
-                budget: "",
-            };
+
         },
         setMaxBudget( ) {
             let selectedDatasetBudget = 0;
@@ -209,17 +230,21 @@ export default {
                 if (dataset.objectId === this.newPlan.datasetId){
                     selectedDatasetBudget = dataset.depositorSetupInfo.epsilon
                     dataset.analysisPlans.forEach(plan =>{
+                        console.log('plan.epsilon: ' + plan.epsilon)
                         spentBudget += plan.epsilon
+                        console.log('spentBudget: ' + spentBudget)
                     })
                 }
             })
+            console.log('spentBudget: ' + spentBudget+", selectedDatasetBudget: "+selectedDatasetBudget)
             this.maxBudget = selectedDatasetBudget - spentBudget
         },
         createPlan() {
             console.log("calling create plan  with newPlan = " + JSON.stringify(this.newPlan))
             console.log('this.newPlan.budget: ' + this.newPlan.budget)
             this.newPlan.description = 'my description'
-            this.newPlan.planName = 'my plan name'
+            this.newPlan.budget = Number(this.newPlan.budget)
+
             this.$store.dispatch('dataset/createAnalysisPlan',
                this.newPlan)
 

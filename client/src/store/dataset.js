@@ -203,7 +203,7 @@ const actions = {
         console.log('store/dataset.js createAnalysisPlan, props = ' + JSON.stringify(props))
         return analysis.createAnalysisPlan(props.datasetId,props.analystId, props.budget, props.description, props.planName, props.expirationDate)
             .then((resp) => {
-                commit('SET_ANALYSIS_PLAN', resp)
+                this.dispatch('dataset/setAnalysisPlanList')
             }).catch((error) => {
                 console.log(error.response.data);
                 console.log(error.response.status);
