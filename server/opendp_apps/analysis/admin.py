@@ -20,6 +20,9 @@ class AnalysisPlanAdmin(admin.ModelAdmin):
                     'created',)
     readonly_fields = ('id',
                        'object_id',
+                       'dataset',
+                       'analyst',
+                       'release_info',
                        'is_complete',
                        'variable_info_display',
                        'created',
