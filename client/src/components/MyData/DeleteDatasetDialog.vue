@@ -43,27 +43,25 @@ export default {
   props: ["dialogDelete", "datasetInfo", "analysisPlan"],
   methods: {
     deleteConfirm() {
-
+      /*
       if (this.analysisPlan !== null) {
         const payload = {
-          datasetId: this.datasetInfo.objectId,
+          datasetId: this.objectId,
           analysisPlanId: this.analysisPlan.objectId
         }
-        this.$store.dispatch('dataset/deleteAnalysisPlan', payload)
+       this.$store.dispatch('dataset/deleteAnalysisPlan', payload)
       } else {
-        this.$store.dispatch('dataset/deleteDataset', this.datasetInfo.objectId)
+        this.$store.dispatch('dataset/deleteDataset', this.objectId)
       }
+   */
+      this.$store.dispatch('dataset/deleteDataset', this.datasetInfo.objectId)
       this.closeDelete();
     },
     closeDelete() {
       this.$emit("close")
     },
     datasetInfoName() {
-      let name = ""
-      if (this.datasetInfo !== null) {
-        name = this.datasetInfo.name
-      }
-      return name
+     return this.datasetInfo.name
     }
   }
 };
