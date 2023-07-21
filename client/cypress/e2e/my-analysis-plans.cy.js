@@ -10,7 +10,66 @@
 
 
         })
-        it('deletes analysis plan', () => {
+        it('creates new Analysis Plan (e2e test)', () => {
+            cy.on('uncaught:exception', (e, runnable) => {
+                console.log('error', e)
+                console.log('runnable', runnable)
+                return false
+            })
+
+            cy.clearData()
+            let testFile = 'cypress/fixtures/Fatigue_data.csv'
+            cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
+            cy.uploadFile(testFile)
+            const selectVariables =  {
+                "typingSpeed": {
+                    "max": 25,
+                    "min": 10,
+                    "name": "TypingSpeed",
+                    "type": "Float",
+                    "label": "TypingSpeed",
+                    "selected": true,
+                    "sortOrder": 5
+                },
+                "blinkDuration": {
+                    "max": 35,
+                    "min": 10,
+                    "name": "BlinkDuration",
+                    "type": "Float",
+                    "label": "",
+                    "sortOrder": 12
+                }}
+            cy.fixture('EyeDemoData.json').then((demoData) => {
+                cy.url().should('contain', 'my-data')
+                cy.goToConfirmVariables(selectVariables)
+                // select the variables we will use
+                cy.selectVariable(selectVariables)
+                cy.get('[data-test="wizardCompleteButton"]').click({force:true})
+                cy.url().should('contain','my-data')
+                cy.visit('/my-plans')
+                //createPlanButton
+                cy.get('[data-test="createPlanButton"]').click({force:true})
+                cy.get('[data-test="selectPlanDataset"]').click();
+
+                // Find and click the desired dataset option within the dropdown
+                cy.findByText('Fatigue_data.csv').click();
+
+
+                cy.get('[data-test="selectPlanAnalyst"]').click()
+                cy.findByText('oscar').click();
+                cy.get('[data-test="inputPlanName"]').type('my cypress test plan')
+                cy.get('[data-test="inputPlanName"]').type('my cypress test desc')
+                cy.get('[data-test="inputPlanBudget"]').type('0.1')
+                cy.get('[data-test="createPlanSubmitButton"]').click({force:true})
+                cy.get('td').should('contain', 'Fatigue_data.csv')
+
+                cy.pause()
+
+
+
+            })
+        })
+        it('calls delete analysis plan API', () => {
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
                 console.log('runnable', runnable)
@@ -41,7 +100,7 @@
 
                     })
 
-                    cy.intercept('GET', '/api/analyze/', {
+                    cy.intercept('GET', '/api/analysis-plan/', {
                         body: {
                             "count": 1,
                             "next": null,
@@ -49,7 +108,7 @@
                             "results": analysisPlanList.plans
                         }
                     })
-                cy.intercept('DELETE', '/api/analyze/'+ analysisPlanList.plans[0].objectId, {
+                cy.intercept('DELETE', '/api/analysis-plan/'+ analysisPlanList.plans[0].objectId, {
                   statusCode: 200
                 }).as('deletePlan')
                     cy.visit('/my-plans')
@@ -58,7 +117,7 @@
                     analysisPlanList.plans.forEach(plan => {
                         cy.get('[data-test="my-plans-table"]').should('contain.text', plan.datasetName)
                     })
-                const deleteId = 'delete' + analysisPlanList.plans[0].planName
+                const deleteId = 'delete' + analysisPlanList.plans[0].name
                 cy.get('[data-test="'+deleteId+'"]').click({force: true})
                 cy.get('[data-test="deleteAnalysisConfirm"]').click({force: true})
                 cy.wait('@deletePlan').its('response.statusCode').should('eq', 200)
@@ -77,7 +136,6 @@
 
                 return false
             })
-            let testfile = 'cypress/fixtures/PUMS5extract1000.csv'
             const username = 'kermit'
             const email = 'kermit@thefrog.com'
             const password = 'kermit123!'
@@ -109,7 +167,7 @@
                             "results": [dataset]
                         }
                     })
-                    cy.intercept('GET', '/api/analyze/', {
+                    cy.intercept('GET', '/api/analysis-plan/', {
                         body: {
                             "count": 1,
                             "next": null,

@@ -30,21 +30,24 @@
         <template v-slot:[`item.status`]="{ item }">
             <StatusTag data-test="table status tag" :status="getWorkflowStatus(item)"/>
         </template>
-        <template v-slot:[`item.timeRemaining`]="{ item }">
-            <div v-if="getWorkflowStatus(item) !== 'completed'">
+        <template v-slot:[`item.expirationDate`]="{ item }">
+            <div v-if="!isCompleted(item)">
            <span v-if="isExpired(item)" class='error_status__color--text'>
              Time has expired
            </span>
                 <span v-else>
-             {{ item.timeRemaining }}
+             {{ formatDate(item.expirationDate) }}
            </span>
             </div>
+            <div v-else-if="item.releaseInfo">
+                Release Generated on {{ new Date(item.releaseInfo.created).toDateString() }}
+            </div>
             <div v-else>
-                Release Generated on {{ new Date(item.datasetInfo.created).toDateString() }}
+                Release Completed
             </div>
         </template>
         <template v-slot:[`item.actions`]="{ item }">
-            <div v-if="!isExpired(item)" class="d-flex justify-space-between">
+            <div  class="d-flex justify-space-between">
 
                 <v-tooltip
 
@@ -53,7 +56,7 @@
                         bottom max-width="220px">
                     <template v-slot:activator="{ on, attrs }">
                         <v-icon
-                                :data-test="action+item.planName"
+                                :data-test="action+item.name"
                                 v-bind="attrs"
                                 v-on="on"
                                 class="mr-2"
@@ -244,10 +247,10 @@ export default {
       headers: [
         {value: "num"},
         {text: "Dataset Name", value: "datasetName"},
-        {text: "Plan Name", value: "planName"},
-        {text: "Analyst", value: "analyst"},
-        {text: "Budget", value: "budget"},
-        {text: "Remaining time to complete release", value: "timeRemaining"},
+        {text: "Plan Name", value: "name"},
+        {text: "Analyst", value: "analystName"},
+        {text: "Budget", value: "epsilon"},
+        {text: "Expiration Date", value: "expirationDate"},
         {text: "Status", value: "status"},
         {text: "Options", value: "actions", align: "end"}
 
@@ -272,15 +275,27 @@ export default {
       this.dialogDelete = false
       this.selectedItem = null
     },
-
+    isExpired(item) {
+        return item.isExpired
+    },
+    isCompleted(item) {
+        return item.isCompleted
+    },
     delete(item) {
       this.deleteItem(item)
     },
-    isExpired(item) {
-      return item.timeRemaining === 0 && this.getWorkflowStatus(item) !== 'completed'
-    },
-    formatCreatedTime(created) {
+    formatDate(dateString) {
+        // Step 1: Parse the string into a Date object
+        const dateObj = new Date(dateString);
 
+        // Step 2: Extract the month, day, and year
+        const month = dateObj.toLocaleString('default', {month: 'long'}); // 'July'
+        const day = dateObj.getDate(); // 23
+        const year = dateObj.getFullYear(); // 2023
+
+        // Step 3: Format the extracted values
+        const formattedDate = `${month} ${day}, ${year}`;
+        return formattedDate
     },
     viewDetails(item) {
       this.goToPage(item, `${NETWORK_CONSTANTS.MY_DATA_DETAILS.PATH}`)
@@ -290,6 +305,7 @@ export default {
       this.goToPage(item, `${NETWORK_CONSTANTS.WIZARD.PATH}`)
     },
     getWorkflowStatus(item) {
+        console.log('item.userStep: '+item.userStep)
         const workflowStatus= stepInformation[item.userStep].workflowStatus
         console.log('returning workflowStatus: '+ workflowStatus)
         return workflowStatus
