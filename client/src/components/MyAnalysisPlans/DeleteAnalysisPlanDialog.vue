@@ -56,7 +56,7 @@ export default {
         analysisPlanName() {
             let name = ""
             if (this.analysisPlan !== null) {
-                name = this.analysisPlan.planName
+                name = this.analysisPlan.name
             }
             return name
         }

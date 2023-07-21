@@ -20,7 +20,7 @@
     "epsilonQuestions": null,
     "variableInfo": null,
     "defaultEpsilon": null,
-    "epsilon": null,
+    "epsilon": 0.5,
     "defaultDelta": 0,
     "delta": 0,
     "confidenceLevel": 0.95,

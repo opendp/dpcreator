@@ -12,6 +12,7 @@ export const STEP_0900_STATISTICS_SUBMITTED = 'step_900'
 export const STEP_1000_RELEASE_COMPLETE = 'step_1000'
 export const STEP_1100_DV_RELEASE_DEPOSITED = 'step_1100'
 export const STEP_1200_PROCESS_COMPLETE = 'step_1200'
+export const STEP_1300_EXPIRED = 'step_1300'
 
 // Error statuses should begin with 9
 export const STEP_9100_VALIDATION_FAILED = 'step_9100'
@@ -31,12 +32,14 @@ export const depositorSteps = [
 ]
 
 export const analystSteps = [
+    STEP_0600_EPSILON_SET,
     STEP_0700_VARIABLES_CONFIRMED,
     STEP_0800_STATISTICS_CREATED,
     STEP_0900_STATISTICS_SUBMITTED,
     STEP_1000_RELEASE_COMPLETE,
     STEP_1100_DV_RELEASE_DEPOSITED,
-    STEP_1200_PROCESS_COMPLETE
+    STEP_1200_PROCESS_COMPLETE,
+    STEP_1300_EXPIRED
 ]
 
 // All userSteps that can occur within the wizard stepper.
@@ -119,6 +122,10 @@ export default {
     [STEP_1200_PROCESS_COMPLETE]: {
         workflowStatus: statusInformation.statuses.COMPLETED,
         label: 'Process Complete'
+    },
+    [STEP_1300_EXPIRED]: {
+        workflowStatus: statusInformation.statuses.EXPIRED,
+        label: 'Expired'
     },
     [STEP_9100_VALIDATION_FAILED]: {
         workflowStatus: statusInformation.statuses.ERROR,
