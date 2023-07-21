@@ -124,7 +124,7 @@ export default {
         label: 'Process Complete'
     },
     [STEP_1300_EXPIRED]: {
-        workflowStatus: statusInformation.statuses.ERROR,
+        workflowStatus: statusInformation.statuses.EXPIRED,
         label: 'Expired'
     },
     [STEP_9100_VALIDATION_FAILED]: {

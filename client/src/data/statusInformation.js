@@ -23,6 +23,12 @@ export default {
         icon: "mdi-alert",
         availableActions: ["viewDetails", "delete"]
     },
+    expired: {
+        label: "Plan Expired",
+        color: "red lighten-3",
+        icon: "mdi-alert",
+        availableActions: ["viewDetails", "delete"]
+    },
     setup_complete: {
         label: "Setup Complete",
         color: "light-green lighten-3",
@@ -41,6 +47,7 @@ export default {
         SETUP_COMPLETE: "setup_complete",
         IN_EXECUTION: "in_execution",
         ERROR: "error",
+        EXPIRED: "expired",
         COMPLETED: "completed"
     }
 };
