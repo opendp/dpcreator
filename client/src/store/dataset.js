@@ -204,6 +204,7 @@ const actions = {
         return analysis.createAnalysisPlan(props.datasetId,props.analystId, props.budget, props.description, props.planName, props.expirationDate)
             .then((resp) => {
                 this.dispatch('dataset/setAnalysisPlanList')
+                this.dispatch('dataset/setDatasetList')
             }).catch((error) => {
                 console.log(error.response.data);
                 console.log(error.response.status);

@@ -1,6 +1,6 @@
 import {wrappedSession} from './session';
 import caseConversion from "@/shared/caseConversion";
-import {STEP_1300_EXPIRED} from "@/data/stepInformation";
+import {STEP_0100_UPLOADED, STEP_1300_EXPIRED, STEP_1400_PLAN_CREATED} from "@/data/stepInformation";
 
 
 const camelcaseKeys = require('camelcase-keys');
@@ -66,6 +66,8 @@ export default {
                         // copy wizard_step into user_step
                         if (obj.isExpired && !obj.isCompleted) {
                             obj.user_step = STEP_1300_EXPIRED
+                        } else if (obj.user_step == STEP_0100_UPLOADED) {
+                            obj.user_step = STEP_1400_PLAN_CREATED
                         }
                         else if( obj.wizard_step) {
                             obj.user_step = obj.wizard_step;

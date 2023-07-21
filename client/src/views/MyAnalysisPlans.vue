@@ -203,6 +203,7 @@ export default {
             this.newPlan.budget = null
             this.newPlan.description =null
             this.newPlan.expirationDate = getDefaultExpirationDate()
+            this.maxBudget = 0
         },
         validateBudgetRule(value) {
             console.log('newPlan.datasetId: ' + this.newPlan.datasetId)
@@ -229,6 +230,7 @@ export default {
             this.datasetList.forEach(dataset => {
                 if (dataset.objectId === this.newPlan.datasetId){
                     selectedDatasetBudget = dataset.depositorSetupInfo.epsilon
+                    console.log('analysisPlans length: ' + dataset.analysisPlans.length)
                     dataset.analysisPlans.forEach(plan =>{
                         console.log('plan.epsilon: ' + plan.epsilon)
                         spentBudget += plan.epsilon
@@ -237,7 +239,7 @@ export default {
                 }
             })
             console.log('spentBudget: ' + spentBudget+", selectedDatasetBudget: "+selectedDatasetBudget)
-            this.maxBudget = selectedDatasetBudget - spentBudget
+            this.maxBudget = Number((selectedDatasetBudget - spentBudget).toFixed(3))
         },
         createPlan() {
             console.log("calling create plan  with newPlan = " + JSON.stringify(this.newPlan))

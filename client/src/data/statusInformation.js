@@ -11,6 +11,12 @@ export default {
         icon: "",
         availableActions: ["viewDetails", "delete", "continueWorkflow"]
     },
+    created: {
+        label: "Created",
+        color: "blue lighten-3",
+        icon: "",
+        availableActions: ["viewDetails", "delete", "continueWorkflow"]
+    },
     in_execution: {
         label: "In Execution",
         color: "grey lighten-3",
@@ -48,6 +54,7 @@ export default {
         IN_EXECUTION: "in_execution",
         ERROR: "error",
         EXPIRED: "expired",
-        COMPLETED: "completed"
+        COMPLETED: "completed",
+        PLAN_CREATED: "created"
     }
 };
