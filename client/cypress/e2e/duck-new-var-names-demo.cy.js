@@ -13,7 +13,7 @@
                 console.log('runnable', runnable)
                 return false
             })
-            cy.runDemo('DuckNewVarNamesMockDV.json', 'DuckNewVarNamesDemoData.json')
+            cy.runDemo('duckNewVarNames.csv', 'DuckNewVarNamesDemoData.json')
 
 
         })

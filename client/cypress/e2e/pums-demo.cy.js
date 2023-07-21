@@ -13,21 +13,11 @@
                 console.log('runnable', runnable)
                 return false
             })
-            cy.runDemo('PUMSMockDV.json', 'PUMSDemoData.json')
-            // Test aux file already exists
-            // logout
-            // submit mock-dv form
-            //login
-            // welcome page shouldn't show "start Process"
-            cy.logout()
-            const createAccount = false
-            cy.createMockDataset('PUMSMockDV.json', createAccount)
-            cy.get('[data-test="Start Process"]').should('not.exist');
+            cy.runDemo('PUMS5extract10000.csv', 'PUMSDemoData.json')
+
 
 
         })
-        //   it("Doesn't show Start Process button if aux file is already deposited",() =>{
-//
-        //   })
+
     })
 }

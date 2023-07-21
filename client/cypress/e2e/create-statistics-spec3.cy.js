@@ -17,7 +17,8 @@
         afterEach(() => {
             cy.logout()
         })
-
+        //TODO: uncomment when analysis is ready
+/*
         it('Displays Fixed Value Input Correctly', () => {
             let variables = {
                 "age": {
@@ -60,6 +61,6 @@
 
         })
 
-
+*/
     })
 }

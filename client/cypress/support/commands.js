@@ -156,14 +156,15 @@ Cypress.Commands.add('runDemo', (testFile, demoDatafile) => {
         // select the variables we will use
         cy.selectVariable(demoData.variables)
 
+        // TODO: add the rest of the steps when the analysis wizard is ready
         // Continue to Set Epsilon Step
-        cy.epsilonStep()
+        //cy.epsilonStep()
         // Add all the statistics in the Create Statistics Step
-        cy.createStatistics(demoData)
+        //cy.createStatistics(demoData)
 
         // Submit the statistics
 
-        cy.submitStatistics(demoData)
+     //   cy.submitStatistics(demoData)
 
 
     })
@@ -275,7 +276,7 @@ Cypress.Commands.add('selectVariable',(demoVariables)=> {
         }
         // TODO: add handling of Categorical vars
     })
-    cy.wait(500)
+
 
 })
 

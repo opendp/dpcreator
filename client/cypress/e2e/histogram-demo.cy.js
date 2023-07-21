@@ -15,7 +15,7 @@
                 return false
             })
 
-            cy.runDemo('EyeDemoMockDV.json', 'EyeDemoHistogram.json')
+            cy.runDemo('Fatigue_data.csv', 'EyeDemoHistogram.json')
 
 
         })

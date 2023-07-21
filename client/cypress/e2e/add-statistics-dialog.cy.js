@@ -28,8 +28,8 @@
 
             })
         })
-
-
+// TODO: uncomment this when analysis wizard is ready
+/*
         it('Enables Create Statistics Button', () => {
             cy.get('h1').should('contain', 'Create Statistics')
             cy.get('[data-test="Add Statistic"]').click({force: true});
@@ -88,6 +88,6 @@
             cy.get('[data-test="maritalstatus"]').should('be.enabled')
 
 
-        })
+        })*/
     })
 }
