@@ -14,3 +14,16 @@ DATABASES = {
 }
 
 DEFAULT_LOGGER = 'console'
+
+# DEV ONLY - For cypress management commands
+
+# (1) This app includes the "clear_test_data" management command
+INSTALLED_APPS += ['opendp_apps.cypress_utils']
+
+# (2) This ROOT_URLCONF adds the API endpoint and view which uses the "clear_test_data" management command
+#ROOT_URLCONF = 'opendp_project.urls_cypress'
+
+# (3) ALLOW_CYPRESS_ENDPOINT value is set
+#ALLOW_CYPRESS_ENDPOINT = 'cypress-in-ci-endpoint'
+
+ALLOW_DEMO_LOADING = True

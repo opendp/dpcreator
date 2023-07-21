@@ -1,9 +1,9 @@
 import json
 import tempfile
 from os.path import abspath, dirname, isfile, join
-from opendp_apps.analysis.misc_formatters import get_timestamp_str
 
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.analysis.misc_formatters import get_timestamp_str
 from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
 from opendp_apps.analysis.tools.dp_histogram_boolean_spec import DPHistogramBooleanSpec
 from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
@@ -14,10 +14,9 @@ CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 DP_REPORTS_TEST_DIR = join(dirname(dirname(CURRENT_DIR)), 'dp_reports', 'test_data')  # has sample release
 
-from unittest import skip
-@skip('Reconfiguring for analyst mode')
+
 class HistogramBooleanStatSpecTest(StatSpecTestCase):
-    fixtures = ['test_dataset_data_001.json', ]
+    """Test the HistogramBooleanStatSpec class"""
 
     def setUp(self):
 

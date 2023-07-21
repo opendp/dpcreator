@@ -1,13 +1,11 @@
 import json
 import uuid
-from datetime import timedelta, datetime
 from http import HTTPStatus
 from os.path import abspath, dirname, join
 
 from django.contrib.auth import get_user_model
 from django.core.files import File as DjangoFileObject
 from django.test import TestCase
-from django.utils.timezone import make_aware
 from rest_framework.test import APIClient
 
 from opendp_apps.analysis import static_vals as astatic
@@ -16,6 +14,7 @@ from opendp_apps.analysis.models import AnalysisPlan
 from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataset.models import DataSetInfo
 from opendp_apps.model_helpers.msg_util import msgt
+from opendp_apps.utils import datetime_util
 
 CURRENT_DIR = dirname(abspath(__file__))
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
@@ -38,8 +37,7 @@ class AnalysisPlanTest(TestCase):
         self.client = APIClient()
         self.client.force_login(self.user_obj)
 
-        expiration_date = datetime.now() + timedelta(days=5)
-        self.expiration_date_str = datetime.strftime(expiration_date, '%Y-%m-%d')
+        self.expiration_date_str = datetime_util.get_expiration_date_str()
 
         # Define a file to upload
         self.test_file_name = join('teacher_survey', 'teacher_survey.csv')
@@ -125,7 +123,6 @@ class AnalysisPlanTest(TestCase):
         expected_msg = astatic.ERR_MSG_NOT_ENOUGH_EPSILON_AVAILABLE.format(available_epsilon=0.25,
                                                                            requested_epsilon=0.50)
         self.assertEqual(plan_util.get_error_message(), expected_msg)
-
 
     def test_10_create_plan(self):
         """(10) Create 3 AnalysisPlan objects; 1st two use exactly all the epsilon; 3rd uses more than remaining epsilon and produces an error"""
@@ -536,7 +533,7 @@ class AnalysisPlanTest(TestCase):
         # Make the expiration date yesterday
         #
         analysis_plan = plan_util.analysis_plan
-        analysis_plan.expiration_date = make_aware(datetime.now() + timedelta(microseconds=-1))
+        analysis_plan.expiration_date = datetime_util.get_expiration_date(days=0, microseconds=-1)
         analysis_plan.save()
 
         # Try to make an update w/ valid data but a bad expiration date
@@ -697,7 +694,7 @@ class AnalysisPlanTest(TestCase):
         # AnalysisPlan owned by the user_obj and expired
         #
         plan1 = self.working_plan_info.copy()
-        plan1['expiration_date'] = (datetime.now() + timedelta(days=-1)).strftime('%Y-%m-%d')
+        plan1['expiration_date'] = datetime_util.get_expiration_date_str(days=-1)
         plan_util = AnalysisPlanCreator(self.user_obj, plan1)
         self.assertTrue(plan_util.has_error() is False)
         analysis_plan1 = plan_util.analysis_plan
