@@ -1,11 +1,11 @@
-from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dataset.models import DatasetInfo
 
 
-class DataSetInfoUpdater:
+class DatasetInfoUpdater:
 
-    def __init__(self, dataset_info: DataSetInfo):
+    def __init__(self, dataset_info: DatasetInfo):
         """
-        Wrapper for common DataSetInfo operations
+        Wrapper for common DatasetInfo operations
         :param dataset_info:
         """
         self.dataset_info = dataset_info
@@ -26,7 +26,7 @@ class DataSetInfoUpdater:
         :return:
         """
 
-        # Save the profile to DataSetInfo.depositor_setup_info
+        # Save the profile to DatasetInfo.depositor_setup_info
         #
         self.dataset_info.depositor_setup_info.data_profile = data_profile
         if 'variables' in data_profile:

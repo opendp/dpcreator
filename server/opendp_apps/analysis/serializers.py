@@ -49,7 +49,7 @@ class ReleaseInfoSerializer(serializers.ModelSerializer):
 
 
 class AnalysisPlanObjectIdSerializer(serializers.Serializer):
-    """Ensure input is a valid UUID and connected to a valid DataSetInfo object"""
+    """Ensure input is a valid UUID and connected to a valid DatasetInfo object"""
     object_id = serializers.UUIDField()
 
     def validate_object_id(self, value):
@@ -228,7 +228,7 @@ class ReleaseValidationSerializer(serializers.ModelSerializer):
 
 
 class IntegerEdgeInputsSerializer(serializers.Serializer):
-    """Ensure input is a valid UUID and connected to a valid DataSetInfo object"""
+    """Ensure input is a valid UUID and connected to a valid DatasetInfo object"""
     min = serializers.IntegerField()
     max = serializers.IntegerField()
     number_of_bins = serializers.IntegerField(min_value=2)

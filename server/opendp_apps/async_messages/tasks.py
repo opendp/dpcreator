@@ -8,7 +8,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 from opendp_apps.async_messages import static_vals as async_static
 from opendp_apps.async_messages.websocket_message import WebsocketMessage
-from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dataset.models import DatasetInfo
 from opendp_apps.dataverses.download_and_profile_util import DownloadAndProfileUtil
 from opendp_apps.model_helpers.basic_response import BasicResponse, ok_resp, err_resp
 from opendp_apps.profiler import tasks as profiler_tasks
@@ -46,9 +46,9 @@ def send_websocket_success_msg(user_msg, websocket_id, profile_str=None):
 
 
 @celery_app.task
-def profile_dataset_info(dataset_object_id: DataSetInfo.object_id, websocket_id=None) -> BasicResponse:
+def profile_dataset_info(dataset_object_id: DatasetInfo.object_id, websocket_id=None) -> BasicResponse:
     """
-    Using the DataSetInfo object_id, download and profile a dataset.
+    Using the DatasetInfo object_id, download and profile a dataset.
     If the "websocket_id" is defined, send back websocket messages
 
     Assumes: if websocket_id is None, then assume this is being called w/o celery

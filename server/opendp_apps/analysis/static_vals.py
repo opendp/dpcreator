@@ -120,13 +120,13 @@ def missing_val_label(missing_val_type):
 # --------------------------------------
 ERR_MSG_ANALYSIS_PLAN_NOT_FOUND = 'The AnalysisPlan was not found.'
 
-ERR_MSG_DATASET_ID_REQUIRED = 'The DataSetInfo object_id is required.'
+ERR_MSG_DATASET_ID_REQUIRED = 'The DatasetInfo object_id is required.'
 ERR_MSG_ANALYSIS_ID_REQUIRED = 'The AnalysisPlan object_id is required.'
 
 ERR_MSG_PLAN_INFO_ANALYST_ID_INVALID = 'A user was not found for the given Analyst ID.'
 
 ERR_MSG_USER_REQUIRED = 'The OpenDP user is required.'
-ERR_MSG_NO_DATASET = 'DataSetInfo object not found for this object_id and creator'
+ERR_MSG_NO_DATASET = 'DatasetInfo object not found for this object_id and creator'
 ERR_MSG_SETUP_INCOMPLETE = 'Depositor setup is not complete'
 
 ERR_MSG_NO_ANALYSIS_PLAN = 'AnalysisPlan object not found for this object_id and creator'

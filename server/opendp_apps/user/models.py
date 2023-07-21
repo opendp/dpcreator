@@ -148,7 +148,7 @@ class DataverseSession(TimestampedModelWithUUID):
 
     # This will keep track of overall privacy budget usage via the DepositorInfo FK relationship
     # TODO: Commenting this out due to circular import problem
-    # dataset_info = models.ForeignKey(BaseDataSetInfo, null=True, blank=True, on_delete=models.CASCADE)
+    # dataset_info = models.ForeignKey(BaseDatasetInfo, null=True, blank=True, on_delete=models.CASCADE)
 
     class SessionTypes(models.TextChoices):
         DEPOSITOR = 'DE', 'Depositor'

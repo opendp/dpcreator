@@ -12,7 +12,7 @@ from opendp_apps.async_messages import static_vals as async_static
 from opendp_apps.async_messages.tasks import profile_dataset_info, send_test_msg
 from opendp_apps.async_messages.utils import get_websocket_id
 from opendp_apps.async_messages.websocket_message import WebsocketMessage
-from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dataset.models import DatasetInfo
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -22,7 +22,7 @@ def view_profile_test(request):
     """Page to test profiler by clicking on it"""
     websocket_id = get_websocket_id(request)
 
-    ds_info_objects = DataSetInfo.objects.all()
+    ds_info_objects = DatasetInfo.objects.all()
 
     info = dict(websocket_id=websocket_id,
                 ds_info_objects=ds_info_objects,
@@ -33,7 +33,7 @@ def view_profile_test(request):
 
 @csrf_exempt
 def ajax_profile_by_dataset_object_id(request):
-    """Profile DataSetInfo based on ajax input from 'view_profile_test'
+    """Profile DatasetInfo based on ajax input from 'view_profile_test'
     In a POST, send 'dataset_object_id'
     """
     json_data = json.loads(request.body)

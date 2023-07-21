@@ -28,7 +28,7 @@ from opendp_apps.banner_messages.views import BannerMessageViewSet
 from opendp_apps.content_pages.view_vue_settings import VueSettingsView
 from opendp_apps.dataset.views import \
     (DepositorSetupViewSet,
-     DataSetInfoViewSet,
+     DatasetInfoViewSet,
      UploadFileSetupViewSet)
 from opendp_apps.dataset.views_profile import ProfilingViewSet
 from opendp_apps.dataverses.urls import router as dataverse_router
@@ -49,7 +49,7 @@ router.register(r'users', UserViewSet)
 router.register(r'analysis-plan', AnalysisPlanViewSet, basename='analysis-plan')
 router.register(r'banner-messages', BannerMessageViewSet, basename='banner-messages')
 
-router.register(r'dataset-info', DataSetInfoViewSet)
+router.register(r'dataset-info', DatasetInfoViewSet)
 # router.register(r'dv-user', DataverseUserView, basename='dv-user')
 router.register(r'deposit', DepositorSetupViewSet, basename='deposit')
 

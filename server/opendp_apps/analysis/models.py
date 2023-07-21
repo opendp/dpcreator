@@ -24,7 +24,7 @@ class ReleaseInfo(TimestampedModelWithUUID):
     """
     Release of differentially private result from an AnalysisPlan
     """
-    dataset = models.ForeignKey('dataset.DataSetInfo',
+    dataset = models.ForeignKey('dataset.DatasetInfo',
                                 on_delete=models.CASCADE)
 
     epsilon_used = models.FloatField(null=False,
@@ -247,7 +247,7 @@ class AnalysisPlan(TimestampedModelWithUUID):
     description = models.TextField(blank=True, null=True,
                                    help_text='Description of the analysis plan')
 
-    dataset = models.ForeignKey('dataset.DataSetInfo',
+    dataset = models.ForeignKey('dataset.DatasetInfo',
                                 on_delete=models.CASCADE)
 
     is_complete = models.BooleanField(default=False)

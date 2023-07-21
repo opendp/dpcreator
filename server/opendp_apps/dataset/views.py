@@ -6,10 +6,10 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
-from opendp_apps.dataset.models import DepositorSetupInfo, DataSetInfo, UploadFileInfo
+from opendp_apps.dataset.models import DepositorSetupInfo, DatasetInfo, UploadFileInfo
 from opendp_apps.dataset.permissions import IsOwnerOrBlocked
 from opendp_apps.dataset.serializers import \
-    (DataSetInfoPolymorphicSerializer,
+    (DatasetInfoPolymorphicSerializer,
      DepositorSetupInfoSerializer,
      UploadFileInfoCreationSerializer)
 from opendp_apps.utils.view_helper import get_json_error
@@ -18,16 +18,16 @@ from opendp_project.views import BaseModelViewSet
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
-class DataSetInfoViewSet(BaseModelViewSet):
-    queryset = DataSetInfo.objects.all().order_by('-created')
-    serializer_class = DataSetInfoPolymorphicSerializer
+class DatasetInfoViewSet(BaseModelViewSet):
+    queryset = DatasetInfo.objects.all().order_by('-created')
+    serializer_class = DatasetInfoPolymorphicSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         """
         This restricts the view to show only the DatasetInfo for the OpenDPUser
         """
-        logger.info(f"Getting DataSetInfo for user {self.request.user.object_id}")
+        logger.info(f"Getting DatasetInfo for user {self.request.user.object_id}")
         return self.queryset.filter(creator=self.request.user)
 
 

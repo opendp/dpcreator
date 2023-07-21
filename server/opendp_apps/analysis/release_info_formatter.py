@@ -12,7 +12,7 @@ from django.template.loader import render_to_string
 from opendp_apps.analysis.misc_formatters import get_readable_datetime
 from opendp_apps.analysis.models import ReleaseInfo
 from opendp_apps.analysis.setup_question_formatter import SetupQuestionFormatter
-from opendp_apps.dataset.dataset_formatter import DataSetFormatter
+from opendp_apps.dataset.dataset_formatter import DatasetFormatter
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 
 
@@ -56,7 +56,7 @@ class ReleaseInfoFormatter(BasicErrCheck):
         """Build the release!"""
         current_dt = dt.now()
 
-        ds_formatter = DataSetFormatter(self.dataset)
+        ds_formatter = DatasetFormatter(self.dataset)
         if ds_formatter.has_error():
             self.add_err_msg(ds_formatter.get_err_msg())
             return

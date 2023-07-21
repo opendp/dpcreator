@@ -9,11 +9,11 @@ from django.db.models.fields.files import FieldFile
 
 from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.dataset import static_vals as dstatic
-from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dataset.models import DatasetInfo
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler import static_vals as pstatic
 from opendp_apps.profiler.csv_reader import CsvReader
-from opendp_apps.profiler.dataset_info_updater import DataSetInfoUpdater
+from opendp_apps.profiler.dataset_info_updater import DatasetInfoUpdater
 from opendp_apps.profiler.variable_info import VariableInfoHandler
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
@@ -27,7 +27,7 @@ class ProfileRunner(BasicErrCheck):
         Note: Use the staticmethods to call this __init__ method.
         Given a path to a dataset, profile it
         Optional args:
-        dataset_object_id : DataSetInfo object_id. Save the profile to this object's data_profile attribute
+        dataset_object_id : DatasetInfo object_id. Save the profile to this object's data_profile attribute
         """
         #
         logger.info(f'Init ProfileRunner dataset_pointer: {dataset_pointer}')
@@ -37,7 +37,7 @@ class ProfileRunner(BasicErrCheck):
 
         self.dataset_is_django_filefield = kwargs.get(pstatic.KEY_DATASET_IS_DJANGO_FILEFIELD, False)
 
-        # If a DataSetInfo object is specified, the profile will be saved to the object
+        # If a DatasetInfo object is specified, the profile will be saved to the object
         self.dataset_info_object_id = kwargs.get(pstatic.KEY_DATASET_OBJECT_ID)
 
         # Set to False depending on an answer to question about whether number of row may be made public
@@ -46,7 +46,7 @@ class ProfileRunner(BasicErrCheck):
         # ------------------------------
         # To be set/calculated
         # ------------------------------
-        # Used if a DataSetInfo object is specified
+        # Used if a DatasetInfo object is specified
         self.dataset_info = None
         # self.depositor_setup_info = None # from the dataset_info object above
         self.dataset_info_updater = None
@@ -89,17 +89,17 @@ class ProfileRunner(BasicErrCheck):
         """
         Run some basic error checking
         """
-        # (1) Optional: Retrieve the DataSetInfo object and set the DataSetInfoUpdater
+        # (1) Optional: Retrieve the DatasetInfo object and set the DatasetInfoUpdater
         #
         if self.dataset_info_object_id:
             try:
-                self.dataset_info = DataSetInfo.objects.get(object_id=self.dataset_info_object_id)
-            except DataSetInfo.DoesNotExist:
+                self.dataset_info = DatasetInfo.objects.get(object_id=self.dataset_info_object_id)
+            except DatasetInfo.DoesNotExist:
                 self.add_err_msg(dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND)
                 return
 
             # self.depositor_setup_info = self.dataset_info.depositor_setup_info
-            self.dataset_info_updater = DataSetInfoUpdater(self.dataset_info)
+            self.dataset_info_updater = DatasetInfoUpdater(self.dataset_info)
 
         # Is the dataset_pointer correct?
         #
@@ -204,7 +204,7 @@ class ProfileRunner(BasicErrCheck):
             logger.info(f'(2c) !Profile failed!: {user_msg}')
             return
 
-        # Profiling success: update DataSetInfo profile and user_step
+        # Profiling success: update DatasetInfo profile and user_step
         logger.info(f'(3) Profile complete!')
         if self.dataset_info:
             self.dataset_info_updater.save_data_profile(variable_info_handler.data_profile)

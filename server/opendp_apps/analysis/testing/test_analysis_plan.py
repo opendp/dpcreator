@@ -12,7 +12,7 @@ from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.analysis_plan_creator import AnalysisPlanCreator
 from opendp_apps.analysis.models import AnalysisPlan
 from opendp_apps.dataset import static_vals as dstatic
-from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dataset.models import DatasetInfo
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.utils import datetime_util
 
@@ -44,9 +44,9 @@ class AnalysisPlanTest(TestCase):
         self.upload_name = 'Teacher Survey'
         test_file = join(TEST_DATA_DIR, self.test_file_name)
 
-        # Attach the file to the DataSetInfo object and
+        # Attach the file to the DatasetInfo object and
         #   make sure to start with epsilon = 1.0
-        self.dataset_info = DataSetInfo.objects.get(id=2)
+        self.dataset_info = DatasetInfo.objects.get(id=2)
         self.dataset_info.source_file.save(self.upload_name, DjangoFileObject(open(test_file, 'rb')))
         self.dataset_info.depositor_setup_info.epsilon = 1.0
         self.dataset_info.save()
@@ -330,7 +330,7 @@ class AnalysisPlanTest(TestCase):
         """(50) Fail b/c DepositorSetupInfo is incomplete"""
         msgt(self.test_50_depositor_setup_incomplete.__doc__)
 
-        dataset_info = DataSetInfo.objects.get(id=2)
+        dataset_info = DatasetInfo.objects.get(id=2)
         dataset_info.depositor_setup_info.variable_info = None
         dataset_info.depositor_setup_info.save()
 
@@ -360,7 +360,7 @@ class AnalysisPlanTest(TestCase):
         """(70) Fail using invalid dataset ID (but it is a valid UUID)"""
         msgt(self.test_70_invalid_dataset_id_via_api.__doc__)
 
-        dataset_info = DataSetInfo.objects.get(id=2)
+        dataset_info = DatasetInfo.objects.get(id=2)
 
         nonsense_dataset_id = str(uuid.uuid4())
 

@@ -3,7 +3,7 @@ from rest_framework import status
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.models import AnalysisPlan
-from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dataset.models import DatasetInfo
 from opendp_apps.model_helpers.basic_response import BasicResponse, ok_resp, err_resp
 from opendp_apps.utils.randname import get_rand_alphanumeric
 
@@ -54,12 +54,12 @@ class AnalysisPlanUtil:
                             data=status.HTTP_400_BAD_REQUEST)
 
         # -------------------------------
-        # Retrieve DataSetInfo object
+        # Retrieve DatasetInfo object
         # -------------------------------
         try:
-            ds_info = DataSetInfo.objects.get(object_id=dataset_object_id,
+            ds_info = DatasetInfo.objects.get(object_id=dataset_object_id,
                                               creator=opendp_user)
-        except DataSetInfo.DoesNotExist:
+        except DatasetInfo.DoesNotExist:
             return err_resp(astatic.ERR_MSG_NO_DATASET,
                             data=status.HTTP_400_BAD_REQUEST)
 
@@ -96,7 +96,7 @@ class AnalysisPlanUtil:
         return ok_resp(plan, message='Plan created!')
 
         @staticmethod
-        def get_available_epsilon(dataset: DataSetInfo) -> float:
+        def get_available_epsilon(dataset: DatasetInfo) -> float:
             """
             Get the available epsilon for a dataset by totaling epsilon allotted to AnalysisPlans
             """

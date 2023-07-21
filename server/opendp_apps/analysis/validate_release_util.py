@@ -31,7 +31,7 @@ from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
 from opendp_apps.analysis.tools.dp_variance_spec import DPVarianceSpec
 from opendp_apps.analysis.tools.histogram_util import get_histogram_stat_spec
 from opendp_apps.analysis.tools.stat_spec import StatSpec
-from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dataset.models import DatasetInfo
 # from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
 from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
@@ -289,7 +289,7 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.analysis_plan.save()
 
         # (6) Delete the "source_file"
-        delete_result = DataSetInfo.delete_source_file(self.analysis_plan.dataset)
+        delete_result = DatasetInfo.delete_source_file(self.analysis_plan.dataset)
         if not delete_result.success:
             logger.error(f"ValidateReleaseUtil.make_release_info: {delete_result.message}")
             self.add_err_msg(delete_result.message)
