@@ -1,0 +1,1001 @@
+integerMinus,Boolean,FloatMinus,AnimalNamesCategorical,IncomeMillion
+55,true,0.63918759,"Lion, asian",8038136
+100,true,-0.67766131,"Cobra, cape",6326531
+-11,false,0.02839591,Grant's gazelle,483906
+-94,false,0.02883387,"Roller, lilac-breasted",3658059
+79,true,0.85602136,"Iguana, land",328322
+-91,true,0.33283219,"Lion, galapagos sea",7395558
+-72,false,0.34302622,"Robin, white-throated",8038262
+36,false,0.2450743,Common green iguana,7490586
+-10,false,0.55671407,"Skunk, western spotted",83313
+-23,false,-0.45072525,Masked booby,7640578
+15,true,-0.75559045,Bird (unidentified),2596307
+-38,false,-0.39887073,African pied wagtail,4349378
+-62,false,0.83528917,Meerkat,3700684
+20,false,-0.24739291,"Starling, superb",2991148
+-98,false,-0.94682908,Kaffir cat,4120142
+40,false,-0.44643742,Brazilian tapir,2545344
+99,true,-0.51900247,Arctic tern,9213735
+22,true,-0.91754775,"Badger, eurasian",2203427
+-6,false,0.37958376,"Tern, white-winged black",8699009
+85,true,0.71431442,Defassa waterbuck,4823446
+-70,false,-0.29200358,Purple moorhen,6387878
+19,true,-0.97811019,Caracara (unidentified),7843267
+-23,false,-0.03581385,Olive baboon,585452
+-57,true,0.86743938,Small Indian mongoose,4744253
+-10,false,0.43597773,Small-spotted genet,2479599
+-48,false,0.43609113,Dark-winged trumpeter,9627850
+-57,true,-0.46688655,Azara's zorro,4443981
+28,true,-0.98901099,"Cat, tiger",1209252
+41,true,-0.7003459,"Sandpiper, spotted wood",7420663
+-71,false,0.90132349,"Stork, jabiru",6429932
+-10,true,-0.7897893,Green-backed heron,7872737
+36,true,-0.18740573,Javan gold-spotted mongoose,9788624
+-24,false,0.10631674,"Hornbill, southern ground",6362702
+38,false,-0.9010846,Cape Barren goose,79765
+13,true,0.88236693,Musk ox,7090712
+77,false,0.42177487,Olive baboon,9905728
+61,true,-0.62326739,Little heron,138908
+-10,false,-0.44581607,Arctic fox,9629536
+-50,true,0.45373628,"Crane, wattled",3948897
+-49,true,0.5245293,Arboral spiny rat,5137620
+85,true,0.07644492,Banded mongoose,9147444
+-87,true,0.97452245,"Deer, roe",7132390
+28,false,0.94667554,Long-tailed skua,118146
+-78,true,0.09659001,"Crane, sarus",8021980
+-95,true,-0.7946391,"Tern, white-winged",5612806
+62,false,-0.61008839,"Sheathbill, snowy",6818495
+-79,true,-0.68572475,"Pheasant, common",779080
+34,true,-0.62100486,"Turkey, common",2923810
+82,true,-0.2214688,White-faced tree rat,1622981
+44,false,-0.93019619,Chital,5288798
+89,true,0.72290287,"Owl, australian masked",9948145
+-36,false,-0.3331197,Western pygmy possum,3592765
+56,false,-0.91451412,Toddy cat,7610378
+24,true,-0.12968929,"Dragon, komodo",5412472
+-95,true,0.93708013,"Lion, southern sea",3649515
+83,true,-0.49745514,"Hawk, galapagos",7856165
+59,true,-0.20700796,Red-breasted nuthatch,7427909
+-41,false,0.6289568,"Heron, boat-billed",4080615
+-36,false,0.52480612,"Lemur, lesser mouse",6364500
+-76,true,0.82677086,"Goose, greylag",7206336
+85,true,-0.04647215,American buffalo,8715720
+13,false,-0.94636328,"Owl, australian masked",9384662
+20,true,0.09184267,"Squirrel, malabar",2701259
+17,false,0.35603245,"Buffalo, wild water",6933702
+-15,false,0.16902343,Black swan,5223447
+-56,false,-0.37783339,"Seal, northern fur",4452244
+-37,true,-0.91564724,Pied butcher bird,6106490
+-92,false,0.57021905,Little brown bat,2526234
+52,true,0.68829204,"Bustard, kori",7557077
+-49,true,-0.31959942,"Sloth, two-toed",6882461
+72,false,-0.1067295,"Sheep, stone",469578
+18,true,-0.17605551,Ibex,8076454
+48,false,0.22824354,Collared lemming,1312417
+87,true,-0.10638697,Rhesus macaque,4527407
+10,true,0.53023154,Springbok,9907586
+57,false,0.38532454,Nelson ground squirrel,1768605
+-57,false,-0.86887101,"Roller, lilac-breasted",4095829
+72,true,-0.27378805,Blue waxbill,9214080
+60,true,0.05543613,Eleven-banded armadillo (unidentified),7393484
+-45,false,0.74169188,Mule deer,4388971
+-41,false,0.55553013,Sage hen,7346552
+25,true,-0.66170679,Brown hyena,3298097
+-59,true,0.16031699,"Mynah, indian",122214
+-18,false,0.84877834,Green vine snake,7056809
+-43,true,0.45976434,Common boubou shrike,4872320
+7,true,-0.19554658,Laughing kookaburra,2159153
+25,true,-0.70441519,"Beaver, eurasian",143940
+45,true,-0.84074701,"Gull, lava",7914995
+-31,false,-0.3057151,Gecko (unidentified),6010786
+5,false,-0.10783035,"Lion, galapagos sea",3218917
+49,false,-0.71333497,"Dove, little brown",7705643
+26,true,0.19498085,American woodcock,1225709
+20,true,-0.12721245,Goanna lizard,575345
+1,true,-0.52721293,"Cobra, cape",3644190
+-37,false,-0.0819392,Yellow-headed caracara,9753641
+-20,true,0.82510514,"Lemur, sportive",8859164
+91,false,0.83752504,"Hartebeest, coke's",1518678
+-35,true,0.94716118,"Starling, red-shouldered glossy",4292593
+-70,false,0.05839947,Goliath heron,6441129
+97,false,-0.63714131,"Wallaby, euro",7645154
+1,false,0.24383742,Steller sea lion,7410608
+14,false,0.25592976,"Toucan, white-throated",9413523
+-61,true,-0.99200896,Black spider monkey,4076871
+87,true,0.83006978,Mexican boa,7055775
+-20,false,0.66522497,"Francolin, swainson's",2769659
+84,false,0.44934561,White-headed vulture,2000604
+93,true,0.23633196,Red hartebeest,5628597
+-58,true,-0.8055944,Square-lipped rhinoceros,5931875
+-60,false,0.60502481,"Shrike, common boubou",2447564
+-19,false,-0.95385354,Black-faced kangaroo,5878449
+57,true,-0.88755623,Common eland,1939749
+85,true,0.06556084,American buffalo,3415052
+-9,true,-0.8294077,"Loris, slender",7208080
+61,false,-0.07408749,"Monitor, white-throated",4665913
+-62,false,-0.8825736,Tokay gecko,2179102
+69,false,-0.68027993,Flightless cormorant,1943490
+-16,true,-0.94649667,Ring dove,6298142
+46,false,-0.8387329,Nyala,2097097
+62,true,0.58836659,"Sloth, hoffman's",12513
+87,false,0.60989213,"Lemming, arctic",9419693
+70,false,-0.22580973,"Deer, mule",8309399
+50,true,0.94525627,"Hyena, spotted",2244085
+-23,true,-0.67975454,"Vulture, white-headed",2872256
+-17,false,-0.04751376,Zorilla,4672772
+-25,true,0.35785359,Western palm tanager (unidentified),7361631
+-76,true,0.81770206,European wild cat,2015003
+86,false,0.76043801,Savanna baboon,8871088
+-37,true,-0.18415062,"Weaver, white-browed sparrow",397567
+-31,true,0.0051425,"Heron, grey",6774878
+-45,false,-0.51677226,Cape fox,7074742
+-100,true,0.01347076,Osprey,8265849
+88,true,-0.5498069,"Badger, european",2404005
+-21,true,0.75145358,Square-lipped rhinoceros,2026166
+76,true,0.70309604,Rhesus macaque,2917093
+9,false,-0.099871,"Capuchin, brown",8060967
+-4,false,-0.10758654,Radiated tortoise,4956478
+-37,true,0.52915501,"Robin, kalahari scrub",4404307
+66,false,-0.63130298,Southern hairy-nosed wombat,3348741
+20,false,-0.30567352,Ant (unidentified),9027685
+12,false,0.31655805,Tayra,8145888
+-70,true,-0.64890187,Sage grouse,9263955
+74,true,-0.50408387,River wallaby,9763943
+67,false,-0.14645294,"Boa, columbian rainbow",8018910
+-28,false,0.20357253,Black-cheeked waxbill,6851448
+67,true,-0.93084465,European badger,584874
+-70,true,-0.43308445,"Crane, blue",8496074
+-56,true,-0.00435532,"Egret, cattle",9734037
+51,true,-0.49164981,Killer whale,3411685
+-4,true,-0.61339768,African pied wagtail,3830686
+-56,true,0.8218375,"Cormorant, neotropic",4414190
+45,false,0.35177026,Dromedary camel,9823925
+20,false,0.91047826,California sea lion,6501211
+3,true,-0.02428209,American crow,4441428
+-58,true,-0.29820082,Laughing dove,2739980
+-26,false,-0.01260389,"Rattlesnake, horned",2186391
+53,false,-0.57146571,"Owl, australian masked",3566529
+92,false,-0.50473461,"Iguana, land",986801
+-90,true,-0.79875205,"Civet, common palm",605837
+86,true,-0.46843642,Ibex,7438963
+-96,false,0.04237978,"Puma, south american",2340761
+-7,false,0.31875363,"Hawk, galapagos",367813
+-39,false,-0.18193255,Nile crocodile,4857213
+-42,false,-0.17934159,"Owl, burrowing",6578225
+-55,false,0.95789167,Grey lourie,8934984
+-52,true,0.05758539,Honey badger,9535937
+90,false,-0.06363775,Gemsbok,6291542
+-50,true,-0.71059345,"Macaw, red and blue",2401301
+17,false,-0.14769355,"Cockatoo, slender-billed",7929712
+-100,true,0.73512888,"Lory, rainbow",7608641
+-97,false,0.14688328,Yellow mongoose,6396269
+53,false,-0.73987184,Cheetah,676655
+13,false,-0.78122377,Fringe-eared oryx,4489687
+-92,false,0.42695537,"Rattlesnake, horned",914908
+-81,true,0.23293786,"Polecat, african",8258064
+-57,true,0.90658201,"Spoonbill, white",7317202
+68,false,-0.72157715,Guerza,5032318
+-26,true,-0.06679057,"Wombat, common",2701057
+86,false,-0.99526498,Azara's zorro,1200630
+-10,true,-0.15923598,Greater rhea,5457481
+61,true,-0.24861281,"Booby, blue-faced",243208
+76,true,-0.34806687,Striped skunk,3840097
+-72,true,-0.50873042,Topi,4237189
+-64,false,0.7430897,"Wapiti, elk,",4598142
+-76,false,0.5609154,Great horned owl,2927086
+5,true,0.69712224,Ringtail,4313097
+-32,false,-0.56110184,"Genet, small-spotted",8739406
+-30,true,0.97776114,Azara's zorro,3255102
+31,true,-0.28559498,Gila monster,4480430
+13,false,-0.06353635,Crown of thorns starfish,3406337
+82,false,-0.13946077,Rhesus monkey,1862440
+94,false,0.31128127,Common wallaroo,4860301
+55,true,-0.7779032,"Albatross, galapagos",8892338
+-26,false,-0.57899595,Brown lemur,6436
+76,true,-0.33564671,"Wallaby, dama",3104870
+11,true,-0.9752334,White stork,5612295
+88,true,-0.50197648,"Duiker, gray",8072355
+-40,true,0.60022168,"Ibis, puna",9985229
+-24,false,-0.12831101,"Stork, painted",8955391
+-56,false,-0.72496905,American crow,4532465
+83,true,-0.97954247,"Waterbuck, defassa",5311346
+-88,false,-0.12020636,"Vulture, white-rumped",4704811
+-25,false,0.34422922,"Dragonfly, russian",5037863
+71,true,-0.66537206,"Phalarope, grey",445101
+-61,false,0.77149631,"Tinamou, elegant crested",8720990
+63,true,-0.19804007,White-browed sparrow weaver,7240746
+62,false,-0.22156788,"Lark, horned",3159634
+-2,true,-0.88250647,"Lemur, brown",5287819
+-65,true,-0.94373845,Yellow-bellied marmot,2068513
+4,true,0.4792426,Woolly-necked stork,5626170
+83,false,-0.63063078,Prehensile-tailed porcupine,1040093
+-18,false,-0.06090883,Bird (unidentified),9031038
+-91,false,-0.92515436,White-lipped peccary,337154
+-73,true,0.43557867,"Zorro, common",7311902
+52,false,0.7276901,Burmese black mountain tortoise,7678852
+-92,true,-0.35108806,"Tortoise, asian foreset",4079206
+-14,false,0.26417303,Coqui francolin,4250034
+-36,true,0.8476216,"Insect, stick",9220311
+4,true,0.76821121,"Mockingbird, galapagos",1186550
+49,false,-0.05442162,"Crab, sally lightfoot",2666761
+98,true,-0.72869114,"Badger, american",4902672
+-17,true,0.2313433,"Lion, steller's sea",2323193
+64,true,-0.78407582,Giant anteater,779354
+-3,true,-0.16057468,"Dove, rock",5331648
+80,false,-0.76614467,Warthog,7534599
+-97,false,0.98802742,"Alligator, american",9670476
+-90,true,0.74021359,"Cormorant, neotropic",9344993
+62,true,0.65530606,"Lemur, sportive",7081624
+-33,true,-0.74651532,"Pheasant, ring-necked",6381739
+-50,true,0.41211482,African polecat,9815361
+33,true,-0.26405656,Ring-tailed gecko,1358736
+83,true,-0.98833862,"Starling, superb",5955233
+39,true,-0.54678689,"Macaque, rhesus",2245511
+-51,true,0.58744059,Bohor reedbuck,4774140
+78,true,0.23692695,Striped skunk,8062939
+-58,true,0.55130705,"Stork, yellow-billed",4432548
+0,false,-0.82653506,Sloth bear,6743091
+-9,false,0.34667648,"Seal, northern fur",2408367
+11,true,-0.85270423,"Baboon, savanna",291280
+14,false,0.42772163,Striated heron,4338640
+-40,false,0.71105161,Fork-tailed drongo,3086023
+18,false,-0.90437,Brown lemur,6300139
+97,false,0.85979942,Rufous tree pie,1736584
+-4,true,0.40733089,"Turkey, wild",6089497
+5,false,0.22440033,"Duck, comb",4846868
+65,true,0.70528295,House sparrow,6155878
+-83,false,0.62145808,Roseat flamingo,1985744
+-91,false,0.56989989,"Vulture, bengal",2303779
+-91,true,-0.49159304,Bobcat,4812270
+14,false,-0.7288092,"Armadillo, seven-banded",5925755
+-81,true,-0.09409472,"Jackal, black-backed",3243327
+-9,true,0.41822343,"Gecko, barking",8076251
+80,false,0.74456806,Mandras tree shrew,5505796
+-15,false,-0.40167025,"Wallaby, river",8707199
+-56,false,-0.41882511,"Dog, bush",4725887
+79,false,-0.8780284,"Wallaby, whip-tailed",9816922
+19,true,-0.20812001,"Cat, ringtail",8672313
+-69,false,0.94121049,"Squirrel, golden-mantled ground",1753894
+14,true,0.51630477,Blue shark,5882805
+-48,true,-0.60555233,"Badger, eurasian",5167
+-51,false,0.66812871,Desert spiny lizard,3902101
+4,false,-0.43460906,"Wolf, timber",4008753
+-12,false,-0.97703814,"Eagle, golden",278219
+94,false,0.77560828,Asian water buffalo,429703
+6,true,0.3765973,Goanna lizard,6677719
+-28,false,-0.94461146,Clark's nutcracker,8007619
+24,true,0.84128584,Ring dove,5288227
+47,true,-0.78206757,Black-winged stilt,9302811
+55,false,0.51935767,"Turtle, eastern box",2196350
+-70,false,-0.8959478,European beaver,9642110
+38,true,-0.7990462,Red deer,3132493
+-3,true,0.02423658,Radiated tortoise,5622150
+-57,true,0.64797354,"Sheep, american bighorn",2350792
+-64,true,-0.10638023,Kaffir cat,1859274
+-76,true,0.46909148,"Albatross, galapagos",5149712
+-16,true,0.04187137,"Lemming, arctic",8051529
+-100,false,-0.54638939,Cape wild cat,3407326
+45,true,-0.15042533,Coyote,3402942
+57,false,-0.68783127,"Polecat, african",3501032
+-62,true,0.74914888,"Penguin, galapagos",5785804
+-92,false,0.32021641,Moose,2822383
+-1,true,-0.85405477,Tawny frogmouth,114988
+-45,true,-0.73387508,Indian porcupine,3049372
+49,false,0.79984594,"Capuchin, white-fronted",6503153
+95,false,0.69533416,Black rhinoceros,6360723
+46,true,-0.00328806,"Lemur, ring-tailed",2517651
+10,false,-0.88822647,African red-eyed bulbul,8870411
+-41,false,-0.50401082,Gaur,9484292
+-57,true,-0.75694827,Carpet snake,3276211
+18,false,-0.13644753,"Squirrel, golden-mantled ground",2519594
+-90,false,0.88026571,"Goldeneye, barrows",5197664
+47,false,-0.03706448,"Phascogale, red-tailed",9036842
+64,true,0.44146849,American badger,8662697
+-74,false,-0.31119035,"Caracara, yellow-headed",6640465
+-100,false,-0.35585385,Southern white-crowned shrike,310769
+-30,false,-0.52505749,"Elephant, asian",5550220
+19,false,0.50575395,"Waterbuck, defassa",9073096
+29,true,-0.05085171,Defassa waterbuck,9699252
+-12,true,0.86098677,Bird (unidentified),6333457
+57,false,-0.73572708,"Avocet, pied",3063978
+-17,false,-0.8614385,Crowned hawk-eagle,1187212
+40,false,0.68258735,Yak,2054936
+-2,false,-0.26184503,Little grebe,2165328
+60,true,-0.1682258,Mourning collared dove,6288907
+-19,true,0.58567295,African lynx,4347968
+64,false,0.69104795,"Crake, african black",2728235
+76,true,-0.45605961,Bobcat,4490567
+-47,false,-0.11412293,"Boa, cook's tree",6661125
+-71,false,0.58984663,"Turtle, eastern box",6098344
+26,false,-0.09204342,"Otter, small-clawed",3361283
+82,true,0.54355762,Numbat,9313308
+30,false,0.33270958,"Rat, white-faced tree",8252343
+14,true,0.11484405,Bushpig,9315356
+-17,true,0.0186514,Square-lipped rhinoceros,8769287
+65,false,0.24050055,"Vulture, white-headed",4812295
+7,false,-0.35955896,"Nutcracker, clark's",986469
+-59,false,-0.50488472,"Otter, giant",3352816
+56,true,0.48087737,American racer,1736563
+-90,false,0.08513802,"Squirrel, palm",8427261
+-75,true,-0.33093826,Brolga crane,4371226
+52,false,-0.80442402,"Devil, tasmanian",1657803
+-68,false,0.41408387,Ring-tailed possum,3513458
+47,true,0.84026694,"Cat, cape wild",7488455
+-71,false,0.49730462,Dark-winged trumpeter,1279168
+27,false,-0.0234103,Gulls (unidentified),4103405
+61,false,0.46425719,"Baboon, chacma",7433590
+-44,true,0.46481557,"Goose, cape barren",7185444
+-10,false,0.33487792,"Ferret, black-footed",1318451
+37,true,-0.42980604,"Wagtail, african pied",904765
+41,true,0.23279617,Crowned hawk-eagle,2711305
+4,false,-0.44329999,Southern white-crowned shrike,478573
+-27,true,0.0696026,"Sheep, stone",7962269
+-41,true,-0.16318526,"Rattlesnake, horned",3855123
+26,false,0.98839526,"Fox, arctic",3678932
+-81,false,-0.87968251,Long-tailed jaeger,5593659
+95,false,0.22203885,Grizzly bear,3020775
+-81,true,-0.7522744,Southern elephant seal,3191506
+-5,true,0.00423384,Dromedary camel,74573
+-14,true,-0.81318692,Peregrine falcon,7428614
+-87,false,0.52896755,"Stork, yellow-billed",4235855
+60,true,-0.5788933,"Spider, wolf",601182
+71,true,0.48793715,"Eagle, tawny",490274
+-16,false,-0.76820234,Platypus,683120
+-1,false,0.97433194,Red hartebeest,1600583
+-12,false,-0.8970267,"Turaco, violet-crested",5386316
+56,true,0.57419421,"Kingfisher, pied",9817916
+55,false,-0.60840949,Mississippi alligator,8956593
+56,false,0.94173716,"Vulture, king",8029790
+65,true,0.911933,African red-eyed bulbul,3657031
+-73,true,-0.92091717,Silver gull,6514662
+48,true,0.99947891,Puna ibis,470024
+61,true,0.82271366,"Dolphin, striped",2351566
+-59,false,0.86845681,Gemsbok,3170759
+-9,false,0.45316576,Long-necked turtle,6775688
+-82,false,-0.47072222,"Rhea, gray",334205
+-96,true,0.14182204,"Woodpecker, downy",9961325
+-35,true,-0.83888543,"Screamer, southern",6871072
+69,true,0.14005084,"Baboon, gelada",3283246
+-74,true,0.51147212,Bushbuck,7818555
+-45,false,0.99619011,"Fox, crab-eating",3118578
+31,false,-0.86856623,"Eagle, crowned",2100994
+-78,false,-0.74932557,"Tortoise, asian foreset",4536731
+-70,false,0.19447433,"Peacock, indian",1181828
+96,true,0.27495085,"Pie, rufous tree",7251275
+87,false,-0.8173163,"Francolin, coqui",4282248
+-70,false,0.60806166,"Iguana, common green",1526069
+-6,true,0.37090397,"Sheep, stone",2013761
+-19,true,-0.30115005,"Pigeon, wood",8212196
+-94,false,0.50943378,"Bird, red-billed tropic",9700851
+-91,false,-0.92973126,Indian leopard,8893491
+-34,false,0.25427609,Capybara,7048146
+86,false,0.00569175,"Cat, civet",988834
+-82,true,-0.04722903,"Heron, striated",9284870
+10,false,-0.26605506,"Pie, indian tree",3711566
+84,false,0.22505293,"Flicker, field",4266487
+-83,true,-0.37992683,Columbian rainbow boa,4862150
+-60,true,-0.54351764,"Crow, american",9763831
+26,true,0.61471657,Gecko (unidentified),583156
+32,true,0.73747403,"Bat, asian false vampire",6402882
+81,true,-0.33200948,Campo flicker,418462
+-86,false,0.8066994,Tokay gecko,7413737
+67,false,-0.79813572,"Peacock, blue",9057291
+71,false,0.78109939,Miner's cat,5550075
+22,true,-0.92139161,"Eagle, bateleur",4564613
+-55,false,0.9492786,"Gull, dusky",1050635
+48,false,0.38414627,Barrows goldeneye,3661384
+-39,false,0.90911252,"Heron, green",2947539
+-56,true,-0.88687632,White-winged dove,156754
+-69,true,-0.08535258,Southern right whale,8231752
+-24,false,-0.20897722,Savanna baboon,5001648
+-19,true,0.60704373,Square-lipped rhinoceros,7605405
+-85,false,-0.78516665,Old world fruit bat (unidentified),3739376
+-75,true,-0.20552971,Red and blue macaw,4382366
+97,false,-0.50561266,Asian openbill,5806025
+-80,false,0.59766198,"Lemur, lesser mouse",3354099
+76,false,0.70766164,Koala,8496469
+45,true,-0.36086278,"Owl, burrowing",8412062
+-63,false,0.77540556,"Partridge, coqui",3274997
+-77,false,-0.97990795,Sage grouse,9259383
+38,true,0.48635398,Woodrat (unidentified),6943641
+-72,true,-0.39603429,White-winged tern,889531
+85,true,0.64873295,"Heron, boat-billed",8679851
+75,true,0.71975534,"Wallaby, agile",7096205
+15,true,-0.67521396,"Rhinoceros, black",6559797
+-11,true,0.02273872,"Cat, african wild",2033167
+21,false,0.8194299,"Kookaburra, laughing",6510709
+40,false,-0.86831528,Grey lourie,2553085
+-80,true,0.92395072,Python (unidentified),2872041
+97,true,0.50603737,White rhinoceros,2529892
+60,true,-0.96713949,European wild cat,118160
+86,false,-0.66345052,African elephant,5252477
+-27,true,-0.78092074,Crowned eagle,2237069
+-86,false,0.16795457,"Rhea, greater",715039
+-84,false,-0.31771223,Long-crested hawk eagle,5912252
+92,false,0.83202381,"Bear, american black",6147475
+91,false,0.31398564,Gelada baboon,5717178
+-9,true,-0.82474904,Verreaux's sifaka,41729
+64,true,0.11474389,Mudskipper (unidentified),48916
+79,true,0.69555102,Red-tailed hawk,6714032
+-19,true,-0.48830073,"Starling, superb",9819952
+-82,true,-0.45418817,"Lion, southern sea",7421111
+-51,true,-0.95452362,Stick insect,9912533
+-71,true,-0.85931041,Brush-tailed bettong,2031609
+78,false,-0.67484911,"Boa, mexican",9375871
+-39,false,0.0637337,Southern screamer,7870462
+-9,false,-0.45789846,"Crow, american",156039
+7,true,-0.90368916,"Otter, cape clawless",7292821
+-34,true,0.1674175,Indian red admiral,8290759
+-31,false,0.44728741,"Squirrel, eastern fox",8586879
+-13,true,0.99576409,"Weaver, red-billed buffalo",3550076
+-60,true,-0.19101817,Comb duck,5221667
+-92,false,-0.61315739,American woodcock,1880078
+-56,false,0.08717364,Potoroo,3069520
+-34,false,-0.1157178,"Lory, rainbow",8252099
+-8,true,0.85396618,"Macaw, red and blue",9281015
+65,false,-0.61517433,Ringtail,1258077
+62,false,-0.40900307,Prairie falcon,9467050
+46,true,0.37748717,Hummingbird (unidentified),8287949
+-49,false,0.74969628,"Dragon, frilled",9343023
+-85,false,0.06788384,Short-beaked echidna,9802416
+-45,false,-0.04076158,"Racer, blue",9116573
+-61,true,-0.19238132,Royal tern,4198274
+-58,true,0.81415614,Arctic hare,6211412
+-9,true,-0.86104732,Mexican boa,7303445
+7,false,0.87787893,"Skunk, western spotted",6150318
+29,false,0.58375997,Mocking cliffchat,9795097
+61,false,0.40789371,Black-throated cardinal,5091339
+-14,true,-0.3828151,"Fowl, helmeted guinea",7898934
+39,true,-0.04213099,South American puma,2303251
+72,false,0.4811655,Long-necked turtle,5681557
+-18,false,-0.22960945,"Tapir, brazilian",7090648
+-14,false,-0.22320795,"Spider, wolf",8441385
+-74,false,0.51690167,Musk ox,52392
+-77,true,-0.40194841,"Fowl, helmeted guinea",4370440
+58,true,-0.46388628,"Starling, superb",9445633
+62,true,0.09405974,Lily trotter,8058951
+-22,false,-0.57803676,African lynx,8361671
+31,true,0.31408104,"Shrike, crimson-breasted",8004041
+17,true,0.99558669,"Squirrel, malabar",8885634
+82,false,-0.85347276,Cape wild cat,1783703
+-11,false,-0.13704025,"Deer, mule",7019690
+-8,true,-0.03004143,Pine snake (unidentified),2735243
+-77,false,0.31540278,"Lemming, collared",8210864
+81,true,0.41861314,Ring-tailed possum,8137106
+74,false,0.88200848,Tawny eagle,7144137
+29,true,0.3874179,Indian porcupine,6580469
+54,true,-0.12608541,"Legaan, ground",5609255
+5,true,0.52115516,"Shrike, crimson-breasted",5042015
+-76,true,-0.36770279,Paca,5328123
+-99,false,0.5845036,Sportive lemur,2076846
+-94,false,0.7679606,"Fox, silver-backed",2761718
+20,true,0.05835401,"Sloth, two-toed tree",5414078
+82,false,0.86349451,Warthog,2894068
+13,false,-0.97981354,"Starling, superb",4256002
+38,false,0.63671804,"Bat, little brown",1296187
+29,true,-0.76610683,"Colobus, white-mantled",8705691
+-65,false,0.12504437,"Heron, little",6857576
+-99,false,-0.6246807,"Cow, scottish highland",9416959
+-95,false,-0.92456891,Black and white colobus,4299802
+84,true,0.18137877,Asian water buffalo,2249638
+-52,true,0.79541052,"Baboon, chacma",363237
+-68,false,-0.6833564,Short-beaked echidna,6977882
+100,false,-0.43676087,Crested barbet,1233962
+-94,false,0.82360745,"Dolphin, common",6372841
+1,true,-0.57257515,"Butterfly, tropical buckeye",4661403
+-94,false,-0.5936151,"Dragon, frilled",2570455
+-49,true,-0.21863766,Black-throated cardinal,4098805
+-76,false,-0.35718467,"Tortoise, burmese black mountain",2735935
+-84,false,-0.40272603,Fringe-eared oryx,7759850
+-100,false,-0.36005496,"Pintail, bahama",6500209
+85,true,-0.65557129,Brolga crane,3185367
+-93,true,0.82830091,"Gonolek, burchell's",9929399
+18,true,-0.27636428,Pied avocet,957911
+54,false,0.14861971,Arctic ground squirrel,9623198
+74,true,-0.06250477,"Stork, white-necked",4906746
+-100,false,-0.28173979,Brown hyena,2064375
+8,true,-0.62073547,African wild dog,288842
+25,true,0.82549224,Sandhill crane,8240582
+48,true,-0.4690675,Red and blue macaw,2010
+-92,false,-0.90251456,Northern fur seal,2812371
+-31,true,-0.46449627,Woylie,3619512
+26,false,0.36239436,"Pelican, eastern white",1774702
+99,false,-0.89487583,"Crane, wattled",1848137
+-12,true,0.6554102,Grey mouse lemur,9526338
+-72,true,0.72315409,Blue crane,1733191
+-79,false,-0.32073626,"Sheep, stone",2427465
+96,true,0.07646759,"Macaw, red and blue",724163
+8,false,0.67097662,"Lemur, lesser mouse",7356332
+-90,true,0.94834112,"Shrike, southern white-crowned",7181482
+-90,false,-0.82817151,"Cat, cape wild",3782659
+19,false,0.48871049,"Lemur, brown",3597951
+-88,true,-0.53209323,Zorilla,622478
+45,true,-0.22107692,"Cobra, egyptian",5107581
+50,true,0.36000267,"Lion, african",8780899
+-18,false,-0.29455517,"Cormorant, little",737670
+-29,false,-0.31736614,"Brocket, brown",3808655
+21,false,0.04517286,Asian foreset tortoise,2660927
+-84,false,-0.71399141,White-faced whistling duck,6040931
+-10,false,0.07844889,Red-billed hornbill,2408198
+-6,true,-0.30030935,Horned rattlesnake,7726947
+-75,false,0.55553464,"Monster, gila",4841448
+16,true,-0.38039452,"Armadillo, giant",122474
+-13,false,0.33714741,"Phalarope, grey",4478573
+-72,true,-0.8601881,Horned puffin,2576167
+-70,true,-0.92305535,Silver gull,7267749
+-29,true,-0.89858491,Brush-tailed bettong,6577305
+78,false,-0.01761893,White-winged tern,7855056
+24,false,-0.63520232,Gecko (unidentified),6992149
+29,false,0.42018866,"Baboon, olive",3164562
+-98,true,-0.95634287,Springbuck,3670217
+51,false,0.29653903,"Goose, egyptian",2106797
+-10,false,-0.00557434,"Darter, african",3273879
+96,true,-0.57328726,"Dolphin, common",4807115
+-79,true,-0.77071729,"Bear, polar",1173773
+-6,false,-0.04717866,"Dolphin, striped",969850
+75,false,0.37114088,Beisa oryx,9169020
+-71,false,-0.05460048,Civet cat,4602199
+12,false,0.70341728,"Pademelon, red-legged",1025302
+57,false,0.91079699,"Lemur, ring-tailed",8953164
+-31,false,0.26597234,Tokay gecko,6601848
+74,false,-0.62882266,Polar bear,8072123
+66,false,0.02829184,"Hawk-eagle, crowned",1009659
+-58,true,0.09676022,"Coatimundi, white-nosed",321417
+70,false,-0.53609059,"Sheep, red",3032522
+-55,false,0.77238566,"Squirrel, antelope ground",583275
+-39,false,0.06202211,Northern phalarope,4223755
+82,false,-0.47913187,"Tortoise, desert",5647382
+-17,false,0.46181773,"Racer, american",7203205
+9,false,-0.81735855,Comb duck,3433554
+96,true,0.47896433,"Hawk-eagle, crowned",3392031
+-7,true,-0.30018692,White-browed sparrow weaver,6974124
+-20,false,-0.79487527,"Skunk, striped",1294300
+-22,false,-0.87262813,"Creeper, black-tailed tree",1766996
+60,false,0.63992555,Cape raven,752021
+-7,false,-0.92459205,Currasow (unidentified),5721
+6,true,0.76230871,"Snake, buttermilk",6042501
+-98,true,-0.86868464,Desert tortoise,5579288
+-11,true,-0.8683712,"Hartebeest, coke's",898866
+-37,false,-0.73151827,"Civet, common palm",9082708
+61,true,0.91065913,Blue racer,6381412
+57,true,0.95735788,"Nighthawk, common",3913336
+-68,false,-0.48268332,Banded mongoose,8238820
+62,false,0.52710693,Amazon parrot (unidentified),1817061
+38,false,-0.8484807,Land iguana,7880860
+76,false,0.20120496,Crested bunting,254409
+-33,false,-0.11442252,"Antechinus, brown",786214
+50,false,-0.11189677,Long-finned pilot whale,2382257
+-7,false,0.6540331,"Lechwe, kafue flats",3704037
+-41,true,0.08229819,"Blackbird, red-winged",5392609
+-83,true,0.37878483,European badger,9048066
+-28,false,0.70746627,"Kangaroo, jungle",520923
+83,false,0.09373392,"Fox, arctic",2678583
+-61,false,0.52702097,"Tortoise, radiated",7372614
+26,false,-0.34811194,"Deer, red",9447777
+-37,true,-0.53172361,"Bird, pied butcher",5899449
+-48,true,-0.59611814,Grey phalarope,6752073
+-79,false,-0.43758232,Gray langur,8568104
+-74,false,0.51952594,"Stork, white-necked",885414
+-47,true,-0.92621777,Kongoni,2072581
+-16,true,-0.04697244,"Coatimundi, ring-tailed",2289999
+87,false,0.6979949,"Tortoise, asian foreset",7595185
+56,true,-0.39757392,"Albatross, galapagos",9554719
+87,true,0.56044359,Aardwolf,1700523
+-3,true,0.1086963,Ring-tailed gecko,8040995
+-54,true,0.22588906,Small Indian mongoose,1564031
+54,false,0.94779384,"Bustard, denham's",9278062
+-55,true,0.59716047,"Weaver, lesser masked",9873116
+83,false,-0.41773273,"Wallaby, tammar",8880240
+39,true,0.64688412,Desert spiny lizard,632259
+48,true,-0.1321187,Common palm civet,3029553
+-60,false,0.01100304,"Grouse, greater sage",3097852
+-91,false,-0.1357758,Two-toed tree sloth,8560860
+-66,false,-0.62330778,"Deer, white-tailed",7831061
+94,false,0.25562622,Long-necked turtle,7515116
+-39,true,0.04964483,Nine-banded armadillo,8487039
+-16,true,0.34214051,Eastern grey kangaroo,5319014
+8,true,0.26302976,"Wolf, common",6845004
+43,true,-0.57734705,"Weaver, white-browed sparrow",32542
+-50,true,-0.50754411,American beaver,1958845
+47,true,0.20917541,Red brocket,1709836
+-50,false,0.92340704,"Squirrel, antelope ground",7540877
+56,true,0.70896285,Great white pelican,9350802
+96,true,-0.03417879,"Goose, egyptian",9113237
+-68,true,0.44997546,Stanley bustard,532592
+-69,false,0.13945067,"Waterbuck, common",5169512
+-11,true,0.10585328,Red phalarope,7420359
+46,true,-0.7282007,"Dragon, frilled",5841143
+59,true,0.83867909,"Squirrel, eastern fox",3587653
+74,true,-0.2159276,European badger,9611672
+3,false,0.72336664,Yellow baboon,3316538
+-54,false,-0.07892706,African pied wagtail,7290444
+-51,false,-0.48455677,Green heron,6572367
+35,false,0.69518819,"Stilt, black-winged",3806017
+32,true,0.76200251,Blue-tongued skink,3857811
+-68,false,0.83213325,White-winged black tern,9563133
+63,true,0.04721909,"Raven, cape",7110659
+-16,false,-0.82887208,Egyptian goose,6810943
+-35,false,-0.48597045,"Antelope, roan",7776366
+-58,false,-0.26550257,Levaillant's barbet,130324
+-36,true,-0.91124197,Cape raven,8070670
+52,false,-0.48580317,Western palm tanager (unidentified),374876
+-61,true,0.82652899,Prehensile-tailed porcupine,9619602
+21,true,0.04355352,Black-backed magpie,3807365
+-75,true,0.62376709,Urial,1436925
+8,true,0.29127403,"Glider, sugar",6923273
+58,true,-0.68225312,Prairie falcon,3979918
+36,true,0.82608384,"Egret, snowy",4569520
+28,false,0.60407545,"Lion, southern sea",683288
+9,false,0.25265046,Eastern white pelican,3794895
+31,false,0.95069531,Oriental short-clawed otter,5603888
+65,true,-0.80090185,Trumpeter swan,2253121
+-22,true,-0.30172602,Jabiru stork,9002475
+67,false,0.60220605,Red-billed toucan,6257283
+48,false,-0.24815342,Smith's bush squirrel,6496420
+2,true,-0.56120921,Defassa waterbuck,9693903
+76,false,0.3031429,California sea lion,3594166
+-58,false,0.77952022,"Phalarope, red",9859691
+94,false,0.26696763,Bush dog,9528605
+20,false,0.21675222,Cape raven,1504860
+91,false,-0.08890722,Lilac-breasted roller,8024939
+66,true,0.3401508,"Lion, california sea",6737492
+-32,false,0.26188575,Springbuck,7284939
+-83,false,-0.94408924,Brown lemur,3975162
+-72,true,0.7786046,"Bat, little brown",2800499
+-80,false,0.3080555,Red and blue macaw,5162071
+3,false,-0.15313068,Wood pigeon,6401598
+-2,true,0.45436136,Yellow mongoose,1051379
+40,false,0.48350435,"Dragon, frilled",1845424
+39,false,0.79740572,"Bird, secretary",8113455
+-35,true,-0.29009108,Hawk-headed parrot,9446586
+82,true,0.14897106,Mandras tree shrew,9731850
+83,false,-0.88724669,White-necked stork,1985174
+-30,true,-0.22700687,"Macaque, bonnet",1912998
+-6,false,0.5649452,"Coatimundi, white-nosed",9939589
+-24,true,0.54482936,"Tern, white-winged",8191756
+51,false,0.58362121,"Grouse, sage",6185184
+0,true,0.7179948,Carpet python,8184703
+-17,true,-0.6585423,White-throated monitor,9672828
+-23,false,-0.5562706,Stanley bustard,2331264
+-64,false,0.54371692,European spoonbill,677316
+6,true,0.71144498,Grey heron,5270918
+34,true,-0.65536302,"Baboon, savanna",4842780
+85,false,0.85887824,Long-tailed skua,658687
+-54,true,0.83894989,"Siskin, yellow-rumped",7326138
+60,false,0.37187136,"Buffalo, asian water",5485127
+-78,false,-0.45128673,Koala,3556023
+19,false,-0.98511013,Royal tern,6944997
+-85,true,-0.67861534,Hudsonian godwit,2748594
+24,true,0.2704026,Vine snake (unidentified),411874
+12,true,-0.65784407,Slender loris,8442244
+-45,false,0.05761789,"Lizard, blue-tongued",709396
+-6,false,0.2017362,"Duck, comb",3585103
+8,true,-0.45112766,"Racer, blue",9841921
+-51,true,-0.03709922,"Tapir, brazilian",6186698
+81,true,-0.97283177,Eastern dwarf mongoose,4248115
+-74,true,-0.8317744,"Tortoise, radiated",1278236
+-43,true,-0.04839273,Salmon pink bird eater tarantula,9662893
+46,false,0.20250908,"Dove, white-winged",8973912
+18,false,0.27438419,"Stork, jabiru",3088259
+-37,false,0.43562904,"Otter, brazilian",5017640
+21,true,0.60088456,"Kangaroo, red",1020910
+-57,false,-0.25558185,Agouti,8384734
+83,false,-0.81504174,"Jackrabbit, white-tailed",4931776
+22,true,-0.54849989,Ring dove,212719
+-75,false,0.73416107,Sloth bear,258884
+6,false,-0.84678828,Margay,7960387
+89,false,-0.26975766,"Dog, black-tailed prairie",4245316
+52,false,0.29575724,Green-winged trumpeter,8493561
+3,true,-0.9666098,"Blackbird, red-winged",4472180
+24,false,0.48705863,"Baboon, chacma",8686098
+48,false,0.5993159,Prehensile-tailed porcupine,7138098
+48,true,0.50034747,"Squirrel, pine",9307551
+91,false,0.20167157,"Avocet, pied",9529421
+-88,false,-0.80236797,"Lemming, arctic",6565980
+-21,true,-0.53419773,"Goldeneye, common",863553
+31,true,-0.72597149,"Siskin, pine",8423812
+46,true,-0.5332728,"Squirrel, african bush",613527
+-30,false,-0.07747882,"Robin, white-throated",7610109
+62,false,0.90981424,"Crane, sarus",1985801
+-89,false,0.07063366,"Gull, swallow-tail",79743
+-33,false,-0.39049785,Caracara (unidentified),9538197
+-98,false,-0.60237777,Mississippi alligator,3613396
+-59,false,0.98149982,Southern brown bandicoot,9323366
+9,false,0.16037256,"Sandpiper, spotted wood",5241375
+-66,true,-0.26524274,Slender-billed cockatoo,2101243
+29,true,-0.17260396,Brown brocket,3879607
+73,true,-0.91899267,Sugar glider,8747379
+-14,false,0.32005785,"Bear, grizzly",1930950
+78,true,-0.13066137,Giant girdled lizard,4224382
+-12,true,-0.73678971,Purple grenadier,4770909
+14,true,-0.16752912,"Squirrel, grey-footed",6946443
+-51,true,0.44896922,Orca,4822386
+12,true,-0.4893395,Red-necked phalarope,2812862
+92,false,0.7952591,"Bird, pied butcher",2242619
+-7,false,0.29265323,South American sea lion,1665077
+32,true,-0.06952673,American badger,5341655
+79,false,0.06977813,Fisher,4401134
+52,true,0.47294717,North American beaver,3731925
+-56,false,0.81615897,"Duiker, common",47934
+35,false,0.63897239,"Porcupine, tree",8821821
+-4,false,-0.53888641,Feral rock pigeon,3279816
+-17,false,0.45713252,Monitor lizard (unidentified),5387518
+0,false,-0.85097275,Common boubou shrike,9483210
+-40,false,0.60826845,White-browed owl,5711850
+87,true,0.66696654,Brazilian otter,4107798
+-77,true,0.45002677,Chacma baboon,7511944
+-81,false,-0.00249424,Steller's sea lion,5133818
+41,true,0.53425541,"Otter, oriental short-clawed",914931
+-49,false,-0.18142089,"Dove, emerald-spotted wood",7184870
+-99,false,-0.56112585,Black-capped capuchin,5748515
+-48,true,-0.47089866,"Cockatoo, red-breasted",3457704
+-79,true,-0.93939175,Greater flamingo,5186841
+79,true,-0.09393434,Malleefowl,8896655
+10,true,0.68536389,White-throated kingfisher,1259795
+-76,true,0.77660786,African snake (unidentified),7093514
+-57,true,0.06709469,Dusky rattlesnake,9963655
+24,false,-0.00268203,Frog (unidentified),9666193
+71,true,0.03290524,Bald eagle,664238
+-14,false,-0.84485052,"Goose, snow",2714681
+99,true,-0.20389153,Indian giant squirrel,8908553
+-92,true,-0.61751915,European beaver,5292233
+-61,true,-0.84494337,"Meerkat, red",4423003
+21,false,-0.76874591,Red-cheeked cordon bleu,5432922
+64,false,-0.59525402,Nelson ground squirrel,7917638
+-95,false,0.18283507,Red and blue macaw,5392207
+-66,true,0.55217905,"Bunting, crested",9239166
+-75,true,0.86743706,"Caiman, spectacled",2384985
+-18,false,0.398395,Black-throated cardinal,3418229
+-99,true,0.14074457,"Squirrel, palm",9845331
+64,false,0.06008983,Yellow-billed hornbill,570638
+-80,false,-0.50190329,"Oryx, beisa",294070
+36,false,-0.59450547,South American meadowlark (unidentified),9892204
+24,false,-0.09902352,North American red fox,8502876
+81,true,0.74047591,Wood pigeon,8309855
+42,false,-0.03012906,"Python, carpet",8653521
+14,false,-0.53508491,Golden brush-tailed possum,8743173
+-59,true,-0.17469955,Common waterbuck,947495
+73,false,0.50665298,"Waterbuck, common",7935429
+-68,false,-0.81935163,Long-nosed bandicoot,8892020
+6,false,0.68827956,"Duck, blue",1903924
+8,false,0.13770809,White-necked stork,2453634
+56,false,-0.85640807,"Loris, slender",2590687
+65,true,-0.04683353,Andean goose,788549
+-1,true,-0.50198831,Mouflon,483159
+73,false,-0.29572057,American bighorn sheep,5769545
+-55,false,-0.99938588,European wild cat,7158372
+48,true,0.78136267,Bengal vulture,7976977
+-65,false,-0.31167356,African wild cat,5330802
+93,true,-0.11652866,Yellow-brown sungazer,8263728
+-63,true,0.0551971,"Waterbuck, common",8733476
+68,true,0.62900635,"Viper, egyptian",720958
+86,true,-0.66112025,Little grebe,7386232
+-46,true,-0.56314661,Water legaan,6973175
+61,true,-0.58297637,"Lizard, giant girdled",7648346
+-16,false,0.06626956,"Kangaroo, jungle",6069008
+46,true,-0.95700696,Chital,3728457
+-39,false,-0.71498757,White-headed vulture,9892453
+87,false,0.14547284,Grey heron,5648394
+-49,false,-0.672668,Oribi,5297613
+27,false,-0.6360501,Kaffir cat,5956136
+-48,true,-0.50920713,Banded mongoose,7015312
+-79,false,0.23771773,"Booby, blue-footed",3931377
+20,false,-0.61279935,"Fox, arctic",5231705
+-41,true,-0.83655821,"Cormorant, great",2245416
+25,true,-0.82346256,Pied avocet,7664847
+49,true,-0.49820322,"Macaw, red and blue",4284374
+91,false,0.23659105,"Brocket, brown",4650930
+70,true,-0.33693115,"Viper, egyptian",8595477
+-41,false,0.21372406,Indian jackal,6555792
+-51,false,-0.76467831,Blue and gold macaw,9054799
+-32,true,0.23862818,"Ox, musk",1581266
+-5,true,0.45358045,"Hen, sage",2738007
+66,true,0.41259416,Brazilian otter,6557635
+-15,true,0.53650227,"Dragon, komodo",4650306
+77,false,-0.45456275,Osprey,7730747
+-94,true,-0.73382031,Snowy sheathbill,2154830
+36,true,-0.54882596,Flightless cormorant,8178289
+77,true,0.89967122,"Possum, pygmy",296209
+72,false,-0.30733894,"Fox, pampa gray",8571889
+-52,true,-0.81580068,"Penguin, little blue",4283405
+-37,true,0.7800125,Blue-breasted cordon bleu,9681767
+93,false,0.04775759,"Dolphin, bottle-nose",5134174
+3,true,0.56555802,Komodo dragon,2693681
+-1,true,-0.19515967,"Skua, great",132049
+42,false,0.90612033,"Rattlesnake, dusky",6405856
+-88,true,0.28019688,African porcupine,5982983
+-27,false,-0.82820591,"Boa, mexican",5147252
+84,false,-0.19068439,African bush squirrel,8455678
+71,true,0.03679492,White-winged dove,4102657
+1,true,-0.3326819,Snow goose,1619913
+20,true,-0.84540134,"Starling, superb",4490832
+79,true,0.73399302,"Hedgehog, south african",5985135
+59,false,-0.56899396,"Monkey, vervet",9438607
+69,true,-0.31758621,Common duiker,9974648
+-47,true,0.6740205,Black-backed magpie,5423461
+46,false,0.08285292,"Boar, wild",2605164
+82,true,-0.39353123,Griffon vulture,3166856
+98,false,-0.64552395,Lesser flamingo,2810915
+-3,true,-0.4774428,"Mynah, indian",569800
+4,false,-0.02825866,"Vulture, turkey",3963090
+-91,false,0.40086259,"Lizard, mexican beaded",9160263
+82,true,-0.66144779,"Skua, great",6817705
+-11,false,0.04923362,"Chickadee, black-capped",943655
+57,true,0.0942158,"Beaver, north american",5667245
+35,true,0.1532234,"Heron, black-crowned night",9997291
+-3,false,-0.88667462,Knob-nosed goose,8335848
+-27,true,0.07920072,"Bird, secretary",2765204
+-84,true,0.98495449,Black swan,381437
+50,true,0.20162728,"Bee-eater, white-fronted",264165
+72,true,-0.7752229,"Peccary, collared",6847240
+-5,false,0.54807758,"Pie, indian tree",6214884
+-16,true,0.19348807,"Dove, ring",1914829
+-26,true,-0.17404756,"Snake, eastern indigo",8580449
+84,true,0.23655808,Brush-tailed bettong,3659862
+10,true,0.74382732,"Shrike, southern white-crowned",8261929
+61,true,0.55858326,"Anteater, australian spiny",5959890
+-59,false,0.79621404,Yellow-crowned night heron,8182231
+77,false,0.30241851,Common duiker,7657140
+29,true,0.03967361,Pine snake (unidentified),4140437
+64,true,-0.5879825,"Trumpeter, green-winged",1422988
+50,true,0.65804589,"Gull, lava",1291454
+74,false,0.40703986,Bush dog,498523
+40,true,0.35079214,Yellow-necked spurfowl,422864
+79,true,-0.37059683,"Egret, great",3034486
+95,false,0.04500468,"Starling, greater blue-eared",179995
+-98,false,-0.46411583,Rhesus macaque,8155351
+31,false,-0.86362605,Northern elephant seal,6067113
+-62,true,0.82485087,Verreaux's sifaka,187721
+36,true,0.83438744,Palm squirrel,1567807
+-81,false,-0.30814231,Nilgai,7146380
+-39,false,0.23530252,Short-beaked echidna,6510189
+58,true,-0.65619336,"Squirrel, eastern fox",972343
+-44,false,0.83007788,Eleven-banded armadillo (unidentified),4237142
+-16,true,0.91211927,Long-nosed bandicoot,9335593
+6,false,0.60991627,"Hawk, galapagos",3068159
+-43,true,0.18388253,"Boa, malagasy ground",1112866
+-95,true,-0.86516175,Common brushtail possum,9217974
+-96,true,0.44659462,Masked booby,2678849
+24,false,-0.62915495,Indian porcupine,6427018
+99,true,-0.74356841,Black-necked stork,5098484
+-44,false,-0.97326064,Worm snake (unidentified),156820
+-70,false,-0.03746361,Honey badger,6860841
+-20,true,0.30576143,"Jaeger, long-tailed",2114868
+-64,false,0.02165651,Green-winged macaw,7822634
+-18,true,-0.3610506,Brown capuchin,2823875
+57,false,-0.67932898,Indian leopard,8141701
+-78,true,-0.58595901,Long-tailed spotted cat,2793697
+96,true,0.20012773,Egyptian goose,947490
+96,true,0.13722188,Ground monitor (unidentified),7732045
+-58,true,0.45150794,Australian masked owl,6654552
+-61,true,-0.02469133,"Tortoise, desert",9794972
+62,false,0.37996765,Banded mongoose,7157487
+-17,false,-0.91478913,White-fronted bee-eater,1705086
+-39,true,-0.40275307,Crab-eating fox,4266488
+0,true,-0.84669209,Egyptian goose,5165586
+-98,false,-0.82076017,"Gull, herring",3083467
+-11,false,-0.19480224,"Lemur, sportive",6332474
+68,true,0.66264147,Common shelduck,2389409
+100,true,0.47069994,Tiger cat,3713100
+15,true,0.68153912,"Boa, malagasy ground",3263428
+-73,true,0.48626422,Common wolf,5145459
+-11,true,0.67532927,"Gecko, ring-tailed",6659428
+11,true,0.84581654,Yellow-rumped siskin,9223072
+95,false,-0.23635193,Monitor lizard (unidentified),8945081
+-48,false,-0.87054119,Sportive lemur,3906602
+22,true,0.02527929,Campo flicker,7802235
+-75,true,-0.32513953,"Boar, wild",3045573
+-48,true,0.70556456,"Bettong, brush-tailed",6459505
+53,true,0.32288932,"Flamingo, lesser",7533585
+84,false,0.72825427,"Monitor, two-banded",1686366
+-85,true,-0.56162624,"Ringtail, common",7366904
+43,true,0.21869416,"Gull, pacific",9393875
+42,false,0.80805359,"Crane, black-crowned",255253
+95,false,0.96410167,Argalis,8040987
+61,true,0.62189853,Spur-winged goose,3068300
+-91,true,0.39104258,Yellow-billed hornbill,1654216
+31,false,0.07173799,European stork,9403536
+46,false,0.21379263,"Skink, blue-tongued",1225952
+-43,false,-0.9424096,Guanaco,4672558
+-35,false,-0.79914151,Red-breasted nuthatch,9645267
+-35,true,-0.25109682,Arctic tern,9151336
+68,false,-0.61690615,Ferruginous hawk,4411265
+68,true,0.78575479,"Goldeneye, common",6488759
+-45,false,-0.13371458,"Squirrel, smith's bush",4295860
+-51,false,-0.97172364,"Wapiti, elk,",4421967
+33,false,0.23387315,Northern elephant seal,2393624
+3,true,0.87296624,Blesbok,2181178
+21,false,0.53031823,"Opossum, american virginia",822708
+-35,false,-0.34906968,American badger,4889218
+82,false,0.98809318,Western palm tanager (unidentified),5080116
+11,false,0.21829513,Egyptian goose,5949849
+32,true,0.78605188,Groundhog,6528415
+-92,false,-0.83193387,"Booby, masked",3203828
+75,true,-0.33232814,Red-winged blackbird,7844722
+-40,true,0.83249471,"Lion, southern sea",363926
+62,false,0.38886527,Crimson-breasted shrike,9100052
+-83,true,-0.42971405,"Sloth, hoffman's",4481331
+97,true,0.27811716,"Flamingo, lesser",296342
+-27,false,0.86566725,"Sloth, two-toed",2694010
+62,false,-0.99627544,"Armadillo, seven-banded",536242
+-17,false,-0.99017617,"Vulture, bengal",3603712
+54,false,0.78966287,American beaver,8544351
+-53,true,0.63291559,Puma,7299740
+86,true,0.96423457,Banded mongoose,6320292
+44,true,-0.84108028,Gray rhea,7936145
+-47,true,0.67359609,"Armadillo, seven-banded",1696957
+-97,true,0.06216409,Barrows goldeneye,5941355
+38,false,0.35669667,Three-banded plover,9151104
+30,false,-0.01471265,Yellow-brown sungazer,2329568
+-34,true,-0.02724559,"Squirrel, antelope ground",907404
+45,true,-0.05288064,Crested screamer,1202521
+-56,true,0.80573438,South American puma,3112530
+-41,false,-0.69293775,"Cat, native",705455
+-42,true,0.08708916,White-throated monitor,5945756
+-93,false,-0.01183687,"Pintail, bahama",9876231
+-53,true,-0.41254915,European shelduck,2487525
+34,true,-0.44011584,Killer whale,477948
+-1,true,0.2351441,Red-billed tropic bird,3359378
+-91,false,0.67199999,Eurasian hoopoe,1714294
+93,true,0.39373082,Numbat,7520294
+90,false,-0.49255442,"Elephant, african",5528403
+-31,false,0.84198156,"Buffalo, asian water",4511325
+56,true,0.80656404,European wild cat,3207324
+87,false,-0.6543343,Black vulture,1202306
+-45,false,0.62571655,"Eagle, golden",1501592
+89,true,0.67993769,"Stork, european",9759215
+-34,false,-0.45210118,Sage grouse,8464182
+92,true,-0.28449156,Emerald-spotted wood dove,8372270
+55,false,-0.91013533,Indian star tortoise,8382871
+-85,false,-0.03915553,Red hartebeest,6561659
+-53,false,0.64729783,Caracal,7572201
+4,false,0.72142057,Bohor reedbuck,544217
+-44,false,0.06426174,"Hornbill, leadbeateri's ground",6166526
+-34,true,-0.85478542,"Phalarope, red-necked",8266438
+-38,true,0.22208041,Eurasian red squirrel,6053648
+63,false,0.27949621,"Iguana, marine",8667751
+-54,false,0.93883989,Cattle egret,3637824
+-33,true,-0.15526821,Southern right whale,7086978
+30,false,-0.19423457,"Starling, greater blue-eared",6448990
+75,true,0.7989334,"Lion, asian",2848500
+47,false,0.05407367,"Shrike, southern white-crowned",102113
+30,true,0.67006976,"Macaw, scarlet",3591576
+57,false,0.98365396,"Bettong, brush-tailed",2448693
+-92,true,-0.14894453,"Dove, little brown",8539725
+-45,false,-0.56275396,Sidewinder,9017060
+98,true,-0.66703384,"Rhinoceros, square-lipped",1432021
+91,true,0.9781448,Long-finned pilot whale,5665154
+38,false,-0.01324932,"Gecko, ring-tailed",8709372
+-93,true,0.9044865,"Gecko, barking",443619
+33,false,-0.97256806,Dromedary camel,750691
+-35,true,0.89641408,"Gull, pacific",5485614
+82,true,-0.50716995,Yak,7167877
+95,false,-0.18418557,"Albatross, galapagos",1074936
+22,true,-0.32059824,Black rhinoceros,9459099
+45,true,0.76321451,"Squirrel, arctic ground",3035562
+-65,false,0.19722085,Weeper capuchin,7425336
+82,false,-0.87857211,"Fox, asian red",3559440
+-49,true,-0.69183998,"Antelope, four-horned",6039131
+93,true,0.07913631,Black kite,7453590
+26,false,0.11342153,Red-knobbed coot,394859
+47,true,0.076806,Four-spotted skimmer,1771544
+-71,false,0.89310417,"Rattlesnake, dusky",5494607
+2,true,-0.82911296,"Heron, striated",6267677
+-90,false,0.44583075,"Rhea, gray",9668366
+-23,true,0.89317341,Blue waxbill,2489670
+-80,false,0.10046654,Burchell's gonolek,5742600
+55,true,0.32761651,"Heron, yellow-crowned night",9257196
+87,true,0.84478984,Agile wallaby,2387221
+70,false,0.45580616,Grey phalarope,1973779
+17,false,-0.54040557,"Jackal, black-backed",5166407
+-39,true,0.90974474,"Gecko, ring-tailed",2393165
+-51,false,-0.39221492,"Lion, steller's sea",4731518
+73,false,0.46146536,"Bear, sloth",7344013
+43,false,0.77553379,"Dog, bush",7502690
+69,false,0.99448501,Osprey,1704891
+81,true,0.58108772,"Owl, snowy",8488773
+-49,false,0.19686353,"Crane, brolga",6630728
+-86,true,-0.13218122,Small Indian mongoose,6258492
+96,false,-0.12941734,Worm snake (unidentified),5045368
+65,false,-0.49486329,Golden-mantled ground squirrel,1141959
+-38,true,0.77685164,"Colobus, white-mantled",2535718

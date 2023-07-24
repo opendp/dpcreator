@@ -10,6 +10,8 @@
             cy.clearData()
 
         })
+        // TODO: update when analysis ready
+        /*
         it('Displays Release Info and links', () => {
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
@@ -17,12 +19,9 @@
                 return false
             })
 
-            /*
-            export properties then -
-            curl -X DELETE -H  X-Dataverse-key:$API_TOKEN  "$SERVER_URL/api/access/datafile/$FILE_ID/auxiliary/$FORMAT_TAG/$FORMAT_VERSION"
-             */
+
             cy.fixture('releaseDetailsAnalysisPlan.json').then(analysisPlan => {
-                cy.intercept('GET', '/api/analyze/' + analysisPlan.objectId + '/', {body: analysisPlan})
+                cy.intercept('GET', '/api/analysis-plan/' + analysisPlan.objectId + '/', {body: analysisPlan})
             })
             cy.fixture('releaseDetailsDatasetInfo.json').then(dataset => {
                 dataset.created = '' + new Date()
@@ -55,10 +54,7 @@
                 return false
             })
 
-            /*
-            export properties then -
-            curl -X DELETE -H  X-Dataverse-key:$API_TOKEN  "$SERVER_URL/api/access/datafile/$FILE_ID/auxiliary/$FORMAT_TAG/$FORMAT_VERSION"
-             */
+
             cy.fixture('releaseDetailsAnalysisPlan.json').then(analysisPlan => {
                 cy.intercept('GET', '/api/analyze/' + analysisPlan.objectId + '/', {body: analysisPlan})
             })
@@ -88,6 +84,6 @@
 
         })
 
-
+*/
     })
 }

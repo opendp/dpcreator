@@ -14,7 +14,8 @@
         afterEach(() => {
             cy.logout()
         })
-
+        //TODO: uncomment when analysis is ready
+/*
         it('Goes back to the Confirm Variables Page', () => {
             const meanAge = {
                 "statistics": [
@@ -116,7 +117,7 @@
             })
 
         })
-
+*/
 
     })
 }

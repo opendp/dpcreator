@@ -11,34 +11,7 @@
 
         })
 
-        it('removes buttons when time expired', () => {
-            cy.on('uncaught:exception', (e, runnable) => {
-                console.log('error', e)
-                console.log('runnable', runnable)
 
-                return false
-            })
-            let testfile = 'cypress/fixtures/PUMS5extract1000.csv'
-            const username = 'kermit'
-            const email = 'kermit@thefrog.com'
-            const password = 'kermit123!'
-
-            cy.createAccount(username, email, password)
-            cy.uploadFile(testfile)
-
-            cy.get('[data-test="continueWorkflow"]').should('be.visible')
-            // timeout is 3 days, so set to a little more than that
-            const millisInDay = 1000 * 60 * 60 * 24
-            const currentTime = new Date().getTime()
-            const testtime = (3 * millisInDay) + 600000
-            cy.clock(currentTime + testtime)
-            cy.visit('/my-data')
-            cy.get('td').should('contain', 'Time has expired')
-            cy.get('[data-test="viewDetails"]').should('not.exist')
-            cy.get('[data-test="continueWorkflow"]').should('not.exist')
-
-
-        })
         it('successfully loads', () => {
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)

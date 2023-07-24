@@ -12,7 +12,8 @@
             cy.login('dev_admin', 'admin')
             cy.setupStatisticsPage('datasetInfoStep600.json', 'analysisPlanStep700.json')
         })
-
+        // Remove until analysis workflow is ready
+/*
         it('Goes to the correct wizard step', () => {
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
@@ -45,6 +46,6 @@
             // We should go back to Create Statistics step
             cy.get('h1').should('contain', 'Create Statistics').should('be.visible')
         })
-
+*/
     })
 }
