@@ -172,10 +172,10 @@ const actions = {
      * @param commit
      * @param state
      * @param getters
-     * @param stepperPosition - the current wizard step that the user is on (0-4)
+     * @param nextStep - the new userStep to assign
      */
-    updateUserStep({commit, state, getters}, stepperPosition) {
-        const nextStep = wizardNextSteps[stepperPosition]
+    updateUserStep({commit, state, getters}, nextStep) {
+
         if (wizardUserSteps.indexOf(getters.userStep) < wizardUserSteps.indexOf(nextStep)) {
             const completedStepProp = {userStep: nextStep}
             // Update the user step on the DepositorSetup or the Analysis Plan, depending

@@ -96,6 +96,7 @@ import Button from "../DesignSystem/Button.vue";
 import GoBackDialog from "./GoBackDialog.vue";
 import NETWORK_CONSTANTS from "../../../src/router/NETWORK_CONSTANTS";
 import {mapGetters, mapState} from "vuex";
+import {analystWizardNextSteps, wizardNextSteps} from "@/data/stepInformation";
 
 export default {
   components: {Button, GoBackDialog},
@@ -131,7 +132,13 @@ export default {
       this.$emit("update:stepperPosition", this.stepperPosition + 1)
     },
     updateUserStep() {
-      this.$store.dispatch('dataset/updateUserStep', this.stepperPosition)
+      let nextStep = null;
+      if (this.workflow === 'depositor') {
+         nextStep = wizardNextSteps[this.stepperPosition]
+      } else {
+        nextStep = analystWizardNextSteps[this.stepperPosition]
+      }
+      this.$store.dispatch('dataset/updateUserStep', nextStep)
       this.emitStepEvent()
 
 

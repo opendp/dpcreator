@@ -299,10 +299,10 @@ export default {
     },
     viewDetails(item) {
       this.goToPage(item, `${NETWORK_CONSTANTS.MY_DATA_DETAILS.PATH}`)
-      //  this.$router.push(`${NETWORK_CONSTANTS.MY_DATA.PATH}/${item.datasetId}`)
+    // TODO: create MY_PLAN_DETAILS
     },
     continueWorkflow(item) {
-      this.goToPage(item, `${NETWORK_CONSTANTS.WIZARD.PATH}`)
+      this.goToPage(item, `${NETWORK_CONSTANTS.ANALYST_WIZARD.PATH}`)
     },
     getWorkflowStatus(item) {
         console.log('item.userStep: '+item.userStep)
@@ -311,17 +311,9 @@ export default {
         return workflowStatus
     },
     goToPage(item, path) {
-      this.$store.dispatch('dataset/setDatasetInfo', item.datasetInfo.objectId)
+      this.$store.dispatch('dataset/setAnalysisPlan', item.objectId)
           .then(() => {
-            if (item.analysisPlan) {
-              this.$store.dispatch('dataset/setAnalysisPlan', item.analysisPlan.objectId).then(() => {
-                this.$router.push(path)
-              })
-            } else {
-              this.$store.dispatch('dataset/clearAnalysisPlan').then(() => {
-                this.$router.push(path)
-              })
-            }
+                 this.$router.push(path)
           })
     },
     cancelExecution(item) {

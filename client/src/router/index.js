@@ -10,7 +10,7 @@ const {
   MY_DATA,
   MY_ANALYSIS_PLANS,
   MY_DATA_DETAILS,
-  WIZARD,
+  ANALYST_WIZARD,
   DEPOSITOR_WIZARD,
   SIGN_UP,
   LOGIN,
@@ -34,10 +34,10 @@ const routes = [
     component: Home
   },
   {
-    path: `${WIZARD.PATH}/`,
-    name: WIZARD.NAME,
+    path: `${ANALYST_WIZARD.PATH}/`,
+    name: ANALYST_WIZARD.NAME,
     // dynamic segments start with a colon
-    component: () => import("../views/Wizard.vue"),
+    component: () => import("../views/AnalystWizard.vue"),
     meta: {
       requiresAuth: true,
       requiresDataset: true
