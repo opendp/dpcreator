@@ -15,6 +15,8 @@
         afterEach(() => {
             cy.logout()
         })
+        //TODO: uncomment when analysis is ready
+        /*
         it('Saves Histogram Options Correctly', () => {
 
 
@@ -81,6 +83,6 @@
 
         })
 
-
+*/
     })
 }

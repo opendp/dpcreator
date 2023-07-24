@@ -25,8 +25,8 @@ if not isfile(DP_ANALYSIS_TEST_DIR):
 
 
 class HistogramIntegerBinEdgesStatSpecTest(StatSpecTestCase):
-    fixtures = ['test_dataset_data_001.json', ]
-
+    """Test the 'DPHistogramIntBinEdgesSpec' class"""
+    
     def setUp(self):
 
         super().setUp()

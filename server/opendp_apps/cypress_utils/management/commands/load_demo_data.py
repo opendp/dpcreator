@@ -3,14 +3,17 @@ Allow deletion of data in between cypress tests
 """
 import json
 import os
+from datetime import datetime, timedelta
 from os.path import abspath, dirname, isfile, join
 
 from allauth.account.models import EmailAddress as VerifyEmailAddress
 from django.core.files import File
 from django.core.management.base import BaseCommand
 
-from opendp_apps.analysis.models import AnalysisPlan, DepositorSetupInfo
+from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.analysis.analysis_plan_creator import AnalysisPlanCreator
 from opendp_apps.cypress_utils.management.commands.demo_loading_decorator import check_allow_demo_loading
+from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.dataset.models import UploadFileInfo
 from opendp_apps.user.models import OpenDPUser
 from opendp_apps.utils.randname import get_rand_alphanumeric
@@ -26,7 +29,7 @@ class Command(BaseCommand):
     depositor_username = 'dp_depositor'
     analyst_username = 'dp_analyst'
     data_profile = None  # Placeholder to load dict from JSON file
-    variable_info = None   # Placeholder to load dict from JSON file
+    variable_info = None  # Placeholder to load dict from JSON file
 
     @check_allow_demo_loading  # Do not remove this check
     def handle(self, *args, **options):
@@ -76,11 +79,11 @@ class Command(BaseCommand):
         upload_file = UploadFileInfo.objects.create(
             name='Teacher Survey',
             creator=analyst_user,
-            data_profile=self.get_data_profile(),
-            profile_variables=self.get_data_profile(),
             depositor_setup_info=depositor_setup,
         )
+        print('save upload file...')
         upload_file.save()
+
         self.write_success_msg(f'UploadFileInfo created: {upload_file}')
 
         # Add File to UploadFileInfo
@@ -97,16 +100,28 @@ class Command(BaseCommand):
         upload_file.save()
         self.write_success_msg(f'Data file attached to UploadFileInfo')
 
+        # Depositor Setup Info re-saved to update step
+        #
+        depositor_setup.save()
+
         # Add AnalysisPlan
         #
-        plan = AnalysisPlan(name=f'Plan {get_rand_alphanumeric(7)}',
-                            analyst=analyst_user,
-                            dataset=upload_file,
-                            variable_info=depositor_setup.variable_info,
-                            user_step=AnalysisPlan.AnalystSteps.STEP_0700_VARIABLES_CONFIRMED)
+        expiration_date = datetime.now() + timedelta(days=5)
+        expiration_date_str = datetime.strftime(expiration_date, '%Y-%m-%d')
+        plan_data = dict(object_id=str(upload_file.object_id),
+                         name=f'Plan {get_rand_alphanumeric(7)}',
+                         description='This is a test plan via the load_demo_data command',
+                         epsilon=0.5,
+                         expiration_date=expiration_date_str)
 
-        plan.save()
-        self.write_success_msg(f'AnalysisPlan created: {plan}')
+        plan_creator = AnalysisPlanCreator(analyst_user, plan_data)
+
+        if plan_creator.has_error():
+            print(plan_creator.get_err_msg())
+            self.stdout.write(self.style.ERROR(plan_creator.get_err_msg()))
+            return
+
+        self.write_success_msg(f'AnalysisPlan created: {plan_creator.analysis_plan}')
         self.write_success_msg(f'>> Success! Process complete.', indent=False)
 
     def is_demo_data_already_loaded(self) -> bool:
@@ -144,15 +159,15 @@ class Command(BaseCommand):
 
         depositor_setup = DepositorSetupInfo.objects.create(
             creator=analyst_user,
-            user_step=DepositorSetupInfo.DepositorSteps.STEP_0600_EPSILON_SET,
             dataset_questions=dataset_questions,
             epsilon_questions=epsilon_questions,
             variable_info=self.get_variable_info(),
+            data_profile=self.get_data_profile(),
             default_epsilon=1.0,
             epsilon=1.0,
-            default_delta=1e-05,
-            delta=1e-05,
-            confidence_level=0.95
+            default_delta=astatic.DELTA_10_NEG_5,
+            delta=astatic.DELTA_10_NEG_5,
+            confidence_level=astatic.CL_95,
         )
 
         depositor_setup.save()

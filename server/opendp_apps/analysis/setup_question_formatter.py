@@ -20,7 +20,7 @@ import json
 from django.core.serializers.json import DjangoJSONEncoder
 
 from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 
 
@@ -42,37 +42,41 @@ class SetupQuestionFormatter(BasicErrCheck):
             setup_questions = dict(setup_questions, **self.dsetup_info.dataset_questions)
 
         if self.dsetup_info.epsilon_questions:
-            setup_questions = dict(setup_questions, **self.dsetup_info.epsilon_questions)
+           setup_questions = dict(setup_questions, **self.dsetup_info.epsilon_questions)
 
+        # Iterate through the 5 questions and format them
         qnum = 0
-        for qattr in astatic.SETUP_QUESTION_LIST:
+        for question_attr in astatic.SETUP_QUESTION_LIST_FOR_FORMATTING:
             qnum += 1
-            if qattr in setup_questions:
-                val = setup_questions.get(qattr)
+            if question_attr in setup_questions:
+                val = setup_questions.get(question_attr)
             else:
                 val = '(not answered)'
 
-            qinfo = astatic.SETUP_QUESTION_LOOKUP.get(qattr)
+            qinfo = astatic.SETUP_QUESTION_LOOKUP.get(question_attr)
             if qinfo:
-                qtext, qcontext = astatic.SETUP_QUESTION_LOOKUP.get(qattr)
+                qtext, qcontext = astatic.SETUP_QUESTION_LOOKUP.get(question_attr)
             else:
                 qtext = None
                 qcontext = None
 
             info = dict(question_num=qnum,
                         text=qtext,
-                        attribute=qattr,
+                        attribute=question_attr,
                         answer=val,
                         context=qcontext
                         )
 
-            # Population size also given, add it to the info dict
-            if qattr == astatic.SETUP_Q_02_ATTR:
+            # Based on the answer to question 2, add the epsilon/delta values
+            #
+            if question_attr == astatic.SETUP_Q_02_ATTR:
                 setup_answer = astatic.SETUP_Q_02_ANSWERS.get(val)
                 if setup_answer and len(setup_answer) == 2:
                     info['longAnswer'], info['privacy_params'] = setup_answer
 
-            if qattr == astatic.SETUP_Q_04_ATTR and val == 'yes':
+            # If a population size is given, add it here
+            #
+            if question_attr == astatic.SETUP_Q_04_ATTR and val == 'yes':
                 info[astatic.SETUP_Q_04a_ATTR] = setup_questions.get(astatic.SETUP_Q_04a_ATTR)
 
             self.formatted_questions.append(info)

@@ -1,4 +1,5 @@
 <template>
+    <div>
   <div class="validateDatasetStep">
     <h1 class="title-size-1">Validate Data File</h1>
     <p>
@@ -213,6 +214,8 @@
       </v-card>
     </v-dialog>
   </div>
+  <SetEpsilonValue v-on:stepCompleted="updateEpsilonStatus" ></SetEpsilonValue>
+  </div>
 </template>
 
 <script>
@@ -223,9 +226,11 @@ import ColoredBorderAlert from "../../components/DynamicHelpResources/ColoredBor
 import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
 
 import {mapState, mapGetters} from "vuex";
+import SetEpsilonValue from "@/views/WizardSteps/SetEpsilonValue.vue";
 
 export default {
   components: {
+      SetEpsilonValue,
     AdditionalInformationAlert,
     ColoredBorderAlert,
     RadioItem,
@@ -233,6 +238,7 @@ export default {
   },
   name: "ValidateDataset",
   data: () => ({
+      epsilonCompleted: false,
     radioDependOnPrivateInformation: "",
     radioBestDescribes: "",
     radioOnlyOneIndividualPerRow: "",
@@ -279,6 +285,12 @@ export default {
     }
   },
   methods: {
+      updateEpsilonStatus: function (stepNumber, completedStatus) {
+          this.epsilonCompleted=completedStatus
+          if (this.radioOnlyOneIndividualPerRow == 'yes' && this.epsilonCompleted) {
+              this.$emit("stepCompleted", 0, true);
+          }
+      },
     saveUserInput() {
       const userInput = {
         datasetQuestions: {
@@ -297,7 +309,7 @@ export default {
       const payload = {objectId: this.getDepositorSetupInfo.objectId, props: userInput}
       this.$store.dispatch('dataset/updateDepositorSetupInfo',
           payload)
-      if (this.radioOnlyOneIndividualPerRow == 'yes') {
+      if (this.radioOnlyOneIndividualPerRow == 'yes' && this.epsilonCompleted) {
         this.$emit("stepCompleted", 0, true);
       }
 

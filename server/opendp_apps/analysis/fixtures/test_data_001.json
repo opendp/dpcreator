@@ -49,8 +49,7 @@
       "persistent_id": "https://fed.some-it.some.edu/idp/shibboleth|92459eabc12ec34@some.edu",
       "email": "mock_user@some.edu",
       "first_name": "B",
-      "last_name": "Martini",
-      "dv_general_token": "shoefly-dont-bother-m3"
+      "last_name": "Martini"
     }
   },
   {
@@ -80,7 +79,7 @@
     }
   },
   {
-    "model": "analysis.depositorsetupinfo",
+    "model": "dataset",
     "pk": 1,
     "fields": {
       "creator": 1,

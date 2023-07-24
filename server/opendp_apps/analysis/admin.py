@@ -1,29 +1,10 @@
 from django.contrib import admin
 
 from .models import \
-    (DepositorSetupInfo,
-     AnalysisPlan,
+    (AnalysisPlan,
      ReleaseEmailRecord,
      ReleaseInfo,
      AuxiliaryFileDepositRecord)
-
-
-class DepositorSetupInfoAdmin(admin.ModelAdmin):
-    save_on_top = True
-    search_fields = ('dataset__name',)
-    list_filter = ('is_complete',)
-    list_display = ('name',
-                    'user_step',
-                    'epsilon',
-                    'updated',
-                    'created',)
-    readonly_fields = ('id',
-                       'name',
-                       'object_id',
-                       'is_complete',
-                       'variable_info_display',
-                       'created',
-                       'updated',)
 
 
 class AnalysisPlanAdmin(admin.ModelAdmin):
@@ -39,6 +20,9 @@ class AnalysisPlanAdmin(admin.ModelAdmin):
                     'created',)
     readonly_fields = ('id',
                        'object_id',
+                       'dataset',
+                       'analyst',
+                       'release_info',
                        'is_complete',
                        'variable_info_display',
                        'created',
@@ -108,7 +92,6 @@ class ReleaseEmailRecordAdmin(admin.ModelAdmin):
                        'created', 'updated',)
 
 
-admin.site.register(DepositorSetupInfo, DepositorSetupInfoAdmin)
 admin.site.register(AnalysisPlan, AnalysisPlanAdmin)
 admin.site.register(ReleaseInfo, ReleaseInfoAdmin)
 admin.site.register(AuxiliaryFileDepositRecord, AuxiliaryFileDepositRecordAdmin)

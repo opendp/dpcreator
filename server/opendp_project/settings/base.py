@@ -29,6 +29,9 @@ CRYPTOGRAPHY_KEY = os.getenv('CRYPTOGRAPHY_KEY', 'CRYPTOGRAPHY_KEY!-ADD-REAL-KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Added with Django 3.2.18
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -129,6 +132,7 @@ CHANNEL_LAYERS = {
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql_psycopg2'),
+        #'HOST': os.getenv('DB_HOST', 'localhost'),
         'HOST': os.getenv('DB_HOST', 'db'),
         'NAME': os.getenv('DB_NAME', 'postgres'),
         'USER': os.getenv('DB_USER', 'postgres'),
@@ -247,7 +251,7 @@ REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'opendp_apps.user.serializers.CustomRegisterSerializer',
 }
 REST_AUTH_SERIALIZERS = {
-    'LOGIN_SERIALIZER': 'opendp_apps.user.serializers.CustomLoginSerializer',
+    # 'LOGIN_SERIALIZER': 'opendp_apps.user.serializers.CustomLoginSerializer',
     'USER_DETAILS_SERIALIZER': 'opendp_apps.user.serializers.OpenDPUserSerializer',
 }
 # ALLOWED_HOSTS=['*']
@@ -301,7 +305,7 @@ assert PROFILER_COLUMN_LIMIT >= 1, 'PROFILER_COLUMN_LIMIT must be at least 1'
 # Epsilon Parameters
 # ---------------------------
 TOTAL_EPSILON_MIN = float(os.environ.get('TOTAL_EPSILON_MIN', '0.001'))
-TOTAL_EPSILON_MAX = float(os.environ.get('TOTAL_EPSILON_MIN', '1.0'))
+TOTAL_EPSILON_MAX = float(os.environ.get('TOTAL_EPSILON_MIN', '3.0'))
 assert TOTAL_EPSILON_MIN > 0, \
     f"The TOTAL_EPSILON_MIN must be greater than 0.0. Found: {TOTAL_EPSILON_MIN}"
 assert TOTAL_EPSILON_MAX > 0, \

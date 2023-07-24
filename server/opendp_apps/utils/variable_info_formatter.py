@@ -35,7 +35,7 @@ def format_variable_info(variable_info: dict) -> dict:
     """
     if not variable_info:  # empty, None, etc, just return it
         return variable_info
-
+    # print('format_variable_info', variable_info)
     variable_info2 = copy(variable_info)
 
     updated_info = {}

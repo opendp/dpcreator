@@ -4,7 +4,7 @@ module.exports = defineConfig({
   projectId: "8we926",
   defaultCommandTimeout: 120000,
   pageLoadTimeout: 120000,
-  video: true,
+  video: false,
   e2e: {
     // We've imported your old cypress plugins here.
     // You may want to clean this up later by importing these.

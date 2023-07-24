@@ -3,7 +3,7 @@ Allow deletion of data in between cypress tests
 """
 from django.core.management.base import BaseCommand
 
-from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.dataverses.models import DataverseHandoff
 
 
@@ -42,7 +42,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR(user_msg))
             return
 
-        depositor_objects_deleted = obj_del_cnts.get('analysis.DepositorSetupInfo', 0)
+        depositor_objects_deleted = obj_del_cnts.get('dataset.DepositorSetupInfo', 0)
         if depositor_objects_deleted != num_objects_to_delete:
             user_msg = (f"Attempted to delete {num_objects_to_delete} DepositorSetupInfo'"
                         f" objects but deleted {del_cnt}")

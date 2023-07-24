@@ -1,6 +1,9 @@
+from datetime import datetime
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.utils.timezone import make_aware
 from rest_framework import serializers
 from rest_framework.relations import PrimaryKeyRelatedField
 
@@ -46,7 +49,7 @@ class ReleaseInfoSerializer(serializers.ModelSerializer):
 
 
 class AnalysisPlanObjectIdSerializer(serializers.Serializer):
-    """Ensure input is a valid UUID and connected to a valid DataSetInfo object"""
+    """Ensure input is a valid UUID and connected to a valid DatasetInfo object"""
     object_id = serializers.UUIDField()
 
     def validate_object_id(self, value):
@@ -68,18 +71,44 @@ class AnalysisPlanObjectIdSerializer(serializers.Serializer):
 
 
 class AnalysisPlanSerializer(serializers.ModelSerializer):
-    analyst = serializers.SlugRelatedField(slug_field='object_id', read_only=True)
-    dataset = serializers.SlugRelatedField(slug_field='object_id', read_only=True)
+    """Fields returned when an AnalysisPlan is serialized"""
+    analysis_id = serializers.CharField(source='object_id', read_only=True)
+    dataset_id = serializers.CharField(source='dataset.object_id', read_only=True)
     release_info = ReleaseInfoSerializer(read_only=True)
+
+    analyst_name = serializers.CharField(source='analyst', read_only=True)
+    dataset_name = serializers.CharField(source='dataset.name', read_only=True)
+    dataset_owner_id = serializers.CharField(source='dataset.creator.object_id', read_only=True)
+    dataset_owner_name = serializers.CharField(source='dataset.creator', read_only=True)
+
+    is_expired = serializers.SerializerMethodField('is_plan_expired')
+
+    def is_plan_expired(self, obj):
+        return make_aware(datetime.now()) > obj.expiration_date
 
     class Meta:
         model = AnalysisPlan
-        fields = ['name', 'object_id',
-                  'analyst', 'dataset',
-                  'is_complete', 'user_step',
-                  'variable_info', 'dp_statistics',
+        fields = ['object_id',
+                  'analysis_id',
+                  'name',
+                  'description',
+                  'analyst_name',
+                  'dataset_id',
+                  'dataset_name',
+                  'dataset_owner_id',
+                  'dataset_owner_name',
+                  'epsilon',
+                  'delta',
+                  'is_expired',
+                  'is_complete',
+                  'user_step',
+                  'wizard_step',
+                  'expiration_date',
                   'release_info',
-                  'created', 'updated']
+                  'dp_statistics',
+                  'variable_info',
+                  'created',
+                  'updated']
 
 
 class DPStatisticSerializer(serializers.Serializer):
@@ -199,7 +228,7 @@ class ReleaseValidationSerializer(serializers.ModelSerializer):
 
 
 class IntegerEdgeInputsSerializer(serializers.Serializer):
-    """Ensure input is a valid UUID and connected to a valid DataSetInfo object"""
+    """Ensure input is a valid UUID and connected to a valid DatasetInfo object"""
     min = serializers.IntegerField()
     max = serializers.IntegerField()
     number_of_bins = serializers.IntegerField(min_value=2)

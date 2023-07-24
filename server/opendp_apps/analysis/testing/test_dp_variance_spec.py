@@ -3,6 +3,7 @@ import json
 from os.path import abspath, dirname, isfile, join
 
 from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
+from django.conf import settings
 from opendp_apps.analysis.tools.dp_variance_spec import DPVarianceSpec
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.utils.extra_validators import *
@@ -12,7 +13,7 @@ TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
 
 class DPVarianceStatSpecTest(StatSpecTestCase):
-    fixtures = ['test_dataset_data_001.json', ]
+    """Test the DPVarianceSpec class"""
 
     def setUp(self):
 
@@ -129,14 +130,14 @@ class DPVarianceStatSpecTest(StatSpecTestCase):
             # print(f'> Valid dataset_size: {good_ds}')
             self.assertTrue(dp_variance.is_chain_valid())
 
-    # @skip
     def test_20_bad_epsilon(self):
         """(20) Bad epsilon"""
         msgt(self.test_20_bad_epsilon.__doc__)
 
         spec_props = self.spec_props
 
-        for epsilon_val in [1.01, -0.01, 10]:
+        epsilon_too_high = settings.TOTAL_EPSILON_MAX + 0.1
+        for epsilon_val in [epsilon_too_high, -0.01, 10]:
             print(f'> Bad epsilon val: {epsilon_val}')
             spec_props['epsilon'] = epsilon_val
             dp_variance = DPVarianceSpec(spec_props)

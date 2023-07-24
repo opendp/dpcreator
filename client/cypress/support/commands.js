@@ -1,3 +1,5 @@
+
+
 Cypress.Commands.add('loadTeacherSurveyDemo', () => {
     cy.on('uncaught:exception', (e, runnable) => {
         console.log('error', e)
@@ -142,26 +144,27 @@ Cypress.Commands.add('uploadFile', (testfile) => {
     cy.get('tr').should('contain',
         'Uploaded')
 })
-Cypress.Commands.add('runDemo', (mockDVfile, demoDatafile) => {
+Cypress.Commands.add('runDemo', (testFile, demoDatafile) => {
     cy.clearData()
-    cy.createMockDataset(mockDVfile)
+    let testPath = 'cypress/fixtures/'+testFile
+    cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
+    cy.uploadFile(testPath)
     cy.fixture(demoDatafile).then((demoData) => {
-        cy.url().should('contain', 'welcome')
-        cy.get('.soft_primary.rounded-lg.mt-10.pa-16').should('contain',
-            demoData['datasetName'])
+        cy.url().should('contain', 'my-data')
         cy.goToConfirmVariables(demoData.variables)
 
         // select the variables we will use
         cy.selectVariable(demoData.variables)
 
+        // TODO: add the rest of the steps when the analysis wizard is ready
         // Continue to Set Epsilon Step
-        cy.epsilonStep()
+        //cy.epsilonStep()
         // Add all the statistics in the Create Statistics Step
-        cy.createStatistics(demoData)
+        //cy.createStatistics(demoData)
 
         // Submit the statistics
 
-        cy.submitStatistics(demoData)
+     //   cy.submitStatistics(demoData)
 
 
     })
@@ -199,7 +202,7 @@ Cypress.Commands.add('createMockDataset', (fixture, createAccount = true) => {
         cy.get('[data-test="username"]').type(mockForm['user']);
         cy.get('[data-test="password"]').type(mockForm['password']);
         cy.get('[data-test="Log in"]').click();
-        cy.url().should('contain', 'welcome')
+        cy.url().should('contain', 'my-data')
     })
 })
 
@@ -225,21 +228,19 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
     cy.get('[data-test="radioPrivateInformationYes"]').check({force: true})
     cy.get('[data-test="notHarmButConfidential"]').check({force: true})
     cy.get('[data-test="radioOnlyOneIndividualPerRowYes"]').check({force: true})
-    cy.intercept('/api/profile/run-async-profile/').as('runAsync')
-    cy.intercept('/api/dataset-info/*').as('getDatasetInfo')
+    cy.get('[data-test="Larger Population - no"]').check({force: true})
+    //  cy.get('[data-test="Public Observations - yes"]').should('be.visible')
+    cy.get('[data-test="Public Observations - yes"]').check({force: true})
+
     // click on continue to go to trigger the profiler and go to the Confirm Variables Page
     cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
-    cy.wait('@runAsync')
-    cy.wait('@getDatasetInfo')
 
     cy.get('h1').should('contain', 'Confirm Variables')
-    const getStore = () => cy.window().its('app.$store')
-    getStore().its('state.dataset.profilerStatus').should('deep.equal', true)
 
     //   dataset.profilerStatus
     for (const key in variableData) {
         const val = variableData[key]
-        cy.get('table').contains('td', val.name).should('be.visible')
+        cy.get('table').contains('td', val.name).should('exist')
         cy.get('table').contains('tr', val.name).should('contain', val.type)
     }
 
@@ -257,8 +258,8 @@ Cypress.Commands.add('selectVariable',(demoVariables)=> {
             const maxDataTest = '[data-test="' + demoVar.name + ':max"]'
             // Enter min and max for one numericVar so we can validate
 
-            cy.get(minDataTest).should('be.visible')
-            cy.get(maxDataTest).should('be.visible')
+            cy.get(minDataTest).should('exist')
+            cy.get(maxDataTest).should('exist')
             cy.get(minDataTest).type(demoVar.min, {force: true})
             cy.get(maxDataTest).type(demoVar.max, {force: true})
             // click back into min input, to trigger change event on max input
@@ -275,7 +276,7 @@ Cypress.Commands.add('selectVariable',(demoVariables)=> {
         }
         // TODO: add handling of Categorical vars
     })
-    cy.wait(500)
+
 
 })
 

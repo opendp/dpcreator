@@ -1,4 +1,4 @@
-from opendp_apps.analysis.models import DepositorSetupInfo
+from opendp_apps.dataset.models import DepositorSetupInfo
 
 
 class StepUpdater(object):

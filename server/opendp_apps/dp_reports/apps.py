@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class DpReportsConfig(AppConfig):
-    name = 'dp_reports'
+    name = 'opendp_apps.dp_reports'

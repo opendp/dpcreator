@@ -5,38 +5,37 @@ from rest_framework.serializers import raise_errors_on_nested_writes
 from rest_framework.utils import model_meta
 from rest_polymorphic.serializers import PolymorphicSerializer
 
-from opendp_apps.analysis.models import DepositorSetupInfo
 from opendp_apps.analysis.serializers import AnalysisPlanSerializer
 from opendp_apps.dataset import static_vals as dstatic
-from opendp_apps.dataset.models import DataSetInfo, DataverseFileInfo, UploadFileInfo
+from opendp_apps.dataset.models import DepositorSetupInfo, DatasetInfo, DataverseFileInfo, UploadFileInfo
 from opendp_apps.dataverses.models import RegisteredDataverse
 from opendp_apps.model_helpers.basic_response import BasicResponse, ok_resp, err_resp
 from opendp_apps.user.models import OpenDPUser
 
 
 class DatasetObjectIdSerializer(serializers.Serializer):
-    """Ensure input is a valid UUID and connected to a valid DataSetInfo object"""
+    """Ensure input is a valid UUID and connected to a valid DatasetInfo object"""
     object_id = serializers.UUIDField()
 
     def validate_object_id(self, value):
         """
-        Check that the object_id belongs to an existing DataSetInfo object
+        Check that the object_id belongs to an existing DatasetInfo object
         """
         try:
-            dsi = DataSetInfo.objects.get(object_id=value)
+            dsi = DatasetInfo.objects.get(object_id=value)
             self.dataset_info = dsi
-        except DataSetInfo.DoesNotExist:
+        except DatasetInfo.DoesNotExist:
             raise serializers.ValidationError(dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND)
 
         return value
 
     def get_dataset_info(self) -> BasicResponse:
-        """Get the related DataSetInfo object"""
+        """Get the related DatasetInfo object"""
         assert self.is_valid(), "Do not call this method before checking \".is_valid()\""
 
         try:
-            dsi = DataSetInfo.objects.get(object_id=self.validated_data.get('object_id'))
-        except DataSetInfo.DoesNotExist:
+            dsi = DatasetInfo.objects.get(object_id=self.validated_data.get('object_id'))
+        except DatasetInfo.DoesNotExist:
             return err_resp(dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND)
 
         return ok_resp(dsi)
@@ -48,19 +47,19 @@ class DatasetObjectIdSerializer(serializers.Serializer):
         return self.validated_data.get('object_id')
 
     def get_dataset_info_with_user_check(self, user: get_user_model()) -> BasicResponse:
-        """Get the related DataSetInfo object and check that the user matches the creator"""
+        """Get the related DatasetInfo object and check that the user matches the creator"""
         assert self.is_valid(), "Do not call this method before checking \".is_valid()\""
 
         try:
-            dsi = DataSetInfo.objects.get(object_id=self.validated_data.get('object_id'),
+            dsi = DatasetInfo.objects.get(object_id=self.validated_data.get('object_id'),
                                           creator=user)
-        except DataSetInfo.DoesNotExist:
+        except DatasetInfo.DoesNotExist:
             return err_resp(dstatic.ERR_MSG_DATASET_INFO_NOT_FOUND_CURRENT_USER)
 
         return ok_resp(dsi)
 
 
-class DataSetInfoSerializer(serializers.ModelSerializer):
+class DatasetInfoSerializer(serializers.ModelSerializer):
     creator = serializers.SlugRelatedField(queryset=OpenDPUser.objects.all(),
                                            slug_field='username',
                                            read_only=False)
@@ -68,7 +67,7 @@ class DataSetInfoSerializer(serializers.ModelSerializer):
     analysis_plans = AnalysisPlanSerializer(many=True, read_only=True, source='analysisplan_set')
 
     class Meta:
-        model = DataSetInfo
+        model = DatasetInfo
         fields = ['object_id', 'name', 'created', 'creator',
                   'source', 'status', 'status_name']
         read_only_fields = ['object_id', 'id', 'created', 'updated']
@@ -82,17 +81,28 @@ class DepositorSetupInfoSerializer(serializers.ModelSerializer):
         fields = ['object_id', 'id', 'created', 'updated',
                   'is_complete',
                   'user_step',
+                  'wizard_step',
                   'dataset_questions',
                   'epsilon_questions',
                   'dataset_size',
+                  'data_profile',
                   'variable_info',
                   'default_epsilon', 'epsilon',
                   'default_delta', 'delta',
                   'confidence_level']
-        read_only_fields = ['object_id', 'id', 'created', 'updated', 'is_complete']
+        read_only_fields = ['object_id',
+                            'id',
+                            'is_complete',
+                            # 'user_step',
+                            'data_profile',
+                            'default_epsilon',
+                            'default_delta',
+                            'created',
+                            'updated', ]
 
     def update(self, instance, validated_data):
         """
+        (Is this still valid? Why was there a race condition? RP, 5/24/2023)
         Override default update method to counteract race conditions.
         (See https://github.com/encode/django-rest-framework/issues/5897)
         :param instance:
@@ -128,7 +138,7 @@ class DepositorSetupInfoSerializer(serializers.ModelSerializer):
         return instance
 
 
-class DataverseFileInfoSerializer(DataSetInfoSerializer):
+class DataverseFileInfoSerializer(DatasetInfoSerializer):
     creator = serializers.SlugRelatedField(queryset=OpenDPUser.objects.all(),
                                            slug_field='username',
                                            read_only=False)
@@ -199,12 +209,15 @@ class UploadFileInfoCreationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UploadFileInfo
-        fields = ['object_id', 'name', 'source_file', 'creator']
+        fields = ['object_id', 'name', 'source_file', 'creator', ]
+
+    def save(self, **kwargs):
+        return super().save(**kwargs)
 
 
-class DataSetInfoPolymorphicSerializer(PolymorphicSerializer):
+class DatasetInfoPolymorphicSerializer(PolymorphicSerializer):
     model_serializer_mapping = {
-        DataSetInfo: DataSetInfoSerializer,
+        DatasetInfo: DatasetInfoSerializer,
         DataverseFileInfo: DataverseFileInfoSerializer,
         UploadFileInfo: UploadFileInfoSerializer
     }

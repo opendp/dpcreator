@@ -3,6 +3,8 @@ For more context regarding these tests, please see the document:
 - /server/opendp_apps/user/README.md
 """
 
+from unittest import skip
+
 import requests_mock
 from django.test import TestCase, override_settings
 from rest_framework import status as http_status
@@ -16,6 +18,7 @@ from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.user.models import DataverseUser
 
 
+@skip('Deprecated Dataverse integration')
 @requests_mock.Mocker()
 @override_settings(ACCOUNT_EMAIL_VERIFICATION='none')  # 'mandatory'
 class TestDataverseHandoffView(TestCase):

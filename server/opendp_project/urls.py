@@ -14,10 +14,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.conf import settings
-from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.views.generic import TemplateView, RedirectView
 from rest_framework import routers
 
@@ -29,7 +28,7 @@ from opendp_apps.banner_messages.views import BannerMessageViewSet
 from opendp_apps.content_pages.view_vue_settings import VueSettingsView
 from opendp_apps.dataset.views import \
     (DepositorSetupViewSet,
-     DataSetInfoViewSet,
+     DatasetInfoViewSet,
      UploadFileSetupViewSet)
 from opendp_apps.dataset.views_profile import ProfilingViewSet
 from opendp_apps.dataverses.urls import router as dataverse_router
@@ -47,14 +46,14 @@ admin.site.site_title = 'DP Creator Admin Panel'
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 
-router.register(r'analyze', AnalysisPlanViewSet, basename='analyze')
+router.register(r'analysis-plan', AnalysisPlanViewSet, basename='analysis-plan')
 router.register(r'banner-messages', BannerMessageViewSet, basename='banner-messages')
 
-router.register(r'dataset-info', DataSetInfoViewSet)
-router.register(r'dv-user', DataverseUserView, basename='dv-user')
+router.register(r'dataset-info', DatasetInfoViewSet)
+# router.register(r'dv-user', DataverseUserView, basename='dv-user')
 router.register(r'deposit', DepositorSetupViewSet, basename='deposit')
 
-router.register(r'dv-handoff', DataverseHandoffView, basename='dv-handoff')
+# router.register(r'dv-handoff', DataverseHandoffView, basename='dv-handoff')
 router.register(r'dv-file', DataverseFileView, basename='dv-file')
 router.register(r'direct-upload', UploadFileSetupViewSet, basename='direct-upload')
 
@@ -83,17 +82,17 @@ urlpatterns = [
     # For testing
     path('dv-mock-api/', include('opendp_apps.dataverses.mock_urls')),
 
-    url(r'^user-details/$',
+    re_path(r'^user-details/$',
         TemplateView.as_view(template_name="user_details.html"),
         name='user-details'),
-    url(r'^rest-auth/', include('dj_rest_auth.urls')),
-    url(r'^rest-auth/registration/', include('dj_rest_auth.registration.urls')),
-    url(r'^account/', include('allauth.urls')),
-    url(r'^accounts/profile/$', RedirectView.as_view(url='/', permanent=True), name='profile-redirect'),
-    url(r'^rest-auth/google/$', GoogleLogin.as_view(), name='google-login'),
+    re_path(r'^rest-auth/', include('dj_rest_auth.urls')),
+    re_path(r'^rest-auth/registration/', include('dj_rest_auth.registration.urls')),
+    re_path(r'^account/', include('allauth.urls')),
+    re_path(r'^accounts/profile/$', RedirectView.as_view(url='/', permanent=True), name='profile-redirect'),
+    re_path(r'^rest-auth/google/$', GoogleLogin.as_view(), name='google-login'),
 
     # Putting all vue-related views under "ui/" for now to separate from the api.
-    url(r'^.*$', TemplateView.as_view(template_name="index.html"), name='vue-home'),
+    re_path(r'^.*$', TemplateView.as_view(template_name="index.html"), name='vue-home'),
 ]
 
 if settings.USE_DEV_STATIC_SERVER:

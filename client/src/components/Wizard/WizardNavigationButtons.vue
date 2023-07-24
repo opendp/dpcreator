@@ -14,10 +14,22 @@
     >
 
 
+        <Button
+                data-test="wizardCompleteButton"
+                v-if="stepperPosition === 1 && workflow==='depositor'"
+                classes="d-block"
+                :class="{
+          'mx-auto': $vuetify.breakpoint.mdAndUp
+        }"
+                color="primary"
+                :click="handleComplete"
+                :disabled="isContinueDisabled"
+                label="Complete"
 
+        />
       <Button
           data-test="wizardContinueButton"
-          v-if="stepperPosition !== LAST_STEP_INDEX"
+          v-else-if="stepperPosition !== LAST_STEP_INDEX"
           classes="d-block"
           :class="{
           'mx-auto': $vuetify.breakpoint.mdAndUp
@@ -82,27 +94,51 @@
 <script>
 import Button from "../DesignSystem/Button.vue";
 import GoBackDialog from "./GoBackDialog.vue";
-import {mapGetters} from "vuex";
+import NETWORK_CONSTANTS from "../../../src/router/NETWORK_CONSTANTS";
+import {mapGetters, mapState} from "vuex";
+import {analystWizardNextSteps, wizardNextSteps} from "@/data/stepInformation";
 
 export default {
   components: {Button, GoBackDialog},
   name: "WizardNavigationButtons",
-  props: ["steps", "stepperPosition"],
+  props: ["steps", "stepperPosition", "workflow"],
 
   methods: {
     handleContinue: function () {
       window.scrollTo(0, 0);
       this.updateUserStep()
     },
+      handleComplete: function () {
+          const props = {
+              userStep: 'step_500'
+          }
+          console.log('handle complete, props:' + JSON.stringify(props))
+          const payload = {objectId: this.getDepositorSetupInfo.objectId, props: props}
+          this.$store.dispatch('dataset/updateDepositorSetupInfo',
+              payload)
+          this.$router.push(`${NETWORK_CONSTANTS.MY_DATA.PATH}`)
+
+      },
     handleBack: function () {
       this.dialogGoBack = false;
       this.$emit("update:stepperPosition", this.stepperPosition - 1);
     },
-    emitStepEvent() {
+      saveUserInput() {
+
+
+      },
+
+      emitStepEvent() {
       this.$emit("update:stepperPosition", this.stepperPosition + 1)
     },
     updateUserStep() {
-      this.$store.dispatch('dataset/updateUserStep', this.stepperPosition)
+      let nextStep = null;
+      if (this.workflow === 'depositor') {
+         nextStep = wizardNextSteps[this.stepperPosition]
+      } else {
+        nextStep = analystWizardNextSteps[this.stepperPosition]
+      }
+      this.$store.dispatch('dataset/updateUserStep', nextStep)
       this.emitStepEvent()
 
 
@@ -118,9 +154,13 @@ export default {
   }),
 
   computed: {
-    ...mapGetters('dataset', ['getUpdatedTime', 'getTimeRemaining']),
+    ...mapGetters('dataset', ['getDepositorSetupInfo','getUpdatedTime', 'getTimeRemaining']),
+
+
 
     isContinueDisabled: function () {
+        console.log('isContinueDisabled, this.stepperPosistion: '+this.stepperPosition)
+        console.log('completed: '+this.steps[this.stepperPosition].completed)
       return !this.steps[this.stepperPosition].completed;
     }
   }

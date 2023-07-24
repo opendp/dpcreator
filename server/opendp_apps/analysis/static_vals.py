@@ -120,15 +120,17 @@ def missing_val_label(missing_val_type):
 # --------------------------------------
 ERR_MSG_ANALYSIS_PLAN_NOT_FOUND = 'The AnalysisPlan was not found.'
 
-ERR_MSG_DATASET_ID_REQUIRED = 'The DataSetInfo id is required.'
-ERR_MSG_ANALYSIS_ID_REQUIRED = 'The AnalysisPlan id is required.'
+ERR_MSG_DATASET_ID_REQUIRED = 'The DatasetInfo object_id is required.'
+ERR_MSG_ANALYSIS_ID_REQUIRED = 'The AnalysisPlan object_id is required.'
+
+ERR_MSG_PLAN_INFO_ANALYST_ID_INVALID = 'A user was not found for the given Analyst ID.'
 
 ERR_MSG_USER_REQUIRED = 'The OpenDP user is required.'
-ERR_MSG_NO_DATASET = 'DataSetInfo object not found for this object_id and creator'
+ERR_MSG_NO_DATASET = 'DatasetInfo object not found for this object_id and creator'
 ERR_MSG_SETUP_INCOMPLETE = 'Depositor setup is not complete'
 
 ERR_MSG_NO_ANALYSIS_PLAN = 'AnalysisPlan object not found for this object_id and creator'
-ERR_MSG_FIELDS_NOT_UPDATEABLE = 'These fields are not updatable'
+ERR_MSG_FIELDS_NOT_UPDATEABLE = 'These fields are not updatable: {problem_field_str}'
 
 ERR_MSG_BAD_TOTAL_EPSILON = 'The depositor setup info has an invalid epsilon value'
 ERR_MSG_BAD_TOTAL_DELTA = 'The depositor setup info has an invalid delta value'
@@ -164,26 +166,28 @@ SETUP_Q_02_TEXT = ('Which of the following best describes your data file?',
                    ' which may be changed later in the process.')
 
 SETUP_Q_02_ANSWERS = dict(
-    public=('Public Information', None),
+    public=('Public Information', {'epsilon': None, 'delta': None}),
     notHarmButConfidential=(('Information that, if disclosed,'
                              ' would not cause material harm,'
                              ' but which the organization has chosen to keep confidential'),
-                            {'epsilon': 1, 'delta': 10 - 5}),
+                            {'epsilon': 1, 'delta': DELTA_10_NEG_5}),
     couldCauseHarm=(('Information that could cause risk of material harm to individuals'
                      ' or the organization if disclosed'),
-                    {'epsilon': .25, 'delta': 10e-6}),
+                    {'epsilon': .25, 'delta': DELTA_10_NEG_6}),
     wouldLikelyCauseHarm=(('Information that would likely cause serious harm to individuals'
                            ' or the organization if disclosed'),
-                          {'epsilon': .05, 'delta': 10e-7}),
+                          {'epsilon': .05, 'delta': DELTA_10_NEG_7}),
     wouldCauseSevereHarm=(('Information that would cause severe harm to individuals or the'
                            ' organization if disclosed. Use of this application is not'
                            ' recommended.'),
                           None),
 )
+SETUP_Q_02_CHOICES = SETUP_Q_02_ANSWERS.keys()
 
 SETUP_Q_03_ATTR = 'radio_only_one_individual_per_row'
 SETUP_Q_03_TEXT = ('Does each individual appear in only one row?',
                    'Used to help determine dataset distance.')
+
 
 SETUP_Q_04_ATTR = 'secret_sample'
 SETUP_Q_04_TEXT = ('Is your data a secret and simple random sample from a larger population?',
@@ -198,6 +202,11 @@ SETUP_Q_05_TEXT = ('Can the number of observations in your data file be made pub
                    ('If the data file size can be made public, we don\'t need to spend a portion'
                     ' of your privacy budget to estimate it.'))
 
+YES_VALUE = 'yes'
+NO_VALUE = 'no'
+YES_NO_VALUES = [YES_VALUE, NO_VALUE]
+YES_NO_QUESTIONS = [SETUP_Q_01_ATTR, SETUP_Q_03_ATTR, SETUP_Q_04_ATTR, SETUP_Q_05_ATTR]
+
 SETUP_QUESTION_LOOKUP = {
     SETUP_Q_01_ATTR: SETUP_Q_01_TEXT,
     SETUP_Q_02_ATTR: SETUP_Q_02_TEXT,
@@ -205,8 +214,36 @@ SETUP_QUESTION_LOOKUP = {
     SETUP_Q_04_ATTR: SETUP_Q_04_TEXT,
     SETUP_Q_05_ATTR: SETUP_Q_05_TEXT,
 }
-SETUP_QUESTION_LIST = [SETUP_Q_01_ATTR,
-                       SETUP_Q_02_ATTR,
-                       SETUP_Q_03_ATTR,
-                       SETUP_Q_04_ATTR,
-                       SETUP_Q_05_ATTR]
+
+SETUP_QUESTION_LIST_FOR_FORMATTING = [SETUP_Q_01_ATTR,
+                                      SETUP_Q_02_ATTR,
+                                      SETUP_Q_03_ATTR,
+                                      SETUP_Q_04_ATTR,
+                                      SETUP_Q_05_ATTR]
+
+EPSILON_QUESTION_LIST = [SETUP_Q_04_ATTR,
+                         SETUP_Q_04a_ATTR,
+                         SETUP_Q_05_ATTR]
+
+ERR_MSG_DATASET_QUESTIONS_NOT_DICT = 'Dataset questions must be a dictionary'
+ERR_MSG_DATASET_QUESTIONS_INVALID_KEY = 'Invalid key for dataset questions: "{key}"'
+ERR_MSG_DATASET_QUESTIONS_INVALID_VALUE = 'Invalid value ("{value}") for dataset question ("{key}")'
+ERR_MSG_DATASET_YES_NO_QUESTIONS_INVALID_VALUE = ('Dataset question "{key}" should have'
+                                                  ' a "yes" or "no" answer, not "{value}"')
+ERR_MSG_POPULATION_SIZE_MISSING = ('If this is a sample from a population, the population size'
+                                   ' must be an integer. Currently, it is type: {val_type}')
+ERR_MSG_POPULATION_CANNOT_BE_NEGATIVE = ('The population must be a positive integer. Currently,'
+                                         ' it is: {pop_size}')
+
+ERR_MSG_NO_EPSILON_AVAILABLE = 'No epsilon is available to create another AnalysisPlan for this dataset.'
+ERR_MSG_NOT_ENOUGH_EPSILON_AVAILABLE = 'Only {available_epsilon} epsilon is available to create another AnalysisPlan for this dataset. You had requested {requested_epsilon} epsilon.'
+
+ERR_MSG_PLAN_INFO_REQUIRED = 'AnalysisPlan info is required include name, epsilon, and expiration date.'
+ERR_MSG_PLAN_INFO_EPSILON_MISSING = '"epsilon" is required to create an AnalysisPlan and should be a positive float value.'
+ERR_MSG_PLAN_INFO_NAME_MISSING = '"name" is required to create an AnalysisPlan and should be a string value.'
+ERR_MSG_PLAN_INFO_EXPIRATION_DATE_INVALID = ('"expiration_date" is required to create an'
+                                                        ' AnalysisPlan and should be a date string in the'
+                                                        ' format "YYYY-MM-DD". (found: "{expiration_date}")')
+
+ERR_MSG_RELEASES_EXISTS = 'A Release has been created from this AnalysisPlan. Changes are not allowed.'
+ERR_MSG_ANALYSIS_PLAN_EXPIRED = 'This AnalysisPlan has expired.'

@@ -12,7 +12,6 @@ TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
 
 class DPSumStatSpecTest(StatSpecTestCase):
-    fixtures = ['test_dataset_data_001.json', ]
 
     def test_05_valid_noise_mechanism(self):
         """(5) Check for the correct noise_mechanism"""

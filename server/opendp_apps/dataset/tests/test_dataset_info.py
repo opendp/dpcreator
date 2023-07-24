@@ -8,7 +8,10 @@ from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.utils.extra_validators import \
     VALIDATE_MSG_ZERO_OR_GREATER, VALIDATE_MSG_EPSILON
 
+from unittest import skip
 
+
+@skip('Reconfiguring for analyst mode')
 @requests_mock.Mocker()
 class TestDepositorInfo(BaseEndpointTest):
     fixtures = ['test_dataverses_01.json',

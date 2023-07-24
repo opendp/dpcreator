@@ -7,7 +7,8 @@ from opendp_apps.user.models import OpenDPUser, DataverseUser
 class OpenDPUserAdmin(UserAdmin):
     save_on_top = True
     list_display_links = ('email', 'username',)
-    list_display = ('username', 'email', 'pk', 'handoff_id', 'first_name', 'last_name', 'object_id')
+    list_display = ('username', 'email', 'pk', 'first_name', 'last_name', 'object_id')
+    readonly_fields = ('object_id',)
 
 
 class DataverseUserAdmin(admin.ModelAdmin):

@@ -1,21 +1,21 @@
 """
-Format a DataSetInfo for use in a JSON Release
+Format a DatasetInfo for use in a JSON Release
 """
 import json
 
 from django.core.serializers.json import DjangoJSONEncoder
 
 from opendp_apps.analysis.misc_formatters import get_readable_datetime
-from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dataset.models import DatasetInfo
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.model_helpers.basic_response import ok_resp, err_resp, BasicResponse
 
 
-class DataSetFormatter(BasicErrCheck):
+class DatasetFormatter(BasicErrCheck):
 
-    def __init__(self, dataset_info: DataSetInfo):
-        """Init with a DataSetInfo object"""
-        assert isinstance(dataset_info, DataSetInfo), '"dataset_info" must be a DataSetInfo instance.'
+    def __init__(self, dataset_info: DatasetInfo):
+        """Init with a DatasetInfo object"""
+        assert isinstance(dataset_info, DatasetInfo), '"dataset_info" must be a DatasetInfo instance.'
 
         self.dataset = dataset_info
         self.formatted_info = {}
@@ -26,10 +26,10 @@ class DataSetFormatter(BasicErrCheck):
         """
         Format the dataset info
         """
-        if self.dataset.source == DataSetInfo.SourceChoices.UserUpload:
+        if self.dataset.source == DatasetInfo.SourceChoices.UserUpload:
             self.dataset = self.dataset.uploadfileinfo  # Get the UploadFileInfo object
             self.format_user_upload()
-        elif self.dataset.source == DataSetInfo.SourceChoices.Dataverse:
+        elif self.dataset.source == DatasetInfo.SourceChoices.Dataverse:
             self.dataset = self.dataset.dataversefileinfo  # Get the DataverseFileInfo object
             self.format_dataverse_dataset()
         else:

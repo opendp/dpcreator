@@ -5,10 +5,29 @@ from django.http import HttpResponseRedirect
 from django.urls import path
 
 from .models import \
-    (DataSetInfo, DataverseFileInfo, UploadFileInfo)
+    (DepositorSetupInfo, DatasetInfo, DataverseFileInfo, UploadFileInfo)
 
 
-class DataSetInfoAdmin(admin.ModelAdmin):
+class DepositorSetupInfoAdmin(admin.ModelAdmin):
+    save_on_top = True
+    search_fields = ('dataset__name',)
+    list_filter = ('is_complete',)
+    list_display = ('name',
+                    'user_step',
+                    'epsilon',
+                    'updated',
+                    'created',)
+    readonly_fields = ('id',
+                       'name',
+                       #'user_step',
+                       'object_id',
+                       'is_complete',
+                       'variable_info_view',
+                       'created',
+                       'updated',)
+
+
+class DatasetInfoAdmin(admin.ModelAdmin):
     change_list_template = "admin/dataset/datasetinfo_change_list.html"
 
     save_on_top = True
@@ -23,7 +42,8 @@ class DataSetInfoAdmin(admin.ModelAdmin):
     readonly_fields = ('id',
                        'object_id',
                        'source',
-                       'data_profile_display',
+                       'depositor_setup_info',
+                       'variable_info_display',
                        'created', 'updated',)
 
     def changelist_view(self, request, extra_context=None):
@@ -68,9 +88,6 @@ class DataSetInfoAdmin(admin.ModelAdmin):
         return HttpResponseRedirect("../")
 
 
-admin.site.register(DataSetInfo, DataSetInfoAdmin)
-
-
 class DataverseFileInfoAdmin(admin.ModelAdmin):
     save_on_top = True
     search_fields = ('name',)
@@ -84,10 +101,12 @@ class DataverseFileInfoAdmin(admin.ModelAdmin):
                     'updated',
                     'created',)
     list_display_links = ('id', 'name')
-    readonly_fields = ('id', 'object_id', 'source', 'created', 'updated',)
-
-
-admin.site.register(DataverseFileInfo, DataverseFileInfoAdmin)
+    readonly_fields = ('id',
+                       'object_id',
+                       'source',
+                       'depositor_setup_info',
+                       'created',
+                       'updated',)
 
 
 class UploadFileInfoAdmin(admin.ModelAdmin):
@@ -99,7 +118,14 @@ class UploadFileInfoAdmin(admin.ModelAdmin):
                     'creator',
                     'updated',
                     'created',)
-    readonly_fields = ('id', 'source', 'created', 'updated',)
+    readonly_fields = ('id',
+                       'source',
+                       'depositor_setup_info',
+                       'created',
+                       'updated',)
 
 
+admin.site.register(DatasetInfo, DatasetInfoAdmin)
+admin.site.register(DataverseFileInfo, DataverseFileInfoAdmin)
 admin.site.register(UploadFileInfo, UploadFileInfoAdmin)
+admin.site.register(DepositorSetupInfo, DepositorSetupInfoAdmin)

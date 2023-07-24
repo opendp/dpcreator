@@ -11,13 +11,21 @@ export default {
         PATH: "/my-data",
         NAME: "MyData"
     },
+    MY_ANALYSIS_PLANS: {
+        PATH: "/my-plans",
+        NAME: "MyAnalysisPlans"
+    },
     MY_DATA_DETAILS: {
         PATH: "/my-data-details",
         NAME: "MyDataDetails"
     },
-    WIZARD: {
-        PATH: "/wizard",
-        NAME: "Wizard"
+    ANALYST_WIZARD: {
+        PATH: "/analyst-wizard",
+        NAME: "AnalystWizard"
+    },
+    DEPOSITOR_WIZARD: {
+        PATH: "/depositor-wizard",
+        NAME: "DepositorWizard"
     },
     MY_PROFILE: {
         PATH: "/my-profile",

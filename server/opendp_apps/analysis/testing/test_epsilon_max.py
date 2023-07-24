@@ -1,6 +1,8 @@
 """
 Test of epsilon addition and offsetting floating point anomaly
 """
+
+from django.conf import settings
 from django.test import TestCase
 
 from opendp_apps.analysis import static_vals as astatic
@@ -8,12 +10,14 @@ from opendp_apps.model_helpers.msg_util import msgt
 
 
 class TestEpsilonMax(TestCase):
+    """Test the epsilon floating point anomaly"""
 
     def setUp(self):
         self.epsilon_budget_1 = 1.0
         self.epsilon_budget_0_5 = 0.5
         self.epsilon_budget_0_1 = 0.1
-        self.budgets_to_test = [self.epsilon_budget_1,
+        self.budgets_to_test = [settings.TOTAL_EPSILON_MAX,
+                                self.epsilon_budget_1,
                                 self.epsilon_budget_0_5,
                                 self.epsilon_budget_0_1]
         self.num_budget_1_stats_that_fail = [

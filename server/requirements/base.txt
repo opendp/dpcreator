@@ -2,18 +2,18 @@
 opendp==0.6.1
 
 # Web application
-asgiref==3.2.10
+Django==4.0
+asgiref>=3.3.2
 bleach==3.3.0
 certifi==2020.6.20
 chardet==3.0.4
-Django==3.1.13
-django-cryptography==1.0
+# django-cryptography==1.0
 django-extensions==3.0.9
-django-polymorphic==3.0.0
+django-polymorphic>=3.1
 dj-rest-auth==2.1.3
 django-allauth==0.44.0
-djangorestframework==3.12.2
-django-rest-polymorphic==0.1.9
+djangorestframework>=3.12.2
+django-rest-polymorphic>=0.1.9
 django-cors-headers==3.6.0
 idna==2.10
 jsonschema==4.2.1
@@ -46,8 +46,8 @@ celery==5.2.2
 
 # Django channels for websockets
 #
-channels==3.0.3
-channels-redis==3.2.0
+channels==3.0.5
+channels-redis==3.4.1
 
 # for PDF creation
 borb==2.0.21

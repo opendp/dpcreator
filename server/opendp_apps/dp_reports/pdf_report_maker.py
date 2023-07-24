@@ -47,7 +47,7 @@ from opendp_apps.analysis import static_vals as astatic
 
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 
-from opendp_apps.dataset.models import DataSetInfo
+from opendp_apps.dataset.models import DatasetInfo
 from opendp_apps.dp_reports import pdf_preset_text
 from opendp_apps.dp_reports import pdf_utils as putil
 from opendp_apps.dp_reports import static_vals as pdf_static
@@ -649,7 +649,7 @@ class PDFReportMaker(BasicErrCheck):
         dataset_info = self.release_dict['dataset']
 
         # Dataset is a UserUpload
-        if dataset_info['type'] == DataSetInfo.SourceChoices.UserUpload:
+        if dataset_info['type'] == DatasetInfo.SourceChoices.UserUpload:
             # note = '!Not a Dataverse dataset. Add handling! (pdf_report_maker.py / add_data_source_and_lib)'
             # self.add_to_layout(putil.txt_reg_para(note))
             self.add_dataset_upload_info(dataset_info)

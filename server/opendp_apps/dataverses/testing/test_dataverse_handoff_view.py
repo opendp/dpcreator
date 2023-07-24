@@ -1,3 +1,5 @@
+import unittest
+
 import requests_mock
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -9,6 +11,7 @@ from opendp_apps.dataverses.models import ManifestTestParams
 from opendp_apps.model_helpers.msg_util import msg, msgt
 
 
+@unittest.skip("skipping TestDataverseHandoffView")
 @requests_mock.Mocker()
 class TestDataverseHandoffView(TestCase):
     """

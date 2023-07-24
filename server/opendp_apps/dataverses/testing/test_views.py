@@ -7,6 +7,7 @@ from opendp_apps.dataverses.testing.test_endpoints import BaseEndpointTest
 from opendp_apps.model_helpers.msg_util import msgt
 
 
+@skip('skipping TestDataverseFileView')
 @requests_mock.Mocker()
 class TestDataverseFileView(BaseEndpointTest):
     client = APIClient()

@@ -81,7 +81,7 @@
 
           <v-tooltip
 
-              v-for="(action, index) in statusInformation[stepInformation[item.userStep].workflowStatus]
+              v-for="(action, index) in statusInformation[stepInformation[item.status].workflowStatus]
             .availableActions"
               bottom max-width="220px">
             <template v-slot:activator="{ on, attrs }">
@@ -106,7 +106,7 @@
     <DeleteDatasetDialog
         v-if="selectedItem"
         :dialogDelete="dialogDelete"
-        :datasetInfo="selectedItem.datasetInfo"
+        :datasetInfo="selectedItem"
         :analysisPlan="selectedItem.analysisPlan"
         v-on:cancel="closeDelete"
         v-on:close="closeDelete"
@@ -242,9 +242,8 @@ export default {
       selectedItem: null,
       headers: [
         {value: "num"},
-        {text: "Data File", value: "datasetInfo.name"},
+        {text: "Data File", value: "name"},
         {text: "Status", value: "status"},
-        {text: "Remaining time to complete release", value: "timeRemaining"},
         {text: "Options", value: "actions", align: "end"}
       ],
       statusInformation,
@@ -269,6 +268,7 @@ export default {
     },
 
     delete(item) {
+      console.log('delete: ' +JSON.stringify(item))
       this.deleteItem(item)
     },
     isExpired(item) {
@@ -282,23 +282,17 @@ export default {
       //  this.$router.push(`${NETWORK_CONSTANTS.MY_DATA.PATH}/${item.datasetId}`)
     },
     continueWorkflow(item) {
-      this.goToPage(item, `${NETWORK_CONSTANTS.WIZARD.PATH}`)
+      this.goToPage(item, `${NETWORK_CONSTANTS.DEPOSITOR_WIZARD.PATH}`)
     },
     getWorkflowStatus(item) {
-      return stepInformation[item.userStep].workflowStatus
+      console.log('item.status: '+JSON.stringify(item.status))
+      console.log('stepInformation[item.status] ' +JSON.stringify(stepInformation[item.status]))
+      return stepInformation[item.status].workflowStatus
     },
     goToPage(item, path) {
-      this.$store.dispatch('dataset/setDatasetInfo', item.datasetInfo.objectId)
+      this.$store.dispatch('dataset/setDatasetInfo', item.objectId)
           .then(() => {
-            if (item.analysisPlan) {
-              this.$store.dispatch('dataset/setAnalysisPlan', item.analysisPlan.objectId).then(() => {
                 this.$router.push(path)
-              })
-            } else {
-              this.$store.dispatch('dataset/clearAnalysisPlan').then(() => {
-                this.$router.push(path)
-              })
-            }
           })
     },
     cancelExecution(item) {

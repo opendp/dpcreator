@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class ProfilerConfig(AppConfig):
-    name = 'profiler'
+    name = 'opendp_apps.profiler'

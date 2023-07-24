@@ -31,8 +31,8 @@ from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
 from opendp_apps.analysis.tools.dp_variance_spec import DPVarianceSpec
 from opendp_apps.analysis.tools.histogram_util import get_histogram_stat_spec
 from opendp_apps.analysis.tools.stat_spec import StatSpec
-from opendp_apps.dataset.models import DataSetInfo
-from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
+from opendp_apps.dataset.models import DatasetInfo
+# from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
 from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
 from opendp_apps.profiler.static_vals_mime_types import get_data_file_separator
@@ -229,10 +229,10 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         # If the ReleaseInfo object was crated and deposit fails,
         # the error for the deposit will be sent to the user
-        deposit_util = DataverseDepositUtil(self.release_info)
-        if deposit_util.has_error():
-            logger.error(deposit_util.get_err_msg())
-            return
+        # deposit_util = DataverseDepositUtil(self.release_info)
+        # if deposit_util.has_error():
+        #    logger.error(deposit_util.get_err_msg())
+        #    return
 
     def make_release_info(self, epsilon_used: float):
         """
@@ -289,7 +289,7 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.analysis_plan.save()
 
         # (6) Delete the "source_file"
-        delete_result = DataSetInfo.delete_source_file(self.analysis_plan.dataset)
+        delete_result = DatasetInfo.delete_source_file(self.analysis_plan.dataset)
         if not delete_result.success:
             logger.error(f"ValidateReleaseUtil.make_release_info: {delete_result.message}")
             self.add_err_msg(delete_result.message)
@@ -555,8 +555,8 @@ class ValidateReleaseUtil(BasicErrCheck):
             return False
 
         # Make sure the total epsilon is valid
-        self.max_epsilon = self.analysis_plan.dataset.get_depositor_setup_info().epsilon
-        self.max_delta = self.analysis_plan.dataset.get_depositor_setup_info().delta
+        self.max_epsilon = self.analysis_plan.dataset.depositor_setup_info.epsilon
+        self.max_delta = self.analysis_plan.dataset.depositor_setup_info.delta
 
         epsilon_ok, _err_msg_or_None = self.is_epsilon_valid(self.max_epsilon)
         if not epsilon_ok:

@@ -25,11 +25,10 @@ DP_REPORTS_TEST_DIR = join(dirname(dirname(CURRENT_DIR)), 'dp_reports', 'test_da
 DP_ANALYSIS_TEST_DIR = join(dirname(CURRENT_DIR), 'test_output')  # to write test PDFs (not saved)
 if not isfile(DP_ANALYSIS_TEST_DIR):
     os.makedirs(DP_ANALYSIS_TEST_DIR, exist_ok=True)
-    print('created: ', DP_ANALYSIS_TEST_DIR)
-
+    
 
 class HistogramIntegerEqualRangeStatSpecTest(StatSpecTestCase):
-    fixtures = ['test_dataset_data_001.json', ]
+    """Test the 'DPHistogramIntEqualRangesSpec' class"""
 
     def setUp(self):
 

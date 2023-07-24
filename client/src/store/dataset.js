@@ -6,6 +6,7 @@ import {
     REMOVE_ANALYSIS_PLAN,
     REMOVE_DATASET,
     SET_ANALYSIS_PLAN,
+    SET_ANALYSIS_PLAN_LIST,
     SET_DATASET_INFO,
     SET_DATASET_LIST,
     SET_MYDATA_LIST,
@@ -27,6 +28,7 @@ const camelcaseKeys = require('camelcase-keys');
 
 const initialState = {
     datasetList: null,
+    analysisPlanList: null,
     datasetInfo: null,
     profilerStatus: null,
     profilerMsg: null,
@@ -56,6 +58,9 @@ const getters = {
 
     getMyDataList: state => {
         return state.myDataList
+    },
+    getAnalysisPlanList: state => {
+        return state.analysisPlanList
     },
     getUpdatedTime: state => {
         if (state.analysisPlan) {
@@ -167,10 +172,10 @@ const actions = {
      * @param commit
      * @param state
      * @param getters
-     * @param stepperPosition - the current wizard step that the user is on (0-4)
+     * @param nextStep - the new userStep to assign
      */
-    updateUserStep({commit, state, getters}, stepperPosition) {
-        const nextStep = wizardNextSteps[stepperPosition]
+    updateUserStep({commit, state, getters}, nextStep) {
+
         if (wizardUserSteps.indexOf(getters.userStep) < wizardUserSteps.indexOf(nextStep)) {
             const completedStepProp = {userStep: nextStep}
             // Update the user step on the DepositorSetup or the Analysis Plan, depending
@@ -186,10 +191,20 @@ const actions = {
             }
         }
     },
-    createAnalysisPlan({commit, state}, datasetId) {
-        return analysis.createAnalysisPlan(datasetId)
+    /*
+      this.$store.dispatch('dataset/createAnalysisPlan',
+                this.newPlan.datasetId,
+                this.newPlan.analystId,
+                this.newPlan.budget,
+                this.newPlan.planName
+            this.newPlan.expirationDate)
+     */
+    createAnalysisPlan({commit, state}, props ) {
+        console.log('store/dataset.js createAnalysisPlan, props = ' + JSON.stringify(props))
+        return analysis.createAnalysisPlan(props.datasetId,props.analystId, props.budget, props.description, props.planName, props.expirationDate)
             .then((resp) => {
-                commit('SET_ANALYSIS_PLAN', resp)
+                this.dispatch('dataset/setAnalysisPlanList')
+                this.dispatch('dataset/setDatasetList')
             }).catch((error) => {
                 console.log(error.response.data);
                 console.log(error.response.status);
@@ -220,6 +235,14 @@ const actions = {
             .then((resp) => {
                 commit(SET_DATASET_LIST, resp.data.results)
                 commit(SET_MYDATA_LIST, resp.data.results)
+            })
+    },
+    setAnalysisPlanList({commit, state}) {
+        return analysis.getUserAnalysisPlans()
+            .then((resp) => {
+                console.log('committing: ' +JSON.stringify(resp.data.results))
+                commit(SET_ANALYSIS_PLAN_LIST, resp.data.results)
+
             })
     },
     setDatasetInfo({commit, state}, objectId) {
@@ -310,69 +333,14 @@ const actions = {
      * @param userId used for websocket URL
      */
     runProfiler({commit, state, rootState}, {userId}) {
-        dataset.runProfiler(state.datasetInfo.objectId)
+        dataset.runProfiler(state.datasetInfo.objectId).then(() => {
+            // when profiler returns, it has saved the variables in the database,
+            // so call setDatasetInfo to refresh the store with the latest datasetInfo object
+            this.dispatch('dataset/setDatasetInfo', state.datasetInfo.objectId)
 
-        const prefix = rootState.settings.vueSettings['VUE_APP_WEBSOCKET_PREFIX']
-        const websocketId = 'ws_' + userId
-        const chatSocket = new WebSocket(
-            prefix + window.location.host + '/async_messages/ws/profile/' + websocketId + '/'
-        );
-
-        /* ---------------------------------------------- */
-        /* Add a handler for incoming websocket messages  */
-        /* ---------------------------------------------- */
-
-        chatSocket.onmessage = (e) => {
-            // parse the incoming JSON to a .js object
-
-            const wsData = camelcaseKeys(JSON.parse(e.data), {deep: true});
-
-            /* "wsMsg" attributes are the defined in the Python WebsocketMessage object
-                 msgType (str): expected "PROFILER_MESSAGE"
-                 success (boolean):  error detected?
-                 userMessage (str): description of what happened
-                 msgCnt (int): Not used for the profiler
-                 data: Profile data, if it exists, JSON
-                 timestamp: timestamp
-
-                - reference: opendp_apps/async_messages/websocket_message.py
-            */
-            const wsMsg = wsData.message
-            // "wsMsg.msgType": should be 'PROFILER_MESSAGE'
-            if (wsMsg.msgType !== 'PROFILER_MESSAGE') {
-                console.log('unknown msgType: ' + wsMsg.msgType);
-            } else {
-                // ---------------------------------------
-                // "ws_msg.success": Did it work?
-                // ---------------------------------------
-                if (wsMsg.success === true) {
-                    console.log('-- success message');
-                } else if (wsMsg.success === false) {
-                    console.log('-- error message');
-                    alert(wsMsg.userMessage);
-                } else {
-                    console.log('-- error occurred!')
-                    return;
-                }
-                commit(SET_PROFILER_MSG, wsMsg.userMessage)
-                commit(SET_PROFILER_STATUS, wsMsg.success)
-                console.log('ws_msg.user_message: ' + wsMsg.userMessage);
-                this.dispatch('dataset/setDatasetInfo', state.datasetInfo.objectId)
+        })
 
 
-                return (wsMsg.userMessage)
-
-
-            }
-
-        };
-
-        chatSocket.onclose = function (e) {
-            console.error('Chat socket closed unexpectedly');
-        };
-        chatSocket.onerror = function (e) {
-            console.error('onerror: ' + e);
-        };
     },
     generateRelease({commit, state}, objectId) {
         // submit statistics openDP release().
@@ -486,6 +454,9 @@ const mutations = {
     },
     [SET_DATASET_LIST](state, datasetList) {
         state.datasetList = datasetList
+    },
+    [SET_ANALYSIS_PLAN_LIST](state, analysisPlanList) {
+        state.analysisPlanList = analysisPlanList
     },
     [SET_PROFILER_MSG](state, msg) {
         state.profilerMsg = msg

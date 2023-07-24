@@ -1,4 +1,7 @@
 """
+NO LONGER USED!
+4/27/2023 - Keeping around but not using. There may be re-usable parts with the new DV API structure
+
 Utility for depositing Dataverse auxiliary files related to a ReleaseInfo object
 """
 import logging
