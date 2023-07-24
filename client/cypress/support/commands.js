@@ -408,7 +408,7 @@ Cypress.Commands.add('setupConfirmVariablesPage', (datasetFixture) => {
         dataset.created = '' + new Date()
         dataset.depositorSetupInfo.updated = dataset.created
         cy.intercept('GET', '/api/dataset-info/' + dataset.objectId + '/', {body: dataset})
-        cy.intercept('PATCH', '/api/deposit/' + dataset.depositorSetupInfo.objectId + '/', {body: dataset})
+        cy.intercept('PATCH', '/api/depositor-setup-info/' + dataset.depositorSetupInfo.objectId + '/', {body: dataset})
 
         cy.intercept('GET', 'rest-auth/user/', {
             body: {
@@ -463,7 +463,7 @@ Cypress.Commands.add('setupStatisticsPageFixtures', (datasetFixture, analysisFix
         dataset.created = '' + new Date()
         dataset.depositorSetupInfo.updated = dataset.created
         cy.intercept('GET', '/api/dataset-info/' + dataset.objectId + '/', {body: dataset})
-        cy.intercept('PATCH', '/api/deposit/' + dataset.depositorSetupInfo.objectId + '/', {body: dataset})
+        cy.intercept('PATCH', '/api/depositor-setup-info/' + dataset.depositorSetupInfo.objectId + '/', {body: dataset})
 
         cy.intercept('GET', '/api/dataset-info/', {
             body: {
