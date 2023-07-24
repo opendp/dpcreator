@@ -15,7 +15,7 @@ TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
 class DatasetTestBase(TestCase):
     maxDiff = None
-    API_DEPOSIT = '/api/deposit/'
+    API_DEPOSIT = '/api/depositor-setup-info/'
     API_DIRECT_UPLOAD = '/api/direct-upload/'
     API_DATASET_INFO = '/api/dataset-info/'
 
@@ -84,11 +84,7 @@ class DatasetTestBase(TestCase):
         """Create a new DatasetInfo object and return the **DepositorSetupInfo** object_id"""
         jresp = self.upload_file_via_api()
 
-        print('jresp', json.dumps(jresp, indent=4))
-
-        dataset_object_id = jresp['object_id']
-        print(json.dumps(self.get_dataset_info_via_api(dataset_object_id),
-                         indent=4))
+        return jresp['depositor_setup_info']['object_id']
 
     def test_it(self):
         self.get_new_dataset_setup_info_id()

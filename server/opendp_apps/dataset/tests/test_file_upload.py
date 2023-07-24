@@ -117,7 +117,7 @@ class TestFileUpload(DatasetTestBase):
         #
         setup_object_id = ds_info['depositor_setup_info']['object_id']
 
-        partial_update_url = f'/api/deposit/{setup_object_id}/'
+        partial_update_url = f'{self.API_DEPOSIT}{setup_object_id}/'
 
         new_epsilon_questions = {"secret_sample": "no",
                                  "population_size": "not applicable",
@@ -281,7 +281,7 @@ class TestFileUpload(DatasetTestBase):
         #
         setup_object_id = ds_info['depositor_setup_info']['object_id']
 
-        partial_update_url = f'/api/deposit/{setup_object_id}/'
+        partial_update_url = f'{self.API_DEPOSIT}{setup_object_id}/'
 
         new_epsilon_questions = {"secret_sample": "no",
                                  "population_size": "7000",
@@ -697,7 +697,7 @@ class TestFileUpload(DatasetTestBase):
         #
         setup_object_id = ds_info['depositor_setup_info']['object_id']
 
-        partial_update_url = f'/api/deposit/{setup_object_id}/'
+        partial_update_url = f'{self.API_DEPOSIT}{setup_object_id}/'
 
         new_epsilon_questions = {"secret_sample": "no",
                                  "population_size": "not applicable",

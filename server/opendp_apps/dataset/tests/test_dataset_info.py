@@ -24,7 +24,9 @@ class TestDepositorInfo(DatasetTestBase):
         """(10) Successful patch"""
         msgt(self.test_10_successful_patch.__doc__)
 
-        # print('reverse 1:', reverse("deposit-detail"))
+        depositor_setup_id = self.get_new_dataset_setup_info_id()
+        return
+        print('reverse 1:', reverse("deposit-detail"))
         print('reverse 2:', reverse("deposit-detail",
                                   kwargs={'object_id': "9255c067-e435-43bd-8af1-33a6987ffc9b"}))
         return

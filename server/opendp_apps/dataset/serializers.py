@@ -68,21 +68,31 @@ class DatasetInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DatasetInfo
-        fields = ['object_id', 'name', 'created', 'creator',
-                  'source', 'status', 'status_name']
-        read_only_fields = ['object_id', 'id', 'created', 'updated']
+        fields = ['object_id',
+                  'name',
+                  'description',
+                  'creator',
+                  'created',
+                  'source',
+                  'status',
+                  'status_name']
+        read_only_fields = ['object_id',
+                            'id',
+                            'created',
+                            'creator',
+                            'source',
+                            'status',
+                            'status_name']
 
 
 class DepositorSetupInfoSerializer(serializers.ModelSerializer):
     """Serializer for the DepositorSetupInfo"""
-    dataset_id = serializers.CharField(source='object_id', read_only=True)
     creator_name = serializers.CharField(source='creator', read_only=True)
     creator_id = serializers.CharField(source='creator.object_id', read_only=True)
 
     class Meta:
         model = DepositorSetupInfo
         fields = ['object_id',
-                  'dataset_id',
                   'creator_id',
                   'creator_name',
                   'is_complete',
@@ -99,7 +109,6 @@ class DepositorSetupInfoSerializer(serializers.ModelSerializer):
                   'created', 'updated',
                   ]
         read_only_fields = ['object_id',
-                            'dataset_id',
                             'creator_id',
                             'creator_name',
                             'is_complete',
@@ -183,8 +192,6 @@ class UploadFileInfoSerializer(serializers.ModelSerializer):
     """
     Used when returning UploadFileInfo objects, including upon creation
     """
-    dataset_id = serializers.CharField(source='object_id', read_only=True)
-
     creator_id = serializers.CharField(source='creator.object_id', read_only=True)
 
     creator_name = serializers.CharField(source='creator', read_only=True)
@@ -198,7 +205,6 @@ class UploadFileInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = UploadFileInfo
         fields = ['object_id',
-                  'dataset_id',
                   'name',
                   'creator_id',
                   'creator_name',
@@ -209,6 +215,15 @@ class UploadFileInfoSerializer(serializers.ModelSerializer):
                   'created',
                   'updated',
                   ]
+        read_only_fields = ['id',
+                            'object_id',
+                            'creator',
+                            'depsoitor_setup_info',
+                            'source',
+                            'source_file',
+                            'status',
+                            'created',
+                            'updated']
         extra_kwargs = {
             'url': {'view_name': 'dataset-info-list'},
         }

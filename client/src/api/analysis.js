@@ -19,7 +19,7 @@ export default {
             props.wizardStep = props.userStep
         }
         const snakeProps = caseConversion.customSnakecaseKeys(props)
-        return wrappedSession.patch('/api/deposit/' + objectId + '/',
+        return wrappedSession.patch('/api/depositor-setup-info/' + objectId + '/',
             snakeProps).then(resp => {
                  resp.data.wizard_step = resp.data.user_step
                 camelcaseKeys(resp.data, {deep: true})

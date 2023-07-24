@@ -6,11 +6,20 @@ DRF link: http://localhost:8000/api/
 **Contents**
 - [Direct File Upload](#direct-file-upload)
 - [Get Dataset info (including depositor setup info)](#get-dataset-info)
+- [Delete Dataset Info](#delete-dataset-info)
 - [Update Depositor Setup Info](#update-depositor-setup-info)
 - [Create Analysis Plan](#create-analysis-plan)
 - [Update Analysis Plan](#update-analysis-plan)
 
 
+
+
+| Object             | Endpoint                   | Methods                  | Notes                                                                        |   |
+|--------------------|----------------------------|--------------------------|------------------------------------------------------------------------------|---|
+| UploadFileInfo     | /api/direct-upload/        | POST (create)            | Subclass of DatasetInfo. For GET, DELETE, etc, use the DatasetInfo endpoints |   |
+| DatasetInfo        | /api/dataset-info/         | GET, DELETE, PATCH       | ?? Do we need PATCH?                                                         |   |
+| DepositorSetupInfo | /api/depositor-setup-info/ | GET, PATCH               | Cannot delete directly. Need to delete the DatasetInfo.                      |   |
+| AnalysisPlan       | /api/analysis-plan/        | POST, GET, PATCH, DELETE | Cannot delete is an associated ReleaseInfo object is created                 |   |
 --- 
 
 ## Direct File Upload
@@ -35,6 +44,9 @@ DRF link: http://localhost:8000/api/
     "creator": "c1b958b3-92a3-46e0-83fc-3a89d276a11a"
 }
 ```
+- **Notes**
+  - This API endpoint is only for creating and UploadFileInfo object
+  - For retrieving, patching, or deleting these object (and other DatasetInfo objects), please use the `/api/dataset-info/` endpoint)
 
 ## Get Dataset info
 
@@ -76,12 +88,21 @@ This includes depositor setup info.
 }
 ```
 
+## Delete Dataset Info]
+
+- **API endpoint**: `/api/dataset-info/{dataset_object_id}/`
+  - **Example**: `/api/dataset-info/0d8f0aec-0f3a-44af-8502-d185fb93e01d/`
+- **Method**: `DELETE`
+- **Auth**: username/password
+- **Expected response**: `204 No Content`
+- **DRF link**: http://localhost:8000/api/dataset-info/
+ 
 ## Update Depositor Setup Info
 
 This includes depositor setup info.
 
-- **API endpoint**: `/api/deposit/{depositor_setup_object_id}/`
-  - **Example**: `/api/deposit/b01377e1-eec0-43cc-9f7f-631f87dd4108/`
+- **API endpoint**: `/api/depositor-setup-info/{depositor_setup_object_id}/`
+  - **Example**: `/api/depositor-setup-info/b01377e1-eec0-43cc-9f7f-631f87dd4108/`
 - **Method**: `PATCH`
 - **Auth**: username/password
 - **Params**: Any or all of these params may be updated
@@ -109,7 +130,7 @@ This includes depositor setup info.
   - **user_step**
   - **default_epsilon**
   - **default_delta**
-- **DRF link**: http://localhost:8000/api/deposit/
+- **DRF link**: http://localhost:8000/api/depositor-setup-info/
 - Response example:
 ```json
 {
