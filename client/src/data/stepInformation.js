@@ -66,6 +66,12 @@ export const wizardNextSteps = [
     STEP_0900_STATISTICS_SUBMITTED //stepperPos 4
 ]
 
+export const analystWizardNextSteps = [
+    STEP_0700_VARIABLES_CONFIRMED,  //stepperPos 0
+    STEP_0800_STATISTICS_CREATED, //stepperPos 1
+    STEP_0900_STATISTICS_SUBMITTED //stepperPos 2
+]
+
 
 export default {
     [STEP_0100_UPLOADED]: {
@@ -93,19 +99,19 @@ export default {
         wizardStepper: 2,
         label: 'Variable Defaults Confirmed',
     },
-    [STEP_0600_EPSILON_SET]: {
-        workflowStatus: statusInformation.statuses.IN_PROGRESS,
-        wizardStepper: 3,
-        label: 'Epsilon Set',
+    [STEP_1400_PLAN_CREATED]: {
+        workflowStatus: statusInformation.statuses.PLAN_CREATED,
+        wizardStepper: 0,
+        label: 'Created',
     },
     [STEP_0700_VARIABLES_CONFIRMED]: {
         workflowStatus: statusInformation.statuses.IN_PROGRESS,
-        wizardStepper: 3,
+        wizardStepper: 1,
         label: 'Variables Confirmed'
     },
     [STEP_0800_STATISTICS_CREATED]: {
         workflowStatus: statusInformation.statuses.IN_PROGRESS,
-        wizardStepper: 4,
+        wizardStepper: 2,
         label: 'Statistics Created'
     },
     [STEP_0900_STATISTICS_SUBMITTED]: {
@@ -127,10 +133,6 @@ export default {
     [STEP_1300_EXPIRED]: {
         workflowStatus: statusInformation.statuses.EXPIRED,
         label: 'Expired'
-    },
-    [STEP_1400_PLAN_CREATED]: {
-        workflowStatus: statusInformation.statuses.PLAN_CREATED,
-        label: 'Created'
     },
     [STEP_9100_VALIDATION_FAILED]: {
         workflowStatus: statusInformation.statuses.ERROR,

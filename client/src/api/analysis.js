@@ -4,6 +4,14 @@ import {STEP_0100_UPLOADED, STEP_1300_EXPIRED, STEP_1400_PLAN_CREATED} from "@/d
 
 
 const camelcaseKeys = require('camelcase-keys');
+function convertWizardStep(resp) {
+    // convert the wizard_step stored in the server side back to user_step
+    if (resp.data && resp.data.wizard_step) {
+        resp.data.user_step = resp.data.wizard_step;
+    }
+    // Return the modified resp object
+    return resp;
+}
 
 export default {
 
@@ -31,17 +39,7 @@ export default {
             {min: min, max: max, number_of_bins: numberOfBins})
             .then(resp => camelcaseKeys(resp.data, {deep: true}))
     },
-    // For analysisPlan, we need to add new params to API
-    /*
-    {
-  "object_id": "bbc5bd52-7c1e-4cf2-9938-28fd4745b5b1",
-  "analyst_id": "0681867b-1ce8-46c9-adfb-df83b8efff24",
-  "name": "Teacher survey plan",
-  "description": "Release DP Statistics for the teacher survey, version 1",
-  "epsilon": 0.25,
-  "expiration_date": "2023-07-23"
-}
-     */
+
     createAnalysisPlan(datasetId, analystId, budget,description, name, expirationDate) {
         console.log('budget: ' + budget)
         const params = {object_id: datasetId,
@@ -63,10 +61,10 @@ export default {
 
                 if (resp.data.results) {
                     const modifiedResults = resp.data.results.map((obj) => {
-                        // copy wizard_step into user_step
+                       console.log('modify results, user_step = '+ obj.user_step +', wizard_step ' +obj.wizard_step)
                         if (obj.isExpired && !obj.isCompleted) {
                             obj.user_step = STEP_1300_EXPIRED
-                        } else if (obj.user_step == STEP_0100_UPLOADED) {
+                        } else if (obj.wizard_step === STEP_0100_UPLOADED) {
                             obj.user_step = STEP_1400_PLAN_CREATED
                         }
                         else if( obj.wizard_step) {
@@ -85,11 +83,13 @@ export default {
     },
     getAnalysisPlan(analysisId) {
         return wrappedSession.get('/api/analysis-plan/' + analysisId + '/')
+            .then(resp => convertWizardStep(resp))
             .then(resp => camelcaseKeys(resp.data, {deep: true}))
     },
     patchAnalysisPlan(objectId, props) {
         if (props.userStep) {
             props.wizardStep = props.userStep
+            delete props.userStep
         }
         const snakeProps = caseConversion.customSnakecaseKeys(props)
         return wrappedSession.patch('/api/analysis-plan/' + objectId + '/',
