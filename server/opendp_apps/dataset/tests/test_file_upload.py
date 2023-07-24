@@ -3,14 +3,12 @@ import uuid
 from http import HTTPStatus
 from os.path import abspath, dirname, join
 
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
 from django.urls import reverse
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.dataset.models import DepositorSetupInfo
+from opendp_apps.dataset.tests.dataset_test_base import DatasetTestBase
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.utils.extra_validators import VALIDATE_MSG_EPSILON
 
@@ -19,73 +17,11 @@ FIXTURE_DATA_DIR = join(dirname(CURRENT_DIR), 'fixtures')
 TEST_DATA_DIR = join(dirname(dirname(dirname(CURRENT_DIR))), 'test_data')
 
 
-class TestFileUpload(TestCase):
+class TestFileUpload(DatasetTestBase):
     maxDiff = None
 
     def setUp(self):
-        self.user_obj, _created = get_user_model().objects.get_or_create(username='rp')
-
-        self.test_file_name = join('teacher_survey', 'teacher_survey.csv')
-        self.upload_name = 'Teacher Survey'
-
-        test_file = join(TEST_DATA_DIR, self.test_file_name)
-        self.test_file_obj = SimpleUploadedFile(self.test_file_name,
-                                                open(test_file, 'rb').read(),
-                                                content_type="text/comma-separated-values")
-
-        self.client.force_login(self.user_obj)
-
-    def upload_file_via_api(self):
-        """Convenience method to upload a file and return the response"""
-        payload = dict(name=self.upload_name,
-                       creator=self.user_obj.object_id,
-                       source_file=self.test_file_obj)
-
-        upload_url = '/api/direct-upload/'  # reverse("direct-upload-create")
-
-        resp = self.client.post(upload_url,
-                                data=payload)
-
-        # print('resp', resp.json())
-        # print('status code', resp.status_code)
-
-        self.assertEqual(resp.status_code, HTTPStatus.CREATED)
-
-        jresp = resp.json()
-        self.assertEqual(jresp['creator'], str(self.user_obj.object_id))
-        self.assertEqual(jresp['name'], self.upload_name)
-
-        return jresp
-
-    def get_dataset_info_via_api(self, dataset_object_id: str) -> dict:
-        """Convenience method to get a dataset info object via the API"""
-        assert dataset_object_id, "dataset_object_id cannot be None"
-
-        dataset_info_url = f'/api/dataset-info/{dataset_object_id}/'
-        resp = self.client.get(dataset_info_url)
-
-        jresp = resp.json()
-        self.assertTrue('depositor_setup_info' in jresp)
-        self.assertTrue('object_id' in jresp['depositor_setup_info'])
-
-        self.assertEqual(jresp['depositor_setup_info']['is_complete'], False)
-        self.assertEqual(jresp['depositor_setup_info']['user_step'],
-                         str(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED))
-
-        return jresp
-
-    def get_depositor_setup_info_via_api(self, dataset_object_id: str) -> DepositorSetupInfo:
-        """Convenience method to get a depositor info object via the API"""
-        assert dataset_object_id, "dataset_object_id cannot be None"
-
-        setup_info_url = f'/api/dataset-info/{dataset_object_id}/'
-        resp = self.client.get(setup_info_url)
-
-        jresp = resp.json()
-        self.assertTrue('depositor_setup_info' in jresp)
-        self.assertTrue('object_id' in jresp['depositor_setup_info'])
-
-        return DepositorSetupInfo.objects.get(object_id=jresp['depositor_setup_info']['object_id'])
+        super().setUp()
 
     def test_10_file_upload_api(self):
         """(10) Test File Upload API"""
@@ -130,13 +66,38 @@ class TestFileUpload(TestCase):
                        creator=self.user_obj.object_id,
                        source_file=self.test_file_obj)
 
-        direct_upload_url = '/api/direct-upload/'
-
-        resp = self.client.post(direct_upload_url,
+        resp = self.client.post(self.API_DIRECT_UPLOAD,
                                 data=payload)
+
         object_id = resp.json().get('object_id')
-        response = self.client.delete(f'{direct_upload_url}{object_id}/')
+
+        response = self.client.delete(f'{self.API_DIRECT_UPLOAD}{object_id}/')
         self.assertEqual(response.status_code, 204)
+
+    def test_35_file_upload_retrieve(self):
+        """(35) Retrieve a file upload"""
+        msgt(self.test_35_file_upload_retrieve.__doc__)
+
+        payload = dict(name=self.upload_name,
+                       creator=self.user_obj.object_id,
+                       source_file=self.test_file_obj)
+
+        resp = self.client.post(self.API_DIRECT_UPLOAD,
+                                data=payload)
+
+        object_id = resp.json().get('object_id')
+
+        response = self.client.get(f'{self.API_DATASET_INFO}{object_id}/')
+        #response = self.client.get(f'{self.API_DATASET_INFO}')
+
+
+        self.assertEqual(response.status_code, 200)
+
+
+        response = self.client.delete(f'{self.API_DATASET_INFO}{object_id}/')
+        print(response.status_code)
+        self.assertEqual(response.status_code, 204)
+
 
     def test_40_update_depositor_info_api(self):
         """(40) Test update depositor info"""
@@ -421,7 +382,7 @@ class TestFileUpload(TestCase):
         #
         setup_object_id = ds_info['depositor_setup_info']['object_id']
 
-        partial_update_url = f'/api/deposit/{setup_object_id}/'
+        partial_update_url = f'{self.API_DEPOSIT}{setup_object_id}/'
 
         new_dataset_questions = {"radio_best_describes": "",
                                  "radio_only_one_individual_per_row": "",
@@ -514,7 +475,7 @@ class TestFileUpload(TestCase):
 
         setup_object_id = ds_info['depositor_setup_info']['object_id']
 
-        partial_update_url = f'/api/deposit/{setup_object_id}/'
+        partial_update_url = f'{self.API_DEPOSIT}{setup_object_id}/'
 
         # --------------------------------------------
         # (3) Update wizard step 1: success
@@ -586,7 +547,7 @@ class TestFileUpload(TestCase):
         # --------------------------------------------
         setup_object_id = ds_info['depositor_setup_info']['object_id']
 
-        partial_update_url = f'/api/deposit/{setup_object_id}/'
+        partial_update_url = f'{self.API_DEPOSIT}{setup_object_id}/'
 
         new_epsilon_questions = {"secret_sample": "yes",
                                  "population_size": "",
@@ -653,7 +614,7 @@ class TestFileUpload(TestCase):
         # --------------------------------------------
         setup_object_id = ds_info['depositor_setup_info']['object_id']
 
-        partial_update_url = f'/api/deposit/{setup_object_id}/'
+        partial_update_url = f'{self.API_DEPOSIT}{setup_object_id}/'
 
         new_epsilon_questions = {"secret_sample": "yes",
                                  "population_size": 17000,
@@ -691,7 +652,7 @@ class TestFileUpload(TestCase):
         # --------------------------------------------
         setup_object_id = ds_info['depositor_setup_info']['object_id']
 
-        partial_update_url = f'/api/deposit/{setup_object_id}/'
+        partial_update_url = f'{self.API_DEPOSIT}{setup_object_id}/'
 
         update_payload = {
             "dataset_questions": {
@@ -717,3 +678,91 @@ class TestFileUpload(TestCase):
         self.assertEqual(update_resp_json['dataset_questions'], update_payload['dataset_questions'])
         self.assertEqual(update_resp_json['user_step'],
                          str(DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED))
+
+    def test_120_update_depositor_info_api(self):
+        """(120) Test update depositor info, default fields"""
+        msgt(self.test_120_update_depositor_info_api.__doc__)
+
+        # (1) Upload a file
+        #
+        jresp = self.upload_file_via_api()
+
+        # (2) Get the dataset info
+        #
+        ds_object_id = jresp['object_id']
+        ds_info = self.get_dataset_info_via_api(ds_object_id)
+        # print('ds_info', ds_info)
+
+        # (3) Update depositor info: epsilon questions, dataset_questions
+        #
+        setup_object_id = ds_info['depositor_setup_info']['object_id']
+
+        partial_update_url = f'/api/deposit/{setup_object_id}/'
+
+        new_epsilon_questions = {"secret_sample": "no",
+                                 "population_size": "not applicable",
+                                 "observations_number_can_be_public": "no"}
+
+        new_dataset_questions = {"radio_best_describes": "notHarmButConfidential",
+                                 "radio_only_one_individual_per_row": "yes",
+                                 "radio_depend_on_private_information": "yes"}
+
+        update_payload = dict(epsilon_questions=new_epsilon_questions,
+                              dataset_questions=new_dataset_questions)
+
+        update_resp = self.client.patch(partial_update_url,
+                                        data=update_payload,
+                                        content_type="application/json")
+
+        self.assertEqual(update_resp.status_code, HTTPStatus.OK)
+
+        update_resp_json = update_resp.json()
+        self.assertEqual(update_resp_json['is_complete'], False)
+        self.assertEqual(update_resp_json['epsilon_questions'], new_epsilon_questions)
+        self.assertEqual(update_resp_json['dataset_questions'], new_dataset_questions)
+        self.assertEqual(update_resp_json['user_step'],
+                         str(DepositorSetupInfo.DepositorSteps.STEP_0200_VALIDATED))
+
+        # (4) Update depositor info: default_epsilon, epsilon
+        #
+        new_variable_info = json.load(open(join(FIXTURE_DATA_DIR,
+                                                'test_data_profile_teacher_survey.json'), 'r'))
+
+        update_payload = dict(variable_info=new_variable_info)
+
+        update_resp = self.client.patch(partial_update_url,
+                                        data=update_payload,
+                                        content_type="application/json")
+
+        self.assertEqual(update_resp.status_code, HTTPStatus.OK)
+
+        update_resp_json = update_resp.json()
+        self.assertEqual(update_resp_json['is_complete'], False)
+        self.assertEqual(update_resp_json['variable_info'], new_variable_info)
+        self.assertEqual(update_resp_json['user_step'],
+                         str(DepositorSetupInfo.DepositorSteps.STEP_0400_PROFILING_COMPLETE))
+
+        # print('update_resp_json', update_resp_json)
+
+        # (5) Update depositor info: default_epsilon, epsilon
+        #
+        new_default_epsilon = 0.5
+        new_epsilon = 0.75
+
+        update_payload = dict(default_epsilon=new_default_epsilon,
+                              epsilon=new_epsilon)
+
+        update_resp = self.client.patch(partial_update_url,
+                                        data=update_payload,
+                                        content_type="application/json")
+
+        self.assertEqual(update_resp.status_code, HTTPStatus.OK)
+
+        update_resp_json = update_resp.json()
+        self.assertEqual(update_resp_json['is_complete'], True)
+        self.assertEqual(update_resp_json['default_epsilon'], 1.0)  # set via dataset_questions
+        self.assertEqual(update_resp_json['default_delta'], astatic.DELTA_10_NEG_5)  # set via dataset_questions
+
+        self.assertEqual(update_resp_json['epsilon'], new_epsilon)
+        self.assertEqual(update_resp_json['user_step'],
+                         str(DepositorSetupInfo.DepositorSteps.STEP_0600_EPSILON_SET))

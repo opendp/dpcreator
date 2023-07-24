@@ -75,10 +75,16 @@ class DatasetInfoSerializer(serializers.ModelSerializer):
 
 class DepositorSetupInfoSerializer(serializers.ModelSerializer):
     """Serializer for the DepositorSetupInfo"""
+    dataset_id = serializers.CharField(source='object_id', read_only=True)
+    creator_name = serializers.CharField(source='creator', read_only=True)
+    creator_id = serializers.CharField(source='creator.object_id', read_only=True)
 
     class Meta:
         model = DepositorSetupInfo
-        fields = ['object_id', 'id', 'created', 'updated',
+        fields = ['object_id',
+                  'dataset_id',
+                  'creator_id',
+                  'creator_name',
                   'is_complete',
                   'user_step',
                   'wizard_step',
@@ -89,11 +95,15 @@ class DepositorSetupInfoSerializer(serializers.ModelSerializer):
                   'variable_info',
                   'default_epsilon', 'epsilon',
                   'default_delta', 'delta',
-                  'confidence_level']
+                  'confidence_level',
+                  'created', 'updated',
+                  ]
         read_only_fields = ['object_id',
-                            'id',
+                            'dataset_id',
+                            'creator_id',
+                            'creator_name',
                             'is_complete',
-                            # 'user_step',
+                            'user_step',
                             'data_profile',
                             'default_epsilon',
                             'default_delta',
@@ -171,17 +181,15 @@ class DataverseFileInfoSerializer(DatasetInfoSerializer):
 
 class UploadFileInfoSerializer(serializers.ModelSerializer):
     """
-    Used in the dataset list API. http://localhost:8000/api/dataset-info/
+    Used when returning UploadFileInfo objects, including upon creation
     """
-    creator = serializers.SlugRelatedField(queryset=OpenDPUser.objects.all(),
-                                           slug_field='username',
-                                           read_only=False)
+    dataset_id = serializers.CharField(source='object_id', read_only=True)
+
+    creator_id = serializers.CharField(source='creator.object_id', read_only=True)
+
+    creator_name = serializers.CharField(source='creator', read_only=True)
 
     depositor_setup_info = DepositorSetupInfoSerializer(read_only=True)
-
-    dataset_schema_info = serializers.JSONField(read_only=True)
-
-    file_schema_info = serializers.JSONField(read_only=True)
 
     analysis_plans = AnalysisPlanSerializer(many=True,
                                             read_only=True,
@@ -189,9 +197,18 @@ class UploadFileInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UploadFileInfo
-        fields = ['object_id', 'name', 'created', 'creator',
-                  'depositor_setup_info', 'dataset_schema_info', 'file_schema_info',
-                  'status', 'status_name', 'analysis_plans']
+        fields = ['object_id',
+                  'dataset_id',
+                  'name',
+                  'creator_id',
+                  'creator_name',
+                  'source',
+                  'depositor_setup_info',
+                  'status', 'status_name',
+                  'analysis_plans',
+                  'created',
+                  'updated',
+                  ]
         extra_kwargs = {
             'url': {'view_name': 'dataset-info-list'},
         }
@@ -200,7 +217,7 @@ class UploadFileInfoSerializer(serializers.ModelSerializer):
 class UploadFileInfoCreationSerializer(serializers.ModelSerializer):
     """
     Used only for UploadFileInfo creation.
-    For retrieval APIs (list/get), see "UploadFileInfoSerializer"
+    Even with creation, returned info is: UploadFileInfoSerializer
     """
     name = serializers.CharField()
     source_file = serializers.FileField(use_url=False)
