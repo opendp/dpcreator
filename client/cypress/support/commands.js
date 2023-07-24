@@ -1,4 +1,4 @@
-import '@testing-library/cypress/add-commands'
+
 
 Cypress.Commands.add('loadTeacherSurveyDemo', () => {
     cy.on('uncaught:exception', (e, runnable) => {

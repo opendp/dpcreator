@@ -52,11 +52,12 @@
                 cy.get('[data-test="selectPlanDataset"]').click();
 
                 // Find and click the desired dataset option within the dropdown
-                cy.findByText('Fatigue_data.csv').click();
+
+                cy.contains('Fatigue_data.csv').click();
 
 
                 cy.get('[data-test="selectPlanAnalyst"]').click()
-                cy.findByText('oscar').click();
+                cy.contains('oscar').click();
                 cy.get('[data-test="inputPlanName"]').type('my cypress test plan')
                 cy.get('[data-test="inputPlanName"]').type('my cypress test desc')
                 cy.get('[data-test="inputPlanBudget"]').type('0.1')
