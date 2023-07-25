@@ -26,8 +26,6 @@ Cypress.Commands.add('loadTeacherSurveyDemo', () => {
     cy.get('[data-test="createPlanButton"]').click({force: true})
     cy.get('[data-test="selectPlanDataset"]').click();
 
-    // Find and click the desired dataset option within the dropdown
-
     cy.contains('teacher_survey.csv').click();
 
     const myPlanName = 'my cypress test plan'
@@ -181,11 +179,7 @@ Cypress.Commands.add('runDemo', (testFile, demoDatafile) => {
         // select the variables we will use
         cy.selectVariable(demoData.variables)
 
-        // TODO: add the rest of the steps when the analysis wizard is ready
-        // Continue to Set Epsilon Step
-        //cy.epsilonStep()
-        // Add all the statistics in the Create Statistics Step
-        //cy.createStatistics(demoData)
+        cy.createStatistics(demoData, testFile)
 
         // Submit the statistics
 
@@ -304,23 +298,31 @@ Cypress.Commands.add('selectVariable',(demoVariables)=> {
 
 })
 
-Cypress.Commands.add('createStatistics', (demoData) => {
+Cypress.Commands.add('createStatistics', (demoData, testFile) => {
+    // Create Analysis plan
+    cy.get('[data-test="wizardCompleteButton"]').click({force: true})
+    cy.get('[data-test="My Analysis Plans"]').click({force: true})
+    cy.get('[data-test="createPlanButton"]').click({force: true})
+    cy.get('[data-test="selectPlanDataset"]').click();
+
+    cy.contains(testFile).click();
+
+    const myPlanName = 'my cypress test plan'
+    const myDesc = 'my cypress test desc'
+    cy.get('[data-test="selectPlanAnalyst"]').click()
+    cy.contains('oscar').click();
+    cy.get('[data-test="inputPlanName"]').type(myPlanName)
+    cy.get('[data-test="inputPlanName"]').type(myDesc)
+    cy.get('[data-test="inputPlanBudget"]').type('0.1')
+    cy.get('[data-test="createPlanSubmitButton"]').click({force:true})
+    cy.get('td').should('contain', testFile)
+    cy.get('[data-test="continueWorkflow0"]').click({force:true})
+    cy.url().should('contain','analyst-wizard')
+    cy.get('[data-test="wizardContinueButton"]').click({force:true})
     // Continue to Create  Statistics Step
-    cy.scrollTo('top')
-    cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
 
     // On the statistics page, test edit statistics Params
     cy.get('h1').should('contain', 'Create Statistics').should('be.visible')
-    cy.get('[data-test="editConfidenceIcon"]').click({force: true});
-    cy.get('[data-test="editNoiseConfirm"]').should('be.visible')
-    cy.get('[data-test="confirmButton"]').should('be.visible')
-    cy.get('[data-test="confirmButton"]').click({force: true});
-    cy.get('[data-test="editNoiseDialog"]').should('be.visible')
-    cy.get('[data-test="editEpsilonInput"]').should('be.visible')
-    cy.get('[data-test="editEpsilonInput"]').should('have.value', 1)
-    cy.get('[data-test="editParamsCancel"]').click({force: true});
-
-
     // Create statistic for every statistics item in the fixture
     cy.enterStatsInPopup(demoData)
 })
