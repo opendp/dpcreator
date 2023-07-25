@@ -27,10 +27,6 @@ export default {
         PATH: "/depositor-wizard",
         NAME: "DepositorWizard"
     },
-    DEPOSITOR_WIZARD: {
-        PATH: "/depositor-wizard",
-        NAME: "DepositorWizard"
-    },
     MY_PROFILE: {
         PATH: "/my-profile",
         NAME: "MyProfile"
