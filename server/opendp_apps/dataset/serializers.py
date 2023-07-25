@@ -71,13 +71,17 @@ class DatasetInfoSerializer(serializers.ModelSerializer):
         fields = ['object_id',
                   'name',
                   'description',
+                  'depositor_setup_info',
                   'creator',
                   'created',
                   'source',
+                  'analysis_plans',
                   'status',
                   'status_name']
+
         read_only_fields = ['object_id',
                             'id',
+                            'depositor_setup_info',
                             'created',
                             'creator',
                             'source',
@@ -181,8 +185,15 @@ class DataverseFileInfoSerializer(DatasetInfoSerializer):
         model = DataverseFileInfo
         fields = ['object_id', 'name', 'created', 'creator', 'installation_name',
                   'dataverse_file_id', 'dataset_doi',
-                  'file_doi', 'status', 'status_name', 'depositor_setup_info',
-                  'dataset_schema_info', 'file_schema_info', 'analysis_plans']
+                  'file_doi',
+                  'status',
+                  'status_name',
+                  'depositor_setup_info',
+                  'dataset_schema_info',
+                  'file_schema_info',
+                  'depositor_setup_info',
+                  'analysis_plans']
+        readonly_fields = ['depositor_setup_info',]
         extra_kwargs = {
             'url': {'view_name': 'dataset-info-list'},
         }
@@ -210,12 +221,13 @@ class UploadFileInfoSerializer(serializers.ModelSerializer):
         model = UploadFileInfo
         fields = ['object_id',
                   'name',
+                  'description',
                   'creator_id',
                   'creator_name',
                   'source',
                   'depositor_setup_info',
                   'status', 'status_name',
-                  'dataset_schema_info', 'file_schema_info',  # not used yet, previously used for DataverseFileInfo
+                  'dataset_schema_info', 'file_schema_info',  # previously used for DataverseFileInfo
                   'analysis_plans',
                   'created',
                   'updated',
@@ -223,7 +235,6 @@ class UploadFileInfoSerializer(serializers.ModelSerializer):
         read_only_fields = ['id',
                             'object_id',
                             'creator',
-                            'depsoitor_setup_info',
                             'source',
                             'source_file',
                             'status',
@@ -254,7 +265,7 @@ class UploadFileInfoCreationSerializer(serializers.ModelSerializer):
 
 class DatasetInfoPolymorphicSerializer(PolymorphicSerializer):
     model_serializer_mapping = {
-        DatasetInfo: DatasetInfoSerializer,
+        #DatasetInfo: DatasetInfoSerializer,
         DataverseFileInfo: DataverseFileInfoSerializer,
         UploadFileInfo: UploadFileInfoSerializer
     }

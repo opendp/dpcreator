@@ -300,6 +300,8 @@ class DatasetInfo(TimestampedModelWithUUID, PolymorphicModel):
 
     name = models.CharField(max_length=128)
 
+    description = models.TextField(blank=True, null=True)
+
     source = models.CharField(max_length=128,
                               choices=SourceChoices.choices)
 

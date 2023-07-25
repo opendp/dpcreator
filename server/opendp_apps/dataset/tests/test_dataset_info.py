@@ -1,21 +1,10 @@
-import requests_mock
-from django.contrib.auth import get_user_model
-from django.urls import reverse
-
-from opendp_apps.analysis import static_vals as astatic
-# from opendp_apps.dataverses.testing.test_endpoints import BaseEndpointTest
-from opendp_apps.model_helpers.msg_util import msgt
-from opendp_apps.utils.extra_validators import \
-    VALIDATE_MSG_ZERO_OR_GREATER, VALIDATE_MSG_EPSILON
+from opendp_apps.dataset.models import DepositorSetupInfo
 from opendp_apps.dataset.tests.dataset_test_base import DatasetTestBase
+from opendp_apps.model_helpers.msg_util import msgt
 
-from unittest import skip
 
 class TestDepositorInfo(DatasetTestBase):
-    xfixtures = ['test_dataverses_01.json',
-                'test_manifest_params_04.json',
-                'test_opendp_users_01.json',
-                'test_dataset_data_001.json']
+    """Test the retrieval of DatasetInfo objects"""
 
     def setUp(self) -> None:
         super().setUp()
@@ -24,76 +13,71 @@ class TestDepositorInfo(DatasetTestBase):
         """(10) Successful patch"""
         msgt(self.test_10_successful_patch.__doc__)
 
-        depositor_setup_id = self.get_new_dataset_setup_info_id()
-        return
-        print('reverse 1:', reverse("deposit-detail"))
-        print('reverse 2:', reverse("deposit-detail",
-                                  kwargs={'object_id': "9255c067-e435-43bd-8af1-33a6987ffc9b"}))
-        return
-        response = self.client.patch(reverse("deposit-detail",
-                                             kwargs={'object_id': "9255c067-e435-43bd-8af1-33a6987ffc9b"}),
-                                     {'default_epsilon': 1.0,
-                                      'epsilon': 0.9,
-                                      'default_delta': astatic.DELTA_0,
-                                      'delta': astatic.DELTA_10_NEG_6,
-                                      'confidence_level': astatic.CL_99})
-        print('(10 resp)', response.json())
+        ds_dict = self.upload_file_via_api()
+
+        update_payload = {'name': 'blueberry scone',
+                          'description': 'this is a test'}
+
+        response = self.client.patch(self.API_DATASET_INFO + ds_dict['object_id'] + '/',
+                                     data=update_payload,
+                                     content_type="application/json")
         self.assertEqual(response.status_code, 200)
-        response = response.json()
+        self.assertEqual(response.json()['object_id'], ds_dict['object_id'])
+        self.assertEqual(response.json()['name'], update_payload['name'])
+        self.assertEqual(response.json()['description'], update_payload['description'])
+        self.assertEqual(response.json()['status'], DepositorSetupInfo.DepositorSteps.STEP_0100_UPLOADED)
 
-        response.pop('updated')
-        self.assertEqual(response,
-                         {'id': 1,
-                          'created': '2021-03-23T17:22:50.889000Z',
-                          'object_id': '9255c067-e435-43bd-8af1-33a6987ffc9b',
-                          'dataset_questions': None,
-                          'dataset_size': None,
-                          'epsilon_questions': None,
-                          'is_complete': False,
-                          'user_step': 'step_100',
-                          'default_epsilon': 1.0,
-                          'epsilon': 0.9,
-                          'default_delta': astatic.DELTA_0,
-                          'delta': astatic.DELTA_10_NEG_6,
-                          'confidence_level': astatic.CL_99,
-                          'variable_info': None})
-
-    @skip('Not implemented yet')
-    def test_20_patch_restricted_field(self, req_mocker):
-        """Try to patch a field that isn't allowed"""
+    def test_20_patch_restricted_field(self):
+        """(20) Try to patch a field that isn't allowed"""
         msgt(self.test_20_patch_restricted_field.__doc__)
-        self.set_mock_requests(req_mocker)
-        response = self.client.patch(reverse("deposit-detail",
-                                             kwargs={'object_id': "9255c067-e435-43bd-8af1-33a6987ffc9b"}),
-                                     {"dataset_schema_info": {"something": "this should fail"}}, format='json')
-        # print(f"patch response: {response.json()}")
-        # get_response = self.client.get(reverse("deposit-detail",
-        #                                        kwargs={'object_id': "9255c067-e435-43bd-8af1-33a6987ffc9b"}))
-        # print(f"get response: {get_response.json()}")
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json(), {'message': 'These fields are not updatable',
-                                           'fields': ['dataset_schema_info']})
 
-    @skip('Not implemented yet')
-    def test_30_patch_bad_values(self, req_mocker):
-        """(30) Attempt a patch with a invalid values for updateable fields"""
-        msgt(self.test_30_patch_bad_values.__doc__)
-        self.set_mock_requests(req_mocker)
-        response = self.client.patch(reverse("deposit-detail",
-                                             kwargs={'object_id': "9255c067-e435-43bd-8af1-33a6987ffc9b"}),
-                                     {'confidence_level': 0.48,
-                                      'default_epsilon': -2,
-                                      'epsilon': 0.0001,
-                                      'default_delta': -0.1,
-                                      'delta': -3})
+        ds_dict = self.upload_file_via_api()
 
-        self.assertEqual(response.status_code, 400)
-        print(f"get response: {response.json()}")
+        update_payload = {'depositor_setup_info': {'has_data': False},
+                          'source': 'marmalade',
+                          'source_file': 'marmalade.txt',
+                          'description': 'Give me a Vegemite sandwich'}
 
-        expected_msg = {'confidence_level': ['"0.48" is not a valid choice.'],
-                        'default_delta': [VALIDATE_MSG_ZERO_OR_GREATER],
-                        'delta': [VALIDATE_MSG_ZERO_OR_GREATER],
-                        'default_epsilon': [VALIDATE_MSG_EPSILON],
-                        'epsilon': [VALIDATE_MSG_EPSILON]
-                        }
-        self.assertEqual(response.json(), expected_msg)
+        response = self.client.patch(self.API_DATASET_INFO + ds_dict['object_id'] + '/',
+                                     data=update_payload,
+                                     content_type="application/json")
+
+        # should skip the restricted fields such as depositor_setup_info, source, and source_file
+        self.assertEqual(response.status_code, 200)
+
+        # Match the original, no update
+        self.assertEqual(response.json()['object_id'], ds_dict['object_id'])
+        self.assertEqual(response.json()['depositor_setup_info'], ds_dict['depositor_setup_info'])
+        self.assertEqual(response.json()['source'], ds_dict['source'])
+
+        # description is updated
+        self.assertEqual(response.json()['description'], update_payload['description'])
+
+    def test_30_get_dataset_info(self):
+        """(30) get dataset info"""
+        msgt(self.test_30_get_dataset_info.__doc__)
+
+        ds_dict = self.upload_file_via_api()
+
+        response = self.client.get(self.API_DATASET_INFO + ds_dict['object_id'] + '/')
+
+        # should skip the restricted fields such as depositor_setup_info, source, and source_file
+        print('response', response.json())
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['object_id'], ds_dict['object_id'])
+        self.assertEqual(response.json()['creator_id'], str(self.user_obj.object_id))
+
+    def test_40_get_dataset_info_list(self):
+        """(40) get dataset info list"""
+        msgt(self.test_40_get_dataset_info_list.__doc__)
+
+        ds_dict = self.upload_file_via_api()
+        ds_dict2 = self.upload_second_file_via_api()
+        ds_info_object_ids = [ds_dict['object_id'], ds_dict2['object_id']]
+
+        response = self.client.get(self.API_DATASET_INFO)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['count'], 2)
+        self.assertTrue(response.json()['results'][0]['object_id'] in ds_info_object_ids)
+        self.assertTrue(response.json()['results'][1]['object_id'] in ds_info_object_ids)

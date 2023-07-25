@@ -54,6 +54,7 @@ This includes depositor setup info.
 
 - **API endpoint**: `/api/dataset-info/{dataset_object_id}/`
   - **Example**: `/api/dataset-info/0d8f0aec-0f3a-44af-8502-d185fb93e01d/`
+  - Remove the `{dataset_object_id}` from the url to get a list of all `DatasetInfo` objects where the logged in user is the `DatasetInfo.creator`
 - **Method**: `GET`
 - **Auth**: username/password
 - **DRF link**: http://localhost:8000/api/dataset-info/

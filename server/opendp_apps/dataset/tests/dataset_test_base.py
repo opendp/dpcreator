@@ -50,6 +50,34 @@ class DatasetTestBase(TestCase):
 
         return jresp
 
+    def upload_second_file_via_api(self):
+        """Convenience method to upload a file and return the response"""
+
+        # 2nd test file
+        self.test_file_name2 = 'Fatigue_data.tab'
+        self.upload_name2 = 'Teacher Survey'
+
+        test_file2 = join(TEST_DATA_DIR, self.test_file_name2)
+        self.test_file_obj2 = SimpleUploadedFile(self.test_file_name2,
+                                                 open(test_file2, 'rb').read(),
+                                                 content_type="text/tab-separated-values")
+
+        payload = dict(name=self.upload_name2,
+                       creator=self.user_obj.object_id,
+                       source_file=self.test_file_obj2)
+
+        resp = self.client.post(self.API_DIRECT_UPLOAD,
+                                data=payload)
+
+        self.assertEqual(resp.status_code, HTTPStatus.CREATED)
+
+        jresp = resp.json()
+
+        self.assertEqual(jresp['creator_id'], str(self.user_obj.object_id))
+        self.assertEqual(jresp['name'], self.upload_name)
+
+        return jresp
+
     def get_dataset_info_via_api(self, dataset_object_id: str) -> dict:
         """Convenience method to get a dataset info object via the API"""
         assert dataset_object_id, "dataset_object_id cannot be None"
