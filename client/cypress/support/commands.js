@@ -345,7 +345,7 @@ Cypress.Commands.add('enterStatsInPopup', (demoData) => {
 
 
     Cypress.Commands.add('createMeanStatistic', (numericVar) => {
-        cy.intercept('PATCH', '/api/deposit/**',).as(
+        cy.intercept('PATCH', '/api/depositor-setup-info/**',).as(
             'patchDeposit'
         )
         cy.intercept('GET', '/api/dataset-info/**',).as(
