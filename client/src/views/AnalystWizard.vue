@@ -76,6 +76,13 @@ export default {
     CreateStatistics,
     GenerateDPRelease
   },
+  watch: {
+    stepperPosition: function (val, oldVal) {
+      if (val == 1) {
+        this.$refs.createStatComponent.initializeForm();
+      }
+    }
+  },
   created() {
           this.initStepperPosition()
           this.loading = false
