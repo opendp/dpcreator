@@ -11,11 +11,9 @@
         beforeEach(() => {
             cy.loadTeacherSurveyDemo()
         })
-        afterEach(() => {
-            cy.logout()
-        })
+
         //TODO: uncomment when analysis is ready
-/*
+
         it('Goes back to the Confirm Variables Page', () => {
             const meanAge = {
                 "statistics": [
@@ -40,10 +38,8 @@
                 .first().children().get(":has(.v-simple-checkbox--disabled)").should('be.visible')
         })
 
-        afterEach(() => {
-            cy.logout()
-        })
 
+/*
         it('Validates fixed value max-min', () => {
             const varMax = 75
             const varMin = 20

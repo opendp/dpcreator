@@ -6,18 +6,43 @@ Cypress.Commands.add('loadTeacherSurveyDemo', () => {
         console.log('runnable', runnable)
         return false
     })
-    cy.login('dev_admin', 'admin')
-    cy.request('/cypress-tests/clear-test-data/').then((resp) => {
-        console.log('CLEAR RESP: ' + JSON.stringify(resp))
-    })
-    cy.request('/cypress-tests/setup-demo-data/').then(() => {
-        cy.logout()
-        cy.login('dp_analyst', 'Test-for-2022')
-        cy.visit('/my-data')
-        cy.get('[data-test="continueWorkflow"]').click({force: true})
+    cy.clearData()
+    let testPath = 'cypress/fixtures/teacher_survey.csv'
+    cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
+    cy.uploadFile(testPath)
+  //  cy.pause()
+    cy.fixture('TeacherDemoData.json').then((demoData) => {
+        cy.url().should('contain', 'my-data')
+        cy.goToConfirmVariables(demoData)
+
+        // select the variables we will use
+        cy.selectVariable(demoData)
 
 
+
     })
+    cy.get('[data-test="wizardCompleteButton"]').click({force: true})
+    cy.get('[data-test="My Analysis Plans"]').click({force: true})
+    cy.get('[data-test="createPlanButton"]').click({force: true})
+    cy.get('[data-test="selectPlanDataset"]').click();
+
+    // Find and click the desired dataset option within the dropdown
+
+    cy.contains('teacher_survey.csv').click();
+
+    const myPlanName = 'my cypress test plan'
+    const myDesc = 'my cypress test desc'
+    cy.get('[data-test="selectPlanAnalyst"]').click()
+    cy.contains('oscar').click();
+    cy.get('[data-test="inputPlanName"]').type(myPlanName)
+    cy.get('[data-test="inputPlanName"]').type(myDesc)
+    cy.get('[data-test="inputPlanBudget"]').type('0.1')
+    cy.get('[data-test="createPlanSubmitButton"]').click({force:true})
+    cy.get('td').should('contain', 'teacher_survey.csv')
+    cy.get('[data-test="continueWorkflow0"]').click({force:true})
+    cy.url().should('contain','analyst-wizard')
+    cy.get('[data-test="wizardContinueButton"]').click({force:true})
+
 })
 
 Cypress.Commands.add('login', (username, password) => {
@@ -249,7 +274,6 @@ Cypress.Commands.add('goToConfirmVariables', (variableData) => {
 Cypress.Commands.add('selectVariable',(demoVariables)=> {
     Object.keys(demoVariables).forEach((varKey)=> {
         const demoVar = demoVariables[varKey]
-        console.log('testing ' +JSON.stringify(demoVar.name))
         cy.contains('td', demoVar.name).parent('tr').should('be.visible')
         cy.contains('td', demoVar.name).parent('tr').children().first().click()
         // If numeric, enter min & max
