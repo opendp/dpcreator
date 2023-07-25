@@ -85,20 +85,16 @@ export default {
   methods: {
 
     updateStepStatus: function (stepNumber, completedStatus) {
-      console.log("updateStepStatus: stepNumber: " + stepNumber + " completedStatus: " + completedStatus)
       this.steps[stepNumber].completed = completedStatus;
 
     },
     // Set the current Wizard stepper position based on the
     // depositorSetup userStep
     initStepperPosition: function () {
-      console.log('INIT stepper position, userStep = ' + this.analysisPlan.userStep)
-      if (this.datasetInfo && this.analysisPlan) {
         this.stepperPosition = stepInformation[this.analysisPlan.userStep].wizardStepper
         for (let index = 0; index < this.stepperPosition; index++) {
           this.steps[index].completed = true
         }
-      }
     },
     gotoStep(step) {
       this.stepperPosition = step
