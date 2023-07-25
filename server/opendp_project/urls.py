@@ -51,7 +51,7 @@ router.register(r'banner-messages', BannerMessageViewSet, basename='banner-messa
 
 router.register(r'dataset-info', DatasetInfoViewSet)
 # router.register(r'dv-user', DataverseUserView, basename='dv-user')
-router.register(r'deposit', DepositorSetupViewSet, basename='deposit')
+router.register(r'depositor-setup-info', DepositorSetupViewSet, basename='depositor-setup-info')
 
 # router.register(r'dv-handoff', DataverseHandoffView, basename='dv-handoff')
 router.register(r'dv-file', DataverseFileView, basename='dv-file')

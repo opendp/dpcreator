@@ -73,14 +73,12 @@ class AnalysisPlanObjectIdSerializer(serializers.Serializer):
 class AnalysisPlanSerializer(serializers.ModelSerializer):
     """Fields returned when an AnalysisPlan is serialized"""
     analysis_id = serializers.CharField(source='object_id', read_only=True)
-    dataset_id = serializers.CharField(source='dataset.object_id', read_only=True)
-    release_info = ReleaseInfoSerializer(read_only=True)
-
     analyst_name = serializers.CharField(source='analyst', read_only=True)
+    dataset_id = serializers.CharField(source='dataset.object_id', read_only=True)
     dataset_name = serializers.CharField(source='dataset.name', read_only=True)
     dataset_owner_id = serializers.CharField(source='dataset.creator.object_id', read_only=True)
     dataset_owner_name = serializers.CharField(source='dataset.creator', read_only=True)
-
+    release_info = ReleaseInfoSerializer(read_only=True)
     is_expired = serializers.SerializerMethodField('is_plan_expired')
 
     def is_plan_expired(self, obj):

@@ -123,8 +123,8 @@ class DatasetFormatter(BasicErrCheck):
             # Shouldn't happen...
             return err_resp(self.get_err_msg())
 
-        if not self.dataset.dataset_schema_info:
-            return err_resp('".dataset_schema_info" is empty')
+        #if not self.dataset.dataset_schema_info:
+        #    return err_resp('".dataset_schema_info" is empty')
 
         if 'name' not in self.dataset.dataset_schema_info:
             return err_resp('"name" not found in ".dataset_schema_info" not found')
