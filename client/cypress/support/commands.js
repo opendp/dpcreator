@@ -7,7 +7,8 @@ Cypress.Commands.add('loadTeacherSurveyDemo', () => {
         return false
     })
     cy.clearData()
-    let testPath = 'cypress/fixtures/teacher_survey.csv'
+    let testFile = 'teacher_survery.csv'
+    let testPath = 'cypress/fixtures/'+testFile
     cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
     cy.uploadFile(testPath)
   //  cy.pause()
@@ -22,24 +23,24 @@ Cypress.Commands.add('loadTeacherSurveyDemo', () => {
 
     })
     cy.get('[data-test="wizardCompleteButton"]').click({force: true})
+    cy.createPlan(testFile, oscar)
+
+})
+
+Cypress.Commands.add('createPlan',(testFile, username )=>{
     cy.get('[data-test="My Analysis Plans"]').click({force: true})
     cy.get('[data-test="createPlanButton"]').click({force: true})
     cy.get('[data-test="selectPlanDataset"]').click();
-
-    cy.contains('teacher_survey.csv').click();
-
+    cy.contains(testFile).click();
     const myPlanName = 'my cypress test plan'
     const myDesc = 'my cypress test desc'
     cy.get('[data-test="selectPlanAnalyst"]').click()
-    cy.contains('oscar').click();
+    cy.contains(username).click();
     cy.get('[data-test="inputPlanName"]').type(myPlanName)
     cy.get('[data-test="inputPlanName"]').type(myDesc)
     cy.get('[data-test="inputPlanBudget"]').type('0.1')
     cy.get('[data-test="createPlanSubmitButton"]').click({force:true})
-    cy.get('td').should('contain', 'teacher_survey.csv')
-    cy.get('[data-test="continueWorkflow0"]').click({force:true})
-    cy.url().should('contain','analyst-wizard')
-    cy.get('[data-test="wizardContinueButton"]').click({force:true})
+    cy.get('td').should('contain', testFile)
 
 })
 
@@ -170,7 +171,8 @@ Cypress.Commands.add('uploadFile', (testfile) => {
 Cypress.Commands.add('runDemo', (testFile, demoDatafile) => {
     cy.clearData()
     let testPath = 'cypress/fixtures/'+testFile
-    cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
+    let username = 'oscar'
+    cy.createAccount(username, 'oscar@sesame.com', 'oscar123!')
     cy.uploadFile(testPath)
     cy.fixture(demoDatafile).then((demoData) => {
         cy.url().should('contain', 'my-data')
@@ -179,7 +181,7 @@ Cypress.Commands.add('runDemo', (testFile, demoDatafile) => {
         // select the variables we will use
         cy.selectVariable(demoData.variables)
 
-        cy.createStatistics(demoData, testFile)
+        cy.createStatistics(demoData, testFile,username )
 
         // Submit the statistics
 
@@ -298,25 +300,12 @@ Cypress.Commands.add('selectVariable',(demoVariables)=> {
 
 })
 
-Cypress.Commands.add('createStatistics', (demoData, testFile) => {
+Cypress.Commands.add('createStatistics', (demoData, testFile,username) => {
     // Create Analysis plan
     cy.get('[data-test="wizardCompleteButton"]').click({force: true})
-    cy.get('[data-test="My Analysis Plans"]').click({force: true})
-    cy.get('[data-test="createPlanButton"]').click({force: true})
-    cy.get('[data-test="selectPlanDataset"]').click();
-
-    cy.contains(testFile).click();
-
-    const myPlanName = 'my cypress test plan'
-    const myDesc = 'my cypress test desc'
-    cy.get('[data-test="selectPlanAnalyst"]').click()
-    cy.contains('oscar').click();
-    cy.get('[data-test="inputPlanName"]').type(myPlanName)
-    cy.get('[data-test="inputPlanName"]').type(myDesc)
-    cy.get('[data-test="inputPlanBudget"]').type('0.1')
-    cy.get('[data-test="createPlanSubmitButton"]').click({force:true})
-    cy.get('td').should('contain', testFile)
-    cy.get('[data-test="continueWorkflow0"]').click({force:true})
+    cy.url().should('contain','my-data')
+    cy.createPlan(testFile,username)
+     cy.get('[data-test="continueWorkflow0"]').click({force:true})
     cy.url().should('contain','analyst-wizard')
     cy.get('[data-test="wizardContinueButton"]').click({force:true})
     // Continue to Create  Statistics Step
