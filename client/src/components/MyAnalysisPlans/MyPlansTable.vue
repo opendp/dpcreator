@@ -285,18 +285,13 @@ export default {
       this.deleteItem(item)
     },
     formatDate(dateString) {
-        // Step 1: Parse the string into a Date object
-        const dateObj = new Date(dateString);
-
-        // Step 2: Extract the month, day, and year
-        const month = dateObj.toLocaleString('default', {month: 'long'}); // 'July'
-        const day = dateObj.getDate(); // 23
-        const year = dateObj.getFullYear(); // 2023
-
-        // Step 3: Format the extracted values
-        const formattedDate = `${month} ${day}, ${year}`;
-        return formattedDate
-    },
+      const dateObj = new Date(dateString);
+      // The dateString returned from the v-date-picker is in UTC, so we have to display that
+      // in the same UTC timezone
+      const options = { timeZone: 'UTC', year: 'numeric', month: 'long', day: '2-digit' };
+      const formattedDate = dateObj.toLocaleString('en-US', options);
+      return formattedDate
+     },
     viewDetails(item) {
       this.goToPage(item, `${NETWORK_CONSTANTS.MY_DATA_DETAILS.PATH}`)
     // TODO: create MY_PLAN_DETAILS
@@ -305,13 +300,10 @@ export default {
       this.goToPage(item, `${NETWORK_CONSTANTS.ANALYST_WIZARD.PATH}`)
     },
     getWorkflowStatus(item) {
-        console.log('item.userStep: '+item.userStep)
         const workflowStatus= stepInformation[item.userStep].workflowStatus
-        console.log('returning workflowStatus: '+ workflowStatus)
         return workflowStatus
     },
     goToPage(item, path) {
-      console.log('going to page, path: '+path)
       this.$store.dispatch('dataset/setAnalysisPlan', item.objectId)
           .then(() => {
                  this.$router.push(path)
