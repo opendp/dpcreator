@@ -96,15 +96,21 @@ class AnalysisPlanViewSet(BaseModelViewSet):
             return Response({'detail': 'Not found.'},
                             status=status.HTTP_404_NOT_FOUND)
 
-        # Does the AnalysisPlan already have a release?
-        if analysis_plan.release_info:
-            return Response(get_json_error(astatic.ERR_MSG_RELEASES_EXISTS),
-                            status=status.HTTP_400_BAD_REQUEST)
-
         # Is the AnalysisPlan expired?
         if make_aware(datetime.now()) > analysis_plan.expiration_date:
             return Response(get_json_error(astatic.ERR_MSG_ANALYSIS_PLAN_EXPIRED),
                             status=status.HTTP_400_BAD_REQUEST)
+
+        # -------------------------------------------------------
+        # Does the AnalysisPlan already have a release?
+        # If so: ONLY ALLOW UPDATES TO THE `wizard_step` field!
+        # -------------------------------------------------------
+        if analysis_plan.release_info:
+            # Remove all fields except `wizard_step`
+            data_field_keys = list(request.data.keys())
+            for data_field_key in data_field_keys:
+                if data_field_key != 'wizard_step':
+                    del request.data[data_field_key]
 
         # Check that only the allowed fields are being updated
         #
@@ -128,7 +134,7 @@ class AnalysisPlanViewSet(BaseModelViewSet):
         # If there are no fields to update, return an error
         #
         if not fields_to_update:
-            return Response(get_json_error(f'There are no fields to update'),
+            return Response(get_json_error(astatic.ERR_MSG_NO_FIELDS_TO_UPDATE),
                             status=status.HTTP_400_BAD_REQUEST)
 
         # Make the partial update

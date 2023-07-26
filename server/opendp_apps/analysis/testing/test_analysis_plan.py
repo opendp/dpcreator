@@ -10,7 +10,7 @@ from rest_framework.test import APIClient
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.analysis_plan_creator import AnalysisPlanCreator
-from opendp_apps.analysis.models import AnalysisPlan
+from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataset.models import DatasetInfo
 from opendp_apps.model_helpers.msg_util import msgt
@@ -752,3 +752,72 @@ class AnalysisPlanTest(TestCase):
         # Plan 2 not found
         response = self.client.get(f'{self.API_PREFIX}{analysis_plan2.object_id}/')
         self.assertTrue(response.status_code, HTTPStatus.NOT_FOUND)
+
+    def test_160_update_plan_with_release(self):
+        """(160) Update AnalysisPlan that has a release. Only the "wizard_step" should be updated"""
+        msgt(self.test_160_update_plan_with_release.__doc__)
+
+        plan_info = self.working_plan_info.copy()
+
+        plan_util = AnalysisPlanCreator(self.user_obj, plan_info)
+
+        self.assertEqual(plan_util.has_error(), False)
+
+        analysis_plan = plan_util.analysis_plan
+        plan_object_id = analysis_plan.object_id
+
+        placeholder_release = ReleaseInfo(dataset=analysis_plan.dataset,
+                                          epsilon_used=analysis_plan.dataset.depositor_setup_info.epsilon,
+                                          dp_release={'zirp': 'but why?'})
+        placeholder_release.save()
+        analysis_plan.release_info = placeholder_release
+        analysis_plan.is_complete = True
+        analysis_plan.dp_statistics = {'foo': 'bar'}
+        analysis_plan.user_step = AnalysisPlan.AnalystSteps.STEP_1200_PROCESS_COMPLETE  # not true, but for testing
+        analysis_plan.save()
+
+        print('analysis_plan', analysis_plan.object_id)
+
+        # note: not checking **validity** of dp_statistics or variable_info here
+        update_data = {'dp_statistics': {'place': 'sardinia', 'temp (F)': 104},
+                       'name': 'Teacher survey extraordinaire',
+                       'is_complete': False,
+                       'wizard_step': 'Barbenheimer'}
+
+        response = self.client.patch(f'{self.API_PREFIX}{plan_object_id}/',
+                                     json.dumps(update_data),
+                                     content_type='application/json')
+
+        print(json.dumps(response.json(), indent=4))
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+        # Should only update the wizard_step
+        self.assertEqual(response.json()['wizard_step'], update_data['wizard_step'])
+
+        # Other update fields are ignored
+        self.assertEqual(response.json()['name'], plan_info['name'])
+        self.assertEqual(response.json()['dp_statistics'], analysis_plan.dp_statistics)
+        self.assertEqual(response.json()['is_complete'], True)
+        self.assertEqual(response.json()['user_step'], AnalysisPlan.AnalystSteps.STEP_1200_PROCESS_COMPLETE)
+
+    def test_170_update_plan_no_data(self):
+        """(170) Update AnalysisPlan w/o any update data"""
+        msgt(self.test_170_update_plan_no_data.__doc__)
+
+        plan_info = self.working_plan_info.copy()
+
+        plan_util = AnalysisPlanCreator(self.user_obj, plan_info)
+
+        self.assertEqual(plan_util.has_error(), False)
+
+        update_data = {}
+
+        response = self.client.patch(f'{self.API_PREFIX}{plan_util.analysis_plan.object_id}/',
+                                     json.dumps(update_data),
+                                     content_type='application/json')
+
+        print(json.dumps(response.json(), indent=4))
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+
+        # Should only update the wizard_step
+        self.assertEqual(response.json()['message'], astatic.ERR_MSG_NO_FIELDS_TO_UPDATE)

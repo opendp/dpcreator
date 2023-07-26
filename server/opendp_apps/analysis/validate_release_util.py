@@ -285,15 +285,16 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         # (5) Attach the ReleaseInfo to the AnalysisPlan, AnalysisPlan.release_info
         self.analysis_plan.release_info = self.release_info
+        self.analysis_plan.is_complete = True
         self.analysis_plan.user_step = AnalysisPlan.AnalystSteps.STEP_1000_RELEASE_COMPLETE
         self.analysis_plan.save()
 
         # (6) Delete the "source_file"
-        delete_result = DatasetInfo.delete_source_file(self.analysis_plan.dataset)
-        if not delete_result.success:
-            logger.error(f"ValidateReleaseUtil.make_release_info: {delete_result.message}")
-            self.add_err_msg(delete_result.message)
-            return False
+        # delete_result = DatasetInfo.delete_source_file(self.analysis_plan.dataset)
+        # if not delete_result.success:
+        #    logger.error(f"ValidateReleaseUtil.make_release_info: {delete_result.message}")
+        #    self.add_err_msg(delete_result.message)
+        #    return False
 
         # (7) Send release email to the user
         #   (On error, continue the process)
