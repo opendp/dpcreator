@@ -24,6 +24,7 @@ Cypress.Commands.add('loadTeacherSurveyDemo', () => {
 
     })
     cy.get('[data-test="wizardCompleteButton"]').click({force: true})
+
     cy.createPlan(testFile, username)
     cy.url().should('contain','my-plans')
     cy.get('[data-test="continueWorkflow0"]').click({force:true})
@@ -35,6 +36,7 @@ Cypress.Commands.add('loadTeacherSurveyDemo', () => {
 })
 
 Cypress.Commands.add('createPlan',(testFile, username )=>{
+    cy.url().should('contain','my-data')
     cy.get('[data-test="My Analysis Plans"]').click({force: true})
     cy.get('[data-test="createPlanButton"]').click({force: true})
     cy.get('[data-test="selectPlanDataset"]').click();

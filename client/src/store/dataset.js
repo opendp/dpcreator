@@ -113,19 +113,11 @@ const actions = {
      * @param {datasetId, analysisPlanId}
      */
     deleteAnalysisPlan({commit, state}, {datasetId, analysisPlanId}) {
-        // check how many analysisPlans  are associated with the dataset
-        // if this is the only analysis plan for the dataset, then delete the dataset as well.
-        const theDataset = state.datasetList.find(item => item.objectId === datasetId)
-        try {
+         try {
             analysis.deleteAnalysisPlan(analysisPlanId)
             commit(REMOVE_ANALYSIS_PLAN, analysisPlanId)
-            if (theDataset.analysisPlans.length == 0) {
-                dataset.deleteDatasetInfo(datasetId)
-                commit(REMOVE_DATASET, datasetId)
-            }
         } catch (error) {
             console.log(error);
-
         }
 
     },
