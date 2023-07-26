@@ -7,9 +7,10 @@ Cypress.Commands.add('loadTeacherSurveyDemo', () => {
         return false
     })
     cy.clearData()
-    let testFile = 'teacher_survery.csv'
+    let testFile = 'teacher_survey.csv'
     let testPath = 'cypress/fixtures/'+testFile
-    cy.createAccount('oscar', 'oscar@sesame.com', 'oscar123!')
+    let username = 'oscar'
+    cy.createAccount(username, 'oscar@sesame.com', 'oscar123!')
     cy.uploadFile(testPath)
   //  cy.pause()
     cy.fixture('TeacherDemoData.json').then((demoData) => {
@@ -23,7 +24,13 @@ Cypress.Commands.add('loadTeacherSurveyDemo', () => {
 
     })
     cy.get('[data-test="wizardCompleteButton"]').click({force: true})
-    cy.createPlan(testFile, oscar)
+    cy.createPlan(testFile, username)
+    cy.url().should('contain','my-plans')
+    cy.get('[data-test="continueWorkflow0"]').click({force:true})
+    cy.url().should('contain','analyst-wizard')
+    cy.get('[data-test="wizardContinueButton"]').click({force:true})
+
+
 
 })
 
@@ -305,6 +312,7 @@ Cypress.Commands.add('createStatistics', (demoData, testFile,username) => {
     cy.get('[data-test="wizardCompleteButton"]').click({force: true})
     cy.url().should('contain','my-data')
     cy.createPlan(testFile,username)
+    cy.url().should('contain','my-plans')
      cy.get('[data-test="continueWorkflow0"]').click({force:true})
     cy.url().should('contain','analyst-wizard')
     cy.get('[data-test="wizardContinueButton"]').click({force:true})
@@ -339,7 +347,8 @@ Cypress.Commands.add('enterStatsInPopup', (demoData) => {
         }
         cy.get('[data-test="Create Statistic Button"]').click({force: true})
         cy.get('[data-test="Create Statistics Title').should('be.visible')
-        cy.get('[data-test="Add Statistic"]').should('be.visible')
+        cy.scrollTo('bottom')
+        cy.get('[data-test="Add Statistic"]').should('exist')
         // The statistic should have been created
         cy.get('tr').first().get('td').should('contain', demoStat.statistic)
 

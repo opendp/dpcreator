@@ -3,7 +3,7 @@
     <v-container v-if="!loading && datasetInfo">
       <v-row>
         <v-col>
-          <v-stepper vertical v-model="stepperPosition" id="wizard-content" alt-labels>
+          <v-stepper  v-model="stepperPosition" id="wizard-content" alt-labels>
             <StepperHeader :steps="steps" :stepperPosition="stepperPosition"/>
             <v-stepper-items>
               <span class="d-block mt-5"
