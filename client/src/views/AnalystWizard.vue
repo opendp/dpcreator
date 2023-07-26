@@ -3,7 +3,7 @@
     <v-container v-if="!loading && datasetInfo">
       <v-row>
         <v-col>
-          <v-stepper vertical v-model="stepperPosition" id="wizard-content" alt-labels>
+          <v-stepper  v-model="stepperPosition" id="wizard-content" alt-labels>
             <StepperHeader :steps="steps" :stepperPosition="stepperPosition"/>
             <v-stepper-items>
               <span class="d-block mt-5"
@@ -76,6 +76,13 @@ export default {
     CreateStatistics,
     GenerateDPRelease
   },
+  watch: {
+    stepperPosition: function (val, oldVal) {
+      if (val == 1) {
+        this.$refs.createStatComponent.initializeForm();
+      }
+    }
+  },
   created() {
           this.initStepperPosition()
           this.loading = false
@@ -85,20 +92,16 @@ export default {
   methods: {
 
     updateStepStatus: function (stepNumber, completedStatus) {
-      console.log("updateStepStatus: stepNumber: " + stepNumber + " completedStatus: " + completedStatus)
       this.steps[stepNumber].completed = completedStatus;
 
     },
     // Set the current Wizard stepper position based on the
     // depositorSetup userStep
     initStepperPosition: function () {
-      console.log('INIT stepper position, userStep = ' + this.analysisPlan.userStep)
-      if (this.datasetInfo && this.analysisPlan) {
         this.stepperPosition = stepInformation[this.analysisPlan.userStep].wizardStepper
         for (let index = 0; index < this.stepperPosition; index++) {
           this.steps[index].completed = true
         }
-      }
     },
     gotoStep(step) {
       this.stepperPosition = step

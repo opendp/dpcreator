@@ -1,0 +1,100 @@
+{
+  "age": {
+    "max": 75,
+    "min": 20,
+    "name": "age",
+    "type": "Integer",
+    "label": "age",
+    "selected": true,
+    "sortOrder": 1
+  },
+  "sex": {
+    "max": 3,
+    "min": 1,
+    "name": "sex",
+    "type": "Integer",
+    "label": "sex",
+    "max": 3,
+    "min": 1
+
+  },
+  "smoking": {
+    "max": 0,
+    "min": 0,
+    "name": "smoking",
+    "type": "Categorical",
+    "label": "smoking",
+    "selected": true,
+    "sortOrder": 6,
+    "categories":"1,2"
+  },
+  "optimism": {
+    "max": 30,
+    "min": 6,
+    "name": "optimism",
+    "type": "Categorical",
+    "label": "optimism",
+    "sortOrder": 7,
+    "categories": "1,2,3"
+  },
+  "selfesteem": {
+    "max": 40,
+    "min": 10,
+    "name": "selfesteem",
+    "type": "Categorical",
+    "label": "selfesteem",
+    "selected": true,
+    "sortOrder": 9,
+    "categories": "1,2,3,4,5"
+  },
+  "havingchild": {
+    "name": "Havingchild",
+    "type": "Categorical",
+    "label": "Havingchild",
+    "selected": true,
+    "sortOrder": 3,
+    "categories": "1,2"
+  },
+  "maritalstatus": {
+    "max": 8,
+    "min": 1,
+    "name": "maritalstatus",
+    "type": "Integer",
+    "label": "maritalstatus",
+    "selected": true,
+    "sortOrder": 2,
+    "max": 8,
+    "min": 1
+  },
+  "sourceofstress": {
+    "max": 9,
+    "min": 1,
+    "name": "sourceofstress",
+    "type": "Categorical",
+    "label": "sourceofstress",
+    "selected": true,
+    "sortOrder": 5,
+    "categories": "1,2,3,4,5,6,7,8,9"
+  },
+  "lifesattisfaction": {
+    "max": 35,
+    "min": 5,
+    "name": "lifesattisfaction",
+    "type": "Categorical",
+    "label": "lifesattisfaction",
+    "selected": true,
+    "sortOrder": 8,
+    "categories": "1,2,3,4,5"
+  },
+  "highesteducationlevel": {
+    "max": 6,
+    "min": 1,
+    "name": "highesteducationlevel",
+    "type": "Integer",
+    "label": "highesteducationlevel",
+    "selected": true,
+    "sortOrder": 4,
+    "max": 16,
+    "min": 1
+  }
+}

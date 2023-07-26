@@ -40,7 +40,6 @@ const routes = [
     component: () => import("../views/AnalystWizard.vue"),
     meta: {
       requiresAuth: true,
-      requiresDataset: true
     }
   },
   {

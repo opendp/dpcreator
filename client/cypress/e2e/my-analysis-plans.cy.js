@@ -64,10 +64,9 @@
                 cy.get('[data-test="inputPlanBudget"]').type('0.1')
                 cy.get('[data-test="createPlanSubmitButton"]').click({force:true})
                 cy.get('td').should('contain', 'Fatigue_data.csv')
-                const continueTestId = 'continueWorkflow'+myPlanName+myDesc
+                const continueTestId = 'continueWorkflow0'
                 cy.get('[data-test="'+continueTestId+'"]').click({force: true})
                 cy.url().should('contains','analyst-wizard')
-                cy.pause()
 
 
             })
@@ -125,12 +124,7 @@
                 cy.get('[data-test="inputPlanBudget"]').type('0.1')
                 cy.get('[data-test="createPlanSubmitButton"]').click({force:true})
                 cy.get('td').should('contain', 'Fatigue_data.csv')
-
-                cy.pause()
-
-
-
-            })
+             })
         })
         it('calls delete analysis plan API', () => {
             cy.on('uncaught:exception', (e, runnable) => {
@@ -180,7 +174,7 @@
                     analysisPlanList.plans.forEach(plan => {
                         cy.get('[data-test="my-plans-table"]').should('contain.text', plan.datasetName)
                     })
-                const deleteId = 'delete' + analysisPlanList.plans[0].name
+                const deleteId = 'delete0'
                 cy.get('[data-test="'+deleteId+'"]').click({force: true})
                 cy.get('[data-test="deleteAnalysisConfirm"]').click({force: true})
                 cy.wait('@deletePlan').its('response.statusCode').should('eq', 200)
