@@ -15,6 +15,7 @@ def set_user_step_based_on_data(depositor_setup_info) -> None:
     assert str(depositor_setup_info._meta) == 'dataset.depositorsetupinfo', \
         "depositor_setup_info must be a DepositorSetupInfo object"
 
+    orig_is_complete_val = depositor_setup_info.is_complete
     depositor_setup_info.is_complete = False
 
     # These error states are should not be changed
@@ -29,12 +30,10 @@ def set_user_step_based_on_data(depositor_setup_info) -> None:
     # Keep updating the user step based on the data available. A bit inefficient, but should
     # stop where data available for that step
     depositor_setup_info.set_user_step(depositor_setup_info.DepositorSteps.STEP_0000_INITIALIZED)
-    # depositor_setup_info.set_wizard_step(DepositorSetupInfo.WizardSteps.STEP_0100_FILE_UPLOAD)
     if not depositor_setup_info.get_dataset_info():
         return
     if depositor_setup_info.get_dataset_info().source_file:
         depositor_setup_info.set_user_step(depositor_setup_info.DepositorSteps.STEP_0100_UPLOADED)
-        # depositor_setup_info.set_wizard_step(DepositorSetupInfo.WizardSteps.STEP_0200_DATASET_QUESTIONS)
     else:
         return
 
@@ -70,9 +69,12 @@ def set_user_step_based_on_data(depositor_setup_info) -> None:
 
     if depositor_setup_info.epsilon:
         depositor_setup_info.set_user_step(depositor_setup_info.DepositorSteps.STEP_0600_EPSILON_SET)
-        depositor_setup_info.is_complete = True
     else:
         return
+
+    # If "is_complete" was True at the start, set it back to True
+    if orig_is_complete_val is True:
+        depositor_setup_info.is_complete = True
 
 def set_default_epsilon_delta_from_questions(depositor_setup_info) -> None:
     """Based on the data, update the "user_step" field

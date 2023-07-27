@@ -1,12 +1,13 @@
 import json
 from collections import OrderedDict
+from datetime import datetime
 
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.utils import timezone
 from django.utils.safestring import mark_safe
+from django.utils.timezone import make_aware
 from rest_framework import status
 from rest_framework.reverse import reverse as drf_reverse
 
@@ -19,6 +20,7 @@ from opendp_apps.utils.variable_info_formatter import format_variable_info
 RELEASE_FILE_STORAGE = FileSystemStorage(location=settings.RELEASE_FILE_STORAGE_ROOT)
 
 from opendp_apps.dataset import static_vals as dstatic
+
 
 class ReleaseInfo(TimestampedModelWithUUID):
     """
@@ -304,6 +306,13 @@ class AnalysisPlan(TimestampedModelWithUUID):
         editable_steps = [self.AnalystSteps.STEP_0700_VARIABLES_CONFIRMED,
                           self.AnalystSteps.STEP_0800_STATISTICS_CREATED]
         return self.user_step in editable_steps
+
+    def is_plan_expired(self) -> bool:
+        """
+        Is the current date past the expiration date?
+        @return:
+        """
+        return make_aware(datetime.now()) > self.expiration_date
 
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the user_step

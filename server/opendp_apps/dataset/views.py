@@ -72,18 +72,29 @@ class DepositorSetupViewSet(BaseModelViewSet):
         """
         Update DepositorSetupInfo fields
         """
+
+        # -------------------------------------------------------
+        # Hack: if DepositorSetupInfo is already complete
+        # -------------------------------------------------------
+        if self.get_object().is_complete:
+            # Remove all fields except `wizard_step`
+            data_field_keys = list(request.data.keys())
+            for data_field_key in data_field_keys:
+                if data_field_key != dstatic.KEY_WIZARD_STEP:
+                    del request.data[data_field_key]
+
         acceptable_fields = ['dataset_questions',
                              'epsilon_questions',
-                             # 'user_step', # TODO: Remove this
                              'variable_info',
                              'epsilon',
                              'delta',
-                             # 'default_epsilon', # TODO: Remove this
-                             # 'default_delta', # TODO: Remove this
                              'confidence_level',
+                             'is_complete',
                              'wizard_step']
 
-        # Adding fields_to_strip for MVP, simplify frontend changes which will be change in Sept
+        # TODO: Update frontend
+        # This is an MVP "hack" to simplify frontend changes which will be changed in Sept
+        #
         fields_to_remove = ['user_step', 'default_epsilon', 'default_delta']
         for field_to_remove in fields_to_remove:
             request.data.pop(field_to_remove, None)
@@ -103,10 +114,6 @@ class DepositorSetupViewSet(BaseModelViewSet):
         # -----------------------------------------------------------------
         # Allow a depositor to return to the "Confirm Variables" page
         #   and update min/max, categories, etc.
-        #
-        # Depositor workflow only, allow edits to DepositorSetupInfo.variable_info
-        #   to also be sent to AnalysisPlan.variable_info, if an AnalysisPlan exists
-        # TODO: Fix this for Analyst workflow
         # -----------------------------------------------------------------
         if 'variable_info' in request.data:
             # Get the DepositorSetupInfo

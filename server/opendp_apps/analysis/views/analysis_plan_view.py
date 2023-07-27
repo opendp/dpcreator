@@ -87,37 +87,51 @@ class AnalysisPlanViewSet(BaseModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def partial_update(self, request, *args, **kwargs):
-        """Allows the AnalysisPlan.analyst to make updates to the AnalysisPlan object."""
-
-        # Make sure this is the AnalysisPlan.analyst!
-        #   The AnalysisPlan.dataset.creator cannot make changes via API
+        """
+        Allows the AnalysisPlan.analyst to make updates to the AnalysisPlan object.
+        Note: The fields that can be updated depend on whether the AnalysisPlan has a ReleaseInfo object
+            - No ReleaseInfo, allow updates of:
+                - 'wizard_step'
+                - 'name'
+                - 'description'
+                - 'variable_info'
+                - 'dp_statistics',
+            - Release exists, only allow updates of:
+                - 'wizard_step'
+                - 'name'
+                - 'description'
+        """
+        # (1) Make sure the logged in user is the AnalysisPlan.analyst!
+        #
         analysis_plan = self.get_object()
-        if analysis_plan.analyst != request.user:
+        if request.user != analysis_plan.analyst:
             return Response({'detail': 'Not found.'},
                             status=status.HTTP_404_NOT_FOUND)
 
-        # Is the AnalysisPlan expired?
-        if make_aware(datetime.now()) > analysis_plan.expiration_date:
+        # (2) Is the AnalysisPlan expired w/o a ReleaseInfo?
+        #   Don't allow an update if the plan is expired and there is no release
+        #
+        if (not analysis_plan.release_info) and analysis_plan.is_plan_expired():
             return Response(get_json_error(astatic.ERR_MSG_ANALYSIS_PLAN_EXPIRED),
                             status=status.HTTP_400_BAD_REQUEST)
 
         # -------------------------------------------------------
-        # Does the AnalysisPlan already have a release?
-        # If so: ONLY ALLOW UPDATES TO THE `wizard_step` field!
+        # (3) Determine the updateable fields.
+        #   Does the AnalysisPlan already have a release?
+        #     If so, restrict updates.
         # -------------------------------------------------------
         if analysis_plan.release_info:
-            # Remove all fields except `wizard_step`
-            data_field_keys = list(request.data.keys())
-            for data_field_key in data_field_keys:
-                if data_field_key != 'wizard_step':
-                    del request.data[data_field_key]
+            # Release exists, only allow updates of:
+            acceptable_fields = ['name', 'description', 'wizard_step']
+        else:
+            # No ReleaseInfo, allow updates of:
+            acceptable_fields = ['name', 'description', 'variable_info', 'dp_statistics', 'wizard_step']
 
         # Check that only the allowed fields are being updated
         #
-        acceptable_fields = ['name', 'description', 'variable_info', 'dp_statistics', 'wizard_step']
         problem_fields = []
         fields_to_update = []
-        for field in request.data.keys():
+        for field in list(request.data.keys()):
             if field not in acceptable_fields:
                 problem_fields.append(field)
             else:

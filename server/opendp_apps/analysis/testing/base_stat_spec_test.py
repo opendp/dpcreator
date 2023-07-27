@@ -74,6 +74,7 @@ class StatSpecTestCase(TestCase):
         plan_creator = AnalysisPlanCreator(self.user_obj, plan_params)
         if plan_creator.has_error():
             print(plan_creator.get_error_message())
+            # import sys; sys.exit(0)
         self.assertTrue(plan_creator.has_error() is False)
 
         # Retrieve it

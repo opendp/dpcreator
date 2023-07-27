@@ -1,10 +1,9 @@
 import json
 import uuid
-from http import HTTPStatus
-from os.path import abspath, dirname, join
-
 from django.core.exceptions import ValidationError
 from django.urls import reverse
+from http import HTTPStatus
+from os.path import abspath, dirname, join
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.dataset.models import DepositorSetupInfo
@@ -88,16 +87,13 @@ class TestFileUpload(DatasetTestBase):
         object_id = resp.json().get('object_id')
 
         response = self.client.get(f'{self.API_DATASET_INFO}{object_id}/')
-        #response = self.client.get(f'{self.API_DATASET_INFO}')
-
+        # response = self.client.get(f'{self.API_DATASET_INFO}')
 
         self.assertEqual(response.status_code, 200)
-
 
         response = self.client.delete(f'{self.API_DATASET_INFO}{object_id}/')
         print(response.status_code)
         self.assertEqual(response.status_code, 204)
-
 
     def test_40_update_depositor_info_api(self):
         """(40) Test update depositor info"""
@@ -127,8 +123,11 @@ class TestFileUpload(DatasetTestBase):
                                  "radio_only_one_individual_per_row": "yes",
                                  "radio_depend_on_private_information": "yes"}
 
+        # Note "is_complete" won't update b/c internal data
+        # also needs to be in a
         update_payload = dict(epsilon_questions=new_epsilon_questions,
-                              dataset_questions=new_dataset_questions)
+                              dataset_questions=new_dataset_questions,
+                              is_complete=True)
 
         update_resp = self.client.patch(partial_update_url,
                                         data=update_payload,
@@ -169,13 +168,17 @@ class TestFileUpload(DatasetTestBase):
         new_default_epsilon = 0.5
         new_epsilon = 0.75
 
+        # "is_complete" will work b/c data in a correct state
+        #
         update_payload = dict(default_epsilon=new_default_epsilon,
-                              epsilon=new_epsilon)
+                              epsilon=new_epsilon,
+                              is_complete=True)
 
         update_resp = self.client.patch(partial_update_url,
                                         data=update_payload,
                                         content_type="application/json")
-
+        print('update_resp.status_code', update_resp.status_code)
+        print('update_resp.json()', update_resp.json())
         self.assertEqual(update_resp.status_code, HTTPStatus.OK)
 
         update_resp_json = update_resp.json()
@@ -750,7 +753,8 @@ class TestFileUpload(DatasetTestBase):
         new_epsilon = 0.75
 
         update_payload = dict(default_epsilon=new_default_epsilon,
-                              epsilon=new_epsilon)
+                              epsilon=new_epsilon,
+                              is_complete=True)
 
         update_resp = self.client.patch(partial_update_url,
                                         data=update_payload,

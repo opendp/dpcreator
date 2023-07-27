@@ -81,8 +81,8 @@ class AnalysisPlanSerializer(serializers.ModelSerializer):
     release_info = ReleaseInfoSerializer(read_only=True)
     is_expired = serializers.SerializerMethodField('is_plan_expired')
 
-    def is_plan_expired(self, obj):
-        return make_aware(datetime.now()) > obj.expiration_date
+    def is_plan_expired(self, obj) -> bool:
+        return obj.is_plan_expired()
 
     class Meta:
         model = AnalysisPlan
