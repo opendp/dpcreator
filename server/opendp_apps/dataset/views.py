@@ -7,6 +7,7 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 
 from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
+from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataset.models import DepositorSetupInfo, DatasetInfo, UploadFileInfo
 from opendp_apps.dataset.permissions import IsOwnerOrBlocked
 from opendp_apps.dataset.serializers import \
@@ -34,7 +35,6 @@ class DatasetInfoViewSet(BaseModelViewSet):
         """
         logger.info(f"Getting DatasetInfo for user {self.request.user.object_id}")
         return self.queryset.filter(creator=self.request.user)
-
 
     def delete(self, request, *args, **kwargs):
         # We currently have on_delete set to protect, so we need to explicitly delete
@@ -74,31 +74,75 @@ class DepositorSetupViewSet(BaseModelViewSet):
         """
 
         # -------------------------------------------------------
-        # Hack: if DepositorSetupInfo is already complete
+        # (1) Make sure the logged in user is the DepositorSetupInfo.creator!
         # -------------------------------------------------------
-        if self.get_object().is_complete:
-            # Remove all fields except `wizard_step`
-            data_field_keys = list(request.data.keys())
-            for data_field_key in data_field_keys:
-                if data_field_key != dstatic.KEY_WIZARD_STEP:
-                    del request.data[data_field_key]
+        depositor_setup_info = self.get_object()
+        if request.user != depositor_setup_info.creator:
+            return Response({'detail': 'Not found.'},
+                            status=status.HTTP_404_NOT_FOUND)
 
-        acceptable_fields = ['dataset_questions',
-                             'epsilon_questions',
-                             'variable_info',
-                             'epsilon',
-                             'delta',
-                             'confidence_level',
-                             'is_complete',
-                             'wizard_step']
+        # -------------------------------------------------------
+        # (2) Determine type of update -> which fields are updateable
+        #   If the DepositorSetupInfo "is_complete", restrict updates
+        # -------------------------------------------------------
+        num_fields_to_update = len(request.data.keys())
 
+        # Case A: "is_complete" has been set to True
+        #   Only the "wizard_step" field may be updated
+        #
+        if depositor_setup_info.is_complete:
+            if dstatic.KEY_WIZARD_STEP not in request.data:
+                return Response(get_json_error(dstatic.ERR_MSG_ONLY_WIZARD_ALREADY_COMPLETE),
+                                status=status.HTTP_400_BAD_REQUEST)
+            else:
+                acceptable_fields = ['wizard_step']
+        elif 'is_complete' in request.data:
+            # Case B: Setting "is_complete"
+            #   This is a special case, it means the user is indicating completion of the setup process.
+            #   The only additional field that may be updated is "wizard_step"
+            #
+            if num_fields_to_update == 1 or \
+                    (num_fields_to_update == 2 and dstatic.KEY_WIZARD_STEP in request.data):
+
+                # Can only set is_complete when the other steps are complete
+                #
+                if depositor_setup_info.user_step != \
+                        DepositorSetupInfo.DepositorSteps.STEP_0600_EPSILON_SET:
+                    # Send  error message
+                    user_msg = dstatic.ERR_MSG_COMPLETE_NOT_ALLOWED_INVALID_DATA
+                    return Response(get_json_error(user_msg),
+                                    status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    acceptable_fields = ['is_complete', 'wizard_step']
+            else:
+                key_list_str = ', '.join(list(request.data.keys()))
+                user_msg = dstatic.ERR_MSG_ONLY_WIZARD_STEP_MAY_BE_UPDATED.format(key_list_str=key_list_str)
+                return Response(get_json_error(user_msg),
+                                status=status.HTTP_400_BAD_REQUEST)
+        else:
+            # Case C: Setup is incomplete, allow updates of:
+            #   wizard_step, dataset_questions, epsilon_questions,
+            #   variable_info, epsilon, delta, confidence_level
+            #
+            acceptable_fields = ['wizard_step',
+                                 'dataset_questions',
+                                 'epsilon_questions',
+                                 'variable_info',
+                                 'epsilon',
+                                 'delta',
+                                 'confidence_level']
+
+        # -------------------------------------------------------
         # TODO: Update frontend
         # This is an MVP "hack" to simplify frontend changes which will be changed in Sept
-        #
+        # -------------------------------------------------------
         fields_to_remove = ['user_step', 'default_epsilon', 'default_delta']
         for field_to_remove in fields_to_remove:
             request.data.pop(field_to_remove, None)
 
+        # -------------------------------------------------------
+        # Use the "acceptable_fields" to make the update
+        # -------------------------------------------------------
         problem_fields = []
         for field in request.data.keys():
             if field not in acceptable_fields:
@@ -111,32 +155,10 @@ class DepositorSetupViewSet(BaseModelViewSet):
                              'fields': problem_fields},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        # -----------------------------------------------------------------
-        # Allow a depositor to return to the "Confirm Variables" page
-        #   and update min/max, categories, etc.
-        # -----------------------------------------------------------------
-        if 'variable_info' in request.data:
-            # Get the DepositorSetupInfo
-            setup_info = DepositorSetupInfo.objects.filter(object_id=kwargs.get('object_id')).first()
-            if setup_info:
-                # Does an AnalysisPlan exist?
-                analysis_plan = AnalysisPlan.objects.filter(dataset=setup_info.get_dataset_info()).first()
-
-                # Yes, if not submitted or complete, update it
-                #
-                if analysis_plan and analysis_plan.is_editable():
-                    analysis_plan.variable_info = request.data['variable_info']
-                    analysis_plan.save()
-                    logger.info(f"DepositorSetupViewSet: AnalysisPlan updated with variable info "
-                                f"{request.data['variable_info']}")
-
         return super(DepositorSetupViewSet, self).partial_update(request, *args, **kwargs)
 
-from rest_framework import mixins
 
-#class UploadFileSetupViewSet(mixins.CreateModelMixin): #BaseModelViewSet):
 class UploadFileSetupViewSet(BaseModelViewSet):
-
     """Used only for creating an initial UploadFile"""
     serializer_class = UploadFileInfoCreationSerializer
     permission_classes = [IsOwnerOrBlocked]

@@ -172,6 +172,13 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     def name(self):
         return str(self)
 
+    def has_source_file(self) -> bool:
+        """Return True if the DatasetInfo has a source file"""
+        if self.get_dataset_info() and self.get_dataset_info().source_file:
+            return True
+
+        return False
+
     def get_dataset_info(self):
         """
         Access a DatasetInfo object, either dataversefileinfo or uploadfileinfo

@@ -297,15 +297,6 @@ class AnalysisPlan(TimestampedModelWithUUID):
     def __str__(self):
         return f'{self.name}'
 
-    def is_editable(self) -> bool:
-        """
-        Allow editing if the user step is either:'
-          STEP_0700_VARIABLES_CONFIRMED or
-          STEP_0800_STATISTICS_CREATED
-        """
-        editable_steps = [self.AnalystSteps.STEP_0700_VARIABLES_CONFIRMED,
-                          self.AnalystSteps.STEP_0800_STATISTICS_CREATED]
-        return self.user_step in editable_steps
 
     def is_plan_expired(self) -> bool:
         """

@@ -55,6 +55,7 @@ class StatSpecTestCase(TestCase):
         self.eye_typing_dataset.depositor_setup_info.epsilon = 3.0
         self.eye_typing_dataset.depositor_setup_info.data_profile = eye_typing_variable_info['data_profile']
         self.eye_typing_dataset.depositor_setup_info.variable_info = eye_typing_variable_info['variable_info']
+        self.eye_typing_dataset.depositor_setup_info.is_complete = True
         self.eye_typing_dataset.depositor_setup_info.save()
 
         self.eye_typing_dataset.save()
@@ -72,9 +73,8 @@ class StatSpecTestCase(TestCase):
                        "expiration_date": datetime_util.get_expiration_date_str()
                        }
         plan_creator = AnalysisPlanCreator(self.user_obj, plan_params)
-        if plan_creator.has_error():
-            print(plan_creator.get_error_message())
-            # import sys; sys.exit(0)
+
+        # print(plan_creator.get_error_message())
         self.assertTrue(plan_creator.has_error() is False)
 
         # Retrieve it
