@@ -151,6 +151,7 @@ class AnalysisPlanCreator(BasicErrCheck):
         params = dict(analyst=self.analyst_user_obj,
                       dataset=self.dataset_info,
                       variable_info=self.dataset_info.depositor_setup_info.variable_info,
+                      confidence_level=self.dataset_info.depositor_setup_info.confidence_level,
                       name=self.new_name,
                       description=self.new_description,
                       epsilon=self.new_epsilon,

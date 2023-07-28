@@ -97,6 +97,7 @@ class AnalysisPlanSerializer(serializers.ModelSerializer):
                   'dataset_owner_name',
                   'epsilon',
                   'delta',
+                  'confidence_level',
                   'is_expired',
                   'is_complete',
                   'user_step',

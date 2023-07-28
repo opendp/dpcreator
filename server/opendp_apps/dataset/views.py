@@ -141,7 +141,7 @@ class DepositorSetupViewSet(BaseModelViewSet):
             request.data.pop(field_to_remove, None)
 
         # -------------------------------------------------------
-        # Use the "acceptable_fields" to make the update 
+        # Use the "acceptable_fields" to make the update
         # -------------------------------------------------------
         problem_fields = []
         for field in request.data.keys():

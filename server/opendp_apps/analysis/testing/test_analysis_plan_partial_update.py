@@ -194,7 +194,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
 
         self.assertEqual(response.status_code, 400)
         user_msg = astatic.ERR_MSG_FIELDS_NOT_UPDATEABLE.format(
-            problem_field_str='epsilon, user_step, zebra')
+            problem_field_str='user_step, zebra')
         self.assertEqual(response.json()['message'], user_msg)
 
     def test_150_update_plan_with_release(self):

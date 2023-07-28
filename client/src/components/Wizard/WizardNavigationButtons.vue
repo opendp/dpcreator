@@ -111,7 +111,8 @@ export default {
     },
       handleComplete: function () {
           const props = {
-              userStep: 'step_500'
+              wizardStep: 'step_500',
+              isComplete: true
           }
           console.log('handle complete, props:' + JSON.stringify(props))
           const payload = {objectId: this.getDepositorSetupInfo.objectId, props: props}

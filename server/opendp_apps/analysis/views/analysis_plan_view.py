@@ -1,6 +1,5 @@
 import logging
-from django.utils.timezone import make_aware
-from datetime import datetime
+
 from django.conf import settings
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
@@ -122,10 +121,14 @@ class AnalysisPlanViewSet(BaseModelViewSet):
         # -------------------------------------------------------
         if analysis_plan.release_info:
             # Release exists, only allow updates of:
-            acceptable_fields = ['name', 'description', 'wizard_step']
+            acceptable_fields = ['wizard_step', 'name', 'description']
         else:
             # No ReleaseInfo, allow updates of:
-            acceptable_fields = ['name', 'description', 'variable_info', 'dp_statistics', 'wizard_step']
+            acceptable_fields = ['wizard_step', 'name', 'description',
+                                 'epsilon', 'delta',
+                                 'variable_info', 'dp_statistics',
+                                 'confidence_level'
+                                 ]
 
         # Check that only the allowed fields are being updated
         #
