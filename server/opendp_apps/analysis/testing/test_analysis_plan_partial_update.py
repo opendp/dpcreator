@@ -1,7 +1,6 @@
 import json
 import uuid
 from http import HTTPStatus
-from os.path import abspath, dirname, join
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.analysis_plan_creator import AnalysisPlanCreator
@@ -9,6 +8,7 @@ from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.analysis.testing.base_analysis_plan_test import BaseAnalysisPlanTest
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.utils import datetime_util
+
 
 class AnalysisPlanTest(BaseAnalysisPlanTest):
     fixtures = ['test_analysis_002.json']
@@ -194,7 +194,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
 
         self.assertEqual(response.status_code, 400)
         user_msg = astatic.ERR_MSG_FIELDS_NOT_UPDATEABLE.format(
-            problem_field_str='user_step, zebra')
+            problem_field_str='epsilon, user_step, zebra')
         self.assertEqual(response.json()['message'], user_msg)
 
     def test_150_update_plan_with_release(self):
@@ -220,7 +220,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
         analysis_plan.user_step = AnalysisPlan.AnalystSteps.STEP_1200_PROCESS_COMPLETE  # not true, but for testing
         analysis_plan.save()
 
-        print('analysis_plan', analysis_plan.object_id)
+        # print('analysis_plan', analysis_plan.object_id)
 
         # Note: Reject b/c dp_statistics, variable_info, and is_complete are not updatable
         #
@@ -255,7 +255,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
                                      json.dumps(update_data),
                                      content_type='application/json')
 
-        print(json.dumps(response.json(), indent=4))
+        # print(json.dumps(response.json(), indent=4))
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
 
         # Should only update the wizard_step

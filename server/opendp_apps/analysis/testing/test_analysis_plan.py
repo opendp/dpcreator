@@ -8,6 +8,7 @@ from opendp_apps.analysis.models import AnalysisPlan
 from opendp_apps.analysis.testing.base_analysis_plan_test import BaseAnalysisPlanTest
 from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataset.models import DatasetInfo
+from opendp_apps.dataset.depositor_setup_helpers import get_selected_variable_info
 from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.utils import datetime_util
 
@@ -188,8 +189,11 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
         self.assertFalse(the_plan2['is_complete'])
         self.assertEqual(the_plan2['user_step'],
                          AnalysisPlan.AnalystSteps.STEP_0000_INITIALIZED)
-        self.assertEqual(the_plan2['variable_info'],
-                         self.dataset_info.depositor_setup_info.variable_info)
+
+        selected_var_info = get_selected_variable_info(
+            self.dataset_info.depositor_setup_info.variable_info)
+        self.assertTrue(selected_var_info.success)
+        self.assertEqual(the_plan2['variable_info'], selected_var_info.data)
         self.assertEqual(the_plan2['dp_statistics'], None)
 
     def test_020_create_fail_no_dataset_id(self):

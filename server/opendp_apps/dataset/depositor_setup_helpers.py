@@ -3,10 +3,13 @@ Helpers for updating fields on DepositorSetupInfo
 """
 from django.core.exceptions import ValidationError
 
+from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataset.dataset_question_validators import \
     (validate_dataset_questions,
      validate_epsilon_questions)
-from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.model_helpers.basic_response import err_resp, ok_resp
+
 
 def set_user_step_based_on_data(depositor_setup_info) -> None:
     """Based on the data, update the "user_step" field
@@ -76,6 +79,7 @@ def set_user_step_based_on_data(depositor_setup_info) -> None:
     if orig_is_complete_val is True:
         depositor_setup_info.is_complete = True
 
+
 def set_default_epsilon_delta_from_questions(depositor_setup_info) -> None:
     """Based on the data, update the "user_step" field
     @rtype: DepositorSetupInfo object
@@ -102,3 +106,23 @@ def set_default_epsilon_delta_from_questions(depositor_setup_info) -> None:
     depositor_setup_info.default_epsilon = None
     depositor_setup_info.default_delta = None
 
+
+def get_selected_variable_info(variable_info) -> dict:
+    """Return only the selected variables from DepositorSetupInfo"""
+    if not variable_info or not isinstance(variable_info, dict):
+        return err_resp(err_msg=dstatic.ERR_MSG_NO_VARIABLE_INFO)
+
+    selected_variable_info = variable_info.copy()
+
+    # Iterate through and keep the selected variables
+    #
+    chosen_variables = {}
+    for var_key in list(selected_variable_info.keys()):
+        var_info = selected_variable_info.get(var_key)
+        if var_info and var_info.get('selected') is True:
+            chosen_variables[var_key] = var_info
+
+    if len(chosen_variables) == 0:
+        return err_resp(err_msg=dstatic.ERR_MSG_NO_VARIABLES_SELECTED)
+
+    return ok_resp(chosen_variables)

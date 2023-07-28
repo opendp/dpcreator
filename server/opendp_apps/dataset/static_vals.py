@@ -8,6 +8,8 @@ ERR_MSG_FAILED_TO_READ_DATASET = 'Failed to read the dataset.'
 ERR_MSG_DATASET_POINTER_NOT_SET = 'In order to profile the data, the "dataset_pointer" must be set.'
 
 ERR_MSG_DATASET_LOCKED_BY_ANOTHER_USER = 'This Dataverse file is locked by another user.'
+ERR_MSG_NO_VARIABLE_INFO = 'No variable info found for this dataset.'
+ERR_MSG_NO_VARIABLES_SELECTED = 'None of the variables in this "variable_info" were selected.'
 
 MSG_VAL_NOT_SPECIFIED = '(not specified)'
 

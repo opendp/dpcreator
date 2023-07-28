@@ -125,7 +125,6 @@ class AnalysisPlanViewSet(BaseModelViewSet):
         else:
             # No ReleaseInfo, allow updates of:
             acceptable_fields = ['wizard_step', 'name', 'description',
-                                 'epsilon', 'delta',
                                  'variable_info', 'dp_statistics',
                                  'confidence_level'
                                  ]
