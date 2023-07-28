@@ -1,13 +1,14 @@
 from datetime import datetime
 
 from django.contrib.auth import get_user_model
+from django.utils.timezone import make_aware
 
 from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.exceptions import EpsilonNotSetException, AllottedEpsilonExceedsLimit
 from opendp_apps.analysis.models import AnalysisPlan
+from opendp_apps.dataset.depositor_setup_helpers import get_selected_variable_info
 from opendp_apps.dataset.models import DatasetInfo
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
-from django.utils.timezone import make_aware
 
 
 class AnalysisPlanCreator(BasicErrCheck):
@@ -148,9 +149,14 @@ class AnalysisPlanCreator(BasicErrCheck):
         if self.has_error():
             return
 
+        var_info_resp = get_selected_variable_info(self.dataset_info.depositor_setup_info.variable_info)
+        if not var_info_resp.success:
+            self.add_err_msg(var_info_resp.message)
+            return
+
         params = dict(analyst=self.analyst_user_obj,
                       dataset=self.dataset_info,
-                      variable_info=self.dataset_info.depositor_setup_info.variable_info,
+                      variable_info=var_info_resp.data,
                       confidence_level=self.dataset_info.depositor_setup_info.confidence_level,
                       name=self.new_name,
                       description=self.new_description,
