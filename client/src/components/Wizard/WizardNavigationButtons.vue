@@ -28,8 +28,18 @@
 
         />
       <Button
+          v-else-if="stepperPosition === 2 && workflow === 'analyst'"
+          color="primary"
+          data-test="wizardSubmitStatistics"
+          :class="{
+          'mx-auto': $vuetify.breakpoint.mdAndUp
+        }"
+          :click="() => $root.$emit('areStatisticsSubmitted')"
+          label="Submit Statistics"
+      />
+      <Button
           data-test="wizardContinueButton"
-          v-else-if="stepperPosition !== LAST_STEP_INDEX"
+          v-else
           classes="d-block"
           :class="{
           'mx-auto': $vuetify.breakpoint.mdAndUp
@@ -41,16 +51,7 @@
 
       />
 
-      <Button
-          v-else
-          color="primary"
-          data-test="wizardSubmitStatistics"
-          :class="{
-          'mx-auto': $vuetify.breakpoint.mdAndUp
-        }"
-          :click="() => $root.$emit('areStatisticsSubmitted')"
-          label="Submit Statistics"
-      />
+
       <p></p>
       <Button v-if="stepperPosition > 0"
               data-test="wizardGoBackButton"
@@ -160,6 +161,7 @@ export default {
 
     isContinueDisabled: function () {
         console.log('isContinueDisabled, this.stepperPosistion: '+this.stepperPosition)
+        console.log('this.steps: ' + JSON.stringify(this.steps))
         console.log('completed: '+this.steps[this.stepperPosition].completed)
       return !this.steps[this.stepperPosition].completed;
     }

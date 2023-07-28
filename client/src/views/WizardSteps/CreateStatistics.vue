@@ -122,7 +122,7 @@ export default {
   },
   watch: {
     statistics: function (newStatisticsArray) {
-      this.$emit("stepCompleted", 3, newStatisticsArray.length !== 0);
+      this.$emit("stepCompleted", 1, newStatisticsArray.length !== 0);
     },
   },
   data: () => ({

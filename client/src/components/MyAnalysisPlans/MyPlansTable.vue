@@ -46,17 +46,17 @@
                 Release Completed
             </div>
         </template>
-        <template v-slot:[`item.actions`]="{ item }">
+Z        <template v-slot:[`item.actions`]="{ item,index }">
             <div  class="d-flex justify-space-between">
 
                 <v-tooltip
 
-                        v-for="(action, index) in statusInformation[stepInformation[item.userStep].workflowStatus]
+                        v-for="(action,  actionIndex) in statusInformation[stepInformation[item.userStep].workflowStatus]
             .availableActions"
                         bottom max-width="220px">
                     <template v-slot:activator="{ on, attrs }">
                         <v-icon
-                                :data-test="action+item.name"
+                                :data-test="action+index"
                                 v-bind="attrs"
                                 v-on="on"
                                 class="mr-2"
@@ -311,6 +311,7 @@ export default {
         return workflowStatus
     },
     goToPage(item, path) {
+      console.log('going to page, path: '+path)
       this.$store.dispatch('dataset/setAnalysisPlan', item.objectId)
           .then(() => {
                  this.$router.push(path)
