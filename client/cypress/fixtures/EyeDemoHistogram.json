@@ -1,5 +1,6 @@
 {
   "datasetName": "Eye-typing experiment",
+  "planEpsilon": 0.99999999,
   "statistics": [
     {
       "statistic": "Histogram",
