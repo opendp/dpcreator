@@ -437,12 +437,8 @@ const mutations = {
         state.myDataList = state.myDataList.filter(item => item.datasetInfo.objectId !== id)
     },
     [REMOVE_ANALYSIS_PLAN](state, analysisPlanId) {
-        state.myDataList = state.myDataList.filter(item =>
-            item.analysisPlan == null || item.analysisPlan.objectId !== analysisPlanId)
-        state.datasetList.forEach(dataset => {
-            dataset.analysisPlans = dataset.analysisPlans.filter(analysisPlan => analysisPlan.objectId !== analysisPlanId)
-        })
-
+        state.analysisPlanList = state.analysisPlanList.filter(item =>
+            item.objectId !== analysisPlanId)
     },
     [SET_DATASET_LIST](state, datasetList) {
         state.datasetList = datasetList
