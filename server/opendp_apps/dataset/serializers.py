@@ -115,7 +115,6 @@ class DepositorSetupInfoSerializer(serializers.ModelSerializer):
         read_only_fields = ['object_id',
                             'creator_id',
                             'creator_name',
-                            'is_complete',
                             'user_step',
                             'data_profile',
                             'default_epsilon',
@@ -143,14 +142,6 @@ class DepositorSetupInfoSerializer(serializers.ModelSerializer):
                 field.set(value)
             else:
                 setattr(instance, attr, value)
-        # if instance.variable_info and instance.epsilon \
-        #         and instance.user_step == instance.DepositorSteps.STEP_0600_EPSILON_SET:
-        #     instance.is_complete = True
-        # else:
-        #     instance.is_complete = False
-
-        # This needs to be added to tell the save method to update the value.
-        update_fields.append('is_complete')
 
         # Specifically for this model, we are overriding the update method with an explicit list of
         # update_fields, so we need to set the updated field manually.

@@ -1,5 +1,6 @@
 {
   "datasetName": "2000 PUMS 5-Percent",
+  "planEpsilon": "1",
    "statistics":  [
     {
       "statistic": "Mean",

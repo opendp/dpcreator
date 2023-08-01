@@ -178,23 +178,18 @@ export default {
       } else {
         this.statistics = []
       }
-      if (this.getDepositorSetupInfo.epsilon == null) {
-        this.epsilon = this.getDepositorSetupInfo.defaultEpsilon
-      } else {
-        this.epsilon = this.getDepositorSetupInfo.epsilon
-      }
-      if (this.getDepositorSetupInfo.confidenceLevel == null) {
+
+      this.epsilon = this.analysisPlan.epsilon
+      if (this.analysisPlan.confidenceLevel == null) {
         this.confidenceLevel = .99
       } else {
-        this.confidenceLevel = this.getDepositorSetupInfo.confidenceLevel
+        this.confidenceLevel = this.analysisPlan.confidenceLevel
       }
 
       if (!createStatsUtils.statisticsUseDelta(this.statistics)) {
         this.delta = 0
-      } else if (this.getDepositorSetupInfo.delta == null) {
-        this.delta = this.getDepositorSetupInfo.defaultDelta
       } else {
-        this.delta = this.getDepositorSetupInfo.delta
+        this.delta = this.analysisPlan.delta
       }
     },
 
@@ -202,14 +197,13 @@ export default {
       this.dialogEditNoiseParamsConfirmation = false;
       this.dialogEditNoiseParams = true;
     },
+    // TODO: refactor this, since only confidence level is editable
     handleSaveEditNoiseParamsDialog(epsilon, delta, confidenceLevel) {
-      this.epsilon = epsilon;
-      this.delta = delta;
       this.confidenceLevel = confidenceLevel;
       this.statistics.forEach((dpStat) => {
         dpStat.cl = confidenceLevel
       })
-      createStatsUtils.redistributeValues(this.statistics, this.delta, this.epsilon, this.getDepositorSetupInfo.defaultDelta)
+      createStatsUtils.redistributeValues(this.statistics, this.delta, this.epsilon)
       // update stats with the accuracy values
       // (we don't have to check validation because that was done in the Dialog)
       createStatsUtils.releaseValidation(this.analysisPlan.objectId, this.statistics)
@@ -238,7 +232,7 @@ export default {
         Object.assign(this.statistics[this.editedIndex], this.editedItem);
       } else {
         const variable = this.editedItem.variable
-        let cl = this.getDepositorSetupInfo.confidenceLevel
+        let cl = this.analysisPlan.confidenceLevel
         if (!createStatsUtils.isDeltaStat(this.editedItem.statistic)) {
           this.editedItem.delta = ""
         }
@@ -249,7 +243,7 @@ export default {
         );
 
       }
-      createStatsUtils.redistributeValues(this.statistics, this.delta, this.epsilon, this.getDepositorSetupInfo.defaultDelta)
+      createStatsUtils.redistributeValues(this.statistics, this.delta, this.epsilon)
       this.setAccuracyAndSaveUserInput()
       this.close()
 
@@ -259,12 +253,10 @@ export default {
       // if there are statistics, update them with the accuracy values
       // (we don't have to check validation because that was done in the Dialog)
       let props = {
-        epsilon: this.epsilon,
-        delta: this.delta,
         confidenceLevel: this.confidenceLevel
       }
-      const payload = {objectId: this.getDepositorSetupInfo.objectId, props: props}
-      this.$store.dispatch('dataset/updateDepositorSetupInfo',
+      const payload = {objectId: this.analysisPlan.objectId, props: props}
+      this.$store.dispatch('dataset/updateAnalysisPlan',
           payload)
       if (this.statistics.length > 0) {
         createStatsUtils.releaseValidation(this.analysisPlan.objectId, this.statistics)
@@ -325,7 +317,7 @@ export default {
     },
     deleteItemConfirm() {
       this.statistics.splice(this.editedIndex, 1);
-      createStatsUtils.redistributeValues(this.statistics, this.delta, this.epsilon, this.getDepositorSetupInfo.defaultDelta)
+      createStatsUtils.redistributeValues(this.statistics, this.delta, this.epsilon)
       this.setAccuracyAndSaveUserInput()
       this.closeDelete();
     },

@@ -19,14 +19,13 @@ Cypress.Commands.add('loadTeacherSurveyDemo', () => {
 
         // select the variables we will use
         cy.selectVariable(demoData)
-
+        cy.get('[data-test="wizardCompleteButton"]').click({force: true})
+        const planEpsilon = .9999999
+        cy.createPlan(planEpsilon, testFile, username)
 
 
     })
-    cy.get('[data-test="wizardCompleteButton"]').click({force: true})
-
-    cy.createPlan(testFile, username)
-    cy.url().should('contain','my-plans')
+     cy.url().should('contain','my-plans')
     cy.get('[data-test="continueWorkflow0"]').click({force:true})
     cy.url().should('contain','analyst-wizard')
     cy.get('[data-test="wizardContinueButton"]').click({force:true})
@@ -35,7 +34,7 @@ Cypress.Commands.add('loadTeacherSurveyDemo', () => {
 
 })
 
-Cypress.Commands.add('createPlan',(testFile, username )=>{
+Cypress.Commands.add('createPlan',(planEpsilon, testFile, username )=>{
     cy.url().should('contain','my-data')
     cy.get('[data-test="My Analysis Plans"]').click({force: true})
     cy.get('[data-test="createPlanButton"]').click({force: true})
@@ -47,7 +46,7 @@ Cypress.Commands.add('createPlan',(testFile, username )=>{
     cy.contains(username).click();
     cy.get('[data-test="inputPlanName"]').type(myPlanName)
     cy.get('[data-test="inputPlanName"]').type(myDesc)
-    cy.get('[data-test="inputPlanBudget"]').type('0.1')
+    cy.get('[data-test="inputPlanBudget"]').type(planEpsilon)
     cy.get('[data-test="createPlanSubmitButton"]').click({force:true})
     cy.get('td').should('contain', testFile)
 
@@ -313,7 +312,7 @@ Cypress.Commands.add('createStatistics', (demoData, testFile,username) => {
     // Create Analysis plan
     cy.get('[data-test="wizardCompleteButton"]').click({force: true})
     cy.url().should('contain','my-data')
-    cy.createPlan(testFile,username)
+    cy.createPlan(demoData.planEpsilon,testFile,username)
     cy.url().should('contain','my-plans')
      cy.get('[data-test="continueWorkflow0"]').click({force:true})
     cy.url().should('contain','analyst-wizard')
