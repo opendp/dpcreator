@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
+from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.dataset.models import DepositorSetupInfo
 
 CURRENT_DIR = dirname(abspath(__file__))
@@ -114,7 +115,39 @@ class DatasetTestBase(TestCase):
 
         return jresp['depositor_setup_info']['object_id']
 
+    def populate_depositor_setup_info(self, depositor_setup_info: DepositorSetupInfo):
+        """Fully populate the DepositorSetupInfo object except "is_complete" and "wizard_step" """
+        assert depositor_setup_info, "depositor_setup_info cannot be None"
+
+        new_variable_info = json.load(open(join(FIXTURE_DATA_DIR,
+                                                'test_data_profile_teacher_survey.json'), 'r'))
+
+        params = {'variable_info': new_variable_info,
+                  'epsilon_questions': {"secret_sample": "no",
+                                        "population_size": "not applicable",
+                                        "observations_number_can_be_public": "no"},
+                  'dataset_questions': {"radio_best_describes": "notHarmButConfidential",
+                                        "radio_only_one_individual_per_row": "yes",
+                                        "radio_depend_on_private_information": "yes"},
+                  'default_epsilon': 1.0,
+                  'default_delta': astatic.DELTA_10_NEG_5,
+                  'epsilon': 0.5,
+                  'delta': astatic.DELTA_10_NEG_5,
+                  'confidence_level': astatic.CL_95
+                  }
+
+        # Update params
+        for k, v in params.items():
+            setattr(depositor_setup_info, k, v)
+        depositor_setup_info.save()
+
+        self.assertEqual(depositor_setup_info.is_complete, False)
+        self.assertEqual(depositor_setup_info.user_step,
+                         DepositorSetupInfo.DepositorSteps.STEP_0600_EPSILON_SET)
+
     def test_it(self):
-        self.get_new_dataset_setup_info_id()
+        ds_info = self.upload_file_via_api()
+        self.assertTrue('object_id' in ds_info)
 
-
+        setup_info = self.get_depositor_setup_info_via_api(ds_info['object_id'])
+        self.assertTrue(isinstance(setup_info, DepositorSetupInfo))

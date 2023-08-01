@@ -1,5 +1,6 @@
 {
   "datasetName": "Eye-typing experiment",
+  "planEpsilon": ".999999999",
   "statistics": [
     {
       "statistic": "Mean",

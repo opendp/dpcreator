@@ -247,3 +247,4 @@ ERR_MSG_PLAN_INFO_EXPIRATION_DATE_INVALID = ('"expiration_date" is required to c
 
 ERR_MSG_RELEASES_EXISTS = 'A Release has been created from this AnalysisPlan. Changes are not allowed.'
 ERR_MSG_ANALYSIS_PLAN_EXPIRED = 'This AnalysisPlan has expired.'
+ERR_MSG_NO_FIELDS_TO_UPDATE = "There are no fields to update."

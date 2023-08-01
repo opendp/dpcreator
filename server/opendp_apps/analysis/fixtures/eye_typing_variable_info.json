@@ -254,6 +254,7 @@
          "name":"Trial",
          "type":"Categorical",
          "label":"",
+         "selected": true,
          "categories":[
 
          ]
@@ -267,6 +268,7 @@
          "name":"Subject",
          "type":"Categorical",
          "label":"",
+         "selected": true,
          "categories":[
             "ac",
             "kj",
