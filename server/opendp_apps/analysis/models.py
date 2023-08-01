@@ -1,16 +1,18 @@
 import json
 from collections import OrderedDict
+from datetime import datetime
 
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.utils import timezone
 from django.utils.safestring import mark_safe
+from django.utils.timezone import make_aware
 from rest_framework import status
 from rest_framework.reverse import reverse as drf_reverse
 
 from opendp_apps.analysis import static_vals as astatic
+from opendp_apps.dataset import static_vals as dstatic
 from opendp_apps.dataverses import static_vals as dv_static
 from opendp_apps.model_helpers.models import TimestampedModelWithUUID
 from opendp_apps.utils.extra_validators import validate_not_negative, validate_epsilon_or_none
@@ -18,7 +20,6 @@ from opendp_apps.utils.variable_info_formatter import format_variable_info
 
 RELEASE_FILE_STORAGE = FileSystemStorage(location=settings.RELEASE_FILE_STORAGE_ROOT)
 
-from opendp_apps.dataset import static_vals as dstatic
 
 class ReleaseInfo(TimestampedModelWithUUID):
     """
@@ -286,6 +287,9 @@ class AnalysisPlan(TimestampedModelWithUUID):
                                          ' value but may be overridden by the user.'),
                               validators=[validate_not_negative])
 
+    confidence_level = models.FloatField(choices=astatic.CL_CHOICES,
+                                         default=astatic.CL_95)
+
     expiration_date = models.DateTimeField(null=True, blank=True,
                                            help_text='The date the analysis plan expires')
 
@@ -295,15 +299,12 @@ class AnalysisPlan(TimestampedModelWithUUID):
     def __str__(self):
         return f'{self.name}'
 
-    def is_editable(self) -> bool:
+    def is_plan_expired(self) -> bool:
         """
-        Allow editing if the user step is either:'
-          STEP_0700_VARIABLES_CONFIRMED or
-          STEP_0800_STATISTICS_CREATED
+        Is the current date past the expiration date?
+        @return:
         """
-        editable_steps = [self.AnalystSteps.STEP_0700_VARIABLES_CONFIRMED,
-                          self.AnalystSteps.STEP_0800_STATISTICS_CREATED]
-        return self.user_step in editable_steps
+        return make_aware(datetime.now()) > self.expiration_date
 
     def save(self, *args, **kwargs):
         # Future: is_complete can be auto-filled based on either field values or the user_step

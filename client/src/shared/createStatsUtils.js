@@ -33,14 +33,8 @@ export default {
     isDeltaStat: function (statistic) {
         return deltaStats.includes(statistic)
     },
-    redistributeValues(statistics, delta, epsilon, defaultDelta) {
+    redistributeValues(statistics, delta, epsilon) {
         if (statistics && statistics.length > 0) {
-            if (this.statisticsUseDelta(statistics) && delta == 0) {
-                delta = defaultDelta
-            }
-            if (this.statisticsUseDelta(statistics)) {
-                delta = 0
-            }
             this.redistributeValue(epsilon, 'epsilon', statistics)
             this.redistributeValue(delta, 'delta', statistics)
         }

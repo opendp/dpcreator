@@ -276,7 +276,7 @@ curl -H X-Dataverse-key:$API_TOKEN -X DELETE $SERVER_URL/api/dataverses/$ID
                        ' token have administrative privileges to delete a dataset?'))
                 self.failed_dataset_deletes.append(ds_info)
                 open('failed_delete_resp.html', 'w').write(r.text)
-                sys.exit(0)
+                # sys.exit(0)
         elif r.status_code == HTTPStatus.FORBIDDEN:
             if (skip_lock_check is False) and \
               r.text.find(self._DV_LOCK_MESSAGE) > -1:

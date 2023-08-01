@@ -26,7 +26,7 @@
                 ]
 
             }
-
+            cy.pause()
             cy.enterStatsInPopup(meanAge)
             cy.get('[data-test="Add Statistic"]').should('be.visible')
             cy.get('[data-test="Add Statistic"]').click({force: true});

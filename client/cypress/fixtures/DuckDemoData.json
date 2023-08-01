@@ -1,5 +1,6 @@
 {
   "datasetName": "Duck",
+  "planEpsilon": "1",
   "statistics": [
     {
       "statistic": "Mean",

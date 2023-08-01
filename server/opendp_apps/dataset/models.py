@@ -122,9 +122,7 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
                               validators=[validate_not_negative])
 
     confidence_level = models.FloatField(choices=astatic.CL_CHOICES,
-                                         default=astatic.CL_95,
-                                         help_text=('Used for OpenDP operations, starts as the "default_delta"'
-                                                    ' value but may be overridden by the user.'))
+                                         default=astatic.CL_95)
 
     wizard_step = models.CharField(max_length=128,
                                    default=dstatic.WIZARD_STEP_DEFAULT_VAL,
@@ -171,6 +169,13 @@ class DepositorSetupInfo(TimestampedModelWithUUID):
     @mark_safe
     def name(self):
         return str(self)
+
+    def has_source_file(self) -> bool:
+        """Return True if the DatasetInfo has a source file"""
+        if self.get_dataset_info() and self.get_dataset_info().source_file:
+            return True
+
+        return False
 
     def get_dataset_info(self):
         """
