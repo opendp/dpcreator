@@ -103,9 +103,13 @@ class AnalysisPlanCreator(BasicErrCheck):
                 self.add_err_msg(astatic.ERR_MSG_PLAN_INFO_ANALYST_ID_INVALID)
                 return
 
-        # check epsilon
+        # check that epsilon is an int or a float and > 0
         self.new_epsilon = self.plan_info.get('epsilon')
-        if not isinstance(self.new_epsilon, float) or self.new_epsilon <= 0:
+        if not (type(self.new_epsilon) == int or type(self.new_epsilon) == float):
+            self.add_err_msg(astatic.ERR_MSG_PLAN_INFO_EPSILON_MISSING)
+            return
+
+        if self.new_epsilon <= 0:
             self.add_err_msg(astatic.ERR_MSG_PLAN_INFO_EPSILON_MISSING)
             return
 
