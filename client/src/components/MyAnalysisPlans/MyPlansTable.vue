@@ -288,7 +288,7 @@ export default {
       const dateObj = new Date(dateString);
       // The dateString returned from the v-date-picker is in UTC, so we have to display that
       // in the same UTC timezone
-      const options = { timeZone: 'UTC', year: 'numeric', month: 'long', day: '2-digit' };
+      const options = { timeZone: 'UTC', year: 'numeric', month: 'long', day: 'numeric' };
       const formattedDate = dateObj.toLocaleString('en-US', options);
       return formattedDate
      },
