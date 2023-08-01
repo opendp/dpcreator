@@ -116,6 +116,7 @@
                 cy.get('[data-test="'+deleteId+'"]').click({force: true})
                 cy.get('[data-test="deleteAnalysisConfirm"]').click({force: true})
                 cy.wait('@deletePlan').its('response.statusCode').should('eq', 200)
+                cy.get('[data-test="my-plans-table"]').should('not.contain.text', analysisPlanList.plans[0].datasetName)
             })
 
 
