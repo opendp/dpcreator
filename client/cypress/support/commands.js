@@ -20,7 +20,7 @@ Cypress.Commands.add('loadTeacherSurveyDemo', () => {
         // select the variables we will use
         cy.selectVariable(demoData)
         cy.get('[data-test="wizardCompleteButton"]').click({force: true})
-        const planEpsilon = .9999999
+        const planEpsilon = 1
         cy.createPlan(planEpsilon, testFile, username)
 
 
