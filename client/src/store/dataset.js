@@ -303,6 +303,25 @@ const actions = {
 
     },
     /**
+     * Save user edits to the variables in the Confirm Variables page
+     * @param commit
+     * @param state
+     * @param variableInput - single variable to be updated
+     */
+    updateAnalysisVariableInfo({commit, state}, variableInput) {
+        //  Get a local copy of variableInfo, for editing
+        let variableInfo = JSON.parse(JSON.stringify(state.analysisPlan.variableInfo))
+        let targetVar = variableInfo[variableInput.key]
+        helperMethods.convertVariableInput(variableInput, targetVar)
+
+        const patch = {
+            variableInfo: variableInfo
+        }
+        const payload = {objectId: state.analysisPlan.objectId, props: patch}
+        this.dispatch('dataset/updateAnalysisPlan', payload)
+
+    },
+    /**
      * Save user edits to the statistics table in the Create Statistics page
      * @param commit
      * @param state
@@ -325,7 +344,7 @@ const actions = {
      * @param userId used for websocket URL
      */
     runProfiler({commit, state, rootState}, {userId}) {
-        dataset.runProfiler(state.datasetInfo.objectId).then(() => {
+        dataset.runProfiler(state.datasetInfo.objectId).then((resp) => {
             // when profiler returns, it has saved the variables in the database,
             // so call setDatasetInfo to refresh the store with the latest datasetInfo object
             this.dispatch('dataset/setDatasetInfo', state.datasetInfo.objectId)

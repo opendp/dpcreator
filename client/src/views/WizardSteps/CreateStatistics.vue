@@ -33,7 +33,7 @@
     />
 
     <AddStatisticDialog
-        :variable-info="datasetInfo.depositorSetupInfo.variableInfo"
+        :variable-info="analysisPlan.variableInfo"
         :statistics="statistics"
         :formTitle="formTitle"
         :dialog="dialogAddStatistic"
