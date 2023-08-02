@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 import os
 import sys
+from django.core.files.storage import FileSystemStorage
 
 from distutils.util import strtobool
 
@@ -218,6 +219,10 @@ UPLOADED_FILE_STORAGE_ROOT = os.getenv('UPLOADED_FILE_STORAGE_ROOT',
                                        os.path.join(BASE_DIR, 'test_setup', 'private_uploaded_data'))
 if not os.path.isdir(UPLOADED_FILE_STORAGE_ROOT):
     os.makedirs(UPLOADED_FILE_STORAGE_ROOT)
+
+def UPLOADED_FILE_STORAGE():
+    """May be overwritten in other settings file"""
+    return FileSystemStorage(location=UPLOADED_FILE_STORAGE_ROOT)
 
 RELEASE_FILE_STORAGE_ROOT = os.getenv('RELEASE_FILE_STORAGE_ROOT',
                                       os.path.join(BASE_DIR, 'test_setup', 'public_release_files'))
