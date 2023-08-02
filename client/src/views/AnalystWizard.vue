@@ -1,6 +1,7 @@
 <template>
   <div class="wizard-page">
-    <v-container v-if="!loading && datasetInfo">
+
+    <v-container v-if="!loading && analysisPlan">
       <v-row>
         <v-col>
           <v-stepper  v-model="stepperPosition" id="wizard-content" alt-labels>
@@ -9,7 +10,7 @@
               <span class="d-block mt-5"
               >Used data file:
                 <a href="http://" class="text-decoration-none"
-                >{{ datasetInfo.name }}
+                >{{ analysisPlan.datasetName }}
                   <v-icon small color="primary">mdi-open-in-new</v-icon></a
                 ></span
               >
@@ -103,7 +104,6 @@ export default {
   methods: {
     // If we are on the Confirm Variables step, set the variableList using the analysisPlan
     initializeVariableList() {
-      console.log('initializeVariableList')
       if (this.analysisPlan !== null) {
         this.variableList = this.analysisPlan.variableInfo
       }

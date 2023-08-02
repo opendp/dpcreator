@@ -755,7 +755,7 @@ export default {
       }
     },
     '$store.state.dataset.analysisPlan': function () {
-      if (this.datasetInfo.depositorSetupInfo.variableInfo !== null) {
+      if (this.analysisPlan.variableInfo !== null) {
         this.updateSelectable()
 
       }
