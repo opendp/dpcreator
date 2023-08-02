@@ -17,7 +17,14 @@
                 <ValidateDataset v-on:stepCompleted="updateStepStatus"/>
               </v-stepper-content>
               <v-stepper-content :complete="stepperPosition > 1" step="1">
-                <ConfirmVariables :stepperPosition="stepperPosition" v-on:stepCompleted="updateStepStatus"/>
+                <ConfirmVariables
+                    :variable-list="variableList"
+                    :stepperPosition="stepperPosition"
+                    allow-select-all=true
+                    v-on:stepCompleted="updateStepStatus"
+                    v-on:updateVariable="updateVariable"
+                    v-on:updateAllVariables="updateAllVariables"
+                />
               </v-stepper-content>
             </v-stepper-items>
           </v-stepper>
@@ -58,6 +65,7 @@ import stepInformation from "@/data/stepInformation";
 
 import {mapGetters, mapState} from "vuex";
 import NETWORK_CONSTANTS from "@/router/NETWORK_CONSTANTS";
+import dataset from "@/api/dataset";
 
 export default {
   name: "DepositorWizard",
@@ -92,18 +100,31 @@ export default {
       }
     },
     gotoStep(step) {
-      console.log("handling variable event")
       this.stepperPosition = step
     },
     // If we are on the Confirm Variables step, and the DepositorSetup variables
-    // are not set, then run the Profiler
-    checkProfileData(step) {
-      if (step === 1 && this.getDepositorSetupInfo.variableInfo === null) {
-        const payload = {userId: this.user.objectId}
-        this.$store.dispatch('dataset/runProfiler', payload)
-      }
-
-    }
+    // are not set, then run the Profiler, else use the existing variables
+    initializeVariableList() {
+        if (this.getDepositorSetupInfo.variableInfo === null) {
+          dataset.runProfiler(this.datasetInfo.objectId).then((resp) => {
+            // when profiler returns, save the variables locally, so they can be passed as a prop to
+            // Confirm Variables
+            this.variableList = resp.data.data.variables
+            // also update the store with the new datasetInfo object (which is populated with variables)
+            this.$store.dispatch('dataset/setDatasetInfo', this.datasetInfo.objectId)
+          })
+        } else {
+          this.variableList = this.getDepositorSetupInfo.variableInfo
+        }
+    },
+    updateVariable(elem) {
+      // make a deep copy so that the form doesn't share object references with the Vuex data
+      const elemCopy = JSON.parse(JSON.stringify(elem))
+      this.$store.dispatch('dataset/updateVariableInfo', elemCopy)
+    },
+    updateAllVariables(varsCopy) {
+      this.$store.dispatch('dataset/updateAllVariables', varsCopy)
+    },
   },
   computed: {
     ...mapState('dataset', ['datasetInfo', 'analysisPlan']),
@@ -112,8 +133,9 @@ export default {
   },
   watch: {
     stepperPosition: function (val, oldVal) {
-
-      this.checkProfileData(val)
+      if (val === 1) {
+        this.initializeVariableList()
+      }
     }
   },
   data: () => ({
@@ -121,6 +143,7 @@ export default {
     loading: true,
     stepperPosition: 0,
     variableList: null,
+    variableItems: [],
     steps: [
       {
         title: "Validate Dataset",

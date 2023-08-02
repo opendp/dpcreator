@@ -1,6 +1,6 @@
 {
   "datasetName": "Duck New Var Names",
-  "planEpsilon": ".999999999",
+  "planEpsilon": "1",
   "statistics": [
     {
       "statistic": "Mean",

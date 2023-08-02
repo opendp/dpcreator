@@ -1,6 +1,7 @@
 <template>
   <div class="wizard-page">
-    <v-container v-if="!loading && datasetInfo">
+
+    <v-container v-if="!loading && analysisPlan">
       <v-row>
         <v-col>
           <v-stepper  v-model="stepperPosition" id="wizard-content" alt-labels>
@@ -9,13 +10,19 @@
               <span class="d-block mt-5"
               >Used data file:
                 <a href="http://" class="text-decoration-none"
-                >{{ datasetInfo.name }}
+                >{{ analysisPlan.datasetName }}
                   <v-icon small color="primary">mdi-open-in-new</v-icon></a
                 ></span
               >
                <v-stepper-content :complete="stepperPosition > 0" step="0">
-                <ConfirmVariables :stepperPosition="stepperPosition" v-on:stepCompleted="updateStepStatus"/>
-              </v-stepper-content>
+                 <ConfirmVariables
+                     :variable-list="variableList"
+                     :stepperPosition="stepperPosition"
+                     allow-select-all=false
+                     v-on:stepCompleted="updateStepStatus"
+                     v-on:updateVariable="updateVariable"
+                 />
+               </v-stepper-content>
               <v-stepper-content :complete="stepperPosition > 1" step="1">
                 <CreateStatistics v-on:addVariable="gotoStep(0)" ref="createStatComponent"
                                   :stepperPosition="stepperPosition.sync"
@@ -78,6 +85,10 @@ export default {
   },
   watch: {
     stepperPosition: function (val, oldVal) {
+      console.log("WATCH: stepperPosition")
+      if (val == 0 ) {
+        this.initializeVariableList()
+      }
       if (val == 1) {
         this.$refs.createStatComponent.initializeForm();
       }
@@ -85,18 +96,29 @@ export default {
   },
   created() {
           this.initStepperPosition()
+          this.initializeVariableList()
           this.loading = false
 
 
   },
   methods: {
-
+    // If we are on the Confirm Variables step, set the variableList using the analysisPlan
+    initializeVariableList() {
+      if (this.analysisPlan !== null) {
+        this.variableList = this.analysisPlan.variableInfo
+      }
+    },
+    updateVariable(elem) {
+      // make a deep copy so that the form doesn't share object references with the Vuex data
+      const elemCopy = JSON.parse(JSON.stringify(elem))
+      this.$store.dispatch('dataset/updateAnalysisVariableInfo', elemCopy)
+    },
     updateStepStatus: function (stepNumber, completedStatus) {
       this.steps[stepNumber].completed = completedStatus;
 
     },
     // Set the current Wizard stepper position based on the
-    // depositorSetup userStep
+    // analyst userStep
     initStepperPosition: function () {
         this.stepperPosition = stepInformation[this.analysisPlan.userStep].wizardStepper
         for (let index = 0; index < this.stepperPosition; index++) {

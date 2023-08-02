@@ -9,7 +9,6 @@ import {
     SET_ANALYSIS_PLAN_LIST,
     SET_DATASET_INFO,
     SET_DATASET_LIST,
-    SET_MYDATA_LIST,
     SET_PROFILER_MSG,
     SET_PROFILER_STATUS,
     SET_UPLOAD_PROGRESS
@@ -33,7 +32,6 @@ const initialState = {
     profilerStatus: null,
     profilerMsg: null,
     analysisPlan: null,
-    myDataList: null,
     uploadProgress: 0
 };
 const getters = {
@@ -56,9 +54,7 @@ const getters = {
         return getUserStep(state.datasetInfo, state.analysisPlan)
     },
 
-    getMyDataList: state => {
-        return state.myDataList
-    },
+
     getAnalysisPlanList: state => {
         return state.analysisPlanList
     },
@@ -75,7 +71,7 @@ const getters = {
         return state.datasetInfo.created
     },
     getTimeRemaining: state => {
-        return getTimeRemaining(state.datasetInfo.created)
+        return getTimeRemaining(state.analysisPlan.created)
     }
 
 };
@@ -91,7 +87,6 @@ const actions = {
         commit('SET_DATASET_INFO', null)
         commit('SET_PROFILER_MSG', null)
         commit('SET_PROFILER_STATUS', null)
-        commit('SET_MYDATA_LIST', null)
     },
     /**
      * 1. Make API call to delete the dataset
@@ -141,11 +136,9 @@ const actions = {
                 }
             }
         ).then(function () {
-            console.log('SUCCESS!!')
             return dataset.getUserDatasets()
                 .then((resp) => {
                     commit(SET_DATASET_LIST, resp.data.results)
-                    commit(SET_MYDATA_LIST, resp.data.results)
                 })
         })
             .catch(function () {
@@ -226,7 +219,6 @@ const actions = {
         return dataset.getUserDatasets()
             .then((resp) => {
                 commit(SET_DATASET_LIST, resp.data.results)
-                commit(SET_MYDATA_LIST, resp.data.results)
             })
     },
     setAnalysisPlanList({commit, state}) {
@@ -303,6 +295,25 @@ const actions = {
 
     },
     /**
+     * Save user edits to the variables in the Confirm Variables page
+     * @param commit
+     * @param state
+     * @param variableInput - single variable to be updated
+     */
+    updateAnalysisVariableInfo({commit, state}, variableInput) {
+        //  Get a local copy of variableInfo, for editing
+        let variableInfo = JSON.parse(JSON.stringify(state.analysisPlan.variableInfo))
+        let targetVar = variableInfo[variableInput.key]
+        helperMethods.convertVariableInput(variableInput, targetVar)
+
+        const patch = {
+            variableInfo: variableInfo
+        }
+        const payload = {objectId: state.analysisPlan.objectId, props: patch}
+        this.dispatch('dataset/updateAnalysisPlan', payload)
+
+    },
+    /**
      * Save user edits to the statistics table in the Create Statistics page
      * @param commit
      * @param state
@@ -325,7 +336,7 @@ const actions = {
      * @param userId used for websocket URL
      */
     runProfiler({commit, state, rootState}, {userId}) {
-        dataset.runProfiler(state.datasetInfo.objectId).then(() => {
+        dataset.runProfiler(state.datasetInfo.objectId).then((resp) => {
             // when profiler returns, it has saved the variables in the database,
             // so call setDatasetInfo to refresh the store with the latest datasetInfo object
             this.dispatch('dataset/setDatasetInfo', state.datasetInfo.objectId)
@@ -398,32 +409,7 @@ const mutations = {
     // List of items for the MyData table, which flattens the nested AnalysisPlan array.
     // If a Dataset contains multiple AnalysisPlan objects,
     // create an item in the list for each AnalysisPlan.
-    [SET_MYDATA_LIST](state, dataList) {
-        let myData = []
-        if (dataList == null) {
-            state.myDataList = null
-        } else {
-            dataList.forEach(dataset => {
-                let myDataElem = {}
-                if (dataset.analysisPlans && dataset.analysisPlans.length > 0) {
-                    myDataElem.datasetInfo = dataset
-                    dataset.analysisPlans.forEach(analysisPlan => {
-                        myDataElem.analysisPlan = analysisPlan
-                        myDataElem.userStep = getUserStep(dataset, analysisPlan)
-                        myDataElem.timeRemaining = getTimeRemaining(dataset.created)
-                        myData.push(myDataElem)
-                    })
-                } else {
-                    myDataElem.datasetInfo = dataset
-                    myDataElem.analysisPlan = null;
-                    myDataElem.userStep = getUserStep(dataset, null)
-                    myDataElem.timeRemaining = getTimeRemaining(dataset.created)
-                    myData.push(myDataElem)
-                }
-            })
-            state.myDataList = myData
-        }
-    },
+
     [SET_UPLOAD_PROGRESS](state, uploadProgress) {
         state.uploadProgress = uploadProgress
     },
@@ -434,15 +420,10 @@ const mutations = {
         //  console.log('removing id = '+ id)
 
         state.datasetList = state.datasetList.filter(item => item.objectId !== id)
-        state.myDataList = state.myDataList.filter(item => item.datasetInfo.objectId !== id)
     },
     [REMOVE_ANALYSIS_PLAN](state, analysisPlanId) {
-        state.myDataList = state.myDataList.filter(item =>
-            item.analysisPlan == null || item.analysisPlan.objectId !== analysisPlanId)
-        state.datasetList.forEach(dataset => {
-            dataset.analysisPlans = dataset.analysisPlans.filter(analysisPlan => analysisPlan.objectId !== analysisPlanId)
-        })
-
+        state.analysisPlanList = state.analysisPlanList.filter(item =>
+            item.objectId !== analysisPlanId)
     },
     [SET_DATASET_LIST](state, datasetList) {
         state.datasetList = datasetList

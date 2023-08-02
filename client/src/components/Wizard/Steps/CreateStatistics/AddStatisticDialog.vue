@@ -667,12 +667,12 @@ export default {
       } else {
         const label = this.editedItemDialog.variable
         const variable = this.editedItemDialog.variable
-        const cl = this.getDepositorSetupInfo.confidenceLevel
+        const cl = this.analysisPlan.confidenceLevel
         tempStats.push(Object.assign({}, this.editedItemDialog, {variable}, {label}, {cl}))
 
       }
-      createStatsUtils.redistributeValue(this.getDepositorSetupInfo.epsilon, 'epsilon', tempStats)
-      createStatsUtils.redistributeValue(this.getDepositorSetupInfo.delta, 'delta', tempStats)
+      createStatsUtils.redistributeValue(this.analysisPlan.epsilon, 'epsilon', tempStats)
+      createStatsUtils.redistributeValue(this.analysisPlan.delta, 'delta', tempStats)
       return createStatsUtils.releaseValidation(this.analysisPlan.objectId, tempStats)
           .then((validateResults) => {
             this.validationErrorMsg = validateResults.data
