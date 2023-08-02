@@ -229,6 +229,10 @@ RELEASE_FILE_STORAGE_ROOT = os.getenv('RELEASE_FILE_STORAGE_ROOT',
 if not os.path.isdir(RELEASE_FILE_STORAGE_ROOT):
     os.makedirs(RELEASE_FILE_STORAGE_ROOT)
 
+def RELEASE_FILE_STORAGE():
+    """May be overwritten in other settings file"""
+    return FileSystemStorage(location=RELEASE_FILE_STORAGE_ROOT)
+
 # -------------------------------------
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
