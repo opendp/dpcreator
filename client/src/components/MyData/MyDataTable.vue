@@ -30,19 +30,7 @@
       <template v-slot:[`item.status`]="{ item }">
         <StatusTag data-test="table status tag" :status="getWorkflowStatus(item)"/>
       </template>
-      <template v-slot:[`item.timeRemaining`]="{ item }">
-        <div v-if="getWorkflowStatus(item) !== 'completed'">
-           <span v-if="isExpired(item)" class='error_status__color--text'>
-             Time has expired
-           </span>
-          <span v-else>
-             {{ item.timeRemaining }}
-           </span>
-        </div>
-        <div v-else>
-          Release Generated on {{ new Date(item.datasetInfo.created).toDateString() }}
-        </div>
-      </template>
+
       <template v-slot:[`item.options`]="{ item }">
 
       </template>
@@ -77,7 +65,7 @@
         </div>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
-        <div v-if="!isExpired(item)" class="d-flex justify-space-between">
+        <div  class="d-flex justify-space-between">
 
           <v-tooltip
 
@@ -270,9 +258,6 @@ export default {
     delete(item) {
       console.log('delete: ' +JSON.stringify(item))
       this.deleteItem(item)
-    },
-    isExpired(item) {
-      return item.timeRemaining === 0 && this.getWorkflowStatus(item) !== 'completed'
     },
     formatCreatedTime(created) {
 
