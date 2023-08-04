@@ -31,7 +31,6 @@ from opendp_apps.analysis.tools.dp_sum_spec import DPSumSpec
 from opendp_apps.analysis.tools.dp_variance_spec import DPVarianceSpec
 from opendp_apps.analysis.tools.histogram_util import get_histogram_stat_spec
 from opendp_apps.analysis.tools.stat_spec import StatSpec
-from opendp_apps.dataset.models import DatasetInfo
 # from opendp_apps.dataverses.dataverse_deposit_util import DataverseDepositUtil
 from opendp_apps.dp_reports.pdf_report_maker import PDFReportMaker
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
@@ -64,8 +63,8 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         self.run_dataverse_deposit = kwargs.get('run_dataverse_deposit', False)
 
-        self.max_epsilon = None  # from analysis_plan.dataset.get_depositor_setup_info()
-        self.max_delta = None  # from analysis_plan.dataset.get_depositor_setup_info()
+        self.max_epsilon = None  # from analysis_plan
+        self.max_delta = None  # from analysis_plan
         self.dataset_size = None  # from analysis_plan.dataset
 
         self.stat_spec_list = []  # list of StatSpec objects
@@ -227,7 +226,7 @@ class ValidateReleaseUtil(BasicErrCheck):
         self.analysis_plan.save()
         logger.info('ValidateReleaseUtil: Deposit complete!')
 
-        # If the ReleaseInfo object was crated and deposit fails,
+        # If the ReleaseInfo object was created and deposit fails,
         # the error for the deposit will be sent to the user
         # deposit_util = DataverseDepositUtil(self.release_info)
         # if deposit_util.has_error():
@@ -345,8 +344,8 @@ class ValidateReleaseUtil(BasicErrCheck):
 
         self.build_stat_specs()
 
-        #print('\n\n>>> stat_spec_list', self.stat_spec_list)
-        #for x in self.stat_spec_list:
+        # print('\n\n>>> stat_spec_list', self.stat_spec_list)
+        # for x in self.stat_spec_list:
         #    if x.has_error():
         #        print(x, x.get_single_err_msg())
 
@@ -413,7 +412,7 @@ class ValidateReleaseUtil(BasicErrCheck):
         stat_num = 0
         for dp_stat in self.dp_statistics:
             stat_num += 1  # not used yet...
-            print(f'\n\n20 (b-{stat_num})', dict(dp_stat))
+            # print(f'\n\n20 (b-{stat_num})', dict(dp_stat))
             """
             We're putting together lots of properties to pass to
             statistic specific classes such as DPMeanSpec.
@@ -464,13 +463,14 @@ class ValidateReleaseUtil(BasicErrCheck):
 
             if variable_info:
                 props['variable_info'] = variable_info
-                print('>>make statSpec: variable_info', variable_info)
+                # print('>>make statSpec: variable_info', variable_info)
                 var_type = variable_info.get('type')
                 props['var_type'] = var_type
             else:
-                props['error_message'] = 'Variable in validation info not found.'
+                user_err_msg = astatic.ERR_MSG_VARIABLE_NOT_FOUND_IN_ANALYSIS_PLAN.format(var_name=variable)
+                props['error_message'] = user_err_msg
                 self.add_stat_spec(DPSpecError(props))
-                logger.error(f'ValidateReleaseUtil.build_stat_specs: Variable in validation info not found.')
+                logger.error(f'ValidateReleaseUtil.build_stat_specs: {user_err_msg}')
                 continue  # to the next dp_stat specification
 
             # (4) Retrieve the column index
@@ -556,12 +556,28 @@ class ValidateReleaseUtil(BasicErrCheck):
             return False
 
         # Make sure the total epsilon is valid
-        self.max_epsilon = self.analysis_plan.dataset.depositor_setup_info.epsilon
-        self.max_delta = self.analysis_plan.dataset.depositor_setup_info.delta
+        self.max_epsilon = self.analysis_plan.epsilon
+        self.max_delta = self.analysis_plan.delta
 
         epsilon_ok, _err_msg_or_None = self.is_epsilon_valid(self.max_epsilon)
         if not epsilon_ok:
-            user_msg = f'{astatic.ERR_MSG_BAD_TOTAL_EPSILON}: {self.max_epsilon}'
+            user_msg = astatic.ERR_MSG_BAD_EPSILON_ANALYSIS_PLAN.format(epsilon=self.max_epsilon)
+            self.add_err_msg(user_msg)
+            logger.error(f'ValidateReleaseUtil.run_preliminary_steps: {user_msg}')
+            return False
+
+        depositor_epsilon = self.analysis_plan.dataset.depositor_setup_info.epsilon
+        depositor_epsilon_ok, _err_msg_or_None = self.is_epsilon_valid(depositor_epsilon)
+        if not depositor_epsilon_ok:
+            user_msg = astatic.ERR_MSG_BAD_TOTAL_EPSILON_DEPOSITOR_INFO.format(epsilon=depositor_epsilon)
+            self.add_err_msg(user_msg)
+            logger.error(f'ValidateReleaseUtil.run_preliminary_steps: {user_msg}')
+            return False
+
+        if self.analysis_plan.epsilon > depositor_epsilon:
+            err_params = {'analysis_epsilon': self.analysis_plan.epsilon,
+                          'dataset_epsilon': depositor_epsilon}
+            user_msg = astatic.ERR_MSG_ANALYSIS_PLAN_EPSILON_TOO_HIGH.format(**err_params)
             self.add_err_msg(user_msg)
             logger.error(f'ValidateReleaseUtil.run_preliminary_steps: {user_msg}')
             return False
@@ -582,7 +598,7 @@ class ValidateReleaseUtil(BasicErrCheck):
         try:
             validate_epsilon_not_null(val)
         except ValidationError as err_obj:
-            logger.error(f'ValidateReleaseUtil.is_epsilon_valid: {err_obj}')
+            # logger.error(f'ValidateReleaseUtil.is_epsilon_valid: {err_obj}')
             return False, str(err_obj)
 
         return True, None

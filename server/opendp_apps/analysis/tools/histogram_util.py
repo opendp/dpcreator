@@ -30,7 +30,7 @@ def get_histogram_stat_spec(props: dict) -> StatSpec:
     @param props:
     @return: StatSpec of the correct Histogram type
     """
-    print('>> (30) get_histogram_stat_spec / props: ', dict(props))
+    # print('>> (30) get_histogram_stat_spec / props: ', dict(props))
     var_type = props.get('var_type')
     histogram_bin_type = props.get(astatic.KEY_HIST_BIN_TYPE, astatic.HIST_BIN_TYPE_ONE_PER_VALUE)
 

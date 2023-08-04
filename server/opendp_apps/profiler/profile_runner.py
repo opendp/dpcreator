@@ -146,10 +146,10 @@ class ProfileRunner(BasicErrCheck):
         #
         logger.info('(1) Does the profile already exist?')
         if self.dataset_info and self.dataset_info.depositor_setup_info.data_profile and \
-                self.dataset_info.variable_info:
+                self.dataset_info.depositor_setup_info.variable_info:
             #
             # Profile is already done! Return!
-            self.data_profile = self.dataset_info.variable_info
+            self.data_profile = self.dataset_info.depositor_setup_info.variable_info
             logger.info('Profile exists. All done.')
             return
 
