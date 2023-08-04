@@ -22,7 +22,7 @@
         hide-details
     ></v-text-field>
 
-    <Checkbox
+    <Checkbox v-if="allowSelectAll"
         data-test="filterCheckBox"
         :class="{ 'width80 mx-auto': $vuetify.breakpoint.xsOnly }"
         :value.sync="filterSelected"
@@ -412,7 +412,7 @@ export default {
     ChipSelectItem,
     Checkbox
   },
-  props: ["stepperPosition"],
+  props: ["stepperPosition","variableList", "allowSelectAll"],
   computed: {
     ...mapState('auth', ['error', 'user']),
     ...mapState('dataset', ['datasetInfo', 'analysisPlan']),
@@ -420,7 +420,7 @@ export default {
 
   },
   created: function () {
-    if (this.datasetInfo.depositorSetupInfo.variableInfo !== null) {
+    if (this.variableList !== null) {
       this.createVariableList()
     }
   },
@@ -637,7 +637,7 @@ export default {
     },
     // Create a list version of variableInfo. A deep copy, so we can edit locally
     createVariableList() {
-      let vars = this.datasetInfo.depositorSetupInfo.variableInfo
+      let vars = this.variableList
       for (const key in vars) {
         let row = {}
         row.key = key
@@ -699,12 +699,13 @@ export default {
     saveUserInput(elem) {
       // make a deep copy so that the form doesn't share object references with the Vuex data
       const elemCopy = JSON.parse(JSON.stringify(elem))
-      this.$store.dispatch('dataset/updateVariableInfo', elemCopy)
       if (this.formCompleted(this.variables) && this.isValidRow(elem) && this.atLeastOneSelected(elem)) {
         this.$emit("stepCompleted", 1, true);
       } else {
         this.$emit("stepCompleted", 1, false);
       }
+      console.log('emitting updateVariable')
+      this.$emit("updateVariable", elem)
     },
     updateStepCompleted(varList, anySelected) {
       if (this.formCompleted(varList) && anySelected) {
@@ -715,7 +716,7 @@ export default {
     },
     saveAllVariables(selectAllValue) {
       const varsCopy = JSON.parse(JSON.stringify(this.variables))
-      this.$store.dispatch('dataset/updateAllVariables', varsCopy)
+      this.$emit("updateAllVariables", varsCopy)
       this.updateStepCompleted(this.variables, selectAllValue)
     },
     atLeastOneSelected(elem) {
@@ -737,8 +738,13 @@ export default {
       this.items = this.getItems()
       this.filterSelected = newFilterValue
     },
-    '$store.state.dataset.datasetInfo.depositorSetupInfo.variableInfo': function () {
-      if (this.datasetInfo.depositorSetupInfo.variableInfo !== null) {
+    variables: function() {
+      if (this.items === []) {
+        this.items = this.getItems()
+      }
+    },
+    variableList: function () {
+      if (this.variableList !== null) {
         // the watch will be triggered multiple times,
         // so check if we have already created the variableList
         if (this.variables.length === 0) {
@@ -749,7 +755,7 @@ export default {
       }
     },
     '$store.state.dataset.analysisPlan': function () {
-      if (this.datasetInfo.depositorSetupInfo.variableInfo !== null) {
+      if (this.analysisPlan.variableInfo !== null) {
         this.updateSelectable()
 
       }

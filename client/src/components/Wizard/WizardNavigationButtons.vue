@@ -78,8 +78,10 @@
     <small class="font-weight-regular">
       Last saved: {{ getUpdatedTime }}</small
     ><br></br>
+    <div v-if="workflow === 'analyst'">
     <v-icon left>mdi-timer</v-icon>
     <small>Remaining: {{ getTimeRemaining }}</small>
+    </div>
   </div>
 
 </template>

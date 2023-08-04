@@ -20,7 +20,7 @@ Cypress.Commands.add('loadTeacherSurveyDemo', () => {
         // select the variables we will use
         cy.selectVariable(demoData)
         cy.get('[data-test="wizardCompleteButton"]').click({force: true})
-        const planEpsilon = .9999999
+        const planEpsilon = 1
         cy.createPlan(planEpsilon, testFile, username)
 
 
@@ -192,8 +192,7 @@ Cypress.Commands.add('runDemo', (testFile, demoDatafile) => {
         cy.createStatistics(demoData, testFile,username )
 
         // Submit the statistics
-
-     //   cy.submitStatistics(demoData)
+        cy.submitStatistics(demoData)
 
 
     })
@@ -422,7 +421,7 @@ Cypress.Commands.add('submitStatistics', (demoData) => {
 
             }
         })
-    cy.visit('/my-data')
+    cy.visit('/my-plans')
     cy.get('[data-test="table status tag"]').should('contain', 'Release Completed')
 
 
