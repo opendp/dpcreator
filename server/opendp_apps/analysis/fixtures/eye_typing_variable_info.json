@@ -299,6 +299,7 @@
          "min":10.0,
          "name":"EyeHeight",
          "type":"Numerical",
+         "selected": true,
          "label":""
       },
       "TypingSpeed":{
@@ -306,6 +307,7 @@
          "min":100.0,
          "name":"TypingSpeed",
          "type":"Numerical",
+         "selected": true,
          "label":""
       },
       "BlinkDuration":{

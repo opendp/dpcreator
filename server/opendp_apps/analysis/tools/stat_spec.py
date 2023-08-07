@@ -28,10 +28,9 @@ from opendp_apps.utils.extra_validators import \
     (validate_confidence_level,
      validate_statistic,
      validate_epsilon_not_null,
-     validate_not_empty_or_none,
      validate_int_not_negative,
      validate_fixed_value_in_categories,
-     # validate_bool_true_false,
+    # validate_bool_true_false,
      )
 
 
@@ -58,7 +57,6 @@ class StatSpec:
         self.col_index = props.get('col_index')  # column index in the orig dataset
         self.epsilon = float(props.get('epsilon')) if props.get('epsilon') else None
         self.cl = props.get('cl')  # confidence level coefficient (e.g. .95, .99, etc)
-
 
         # (1a) histogram specific
         self.histogram_bin_type = props.get('histogram_bin_type')
@@ -486,12 +484,12 @@ class StatSpec:
     def print_debug(self):
         """show params"""
         print('-' * 40)
+        props_to_print = self.__dict__.copy()
+        del props_to_print['prop_validators']
         try:
-            print(json.dumps(self.__dict__, indent=4, cls=DjangoJSONEncoder))
+            print(json.dumps(props_to_print, indent=4, cls=DjangoJSONEncoder))
         except TypeError as err_obj:
-            print(f'stat_spec.print_debug() failed with {err_obj}')
-        # for key, val in self.__dict__.items():
-        #    print(f'{key}: {val}')
+            print(f'stat_spec.print_debug() failed with {err_obj}', self.__dict__)
 
     def get_short_description_text(self, template_name=None):
         """Get description in plain text"""
@@ -567,7 +565,7 @@ class StatSpec:
         #
         if 'true_value' in self.get_prop_validator_keys():
             final_info['boolean_values'] = OrderedDict({'true_value': self.true_value,
-                                                'false_value': self.false_value})
+                                                        'false_value': self.false_value})
 
         # Missing values
         #

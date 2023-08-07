@@ -34,12 +34,12 @@ class ReleaseInfo(TimestampedModelWithUUID):
     dp_release = models.JSONField()
 
     dp_release_json_file = models.FileField( \
-        storage=RELEASE_FILE_STORAGE,
+        storage=settings.RELEASE_FILE_STORAGE,
         upload_to='release-files/%Y/%m/%d/',
         blank=True, null=True)
 
     dp_release_pdf_file = models.FileField(
-        storage=RELEASE_FILE_STORAGE,
+        storage=settings.RELEASE_FILE_STORAGE,
         upload_to='release-files/%Y/%m/%d/',
         blank=True, null=True)
 

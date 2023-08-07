@@ -34,9 +34,8 @@ from opendp_apps.utils.camel_to_snake import camel_to_snake
 from opendp_apps.utils.extra_validators import validate_not_negative, validate_epsilon_or_none
 from opendp_apps.utils.variable_info_formatter import format_variable_info
 
-logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
-UPLOADED_FILE_STORAGE = FileSystemStorage(location=settings.UPLOADED_FILE_STORAGE_ROOT)
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class DepositorSetupInfo(TimestampedModelWithUUID):
@@ -310,7 +309,7 @@ class DatasetInfo(TimestampedModelWithUUID, PolymorphicModel):
     source = models.CharField(max_length=128,
                               choices=SourceChoices.choices)
 
-    source_file = models.FileField(storage=UPLOADED_FILE_STORAGE,
+    source_file = models.FileField(storage=settings.UPLOADED_FILE_STORAGE,
                                    upload_to='source-file/%Y/%m/%d/',
                                    blank=True, null=True)
 
@@ -539,38 +538,6 @@ class DatasetInfo(TimestampedModelWithUUID, PolymorphicModel):
         od.update(self.variable_info)
 
         return od
-
-    def xvariable_info_as_dict(self):
-        """Return the variable_info as a dict or None."""
-        if not self.variable_info:
-            return None
-
-        try:
-            if isinstance(self.variable_info, str):  # messy; decode escaped string to JSON string
-                load1 = json.loads(self.variable_info,
-                                   object_pairs_hook=OrderedDict)
-            else:
-                load1 = self.variable_info
-
-            if isinstance(load1, dict):
-                return load1
-
-            return json.loads(load1, object_pairs_hook=OrderedDict)  # JSON string to OrderedDict
-
-        except json.JSONDecodeError:
-            return None
-
-    def xvariable_info_as_json_str(self):
-        """
-        Return the variable_info as a dict or None.
-        """
-        if not self.variable_info:
-            return None
-
-        try:
-            return json.loads(self.variable_info)
-        except json.JSONDecodeError:
-            return None
 
     def is_dataverse_dataset(self) -> bool:
         """Shortcut to check if it's a Dataverse dataset"""

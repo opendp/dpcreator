@@ -132,6 +132,13 @@ ERR_MSG_SETUP_INCOMPLETE = 'Depositor setup is not complete'
 ERR_MSG_NO_ANALYSIS_PLAN = 'AnalysisPlan object not found for this object_id and creator'
 ERR_MSG_FIELDS_NOT_UPDATEABLE = 'These fields are not updatable: {problem_field_str}'
 
+ERR_MSG_ANALYSIS_PLAN_EPSILON_TOO_HIGH =  ('The AnalysisPlan epsilon ({analysis_epsilon}) is greater than'
+                                      ' the DepositorSetupInfo epsilon ({dataset_epsilon}).')
+
+ERR_MSG_BAD_TOTAL_EPSILON_DEPOSITOR_INFO = 'The depositor setup info has an invalid epsilon value ({epsilon})'
+ERR_MSG_BAD_EPSILON_ANALYSIS_PLAN = 'The analysis plan has an invalid epsilon value ({epsilon}).'
+
+
 ERR_MSG_BAD_TOTAL_EPSILON = 'The depositor setup info has an invalid epsilon value'
 ERR_MSG_BAD_TOTAL_DELTA = 'The depositor setup info has an invalid delta value'
 
@@ -248,3 +255,5 @@ ERR_MSG_PLAN_INFO_EXPIRATION_DATE_INVALID = ('"expiration_date" is required to c
 ERR_MSG_RELEASES_EXISTS = 'A Release has been created from this AnalysisPlan. Changes are not allowed.'
 ERR_MSG_ANALYSIS_PLAN_EXPIRED = 'This AnalysisPlan has expired.'
 ERR_MSG_NO_FIELDS_TO_UPDATE = "There are no fields to update."
+
+ERR_MSG_VARIABLE_NOT_FOUND_IN_ANALYSIS_PLAN = 'Variable "{var_name}" was not found in the AnalysisPlan'
