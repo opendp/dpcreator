@@ -18,7 +18,8 @@ FIXTURES_DIR = join(dirname(CURRENT_DIR), 'fixtures')
 class StatSpecTestCase(TestCase):
     fixtures = ['test_analysis_002.json']  # ['test_dataset_data_001.json', ]
 
-    API_PREFIX = '/api/analysis-plan/'
+    API_ANALYSIS_PREFIX = '/api/analysis-plan/'
+    API_RELEASE_PREFIX = '/api/release/'
 
     def setUp(self):
         """Create an OpenDPUser, DatasetInfo, and AnalysisPlan"""

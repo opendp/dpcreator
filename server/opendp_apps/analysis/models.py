@@ -105,6 +105,12 @@ class ReleaseInfo(TimestampedModelWithUUID):
         download_url = drf_reverse('release-download-json', args=[], kwargs={'pk': str(self.object_id)})
         return download_url
 
+    def get_analysis_plan_or_None(self):
+        """Return the AnalysisPlan object, a reverse lookup of a OneToOneField"""
+        try:
+            return self.analysisplan
+        except ReleaseInfo.analysisplan.RelatedObjectDoesNotExist as _err_obj:
+            return None
 
 class ReleaseEmailRecord(TimestampedModelWithUUID):
     """Record the sending of release emails"""
@@ -265,11 +271,11 @@ class AnalysisPlan(TimestampedModelWithUUID):
     dp_statistics = models.JSONField(blank=True,
                                      null=True)
 
-    release_info = models.ForeignKey(ReleaseInfo,
-                                     on_delete=models.SET_NULL,
-                                     # on_delete=models.PROTECT,
-                                     null=True,
-                                     blank=True)
+    release_info = models.OneToOneField(ReleaseInfo,
+                                        on_delete=models.SET_NULL,
+                                        # on_delete=models.PROTECT,
+                                        null=True,
+                                        blank=True)
 
     wizard_step = models.CharField(max_length=128,
                                    default=dstatic.WIZARD_STEP_DEFAULT_VAL,

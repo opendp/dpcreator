@@ -19,7 +19,7 @@ class TestAnalysisPlanView(StatSpecTestCase):
 
         new_plan = self.retrieve_new_plan()
 
-        delete_url = f'{self.API_PREFIX}{new_plan.object_id}/'
+        delete_url = f'{self.API_ANALYSIS_PREFIX}{new_plan.object_id}/'
 
         self.client.force_login(self.user_obj)
         response = self.client.delete(delete_url)
@@ -44,7 +44,7 @@ class TestAnalysisPlanView(StatSpecTestCase):
         new_plan.release_info = release_info
         new_plan.save()
 
-        delete_url = f'{self.API_PREFIX}{new_plan.object_id}/'
+        delete_url = f'{self.API_ANALYSIS_PREFIX}{new_plan.object_id}/'
 
         self.client.force_login(self.user_obj)
         response = self.client.delete(delete_url)
@@ -72,7 +72,7 @@ class TestAnalysisPlanView(StatSpecTestCase):
         #
         self.client.force_login(self.unauth_user)
 
-        delete_url = f'{self.API_PREFIX}{new_plan.object_id}/'
+        delete_url = f'{self.API_ANALYSIS_PREFIX}{new_plan.object_id}/'
         response = self.client.delete(delete_url)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -92,7 +92,7 @@ class TestAnalysisPlanView(StatSpecTestCase):
 
         new_plan = self.retrieve_new_plan()
 
-        delete_url = f'{self.API_PREFIX}{new_plan.object_id}/'
+        delete_url = f'{self.API_ANALYSIS_PREFIX}{new_plan.object_id}/'
         response = self.client.delete(delete_url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

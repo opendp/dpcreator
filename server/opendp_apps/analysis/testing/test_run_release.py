@@ -1,6 +1,7 @@
 import json
 from os.path import abspath, dirname, isfile, join
 
+from unittest import skip
 from django.core import mail
 from django.core.files import File
 from django.test import override_settings
@@ -9,7 +10,7 @@ from rest_framework.reverse import reverse as drf_reverse
 from rest_framework.test import APIClient
 
 from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.analysis.models import AnalysisPlan, ReleaseEmailRecord
+from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo, ReleaseEmailRecord
 from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
 from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
@@ -146,9 +147,9 @@ class TestRunRelease(StatSpecTestCase):
         return DatasetInfo.objects.get(object_id=dataset_info.object_id)
 
     @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
-    def test_10_compute_stats(self):
+    def test_010_compute_stats(self):
         """(10) Run compute stats"""
-        msgt(self.test_10_compute_stats.__doc__)
+        msgt(self.test_010_compute_stats.__doc__)
 
         analysis_plan = self.analysis_plan
 
@@ -187,9 +188,9 @@ class TestRunRelease(StatSpecTestCase):
         self.assertTrue('value' in stats_list[1]['result'])
         self.assertTrue(float(stats_list[1]['result']['value']))
 
-    def test_30_api_bad_stat(self):
+    def test_030_api_bad_stat(self):
         """(30) Via API, run compute stats with error"""
-        msgt(self.test_30_api_bad_stat.__doc__)
+        msgt(self.test_030_api_bad_stat.__doc__)
 
         analysis_plan = self.analysis_plan
 
@@ -200,7 +201,7 @@ class TestRunRelease(StatSpecTestCase):
         analysis_plan.save()
 
         params = dict(object_id=str(analysis_plan.object_id))
-        response = self.client.post('/api/release/',
+        response = self.client.post(self.API_RELEASE_PREFIX,
                                     json.dumps(params),
                                     content_type='application/json')
 
@@ -211,9 +212,9 @@ class TestRunRelease(StatSpecTestCase):
         self.assertTrue(jresp['message'].find(VALIDATE_MSG_EPSILON) > -1)
 
     # @skip('Reconfiguring for analyst mode')
-    def test_40_api_bad_overall_epsilon(self):
+    def test_040_api_bad_overall_epsilon(self):
         """(40) Via API, run compute stats, bad overall epsilon"""
-        msgt(self.test_40_api_bad_overall_epsilon.__doc__)
+        msgt(self.test_040_api_bad_overall_epsilon.__doc__)
 
         analysis_plan = self.analysis_plan
 
@@ -226,7 +227,7 @@ class TestRunRelease(StatSpecTestCase):
         analysis_plan.save()
 
         params = dict(object_id=str(analysis_plan.object_id))
-        response = self.client.post('/api/release/',
+        response = self.client.post(self.API_RELEASE_PREFIX,
                                     json.dumps(params),
                                     content_type='application/json')
 
@@ -238,9 +239,9 @@ class TestRunRelease(StatSpecTestCase):
 
     # @skip('Reconfiguring for analyst mode')
     @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
-    def test_50_success(self):
+    def test_050_success(self):
         """(50) Via API, run compute stats successfully"""
-        msgt(self.test_50_success.__doc__)
+        msgt(self.test_050_success.__doc__)
 
         analysis_plan = self.analysis_plan
 
@@ -257,7 +258,7 @@ class TestRunRelease(StatSpecTestCase):
 
         params = dict(object_id=str(analysis_plan2.object_id))
 
-        response = self.client.post('/api/release/',
+        response = self.client.post(self.API_RELEASE_PREFIX,
                                     json.dumps(params),
                                     content_type='application/json')
 
@@ -291,9 +292,9 @@ class TestRunRelease(StatSpecTestCase):
         # self.assertTrue(not analysis_plan.dataset.source_file)
 
     @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
-    def test_55_success_download_urls(self):
+    def test_055_success_download_urls(self):
         """(55) Test PDF and JSOn download Urls"""
-        msgt(self.test_55_success_download_urls.__doc__)
+        msgt(self.test_055_success_download_urls.__doc__)
 
         analysis_plan = self.analysis_plan
 
@@ -304,7 +305,7 @@ class TestRunRelease(StatSpecTestCase):
 
         params = dict(object_id=str(analysis_plan.object_id))
 
-        response = self.client.post('/api/release/',
+        response = self.client.post(self.API_RELEASE_PREFIX,
                                     json.dumps(params),
                                     content_type='application/json')
 
@@ -360,9 +361,9 @@ class TestRunRelease(StatSpecTestCase):
         # self.assertTrue(not analysis_plan.dataset.source_file)
 
     @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
-    def test_60_analysis_plan_has_release_info(self):
+    def test_060_analysis_plan_has_release_info(self):
         """(60) Via API, ensure that release_info is added as a field to AnalysisPlan"""
-        msgt(self.test_60_analysis_plan_has_release_info.__doc__)
+        msgt(self.test_060_analysis_plan_has_release_info.__doc__)
 
         analysis_plan = self.analysis_plan
 
@@ -372,7 +373,7 @@ class TestRunRelease(StatSpecTestCase):
         analysis_plan.save()
 
         params = dict(object_id=str(analysis_plan.object_id))
-        response = self.client.post('/api/release/',
+        response = self.client.post(self.API_RELEASE_PREFIX,
                                     json.dumps(params),
                                     content_type='application/json')
 
@@ -425,9 +426,9 @@ class TestRunRelease(StatSpecTestCase):
         self.assertTrue(not analysis_plan.dataset.source_file)
         """
 
-    def test_70_dataset_formatter_eye_fatigue_file(self):
+    def test_070_dataset_formatter_eye_fatigue_file(self):
         """(70) Test the DatasetFormatter -- dataset info formatted for inclusion in ReleaseInfo.dp_release"""
-        msgt(self.test_70_dataset_formatter_eye_fatigue_file.__doc__)
+        msgt(self.test_070_dataset_formatter_eye_fatigue_file.__doc__)
         """
         Expected result:
         {
@@ -462,12 +463,12 @@ class TestRunRelease(StatSpecTestCase):
         self.assertTrue('human_readable' in ds_info['upload_date'])
 
     @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
-    def test_90_dp_count_pums_data(self):
+    def test_090_dp_count_pums_data(self):
         """
         (90) Via API, Test DP Count with PUMS data.
         Note: This is very hack! A full DatasetInfo object with related objects should be saved as a separate fixture
         """
-        msgt(self.test_90_dp_count_pums_data.__doc__)
+        msgt(self.test_090_dp_count_pums_data.__doc__)
 
         dataset_info = DatasetInfo.objects.get(id=self.eye_typing_dataset.id)
 
@@ -552,7 +553,7 @@ class TestRunRelease(StatSpecTestCase):
         analysis_plan.save()
 
         params = dict(object_id=str(analysis_plan.object_id))
-        response = self.client.post('/api/release/',
+        response = self.client.post(self.API_RELEASE_PREFIX,
                                     json.dumps(params),
                                     content_type='application/json')
 
@@ -581,6 +582,89 @@ class TestRunRelease(StatSpecTestCase):
         """(100) Run stats and test email"""
         msgt(self.test_100_release_email.__doc__)
 
+        analysis_plan = self.analysis_plan
+
+        # Send the dp_statistics for validation
+        #
+        analysis_plan.dp_statistics = self.general_stat_specs
+        analysis_plan.save()
+
+        # Check the basics
+        #
+        release_util = ValidateReleaseUtil.compute_mode( \
+            self.user_obj,
+            analysis_plan.object_id,
+            run_dataverse_deposit=False)
+
+        if release_util.has_error():
+            print('release_util:', release_util.get_err_msg())
+        self.assertFalse(release_util.has_error())
+
+        release_info_object = release_util.get_new_release_info_object()
+        dp_release = release_info_object.dp_release
+
+        stats_list = dp_release['statistics']
+
+        self.assertEqual(len(stats_list), 3)
+
+        # Check the email record
+        email_rec = ReleaseEmailRecord.objects.first()
+        # print('email_rec.email_content', email_rec.email_content)
+        self.assertTrue(email_rec.success)
+        self.assertTrue(email_rec.email_content.find(f'Dear {self.user_obj.username}') > -1)
+        # self.assertTrue(email_rec.pdf_attached)
+        self.assertTrue(email_rec.json_attached)
+        self.assertEqual(email_rec.note, '')
+
+        # Test that one message has been sent.
+        self.assertEqual(len(mail.outbox), 1)
+
+        # Verify that the subject of the first message is correct.
+        self.assertTrue(mail.outbox[0].subject.startswith('DP Release ready'))
+
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
+    def get_release_info(self):
+        """Convenience method to create a ReleaseInfo object"""
+        analysis_plan = self.analysis_plan
+
+        # The source_file should exist
+        self.assertTrue(analysis_plan.dataset.source_file)
+
+        # Send the dp_statistics for validation
+        #
+        analysis_plan.dp_statistics = [self.general_stat_specs[2],
+                                       self.general_stat_specs[1]]  # , self.general_stat_specs[2]]
+        analysis_plan.save()
+
+        params = dict(object_id=str(analysis_plan.object_id))
+
+        response = self.client.post(self.API_RELEASE_PREFIX,
+                                    json.dumps(params),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue('object_id' in response.json())
+        return ReleaseInfo.objects.get(object_id=response.json()['object_id'])
+
+    @skip('skip for now')
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True, SKIP_EMAIL_RELEASE_FOR_TESTS=False)
+    def test_110_get_release_by_api(self):
+        """(100) Run stats and test email"""
+        msgt(self.test_110_get_release_by_api.__doc__)
+
+        release_info = self.get_release_info()
+
+        release_get_url = self.API_RELEASE_PREFIX + str(release_info.object_id) + '/'
+
+        print('release_get_url', release_get_url)
+        response = self.client.get(release_get_url)
+
+        self.assertEqual(response.status_code, 200)
+        print(response.json())
+
+        print('-' * 40)
+        print(self.get_release_info().object_id)
+        return
         analysis_plan = self.analysis_plan
 
         # Send the dp_statistics for validation
