@@ -72,7 +72,6 @@ class AnalysisPlanObjectIdSerializer(serializers.Serializer):
 
 class AnalysisPlanSerializer(serializers.ModelSerializer):
     """Fields returned when an AnalysisPlan is serialized"""
-    analysis_id = serializers.CharField(source='object_id', read_only=True)
     analyst_name = serializers.CharField(source='analyst', read_only=True)
     dataset_id = serializers.CharField(source='dataset.object_id', read_only=True)
     dataset_name = serializers.CharField(source='dataset.name', read_only=True)
@@ -87,7 +86,6 @@ class AnalysisPlanSerializer(serializers.ModelSerializer):
     class Meta:
         model = AnalysisPlan
         fields = ['object_id',
-                  'analysis_id',
                   'name',
                   'description',
                   'analyst_name',

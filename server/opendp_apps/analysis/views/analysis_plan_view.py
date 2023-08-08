@@ -160,18 +160,22 @@ class AnalysisPlanViewSet(BaseModelViewSet):
 
         return partial_update_result
 
-    def delete(self, request, *args, **kwargs):
+    def destroy(self, request, *args, **kwargs):
         """
         Allow the Analyst or DatasetInfo.creator to delete an AnalysisPlan object.
         If an associated ReleaseInfo exists, delete is not allowed
         """
         analysis_plan = self.get_object()
-        if analysis_plan.release_info.exists():
-            if not settings.ALLOW_RELEASE_DELETION:
+
+        if analysis_plan.release_info:
+            print(f'(1) release exists. settings.ALLOW_RELEASE_DELETION: {settings.ALLOW_RELEASE_DELETION}')
+            if settings.ALLOW_RELEASE_DELETION:
+                print('(2) ALLOW_RELEASE_DELETION is True')
+                analysis_plan.release_info.delete()
+            else:
+                print('(2) ALLOW_RELEASE_DELETION is False')
                 return Response(get_json_error(('Deleting AnalysisPlan with an associated '
                                                 'ReleaseInfo is not allowed')),
                                 status=status.HTTP_400_BAD_REQUEST)
-            else:
-                analysis_plan.release_info.delete()
 
         return super().destroy(request, *args, **kwargs)

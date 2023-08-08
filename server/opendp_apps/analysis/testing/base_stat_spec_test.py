@@ -18,6 +18,8 @@ FIXTURES_DIR = join(dirname(CURRENT_DIR), 'fixtures')
 class StatSpecTestCase(TestCase):
     fixtures = ['test_analysis_002.json']  # ['test_dataset_data_001.json', ]
 
+    API_PREFIX = '/api/analysis-plan/'
+
     def setUp(self):
         """Create an OpenDPUser, DatasetInfo, and AnalysisPlan"""
         user_params = dict(username='kpowers',
@@ -74,7 +76,8 @@ class StatSpecTestCase(TestCase):
                        }
         plan_creator = AnalysisPlanCreator(self.user_obj, plan_params)
 
-        # print(plan_creator.get_error_message())
+        if plan_creator.has_error():
+            print(plan_creator.get_error_message())
         self.assertTrue(plan_creator.has_error() is False)
 
         # Retrieve it

@@ -4,6 +4,7 @@ from os.path import abspath, dirname, isfile, join
 from django.core import mail
 from django.core.files import File
 from django.test import override_settings
+from rest_framework import status
 from rest_framework.reverse import reverse as drf_reverse
 from rest_framework.test import APIClient
 
@@ -205,7 +206,7 @@ class TestRunRelease(StatSpecTestCase):
 
         jresp = response.json()
         # print('jresp', jresp)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(jresp['success'])
         self.assertTrue(jresp['message'].find(VALIDATE_MSG_EPSILON) > -1)
 
@@ -231,7 +232,7 @@ class TestRunRelease(StatSpecTestCase):
 
         jresp = response.json()
         print('jresp', jresp)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(jresp['success'])
         self.assertTrue(jresp['message'].find(astatic.ERR_MSG_BAD_EPSILON_ANALYSIS_PLAN.format(epsilon=None)) > -1)
 
@@ -309,7 +310,7 @@ class TestRunRelease(StatSpecTestCase):
 
         jresp = response.json()
         # print('jresp', jresp)
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         updated_plan = AnalysisPlan.objects.get(object_id=analysis_plan.object_id)
 
@@ -376,14 +377,14 @@ class TestRunRelease(StatSpecTestCase):
                                     content_type='application/json')
 
         jresp = response.json()
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIsNotNone(jresp['dp_release'])
         self.assertIsNotNone(jresp['object_id'])
 
         response = self.client.get(f'/api/analysis-plan/{analysis_plan.object_id}/')
         analysis_plan_jresp = response.json()
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsNotNone(analysis_plan_jresp['release_info'])
 
         # print(json.dumps(analysis_plan_jresp, indent=4))
@@ -557,7 +558,7 @@ class TestRunRelease(StatSpecTestCase):
 
         jresp = response.json()
         # print('jresp', jresp)
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         self.assertIsNotNone(jresp['dp_release'])
         self.assertIsNotNone(jresp['object_id'])

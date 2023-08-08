@@ -10,7 +10,7 @@ from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.utils import datetime_util
 
 
-class AnalysisPlanTest(BaseAnalysisPlanTest):
+class AnalysisPlanPartialUpdateTest(BaseAnalysisPlanTest):
     fixtures = ['test_analysis_002.json']
 
     def setUp(self):
