@@ -4,9 +4,10 @@ from os.path import abspath, dirname, join
 from django.contrib.auth import get_user_model
 from django.core.files import File as DjangoFileObject
 from django.test import TestCase
+from django.test import override_settings
 
 from opendp_apps.analysis.analysis_plan_creator import AnalysisPlanCreator
-from opendp_apps.analysis.models import AnalysisPlan
+from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo
 from opendp_apps.dataset.models import UploadFileInfo
 from opendp_apps.utils import datetime_util
 
@@ -76,7 +77,6 @@ class StatSpecTestCase(TestCase):
                        "expiration_date": datetime_util.get_expiration_date_str()
                        }
         plan_creator = AnalysisPlanCreator(self.user_obj, plan_params)
-
         if plan_creator.has_error():
             print(plan_creator.get_error_message())
         self.assertTrue(plan_creator.has_error() is False)
@@ -88,6 +88,35 @@ class StatSpecTestCase(TestCase):
 
         return analysis_plan
 
+    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
+    def get_release_info(self):
+        """Convenience method to create a ReleaseInfo object"""
+        analysis_plan = self.analysis_plan
+
+        # The source_file should exist
+        self.assertTrue(analysis_plan.dataset.source_file)
+
+        # Send the dp_statistics for validation
+        #
+        analysis_plan.dp_statistics = [self.general_stat_specs[2],
+                                       self.general_stat_specs[1]]  # , self.general_stat_specs[2]]
+        analysis_plan.save()
+
+        params = dict(object_id=str(analysis_plan.object_id))
+
+        response = self.client.post(self.API_RELEASE_PREFIX,
+                                    json.dumps(params),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue('object_id' in response.json())
+
+        new_release = ReleaseInfo.objects.get(object_id=response.json()['object_id'])
+        self.assertEqual(new_release.get_analysis_plan_or_none().object_id,
+                         analysis_plan.object_id)
+
+        return new_release
+
     def test_for_available_epsilon(self):
         """Check for available epsilon"""
         plan = self.retrieve_new_plan()
@@ -96,16 +125,3 @@ class StatSpecTestCase(TestCase):
         # self.assertEqual(2.0, AnalysisPlanCreator.get_available_epsilon(self.eye_typing_dataset))
 
         return
-        """
-        from django.core.management import call_command
-
-        object_to_serialize = ['user',
-                               'dataset',
-                               'analysis',
-                               ]
-
-        call_command('dumpdata',
-                     object_to_serialize,
-                     format='json',
-                     indent=4)
-        """

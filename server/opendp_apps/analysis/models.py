@@ -105,7 +105,7 @@ class ReleaseInfo(TimestampedModelWithUUID):
         download_url = drf_reverse('release-download-json', args=[], kwargs={'pk': str(self.object_id)})
         return download_url
 
-    def get_analysis_plan_or_None(self):
+    def get_analysis_plan_or_none(self):
         """Return the AnalysisPlan object, a reverse lookup of a OneToOneField"""
         try:
             return self.analysisplan

@@ -43,7 +43,7 @@ class ReleaseEmailUtil(BasicErrCheck):
 
         self.current_site = Site.objects.first()
 
-        self.analysis_plan = self.release_info.get_analysis_plan_or_None()
+        self.analysis_plan = self.release_info.get_analysis_plan_or_none()
         if not self.analysis_plan:
             self.add_err_msg('The ReleaseInfo does not have an AnalysisPlan object')
             return

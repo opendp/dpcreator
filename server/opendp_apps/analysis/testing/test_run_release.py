@@ -1,7 +1,7 @@
 import json
 from os.path import abspath, dirname, isfile, join
 
-from unittest import skip
+from django.contrib.auth import get_user_model
 from django.core import mail
 from django.core.files import File
 from django.test import override_settings
@@ -10,7 +10,7 @@ from rest_framework.reverse import reverse as drf_reverse
 from rest_framework.test import APIClient
 
 from opendp_apps.analysis import static_vals as astatic
-from opendp_apps.analysis.models import AnalysisPlan, ReleaseInfo, ReleaseEmailRecord
+from opendp_apps.analysis.models import AnalysisPlan, ReleaseEmailRecord
 from opendp_apps.analysis.release_info_formatter import ReleaseInfoFormatter
 from opendp_apps.analysis.testing.base_stat_spec_test import StatSpecTestCase
 from opendp_apps.analysis.validate_release_util import ValidateReleaseUtil
@@ -622,85 +622,104 @@ class TestRunRelease(StatSpecTestCase):
         # Verify that the subject of the first message is correct.
         self.assertTrue(mail.outbox[0].subject.startswith('DP Release ready'))
 
-    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
-    def get_release_info(self):
-        """Convenience method to create a ReleaseInfo object"""
-        analysis_plan = self.analysis_plan
-
-        # The source_file should exist
-        self.assertTrue(analysis_plan.dataset.source_file)
-
-        # Send the dp_statistics for validation
-        #
-        analysis_plan.dp_statistics = [self.general_stat_specs[2],
-                                       self.general_stat_specs[1]]  # , self.general_stat_specs[2]]
-        analysis_plan.save()
-
-        params = dict(object_id=str(analysis_plan.object_id))
-
-        response = self.client.post(self.API_RELEASE_PREFIX,
-                                    json.dumps(params),
-                                    content_type='application/json')
-
-        self.assertEqual(response.status_code, 201)
-        self.assertTrue('object_id' in response.json())
-        return ReleaseInfo.objects.get(object_id=response.json()['object_id'])
-
-    @skip('skip for now')
-    @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True, SKIP_EMAIL_RELEASE_FOR_TESTS=False)
     def test_110_get_release_by_api(self):
-        """(100) Run stats and test email"""
+        """(110) Get release by API"""
         msgt(self.test_110_get_release_by_api.__doc__)
 
-        release_info = self.get_release_info()
+        release_info_obj = self.get_release_info()
+        release_info_object_id = str(release_info_obj.object_id)
 
-        release_get_url = self.API_RELEASE_PREFIX + str(release_info.object_id) + '/'
+        release_get_url = f'{self.API_RELEASE_PREFIX}{release_info_object_id}/'
 
-        print('release_get_url', release_get_url)
         response = self.client.get(release_get_url)
 
-        self.assertEqual(response.status_code, 200)
-        print(response.json())
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()['object_id'], release_info_object_id)
 
-        print('-' * 40)
-        print(self.get_release_info().object_id)
-        return
-        analysis_plan = self.analysis_plan
+    def test_115_get_release_by_api_another_user(self):
+        """(115) Get release by API, another user"""
+        msgt(self.test_115_get_release_by_api_another_user.__doc__)
 
-        # Send the dp_statistics for validation
+        release_info_obj = self.get_release_info()
+        release_info_object_id = str(release_info_obj.object_id)
+
+        # Make unauthorized user
         #
-        analysis_plan.dp_statistics = self.general_stat_specs
-        analysis_plan.save()
+        new_user_params = dict(username='jgemstone',
+                               email='jgemstone@ridiculous.edu',
+                               first_name='Judy',
+                               last_name='Gemstone')
 
-        # Check the basics
-        #
-        release_util = ValidateReleaseUtil.compute_mode( \
-            self.user_obj,
-            analysis_plan.object_id,
-            run_dataverse_deposit=False)
+        new_user, _created = get_user_model().objects.get_or_create(**new_user_params)
+        self.client.force_login(new_user)
 
-        if release_util.has_error():
-            print('release_util:', release_util.get_err_msg())
-        self.assertFalse(release_util.has_error())
+        release_get_url = f'{self.API_RELEASE_PREFIX}{release_info_object_id}/'
 
-        release_info_object = release_util.get_new_release_info_object()
-        dp_release = release_info_object.dp_release
+        response = self.client.get(release_get_url)
 
-        stats_list = dp_release['statistics']
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.assertEqual(len(stats_list), 3)
+    def test_118_get_release_user_not_logged_in(self):
+        """(118) Get release by API, not logged in"""
+        msgt(self.test_118_get_release_user_not_logged_in.__doc__)
 
-        # Check the email record
-        email_rec = ReleaseEmailRecord.objects.first()
-        # print('email_rec.email_content', email_rec.email_content)
-        self.assertTrue(email_rec.success)
-        self.assertTrue(email_rec.email_content.find(f'Dear {self.user_obj.username}') > -1)
-        # self.assertTrue(email_rec.pdf_attached)
-        self.assertTrue(email_rec.json_attached)
-        self.assertEqual(email_rec.note, '')
+        release_info_obj = self.get_release_info()
+        release_info_object_id = str(release_info_obj.object_id)
 
-        # Test that one message has been sent.
-        self.assertEqual(len(mail.outbox), 1)
+        release_get_url = f'{self.API_RELEASE_PREFIX}{release_info_object_id}/'
 
-        # Verify that the subject of the first message is correct.
-        self.assertTrue(mail.outbox[0].subject.startswith('DP Release ready'))
+        self.client = APIClient()
+
+        response = self.client.get(release_get_url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_120_fail_to_delete_release_by_api(self):
+        """(120) Fail to delete Release by API """
+        msgt(self.test_120_fail_to_delete_release_by_api.__doc__)
+
+        release_info_obj = self.get_release_info()
+        release_info_object_id = str(release_info_obj.object_id)
+
+        release_del_url = f'{self.API_RELEASE_PREFIX}{release_info_object_id}/'
+
+        response = self.client.delete(release_del_url)
+
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_130_fail_to_patch_release_by_api(self):
+        """(130) Fail to patch release by API"""
+        msgt(self.test_130_fail_to_patch_release_by_api.__doc__)
+
+        release_info_obj = self.get_release_info()
+        release_info_object_id = str(release_info_obj.object_id)
+
+        release_patch_url = f'{self.API_RELEASE_PREFIX}{release_info_object_id}/'
+
+        # Patch dp_release
+        payload = json.dumps(dict(dp_release=dict(hi='there')))
+
+        response = self.client.patch(release_patch_url,
+                                     payload,
+                                     content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        # Patch epsilon
+        payload = json.dumps(dict(epsilon=0.75))
+
+        response = self.client.patch(release_patch_url,
+                                     payload,
+                                     content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_140_fail_to_list_releases_by_api(self):
+        """(140) Fail to list releases by API"""
+        msgt(self.test_140_fail_to_list_releases_by_api.__doc__)
+
+        _release_info_obj = self.get_release_info()
+
+        response = self.client.get(self.API_RELEASE_PREFIX)
+
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
