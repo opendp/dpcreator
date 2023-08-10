@@ -11,10 +11,9 @@ export default {
      */
     getUsers() {
         return wrappedSession.get('/api/users/')
-            .then(resp => {console.log(JSON.stringify(resp)); return resp})
+            .then(resp => { return resp})
             .then(resp => {
                 resp = camelcaseKeys(resp, {deep: true});
-                console.log('returning: ' + JSON.stringify(resp))
                 return resp;})
 
     },
