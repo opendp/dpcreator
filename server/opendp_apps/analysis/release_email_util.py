@@ -43,9 +43,10 @@ class ReleaseEmailUtil(BasicErrCheck):
 
         self.current_site = Site.objects.first()
 
-        self.analysis_plan = self.release_info.analysisplan_set.first()
+        self.analysis_plan = self.release_info.get_analysis_plan_or_none()
         if not self.analysis_plan:
-            self.add_err_msg('Failed to retrieve the AnalysisPlan object')
+            self.add_err_msg('The ReleaseInfo does not have an AnalysisPlan object')
+            return
 
         if not self.release_info.dp_release:
             self.add_err_msg('Email error, within the release object, "dp_release" has no data.')

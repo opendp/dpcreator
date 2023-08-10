@@ -150,7 +150,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
 
         payload = self.working_plan_info.copy()
 
-        response = self.client.post(self.API_PREFIX,
+        response = self.client.post(self.API_ANALYSIS_PREFIX,
                                     json.dumps(payload),
                                     content_type='application/json')
 
@@ -174,7 +174,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
         # -----------------------------------------
         # Retrieve the new Analysis Plan via API
         # -----------------------------------------
-        response = self.client.get(f'{self.API_PREFIX}{new_plan_object_id}/',
+        response = self.client.get(f'{self.API_ANALYSIS_PREFIX}{new_plan_object_id}/',
                                    content_type='application/json')
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
@@ -246,7 +246,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
         msgt(self.test_060_create_fail_bad_dataset_id_via_api.__doc__)
 
         payload = json.dumps({"object_id": 'mickey mouse'})  # str(dataset_info.object_id)})
-        response = self.client.post(self.API_PREFIX,
+        response = self.client.post(self.API_ANALYSIS_PREFIX,
                                     payload,
                                     content_type='application/json')
 
@@ -263,7 +263,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
         nonsense_dataset_id = str(uuid.uuid4())
 
         payload = json.dumps({"object_id": str(nonsense_dataset_id)})
-        response = self.client.post(self.API_PREFIX,
+        response = self.client.post(self.API_ANALYSIS_PREFIX,
                                     payload,
                                     content_type='application/json')
 
@@ -290,7 +290,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
         # -------------------------------------------------------------------
         # (b) do it again via API, should also fail
         # -------------------------------------------------------------------
-        response = self.client.post(self.API_PREFIX,
+        response = self.client.post(self.API_ANALYSIS_PREFIX,
                                     json.dumps(payload),
                                     content_type='application/json')
 
@@ -310,7 +310,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
         #
         plan_object_id = plan_util.analysis_plan.object_id
 
-        response = self.client.delete(f'{self.API_PREFIX}{plan_object_id}/')
+        response = self.client.delete(f'{self.API_ANALYSIS_PREFIX}{plan_object_id}/')
 
         # Works fine, HTTP 204
         self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT)
@@ -329,7 +329,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
         #
         plan_object_id = plan_util.analysis_plan.object_id
 
-        response = self.client.delete(f'{self.API_PREFIX}{plan_object_id}/')
+        response = self.client.delete(f'{self.API_ANALYSIS_PREFIX}{plan_object_id}/')
 
         # AnalysisPlan not found, HTTP 204
         self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT)
@@ -351,7 +351,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
 
         self.client.force_login(self.another_user)
 
-        response = self.client.delete(f'{self.API_PREFIX}{plan_object_id}/')
+        response = self.client.delete(f'{self.API_ANALYSIS_PREFIX}{plan_object_id}/')
 
         # AnalysisPlan not found, HTTP 404
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
@@ -376,7 +376,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
 
         # List the plans w/ call by the dataset owner
         #
-        response = self.client.get(f'{self.API_PREFIX}')
+        response = self.client.get(f'{self.API_ANALYSIS_PREFIX}')
         self.assertTrue(response.status_code, HTTPStatus.OK)
         self.assertEqual(response.json()['count'], 2)
 
@@ -388,7 +388,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
         # List the plans w/ call by the analyst
         #
         self.client.force_login(self.analyst_user_obj)
-        response = self.client.get(f'{self.API_PREFIX}')
+        response = self.client.get(f'{self.API_ANALYSIS_PREFIX}')
         self.assertTrue(response.status_code, HTTPStatus.OK)
         self.assertEqual(response.json()['count'], 1)
         self.assertEqual(response.json()['results'][0]['object_id'], str(analysis_plan2.object_id))
@@ -397,7 +397,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
         # List the plans w/ call by user with no permission
         #
         self.client.force_login(self.another_user)
-        response = self.client.get(f'{self.API_PREFIX}')
+        response = self.client.get(f'{self.API_ANALYSIS_PREFIX}')
         self.assertTrue(response.status_code, HTTPStatus.OK)
         self.assertEqual(response.json()['count'], 0)
 
@@ -431,13 +431,13 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
         self.client.force_login(self.user_obj)
 
         # Plan 1 returned successfully
-        response = self.client.get(f'{self.API_PREFIX}{analysis_plan1.object_id}/')
+        response = self.client.get(f'{self.API_ANALYSIS_PREFIX}{analysis_plan1.object_id}/')
         self.assertTrue(response.status_code, HTTPStatus.OK)
         self.assertEqual(response.json()['object_id'], str(analysis_plan1.object_id))
         self.assertEqual(response.json()['is_expired'], True)
 
         # Plan 2 not found
-        response = self.client.get(f'{self.API_PREFIX}{analysis_plan2.object_id}/')
+        response = self.client.get(f'{self.API_ANALYSIS_PREFIX}{analysis_plan2.object_id}/')
         self.assertTrue(response.status_code, HTTPStatus.NOT_FOUND)
 
         # -------------------------------
@@ -446,11 +446,11 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
         self.client.force_login(self.analyst_user_obj)
 
         # Plan 1 not found
-        response = self.client.get(f'{self.API_PREFIX}{analysis_plan1.object_id}/')
+        response = self.client.get(f'{self.API_ANALYSIS_PREFIX}{analysis_plan1.object_id}/')
         self.assertTrue(response.status_code, HTTPStatus.NOT_FOUND)
 
         # Plan 2 returned successfully
-        response = self.client.get(f'{self.API_PREFIX}{analysis_plan2.object_id}/')
+        response = self.client.get(f'{self.API_ANALYSIS_PREFIX}{analysis_plan2.object_id}/')
         self.assertTrue(response.status_code, HTTPStatus.OK)
         self.assertEqual(response.json()['object_id'], str(analysis_plan2.object_id))
         self.assertEqual(response.json()['is_expired'], False)
@@ -463,9 +463,9 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
         self.client.force_login(self.another_user)
 
         # Plan 1 not found
-        response = self.client.get(f'{self.API_PREFIX}{analysis_plan1.object_id}/')
+        response = self.client.get(f'{self.API_ANALYSIS_PREFIX}{analysis_plan1.object_id}/')
         self.assertTrue(response.status_code, HTTPStatus.NOT_FOUND)
 
         # Plan 2 not found
-        response = self.client.get(f'{self.API_PREFIX}{analysis_plan2.object_id}/')
+        response = self.client.get(f'{self.API_ANALYSIS_PREFIX}{analysis_plan2.object_id}/')
         self.assertTrue(response.status_code, HTTPStatus.NOT_FOUND)

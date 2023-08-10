@@ -114,9 +114,10 @@ class ReleaseFileDownloadView(viewsets.ReadOnlyModelViewSet):
 
 
 class ReleaseView(viewsets.ViewSet):
+    """API endpoint to allow the creation of a ReleaseInfo object"""
     analysis_plan = AnalysisPlanSerializer()
     permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ['post']  # 'patch']
+    http_method_names = ['get', 'post']  # 'patch']
 
     def get_queryset(self):
         """
@@ -125,10 +126,25 @@ class ReleaseView(viewsets.ViewSet):
         return AnalysisPlan.objects.filter(analyst=self.request.user)
 
     def retrieve(self, request, pk=None):
+        """Retrieve a ReleaseInfo object. These releases are public"""
         release_info = get_object_or_404(ReleaseInfo, object_id=pk)
-        serializer = ReleaseValidationSerializer(release_info, context={'request': request})
+
+        analysis_plan = release_info.get_analysis_plan_or_none()
+        if not analysis_plan:
+            user_msg = 'The ReleaseInfo does not have a related AnalysisPlan.'
+            logger.error(user_msg + ' ReleaseInfo: ' + str(release_info.object_id))
+            return Response(get_json_error(user_msg),
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        #if request.user != analysis_plan.analyst:
+        #    user_msg = 'You do not have permission to access this ReleaseInfo'
+        #    logger.error(user_msg + ' ReleaseInfo: ' + str(release_info.object_id))
+        #    return Response(get_json_error(user_msg),
+        #                    status=status.HTTP_403_FORBIDDEN)
+
+        serializer = ReleaseInfoSerializer(release_info, context={'request': request})
         logger.info("Getting ReleaseInfo with request %s", request.__dict__)
-        return Response(data=serializer)
+        return Response(data=serializer.data)
 
     def create(self, request, *args, **kwargs):
         """

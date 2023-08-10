@@ -10,7 +10,7 @@ from opendp_apps.model_helpers.msg_util import msgt
 from opendp_apps.utils import datetime_util
 
 
-class AnalysisPlanTest(BaseAnalysisPlanTest):
+class AnalysisPlanPartialUpdateTest(BaseAnalysisPlanTest):
     fixtures = ['test_analysis_002.json']
 
     def setUp(self):
@@ -43,7 +43,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
                        'description': 'A new description',
                        'wizard_step': 'yellow brick road'}
 
-        response = self.client.patch(f'{self.API_PREFIX}{plan_object_id}/',
+        response = self.client.patch(f'{self.API_ANALYSIS_PREFIX}{plan_object_id}/',
                                      json.dumps(update_data),
                                      content_type='application/json')
 
@@ -87,7 +87,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
                        'description': 'A new description',
                        'wizard_step': 'yellow brick road'}
 
-        response = self.client.patch(f'{self.API_PREFIX}{plan_object_id}/',
+        response = self.client.patch(f'{self.API_ANALYSIS_PREFIX}{plan_object_id}/',
                                      json.dumps(update_data),
                                      content_type='application/json')
 
@@ -100,7 +100,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
         # -------------------------------------------------------------------
         self.client.force_login(self.another_user)
 
-        response = self.client.patch(f'{self.API_PREFIX}{plan_object_id}/',
+        response = self.client.patch(f'{self.API_ANALYSIS_PREFIX}{plan_object_id}/',
                                      json.dumps(update_data),
                                      content_type='application/json')
 
@@ -112,7 +112,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
         # -------------------------------------------------------------------
         self.client.force_login(self.analyst_user_obj)
 
-        response = self.client.patch(f'{self.API_PREFIX}{plan_object_id}/',
+        response = self.client.patch(f'{self.API_ANALYSIS_PREFIX}{plan_object_id}/',
                                      json.dumps(update_data),
                                      content_type='application/json')
 
@@ -132,7 +132,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
 
         payload = json.dumps(dict(dp_statistics=dict(hi='there')))
 
-        response = self.client.patch(f'{self.API_PREFIX}{nonsense_dataset_id}/',
+        response = self.client.patch(f'{self.API_ANALYSIS_PREFIX}{nonsense_dataset_id}/',
                                      payload,
                                      content_type='application/json')
 
@@ -161,7 +161,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
         update_data = {'description': 'A new description',
                        'wizard_step': 'yellow brick road'}
 
-        response = self.client.patch(f'{self.API_PREFIX}{analysis_plan.object_id}/',
+        response = self.client.patch(f'{self.API_ANALYSIS_PREFIX}{analysis_plan.object_id}/',
                                      json.dumps(update_data),
                                      content_type='application/json')
 
@@ -188,7 +188,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
                        user_step=AnalysisPlan.AnalystSteps.STEP_0700_VARIABLES_CONFIRMED,
                        zebra='stripes')
 
-        response = self.client.patch(f'{self.API_PREFIX}{plan_object_id}/',
+        response = self.client.patch(f'{self.API_ANALYSIS_PREFIX}{plan_object_id}/',
                                      json.dumps(payload),
                                      content_type='application/json')
 
@@ -230,7 +230,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
                        'is_complete': False,
                        'wizard_step': 'Barbenheimer'}
 
-        response = self.client.patch(f'{self.API_PREFIX}{plan_object_id}/',
+        response = self.client.patch(f'{self.API_ANALYSIS_PREFIX}{plan_object_id}/',
                                      json.dumps(update_data),
                                      content_type='application/json')
 
@@ -251,7 +251,7 @@ class AnalysisPlanTest(BaseAnalysisPlanTest):
 
         update_data = {}
 
-        response = self.client.patch(f'{self.API_PREFIX}{plan_util.analysis_plan.object_id}/',
+        response = self.client.patch(f'{self.API_ANALYSIS_PREFIX}{plan_util.analysis_plan.object_id}/',
                                      json.dumps(update_data),
                                      content_type='application/json')
 

@@ -1,9 +1,11 @@
 import json
 from os.path import abspath, dirname, isfile, join
 
+from django.contrib.auth import get_user_model
 from django.core import mail
 from django.core.files import File
 from django.test import override_settings
+from rest_framework import status
 from rest_framework.reverse import reverse as drf_reverse
 from rest_framework.test import APIClient
 
@@ -145,9 +147,9 @@ class TestRunRelease(StatSpecTestCase):
         return DatasetInfo.objects.get(object_id=dataset_info.object_id)
 
     @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
-    def test_10_compute_stats(self):
+    def test_010_compute_stats(self):
         """(10) Run compute stats"""
-        msgt(self.test_10_compute_stats.__doc__)
+        msgt(self.test_010_compute_stats.__doc__)
 
         analysis_plan = self.analysis_plan
 
@@ -186,9 +188,9 @@ class TestRunRelease(StatSpecTestCase):
         self.assertTrue('value' in stats_list[1]['result'])
         self.assertTrue(float(stats_list[1]['result']['value']))
 
-    def test_30_api_bad_stat(self):
+    def test_030_api_bad_stat(self):
         """(30) Via API, run compute stats with error"""
-        msgt(self.test_30_api_bad_stat.__doc__)
+        msgt(self.test_030_api_bad_stat.__doc__)
 
         analysis_plan = self.analysis_plan
 
@@ -199,20 +201,20 @@ class TestRunRelease(StatSpecTestCase):
         analysis_plan.save()
 
         params = dict(object_id=str(analysis_plan.object_id))
-        response = self.client.post('/api/release/',
+        response = self.client.post(self.API_RELEASE_PREFIX,
                                     json.dumps(params),
                                     content_type='application/json')
 
         jresp = response.json()
         # print('jresp', jresp)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(jresp['success'])
         self.assertTrue(jresp['message'].find(VALIDATE_MSG_EPSILON) > -1)
 
     # @skip('Reconfiguring for analyst mode')
-    def test_40_api_bad_overall_epsilon(self):
+    def test_040_api_bad_overall_epsilon(self):
         """(40) Via API, run compute stats, bad overall epsilon"""
-        msgt(self.test_40_api_bad_overall_epsilon.__doc__)
+        msgt(self.test_040_api_bad_overall_epsilon.__doc__)
 
         analysis_plan = self.analysis_plan
 
@@ -225,21 +227,21 @@ class TestRunRelease(StatSpecTestCase):
         analysis_plan.save()
 
         params = dict(object_id=str(analysis_plan.object_id))
-        response = self.client.post('/api/release/',
+        response = self.client.post(self.API_RELEASE_PREFIX,
                                     json.dumps(params),
                                     content_type='application/json')
 
         jresp = response.json()
         print('jresp', jresp)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(jresp['success'])
         self.assertTrue(jresp['message'].find(astatic.ERR_MSG_BAD_EPSILON_ANALYSIS_PLAN.format(epsilon=None)) > -1)
 
     # @skip('Reconfiguring for analyst mode')
     @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
-    def test_50_success(self):
+    def test_050_success(self):
         """(50) Via API, run compute stats successfully"""
-        msgt(self.test_50_success.__doc__)
+        msgt(self.test_050_success.__doc__)
 
         analysis_plan = self.analysis_plan
 
@@ -256,7 +258,7 @@ class TestRunRelease(StatSpecTestCase):
 
         params = dict(object_id=str(analysis_plan2.object_id))
 
-        response = self.client.post('/api/release/',
+        response = self.client.post(self.API_RELEASE_PREFIX,
                                     json.dumps(params),
                                     content_type='application/json')
 
@@ -290,9 +292,9 @@ class TestRunRelease(StatSpecTestCase):
         # self.assertTrue(not analysis_plan.dataset.source_file)
 
     @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
-    def test_55_success_download_urls(self):
+    def test_055_success_download_urls(self):
         """(55) Test PDF and JSOn download Urls"""
-        msgt(self.test_55_success_download_urls.__doc__)
+        msgt(self.test_055_success_download_urls.__doc__)
 
         analysis_plan = self.analysis_plan
 
@@ -303,13 +305,13 @@ class TestRunRelease(StatSpecTestCase):
 
         params = dict(object_id=str(analysis_plan.object_id))
 
-        response = self.client.post('/api/release/',
+        response = self.client.post(self.API_RELEASE_PREFIX,
                                     json.dumps(params),
                                     content_type='application/json')
 
         jresp = response.json()
         # print('jresp', jresp)
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         updated_plan = AnalysisPlan.objects.get(object_id=analysis_plan.object_id)
 
@@ -359,9 +361,9 @@ class TestRunRelease(StatSpecTestCase):
         # self.assertTrue(not analysis_plan.dataset.source_file)
 
     @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
-    def test_60_analysis_plan_has_release_info(self):
+    def test_060_analysis_plan_has_release_info(self):
         """(60) Via API, ensure that release_info is added as a field to AnalysisPlan"""
-        msgt(self.test_60_analysis_plan_has_release_info.__doc__)
+        msgt(self.test_060_analysis_plan_has_release_info.__doc__)
 
         analysis_plan = self.analysis_plan
 
@@ -371,19 +373,19 @@ class TestRunRelease(StatSpecTestCase):
         analysis_plan.save()
 
         params = dict(object_id=str(analysis_plan.object_id))
-        response = self.client.post('/api/release/',
+        response = self.client.post(self.API_RELEASE_PREFIX,
                                     json.dumps(params),
                                     content_type='application/json')
 
         jresp = response.json()
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIsNotNone(jresp['dp_release'])
         self.assertIsNotNone(jresp['object_id'])
 
         response = self.client.get(f'/api/analysis-plan/{analysis_plan.object_id}/')
         analysis_plan_jresp = response.json()
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIsNotNone(analysis_plan_jresp['release_info'])
 
         # print(json.dumps(analysis_plan_jresp, indent=4))
@@ -424,9 +426,9 @@ class TestRunRelease(StatSpecTestCase):
         self.assertTrue(not analysis_plan.dataset.source_file)
         """
 
-    def test_70_dataset_formatter_eye_fatigue_file(self):
+    def test_070_dataset_formatter_eye_fatigue_file(self):
         """(70) Test the DatasetFormatter -- dataset info formatted for inclusion in ReleaseInfo.dp_release"""
-        msgt(self.test_70_dataset_formatter_eye_fatigue_file.__doc__)
+        msgt(self.test_070_dataset_formatter_eye_fatigue_file.__doc__)
         """
         Expected result:
         {
@@ -461,12 +463,12 @@ class TestRunRelease(StatSpecTestCase):
         self.assertTrue('human_readable' in ds_info['upload_date'])
 
     @override_settings(SKIP_PDF_CREATION_FOR_TESTS=True)
-    def test_90_dp_count_pums_data(self):
+    def test_090_dp_count_pums_data(self):
         """
         (90) Via API, Test DP Count with PUMS data.
         Note: This is very hack! A full DatasetInfo object with related objects should be saved as a separate fixture
         """
-        msgt(self.test_90_dp_count_pums_data.__doc__)
+        msgt(self.test_090_dp_count_pums_data.__doc__)
 
         dataset_info = DatasetInfo.objects.get(id=self.eye_typing_dataset.id)
 
@@ -551,13 +553,13 @@ class TestRunRelease(StatSpecTestCase):
         analysis_plan.save()
 
         params = dict(object_id=str(analysis_plan.object_id))
-        response = self.client.post('/api/release/',
+        response = self.client.post(self.API_RELEASE_PREFIX,
                                     json.dumps(params),
                                     content_type='application/json')
 
         jresp = response.json()
         # print('jresp', jresp)
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         self.assertIsNotNone(jresp['dp_release'])
         self.assertIsNotNone(jresp['object_id'])
@@ -619,3 +621,105 @@ class TestRunRelease(StatSpecTestCase):
 
         # Verify that the subject of the first message is correct.
         self.assertTrue(mail.outbox[0].subject.startswith('DP Release ready'))
+
+    def test_110_get_release_by_api(self):
+        """(110) Get release by API"""
+        msgt(self.test_110_get_release_by_api.__doc__)
+
+        release_info_obj = self.get_release_info()
+        release_info_object_id = str(release_info_obj.object_id)
+
+        release_get_url = f'{self.API_RELEASE_PREFIX}{release_info_object_id}/'
+
+        response = self.client.get(release_get_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()['object_id'], release_info_object_id)
+
+    def test_115_get_release_by_api_another_user(self):
+        """(115) Get release by API, another user"""
+        msgt(self.test_115_get_release_by_api_another_user.__doc__)
+
+        release_info_obj = self.get_release_info()
+        release_info_object_id = str(release_info_obj.object_id)
+
+        # Make unauthorized user
+        #
+        new_user_params = dict(username='jgemstone',
+                               email='jgemstone@ridiculous.edu',
+                               first_name='Judy',
+                               last_name='Gemstone')
+
+        new_user, _created = get_user_model().objects.get_or_create(**new_user_params)
+        self.client.force_login(new_user)
+
+        release_get_url = f'{self.API_RELEASE_PREFIX}{release_info_object_id}/'
+
+        response = self.client.get(release_get_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_118_get_release_user_not_logged_in(self):
+        """(118) Get release by API, not logged in"""
+        msgt(self.test_118_get_release_user_not_logged_in.__doc__)
+
+        release_info_obj = self.get_release_info()
+        release_info_object_id = str(release_info_obj.object_id)
+
+        release_get_url = f'{self.API_RELEASE_PREFIX}{release_info_object_id}/'
+
+        self.client = APIClient()
+
+        response = self.client.get(release_get_url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_120_fail_to_delete_release_by_api(self):
+        """(120) Fail to delete Release by API """
+        msgt(self.test_120_fail_to_delete_release_by_api.__doc__)
+
+        release_info_obj = self.get_release_info()
+        release_info_object_id = str(release_info_obj.object_id)
+
+        release_del_url = f'{self.API_RELEASE_PREFIX}{release_info_object_id}/'
+
+        response = self.client.delete(release_del_url)
+
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_130_fail_to_patch_release_by_api(self):
+        """(130) Fail to patch release by API"""
+        msgt(self.test_130_fail_to_patch_release_by_api.__doc__)
+
+        release_info_obj = self.get_release_info()
+        release_info_object_id = str(release_info_obj.object_id)
+
+        release_patch_url = f'{self.API_RELEASE_PREFIX}{release_info_object_id}/'
+
+        # Patch dp_release
+        payload = json.dumps(dict(dp_release=dict(hi='there')))
+
+        response = self.client.patch(release_patch_url,
+                                     payload,
+                                     content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        # Patch epsilon
+        payload = json.dumps(dict(epsilon=0.75))
+
+        response = self.client.patch(release_patch_url,
+                                     payload,
+                                     content_type='application/json')
+
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_140_fail_to_list_releases_by_api(self):
+        """(140) Fail to list releases by API"""
+        msgt(self.test_140_fail_to_list_releases_by_api.__doc__)
+
+        _release_info_obj = self.get_release_info()
+
+        response = self.client.get(self.API_RELEASE_PREFIX)
+
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)

@@ -18,7 +18,7 @@ class BaseAnalysisPlanTest(TestCase):
     def setUp(self):
         """Create user object and define file to upload"""
 
-        self.API_PREFIX = '/api/analysis-plan/'
+        self.API_ANALYSIS_PREFIX = '/api/analysis-plan/'
 
         # Create a OpenDP User object
         #
