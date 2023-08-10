@@ -199,7 +199,7 @@ export default {
         {
             title: "My Analysis Plans",
             link: NETWORK_CONSTANTS.MY_ANALYSIS_PLANS.PATH,
-            icon: "mdi-database"
+            icon: "mdi-notebook"
         },
       {
         title: "My Profile",
@@ -231,6 +231,11 @@ export default {
         title: "My Data",
         link: NETWORK_CONSTANTS.MY_DATA.PATH,
         icon: "mdi-database"
+      },
+      {
+        title: "My Analysis Plans",
+        link: NETWORK_CONSTANTS.MY_ANALYSIS_PLANS.PATH,
+        icon: "mdi-notebook"
       },
       {
         title: "My Profile",
