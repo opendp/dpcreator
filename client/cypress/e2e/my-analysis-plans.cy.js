@@ -10,6 +10,23 @@
 
 
         })
+        it('disables Create Button if there are no available datasets', () => {
+            cy.on('uncaught:exception', (e, runnable) => {
+                console.log('error', e)
+                console.log('runnable', runnable)
+
+                return false
+            })
+            const username = 'kermit'
+            const email = 'kermit@thefrog.com'
+            const password = 'kermit123!'
+
+            cy.createAccount(username, email, password)
+            cy.visit('/my-plans')
+            cy.get('[data-test="createPlanButton"]').should('be.disabled')
+
+
+        })
         it('Goes To Confirm Variables Analyst step  (e2e test)', () => {
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
@@ -165,6 +182,7 @@
                     analysisPlanList.plans.forEach(plan => {
                         cy.get('[data-test="my-plans-table"]').should('contain.text', plan.datasetName)
                     })
+                    cy.get('[data-test="createPlanButton"]').should('be.disabled')
                 })
 
             })
