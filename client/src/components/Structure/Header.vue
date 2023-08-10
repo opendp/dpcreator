@@ -29,6 +29,7 @@
         <v-spacer></v-spacer>
 
         <v-app-bar-nav-icon
+            data-test="menuIcon"
             @click.stop="isDrawerActive = !isDrawerActive"
             class="hidden-md-and-up"
         ></v-app-bar-nav-icon>
@@ -102,7 +103,7 @@
           >
         </div>
       </v-container>
-      <v-list nav class="mobile-menu-list">
+      <v-list data-test="mobileMenu" nav class="mobile-menu-list">
         <v-list-item
             v-for="(item, index) in mobileMenu"
             :key="item.title + '-' + index"
