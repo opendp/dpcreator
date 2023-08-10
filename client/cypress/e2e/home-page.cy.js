@@ -37,7 +37,7 @@
 
             cy.visit('/')
             cy.get('[data-test="menuIcon"]').should('be.visible')
-            cy.get('[data-test="menuIcon"]').click({force: true})
+            cy.get('[data-test="menuIcon"]').click()
             cy.get('[data-test="mobileMenu"]').should('be.visible')
             cy.get('[data-test="mobileMenu"]').should('include.text', 'My Analysis Plans')
 
