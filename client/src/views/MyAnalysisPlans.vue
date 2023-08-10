@@ -50,6 +50,7 @@
                         <v-col class="text-right">
                             <Button
                                     data-test="createPlanButton"
+                                    :disabled="!budgetAvailableForCreate()"
                                     color="Secondary"
                                     label="Create Analysis Plan"
                                     :class="{
@@ -80,7 +81,7 @@
                     <v-select
                         data-test="selectPlanDataset"
                         v-model="newPlan.datasetId"
-                        :items="datasetList"
+                        :items="availableDatasets()"
                         label="Dataset Name"
                         item-text="name"
                         item-value="objectId"
@@ -206,14 +207,34 @@ export default {
             this.maxBudget = 0
         },
         validateBudgetRule(value) {
-            console.log('newPlan.datasetId: ' + this.newPlan.datasetId)
-            console.log('value:' + value)
-            console.log('this.maxBudget:'+ this.maxBudget)
-            return (this.newPlan.datasetId == null  ||( value  && value <= this.maxBudget)) ||
+              return (this.newPlan.datasetId == null  ||( value  && value <= this.maxBudget)) ||
              "Budget must be less than Max Budget." // Invalid budget input
         },
+        // Return true if there is available budget for the user to create an analysis plan
+        // (ie the user owns at least one dataset that has > 0 unused epsilon. )
+        budgetAvailableForCreate() {
+          let availableBudget = false
+          if (this.datasetList)
+            this.datasetList.forEach(dataset => {
+              const maxBudget = this.getDatasetMaxBudget(dataset)
+              if (maxBudget > 0){
+                availableBudget = true
+              }
+          })
+          return availableBudget
+        },
+        availableDatasets() {
+          let availableDatasets = []
+          if (this.datasetList)
+            this.datasetList.forEach(dataset => {
+              const maxBudget = this.getDatasetMaxBudget(dataset)
+              if (maxBudget > 0){
+                availableDatasets.push(dataset)
+              }
+            })
+          return availableDatasets
+        },
         openDialog() {
-            console.log('openDialog')
             this.resetPlan()
             this.createDialogVisible = true;
         },
@@ -228,22 +249,23 @@ export default {
             let selectedDatasetBudget = 0;
             let spentBudget = 0
             this.datasetList.forEach(dataset => {
-                if (dataset.objectId === this.newPlan.datasetId){
-                    selectedDatasetBudget = dataset.depositorSetupInfo.epsilon
-                    console.log('analysisPlans length: ' + dataset.analysisPlans.length)
-                    dataset.analysisPlans.forEach(plan =>{
-                        console.log('plan.epsilon: ' + plan.epsilon)
-                        spentBudget += plan.epsilon
-                        console.log('spentBudget: ' + spentBudget)
-                    })
+                if (dataset.objectId === this.newPlan.datasetId) {
+                  this.maxBudget = this.getDatasetMaxBudget(dataset)
                 }
             })
-            console.log('spentBudget: ' + spentBudget+", selectedDatasetBudget: "+selectedDatasetBudget)
-            this.maxBudget = Number((selectedDatasetBudget - spentBudget).toFixed(3))
         },
+        getDatasetMaxBudget(dataset) {
+          let selectedDatasetBudget = dataset.depositorSetupInfo.epsilon
+          let spentBudget = 0
+          dataset.analysisPlans.forEach(plan =>{
+            spentBudget += plan.epsilon
+          })
+          let maxBudget = Number((selectedDatasetBudget - spentBudget).toFixed(3))
+          return maxBudget
+        },
+
+
         createPlan() {
-            console.log("calling create plan  with newPlan = " + JSON.stringify(this.newPlan))
-            console.log('this.newPlan.budget: ' + this.newPlan.budget)
             this.newPlan.description = 'my description'
             this.newPlan.budget = Number(this.newPlan.budget)
 
