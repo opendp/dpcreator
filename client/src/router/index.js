@@ -9,6 +9,7 @@ const {
   WELCOME,
   MY_DATA,
   MY_ANALYSIS_PLANS,
+  DATASET_ANALYSIS_PLANS,
   MY_DATA_DETAILS,
   ANALYST_WIZARD,
   DEPOSITOR_WIZARD,
@@ -55,6 +56,14 @@ const routes = [
   {
     path: MY_ANALYSIS_PLANS.PATH,
     name: MY_ANALYSIS_PLANS.NAME,
+    component: () => import("../views/MyAnalysisPlans.vue"),
+    meta: {
+      requiresAuth: true,
+    }
+  },
+  {
+    path: DATASET_ANALYSIS_PLANS.PATH,
+    name: DATASET_ANALYSIS_PLANS.NAME,
     component: () => import("../views/MyAnalysisPlans.vue"),
     meta: {
       requiresAuth: true,

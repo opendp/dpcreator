@@ -11,6 +11,7 @@ export default {
     },
     icons: {
         viewDetails: "mdi-eye",
+        viewPlans: "mdi-notebook",
         continueWorkflow: "mdi-arrow-right",
         cancelExecution: "mdi-cancel",
         delete: "mdi-delete"

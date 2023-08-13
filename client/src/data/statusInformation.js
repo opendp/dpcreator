@@ -21,13 +21,13 @@ export default {
         label: "In Execution",
         color: "grey lighten-3",
         icon: "mdi-progress-clock",
-        availableActions: ["viewDetails", "delete", "cancelExecution"]
+        availableActions: ["viewDetails",  "delete", "cancelExecution"]
     },
     error: {
         label: "Execution Error",
         color: "red lighten-3",
         icon: "mdi-alert",
-        availableActions: ["viewDetails", "delete"]
+        availableActions: ["viewDetails",  "delete"]
     },
     expired: {
         label: "Plan Expired",
@@ -39,7 +39,7 @@ export default {
         label: "Setup Complete",
         color: "light-green lighten-3",
         icon: "",
-        availableActions: ["viewDetails", "delete"]
+        availableActions: ["viewDetails", "viewPlans", "delete"]
     },
     completed: {
         label: "Release Completed",

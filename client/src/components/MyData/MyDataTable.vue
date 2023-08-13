@@ -4,6 +4,7 @@
         data-test="my-data-table"
         :headers="headers"
         :items="datasets"
+        item-key="name"
         :items-per-page="computedItemsPerPage"
         :search="searchTerm || search"
         :hide-default-footer="true"
@@ -246,6 +247,10 @@ export default {
     handleButtonClick(action, item) {
       this[action](item)
     },
+    viewPlans(item) {
+      console.log('plan clicked ' +item.objectId)
+      this.goToAnalysisPlanPage(item.objectId)
+    },
     deleteItem(item) {
       this.selectedItem = Object.assign({}, item);
       this.dialogDelete = true;
@@ -270,15 +275,16 @@ export default {
       this.goToPage(item, `${NETWORK_CONSTANTS.DEPOSITOR_WIZARD.PATH}`)
     },
     getWorkflowStatus(item) {
-      console.log('item.status: '+JSON.stringify(item.status))
-      console.log('stepInformation[item.status] ' +JSON.stringify(stepInformation[item.status]))
-      return stepInformation[item.status].workflowStatus
+       return stepInformation[item.status].workflowStatus
     },
     goToPage(item, path) {
       this.$store.dispatch('dataset/setDatasetInfo', item.objectId)
           .then(() => {
                 this.$router.push(path)
           })
+    },
+    goToAnalysisPlanPage(datasetId){
+      this.$router.push({name: NETWORK_CONSTANTS.DATASET_ANALYSIS_PLANS.NAME, params: { datasetId: datasetId}})
     },
     cancelExecution(item) {
       //TODO: Implement Cancel Execution handler

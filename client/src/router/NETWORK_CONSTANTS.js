@@ -15,6 +15,10 @@ export default {
         PATH: "/my-plans",
         NAME: "MyAnalysisPlans"
     },
+    DATASET_ANALYSIS_PLANS: {
+        PATH: "/my-plans/:datasetId",
+        NAME: "MyDatasetAnalysisPlans"
+    },
     MY_DATA_DETAILS: {
         PATH: "/my-data-details",
         NAME: "MyDataDetails"
