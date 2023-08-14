@@ -6,6 +6,7 @@
   </v-card-title>
   <v-card-text>
     <v-select
+        v-if="selectedDataset ==null"
         data-test="selectPlanDataset"
         v-model="newPlan.datasetId"
         :items="availableDatasets()"
@@ -59,7 +60,8 @@ export default {
   props: {
     dialogVisible: Boolean,
     users: Array,
-    datasetList: Array
+    datasetList: Array,
+    selectedDataset: Object
   },
   data() {
     return {
@@ -71,13 +73,31 @@ export default {
         expirationDate: getDefaultExpirationDate(),
         budget: null,
       },
-      maxBudget: 0
     };
   },
+
   computed: {
+    maxBudget( ) {
+      let budget = 0;
+      console.log('getting max budget')
+      if (this.selectedDataset == null ) {
+        if (this.datasetList == null) {
+          budget = 0
+        } else  {
+          this.datasetList.forEach(dataset => {
+            if (dataset.objectId === this.newPlan.datasetId) {
+              budget = epsilonBudget.getDatasetMaxBudget(dataset)
+            }
+          })
+        }
+      } else {
+        budget = epsilonBudget.getDatasetMaxBudget(this.selectedDataset)
+      }
+      return  budget
+    },
     isSubmitDisabled() {
       return (
-          !this.newPlan.datasetId ||
+          !(this.getSelectedDatasetId()) ||
           !this.newPlan.planName ||
           !this.newPlan.analystId ||
           !this.newPlan.budget ||
@@ -93,24 +113,28 @@ export default {
       this.newPlan.budget = null
       this.newPlan.description =null
       this.newPlan.expirationDate = getDefaultExpirationDate()
-      this.maxBudget = 0
+
     },
     validateBudgetRule(value) {
-      return (this.newPlan.datasetId == null  ||( value  && value <= this.maxBudget)) ||
+      return (this.getSelectedDatasetId() == null  ||( value  && value <= this.maxBudget)) ||
           "Budget must be less than Max Budget." // Invalid budget input
     },
     setMaxBudget( ) {
       this.datasetList.forEach(dataset => {
-        if (dataset.objectId === this.newPlan.datasetId) {
+        if (dataset.objectId === this.getSelectedDatasetId()) {
           this.maxBudget = epsilonBudget.getDatasetMaxBudget(dataset)
         }
       })
     },
-
+    getSelectedDatasetId() {
+         return this.selectedDataset == null  ? this.newPlan.datasetId : this.selectedDataset.objectId
+    },
     createPlan() {
       this.newPlan.description = 'my description'
       this.newPlan.budget = Number(this.newPlan.budget)
-
+      if (this.selectedDataset) {
+        this.newPlan.datasetId = this.selectedDataset.objectId
+      }
       this.$store.dispatch('dataset/createAnalysisPlan',
           this.newPlan)
 

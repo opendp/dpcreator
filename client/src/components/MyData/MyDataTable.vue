@@ -100,6 +100,14 @@
         v-on:cancel="closeDelete"
         v-on:close="closeDelete"
     />
+    <CreateAnalysisPlanDialog
+        v-if="selectedItem"
+        :dialog-visible.sync="dialogCreateAnalysis"
+        :users="users"
+        :selected-dataset="selectedItem"
+
+        v-on:close="closeCreatePlan">
+    </CreateAnalysisPlanDialog>
   </div>
 
 </template>
@@ -191,6 +199,8 @@ import StatusTag from "../DesignSystem/StatusTag.vue";
 import Button from "../DesignSystem/Button.vue";
 import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
 import DeleteDatasetDialog from "@/components/MyData/DeleteDatasetDialog";
+import CreateAnalysisPlanDialog from "@/components/MyAnalysisPlans/CreateAnalysisPlanDialog.vue";
+import UsersAPI from "@/api/users";
 
 const {
   VIEW_DETAILS,
@@ -200,7 +210,7 @@ const {
 
 export default {
   name: "MyDataTable",
-  components: {StatusTag, Button, DeleteDatasetDialog},
+  components: {CreateAnalysisPlanDialog, StatusTag, Button, DeleteDatasetDialog},
   props: {
     datasets: {
       type: Array
@@ -228,7 +238,9 @@ export default {
       pageCount: 0,
       search: "",
       dialogDelete: false,
+      dialogCreateAnalysis: false,
       selectedItem: null,
+      users: null,
       headers: [
         {value: "num"},
         {text: "Data File", value: "name"},
@@ -243,13 +255,22 @@ export default {
       CANCEL_EXECUTION
     };
   },
+  created() {
+      UsersAPI.getUsers().then(resp => {
+        this.users = resp.data.results
+      } )
+  },
   methods: {
     handleButtonClick(action, item) {
       this[action](item)
     },
     viewPlans(item) {
-      console.log('plan clicked ' +item.objectId)
-      this.goToAnalysisPlanPage(item.objectId)
+      if (item.analysisPlans.length === 0){
+         this.selectedItem = Object.assign({}, item);
+         this.dialogCreateAnalysis = true
+      } else {
+        this.goToAnalysisPlanPage(item.objectId)
+      }
     },
     deleteItem(item) {
       this.selectedItem = Object.assign({}, item);
@@ -259,9 +280,11 @@ export default {
       this.dialogDelete = false
       this.selectedItem = null
     },
+    closeCreatePlan() {
+      this.dialogCreateAnalysis = false
+    },
 
     delete(item) {
-      console.log('delete: ' +JSON.stringify(item))
       this.deleteItem(item)
     },
     formatCreatedTime(created) {

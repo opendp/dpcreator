@@ -2,6 +2,7 @@ export default {
     viewDetails: "View Details",
     continueWorkflow: "Continue",
     cancelExecution: "Cancel Execution",
+    viewPlans: "Create/View Analysis Plans",
     delete: "Delete",
     actions: {
         VIEW_DETAILS: "viewDetails",
