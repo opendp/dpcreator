@@ -71,54 +71,13 @@
                 </v-container>
             </v-sheet>
         </v-container>
-        <!-- Add Analysis Plan Dialog -->
-        <v-dialog  v-model="createDialogVisible" max-width="500px">
-            <v-card data-test="createPlanDialog" >
-                <v-card-title>
-                    <span class="headline">Add Analysis Plan</span>
-                </v-card-title>
-                <v-card-text>
-                    <v-select
-                        data-test="selectPlanDataset"
-                        v-model="newPlan.datasetId"
-                        :items="availableDatasets()"
-                        label="Dataset Name"
-                        item-text="name"
-                        item-value="objectId"
-                        v-on:change="setMaxBudget()"
-                    ></v-select>
-                    <v-text-field data-test="inputPlanName" v-model="newPlan.planName" label="Plan Name"></v-text-field>
-                    <v-text-field data-test="inputPlanDescription" v-model="newPlan.description" label="Description"></v-text-field>
-                    <v-select
-                        data-test="selectPlanAnalyst"
-                        v-model="newPlan.analystId"
-                        :items="users"
-                        label="Analyst Name"
-                        item-text="username"
-                        item-value="objectId"
-                    ></v-select>
-                    <div class="budget-row">
-                        <v-text-field
-                            data-test="inputPlanBudget"
-                            :rules="[validateBudgetRule]"
-                            v-model="newPlan.budget"
-                            label="Budget"></v-text-field>
-                        <div class="max-budget" v-if="maxBudget > 0">
-                            <span class="help-text">(Max Budget: {{maxBudget}})</span>
-                        </div>
-                    </div>
-                    <v-text-field v-model="newPlan.expirationDate" label="ExpirationDate"></v-text-field>
-                    <v-date-picker v-model="newPlan.expirationDate" no-title></v-date-picker>
-
-                </v-card-text>
-
-                <v-card-actions>
-                    <v-btn :disabled="isSubmitDisabled" data-test="createPlanSubmitButton" color="primary" @click="createPlan">Create</v-btn>
-                    <v-btn color="secondary" @click="closeDialog">Cancel</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-    </div>
+      <CreateAnalysisPlanDialog
+          :dialog-visible.sync="createDialogVisible"
+          :users="users"
+          :dataset-list="datasetList"
+          v-on:close="closeDialog">
+      </CreateAnalysisPlanDialog>
+          </div>
 </template>
 <style>
 .budget-row {
@@ -130,9 +89,7 @@
     color: #888;
     margin-top: 4px;
 }
-.max-budget {
-    margin-left: 16px;
-}
+
 </style>
 
 <script>
@@ -144,15 +101,12 @@ import UploadFiles from "@/components/DesignSystem/UploadFiles.vue";
 import {mapState} from "vuex";
 import Button from "@/components/DesignSystem/Button.vue";
 import UsersAPI from "@/api/users";
-const getDefaultExpirationDate =() => {
-    const currentDate = new Date();
-    const threeDaysAfter = new Date(currentDate.getTime() + (3 * 24 * 60 * 60 * 1000));
-    return threeDaysAfter.toISOString().substr(0, 10);
+import CreateAnalysisPlanDialog from "@/components/MyAnalysisPlans/CreateAnalysisPlanDialog.vue";
+import epsilonBudget from "@/shared/epsilonBudget";
 
-}
 export default {
     name: "MyAnalysisPlans",
-    components: {Button, MyPlansTable, ColoredBorderAlert, SupportBanner, UploadFiles},
+    components: {CreateAnalysisPlanDialog, Button, MyPlansTable, ColoredBorderAlert, SupportBanner, UploadFiles},
 
     created() {
         this.$store.dispatch('dataset/setAnalysisPlanList')
@@ -167,15 +121,7 @@ export default {
 
     computed: {
         ...mapState('dataset', ['analysisPlanList',"datasetList"]),
-        isSubmitDisabled() {
-            return (
-                !this.newPlan.datasetId ||
-                !this.newPlan.planName ||
-                !this.newPlan.analystId ||
-                !this.newPlan.budget ||
-                !this.newPlan.expirationDate
-            );
-        },
+
 
 
     },
@@ -186,94 +132,41 @@ export default {
         plans: [],
         maxBudget: 0,
         createDialogVisible: false,
-        newPlan: {
-            datasetId: null,
-            planName: null,
-            description: null,
-            analystId: null,
-            expirationDate: getDefaultExpirationDate(),
-            budget: null,
-        }
+
 
     }),
     methods: {
-        resetPlan() {
-            this.newPlan.datasetId = null
-            this.newPlan.planName = null
-            this.newPlan.analystId = null
-            this.newPlan.budget = null
-            this.newPlan.description =null
-            this.newPlan.expirationDate = getDefaultExpirationDate()
-            this.maxBudget = 0
-        },
-        validateBudgetRule(value) {
-              return (this.newPlan.datasetId == null  ||( value  && value <= this.maxBudget)) ||
-             "Budget must be less than Max Budget." // Invalid budget input
-        },
+
+
         // Return true if there is available budget for the user to create an analysis plan
         // (ie the user owns at least one dataset that has > 0 unused epsilon. )
         budgetAvailableForCreate() {
           let availableBudget = false
           if (this.datasetList)
             this.datasetList.forEach(dataset => {
-              const maxBudget = this.getDatasetMaxBudget(dataset)
+              const maxBudget = epsilonBudget.getDatasetMaxBudget(dataset)
               if (maxBudget > 0){
                 availableBudget = true
               }
           })
           return availableBudget
         },
-        availableDatasets() {
-          let availableDatasets = []
-          if (this.datasetList)
-            this.datasetList.forEach(dataset => {
-              const maxBudget = this.getDatasetMaxBudget(dataset)
-              if (maxBudget > 0){
-                availableDatasets.push(dataset)
-              }
-            })
-          return availableDatasets
-        },
-        openDialog() {
-            this.resetPlan()
-            this.createDialogVisible = true;
-        },
 
-        closeDialog() {
-            this.resetPlan()
-            this.createDialogVisible = false;
-            // Reset newPlan object
+      openDialog() {
 
-        },
-        setMaxBudget( ) {
-            let selectedDatasetBudget = 0;
-            let spentBudget = 0
-            this.datasetList.forEach(dataset => {
-                if (dataset.objectId === this.newPlan.datasetId) {
-                  this.maxBudget = this.getDatasetMaxBudget(dataset)
-                }
-            })
-        },
-        getDatasetMaxBudget(dataset) {
-          let selectedDatasetBudget = dataset.depositorSetupInfo.epsilon
-          let spentBudget = 0
-          dataset.analysisPlans.forEach(plan =>{
-            spentBudget += plan.epsilon
-          })
-          let maxBudget = Number((selectedDatasetBudget - spentBudget).toFixed(3))
-          return maxBudget
-        },
+        this.createDialogVisible = true;
+      },
+
+      closeDialog() {
+        this.createDialogVisible = false;
 
 
-        createPlan() {
-            this.newPlan.description = 'my description'
-            this.newPlan.budget = Number(this.newPlan.budget)
+      },
 
-            this.$store.dispatch('dataset/createAnalysisPlan',
-               this.newPlan)
 
-            this.closeDialog();
-        },
+
+
+
 
     }
 };
