@@ -52,7 +52,7 @@
                                     data-test="createPlanButton"
                                     :disabled="!budgetAvailableForCreate()"
                                     color="Secondary"
-                                    label="Create Analysis Plan"
+                                    label="Add Analysis Plan"
                                     :class="{
                                     'width80 mx-auto d-block mb-2': $vuetify.breakpoint.xsOnly,
                                     'mr-2 mb-2': $vuetify.breakpoint.smAndUp

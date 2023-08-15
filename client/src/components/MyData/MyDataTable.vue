@@ -265,12 +265,8 @@ export default {
       this[action](item)
     },
     viewPlans(item) {
-      if (item.analysisPlans.length === 0){
          this.selectedItem = Object.assign({}, item);
          this.dialogCreateAnalysis = true
-      } else {
-        this.goToAnalysisPlanPage(item.objectId)
-      }
     },
     deleteItem(item) {
       this.selectedItem = Object.assign({}, item);

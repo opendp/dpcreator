@@ -40,9 +40,14 @@
 
   </v-card-text>
 
-  <v-card-actions>
+  <v-card-actions v-if="!isPlanCreated || selectedDataset == null">
     <v-btn :disabled="isSubmitDisabled" data-test="createPlanSubmitButton" color="primary" @click="createPlan">Create</v-btn>
     <v-btn color="secondary" @click="closeDialog">Cancel</v-btn>
+  </v-card-actions>
+  <v-card-actions v-if="isPlanCreated && selectedDataset !== null" class="success-message">
+    Plan created successfully!
+    <router-link to="/my-data">Go to My Data</router-link>
+    <router-link to="/my-plans">Go to My Analysis Plans</router-link>
   </v-card-actions>
 </v-card>
 </v-dialog>
@@ -65,6 +70,7 @@ export default {
   },
   data() {
     return {
+      isPlanCreated:  false,
       newPlan: {
         datasetId: null,
         planName: null,
@@ -138,7 +144,17 @@ export default {
       this.$store.dispatch('dataset/createAnalysisPlan',
           this.newPlan)
 
-      this.closeDialog();
+      // If we opened this from the Analysis Plans table, then close the dialog
+      // when the plan is created
+      if (this.selectedDataset == null) {
+        this.closeDialog();
+      } else {
+        // Else keep the dialog open so the Success message appears
+        // and user can choose to go to
+        // the analysis plans page or back to My Data
+        this.isPlanCreated = true
+      }
+    //
     },
 
     availableDatasets() {
@@ -154,6 +170,7 @@ export default {
     },
     closeDialog() {
       this.resetPlan()
+      this.isPlanCreated = false
       this.$emit("close")
 
     },
@@ -164,6 +181,14 @@ export default {
 <style scoped>
 .max-budget {
   margin-left: 16px;
+}
+.success-message {
+  justify-content: center;
+  margin-top: 10px;
+}
+.success-message a {
+  color: green;
+  text-decoration: underline;
 }
 </style>
 
