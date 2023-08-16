@@ -84,7 +84,8 @@
                 const continueTestId = 'continueWorkflow0'
                 cy.get('[data-test="'+continueTestId+'"]').click({force: true})
                 cy.url().should('contains','analyst-wizard')
-
+                cy.visit('my-data')
+                cy.pause()
 
             })
         })

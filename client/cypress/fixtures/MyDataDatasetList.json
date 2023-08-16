@@ -1,0 +1,1432 @@
+[{
+  "objectId": "29b14152-ebb3-47f1-b34d-2009dfb567e6",
+  "name": "Mock Data",
+  "created": "2021-12-09T21:14:28.684160Z",
+  "creator": "ernie",
+  "installationName": "Test Dataverse EC2",
+  "dataverseFileId": 88,
+  "datasetDoi": "doi:10.5072/FK2/MBRUWW",
+  "fileDoi": "doi:10.5072/FK2/MBRUWW",
+  "status": "step_100",
+  "depositor_setup_info": {
+    "id": 22,
+    "created": "2021-12-09T21:14:28.680831Z",
+    "updated": "2021-12-09T21:14:28.680873Z",
+    "objectId": "10c223a4-f0ae-41ec-b4c9-eec8083017c8",
+    "isComplete": false,
+    "userStep": "step_100",
+    "wizard_step": "step_500",
+    "datasetQuestions": null,
+    "epsilonQuestions": null,
+    "variableInfo": null,
+    "defaultEpsilon": null,
+    "epsilon": 0.5,
+    "defaultDelta": 0,
+    "delta": 0,
+    "confidenceLevel": 0.95,
+    "creator": 21
+  },
+  "datasetSchemaInfo": {
+    "@id": "https://doi.org/10.5072/FK2/MBRUWW",
+    "name": "Mock Data",
+    "@type": "Dataset",
+    "author": [
+      {
+        "name": "Kraffmiller, Ellen"
+      }
+    ],
+    "creator": [
+      {
+        "name": "Kraffmiller, Ellen"
+      }
+    ],
+    "license": {
+      "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "text": "CC0",
+      "@type": "Dataset"
+    },
+    "version": "3",
+    "@context": "http://schema.org",
+    "keywords": [
+      "Computer and Information Science"
+    ],
+    "provider": {
+      "name": "Root",
+      "@type": "Organization"
+    },
+    "publisher": {
+      "name": "Root",
+      "@type": "Organization"
+    },
+    "identifier": "https://doi.org/10.5072/FK2/MBRUWW",
+    "description": [
+      "test"
+    ],
+    "dateModified": "2021-12-09",
+    "distribution": [
+      {
+        "name": "bonabo MOCK_DATA-1.tab",
+        "@type": "DataDownload",
+        "contentUrl": "http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88",
+        "fileFormat": "text/tab-separated-values",
+        "contentSize": 234725
+      },
+      {
+        "name": "bonabo MOCK_DATA.tab",
+        "@type": "DataDownload",
+        "contentUrl": "http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/87",
+        "fileFormat": "text/tab-separated-values",
+        "contentSize": 234725
+      },
+      {
+        "name": "MOCK_DATA.tab",
+        "@type": "DataDownload",
+        "contentUrl": "http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/86",
+        "fileFormat": "text/tab-separated-values",
+        "contentSize": 85701
+      }
+    ],
+    "datePublished": "2021-12-07",
+    "includedInDataCatalog": {
+      "url": "http://ec2-35-171-244-178.compute-1.amazonaws.com",
+      "name": "Root",
+      "@type": "DataCatalog"
+    }
+  },
+  "fileSchemaInfo": {
+    "name": "bonabo MOCK_DATA-1.tab",
+    "@type": "DataDownload",
+    "contentUrl": "http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88",
+    "fileFormat": "text/tab-separated-values",
+    "contentSize": 234725
+  },
+  "analysisPlans": [
+    {
+      "name": "Plan Test1",
+      "objectId": "954af17e-7dda-41e1-89cd-19b367313f00",
+      "analyst": "4331fad4-8341-4fb5-a5eb-16a15289d203",
+      "dataset": "29b14152-ebb3-47f1-b34d-2009dfb567e6",
+      "isComplete": true,
+      "userStep": "step_1200",
+      "variableInfo": {
+        "id": {
+          "name": "id",
+          "type": "Integer",
+          "label": "",
+          "sortOrder": 0
+        },
+        "ein": {
+          "name": "EIN",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 17
+        },
+        "email": {
+          "name": "email",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 3
+        },
+        "color1": {
+          "name": "Color 1",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 12
+        },
+        "color2": {
+          "name": "Color 2",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 13
+        },
+        "gender": {
+          "name": "gender",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 4
+        },
+        "boolean1": {
+          "name": "Boolean1",
+          "type": "Boolean",
+          "label": "",
+          "categories": [],
+          "sortOrder": 7
+        },
+        "boolean2": {
+          "name": "Boolean2",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 8
+        },
+        "boolean3": {
+          "name": "Boolean3",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 9
+        },
+        "carMake": {
+          "name": "Car Make",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 10
+        },
+        "currency": {
+          "name": "Currency",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 16
+        },
+        "lastName": {
+          "name": "last_name",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 2
+        },
+        "firstName": {
+          "name": "first_name",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 1
+        },
+        "ipAddress": {
+          "name": "ip_address",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 5
+        },
+        "appVersion": {
+          "name": "App Version",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 6
+        },
+        "carModelYear": {
+          "max": 2022,
+          "min": 1900,
+          "name": "Car Model Year",
+          "type": "Float",
+          "label": "Car Model Year",
+          "selected": true,
+          "sortOrder": 11
+        },
+        "genderFacebook": {
+          "name": "Gender Facebook",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 19
+        },
+        "creditCardType": {
+          "name": "Credit Card Type",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 15
+        },
+        "familyNameChinese": {
+          "name": "Family Name Chinese",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 18
+        },
+        "constructionMaterial": {
+          "name": "Construction Material",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 14
+        }
+      },
+      "dpStatistics": [
+        {
+          "cl": 0.95,
+          "delta": 0,
+          "error": "",
+          "label": "Mean",
+          "locked": false,
+          "epsilon": 1,
+          "accuracy": {
+            "value": 0.36547935211730537,
+            "message": "There is a probability of 95.0% that the DP Mean will differ from the true Mean by at most 0.36547935211730537 units. Here the units are the same units the variable Car Model Year has in the dataset."
+          },
+          "variable": "Car Model Year",
+          "colIndex": 11,
+          "statistic": "mean",
+          "fixedValue": "1990",
+          "datasetSize": 1000,
+          "variableInfo": {
+            "max": 2022,
+            "min": 1900,
+            "name": "Car Model Year",
+            "type": "Float",
+            "label": "Car Model Year",
+            "selected": true,
+            "sortOrder": 11
+          },
+          "handleAsFixed": true,
+          "missingValuesHandling": "insert_fixed"
+        }
+      ],
+      "releaseInfo": {
+        "downloadJsonUrl": "http://localhost:8000/api/release-download/9b88249b-6212-46e2-83f7-417b78fca8bc/json/",
+        "downloadPdfUrl": null,
+        "created": "2021-12-09T21:16:15.444299Z",
+        "updated": "2021-12-09T21:16:15.668228Z",
+        "objectId": "9b88249b-6212-46e2-83f7-417b78fca8bc",
+        "epsilonUsed": 1,
+        "dpRelease": {
+          "name": "Mock Data - step_900",
+          "created": {
+            "iso": "2021-12-09T21:16:15.434143",
+            "humanReadable": "December 09, 2021 at 21:16:15:434143"
+          },
+          "dataset": {
+            "doi": "doi:10.5072/FK2/MBRUWW",
+            "name": "Mock Data",
+            "type": "dataverse",
+            "citation": null,
+            "identifier": null,
+            "installation": {
+              "url": "http://ec2-35-171-244-178.compute-1.amazonaws.com",
+              "name": "Test Dataverse EC2"
+            },
+            "fileInformation": {
+              "name": "bonabo MOCK_DATA-1.tab",
+              "fileFormat": "text/tab-separated-values",
+              "identifier": null
+            }
+          },
+          "statistics": [
+            {
+              "delta": 0,
+              "bounds": {
+                "max": 2022,
+                "min": 1900
+              },
+              "result": {
+                "value": 1998.725291634407
+              },
+              "epsilon": 1,
+              "accuracy": {
+                "value": 0.36547935211730537,
+                "message": "There is a probability of 95.0% that the DP Mean will differ from the true Mean by at most 0.36547935211730537 units. Here the units are the same units the variable Car Model Year has in the dataset."
+              },
+              "variable": "Car Model Year",
+              "statistic": "mean",
+              "description": {
+                "html": "A differentially private <b>Mean</b> for variable <b>Car Model Year</b> was calculated with the result <b>1998.725291634407</b>.  There is a probability of <b>95.0%</b> that the <b>DP Mean</b> will differ from the true Mean by at most <b>0.36547935211730537</b> units. Here the units are the same units the variable <b>Car Model Year</b>} has in the dataset.",
+                "text": "A differentially private Mean for variable \"Car Model Year\" was calculated with the result 1998.725291634407. There is a probability of 95.0% that the DP Mean will differ from the true Mean by at most 0.36547935211730537 units. Here the units are the same units the variable Car Model Year has in the dataset."
+              },
+              "confidenceLevel": 0.95,
+              "confidenceLevelAlpha": 0.05,
+              "missingValueHandling": {
+                "type": "insert_fixed",
+                "fixedValue": 1990
+              }
+            }
+          ],
+          "application": "DP Creator",
+          "applicationUrl": "https://github.com/opendp/dpcreator",
+          "differentiallyPrivateLibrary": {
+            "url": "https://github.com/opendp/opendp",
+            "name": "OpenDP",
+            "version": "0.3.0"
+          }
+        },
+        "dataverseDepositInfo": {
+          "deposited": true,
+          "pdfDepositRecord": null,
+          "jsonDepositRecord": {
+            "name": "ReleaseInfo object (5) - v1 (dpJSON)",
+            "created": "2021-12-09T21:16:15.642939+00:00",
+            "updated": "2021-12-09T21:16:15.661748+00:00",
+            "objectId": "6de534a7-d6d4-4bee-81cd-1decf70f87cf",
+            "dvErrMsg": "",
+            "userMsgHtml": "The dpJSON release file, version v1, has been deposited to Dataverse as an auxiliary file.\n<br>Download link: <a href=\"http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88/auxiliary/dpJSON/v1\" target=\"_blank\">http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88/auxiliary/dpJSON/v1</a>.\n\n\n",
+            "userMsgText": "The dpJSON release file, version v1, has been deposited to Dataverse as an auxiliary file. It may be accessed through: http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88/auxiliary/dpJSON/v1\n\n",
+            "httpRespJson": {
+              "data": {
+                "type": "dpJSON",
+                "origin": "DP Creator (test)",
+                "checksum": "94490b358aab9f07f2a52d54686f2307",
+                "dataFile": {
+                  "id": 88,
+                  "unf": "UNF:6:42jfem90jf+WruX01jBjpw==",
+                  "md5": "012f04c22246d4cd9b340d04602ff171",
+                  "pidUrl": "",
+                  "checksum": {
+                    "type": "MD5",
+                    "value": "012f04c22246d4cd9b340d04602ff171"
+                  },
+                  "filename": "bonabo MOCK_DATA-1.tab",
+                  "filesize": 234725,
+                  "contentType": "text/tab-separated-values",
+                  "creationDate": "2021-12-09",
+                  "persistentId": "",
+                  "rootDataFileId": -1,
+                  "originalFileName": "bonabo MOCK_DATA-1.csv",
+                  "originalFileSize": 199012,
+                  "storageIdentifier": "file://17da105ac4f-6dd4da568ecc",
+                  "originalFileFormat": "text/csv",
+                  "originalFormatLabel": "Comma Separated Values"
+                },
+                "fileSize": 2571,
+                "isPublic": true,
+                "formatTag": "dpJSON",
+                "contentType": "text/plain",
+                "formatVersion": "v1"
+              },
+              "status": "OK"
+            },
+            "httpRespText": "{\"status\":\"OK\",\"data\":{\"formatTag\":\"dpJSON\",\"formatVersion\":\"v1\",\"origin\":\"DP Creator (test)\",\"isPublic\":true,\"type\":\"dpJSON\",\"contentType\":\"text/plain\",\"fileSize\":2571,\"checksum\":\"94490b358aab9f07f2a52d54686f2307\",\"dataFile\":{\"id\":88,\"persistentId\":\"\",\"pidURL\":\"\",\"filename\":\"bonabo MOCK_DATA-1.tab\",\"contentType\":\"text/tab-separated-values\",\"filesize\":234725,\"storageIdentifier\":\"file://17da105ac4f-6dd4da568ecc\",\"originalFileFormat\":\"text/csv\",\"originalFormatLabel\":\"Comma Separated Values\",\"originalFileSize\":199012,\"originalFileName\":\"bonabo MOCK_DATA-1.csv\",\"UNF\":\"UNF:6:42jfem90jf+WruX01jBjpw==\",\"rootDataFileId\":-1,\"md5\":\"012f04c22246d4cd9b340d04602ff171\",\"checksum\":{\"type\":\"MD5\",\"value\":\"012f04c22246d4cd9b340d04602ff171\"},\"creationDate\":\"2021-12-09\"}}}",
+            "depositSuccess": true,
+            "dvDownloadUrl": "http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88/auxiliary/dpJSON/v1",
+            "httpStatusCode": 200,
+            "dvAuxiliaryType": "dpJSON",
+            "dvAuxiliaryVersion": "v1"
+          }
+        },
+        "dvJsonDepositComplete": true,
+        "dvPdfDepositComplete": false
+      },
+      "created": "2021-12-09T21:15:51.091644Z",
+      "updated": "2021-12-09T21:16:15.708276Z"
+    },
+    {
+      "name": "Plan Test 2",
+      "objectId": "954af17e-7dda-41e1-89cd-19b367313f00",
+      "analyst": "4331fad4-8341-4fb5-a5eb-16a15289d203",
+      "dataset": "29b14152-ebb3-47f1-b34d-2009dfb567e6",
+      "isComplete": true,
+      "userStep": "step_1200",
+      "variableInfo": {
+        "id": {
+          "name": "id",
+          "type": "Integer",
+          "label": "",
+          "sortOrder": 0
+        },
+        "ein": {
+          "name": "EIN",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 17
+        },
+        "email": {
+          "name": "email",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 3
+        },
+        "color1": {
+          "name": "Color 1",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 12
+        },
+        "color2": {
+          "name": "Color 2",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 13
+        },
+        "gender": {
+          "name": "gender",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 4
+        },
+        "boolean1": {
+          "name": "Boolean1",
+          "type": "Boolean",
+          "label": "",
+          "categories": [],
+          "sortOrder": 7
+        },
+        "boolean2": {
+          "name": "Boolean2",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 8
+        },
+        "boolean3": {
+          "name": "Boolean3",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 9
+        },
+        "carMake": {
+          "name": "Car Make",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 10
+        },
+        "currency": {
+          "name": "Currency",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 16
+        },
+        "lastName": {
+          "name": "last_name",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 2
+        },
+        "firstName": {
+          "name": "first_name",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 1
+        },
+        "ipAddress": {
+          "name": "ip_address",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 5
+        },
+        "appVersion": {
+          "name": "App Version",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 6
+        },
+        "carModelYear": {
+          "max": 2022,
+          "min": 1900,
+          "name": "Car Model Year",
+          "type": "Float",
+          "label": "Car Model Year",
+          "selected": true,
+          "sortOrder": 11
+        },
+        "genderFacebook": {
+          "name": "Gender Facebook",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 19
+        },
+        "creditCardType": {
+          "name": "Credit Card Type",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 15
+        },
+        "familyNameChinese": {
+          "name": "Family Name Chinese",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 18
+        },
+        "constructionMaterial": {
+          "name": "Construction Material",
+          "type": "Categorical",
+          "label": "",
+          "categories": [],
+          "sortOrder": 14
+        }
+      },
+      "dpStatistics": [
+        {
+          "cl": 0.95,
+          "delta": 0,
+          "error": "",
+          "label": "Mean",
+          "locked": false,
+          "epsilon": 1,
+          "accuracy": {
+            "value": 0.36547935211730537,
+            "message": "There is a probability of 95.0% that the DP Mean will differ from the true Mean by at most 0.36547935211730537 units. Here the units are the same units the variable Car Model Year has in the dataset."
+          },
+          "variable": "Car Model Year",
+          "colIndex": 11,
+          "statistic": "mean",
+          "fixedValue": "1990",
+          "datasetSize": 1000,
+          "variableInfo": {
+            "max": 2022,
+            "min": 1900,
+            "name": "Car Model Year",
+            "type": "Float",
+            "label": "Car Model Year",
+            "selected": true,
+            "sortOrder": 11
+          },
+          "handleAsFixed": true,
+          "missingValuesHandling": "insert_fixed"
+        }
+      ],
+      "releaseInfo": {
+        "downloadJsonUrl": "http://localhost:8000/api/release-download/9b88249b-6212-46e2-83f7-417b78fca8bc/json/",
+        "downloadPdfUrl": null,
+        "created": "2021-12-09T21:16:15.444299Z",
+        "updated": "2021-12-09T21:16:15.668228Z",
+        "objectId": "9b88249b-6212-46e2-83f7-417b78fca8bc",
+        "epsilonUsed": 1,
+        "dpRelease": {
+          "name": "Mock Data - step_900",
+          "created": {
+            "iso": "2021-12-09T21:16:15.434143",
+            "humanReadable": "December 09, 2021 at 21:16:15:434143"
+          },
+          "dataset": {
+            "doi": "doi:10.5072/FK2/MBRUWW",
+            "name": "Mock Data",
+            "type": "dataverse",
+            "citation": null,
+            "identifier": null,
+            "installation": {
+              "url": "http://ec2-35-171-244-178.compute-1.amazonaws.com",
+              "name": "Test Dataverse EC2"
+            },
+            "fileInformation": {
+              "name": "bonabo MOCK_DATA-1.tab",
+              "fileFormat": "text/tab-separated-values",
+              "identifier": null
+            }
+          },
+          "statistics": [
+            {
+              "delta": 0,
+              "bounds": {
+                "max": 2022,
+                "min": 1900
+              },
+              "result": {
+                "value": 1998.725291634407
+              },
+              "epsilon": 1,
+              "accuracy": {
+                "value": 0.36547935211730537,
+                "message": "There is a probability of 95.0% that the DP Mean will differ from the true Mean by at most 0.36547935211730537 units. Here the units are the same units the variable Car Model Year has in the dataset."
+              },
+              "variable": "Car Model Year",
+              "statistic": "mean",
+              "description": {
+                "html": "A differentially private <b>Mean</b> for variable <b>Car Model Year</b> was calculated with the result <b>1998.725291634407</b>.  There is a probability of <b>95.0%</b> that the <b>DP Mean</b> will differ from the true Mean by at most <b>0.36547935211730537</b> units. Here the units are the same units the variable <b>Car Model Year</b>} has in the dataset.",
+                "text": "A differentially private Mean for variable \"Car Model Year\" was calculated with the result 1998.725291634407. There is a probability of 95.0% that the DP Mean will differ from the true Mean by at most 0.36547935211730537 units. Here the units are the same units the variable Car Model Year has in the dataset."
+              },
+              "confidenceLevel": 0.95,
+              "confidenceLevelAlpha": 0.05,
+              "missingValueHandling": {
+                "type": "insert_fixed",
+                "fixedValue": 1990
+              }
+            }
+          ],
+          "application": "DP Creator",
+          "applicationUrl": "https://github.com/opendp/dpcreator",
+          "differentiallyPrivateLibrary": {
+            "url": "https://github.com/opendp/opendp",
+            "name": "OpenDP",
+            "version": "0.3.0"
+          }
+        },
+        "dataverseDepositInfo": {
+          "deposited": true,
+          "pdfDepositRecord": null,
+          "jsonDepositRecord": {
+            "name": "ReleaseInfo object (5) - v1 (dpJSON)",
+            "created": "2021-12-09T21:16:15.642939+00:00",
+            "updated": "2021-12-09T21:16:15.661748+00:00",
+            "objectId": "6de534a7-d6d4-4bee-81cd-1decf70f87cf",
+            "dvErrMsg": "",
+            "userMsgHtml": "The dpJSON release file, version v1, has been deposited to Dataverse as an auxiliary file.\n<br>Download link: <a href=\"http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88/auxiliary/dpJSON/v1\" target=\"_blank\">http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88/auxiliary/dpJSON/v1</a>.\n\n\n",
+            "userMsgText": "The dpJSON release file, version v1, has been deposited to Dataverse as an auxiliary file. It may be accessed through: http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88/auxiliary/dpJSON/v1\n\n",
+            "httpRespJson": {
+              "data": {
+                "type": "dpJSON",
+                "origin": "DP Creator (test)",
+                "checksum": "94490b358aab9f07f2a52d54686f2307",
+                "dataFile": {
+                  "id": 88,
+                  "unf": "UNF:6:42jfem90jf+WruX01jBjpw==",
+                  "md5": "012f04c22246d4cd9b340d04602ff171",
+                  "pidUrl": "",
+                  "checksum": {
+                    "type": "MD5",
+                    "value": "012f04c22246d4cd9b340d04602ff171"
+                  },
+                  "filename": "bonabo MOCK_DATA-1.tab",
+                  "filesize": 234725,
+                  "contentType": "text/tab-separated-values",
+                  "creationDate": "2021-12-09",
+                  "persistentId": "",
+                  "rootDataFileId": -1,
+                  "originalFileName": "bonabo MOCK_DATA-1.csv",
+                  "originalFileSize": 199012,
+                  "storageIdentifier": "file://17da105ac4f-6dd4da568ecc",
+                  "originalFileFormat": "text/csv",
+                  "originalFormatLabel": "Comma Separated Values"
+                },
+                "fileSize": 2571,
+                "isPublic": true,
+                "formatTag": "dpJSON",
+                "contentType": "text/plain",
+                "formatVersion": "v1"
+              },
+              "status": "OK"
+            },
+            "httpRespText": "{\"status\":\"OK\",\"data\":{\"formatTag\":\"dpJSON\",\"formatVersion\":\"v1\",\"origin\":\"DP Creator (test)\",\"isPublic\":true,\"type\":\"dpJSON\",\"contentType\":\"text/plain\",\"fileSize\":2571,\"checksum\":\"94490b358aab9f07f2a52d54686f2307\",\"dataFile\":{\"id\":88,\"persistentId\":\"\",\"pidURL\":\"\",\"filename\":\"bonabo MOCK_DATA-1.tab\",\"contentType\":\"text/tab-separated-values\",\"filesize\":234725,\"storageIdentifier\":\"file://17da105ac4f-6dd4da568ecc\",\"originalFileFormat\":\"text/csv\",\"originalFormatLabel\":\"Comma Separated Values\",\"originalFileSize\":199012,\"originalFileName\":\"bonabo MOCK_DATA-1.csv\",\"UNF\":\"UNF:6:42jfem90jf+WruX01jBjpw==\",\"rootDataFileId\":-1,\"md5\":\"012f04c22246d4cd9b340d04602ff171\",\"checksum\":{\"type\":\"MD5\",\"value\":\"012f04c22246d4cd9b340d04602ff171\"},\"creationDate\":\"2021-12-09\"}}}",
+            "depositSuccess": true,
+            "dvDownloadUrl": "http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88/auxiliary/dpJSON/v1",
+            "httpStatusCode": 200,
+            "dvAuxiliaryType": "dpJSON",
+            "dvAuxiliaryVersion": "v1"
+          }
+        },
+        "dvJsonDepositComplete": true,
+        "dvPdfDepositComplete": false
+      },
+      "created": "2021-12-09T21:15:51.091644Z",
+      "updated": "2021-12-09T21:16:15.708276Z"
+    }
+  ],
+  "resourcetype": "DataverseFileInfo"
+},
+{
+"objectId": "29b14152-ebb3-47f1-b34d-2009dfb567e6",
+"name": "Mock Data2",
+"created": "2021-12-09T21:14:28.684160Z",
+"creator": "ernie",
+"installationName": "Test Dataverse EC2",
+"dataverseFileId": 88,
+"datasetDoi": "doi:10.5072/FK2/MBRUWW",
+"fileDoi": "doi:10.5072/FK2/MBRUWW",
+"status": "step_100",
+"depositor_setup_info": {
+"id": 22,
+"created": "2021-12-09T21:14:28.680831Z",
+"updated": "2021-12-09T21:14:28.680873Z",
+"objectId": "10c223a4-f0ae-41ec-b4c9-eec8083017c8",
+"isComplete": false,
+"userStep": "step_100",
+"wizard_step": "step_400",
+"datasetQuestions": null,
+"epsilonQuestions": null,
+"variableInfo": null,
+"defaultEpsilon": null,
+"epsilon": 0.5,
+"defaultDelta": 0,
+"delta": 0,
+"confidenceLevel": 0.95,
+"creator": 21
+},
+"datasetSchemaInfo": {
+"@id": "https://doi.org/10.5072/FK2/MBRUWW",
+"name": "Mock Data",
+"@type": "Dataset",
+"author": [
+{
+"name": "Kraffmiller, Ellen"
+}
+],
+"creator": [
+{
+"name": "Kraffmiller, Ellen"
+}
+],
+"license": {
+"url": "https://creativecommons.org/publicdomain/zero/1.0/",
+"text": "CC0",
+"@type": "Dataset"
+},
+"version": "3",
+"@context": "http://schema.org",
+"keywords": [
+"Computer and Information Science"
+],
+"provider": {
+"name": "Root",
+"@type": "Organization"
+},
+"publisher": {
+"name": "Root",
+"@type": "Organization"
+},
+"identifier": "https://doi.org/10.5072/FK2/MBRUWW",
+"description": [
+"test"
+],
+"dateModified": "2021-12-09",
+"distribution": [
+{
+"name": "bonabo MOCK_DATA-1.tab",
+"@type": "DataDownload",
+"contentUrl": "http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88",
+"fileFormat": "text/tab-separated-values",
+"contentSize": 234725
+},
+{
+"name": "bonabo MOCK_DATA.tab",
+"@type": "DataDownload",
+"contentUrl": "http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/87",
+"fileFormat": "text/tab-separated-values",
+"contentSize": 234725
+},
+{
+"name": "MOCK_DATA.tab",
+"@type": "DataDownload",
+"contentUrl": "http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/86",
+"fileFormat": "text/tab-separated-values",
+"contentSize": 85701
+}
+],
+"datePublished": "2021-12-07",
+"includedInDataCatalog": {
+"url": "http://ec2-35-171-244-178.compute-1.amazonaws.com",
+"name": "Root",
+"@type": "DataCatalog"
+}
+},
+"fileSchemaInfo": {
+"name": "bonabo MOCK_DATA-1.tab",
+"@type": "DataDownload",
+"contentUrl": "http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88",
+"fileFormat": "text/tab-separated-values",
+"contentSize": 234725
+},
+"analysisPlans": [
+{
+"name": "Plan Test1",
+"objectId": "954af17e-7dda-41e1-89cd-19b367313f00",
+"analyst": "4331fad4-8341-4fb5-a5eb-16a15289d203",
+"dataset": "29b14152-ebb3-47f1-b34d-2009dfb567e6",
+"isComplete": true,
+"userStep": "step_1200",
+"variableInfo": {
+"id": {
+"name": "id",
+"type": "Integer",
+"label": "",
+"sortOrder": 0
+},
+"ein": {
+"name": "EIN",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 17
+},
+"email": {
+"name": "email",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 3
+},
+"color1": {
+"name": "Color 1",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 12
+},
+"color2": {
+"name": "Color 2",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 13
+},
+"gender": {
+"name": "gender",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 4
+},
+"boolean1": {
+"name": "Boolean1",
+"type": "Boolean",
+"label": "",
+"categories": [],
+"sortOrder": 7
+},
+"boolean2": {
+"name": "Boolean2",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 8
+},
+"boolean3": {
+"name": "Boolean3",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 9
+},
+"carMake": {
+"name": "Car Make",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 10
+},
+"currency": {
+"name": "Currency",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 16
+},
+"lastName": {
+"name": "last_name",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 2
+},
+"firstName": {
+"name": "first_name",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 1
+},
+"ipAddress": {
+"name": "ip_address",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 5
+},
+"appVersion": {
+"name": "App Version",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 6
+},
+"carModelYear": {
+"max": 2022,
+"min": 1900,
+"name": "Car Model Year",
+"type": "Float",
+"label": "Car Model Year",
+"selected": true,
+"sortOrder": 11
+},
+"genderFacebook": {
+"name": "Gender Facebook",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 19
+},
+"creditCardType": {
+"name": "Credit Card Type",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 15
+},
+"familyNameChinese": {
+"name": "Family Name Chinese",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 18
+},
+"constructionMaterial": {
+"name": "Construction Material",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 14
+}
+},
+"dpStatistics": [
+{
+"cl": 0.95,
+"delta": 0,
+"error": "",
+"label": "Mean",
+"locked": false,
+"epsilon": 1,
+"accuracy": {
+"value": 0.36547935211730537,
+"message": "There is a probability of 95.0% that the DP Mean will differ from the true Mean by at most 0.36547935211730537 units. Here the units are the same units the variable Car Model Year has in the dataset."
+},
+"variable": "Car Model Year",
+"colIndex": 11,
+"statistic": "mean",
+"fixedValue": "1990",
+"datasetSize": 1000,
+"variableInfo": {
+"max": 2022,
+"min": 1900,
+"name": "Car Model Year",
+"type": "Float",
+"label": "Car Model Year",
+"selected": true,
+"sortOrder": 11
+},
+"handleAsFixed": true,
+"missingValuesHandling": "insert_fixed"
+}
+],
+"releaseInfo": {
+"downloadJsonUrl": "http://localhost:8000/api/release-download/9b88249b-6212-46e2-83f7-417b78fca8bc/json/",
+"downloadPdfUrl": null,
+"created": "2021-12-09T21:16:15.444299Z",
+"updated": "2021-12-09T21:16:15.668228Z",
+"objectId": "9b88249b-6212-46e2-83f7-417b78fca8bc",
+"epsilonUsed": 1,
+"dpRelease": {
+"name": "Mock Data - step_900",
+"created": {
+"iso": "2021-12-09T21:16:15.434143",
+"humanReadable": "December 09, 2021 at 21:16:15:434143"
+},
+"dataset": {
+"doi": "doi:10.5072/FK2/MBRUWW",
+"name": "Mock Data",
+"type": "dataverse",
+"citation": null,
+"identifier": null,
+"installation": {
+"url": "http://ec2-35-171-244-178.compute-1.amazonaws.com",
+"name": "Test Dataverse EC2"
+},
+"fileInformation": {
+"name": "bonabo MOCK_DATA-1.tab",
+"fileFormat": "text/tab-separated-values",
+"identifier": null
+}
+},
+"statistics": [
+{
+"delta": 0,
+"bounds": {
+"max": 2022,
+"min": 1900
+},
+"result": {
+"value": 1998.725291634407
+},
+"epsilon": 1,
+"accuracy": {
+"value": 0.36547935211730537,
+"message": "There is a probability of 95.0% that the DP Mean will differ from the true Mean by at most 0.36547935211730537 units. Here the units are the same units the variable Car Model Year has in the dataset."
+},
+"variable": "Car Model Year",
+"statistic": "mean",
+"description": {
+"html": "A differentially private <b>Mean</b> for variable <b>Car Model Year</b> was calculated with the result <b>1998.725291634407</b>.  There is a probability of <b>95.0%</b> that the <b>DP Mean</b> will differ from the true Mean by at most <b>0.36547935211730537</b> units. Here the units are the same units the variable <b>Car Model Year</b>} has in the dataset.",
+"text": "A differentially private Mean for variable \"Car Model Year\" was calculated with the result 1998.725291634407. There is a probability of 95.0% that the DP Mean will differ from the true Mean by at most 0.36547935211730537 units. Here the units are the same units the variable Car Model Year has in the dataset."
+},
+"confidenceLevel": 0.95,
+"confidenceLevelAlpha": 0.05,
+"missingValueHandling": {
+"type": "insert_fixed",
+"fixedValue": 1990
+}
+}
+],
+"application": "DP Creator",
+"applicationUrl": "https://github.com/opendp/dpcreator",
+"differentiallyPrivateLibrary": {
+"url": "https://github.com/opendp/opendp",
+"name": "OpenDP",
+"version": "0.3.0"
+}
+},
+"dataverseDepositInfo": {
+"deposited": true,
+"pdfDepositRecord": null,
+"jsonDepositRecord": {
+"name": "ReleaseInfo object (5) - v1 (dpJSON)",
+"created": "2021-12-09T21:16:15.642939+00:00",
+"updated": "2021-12-09T21:16:15.661748+00:00",
+"objectId": "6de534a7-d6d4-4bee-81cd-1decf70f87cf",
+"dvErrMsg": "",
+"userMsgHtml": "The dpJSON release file, version v1, has been deposited to Dataverse as an auxiliary file.\n<br>Download link: <a href=\"http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88/auxiliary/dpJSON/v1\" target=\"_blank\">http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88/auxiliary/dpJSON/v1</a>.\n\n\n",
+"userMsgText": "The dpJSON release file, version v1, has been deposited to Dataverse as an auxiliary file. It may be accessed through: http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88/auxiliary/dpJSON/v1\n\n",
+"httpRespJson": {
+"data": {
+"type": "dpJSON",
+"origin": "DP Creator (test)",
+"checksum": "94490b358aab9f07f2a52d54686f2307",
+"dataFile": {
+"id": 88,
+"unf": "UNF:6:42jfem90jf+WruX01jBjpw==",
+"md5": "012f04c22246d4cd9b340d04602ff171",
+"pidUrl": "",
+"checksum": {
+"type": "MD5",
+"value": "012f04c22246d4cd9b340d04602ff171"
+},
+"filename": "bonabo MOCK_DATA-1.tab",
+"filesize": 234725,
+"contentType": "text/tab-separated-values",
+"creationDate": "2021-12-09",
+"persistentId": "",
+"rootDataFileId": -1,
+"originalFileName": "bonabo MOCK_DATA-1.csv",
+"originalFileSize": 199012,
+"storageIdentifier": "file://17da105ac4f-6dd4da568ecc",
+"originalFileFormat": "text/csv",
+"originalFormatLabel": "Comma Separated Values"
+},
+"fileSize": 2571,
+"isPublic": true,
+"formatTag": "dpJSON",
+"contentType": "text/plain",
+"formatVersion": "v1"
+},
+"status": "OK"
+},
+"httpRespText": "{\"status\":\"OK\",\"data\":{\"formatTag\":\"dpJSON\",\"formatVersion\":\"v1\",\"origin\":\"DP Creator (test)\",\"isPublic\":true,\"type\":\"dpJSON\",\"contentType\":\"text/plain\",\"fileSize\":2571,\"checksum\":\"94490b358aab9f07f2a52d54686f2307\",\"dataFile\":{\"id\":88,\"persistentId\":\"\",\"pidURL\":\"\",\"filename\":\"bonabo MOCK_DATA-1.tab\",\"contentType\":\"text/tab-separated-values\",\"filesize\":234725,\"storageIdentifier\":\"file://17da105ac4f-6dd4da568ecc\",\"originalFileFormat\":\"text/csv\",\"originalFormatLabel\":\"Comma Separated Values\",\"originalFileSize\":199012,\"originalFileName\":\"bonabo MOCK_DATA-1.csv\",\"UNF\":\"UNF:6:42jfem90jf+WruX01jBjpw==\",\"rootDataFileId\":-1,\"md5\":\"012f04c22246d4cd9b340d04602ff171\",\"checksum\":{\"type\":\"MD5\",\"value\":\"012f04c22246d4cd9b340d04602ff171\"},\"creationDate\":\"2021-12-09\"}}}",
+"depositSuccess": true,
+"dvDownloadUrl": "http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88/auxiliary/dpJSON/v1",
+"httpStatusCode": 200,
+"dvAuxiliaryType": "dpJSON",
+"dvAuxiliaryVersion": "v1"
+}
+},
+"dvJsonDepositComplete": true,
+"dvPdfDepositComplete": false
+},
+"created": "2021-12-09T21:15:51.091644Z",
+"updated": "2021-12-09T21:16:15.708276Z"
+},
+{
+"name": "Plan Test 2",
+"objectId": "954af17e-7dda-41e1-89cd-19b367313f00",
+"analyst": "4331fad4-8341-4fb5-a5eb-16a15289d203",
+"dataset": "29b14152-ebb3-47f1-b34d-2009dfb567e6",
+"isComplete": true,
+"userStep": "step_1200",
+"variableInfo": {
+"id": {
+"name": "id",
+"type": "Integer",
+"label": "",
+"sortOrder": 0
+},
+"ein": {
+"name": "EIN",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 17
+},
+"email": {
+"name": "email",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 3
+},
+"color1": {
+"name": "Color 1",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 12
+},
+"color2": {
+"name": "Color 2",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 13
+},
+"gender": {
+"name": "gender",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 4
+},
+"boolean1": {
+"name": "Boolean1",
+"type": "Boolean",
+"label": "",
+"categories": [],
+"sortOrder": 7
+},
+"boolean2": {
+"name": "Boolean2",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 8
+},
+"boolean3": {
+"name": "Boolean3",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 9
+},
+"carMake": {
+"name": "Car Make",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 10
+},
+"currency": {
+"name": "Currency",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 16
+},
+"lastName": {
+"name": "last_name",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 2
+},
+"firstName": {
+"name": "first_name",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 1
+},
+"ipAddress": {
+"name": "ip_address",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 5
+},
+"appVersion": {
+"name": "App Version",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 6
+},
+"carModelYear": {
+"max": 2022,
+"min": 1900,
+"name": "Car Model Year",
+"type": "Float",
+"label": "Car Model Year",
+"selected": true,
+"sortOrder": 11
+},
+"genderFacebook": {
+"name": "Gender Facebook",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 19
+},
+"creditCardType": {
+"name": "Credit Card Type",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 15
+},
+"familyNameChinese": {
+"name": "Family Name Chinese",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 18
+},
+"constructionMaterial": {
+"name": "Construction Material",
+"type": "Categorical",
+"label": "",
+"categories": [],
+"sortOrder": 14
+}
+},
+"dpStatistics": [
+{
+"cl": 0.95,
+"delta": 0,
+"error": "",
+"label": "Mean",
+"locked": false,
+"epsilon": 1,
+"accuracy": {
+"value": 0.36547935211730537,
+"message": "There is a probability of 95.0% that the DP Mean will differ from the true Mean by at most 0.36547935211730537 units. Here the units are the same units the variable Car Model Year has in the dataset."
+},
+"variable": "Car Model Year",
+"colIndex": 11,
+"statistic": "mean",
+"fixedValue": "1990",
+"datasetSize": 1000,
+"variableInfo": {
+"max": 2022,
+"min": 1900,
+"name": "Car Model Year",
+"type": "Float",
+"label": "Car Model Year",
+"selected": true,
+"sortOrder": 11
+},
+"handleAsFixed": true,
+"missingValuesHandling": "insert_fixed"
+}
+],
+"releaseInfo": {
+"downloadJsonUrl": "http://localhost:8000/api/release-download/9b88249b-6212-46e2-83f7-417b78fca8bc/json/",
+"downloadPdfUrl": null,
+"created": "2021-12-09T21:16:15.444299Z",
+"updated": "2021-12-09T21:16:15.668228Z",
+"objectId": "9b88249b-6212-46e2-83f7-417b78fca8bc",
+"epsilonUsed": 1,
+"dpRelease": {
+"name": "Mock Data - step_900",
+"created": {
+"iso": "2021-12-09T21:16:15.434143",
+"humanReadable": "December 09, 2021 at 21:16:15:434143"
+},
+"dataset": {
+"doi": "doi:10.5072/FK2/MBRUWW",
+"name": "Mock Data",
+"type": "dataverse",
+"citation": null,
+"identifier": null,
+"installation": {
+"url": "http://ec2-35-171-244-178.compute-1.amazonaws.com",
+"name": "Test Dataverse EC2"
+},
+"fileInformation": {
+"name": "bonabo MOCK_DATA-1.tab",
+"fileFormat": "text/tab-separated-values",
+"identifier": null
+}
+},
+"statistics": [
+{
+"delta": 0,
+"bounds": {
+"max": 2022,
+"min": 1900
+},
+"result": {
+"value": 1998.725291634407
+},
+"epsilon": 1,
+"accuracy": {
+"value": 0.36547935211730537,
+"message": "There is a probability of 95.0% that the DP Mean will differ from the true Mean by at most 0.36547935211730537 units. Here the units are the same units the variable Car Model Year has in the dataset."
+},
+"variable": "Car Model Year",
+"statistic": "mean",
+"description": {
+"html": "A differentially private <b>Mean</b> for variable <b>Car Model Year</b> was calculated with the result <b>1998.725291634407</b>.  There is a probability of <b>95.0%</b> that the <b>DP Mean</b> will differ from the true Mean by at most <b>0.36547935211730537</b> units. Here the units are the same units the variable <b>Car Model Year</b>} has in the dataset.",
+"text": "A differentially private Mean for variable \"Car Model Year\" was calculated with the result 1998.725291634407. There is a probability of 95.0% that the DP Mean will differ from the true Mean by at most 0.36547935211730537 units. Here the units are the same units the variable Car Model Year has in the dataset."
+},
+"confidenceLevel": 0.95,
+"confidenceLevelAlpha": 0.05,
+"missingValueHandling": {
+"type": "insert_fixed",
+"fixedValue": 1990
+}
+}
+],
+"application": "DP Creator",
+"applicationUrl": "https://github.com/opendp/dpcreator",
+"differentiallyPrivateLibrary": {
+"url": "https://github.com/opendp/opendp",
+"name": "OpenDP",
+"version": "0.3.0"
+}
+},
+"dataverseDepositInfo": {
+"deposited": true,
+"pdfDepositRecord": null,
+"jsonDepositRecord": {
+"name": "ReleaseInfo object (5) - v1 (dpJSON)",
+"created": "2021-12-09T21:16:15.642939+00:00",
+"updated": "2021-12-09T21:16:15.661748+00:00",
+"objectId": "6de534a7-d6d4-4bee-81cd-1decf70f87cf",
+"dvErrMsg": "",
+"userMsgHtml": "The dpJSON release file, version v1, has been deposited to Dataverse as an auxiliary file.\n<br>Download link: <a href=\"http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88/auxiliary/dpJSON/v1\" target=\"_blank\">http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88/auxiliary/dpJSON/v1</a>.\n\n\n",
+"userMsgText": "The dpJSON release file, version v1, has been deposited to Dataverse as an auxiliary file. It may be accessed through: http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88/auxiliary/dpJSON/v1\n\n",
+"httpRespJson": {
+"data": {
+"type": "dpJSON",
+"origin": "DP Creator (test)",
+"checksum": "94490b358aab9f07f2a52d54686f2307",
+"dataFile": {
+"id": 88,
+"unf": "UNF:6:42jfem90jf+WruX01jBjpw==",
+"md5": "012f04c22246d4cd9b340d04602ff171",
+"pidUrl": "",
+"checksum": {
+"type": "MD5",
+"value": "012f04c22246d4cd9b340d04602ff171"
+},
+"filename": "bonabo MOCK_DATA-1.tab",
+"filesize": 234725,
+"contentType": "text/tab-separated-values",
+"creationDate": "2021-12-09",
+"persistentId": "",
+"rootDataFileId": -1,
+"originalFileName": "bonabo MOCK_DATA-1.csv",
+"originalFileSize": 199012,
+"storageIdentifier": "file://17da105ac4f-6dd4da568ecc",
+"originalFileFormat": "text/csv",
+"originalFormatLabel": "Comma Separated Values"
+},
+"fileSize": 2571,
+"isPublic": true,
+"formatTag": "dpJSON",
+"contentType": "text/plain",
+"formatVersion": "v1"
+},
+"status": "OK"
+},
+"httpRespText": "{\"status\":\"OK\",\"data\":{\"formatTag\":\"dpJSON\",\"formatVersion\":\"v1\",\"origin\":\"DP Creator (test)\",\"isPublic\":true,\"type\":\"dpJSON\",\"contentType\":\"text/plain\",\"fileSize\":2571,\"checksum\":\"94490b358aab9f07f2a52d54686f2307\",\"dataFile\":{\"id\":88,\"persistentId\":\"\",\"pidURL\":\"\",\"filename\":\"bonabo MOCK_DATA-1.tab\",\"contentType\":\"text/tab-separated-values\",\"filesize\":234725,\"storageIdentifier\":\"file://17da105ac4f-6dd4da568ecc\",\"originalFileFormat\":\"text/csv\",\"originalFormatLabel\":\"Comma Separated Values\",\"originalFileSize\":199012,\"originalFileName\":\"bonabo MOCK_DATA-1.csv\",\"UNF\":\"UNF:6:42jfem90jf+WruX01jBjpw==\",\"rootDataFileId\":-1,\"md5\":\"012f04c22246d4cd9b340d04602ff171\",\"checksum\":{\"type\":\"MD5\",\"value\":\"012f04c22246d4cd9b340d04602ff171\"},\"creationDate\":\"2021-12-09\"}}}",
+"depositSuccess": true,
+"dvDownloadUrl": "http://ec2-35-171-244-178.compute-1.amazonaws.com/api/access/datafile/88/auxiliary/dpJSON/v1",
+"httpStatusCode": 200,
+"dvAuxiliaryType": "dpJSON",
+"dvAuxiliaryVersion": "v1"
+}
+},
+"dvJsonDepositComplete": true,
+"dvPdfDepositComplete": false
+},
+"created": "2021-12-09T21:15:51.091644Z",
+"updated": "2021-12-09T21:16:15.708276Z"
+}
+],
+"resourcetype": "DataverseFileInfo"
+}]

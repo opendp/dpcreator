@@ -10,9 +10,42 @@
 
 
         })
+        it('displays Table correctly', () => {
+            cy.on('uncaught:exception', (e, runnable) => {
+                console.log('error', e)
+                console.log('runnable', runnable)
+
+                return false
+            })
+            const username = 'kermit'
+            const email = 'kermit@thefrog.com'
+            const password = 'kermit123!'
+
+            cy.createAccount(username, email, password)
+                cy.fixture('MyDataDatasetList.json').then(datasetList => {
+                    // set Expiration Date and Time Remaining
+
+                    cy.intercept('GET', '/api/dataset-info/', {
+                        body: {
+                            "count": 2,
+                            "next": null,
+                            "previous": null,
+                            "results": datasetList
+                        }
+                    })
+
+                    cy.visit('/my-data')
+
+                    cy.get('[data-test="my-data-table"]').should('be.visible')
+                    cy.pause()
+
+                })
 
 
-        it('successfully loads', () => {
+
+        })
+
+        it('successfully uploads a file ', () => {
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
                 console.log('runnable', runnable)

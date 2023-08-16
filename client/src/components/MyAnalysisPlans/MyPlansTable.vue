@@ -1,11 +1,13 @@
 <template>
   <div>
+
     <v-data-table v-if="plans"
         data-test="my-plans-table"
         :headers="headers"
         :items="plans"
+         :custom-filter="filterOnlyCapsText"
         :items-per-page="computedItemsPerPage"
-        :search="searchTerm || search"
+        :search="search"
         :hide-default-footer="true"
         class="my-data-table"
         :page.sync="page"
@@ -13,11 +15,20 @@
         :disable-sort="$vuetify.breakpoint.xsOnly"
     >
       <template v-slot:top v-if="inlineSearchEnabled">
-        <v-text-field
-            v-model="search"
-            label="Search"
-            class="mx-4"
-        ></v-text-field>
+      <v-container>
+      <v-row  align="start"
+              no-gutters>
+        <v-col cols="6" class="align-left">
+          <b>Filter By:</b>
+          <v-select
+              v-model="selectedFilter"
+              :items="filterOptions"
+              label="Select Filter"
+          ></v-select>
+          <v-btn text small @click="clearFilter">Clear Filter</v-btn>
+        </v-col>
+      </v-row>
+      </v-container>
       </template>
       <template v-slot:[`header.options`]="{ header }">
         <span class="font-weight-bold text-start d-inline">
@@ -222,7 +233,7 @@ export default {
     },
     inlineSearchEnabled: {
       type: Boolean,
-      default: false
+      default: true
     },
     searchTerm: {
       type: String
@@ -255,6 +266,8 @@ export default {
         {text: "Options", value: "actions", align: "end"}
 
       ],
+      selectedFilter: '', // Initialize selected filter
+      filterOptions: ['My Plans', 'Plans Created From My Datasets'], // Define filter options
       statusInformation,
       actionsInformation,
       stepInformation,
@@ -266,6 +279,9 @@ export default {
   methods: {
     handleButtonClick(action, item) {
       this[action](item)
+    },
+    filterOnlyCapsText (value, query, item) {
+      return value != null && query != null && typeof value === 'string' && value.toString().toLocaleUpperCase().indexOf(query) !== -1
     },
     deleteItem(item) {
       this.selectedItem = Object.assign({}, item);
@@ -283,6 +299,9 @@ export default {
     },
     delete(item) {
       this.deleteItem(item)
+    },
+    clearFilter() {
+      this.selectedFilter = ''; // Clear the selected filter
     },
     formatDate(dateString) {
       const dateObj = new Date(dateString);

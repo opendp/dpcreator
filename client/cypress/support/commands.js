@@ -433,17 +433,11 @@ Cypress.Commands.add('setupConfirmVariablesPage', (datasetFixture) => {
         dataset.depositorSetupInfo.updated = dataset.created
         cy.intercept('GET', '/api/dataset-info/' + dataset.objectId + '/', {body: dataset})
         cy.intercept('PATCH', '/api/depositor-setup-info/' + dataset.depositorSetupInfo.objectId + '/', {body: dataset})
+        const username = 'kermit'
+        const email = 'kermit@thefrog.com'
+        const password = 'kermit123!'
 
-        cy.intercept('GET', 'rest-auth/user/', {
-            body: {
-                "url": "http://localhost:8000/api/users/30/",
-                "username": "test",
-                "email": "oscar@sesame.com",
-                "groups": [],
-                "object_id": "test",
-                "handoff_id": null
-            }
-        })
+        cy.createAccount(username, email, password)
         cy.intercept('GET', '/api/dataset-info/', {
             body: {
                 "count": 1,
