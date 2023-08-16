@@ -38,6 +38,9 @@
       <template v-slot:[`item.num`]="{ index }">
         <span class="index-td hidden-xs-only grey--text">{{ index + 1 }}</span>
       </template>
+      <template v-slot:[`item.epsilon`]="{ item }">
+        {{item.epsilon}}&epsilon;
+      </template>
         <template v-slot:[`item.status`]="{ item }">
             <StatusTag data-test="table status tag" :status="getWorkflowStatus(item)"/>
         </template>
@@ -267,7 +270,7 @@ export default {
 
       ],
       selectedFilter: '', // Initialize selected filter
-      filterOptions: ['My Plans', 'Plans Created From My Datasets'], // Define filter options
+      filterOptions: ['My Plans', 'Plans Created From My Datasets', 'Released Plans'], // Define filter options
       statusInformation,
       actionsInformation,
       stepInformation,

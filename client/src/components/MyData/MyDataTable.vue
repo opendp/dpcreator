@@ -32,7 +32,7 @@
         <StatusTag data-test="table status tag" :status="getWorkflowStatus(item)"/>
       </template>
       <template v-slot:[`item.budget`]="{ item }">
-        {{epsilonBudget.getDatasetMaxBudget(item)}}
+        {{epsilonBudget.getDatasetMaxBudget(item)}}&epsilon;
       </template>
       <template v-slot:[`item.options`]="{ item }">
 
