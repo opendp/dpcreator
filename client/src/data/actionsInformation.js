@@ -2,7 +2,7 @@ export default {
     viewDetails: "View Details",
     continueWorkflow: "Continue",
     cancelExecution: "Cancel Execution",
-    viewPlans: "Add Analysis Plan",
+    addPlan: "Add Analysis Plan",
     delete: "Delete",
     actions: {
         VIEW_DETAILS: "viewDetails",
@@ -12,7 +12,7 @@ export default {
     },
     icons: {
         viewDetails: "mdi-eye",
-        viewPlans: "mdi-notebook-plus",
+        addPlan: "mdi-notebook-plus",
         continueWorkflow: "mdi-arrow-right",
         cancelExecution: "mdi-cancel",
         delete: "mdi-delete"
