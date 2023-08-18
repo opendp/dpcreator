@@ -5,6 +5,17 @@
         <v-container>
           <h1 class="title-size-2" style="line-height:150%">
             <br/><b>Dataset:</b> {{ datasetInfo.name }}</h1>
+          <v-container>
+            <v-row>
+              Created : {{ datasetInfo.created }}
+            </v-row>
+            <v-row>
+              Created By : {{ datasetInfo.creatorName }}
+            </v-row>
+            <v-row>
+              Epsilon Budget : {{ datasetInfo.epsilon }}
+            </v-row>
+          </v-container>
           Current Status:
           <StatusTag class="my-5" :status="status"/>
           <h1  v-if="datasetInfo.analysisPlans.length > 0" class="title-size-2" style="line-height:100%">
