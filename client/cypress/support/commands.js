@@ -36,7 +36,7 @@ Cypress.Commands.add('loadTeacherSurveyDemo', () => {
 
 Cypress.Commands.add('createPlan',(planEpsilon, testFile, username )=>{
     cy.url().should('contain','my-data')
-    cy.get('[data-test="My Analysis Plans"]').click({force: true})
+    cy.get('[data-test="Analysis Plans"]').click({force: true})
     cy.get('[data-test="createPlanButton"]').click({force: true})
     cy.get('[data-test="selectPlanDataset"]').click();
     cy.contains(testFile).click();

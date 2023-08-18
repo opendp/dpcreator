@@ -8,6 +8,7 @@ export default {
         VIEW_DETAILS: "viewDetails",
         CONTINUE_WORKFLOW: "continueWorkflow",
         CANCEL_EXECUTION: "cancelExecution",
+        ADD_PLAN: "addPlan",
         DELETE: "delete"
     },
     icons: {
