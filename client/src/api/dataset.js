@@ -8,6 +8,12 @@ function convertWizardStep(resp) {
         resp.data.depositor_setup_info.user_step = resp.data.depositor_setup_info.wizard_step;
         resp.data.status = resp.data.depositor_setup_info.wizard_step;
     }
+
+
+    resp.data.analysis_plans.forEach(plan => {
+        plan.user_step = plan.wizard_step
+    })
+
     // Return the modified resp object
     return resp;
 }

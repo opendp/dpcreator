@@ -196,10 +196,10 @@ export default {
     ...mapState('dataset', ['analysisPlan']),
     ...mapGetters('dataset', ['userStep']),
     status: function () {
-      return stepInformation[this.userStep].workflowStatus
+      return stepInformation[this.analysisPlan.userStep].workflowStatus
     },
     releaseLink: function () {
-      return `${NETWORK_CONSTANTS.MY_DATA_DETAILS.PATH}`
+      return `${NETWORK_CONSTANTS.MY_PLAN_DETAILS.PATH}`
 
     }
   }

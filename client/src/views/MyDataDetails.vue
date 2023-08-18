@@ -4,26 +4,22 @@
       <v-sheet rounded="lg">
         <v-container>
           <h1 class="title-size-2" style="line-height:150%">
-            <b v-if="status === COMPLETED">DP Release</b>
-            <b v-if="status !== COMPLETED">Data File</b>
-            <br/>{{ datasetInfo.name }}</h1>
+            <br/><b>Dataset:</b> {{ datasetInfo.name }}</h1>
           Current Status:
           <StatusTag class="my-5" :status="status"/>
-          <p></p>
+          <h1  v-if="datasetInfo.analysisPlans.length > 0" class="title-size-2" style="line-height:100%">
+            <br/>Analysis Plans:</h1>
           <v-row>
-            <template v-if="status === COMPLETED">
-              <v-col cols="6">
-                <p>
-                  Created: {{ analysisPlan.releaseInfo.dpRelease.created.humanReadable }}
-                </p>
-              </v-col>
-              <v-col cols="6">
-                <a v-if="analysisPlan.releaseInfo.dataverseDepositInfo && analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
-                   data-test="dataverseLink"
-                   class="text-decoration-none" :href="fileUrl"
-                >Check DP release in Dataverse
-                  <v-icon small color="primary">mdi-open-in-new</v-icon>
-                </a>
+
+            <template v-if="datasetInfo.analysisPlans.length > 0">
+
+              <v-col cols="12">
+                <MyPlansTable
+                    :class="{ 'my-5': $vuetify.breakpoint.smAndUp }"
+                    :plans="datasetInfo.analysisPlans"
+                    :searchTerm="search"
+                    :itemsPerPage="5"
+                />
               </v-col>
             </template>
           </v-row>
@@ -46,70 +42,7 @@
               {{ generalErrorSummary }}
             </template>
           </ColoredBorderAlert>
-          <div class="mb-5" v-if="status === COMPLETED">
-            <ReleasePDF></ReleasePDF>
-            <p></p>
-            <p> This information can also be downloaded in other formats:</p>
-            <Button v-if="hasPDF"
-                    data-test="pdfDownload"
-                    :click="handlePDFDownload"
-                    color="primary"
-                    classes="d-block mb-2"
-            >
-              <v-icon left>mdi-download</v-icon>
-              <span>DP Release PDF File</span>
-            </Button>
-            <Button v-if="hasJSON"
-                    data-test="jsonDownload"
-                    :click="handleJSONDownload"
-                    color="primary"
-                    classes="d-block mb-2"
-            >
-              <v-icon left>mdi-download</v-icon>
-              <span>DP Release JSON File</span>
-            </Button>
-            <div style="padding-top:20px;">
-              <hr/>
-              <br/>
-              <div v-if="analysisPlan.releaseInfo.dataverseDepositInfo">
-                <h3 class="title-size-3">Dataverse deposits</h3>
-                <p v-if="!analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
-                   style="padding-bottom:20px; padding-top: 10px;">
-                  <b>JSON file: </b><span
-                    v-html="'' + analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.dvErrMsg"></span>
-                </p>
-                <p v-if="analysisPlan.releaseInfo.dataverseDepositInfo.jsonDepositRecord.depositSuccess"
-                   style="padding-bottom:20px; padding-top: 10px;">
-                  <a
-                      data-test="dataverseLink"
-                      class="text-decoration-none" :href="fileUrl"
-                  >Check DP release in Dataverse
-                    <v-icon small color="primary">mdi-open-in-new</v-icon>
-                  </a>
-                </p>
-              </div>
-            </div>
 
-          </div>
-
-
-          <Button
-              v-for="(action, index) in statusInformation[
-              status
-            ].availableActions.filter(action => action !== VIEW_DETAILS)"
-              :key="action + '-' + index"
-              color="primary"
-              :data-test="action+'Button'"
-              :click="() => handleButtonClick(action, datasetTitle)"
-              :label="actionsInformation[action]"
-              :class="{
-              'width80 mx-auto d-block mb-2': $vuetify.breakpoint.xsOnly,
-              'mr-2': $vuetify.breakpoint.smAndUp
-            }"
-              :disabled="
-              action === CONTINUE_WORKFLOW && $vuetify.breakpoint.xsOnly
-            "
-          />
           <Button
               color="primary"
               outlined
@@ -147,6 +80,7 @@ import stepInformation from "@/data/stepInformation";
 import Chart from "../components/MyData/Chart.vue";
 import ReleasePDF from "@/components/MyData/ReleasePDF";
 import DeleteDatasetDialog from "@/components/MyData/DeleteDatasetDialog";
+import MyPlansTable from "@/components/MyAnalysisPlans/MyPlansTable.vue";
 
 const {
   IN_PROGRESS,
@@ -158,12 +92,14 @@ const {
 const {
   VIEW_DETAILS,
   CONTINUE_WORKFLOW,
-  CANCEL_EXECUTION
+  CANCEL_EXECUTION,
+  ADD_PLAN
 } = actionsInformation.actions;
 
 export default {
   name: "MyDataDetails",
   components: {
+    MyPlansTable,
     ReleasePDF,
     QuestionIconTooltip,
     ColoredBorderAlert,
@@ -310,7 +246,10 @@ export default {
     },
 
     status: function () {
-      return stepInformation[this.userStep].workflowStatus
+      console.log('this.userStep: '+ this.userStep)
+      console.log('this.datasetInfo.userStep: ' + this.datasetInfo.userStep)
+      console.log('this.datasetInfo.depositorSetupInfo.userStep: ' + this.datasetInfo.depositorSetupInfo.userStep)
+      return stepInformation[this.datasetInfo.depositorSetupInfo.userStep].workflowStatus
     },
     generalError: function () {
       return this.status === ERROR;
@@ -325,6 +264,7 @@ export default {
     IN_PROGRESS,
     IN_EXECUTION,
     ERROR,
+    ADD_PLAN,
     COMPLETED,
     VIEW_DETAILS,
     CONTINUE_WORKFLOW,
