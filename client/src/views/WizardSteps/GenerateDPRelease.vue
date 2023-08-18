@@ -113,7 +113,7 @@
               color="primary"
               classes="mr-2 px-5"
               :click="() => $router.push(releaseLink)"
-              label="View Data Details"
+              label="View Analysis Plan Details"
               data-test="View Data Details"
           />
           <Button
@@ -196,10 +196,10 @@ export default {
     ...mapState('dataset', ['analysisPlan']),
     ...mapGetters('dataset', ['userStep']),
     status: function () {
-      return stepInformation[this.userStep].workflowStatus
+      return stepInformation[this.analysisPlan.userStep].workflowStatus
     },
     releaseLink: function () {
-      return `${NETWORK_CONSTANTS.MY_DATA_DETAILS.PATH}`
+      return `${NETWORK_CONSTANTS.MY_PLAN_DETAILS.PATH}`
 
     }
   }
