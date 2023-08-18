@@ -11,6 +11,7 @@ const {
   MY_ANALYSIS_PLANS,
   DATASET_ANALYSIS_PLANS,
   MY_DATA_DETAILS,
+  MY_PLAN_DETAILS,
   ANALYST_WIZARD,
   DEPOSITOR_WIZARD,
   SIGN_UP,
@@ -81,6 +82,15 @@ const routes = [
     path: `${MY_DATA_DETAILS.PATH}`,
     name: "MyDataDetails",
     component: () => import("../views/MyDataDetails.vue"),
+    meta: {
+      requiresAuth: true,
+      requiresDataset: true
+    }
+  },
+  {
+    path: `${MY_PLAN_DETAILS.PATH}`,
+    name: "MyPlanDetails",
+    component: () => import("../views/MyPlanDetails.vue"),
     meta: {
       requiresAuth: true,
       requiresDataset: true

@@ -315,7 +315,7 @@ export default {
       return formattedDate
      },
     viewDetails(item) {
-      this.goToPage(item, `${NETWORK_CONSTANTS.MY_DATA_DETAILS.PATH}`)
+      this.goToPage(item, `${NETWORK_CONSTANTS.MY_PLAN_DETAILS.PATH}`)
     // TODO: create MY_PLAN_DETAILS
     },
     continueWorkflow(item) {
