@@ -1,10 +1,10 @@
 <template>
   <div>
 
-    <v-data-table v-if="plans"
+    <v-data-table v-if="tableItems"
         data-test="my-plans-table"
         :headers="headers"
-        :items="plans"
+        :items="tableItems"
          :custom-filter="filterOnlyCapsText"
         :items-per-page="computedItemsPerPage"
         :search="search"
@@ -220,12 +220,19 @@ import Button from "../DesignSystem/Button.vue";
 import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
 import DeleteDatasetDialog from "@/components/MyData/DeleteDatasetDialog";
 import DeleteAnalysisPlanDialog from "@/components/MyAnalysisPlans/DeleteAnalysisPlanDialog.vue";
+import {mapGetters, mapState} from "vuex";
 
 const {
   VIEW_DETAILS,
   CONTINUE_WORKFLOW,
   CANCEL_EXECUTION
 } = actionsInformation.actions;
+
+// plan filter options
+const MY_PLANS = 'My Plans';
+const CREATED_FROM_MY_DATASETS = 'Plans Created From My Datasets';
+const RELEASED_PLANS = 'Released Plans';
+
 
 export default {
   name: "MyPlansTable",
@@ -250,12 +257,31 @@ export default {
       default: true
     }
   },
-  data: function () {
+  computed: {
+    tableItems(){
+      let items = []
+      if (this.selectedFilter === RELEASED_PLANS) {
+        items = this.plans.filter(plan => plan.status === "step_1200")
+      }
+      else if (this.selectedFilter === MY_PLANS) {
+        items = this.plans.filter(plan =>   plan.analystName == this.user.username)
+      }
+      else if (this.selectedFilter === CREATED_FROM_MY_DATASETS) {
+        items = this.plans.filter(plan =>  plan.datasetOwnerId == this.user.objectId)
+      } else {
+        items = [...this.plans]; // Create a shallow copy of the plans array
+      }
+      return items
+    },
+    ...mapState('auth', ['user']),
+  },
+    data: function () {
     return {
       computedItemsPerPage: this.itemsPerPage,
       page: 1,
       pageCount: 0,
       search: "",
+
       dialogDelete: false,
       selectedItem: null,
       headers: [
@@ -270,7 +296,7 @@ export default {
 
       ],
       selectedFilter: '', // Initialize selected filter
-      filterOptions: ['My Plans', 'Plans Created From My Datasets', 'Released Plans'], // Define filter options
+      filterOptions: [MY_PLANS, CREATED_FROM_MY_DATASETS, RELEASED_PLANS],
       statusInformation,
       actionsInformation,
       stepInformation,
@@ -282,6 +308,10 @@ export default {
   methods: {
     handleButtonClick(action, item) {
       this[action](item)
+    },
+
+    clearFilter() {
+      this.selectedFilter = ''; // Clear the selected filter
     },
     filterOnlyCapsText (value, query, item) {
       return value != null && query != null && typeof value === 'string' && value.toString().toLocaleUpperCase().indexOf(query) !== -1
@@ -303,9 +333,7 @@ export default {
     delete(item) {
       this.deleteItem(item)
     },
-    clearFilter() {
-      this.selectedFilter = ''; // Clear the selected filter
-    },
+
     formatDate(dateString) {
       const dateObj = new Date(dateString);
       // The dateString returned from the v-date-picker is in UTC, so we have to display that
