@@ -47,7 +47,7 @@
   <v-card-actions v-if="isPlanCreated && selectedDataset !== null" class="success-message">
     Plan created successfully!
     <a  v-on:click="closeDialog" >Go to My Data</a>
-    <router-link to="/my-plans">Go to My Analysis Plans</router-link>
+    <router-link to="/my-plans">Go to Analysis Plans</router-link>
   </v-card-actions>
 </v-card>
 </v-dialog>
