@@ -403,7 +403,7 @@ Cypress.Commands.add('submitStatistics', (demoData) => {
     cy.get('[data-test="generate release status"]').should('contain', 'In Progress')
     // Go to Details page
     cy.get('[data-test="View Data Details"]').click({force: true});
-    cy.url().should('contain', 'my-data-details')
+    cy.url().should('contain', 'my-plan-details')
     // The Release Details should be visible
     cy.get('[data-test="status tag"]').should('contain', 'Release Completed')
         .then(() => {

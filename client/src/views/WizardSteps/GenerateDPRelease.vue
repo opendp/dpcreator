@@ -113,7 +113,7 @@
               color="primary"
               classes="mr-2 px-5"
               :click="() => $router.push(releaseLink)"
-              label="View Data Details"
+              label="View Analysis Plan Details"
               data-test="View Data Details"
           />
           <Button
