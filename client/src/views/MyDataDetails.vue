@@ -3,22 +3,23 @@
     <v-container>
       <v-sheet rounded="lg">
         <v-container>
-          <h1 class="title-size-2" style="line-height:150%">
-            <br/><b>Dataset:</b> {{ datasetInfo.name }}</h1>
+          <h1 class="title-size-2 mb-4" style="line-height:150%">
+            <br/><b>Dataset: </b> {{ datasetInfo.name }}</h1>
           <v-container>
-            <v-row>
-              Created : {{ datasetInfo.created }}
+            <v-row class="mb-4">
+             <strong  class="mr-2"> Created: </strong>{{ datasetInfo.created }}
             </v-row>
-            <v-row>
-              Created By : {{ datasetInfo.creatorName }}
+            <v-row class="mb-4">
+              <strong  class="mr-2">Created By: </strong>{{ datasetInfo.creatorName }}
             </v-row>
-            <v-row>
-              Epsilon Budget : {{ datasetInfo.epsilon }}
+            <v-row class="mb-4">
+             <strong  class="mr-2"> Epsilon Budget: </strong> {{ datasetInfo.depositorSetupInfo.epsilon }}
+            </v-row>
+            <v-row class="mb-4">
+              <StatusTag class="my-5" :status="status"/>
             </v-row>
           </v-container>
-          Current Status:
-          <StatusTag class="my-5" :status="status"/>
-          <h1  v-if="datasetInfo.analysisPlans.length > 0" class="title-size-2" style="line-height:100%">
+           <h1  v-if="datasetInfo.analysisPlans.length > 0" class="title-size-2" style="line-height:100%">
             <br/>Analysis Plans:</h1>
           <v-row>
 
@@ -76,6 +77,26 @@
     <SupportBanner/>
   </div>
 </template>
+<style lang="scss" scoped>
+.my-data-details {
+  padding: 20px;
+
+  .title-size-2 {
+    font-size: 1.5rem;
+  }
+  .mr-2 {
+    margin-right: 0.5rem;
+  }
+  .mb-4 {
+    margin-bottom: 20px;
+  }
+
+  .ml-2 {
+    margin-left: 0.5rem;
+  }
+}
+</style>
+
 
 <script>
 import statusInformation from "../data/statusInformation";
