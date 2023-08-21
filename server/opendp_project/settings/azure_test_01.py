@@ -7,9 +7,9 @@ from opendp_project.settings.base import *
 ASGI_APPLICATION = "opendp_project.asgi_azure.application"
 
 # to test...
-CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_ALL_ORIGINS = True
 
-CORS_ALLOWED_ORIGINS = os.getenv('TRUSTED_ORIGINS', "TRUSTED_ORIGINS_ENV_VAR_MISSING").split(',')
+#CORS_ALLOWED_ORIGINS = os.getenv('TRUSTED_ORIGINS', "TRUSTED_ORIGINS_ENV_VAR_MISSING").split(',')
 CSRF_TRUSTED_ORIGINS = os.getenv('TRUSTED_ORIGINS', "TRUSTED_ORIGINS_ENV_VAR_MISSING").split(',')
 
 # Let nginx serve static files

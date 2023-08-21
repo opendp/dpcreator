@@ -55,7 +55,7 @@ specs_demo_dpcreator_org = dict(base_specs, **dict(
                 # dpcreator_container_tag="dpcreator-demo",  # Tag for Images
                 #                #
                 ALLOWED_HOSTS="13.82.125.69,demo.dpcreator.org,127.0.0.1,0.0.0.0",  # Django setting
-                TRUSTED_ORIGINS="13.82.125.69,demo.dpcreator.org,127.0.0.1,0.0.0.0",  # Django setting
+                TRUSTED_ORIGINS="https://demo.dpcreator.org,http://demo.dpcreator.org,http://127.0.0.1",  # Django setting
                 #
                 loadBalancerIP="13.82.125.69",   # k8s LoadBalancer.
                 #
