@@ -35,8 +35,7 @@ specs_dev_dpcreator_org = dict(base_specs, **dict(
                 dpcreator_startup_script_filename="azure_dev.dpcreator.org.sh",
                 #
                 ALLOWED_HOSTS="40.85.170.176,dev.dpcreator.org,127.0.0.1,0.0.0.0",  # Django setting
-                TRUSTED_ORIGINS="40.85.170.176,dev.dpcreator.org,127.0.0.1,0.0.0.0",  # Django setting
-                DJANGO_SETTINGS_MODULE="opendp_project.settings.azure_dev_dpcreator_org",
+                TRUSTED_ORIGINS="https://dev.dpcreator.org",  # Django setting
                 # This loadBalancerIP should also appear in ALLOWED_HOSTS
                 loadBalancerIP="40.85.170.176",  # k8s LoadBalancer.
                 #
@@ -54,9 +53,9 @@ specs_demo_dpcreator_org = dict(base_specs, **dict(
                 #
                 # dpcreator_container_tag="dpcreator-demo",  # Tag for Images
                 #                #
-                ALLOWED_HOSTS="13.82.125.69,demo.dpcreator.org,127.0.0.1,0.0.0.0",  # Django setting
+                xALLOWED_HOSTS="13.82.125.69,demo.dpcreator.org,127.0.0.1,0.0.0.0",  # Django setting
+                ALLOWED_HOSTS="demo.dpcreator.org",  # Django setting
                 TRUSTED_ORIGINS="https://demo.dpcreator.org",  # Django setting
-                xTRUSTED_ORIGINS="https://demo.dpcreator.org,http://demo.dpcreator.org,http://127.0.0.1",  # Django setting
                 #
                 loadBalancerIP="13.82.125.69",   # k8s LoadBalancer.
                 #

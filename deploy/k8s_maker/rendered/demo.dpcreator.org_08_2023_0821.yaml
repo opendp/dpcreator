@@ -216,7 +216,7 @@ spec:
             - name: DJANGO_SETTINGS_MODULE
               value: opendp_project.settings.azure_test_01
             - name: ALLOWED_HOSTS
-              value: "13.82.125.69,demo.dpcreator.org,127.0.0.1,0.0.0.0"
+              value: "demo.dpcreator.org"
             - name: TRUSTED_ORIGINS
               value: "https://demo.dpcreator.org"
             - name: DB_USER
@@ -294,7 +294,7 @@ spec:
               value: opendp_project.settings.azure_test_01
             # ----------------------------------------------------
             - name: ALLOWED_HOSTS
-              value: "13.82.125.69,demo.dpcreator.org,127.0.0.1,0.0.0.0"
+              value: "demo.dpcreator.org"
             - name: TRUSTED_ORIGINS
               value: "https://demo.dpcreator.org"
             - name: DB_USER
