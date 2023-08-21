@@ -7,13 +7,10 @@ from opendp_project.settings.base import *
 ASGI_APPLICATION = "opendp_project.asgi_azure.application"
 
 # to test...
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
 
-xCORS_ALLOWED_ORIGINS = (
-    'http://dev.dpcreator.org',
-    'http://52.147.198.81',
-    'http://0.0.0.0:8000',
-)
+CORS_ALLOWED_ORIGINS = os.getenv('TRUSTED_ORIGINS', "TRUSTED_ORIGINS_ENV_VAR_MISSING").split(',')
+CSRF_TRUSTED_ORIGINS = os.getenv('TRUSTED_ORIGINS', "TRUSTED_ORIGINS_ENV_VAR_MISSING").split(',')
 
 # Let nginx serve static files
 USE_DEV_STATIC_SERVER = False

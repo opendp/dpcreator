@@ -35,6 +35,8 @@ specs_dev_dpcreator_org = dict(base_specs, **dict(
                 dpcreator_startup_script_filename="azure_dev.dpcreator.org.sh",
                 #
                 ALLOWED_HOSTS="40.85.170.176,dev.dpcreator.org,127.0.0.1,0.0.0.0",  # Django setting
+                TRUSTED_ORIGINS="40.85.170.176,dev.dpcreator.org,127.0.0.1,0.0.0.0",  # Django setting
+                DJANGO_SETTINGS_MODULE="opendp_project.settings.azure_dev_dpcreator_org",
                 # This loadBalancerIP should also appear in ALLOWED_HOSTS
                 loadBalancerIP="40.85.170.176",  # k8s LoadBalancer.
                 #
@@ -51,9 +53,10 @@ specs_demo_dpcreator_org = dict(base_specs, **dict(
                 dpcreator_startup_script_filename="azure_demo.dpcreator.org.sh",
                 #
                 # dpcreator_container_tag="dpcreator-demo",  # Tag for Images
-                #
+                #                #
                 ALLOWED_HOSTS="13.82.125.69,demo.dpcreator.org,127.0.0.1,0.0.0.0",  # Django setting
-                # This loadBalancerIP should also appear in ALLOWED_HOSTS
+                TRUSTED_ORIGINS="13.82.125.69,demo.dpcreator.org,127.0.0.1,0.0.0.0",  # Django setting
+                #
                 loadBalancerIP="13.82.125.69",   # k8s LoadBalancer.
                 #
                 VUE_APP_ADOBE_PDF_CLIENT_ID="44937032e26b4033a840626ed0cd8e79",

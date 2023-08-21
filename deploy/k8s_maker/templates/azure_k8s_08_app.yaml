@@ -126,6 +126,8 @@ spec:
               value: opendp_project.settings.azure_test_01
             - name: ALLOWED_HOSTS
               value: "{{ ALLOWED_HOSTS }}"
+            - name: TRUSTED_ORIGINS
+              value: "{{ TRUSTED_ORIGINS }}"
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
@@ -202,6 +204,8 @@ spec:
             # ----------------------------------------------------
             - name: ALLOWED_HOSTS
               value: "{{ ALLOWED_HOSTS }}"
+            - name: TRUSTED_ORIGINS
+              value: "{{ TRUSTED_ORIGINS }}"
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
