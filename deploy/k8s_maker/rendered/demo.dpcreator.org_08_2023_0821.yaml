@@ -218,7 +218,7 @@ spec:
             - name: ALLOWED_HOSTS
               value: "13.82.125.69,demo.dpcreator.org,127.0.0.1,0.0.0.0"
             - name: TRUSTED_ORIGINS
-              value: "https://demo.dpcreator.org,http://demo.dpcreator.org,http://127.0.0.1"
+              value: "https://demo.dpcreator.org"
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
@@ -296,7 +296,7 @@ spec:
             - name: ALLOWED_HOSTS
               value: "13.82.125.69,demo.dpcreator.org,127.0.0.1,0.0.0.0"
             - name: TRUSTED_ORIGINS
-              value: "https://demo.dpcreator.org,http://demo.dpcreator.org,http://127.0.0.1"
+              value: "https://demo.dpcreator.org"
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
