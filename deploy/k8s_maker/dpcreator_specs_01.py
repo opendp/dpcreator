@@ -34,7 +34,8 @@ specs_dev_dpcreator_org = dict(base_specs, **dict(
                 #
                 dpcreator_startup_script_filename="azure_dev.dpcreator.org.sh",
                 #
-                ALLOWED_HOSTS="40.85.170.176,dev.dpcreator.org,127.0.0.1,0.0.0.0",  # Django setting
+                xALLOWED_HOSTS="40.85.170.176,dev.dpcreator.org,127.0.0.1,0.0.0.0",  # Django setting
+                ALLOWED_HOSTS="dev.dpcreator.org",  # Django setting
                 TRUSTED_ORIGINS="https://dev.dpcreator.org",  # Django setting
                 # This loadBalancerIP should also appear in ALLOWED_HOSTS
                 loadBalancerIP="40.85.170.176",  # k8s LoadBalancer.
