@@ -88,7 +88,7 @@ export default {
     initStepperPosition: function () {
       console.log('INIT stepper position')
       if (this.datasetInfo && this.getDepositorSetupInfo) {
-        this.stepperPosition = stepInformation[this.userStep].wizardStepper
+        this.stepperPosition = stepInformation[this.getDepositorSetupInfo.userStep].wizardStepper
         for (let index = 0; index < this.stepperPosition; index++) {
           this.steps[index].completed = true
         }

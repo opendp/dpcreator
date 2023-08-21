@@ -13,7 +13,7 @@
               'px-5': $vuetify.breakpoint.xsOnly
             }"
                     >
-                        My Analysis Plans
+                        Analysis Plans
                     </h1>
                     <v-row
                             :class="{

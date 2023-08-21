@@ -31,7 +31,9 @@
       <template v-slot:[`item.status`]="{ item }">
         <StatusTag data-test="table status tag" :status="getWorkflowStatus(item)"/>
       </template>
-
+      <template v-slot:[`item.budget`]="{ item }">
+        {{epsilonBudget.getDatasetMaxBudget(item)}}&epsilon;
+      </template>
       <template v-slot:[`item.options`]="{ item }">
 
       </template>
@@ -70,8 +72,7 @@
 
           <v-tooltip
 
-              v-for="(action, index) in statusInformation[stepInformation[item.status].workflowStatus]
-            .availableActions"
+              v-for="(action, index) in getAvailableActions(item)"
               bottom max-width="220px">
             <template v-slot:activator="{ on, attrs }">
               <v-icon
@@ -201,6 +202,7 @@ import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
 import DeleteDatasetDialog from "@/components/MyData/DeleteDatasetDialog";
 import CreateAnalysisPlanDialog from "@/components/MyAnalysisPlans/CreateAnalysisPlanDialog.vue";
 import UsersAPI from "@/api/users";
+import epsilonBudget from "../../shared/epsilonBudget";
 
 const {
   VIEW_DETAILS,
@@ -210,6 +212,11 @@ const {
 
 export default {
   name: "MyDataTable",
+  computed: {
+    epsilonBudget() {
+      return epsilonBudget
+    }
+  },
   components: {CreateAnalysisPlanDialog, StatusTag, Button, DeleteDatasetDialog},
   props: {
     datasets: {
@@ -244,6 +251,7 @@ export default {
       headers: [
         {value: "num"},
         {text: "Data File", value: "name"},
+        {text: "Remaining Budget", value: "budget"},
         {text: "Status", value: "status"},
         {text: "Options", value: "actions", align: "end"}
       ],
@@ -261,10 +269,18 @@ export default {
       } )
   },
   methods: {
+    getAvailableActions(item) {
+      let actions = statusInformation[stepInformation[item.status].workflowStatus].availableActions
+      // Don't show Add Plan option if there is no more remaining budget
+      if (epsilonBudget.getDatasetMaxBudget(item) == 0) {
+       actions=  actions.filter(item => item !== "addPlan");
+      }
+      return actions
+    },
     handleButtonClick(action, item) {
       this[action](item)
     },
-    viewPlans(item) {
+    addPlan(item) {
          this.selectedItem = Object.assign({}, item);
          this.dialogCreateAnalysis = true
     },

@@ -39,7 +39,7 @@ export default {
         label: "Setup Complete",
         color: "light-green lighten-3",
         icon: "",
-        availableActions: ["viewDetails", "viewPlans", "delete"]
+        availableActions: ["viewDetails", "addPlan", "delete"]
     },
     completed: {
         label: "Release Completed",

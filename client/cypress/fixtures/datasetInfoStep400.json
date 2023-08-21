@@ -150,6 +150,6 @@
     "confidenceLevel": 0.95
   },
   "status": "step_400",
-  "analysisPlans": [],
+  "analysis_plans": [],
   "resourcetype": "UploadFileInfo"
 }
