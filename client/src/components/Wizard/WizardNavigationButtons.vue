@@ -16,7 +16,7 @@
 
         <Button
                 data-test="wizardCompleteButton"
-                v-if="stepperPosition === 1 && workflow==='depositor'"
+                v-if="stepperPosition === 2 && workflow==='depositor'"
                 classes="d-block"
                 :class="{
           'mx-auto': $vuetify.breakpoint.mdAndUp
@@ -138,7 +138,9 @@ export default {
     updateUserStep() {
       let nextStep = null;
       if (this.workflow === 'depositor') {
+         console.log('stepperPosition: ' + this.stepperPosition)
          nextStep = wizardNextSteps[this.stepperPosition]
+        console.log('nextStep: ' +nextStep)
       } else {
         nextStep = analystWizardNextSteps[this.stepperPosition]
       }

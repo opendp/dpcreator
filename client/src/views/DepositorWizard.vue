@@ -26,6 +26,13 @@
                     v-on:updateAllVariables="updateAllVariables"
                 />
               </v-stepper-content>
+              <v-stepper-content :complete="stepperPosition > 2" step="2">
+                <ConfirmEpsilonDelta
+                    :default-delta="getDepositorSetupInfo.delta"
+                    :default-epsilon="getDepositorSetupInfo.epsilon"
+                    v-on:stepCompleted="updateStepStatus"
+                ></ConfirmEpsilonDelta>
+              </v-stepper-content>
             </v-stepper-items>
           </v-stepper>
           <WizardNavigationButtons
@@ -66,10 +73,13 @@ import stepInformation from "@/data/stepInformation";
 import {mapGetters, mapState} from "vuex";
 import NETWORK_CONSTANTS from "@/router/NETWORK_CONSTANTS";
 import dataset from "@/api/dataset";
+import SetEpsilonValue from "@/views/WizardSteps/SetEpsilonValue.vue";
+import ConfirmEpsilonDelta from "@/views/WizardSteps/ConfirmEpsilonDelta.vue";
 
 export default {
   name: "DepositorWizard",
   components: {
+    ConfirmEpsilonDelta,
     ConfirmVariables,
     StepperHeader,
     WizardNavigationButtons,
@@ -151,6 +161,10 @@ export default {
         title: "Confirm Variables",
         completed: false
       },
+      {
+        title: "Confirm Epsilon",
+        completed: false
+      }
       ]
   })
 };
