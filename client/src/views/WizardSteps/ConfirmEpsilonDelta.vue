@@ -6,68 +6,68 @@
         $t('set epsilon.epsilon intro')
       }}
     </p>
-    <v-text-field
-        v-model="editEpsilon"
-        background-color="soft_primary"
-        class="top-borders-radius width50"
-        data-test="editEpsilon"
-        :rules="[validateEpsilon]"
-        v-on:keyup="saveUserInput"
-    ></v-text-field>
-    <v-text-field
-        v-model="editDelta"
-        background-color="soft_primary"
-        class="top-borders-radius width50"
-        data-test="Fixed value"
-        :rules="[validateDelta]"
-        v-on:keyup="saveUserInput"
-    ></v-text-field>
+    <template>
+      <v-container class="form-container">
+        <v-row class="form-row">
+          <v-col cols="12" sm="6">
+            <label class="form-label">Epsilon:</label>
+            <v-text-field
+                v-model="editEpsilon"
+                data-test="confirmEpsilon"
+                outlined
+                :rules="[validateEpsilon]"
+                v-on:keyup="saveUserInput"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <label class="form-label">Delta:</label>
+            <v-text-field
+                v-model="editDelta"
+                data-test="confirmDelta"
+                outlined
+                :rules="[validateDelta]"
+                v-on:keyup="saveUserInput"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+      </v-container>
+    </template>
 
   </div>
 </template>
 
-<style lang="scss">
-// Remove up an down error from text field when type == number
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+
+<style scoped>
+ .form-container {
+   max-width: 600px;
+   margin: 0 auto;
+ }
+
+.form-row {
+  margin-bottom: 20px;
 }
 
-.info-banner {
-  .v-banner__content {
-    align-items: unset;
-  }
+.form-label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
 }
 
-#populationSize {
-  text-align: center;
-}
-
-.set-epsilon-page {
-  .population-size-container {
-    margin-left: 30px;
-  }
-
-  .v-input__control {
-    padding: 0 10px;
-    border-top-left-radius: 5px !important;
-    border-top-right-radius: 5px !important;
-
-    input {
-      padding-left: 15px;
-      padding-right: 15px;
-    }
-  }
+.v-text-field {
+  width: 100%;
 }
 </style>
-
 <script>
 import RadioItem from "../../components/DesignSystem/RadioItem.vue";
 import AdditionalInformationAlert from "../../components/DynamicHelpResources/AdditionalInformationAlert.vue";
 import BorderTopAlertDismissible from "../../components/DynamicHelpResources/BorderTopAlertDismissible.vue";
 import {mapGetters, mapState} from "vuex";
 import {MAX_TOTAL_EPSILON} from "@/shared/createStatsUtils";
+
+const MAX_EPSILON = MAX_TOTAL_EPSILON
+const MIN_EPSILON = 0
+const MAX_DELTA = 1
+const MIN_DELTA = 0
 
 export default {
   name: "ConfirmEpsilonDelta",
@@ -97,38 +97,47 @@ export default {
   },
   methods: {
     inputIsValid(inputEpsilon, inputDelta) {
-      return inputEpsilon !== null && inputDelta !== null
+      return inputEpsilon !== null && inputDelta !== null && this.epsilonIsValid(inputEpsilon) && this.deltaIsValid(inputDelta)
+    },
+    epsilonIsValid(v) {
+
+      let valid = false
+      if (v) {
+        const val = Number(v)
+        if (val >= MIN_EPSILON &&
+            val <= MAX_EPSILON) {
+          valid = true
+        }
+      }
+      return valid
     },
     validateEpsilon(v) {
-      const minEpsilon = 0
-      const maxEpsilon = MAX_TOTAL_EPSILON
-      let valid = true
-      if (this.editEpsilon) {
-        const val = Number(v)
-        if (val < minEpsilon ||
-            val > maxEpsilon)
-          valid = false
-      }
+     let valid = this.epsilonIsValid(v)
       return valid || "Value must be between " +
-          minEpsilon +
-          " and " + maxEpsilon
+          MIN_EPSILON +
+          " and " + MAX_EPSILON
     },
-    validateDelta(v) {
+    deltaIsValid(v) {
       const minDelta = 0
       const maxDelta = 1
-      let valid = true
-      if (this.editDelta) {
+      let valid = false
+      if (v) {
         const val = Number(v)
-        if (val < minDelta ||
-            val > maxDelta)
-          valid = false
+        if (val >= MIN_DELTA &&
+            val <= MAX_DELTA) {
+          valid = true
+        }
       }
+      return valid
+    },
+    validateDelta(v) {
+      let valid = this.deltaIsValid(v)
       return valid || "Value must be between " +
-          minDelta +
-          " and " + maxDeltaç
+          MIN_DELTA +
+          " and " + MAX_DELTA
     },
     saveUserInput() {
-      if (this.inputIsValid(this.editEpsilon, this.editDelta)) {
+      if (this.editEpsilon && this.editDelta && this.inputIsValid(this.editEpsilon, this.editDelta)) {
         const userInput = {
           epsilon: this.editEpsilon,
           delta: this.editDelta
