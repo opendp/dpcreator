@@ -10,8 +10,7 @@
           <span>Epsilon (&epsilon;)</span>
           <span>
             {{ epsilon }}
-            <v-icon data-test="editEpsilonIcon" right @click="emitEditEvent">mdi-pencil</v-icon>
-          </span>
+            </span>
         </div>
         <router-link to="/more-information" class="primary--text caption">More information about Epsilon</router-link>
       </v-col>
