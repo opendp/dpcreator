@@ -16,18 +16,19 @@
                 data-test="confirmEpsilon"
                 outlined
                 :rules="[validateEpsilon]"
-                v-on:keyup="handleKeyUp"
+                v-on:keyup="handleChange"
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6">
             <label class="form-label">Delta:</label>
-            <v-text-field
+            <v-select
                 v-model="editDelta"
-                data-test="confirmDelta"
+                :items="deltaOptions"
+                label="Select Delta"
                 outlined
+                v-on:change="handleChange"
                 :rules="[validateDelta]"
-                v-on:keyup="handleKeyUp"
-            ></v-text-field>
+            ></v-select>
           </v-col>
         </v-row>
       </v-container>
@@ -66,8 +67,7 @@ import {MAX_TOTAL_EPSILON} from "@/shared/createStatsUtils";
 
 const MAX_EPSILON = MAX_TOTAL_EPSILON
 const MIN_EPSILON = 0
-const MAX_DELTA = 1
-const MIN_DELTA = 0
+
 
 export default {
   name: "ConfirmEpsilonDelta",
@@ -80,7 +80,13 @@ export default {
   data() {
     return {
       editEpsilon: 0,
-      editDelta: 0
+      editDelta: null,
+      deltaOptions: [
+        { value: 0.0, text: '0.0' },
+        { value: 0.00001, text: '0.00001 (10^-5)' },
+        { value: 0.000001, text: '0.00001 (10^-6)' },
+        { value: 0.0000001, text: '0.00001 (10^-7)' },
+      ]
     };
   },
 
@@ -98,7 +104,10 @@ export default {
   },
   methods: {
     inputIsValid(inputEpsilon, inputDelta) {
-      return inputEpsilon !== null && inputDelta !== null && this.epsilonIsValid(inputEpsilon) && this.deltaIsValid(inputDelta)
+      console.log('inputDelta ' + inputDelta)
+      const inputValid = inputEpsilon !== null && inputDelta !== null && this.epsilonIsValid(inputEpsilon) && this.deltaIsValid(inputDelta)
+      console.log('inputValid ' + inputValid)
+      return inputValid
     },
     epsilonIsValid(v) {
 
@@ -119,27 +128,24 @@ export default {
           " and " + MAX_EPSILON
     },
     deltaIsValid(v) {
-      const minDelta = 0
-      const maxDelta = 1
-      let valid = false
-      if (v) {
-        const val = Number(v)
-        if (val >= MIN_DELTA &&
-            val <= MAX_DELTA) {
-          valid = true
-        }
-      }
+      const valid= this.editDelta !== null
+      console.log('delta valid =' + valid )
       return valid
     },
     validateDelta(v) {
       let valid = this.deltaIsValid(v)
-      return valid || "Value must be between " +
-          MIN_DELTA +
-          " and " + MAX_DELTA
+      return valid || "Delta must not be null"
     },
 
-    handleKeyUp() {
-      if (this.editEpsilon && this.editDelta && this.inputIsValid(this.editEpsilon, this.editDelta)) {
+
+    handleChange() {
+      console.log('handleChange, this.editDelta = ' + this.editDelta)
+      if (this.editDelta) {
+        console.log('delta true')
+      } else {
+        console.log('delta false')
+      }
+      if (this.editEpsilon !== null && this.editDelta !==null  && this.inputIsValid(this.editEpsilon, this.editDelta)) {
         const userInput = {
           epsilon: this.editEpsilon,
           delta: this.editDelta

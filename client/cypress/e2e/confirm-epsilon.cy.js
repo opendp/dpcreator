@@ -23,7 +23,6 @@
 
                 // select the variables we will use
                 cy.selectVariable(demoData)
-                cy.pause()
                 cy.get('[data-test="wizardContinueButton"]').click()
                 cy.get('h1').should('contain', 'Confirm Epsilon')
                 cy.get('[data-test="confirmEpsilon"]').should('be.visible')
