@@ -85,7 +85,8 @@ export default {
   },
 
   created() {
-
+    this.editEpsilon = this.defaultEpsilon
+    this.editDelta = this.defaultDelta
 
   },
   computed: {
@@ -136,6 +137,7 @@ export default {
           MIN_DELTA +
           " and " + MAX_DELTA
     },
+
     handleKeyUp() {
       if (this.editEpsilon && this.editDelta && this.inputIsValid(this.editEpsilon, this.editDelta)) {
         const userInput = {

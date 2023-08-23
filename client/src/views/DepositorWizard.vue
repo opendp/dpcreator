@@ -75,7 +75,6 @@ import stepInformation from "@/data/stepInformation";
 import {mapGetters, mapState} from "vuex";
 import NETWORK_CONSTANTS from "@/router/NETWORK_CONSTANTS";
 import dataset from "@/api/dataset";
-import SetEpsilonValue from "@/views/WizardSteps/SetEpsilonValue.vue";
 import ConfirmEpsilonDelta from "@/views/WizardSteps/ConfirmEpsilonDelta.vue";
 
 export default {

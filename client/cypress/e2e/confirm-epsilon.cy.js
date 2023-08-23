@@ -26,6 +26,8 @@
                 cy.pause()
                 cy.get('[data-test="wizardContinueButton"]').click()
                 cy.get('h1').should('contain', 'Confirm Epsilon')
+                cy.get('[data-test="confirmEpsilon"]').should('be.visible')
+                cy.get('[data-test="confirmEpsilon"]').should('have.value',1)
                 cy.get('[data-test="wizardCompleteButton"]').should('be.enabled')
                 cy.get('[data-test="confirmEpsilon"]').clear().type('5')
                 cy.get('[data-test="wizardCompleteButton"]').should('be.disabled')
