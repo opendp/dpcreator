@@ -16,7 +16,7 @@
                 data-test="confirmEpsilon"
                 outlined
                 :rules="[validateEpsilon]"
-                v-on:keyup="saveUserInput"
+                v-on:keyup="handleKeyUp"
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6">
@@ -26,7 +26,7 @@
                 data-test="confirmDelta"
                 outlined
                 :rules="[validateDelta]"
-                v-on:keyup="saveUserInput"
+                v-on:keyup="handleKeyUp"
             ></v-text-field>
           </v-col>
         </v-row>
@@ -112,7 +112,7 @@ export default {
       return valid
     },
     validateEpsilon(v) {
-     let valid = this.epsilonIsValid(v)
+      let valid = this.epsilonIsValid(v)
       return valid || "Value must be between " +
           MIN_EPSILON +
           " and " + MAX_EPSILON
@@ -136,16 +136,20 @@ export default {
           MIN_DELTA +
           " and " + MAX_DELTA
     },
-    saveUserInput() {
+    handleKeyUp() {
       if (this.editEpsilon && this.editDelta && this.inputIsValid(this.editEpsilon, this.editDelta)) {
         const userInput = {
           epsilon: this.editEpsilon,
           delta: this.editDelta
         }
-      const payload = {objectId: this.getDepositorSetupInfo.objectId, props: userInput}
-      this.$store.dispatch('dataset/updateDepositorSetupInfo',
-          payload)
-    }}
+        const payload = {objectId: this.getDepositorSetupInfo.objectId, props: userInput}
+        this.$store.dispatch('dataset/updateDepositorSetupInfo',
+            payload)
+        this.$emit("completeDisabled",  false);
+      } else {
+        this.$emit("completeDisabled",  true);
+      }
+    }
   },
   watch: {
     defaultEpsilon:function(newValue,oldValue){
@@ -153,20 +157,6 @@ export default {
     },
     defaultDelta:function(newValue,oldValue){
       this.editDelta = newValue
-    },
-    editEpsilon: function (newValue, oldValue) {
-      if (this.inputIsValid(newValue, this.editDelta)) {
-        this.$emit("stepCompleted", 2, true);
-      } else {
-        this.$emit("stepCompleted", 2, false);
-      }
-    },
-    editDelta: function (newValue, oldValue) {
-      if (this.inputIsValid(this.editEpsilon, newValue)) {
-        this.$emit("stepCompleted", 2, true);
-      } else {
-        this.$emit("stepCompleted", 2, false);
-      }
     },
   }
 };

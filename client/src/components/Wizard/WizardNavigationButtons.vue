@@ -23,7 +23,7 @@
         }"
                 color="primary"
                 :click="handleComplete"
-                :disabled="isContinueDisabled"
+                :disabled="completeDisabled"
                 label="Complete"
 
         />
@@ -104,7 +104,7 @@ import {analystWizardNextSteps, wizardNextSteps} from "@/data/stepInformation";
 export default {
   components: {Button, GoBackDialog},
   name: "WizardNavigationButtons",
-  props: ["steps", "stepperPosition", "workflow"],
+  props: ["steps", "stepperPosition", "completeDisabled", "workflow"],
 
   methods: {
     handleContinue: function () {
@@ -113,7 +113,7 @@ export default {
     },
       handleComplete: function () {
           const props = {
-              wizardStep: 'step_500',
+              wizardStep: 'step_600',
               isComplete: true
           }
           console.log('handle complete, props:' + JSON.stringify(props))

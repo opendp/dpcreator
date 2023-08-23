@@ -30,6 +30,7 @@
                 <ConfirmEpsilonDelta
                     :default-delta="getDepositorSetupInfo.delta"
                     :default-epsilon="getDepositorSetupInfo.epsilon"
+                     v-on:completeDisabled="handleCompleteDisabled"
                     v-on:stepCompleted="updateStepStatus"
                 ></ConfirmEpsilonDelta>
               </v-stepper-content>
@@ -38,6 +39,7 @@
           <WizardNavigationButtons
               :steps="steps"
               :workflow="workflow"
+              :complete-disabled="completeDisabled"
               :stepperPosition.sync="stepperPosition"
           />
         </v-col>
@@ -97,6 +99,9 @@ export default {
       this.steps[stepNumber].completed = completedStatus;
 
     },
+    handleCompleteDisabled: function( isDisabled ) {
+      this.completeDisabled = isDisabled
+    },
     // Set the current Wizard stepper position based on the
     // depositorSetup userStep
     initStepperPosition: function () {
@@ -152,6 +157,7 @@ export default {
     stepperPosition: 0,
     variableList: null,
     variableItems: [],
+    completeDisabled: false,
     steps: [
       {
         title: "Validate Dataset",

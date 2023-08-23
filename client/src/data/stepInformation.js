@@ -95,9 +95,14 @@ export default {
         label: 'Profiling Complete',
     },
     [STEP_0500_VARIABLE_DEFAULTS_CONFIRMED]: {
-        workflowStatus: statusInformation.statuses.SETUP_COMPLETE,
+        workflowStatus: statusInformation.statuses.IN_PROGRESS,
         wizardStepper: 2,
         label: 'Variable Defaults Confirmed',
+    },
+    [STEP_0600_EPSILON_SET]: {
+        workflowStatus: statusInformation.statuses.SETUP_COMPLETE,
+        wizardStepper: 3,
+        label: 'Epsilon Confirmed',
     },
     [STEP_1400_PLAN_CREATED]: {
         workflowStatus: statusInformation.statuses.PLAN_CREATED,
