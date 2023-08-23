@@ -167,7 +167,7 @@ export default {
         completed: false
       },
       {
-        title: "Confirm Epsilon",
+        title: "Confirm Epsilon & Delta",
         completed: false
       }
       ]
