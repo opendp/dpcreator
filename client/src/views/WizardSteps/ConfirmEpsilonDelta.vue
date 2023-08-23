@@ -104,9 +104,7 @@ export default {
   },
   methods: {
     inputIsValid(inputEpsilon, inputDelta) {
-      console.log('inputDelta ' + inputDelta)
       const inputValid = inputEpsilon !== null && inputDelta !== null && this.epsilonIsValid(inputEpsilon) && this.deltaIsValid(inputDelta)
-      console.log('inputValid ' + inputValid)
       return inputValid
     },
     epsilonIsValid(v) {
@@ -129,7 +127,6 @@ export default {
     },
     deltaIsValid(v) {
       const valid= this.editDelta !== null
-      console.log('delta valid =' + valid )
       return valid
     },
     validateDelta(v) {
@@ -139,12 +136,6 @@ export default {
 
 
     handleChange() {
-      console.log('handleChange, this.editDelta = ' + this.editDelta)
-      if (this.editDelta) {
-        console.log('delta true')
-      } else {
-        console.log('delta false')
-      }
       if (this.editEpsilon !== null && this.editDelta !==null  && this.inputIsValid(this.editEpsilon, this.editDelta)) {
         const userInput = {
           epsilon: this.editEpsilon,
