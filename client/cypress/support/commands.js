@@ -19,6 +19,8 @@ Cypress.Commands.add('loadTeacherSurveyDemo', () => {
 
         // select the variables we will use
         cy.selectVariable(demoData)
+        cy.get('[data-test="wizardContinueButton"]').click()
+        cy.get('h1').should('contain', 'Confirm Epsilon')
         cy.get('[data-test="wizardCompleteButton"]').click({force: true})
         const planEpsilon = 1
         cy.createPlan(planEpsilon, testFile, username)
@@ -188,6 +190,9 @@ Cypress.Commands.add('runDemo', (testFile, demoDatafile) => {
 
         // select the variables we will use
         cy.selectVariable(demoData.variables)
+        cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
+        cy.get('h1').should('contain', 'Confirm Epsilon')
+        cy.get('[data-test="wizardCompleteButton"]').click({force: true})
 
         cy.createStatistics(demoData, testFile,username )
 
@@ -309,7 +314,6 @@ Cypress.Commands.add('selectVariable',(demoVariables)=> {
 
 Cypress.Commands.add('createStatistics', (demoData, testFile,username) => {
     // Create Analysis plan
-    cy.get('[data-test="wizardCompleteButton"]').click({force: true})
     cy.url().should('contain','my-data')
     cy.createPlan(demoData.planEpsilon,testFile,username)
     cy.url().should('contain','my-plans')

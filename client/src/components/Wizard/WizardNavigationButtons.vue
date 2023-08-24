@@ -16,14 +16,14 @@
 
         <Button
                 data-test="wizardCompleteButton"
-                v-if="stepperPosition === 1 && workflow==='depositor'"
+                v-if="stepperPosition === 2 && workflow==='depositor'"
                 classes="d-block"
                 :class="{
           'mx-auto': $vuetify.breakpoint.mdAndUp
         }"
                 color="primary"
                 :click="handleComplete"
-                :disabled="isContinueDisabled"
+                :disabled="completeDisabled"
                 label="Complete"
 
         />
@@ -104,7 +104,7 @@ import {analystWizardNextSteps, wizardNextSteps} from "@/data/stepInformation";
 export default {
   components: {Button, GoBackDialog},
   name: "WizardNavigationButtons",
-  props: ["steps", "stepperPosition", "workflow"],
+  props: ["steps", "stepperPosition", "completeDisabled", "workflow"],
 
   methods: {
     handleContinue: function () {
@@ -113,7 +113,7 @@ export default {
     },
       handleComplete: function () {
           const props = {
-              wizardStep: 'step_500',
+              wizardStep: 'step_600',
               isComplete: true
           }
           console.log('handle complete, props:' + JSON.stringify(props))
@@ -138,7 +138,9 @@ export default {
     updateUserStep() {
       let nextStep = null;
       if (this.workflow === 'depositor') {
+         console.log('stepperPosition: ' + this.stepperPosition)
          nextStep = wizardNextSteps[this.stepperPosition]
+        console.log('nextStep: ' +nextStep)
       } else {
         nextStep = analystWizardNextSteps[this.stepperPosition]
       }
