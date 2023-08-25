@@ -39,9 +39,15 @@ class AnalysisPlanViewSet(BaseModelViewSet):
         AnalysisPlans for the currently authenticated user.
         """
         logger.info(f"Getting AnalysisPlans for user {self.request.user.object_id}")
+        #return AnalysisPlan.objects.select_related('dataset'
+        #                                           ).filter(Q(analyst=self.request.user) |
+        #                                                    Q(dataset__creator=self.request.user))
+
         return AnalysisPlan.objects.select_related('dataset'
-                                                   ).filter(Q(analyst=self.request.user) |
-                                                            Q(dataset__creator=self.request.user))
+                    ).filter(Q(analyst__username=self.request.user) | \
+                             Q(dataset__creator__username=self.request.user) | \
+                             Q(release_info__isnull=False, release_info__dp_release__isnull=False))
+
 
     @csrf_exempt
     def create(self, request, *args, **kwargs):
@@ -179,3 +185,17 @@ class AnalysisPlanViewSet(BaseModelViewSet):
                                 status=status.HTTP_400_BAD_REQUEST)
 
         return super().destroy(request, *args, **kwargs)
+
+"""
+from django.db.models import Q
+username = 'dp_analyst'
+username = 'dev_admin'
+
+def get_plans(username):
+    return AnalysisPlan.objects.select_related('dataset').filter(\
+Q(analyst__username=username) | \
+Q(dataset__creator__username=username)| \
+Q(release_info__isnull=False, 
+release_info__dp_release__isnull=False))
+
+"""

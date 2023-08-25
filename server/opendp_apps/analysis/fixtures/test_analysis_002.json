@@ -1,260 +1,320 @@
 [
-{
+  {
     "model": "user.opendpuser",
     "pk": 1,
     "fields": {
-        "password": "pbkdf2_sha256$320000$YRom5cF80OGhOsMVP6TD5b$Bap5EcfUUJKREkN/+hhE1h3WBch8bMUHPT/+TzZyFNs=",
-        "last_login": "2023-07-17T15:14:08.694Z",
-        "is_superuser": true,
-        "username": "dp_depositor",
-        "first_name": "Jameela",
-        "last_name": "Baker",
-        "email": "dp_analyst@some.edu",
-        "is_staff": true,
-        "is_active": true,
-        "date_joined": "2023-07-17T15:11:53.767Z",
-        "object_id": "549a4c94-2f85-4687-8205-94d7947f17e4",
-        "handoff_id": null,
-        "groups": [],
-        "user_permissions": []
+      "password": "pbkdf2_sha256$320000$YRom5cF80OGhOsMVP6TD5b$Bap5EcfUUJKREkN/+hhE1h3WBch8bMUHPT/+TzZyFNs=",
+      "last_login": "2023-07-17T15:14:08.694Z",
+      "is_superuser": true,
+      "username": "dp_depositor",
+      "first_name": "Jameela",
+      "last_name": "Baker",
+      "email": "dp_analyst@some.edu",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2023-07-17T15:11:53.767Z",
+      "object_id": "549a4c94-2f85-4687-8205-94d7947f17e4",
+      "handoff_id": null,
+      "groups": [],
+      "user_permissions": []
     }
-},
-{
+  },
+  {
     "model": "dataset.depositorsetupinfo",
     "pk": 3,
     "fields": {
-        "created": "2023-07-17T15:45:21.108Z",
-        "updated": "2023-07-17T15:45:36.469Z",
-        "object_id": "6cb974f3-58de-4203-af23-9810fedde0c0",
-        "creator": 1,
-        "is_complete": true,
-        "user_step": "step_600",
-        "dataset_questions": {
-            "radio_best_describes": "notHarmButConfidential",
-            "radio_only_one_individual_per_row": "yes",
-            "radio_depend_on_private_information": "yes"
+      "created": "2023-07-17T15:45:21.108Z",
+      "updated": "2023-07-17T15:45:36.469Z",
+      "object_id": "6cb974f3-58de-4203-af23-9810fedde0c0",
+      "creator": 1,
+      "is_complete": true,
+      "user_step": "step_600",
+      "dataset_questions": {
+        "radio_best_describes": "notHarmButConfidential",
+        "radio_only_one_individual_per_row": "yes",
+        "radio_depend_on_private_information": "yes"
+      },
+      "epsilon_questions": {
+        "secret_sample": "no",
+        "population_size": 0,
+        "observations_number_can_be_public": "yes"
+      },
+      "data_profile": {
+        "dataset": {
+          "rowCount": 7000,
+          "variableCount": 10,
+          "variableOrder": [
+            [
+              0,
+              "sex"
+            ],
+            [
+              1,
+              "age"
+            ],
+            [
+              2,
+              "maritalstatus"
+            ],
+            [
+              3,
+              "Havingchild"
+            ],
+            [
+              4,
+              "highesteducationlevel"
+            ],
+            [
+              5,
+              "sourceofstress"
+            ],
+            [
+              6,
+              "smoking"
+            ],
+            [
+              7,
+              "optimism"
+            ],
+            [
+              8,
+              "lifesattisfaction"
+            ],
+            [
+              9,
+              "selfesteem"
+            ]
+          ]
         },
-        "epsilon_questions": {
-            "secret_sample": "no",
-            "population_size": 0,
-            "observations_number_can_be_public": "yes"
+        "variables": {
+          "age": {
+            "name": "age",
+            "type": "Integer",
+            "label": "",
+            "sort_order": 1
+          },
+          "sex": {
+            "name": "sex",
+            "type": "Integer",
+            "label": "",
+            "sort_order": 0
+          },
+          "smoking": {
+            "name": "smoking",
+            "type": "Categorical",
+            "label": "",
+            "categories": [],
+            "sort_order": 6
+          },
+          "optimism": {
+            "name": "optimism",
+            "type": "Categorical",
+            "label": "",
+            "categories": [],
+            "sort_order": 7
+          },
+          "selfesteem": {
+            "name": "selfesteem",
+            "type": "Categorical",
+            "label": "",
+            "categories": [],
+            "sort_order": 9
+          },
+          "Havingchild": {
+            "name": "Havingchild",
+            "type": "Categorical",
+            "label": "",
+            "categories": [],
+            "sort_order": 3
+          },
+          "maritalstatus": {
+            "name": "maritalstatus",
+            "type": "Integer",
+            "label": "",
+            "sort_order": 2
+          },
+          "sourceofstress": {
+            "name": "sourceofstress",
+            "type": "Categorical",
+            "label": "",
+            "categories": [],
+            "sort_order": 5
+          },
+          "lifesattisfaction": {
+            "name": "lifesattisfaction",
+            "type": "Categorical",
+            "label": "",
+            "categories": [],
+            "sort_order": 8
+          },
+          "highesteducationlevel": {
+            "name": "highesteducationlevel",
+            "type": "Integer",
+            "label": "",
+            "sort_order": 4
+          }
+        }
+      },
+      "variable_info": {
+        "age": {
+          "max": 75,
+          "min": 20,
+          "name": "age",
+          "type": "Integer",
+          "label": "age",
+          "selected": true,
+          "sortOrder": 1
         },
-        "data_profile": {
-            "dataset": {
-                "rowCount": 7000,
-                "variableCount": 10,
-                "variableOrder": [
-                    [
-                        0,
-                        "sex"
-                    ],
-                    [
-                        1,
-                        "age"
-                    ],
-                    [
-                        2,
-                        "maritalstatus"
-                    ],
-                    [
-                        3,
-                        "Havingchild"
-                    ],
-                    [
-                        4,
-                        "highesteducationlevel"
-                    ],
-                    [
-                        5,
-                        "sourceofstress"
-                    ],
-                    [
-                        6,
-                        "smoking"
-                    ],
-                    [
-                        7,
-                        "optimism"
-                    ],
-                    [
-                        8,
-                        "lifesattisfaction"
-                    ],
-                    [
-                        9,
-                        "selfesteem"
-                    ]
-                ]
-            },
-            "variables": {
-                "age": {
-                    "name": "age",
-                    "type": "Integer",
-                    "label": "",
-                    "sort_order": 1
-                },
-                "sex": {
-                    "name": "sex",
-                    "type": "Integer",
-                    "label": "",
-                    "sort_order": 0
-                },
-                "smoking": {
-                    "name": "smoking",
-                    "type": "Categorical",
-                    "label": "",
-                    "categories": [],
-                    "sort_order": 6
-                },
-                "optimism": {
-                    "name": "optimism",
-                    "type": "Categorical",
-                    "label": "",
-                    "categories": [],
-                    "sort_order": 7
-                },
-                "selfesteem": {
-                    "name": "selfesteem",
-                    "type": "Categorical",
-                    "label": "",
-                    "categories": [],
-                    "sort_order": 9
-                },
-                "Havingchild": {
-                    "name": "Havingchild",
-                    "type": "Categorical",
-                    "label": "",
-                    "categories": [],
-                    "sort_order": 3
-                },
-                "maritalstatus": {
-                    "name": "maritalstatus",
-                    "type": "Integer",
-                    "label": "",
-                    "sort_order": 2
-                },
-                "sourceofstress": {
-                    "name": "sourceofstress",
-                    "type": "Categorical",
-                    "label": "",
-                    "categories": [],
-                    "sort_order": 5
-                },
-                "lifesattisfaction": {
-                    "name": "lifesattisfaction",
-                    "type": "Categorical",
-                    "label": "",
-                    "categories": [],
-                    "sort_order": 8
-                },
-                "highesteducationlevel": {
-                    "name": "highesteducationlevel",
-                    "type": "Integer",
-                    "label": "",
-                    "sort_order": 4
-                }
-            }
+        "sex": {
+          "max": 3,
+          "min": 1,
+          "name": "sex",
+          "type": "Categorical",
+          "label": "sex",
+          "selected": true,
+          "sortOrder": 0,
+          "categories": [
+            1,
+            2,
+            3
+          ]
         },
-        "variable_info": {
-            "age": {
-                "max": 55,
-                "min": 5,
-                "name": "age",
-                "type": "Integer",
-                "label": "age",
-                "selected": true,
-                "sortOrder": 1
-            },
-            "sex": {
-                "max": null,
-                "min": null,
-                "name": "sex",
-                "type": "Integer",
-                "label": "sex",
-                "selected": false,
-                "sortOrder": 0
-            },
-            "smoking": {
-                "name": "smoking",
-                "type": "Categorical",
-                "label": "",
-                "sortOrder": 6,
-                "categories": []
-            },
-            "optimism": {
-                "name": "optimism",
-                "type": "Categorical",
-                "label": "",
-                "sortOrder": 7,
-                "categories": []
-            },
-            "selfesteem": {
-                "name": "selfesteem",
-                "type": "Categorical",
-                "label": "",
-                "sortOrder": 9,
-                "categories": []
-            },
-            "havingchild": {
-                "name": "Havingchild",
-                "type": "Categorical",
-                "label": "",
-                "sortOrder": 3,
-                "categories": []
-            },
-            "maritalstatus": {
-                "name": "maritalstatus",
-                "type": "Integer",
-                "label": "",
-                "sortOrder": 2
-            },
-            "sourceofstress": {
-                "name": "sourceofstress",
-                "type": "Categorical",
-                "label": "",
-                "sortOrder": 5,
-                "categories": []
-            },
-            "lifesattisfaction": {
-                "name": "lifesattisfaction",
-                "type": "Categorical",
-                "label": "",
-                "sortOrder": 8,
-                "categories": []
-            },
-            "highesteducationlevel": {
-                "name": "highesteducationlevel",
-                "type": "Integer",
-                "label": "",
-                "sortOrder": 4
-            }
+        "smoking": {
+          "max": 0,
+          "min": 0,
+          "name": "smoking",
+          "type": "Boolean",
+          "label": "smoking",
+          "selected": true,
+          "sortOrder": 6,
+          "trueValue": 1,
+          "falseValue": 2
         },
-        "default_epsilon": 1.0,
-        "epsilon": 1.0,
-        "default_delta": 1e-05,
-        "delta": 1e-05,
-        "confidence_level": 0.95,
-        "wizard_step": "step_500"
+        "optimism": {
+          "max": 30,
+          "min": 6,
+          "name": "optimism",
+          "type": "Integer",
+          "label": "optimism",
+          "selected": true,
+          "sortOrder": 7,
+          "categories": [
+          ]
+        },
+        "selfesteem": {
+          "max": 40,
+          "min": 10,
+          "name": "selfesteem",
+          "type": "Integer",
+          "label": "selfesteem",
+          "selected": true,
+          "sortOrder": 9,
+          "categories": [
+          ]
+        },
+        "havingchild": {
+          "name": "Havingchild",
+          "type": "Boolean",
+          "label": "Havingchild",
+          "selected": true,
+          "sortOrder": 3,
+          "trueValue": 1,
+          "falseValue": 2
+        },
+        "maritalstatus": {
+          "max": 8,
+          "min": 1,
+          "name": "maritalstatus",
+          "type": "Categorical",
+          "label": "maritalstatus",
+          "selected": true,
+          "sortOrder": 2,
+          "categories": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ]
+        },
+        "sourceofstress": {
+          "max": 9,
+          "min": 1,
+          "name": "sourceofstress",
+          "type": "Categorical",
+          "label": "sourceofstress",
+          "selected": true,
+          "sortOrder": 5,
+          "categories": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ]
+        },
+        "lifesattisfaction": {
+          "max": 35,
+          "min": 5,
+          "name": "lifesattisfaction",
+          "type": "Integer",
+          "label": "lifesattisfaction",
+          "selected": true,
+          "sortOrder": 8,
+          "categories": [
+          ]
+        },
+        "highesteducationlevel": {
+          "max": 6,
+          "min": 1,
+          "name": "highesteducationlevel",
+          "type": "Categorical",
+          "label": "highesteducationlevel",
+          "selected": true,
+          "sortOrder": 4,
+          "categories": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ]
+        }
+      },
+      "default_epsilon": 1.0,
+      "epsilon": 1.0,
+      "default_delta": 1e-05,
+      "delta": 1e-05,
+      "confidence_level": 0.95,
+      "wizard_step": "step_500"
     }
-},
-{
+  },
+  {
     "model": "dataset.datasetinfo",
     "pk": 2,
     "fields": {
-        "polymorphic_ctype": 24,
-        "created": "2023-07-17T15:45:21.113Z",
-        "updated": "2023-07-17T15:45:36.473Z",
-        "object_id": "bbc5bd52-7c1e-4cf2-9938-28fd4745b5b1",
-        "creator": 1,
-        "name": "teacher_survey.csv",
-        "source": "upload",
-        "source_file": null,
-        "depositor_setup_info": 3
+      "polymorphic_ctype": 24,
+      "created": "2023-07-17T15:45:21.113Z",
+      "updated": "2023-07-17T15:45:36.473Z",
+      "object_id": "bbc5bd52-7c1e-4cf2-9938-28fd4745b5b1",
+      "creator": 1,
+      "name": "teacher_survey.csv",
+      "source": "upload",
+      "source_file": null,
+      "depositor_setup_info": 3
     }
-},
-{
+  },
+  {
     "model": "dataset.uploadfileinfo",
     "pk": 2,
     "fields": {}
-}
+  }
 ]

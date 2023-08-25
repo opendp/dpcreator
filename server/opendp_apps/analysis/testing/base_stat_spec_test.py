@@ -82,7 +82,8 @@ class StatSpecTestCase(TestCase):
         self.assertTrue(plan_creator.has_error() is False)
 
         # Retrieve it
-        analysis_plan = AnalysisPlan.objects.get(object_id=plan_creator.analysis_plan.object_id)
+        analysis_plan = AnalysisPlan.objects.get(
+            object_id=plan_creator.analysis_plan.object_id)
 
         self.assertEqual(plan_creator.analysis_plan.object_id, analysis_plan.object_id)
 
