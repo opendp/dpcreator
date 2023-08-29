@@ -104,6 +104,49 @@ class AnalysisPlanSerializer(serializers.ModelSerializer):
                   'created',
                   'updated']
 
+class AnalysisPlanListSerializer(serializers.ModelSerializer):
+    """
+    Used for displaying AnalysisPlan tables. Three type of AnalysisPlans are displayed:
+    (1) Plans where the logged-in user is the AnalysisPlan.analyst
+    (2) Plans where the logged-in user is the AnalaysisPlan.dataset.creator
+    (3) Plans which are complete and have a ReleaseInfo object--regardless of the analyst or creator
+
+    Because of plan type (3), this serializer does not include "variable_info" or "dp_statistics"
+    """
+    analyst_name = serializers.CharField(source='analyst', read_only=True)
+    # dataset_id = serializers.CharField(source='dataset.object_id', read_only=True)
+    dataset_name = serializers.CharField(source='dataset.name', read_only=True)
+    dataset_owner_id = serializers.CharField(source='dataset.creator.object_id', read_only=True)
+    dataset_owner_name = serializers.CharField(source='dataset.creator', read_only=True)
+    release_info = ReleaseInfoSerializer(read_only=True)
+    is_expired = serializers.SerializerMethodField('is_plan_expired')
+
+    def is_plan_expired(self, obj) -> bool:
+        return obj.is_plan_expired()
+
+    class Meta:
+        model = AnalysisPlan
+        fields = ['object_id',
+                  'name',
+                  'description',
+                  'analyst_name',
+                  #'dataset_id',
+                  'dataset_name',
+                  'dataset_owner_id',
+                  'dataset_owner_name',
+                  'epsilon',
+                  #'delta',
+                  #'confidence_level',
+                  'is_expired',
+                  'is_complete',
+                  'user_step',
+                  'wizard_step',
+                  'expiration_date',
+                  'release_info',
+                  #'dp_statistics',
+                  #'variable_info',
+                  'created',
+                  'updated']
 
 class DPStatisticSerializer(serializers.Serializer):
     """

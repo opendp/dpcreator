@@ -10,7 +10,7 @@ from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.analysis_plan_creator import AnalysisPlanCreator
 from opendp_apps.analysis.models import AnalysisPlan
 from opendp_apps.analysis.serializers import \
-    AnalysisPlanSerializer
+    AnalysisPlanSerializer, AnalysisPlanListSerializer
 from opendp_apps.dataset.serializers import DatasetObjectIdSerializer
 from opendp_apps.utils.view_helper import get_json_error
 from opendp_project.views import BaseModelViewSet
@@ -21,7 +21,7 @@ logger = logging.getLogger(settings.DEFAULT_LOGGER)
 class AnalysisPlanViewSet(BaseModelViewSet):
     """Publicly available listing of registered Dataverses"""
     serializer_classes = {
-        'list': AnalysisPlanSerializer,
+        'list': AnalysisPlanListSerializer,
         'retrieve': AnalysisPlanSerializer,
         'create': DatasetObjectIdSerializer,
         'partial_update': AnalysisPlanSerializer,
