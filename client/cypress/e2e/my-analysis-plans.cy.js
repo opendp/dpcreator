@@ -61,6 +61,8 @@
                 cy.goToConfirmVariables(selectVariables)
                 // select the variables we will use
                 cy.selectVariable(selectVariables)
+                cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
+                cy.get('h1').should('contain', 'Confirm Epsilon')
                 cy.get('[data-test="wizardCompleteButton"]').click({force:true})
                 cy.url().should('contain','my-data')
                 cy.visit('/my-plans')
@@ -85,7 +87,6 @@
                 cy.get('[data-test="'+continueTestId+'"]').click({force: true})
                 cy.url().should('contains','analyst-wizard')
                 cy.visit('my-data')
-                cy.pause()
 
             })
         })
@@ -222,6 +223,8 @@
                 cy.goToConfirmVariables(selectVariables)
                 // select the variables we will use
                 cy.selectVariable(selectVariables)
+                cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
+                cy.get('h1').should('contain', 'Confirm Epsilon')
                 cy.get('[data-test="wizardCompleteButton"]').click({force:true})
                 cy.url().should('contain','my-data')
                 cy.visit('/my-plans')

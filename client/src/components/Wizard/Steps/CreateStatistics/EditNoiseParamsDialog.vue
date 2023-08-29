@@ -13,53 +13,17 @@
       >
       <v-card-title data-test="editNoiseDialog">
         <h2 class="title-size-2 mb-5">
-          Please confirm the epsilon (&epsilon;) and delta (&delta;) values.
+          Please confirm the Confidence Level.
         </h2>
       </v-card-title>
       <v-card-text class="text--primary">
-        <span>
-          <div v-html="$t('create statistics.confirm 1')"></div>
-        </span>
-        <span class="grey--text text--darken-2">
-          (i.e.
-          <span class="font-italic">
-            “Information that could cause risk of harm to individuals or the
-            university if disclosed”</span
-          >)<br/>
-        </span>
+
         <v-form
             v-model="validParamsForm"
             ref="paramsForm"
             @submit.prevent="handleSaveEditNoiseParamsDialog">
-          <div
-              class="borderBottom soft_primary grey--text text--darken-2 pa-3 my-5 top-borders-radius noise-params d-flex justify-space-between width50"
-          >
 
-            <span>Epsilon (&epsilon;)</span>
-            <v-text-field
-                class="text-right font-weight-bold"
-                type="number"
-                data-test="editEpsilonInput"
-                v-model="editEpsilon"
-                :rules="[validateEpsilon]"
-            />
-          </div>
-          <small class="mr-16 grey--text text--darken-2">
-            <div v-html="$t('create statistics.confirm 2')"></div>
-          </small>
-          <div
-              class="borderBottom soft_primary grey--text text--darken-2 pa-3 my-5 top-borders-radius noise-params d-flex justify-space-between width50"
-          >
-            <span>Delta (δ)</span>
-            <v-text-field
-                class="text-right font-weight-bold"
-                type="number"
-                v-model="editDelta"
-            />
-          </div>
-          <small class="mr-16 mb-5 d-block grey--text text--darken-2">
-            <div v-html="$t('create statistics.confirm 3')"></div>
-          </small>
+
           <div
               class="soft_primary grey--text text--darken-2 top-borders-radius width50 pl-3 mb-5 borderBottom"
           >
@@ -164,32 +128,7 @@ export default {
     }
   },
   methods: {
-    validateEpsilon(v) {
-      if (this) {
-        let lockedEpsilon = 0
-        let unlockedCount = 0
-        if (this.analysisPlan && this.analysisPlan.dpStatistics) {
-          this.analysisPlan.dpStatistics.forEach(stat => {
-            if (stat.locked) {
-              lockedEpsilon += stat.epsilon
-            } else {
-              unlockedCount++
-            }
-          })
-        }
-        // The minimum  total epsilon needs to take into account the
-        // statistics that have already been created. (Each unlocked epsilon needs to be >= MIN_EPSILON)
-        const minTotalEpsilon = Math.max(MIN_EPSILON, lockedEpsilon + MIN_EPSILON * unlockedCount)
 
-
-        // console.log('v: ' + v + ' totalLocked: ' + lockedEpsilon + ' MAX_TOTAL:' + MAX_TOTAL_EPSILON)
-        return (v >= minTotalEpsilon && v <= MAX_TOTAL_EPSILON)
-            || "Epsilon must be between " + minTotalEpsilon + " and " + MAX_TOTAL_EPSILON
-      } else {
-        return true
-      }
-
-    },
     handleCancelEditNoiseParamsDialog() {
       this.editEpsilon = this.epsilon;
       this.editDelta = this.delta;

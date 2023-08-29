@@ -7,14 +7,18 @@
             <br/><b>Dataset: </b> {{ datasetInfo.name }}</h1>
           <v-container>
             <v-row class="mb-4">
-             <strong  class="mr-2"> Created: </strong>{{ datasetInfo.created }}
+             <strong  class="mr-2">Created: </strong>{{ datasetInfo.created }}
             </v-row>
             <v-row class="mb-4">
               <strong  class="mr-2">Created By: </strong>{{ datasetInfo.creatorName }}
             </v-row>
             <v-row class="mb-4">
-             <strong  class="mr-2"> Epsilon Budget: </strong> {{ datasetInfo.depositorSetupInfo.epsilon }}
+             <strong  class="mr-2">Epsilon Budget: </strong> {{ datasetInfo.depositorSetupInfo.epsilon }}
             </v-row>
+            <v-row class="mb-4">
+              <strong  class="mr-2">Delta: </strong> {{ datasetInfo.depositorSetupInfo.delta }}
+            </v-row>
+
             <v-row class="mb-4">
               <StatusTag class="my-5" :status="status"/>
             </v-row>
