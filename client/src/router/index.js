@@ -92,8 +92,7 @@ const routes = [
     name: "MyPlanDetails",
     component: () => import("../views/MyPlanDetails.vue"),
     meta: {
-      requiresAuth: true,
-      requiresDataset: true
+      requiresAuth: true
     }
   },
   {

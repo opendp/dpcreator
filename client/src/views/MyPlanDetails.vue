@@ -2,11 +2,11 @@
   <div class="my-data-details mt-10">
     <v-container>
       <v-sheet rounded="lg">
-        <v-container>
+        <v-container >
           <h1 class="title-size-2" style="line-height:150%">
             <b v-if="status === COMPLETED">DP Release</b>
-            <b v-if="status !== COMPLETED">Data File</b>
-            <br/>{{ datasetInfo.name }}, {{analysisPlan.name}}</h1>
+            <b v-if="status !== COMPLETED">Analysis Plan</b>
+            <br/> {{analysisPlan.datasetName}}, {{analysisPlan.name}}</h1>
           Current Status:
           <StatusTag class="my-5" :status="status"/>
           <p></p>
@@ -119,12 +119,11 @@
               'width80 mx-auto d-block': $vuetify.breakpoint.xsOnly
             }"
           />
-          <DeleteDatasetDialog
+          <DeleteAnalysisPlanDialog
               :dialogDelete="dialogDelete"
-              :datasetInfo="datasetInfo"
               :analysisPlan="analysisPlan"
               v-on:cancel="closeDelete"
-              v-on:close="datasetDeleted"
+              v-on:close="closeDelete"
           />
         </v-container>
       </v-sheet>
@@ -146,7 +145,7 @@ import {mapGetters, mapState} from "vuex";
 import stepInformation from "@/data/stepInformation";
 import Chart from "../components/MyData/Chart.vue";
 import ReleasePDF from "@/components/MyData/ReleasePDF";
-import DeleteDatasetDialog from "@/components/MyData/DeleteDatasetDialog";
+import DeleteAnalysisPlanDialog from "@/components/MyAnalysisPlans/DeleteAnalysisPlanDialog.vue";
 
 const {
   IN_PROGRESS,
@@ -164,14 +163,14 @@ const {
 export default {
   name: "MyDataDetails",
   components: {
+    DeleteAnalysisPlanDialog,
     ReleasePDF,
     QuestionIconTooltip,
     ColoredBorderAlert,
     StatusTag,
     Button,
     SupportBanner,
-    Chart,
-    DeleteDatasetDialog
+    Chart
   },
 
   methods: {
