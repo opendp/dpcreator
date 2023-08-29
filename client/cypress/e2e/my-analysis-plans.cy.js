@@ -10,6 +10,56 @@
 
 
         })
+        it('allows analyst to view plan details',() => {
+            const username1 = 'oscar'
+            const email1 = 'oscar@thegrouch.com'
+            const password1 = 'oscar123!'
+            cy.createAccount(username1, email1, password1)
+            cy.logout()
+            const username = 'kermit'
+            const email = 'kermit@thefrog.com'
+            const password = 'kermit123!'
+            cy.createAccount(username, email, password)
+            let testFile = 'Fatigue_data.csv'
+            let testPath = 'cypress/fixtures/'+testFile
+
+            cy.uploadFile(testPath)
+            cy.fixture('EyeDemoData.json').then((demoData) => {
+                cy.url().should('contain', 'my-data')
+                cy.goToConfirmVariables(demoData.variables)
+
+                // select the variables we will use
+                cy.selectVariable(demoData.variables)
+                cy.get('[data-test="wizardContinueButton"]').last().click({force: true});
+                cy.get('h1').should('contain', 'Confirm Epsilon')
+                cy.get('[data-test="wizardCompleteButton"]').click({force: true})
+                cy.visit('/my-data')
+                cy.url().should('contain','my-data')
+                cy.createPlan(demoData.planEpsilon,testFile,username1)
+                cy.logout()
+                // login as Analyst to start the workflow on the analysis plan
+                cy.login(username1, password1)
+                cy.visit('/my-plans')
+                cy.url().should('contain','my-plans')
+                cy.get('[data-test="continueWorkflow0"]').click({force:true})
+                cy.url().should('contain','analyst-wizard')
+                cy.get('[data-test="wizardContinueButton"]').click({force:true})
+                // Continue to Create  Statistics Step
+
+                // On the statistics page, test edit statistics Params
+                cy.get('h1').should('contain', 'Create Statistics').should('be.visible')
+                // Create statistic for every statistics item in the fixture
+                cy.enterStatsInPopup(demoData)
+                // Submit the statistics
+                cy.submitStatistics(demoData)
+                cy.url().should('contain','my-plans')
+                cy.get('[data-test="viewDetails0"]').click()
+                cy.get('div').should('contain.text', 'Release Completed')
+                cy.get('h1').should('contain.text', testFile)
+
+            })
+
+        })
         it('disables Create Button if there are no available datasets', () => {
             cy.on('uncaught:exception', (e, runnable) => {
                 console.log('error', e)
