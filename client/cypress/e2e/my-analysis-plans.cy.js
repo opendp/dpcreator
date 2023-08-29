@@ -36,6 +36,8 @@
                 cy.visit('/my-data')
                 cy.url().should('contain','my-data')
                 cy.createPlan(demoData.planEpsilon,testFile,username1)
+                cy.url().should('contain','my-plans')
+                cy.get('[data-test="continueWorkflow0"]').should('not.exist')
                 cy.logout()
                 // login as Analyst to start the workflow on the analysis plan
                 cy.login(username1, password1)
