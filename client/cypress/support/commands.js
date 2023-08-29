@@ -42,8 +42,8 @@ Cypress.Commands.add('createPlan',(planEpsilon, testFile, username )=>{
     cy.get('[data-test="createPlanButton"]').click({force: true})
     cy.get('[data-test="selectPlanDataset"]').click();
     cy.contains(testFile).click();
-    const myPlanName = 'my cypress test plan'
-    const myDesc = 'my cypress test desc'
+    const myPlanName = testFile + ' analysis plan'
+    const myDesc = testFile + ' plan description'
     cy.get('[data-test="selectPlanAnalyst"]').click()
     cy.contains(username).click();
     cy.get('[data-test="inputPlanName"]').type(myPlanName)
