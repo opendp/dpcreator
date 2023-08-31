@@ -65,8 +65,7 @@ Z        <template v-slot:[`item.actions`]="{ item,index }">
 
                 <v-tooltip
 
-                        v-for="(action,  actionIndex) in statusInformation[stepInformation[item.userStep].workflowStatus]
-            .availableActions"
+                    v-for="(action, actionIndex) in getAvailableActions(item)"
                         bottom max-width="220px">
                     <template v-slot:activator="{ on, attrs }">
                         <v-icon
@@ -221,6 +220,7 @@ import NETWORK_CONSTANTS from "../../router/NETWORK_CONSTANTS";
 import DeleteDatasetDialog from "@/components/MyData/DeleteDatasetDialog";
 import DeleteAnalysisPlanDialog from "@/components/MyAnalysisPlans/DeleteAnalysisPlanDialog.vue";
 import {mapGetters, mapState} from "vuex";
+import epsilonBudget from "@/shared/epsilonBudget";
 
 const {
   VIEW_DETAILS,
@@ -306,6 +306,14 @@ export default {
     };
   },
   methods: {
+    getAvailableActions(item) {
+      let actions = statusInformation[stepInformation[item.userStep].workflowStatus].availableActions
+      // Don't show Continue Workflow button if the user is not the analyst
+      if (!this.userIsAnalyst(item)) {
+        actions=  actions.filter(item => item !== "continueWorkflow");
+      }
+      return actions
+    },
     handleButtonClick(action, item) {
       this[action](item)
     },
@@ -352,6 +360,9 @@ export default {
     getWorkflowStatus(item) {
         const workflowStatus= stepInformation[item.userStep].workflowStatus
         return workflowStatus
+    },
+    userIsAnalyst(plan) {
+      return this.user && (plan.analystName === this.user.username)
     },
     goToPage(item, path) {
       this.$store.dispatch('dataset/setAnalysisPlan', item.objectId)
