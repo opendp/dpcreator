@@ -10,12 +10,31 @@ from opendp_apps.analysis import static_vals as astatic
 from opendp_apps.analysis.analysis_plan_creator import AnalysisPlanCreator
 from opendp_apps.analysis.models import AnalysisPlan
 from opendp_apps.analysis.serializers import \
-    AnalysisPlanSerializer
+    AnalysisPlanSerializer, AnalysisPlanListSerializer
 from opendp_apps.dataset.serializers import DatasetObjectIdSerializer
 from opendp_apps.utils.view_helper import get_json_error
 from opendp_project.views import BaseModelViewSet
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
+
+class AnalysisPlanListViewSet(BaseModelViewSet):
+    """
+    API endpoint to list AnalysisPlans, but w/o information such as variable_info and dp_statistics.
+    This listing is used to populate tables that include AnalysisPlans with published ReleaseInfo object where the logged in user is not the analyst or dataset creator.
+    """
+    serializer_class = AnalysisPlanListSerializer
+
+    http_method_names = ['get']
+
+    def get_queryset(self):
+        """
+        AnalysisPlans for the currently authenticated user.
+        """
+        return AnalysisPlan.objects.select_related('dataset'
+                    ).filter(Q(analyst__username=self.request.user) | \
+                             Q(dataset__creator__username=self.request.user) | \
+                             Q(release_info__isnull=False, release_info__dp_release__isnull=False))
+
 
 
 class AnalysisPlanViewSet(BaseModelViewSet):
@@ -39,9 +58,14 @@ class AnalysisPlanViewSet(BaseModelViewSet):
         AnalysisPlans for the currently authenticated user.
         """
         logger.info(f"Getting AnalysisPlans for user {self.request.user.object_id}")
+        #return AnalysisPlan.objects.select_related('dataset'
+        #                                           ).filter(Q(analyst=self.request.user) |
+        #                                                    Q(dataset__creator=self.request.user))
+
         return AnalysisPlan.objects.select_related('dataset'
-                                                   ).filter(Q(analyst=self.request.user) |
-                                                            Q(dataset__creator=self.request.user))
+                    ).filter(Q(analyst__username=self.request.user) | \
+                             Q(dataset__creator__username=self.request.user))
+
 
     @csrf_exempt
     def create(self, request, *args, **kwargs):
@@ -179,3 +203,17 @@ class AnalysisPlanViewSet(BaseModelViewSet):
                                 status=status.HTTP_400_BAD_REQUEST)
 
         return super().destroy(request, *args, **kwargs)
+
+"""
+from django.db.models import Q
+username = 'dp_analyst'
+username = 'dev_admin'
+
+def get_plans(username):
+    return AnalysisPlan.objects.select_related('dataset').filter(\
+Q(analyst__username=username) | \
+Q(dataset__creator__username=username)| \
+Q(release_info__isnull=False, 
+release_info__dp_release__isnull=False))
+
+"""
