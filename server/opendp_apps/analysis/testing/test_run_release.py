@@ -649,7 +649,6 @@ class TestRunRelease(StatSpecTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-
     def test_115_get_release_by_api_another_user(self):
         """(115) Get release by API, another user"""
         msgt(self.test_115_get_release_by_api_another_user.__doc__)
@@ -743,6 +742,7 @@ class TestRunRelease(StatSpecTestCase):
 
         release_info_obj = self.get_release_info()
 
+        # Unrelated user should not be able to access the plan from this API
         analysis_plan_get_url = f'{self.API_ANALYSIS_PREFIX}{release_info_obj.get_analysis_plan_or_none().object_id}/'
 
         self.client = APIClient()
@@ -753,7 +753,7 @@ class TestRunRelease(StatSpecTestCase):
 
         response = self.client.get(analysis_plan_get_url)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_170_get_analysis_plan_no_release_unrelated_user(self):
         """(170) Get analysis plan WITHOUT a release by a user not connected to the AnalysisPlan or Dataset. AnalysisPlan will not be found"""

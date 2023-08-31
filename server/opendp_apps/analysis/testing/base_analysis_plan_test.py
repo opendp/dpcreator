@@ -19,6 +19,7 @@ class BaseAnalysisPlanTest(TestCase):
         """Create user object and define file to upload"""
 
         self.API_ANALYSIS_PREFIX = '/api/analysis-plan/'
+        self.API_ANALYSIS_LIST_VIEW_PREFIX = '/api/analysis-plan-list-view/'
 
         # Create a OpenDP User object
         #

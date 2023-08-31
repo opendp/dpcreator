@@ -20,7 +20,7 @@ from django.urls import path, include, re_path
 from django.views.generic import TemplateView, RedirectView
 from rest_framework import routers
 
-from opendp_apps.analysis.views.analysis_plan_view import AnalysisPlanViewSet
+from opendp_apps.analysis.views.analysis_plan_view import AnalysisPlanViewSet, AnalysisPlanListViewSet
 from opendp_apps.analysis.views.release_view import ReleaseView, ReleaseFileDownloadView
 from opendp_apps.analysis.views.stat_helper_view import StatHelperView
 from opendp_apps.analysis.views.validation_view import ValidationView
@@ -33,8 +33,6 @@ from opendp_apps.dataset.views import \
 from opendp_apps.dataset.views_profile import ProfilingViewSet
 from opendp_apps.dataverses.urls import router as dataverse_router
 from opendp_apps.dataverses.views.dataverse_file_view import DataverseFileView
-from opendp_apps.dataverses.views.dataverse_handoff_view import DataverseHandoffView
-from opendp_apps.dataverses.views.dataverse_user_view import DataverseUserView
 from opendp_apps.dataverses.views.registered_dataverse_view import RegisteredDataverseView
 from opendp_apps.terms_of_access.views import TermsOfAccessViewSet, TermsOfAccessAgreementViewSet
 from opendp_apps.user.views import GoogleLogin
@@ -46,7 +44,9 @@ admin.site.site_title = 'DP Creator Admin Panel'
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 
+router.register(r'analysis-plan-list-view', AnalysisPlanListViewSet, basename='analysis-plan-list-view')
 router.register(r'analysis-plan', AnalysisPlanViewSet, basename='analysis-plan')
+
 router.register(r'banner-messages', BannerMessageViewSet, basename='banner-messages')
 
 router.register(r'dataset-info', DatasetInfoViewSet)
@@ -83,8 +83,8 @@ urlpatterns = [
     path('dv-mock-api/', include('opendp_apps.dataverses.mock_urls')),
 
     re_path(r'^user-details/$',
-        TemplateView.as_view(template_name="user_details.html"),
-        name='user-details'),
+            TemplateView.as_view(template_name="user_details.html"),
+            name='user-details'),
     re_path(r'^rest-auth/', include('dj_rest_auth.urls')),
     re_path(r'^rest-auth/registration/', include('dj_rest_auth.registration.urls')),
     re_path(r'^account/', include('allauth.urls')),

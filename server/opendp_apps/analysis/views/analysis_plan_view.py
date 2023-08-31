@@ -17,11 +17,30 @@ from opendp_project.views import BaseModelViewSet
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
+class AnalysisPlanListViewSet(BaseModelViewSet):
+    """
+    API endpoint to list AnalysisPlans, but w/o information such as variable_info and dp_statistics.
+    This listing is used to populate tables that include AnalysisPlans with published ReleaseInfo object where the logged in user is not the analyst or dataset creator.
+    """
+    serializer_class = AnalysisPlanListSerializer
+
+    http_method_names = ['get']
+
+    def get_queryset(self):
+        """
+        AnalysisPlans for the currently authenticated user.
+        """
+        return AnalysisPlan.objects.select_related('dataset'
+                    ).filter(Q(analyst__username=self.request.user) | \
+                             Q(dataset__creator__username=self.request.user) | \
+                             Q(release_info__isnull=False, release_info__dp_release__isnull=False))
+
+
 
 class AnalysisPlanViewSet(BaseModelViewSet):
     """Publicly available listing of registered Dataverses"""
     serializer_classes = {
-        'list': AnalysisPlanListSerializer,
+        'list': AnalysisPlanSerializer,
         'retrieve': AnalysisPlanSerializer,
         'create': DatasetObjectIdSerializer,
         'partial_update': AnalysisPlanSerializer,
@@ -45,8 +64,7 @@ class AnalysisPlanViewSet(BaseModelViewSet):
 
         return AnalysisPlan.objects.select_related('dataset'
                     ).filter(Q(analyst__username=self.request.user) | \
-                             Q(dataset__creator__username=self.request.user) | \
-                             Q(release_info__isnull=False, release_info__dp_release__isnull=False))
+                             Q(dataset__creator__username=self.request.user))
 
 
     @csrf_exempt
