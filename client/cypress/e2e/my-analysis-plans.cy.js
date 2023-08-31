@@ -164,7 +164,7 @@
 
                     })
 
-                    cy.intercept('GET', '/api/analysis-plan/', {
+                    cy.intercept('GET', '/api/analysis-plan-list-view/', {
                         body: {
                             "count": 1,
                             "next": null,
@@ -220,7 +220,7 @@
                             "results": [dataset]
                         }
                     })
-                    cy.intercept('GET', '/api/analysis-plan/', {
+                    cy.intercept('GET', '/api/analysis-plan-list-view/', {
                         body: {
                             "count": 1,
                             "next": null,
