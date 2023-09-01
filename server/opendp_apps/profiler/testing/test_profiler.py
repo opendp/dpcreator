@@ -443,7 +443,7 @@ class ProfilerTest(TestCase):
             varname_snakecase = camel_to_snake(orig_varname)
             var_found = (orig_varname in plan_var_info) or \
                         (varname_snakecase in plan_var_info)
-            print(f'> Check: {orig_varname}/{varname_snakecase} -> {var_found}')
+            # print(f'> Check: {orig_varname}/{varname_snakecase} -> {var_found}')
             self.assertTrue(var_found)
 
     def test_110_profile_good_file_via_api(self):

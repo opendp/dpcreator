@@ -1,0 +1,95 @@
+[
+  {
+    "cl": 0.95,
+    "id": 0,
+    "delta": 0,
+    "error": "",
+    "label": "Mean",
+    "locked": false,
+    "epsilon": 0.2,
+    "accuracy": {
+      "value": "0.0471",
+      "message": "There is a probability of 95.0% that the DP Mean will differ from the true Mean by at most 0.04707579287276825 units. Here the units are the same units the variable age has in the dataset."
+    },
+    "variable": "age",
+    "statistic": "mean",
+    "can_expand": false,
+    "fixed_value": "45",
+    "handle_as_fixed": true,
+    "histogram_buckets": "",
+    "histogram_bin_type": "",
+    "histogram_bin_edges": [
+    ],
+    "missing_values_handling": "insert_fixed",
+    "histogram_number_of_bins": null
+  },
+  {
+    "cl": 0.95,
+    "id": 0,
+    "delta": 0,
+    "error": "",
+    "label": "Histogram",
+    "locked": false,
+    "epsilon": 0.20,
+    "accuracy": {
+      "value": "20.8",
+      "message": "There is a probability of 95.0% that a count in the  DP Histogram will differ from the count in the true Histogram by at most 20.77182740356084 units. Here the units are the same units the variable sourceofstress has in the dataset."
+    },
+    "variable": "sourceofstress",
+    "statistic": "histogram",
+    "can_expand": true,
+    "fixed_value": "4",
+    "handle_as_fixed": true,
+    "histogram_buckets": "",
+    "histogram_bin_type": "onePerValue",
+    "histogram_bin_edges": [],
+    "missing_values_handling": "insert_fixed",
+    "histogram_number_of_bins": null
+  },
+  {
+    "cl": 0.95,
+    "id": 0,
+    "delta": 0,
+    "error": "",
+    "label": "Histogram",
+    "locked": false,
+    "epsilon": 0.1,
+    "accuracy": {
+      "value": "64.3",
+      "message": "There is a probability of 95.0% that a count in the  DP Histogram will differ from the count in the true Histogram by at most 64.29719478039138 units. Here the units are the same units the variable lifesattisfaction has in the dataset."
+    },
+    "variable": "lifesattisfaction",
+    "statistic": "histogram",
+    "can_expand": true,
+    "fixed_value": "35",
+    "handle_as_fixed": true,
+    "histogram_buckets": "",
+    "histogram_bin_type": "onePerValue",
+    "histogram_bin_edges": [],
+    "missing_values_handling": "insert_fixed",
+    "histogram_number_of_bins": ""
+  },
+  {
+    "cl": 0.95,
+    "id": 0,
+    "delta": 0,
+    "error": "",
+    "label": "Histogram",
+    "locked": false,
+    "epsilon": 0.15,
+    "accuracy": {
+      "value": "31.9",
+      "message": "There is a probability of 95.0% that a count in the  DP Histogram will differ from the count in the true Histogram by at most 31.916611618546973 units. Here the units are the same units the variable highesteducationlevel has in the dataset."
+    },
+    "variable": "highesteducationlevel",
+    "statistic": "histogram",
+    "can_expand": true,
+    "fixed_value": "5",
+    "handle_as_fixed": true,
+    "histogram_buckets": "",
+    "histogram_bin_type": "onePerValue",
+    "histogram_bin_edges": [],
+    "missing_values_handling": "insert_fixed",
+    "histogram_number_of_bins": null
+  }
+]

@@ -57,7 +57,7 @@ export default {
             .then(resp => camelcaseKeys(resp.data, {deep: true}))
     },
     getUserAnalysisPlans() {
-        return wrappedSession.get('/api/analysis-plan/')
+        return wrappedSession.get('/api/analysis-plan-list-view/')
             .then(resp => {
 
                 if (resp.data.results) {

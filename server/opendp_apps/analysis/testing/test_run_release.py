@@ -34,18 +34,8 @@ class TestRunRelease(StatSpecTestCase):
         # test client
         self.client = APIClient()
 
-        # self.user_obj, _created = get_user_model().objects.get_or_create(username='dev_admin')
-
         self.client.force_login(self.user_obj)
 
-        # dataset_info = DatasetInfo.objects.get(id=4)
-        # self.add_source_file(dataset_info, 'Fatigue_data.tab', True)
-
-        # plan_info = AnalysisPlanUtil.create_plan(dataset_info.object_id, self.user_obj)
-        # self.assertTrue(plan_info.success)
-        # orig_plan = plan_info.data
-
-        # plan_info = self.get_release_plan()
         # Retrieve it
         #
         self.analysis_plan = self.retrieve_new_plan()
@@ -659,20 +649,28 @@ class TestRunRelease(StatSpecTestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_118_get_release_user_not_logged_in(self):
-        """(118) Get release by API, not logged in"""
-        msgt(self.test_118_get_release_user_not_logged_in.__doc__)
+    def test_115_get_release_by_api_another_user(self):
+        """(115) Get release by API, another user"""
+        msgt(self.test_115_get_release_by_api_another_user.__doc__)
 
         release_info_obj = self.get_release_info()
         release_info_object_id = str(release_info_obj.object_id)
 
-        release_get_url = f'{self.API_RELEASE_PREFIX}{release_info_object_id}/'
+        # Make unauthorized user
+        #
+        new_user_params = dict(username='jgemstone',
+                               email='jgemstone@ridiculous.edu',
+                               first_name='Judy',
+                               last_name='Gemstone')
 
-        self.client = APIClient()
+        new_user, _created = get_user_model().objects.get_or_create(**new_user_params)
+        self.client.force_login(new_user)
+
+        release_get_url = f'{self.API_RELEASE_PREFIX}{release_info_object_id}/'
 
         response = self.client.get(release_get_url)
 
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_120_fail_to_delete_release_by_api(self):
         """(120) Fail to delete Release by API """
@@ -723,3 +721,54 @@ class TestRunRelease(StatSpecTestCase):
         response = self.client.get(self.API_RELEASE_PREFIX)
 
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_150_get_analysis_plan_user_not_logged_in(self):
+        """(150) Get analysis plan  with a release by user not logged in"""
+        msgt(self.test_150_get_analysis_plan_user_not_logged_in.__doc__)
+
+        release_info_obj = self.get_release_info()
+
+        analysis_plan_get_url = f'{self.API_ANALYSIS_PREFIX}{release_info_obj.get_analysis_plan_or_none().object_id}/'
+
+        self.client = APIClient()
+
+        response = self.client.get(analysis_plan_get_url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_160_get_analysis_plan_with_release_unrelated_user(self):
+        """(160) Get analysis plan with a release by a user not connected to the AnalysisPlan or Dataset."""
+        msgt(self.test_160_get_analysis_plan_with_release_unrelated_user.__doc__)
+
+        release_info_obj = self.get_release_info()
+
+        # Unrelated user should not be able to access the plan from this API
+        analysis_plan_get_url = f'{self.API_ANALYSIS_PREFIX}{release_info_obj.get_analysis_plan_or_none().object_id}/'
+
+        self.client = APIClient()
+
+        new_user, _created = get_user_model().objects.get_or_create(username='butterfly')
+
+        self.client.force_login(new_user)
+
+        response = self.client.get(analysis_plan_get_url)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_170_get_analysis_plan_no_release_unrelated_user(self):
+        """(170) Get analysis plan WITHOUT a release by a user not connected to the AnalysisPlan or Dataset. AnalysisPlan will not be found"""
+        msgt(self.test_170_get_analysis_plan_no_release_unrelated_user.__doc__)
+
+        analysis_plan_obj = self.retrieve_new_plan()
+
+        analysis_plan_get_url = f'{self.API_ANALYSIS_PREFIX}{analysis_plan_obj.object_id}/'
+
+        self.client = APIClient()
+
+        new_user, _created = get_user_model().objects.get_or_create(username='butterfly')
+
+        self.client.force_login(new_user)
+
+        response = self.client.get(analysis_plan_get_url)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
