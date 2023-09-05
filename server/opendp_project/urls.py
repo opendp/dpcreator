@@ -34,6 +34,7 @@ from opendp_apps.dataset.views_profile import ProfilingViewSet
 from opendp_apps.dataverses.urls import router as dataverse_router
 from opendp_apps.dataverses.views.dataverse_file_view import DataverseFileView
 from opendp_apps.dataverses.views.registered_dataverse_view import RegisteredDataverseView
+from opendp_apps.release_schemas.views import ReleaseSchemaView
 from opendp_apps.terms_of_access.views import TermsOfAccessViewSet, TermsOfAccessAgreementViewSet
 from opendp_apps.user.views import GoogleLogin
 from opendp_apps.user.views import UserViewSet
@@ -59,6 +60,7 @@ router.register(r'direct-upload', UploadFileSetupViewSet, basename='direct-uploa
 
 router.register(r'profile', ProfilingViewSet, basename='profile')
 router.register(r'registered-dvs', RegisteredDataverseView, basename='registered-dvs')
+router.register(r'release-schemas', ReleaseSchemaView, basename='release-schemas')
 router.register(r'release', ReleaseView, basename='release')
 router.register(r'release-download', ReleaseFileDownloadView, basename='release-download')
 

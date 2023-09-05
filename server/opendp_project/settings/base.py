@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     'opendp_apps.terms_of_access',
     'opendp_apps.banner_messages',
     'opendp_apps.profiler',
+    'opendp_apps.release_schemas',
     'opendp_apps.dp_reports',
 ]
 

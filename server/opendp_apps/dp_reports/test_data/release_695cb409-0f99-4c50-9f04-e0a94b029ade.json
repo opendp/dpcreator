@@ -1,0 +1,511 @@
+{
+    "name": "Plan A",
+    "created": {
+        "iso": "2023-08-31T19:51:52.589029",
+        "human_readable": "August 31, 2023 at 19:51:52:589029 ",
+        "human_readable_date_only": "31 August, 2023"
+    },
+    "application": "DP Creator",
+    "application_url": "https://github.com/opendp/dpcreator",
+    "differentially_private_library": {
+        "name": "OpenDP",
+        "url": "https://github.com/opendp/opendp",
+        "version": "0.6.1"
+    },
+    "dataset": {
+        "type": "upload",
+        "name": "Teacher Survey",
+        "fileFormat": "(unknown file type)",
+        "creator": {
+            "first_name": "DP",
+            "last_name": "Analyst",
+            "email": "test_analyst@opendp.org"
+        },
+        "upload_date": {
+            "iso": "2023-08-31T19:45:39.154207+00:00",
+            "human_readable": "August 31, 2023 at 19:45:39:154207 UTC",
+            "human_readable_date_only": "31 August, 2023"
+        }
+    },
+    "setup_questions": [
+        {
+            "question_num": 1,
+            "text": "Does your data file depend on private information of subjects?",
+            "attribute": "radio_depend_on_private_information",
+            "answer": "yes",
+            "context": "Question to help determine whether differential privacy is appropriate for this data file."
+        },
+        {
+            "question_num": 2,
+            "text": "Which of the following best describes your data file?",
+            "attribute": "radio_best_describes",
+            "answer": "notHarmButConfidential",
+            "context": "The answer is used to set privacy parameters (default epsilon and delta values) which may be changed later in the process.",
+            "longAnswer": "Information that, if disclosed, would not cause material harm, but which the organization has chosen to keep confidential",
+            "privacy_params": {
+                "epsilon": 1,
+                "delta": 1e-05
+            }
+        },
+        {
+            "question_num": 3,
+            "text": "Does each individual appear in only one row?",
+            "attribute": "radio_only_one_individual_per_row",
+            "answer": "yes",
+            "context": "Used to help determine dataset distance."
+        },
+        {
+            "question_num": 4,
+            "text": "Is your data a secret and simple random sample from a larger population?",
+            "attribute": "secret_sample",
+            "answer": "no",
+            "context": "If the data is a simple random sample, we can use methods (amplification) to increase the accuracy and utility of the statistics you create."
+        },
+        {
+            "question_num": 5,
+            "text": "Can the number of observations in your data file be made public knowledge?",
+            "attribute": "observations_number_can_be_public",
+            "answer": "yes",
+            "context": "If the data file size can be made public, we don't need to spend a portion of your privacy budget to estimate it."
+        }
+    ],
+    "statistics": [
+        {
+            "statistic": "histogram",
+            "variable": "smoking",
+            "variable_type": "Boolean",
+            "result": {
+                "value": {
+                    "categories": [
+                        1,
+                        2,
+                        "uncategorized"
+                    ],
+                    "values": [
+                        1355,
+                        5611,
+                        51
+                    ],
+                    "category_value_pairs": [
+                        [
+                            1,
+                            1355
+                        ],
+                        [
+                            2,
+                            5611
+                        ],
+                        [
+                            "uncategorized",
+                            51
+                        ]
+                    ]
+                }
+            },
+            "noise_mechanism": "Geometric",
+            "epsilon": 0.21428571428571427,
+            "delta": null,
+            "boolean_values": {
+                "true_value": 1,
+                "false_value": 2
+            },
+            "missing_value_handling": {
+                "type": "insert_fixed",
+                "fixed_value": "2"
+            },
+            "confidence_level": 0.95,
+            "confidence_level_alpha": 0.05,
+            "accuracy": {
+                "value": 17.21477078586504,
+                "message": "There is a probability of 95.0% that a count in the  DP Histogram will differ from the count in the true Histogram by at most 17.21477078586504 units. Here the units are the same units the variable smoking has in the dataset."
+            },
+            "description": {
+                "html": "A differentially private <b>Histogram</b> for variable <b>smoking</b> was calculated with the result <b>{&#x27;categories&#x27;: [1, 2, &#x27;uncategorized&#x27;], &#x27;values&#x27;: [1355, 5611, 51], &#x27;category_value_pairs&#x27;: [(1, 1355), (2, 5611), (&#x27;uncategorized&#x27;, 51)]}</b>. There is a probability of <b>95.0%</b> that a count in the  <b>DP Histogram</b> will differ from the count in the true Histogram by at most <b>17.21477078586504</b> units. Here the units are the same units the variable <b>smoking</b> has in the dataset.",
+                "text": "A differentially private Histogram for variable \"smoking\" was calculated with the result {&#x27;categories&#x27;: [1, 2, &#x27;uncategorized&#x27;], &#x27;values&#x27;: [1355, 5611, 51], &#x27;category_value_pairs&#x27;: [(1, 1355), (2, 5611), (&#x27;uncategorized&#x27;, 51)]}. There is a probability of 95.0% that a count in the  DP Histogram will differ from the count in the true Histogram by at most 17.21477078586504 units. Here the units are the same units the variable smoking has in the dataset."
+            }
+        },
+        {
+            "statistic": "mean",
+            "variable": "age",
+            "variable_type": "Integer",
+            "result": {
+                "value": 37.418067531157185
+            },
+            "noise_mechanism": "Laplace",
+            "epsilon": 0.21428571428571427,
+            "delta": null,
+            "bounds": {
+                "min": 20.0,
+                "max": 75.0
+            },
+            "missing_value_handling": {
+                "type": "insert_fixed",
+                "fixed_value": 42.0
+            },
+            "confidence_level": 0.95,
+            "confidence_level_alpha": 0.05,
+            "accuracy": {
+                "value": 0.10984351670312595,
+                "message": "There is a probability of 95.0% that the DP Mean will differ from the true Mean by at most 0.10984351670312595 units. Here the units are the same units the variable age has in the dataset."
+            },
+            "description": {
+                "html": "A differentially private <b>Mean</b> for variable <b>age</b> was calculated with the result <b>37.418067531157185</b>.  There is a probability of <b>95.0%</b> that the <b>DP Mean</b> will differ from\nthe true Mean by at most <b>0.10984351670312595</b> units. Here the units are the same units\nthe variable <b>age</b> has in the dataset.",
+                "text": "A differentially private Mean for variable \"age\" was calculated with the result 37.418067531157185. There is a probability of 95.0% that the DP Mean will differ from the true Mean by at most 0.10984351670312595 units. Here the units are the same units the variable age has in the dataset."
+            }
+        },
+        {
+            "statistic": "histogram",
+            "variable": "sourceofstress",
+            "variable_type": "Integer",
+            "result": {
+                "value": {
+                    "categories": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        "uncategorized"
+                    ],
+                    "values": [
+                        3839,
+                        188,
+                        187,
+                        405,
+                        415,
+                        313,
+                        510,
+                        870,
+                        240,
+                        -7
+                    ],
+                    "category_value_pairs": [
+                        [
+                            1,
+                            3839
+                        ],
+                        [
+                            2,
+                            188
+                        ],
+                        [
+                            3,
+                            187
+                        ],
+                        [
+                            4,
+                            405
+                        ],
+                        [
+                            5,
+                            415
+                        ],
+                        [
+                            6,
+                            313
+                        ],
+                        [
+                            7,
+                            510
+                        ],
+                        [
+                            8,
+                            870
+                        ],
+                        [
+                            9,
+                            240
+                        ],
+                        [
+                            "uncategorized",
+                            -7
+                        ]
+                    ]
+                }
+            },
+            "noise_mechanism": "Geometric",
+            "epsilon": 0.21428571428571427,
+            "delta": null,
+            "bounds": {
+                "min": 1,
+                "max": 9
+            },
+            "missing_value_handling": {
+                "type": "insert_fixed",
+                "fixed_value": 1
+            },
+            "confidence_level": 0.95,
+            "confidence_level_alpha": 0.05,
+            "accuracy": {
+                "value": 24.23379863748765,
+                "message": "There is a probability of 95.0% that a count in the  DP Histogram will differ from the count in the true Histogram by at most 24.23379863748765 units. Here the units are the same units the variable sourceofstress has in the dataset."
+            },
+            "description": {
+                "html": "A differentially private <b>Histogram</b> for variable <b>sourceofstress</b> was calculated with the result <b>{&#x27;categories&#x27;: [1, 2, 3, 4, 5, 6, 7, 8, 9, &#x27;uncategorized&#x27;], &#x27;values&#x27;: [3839, 188, 187, 405, 415, 313, 510, 870, 240, -7], &#x27;category_value_pairs&#x27;: [(1, 3839), (2, 188), (3, 187), (4, 405), (5, 415), (6, 313), (7, 510), (8, 870), (9, 240), (&#x27;uncategorized&#x27;, -7)]}</b>. There is a probability of <b>95.0%</b> that a count in the  <b>DP Histogram</b> will differ from the count in the true Histogram by at most <b>24.23379863748765</b> units. Here the units are the same units the variable <b>sourceofstress</b> has in the dataset.",
+                "text": "A differentially private Histogram for variable \"sourceofstress\" was calculated with the result {&#x27;categories&#x27;: [1, 2, 3, 4, 5, 6, 7, 8, 9, &#x27;uncategorized&#x27;], &#x27;values&#x27;: [3839, 188, 187, 405, 415, 313, 510, 870, 240, -7], &#x27;category_value_pairs&#x27;: [(1, 3839), (2, 188), (3, 187), (4, 405), (5, 415), (6, 313), (7, 510), (8, 870), (9, 240), (&#x27;uncategorized&#x27;, -7)]}. There is a probability of 95.0% that a count in the  DP Histogram will differ from the count in the true Histogram by at most 24.23379863748765 units. Here the units are the same units the variable sourceofstress has in the dataset."
+            }
+        },
+        {
+            "statistic": "histogram",
+            "variable": "highesteducationlevel",
+            "variable_type": "Integer",
+            "result": {
+                "value": {
+                    "categories": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        "uncategorized"
+                    ],
+                    "values": [
+                        30,
+                        848,
+                        1368,
+                        1903,
+                        1963,
+                        887,
+                        2
+                    ],
+                    "category_value_pairs": [
+                        [
+                            1,
+                            30
+                        ],
+                        [
+                            2,
+                            848
+                        ],
+                        [
+                            3,
+                            1368
+                        ],
+                        [
+                            4,
+                            1903
+                        ],
+                        [
+                            5,
+                            1963
+                        ],
+                        [
+                            6,
+                            887
+                        ],
+                        [
+                            "uncategorized",
+                            2
+                        ]
+                    ]
+                }
+            },
+            "noise_mechanism": "Geometric",
+            "epsilon": 0.21428571428571427,
+            "delta": null,
+            "bounds": {
+                "min": 1,
+                "max": 6
+            },
+            "missing_value_handling": {
+                "type": "insert_fixed",
+                "fixed_value": 5
+            },
+            "confidence_level": 0.95,
+            "confidence_level_alpha": 0.05,
+            "accuracy": {
+                "value": 22.341628132982883,
+                "message": "There is a probability of 95.0% that a count in the  DP Histogram will differ from the count in the true Histogram by at most 22.341628132982883 units. Here the units are the same units the variable highesteducationlevel has in the dataset."
+            },
+            "description": {
+                "html": "A differentially private <b>Histogram</b> for variable <b>highesteducationlevel</b> was calculated with the result <b>{&#x27;categories&#x27;: [1, 2, 3, 4, 5, 6, &#x27;uncategorized&#x27;], &#x27;values&#x27;: [30, 848, 1368, 1903, 1963, 887, 2], &#x27;category_value_pairs&#x27;: [(1, 30), (2, 848), (3, 1368), (4, 1903), (5, 1963), (6, 887), (&#x27;uncategorized&#x27;, 2)]}</b>. There is a probability of <b>95.0%</b> that a count in the  <b>DP Histogram</b> will differ from the count in the true Histogram by at most <b>22.341628132982883</b> units. Here the units are the same units the variable <b>highesteducationlevel</b> has in the dataset.",
+                "text": "A differentially private Histogram for variable \"highesteducationlevel\" was calculated with the result {&#x27;categories&#x27;: [1, 2, 3, 4, 5, 6, &#x27;uncategorized&#x27;], &#x27;values&#x27;: [30, 848, 1368, 1903, 1963, 887, 2], &#x27;category_value_pairs&#x27;: [(1, 30), (2, 848), (3, 1368), (4, 1903), (5, 1963), (6, 887), (&#x27;uncategorized&#x27;, 2)]}. There is a probability of 95.0% that a count in the  DP Histogram will differ from the count in the true Histogram by at most 22.341628132982883 units. Here the units are the same units the variable highesteducationlevel has in the dataset."
+            }
+        },
+        {
+            "statistic": "histogram",
+            "variable": "optimism",
+            "variable_type": "Integer",
+            "result": {
+                "value": {
+                    "categories": [
+                        "[6, 13]",
+                        "[14, 21]",
+                        "[22, 30]",
+                        "uncategorized"
+                    ],
+                    "histogram_bin_edges": [
+                        6,
+                        14,
+                        22,
+                        31
+                    ],
+                    "values": [
+                        206,
+                        2876,
+                        3923,
+                        2
+                    ],
+                    "category_value_pairs": [
+                        [
+                            "[6, 13]",
+                            206
+                        ],
+                        [
+                            "[14, 21]",
+                            2876
+                        ],
+                        [
+                            "[22, 30]",
+                            3923
+                        ],
+                        [
+                            "uncategorized",
+                            2
+                        ]
+                    ]
+                }
+            },
+            "noise_mechanism": "Geometric",
+            "epsilon": 0.21428571428571427,
+            "delta": null,
+            "bounds": {
+                "min": 6,
+                "max": 30
+            },
+            "missing_value_handling": {
+                "type": "insert_fixed",
+                "fixed_value": 15
+            },
+            "confidence_level": 0.95,
+            "confidence_level_alpha": 0.05,
+            "accuracy": {
+                "value": 19.106941290369804,
+                "message": "There is a probability of 95.0% that a count in the  DP Histogram will differ from the count in the true Histogram by at most 19.106941290369804 units. Here the units are the same units the variable optimism has in the dataset."
+            },
+            "description": {
+                "html": "A differentially private <b>Histogram</b> for variable <b>optimism</b> was calculated with the result <b>{&#x27;categories&#x27;: [&#x27;[6, 13]&#x27;, &#x27;[14, 21]&#x27;, &#x27;[22, 30]&#x27;, &#x27;uncategorized&#x27;], &#x27;histogram_bin_edges&#x27;: [6, 14, 22, 31], &#x27;values&#x27;: [206, 2876, 3923, 2], &#x27;category_value_pairs&#x27;: [(&#x27;[6, 13]&#x27;, 206), (&#x27;[14, 21]&#x27;, 2876), (&#x27;[22, 30]&#x27;, 3923), (&#x27;uncategorized&#x27;, 2)]}</b>. There is a probability of <b>95.0%</b> that a count in the  <b>DP Histogram</b> will differ from the count in the true Histogram by at most <b>19.106941290369804</b> units. Here the units are the same units the variable <b>optimism</b> has in the dataset.",
+                "text": "A differentially private Histogram for variable \"optimism\" was calculated with the result {&#x27;categories&#x27;: [&#x27;[6, 13]&#x27;, &#x27;[14, 21]&#x27;, &#x27;[22, 30]&#x27;, &#x27;uncategorized&#x27;], &#x27;histogram_bin_edges&#x27;: [6, 14, 22, 31], &#x27;values&#x27;: [206, 2876, 3923, 2], &#x27;category_value_pairs&#x27;: [(&#x27;[6, 13]&#x27;, 206), (&#x27;[14, 21]&#x27;, 2876), (&#x27;[22, 30]&#x27;, 3923), (&#x27;uncategorized&#x27;, 2)]}. There is a probability of 95.0% that a count in the  DP Histogram will differ from the count in the true Histogram by at most 19.106941290369804 units. Here the units are the same units the variable optimism has in the dataset."
+            }
+        },
+        {
+            "statistic": "count",
+            "variable": "maritalstatus",
+            "variable_type": "Categorical",
+            "result": {
+                "value": 7001
+            },
+            "noise_mechanism": "Geometric",
+            "epsilon": 0.21428571428571427,
+            "delta": null,
+            "missing_value_handling": {
+                "type": ""
+            },
+            "confidence_level": 0.95,
+            "confidence_level_alpha": 0.05,
+            "accuracy": {
+                "value": 13.980083943251959,
+                "message": "There is a probability of 95.0% that the DP Count will differ from the true Count by at most 13.980083943251959 units. Here the units are the same units the variable maritalstatus has in the dataset."
+            },
+            "description": {
+                "html": "A differentially private <b>Count</b> for variable <b>maritalstatus</b> was calculated with the result <b>7001</b>.  There is a probability of <b>95.0%</b> that the <b>DP Count</b> will differ from\nthe true Count by at most <b>13.980083943251959</b> units. Here the units are the same units\nthe variable <b>maritalstatus</b> has in the dataset.",
+                "text": "A differentially private Count for variable \"maritalstatus\" was calculated with the result 7001. There is a probability of 95.0% that the DP Count will differ from the true Count by at most 13.980083943251959 units. Here the units are the same units the variable maritalstatus has in the dataset."
+            }
+        },
+        {
+            "statistic": "histogram",
+            "variable": "maritalstatus",
+            "variable_type": "Integer",
+            "result": {
+                "value": {
+                    "categories": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        "uncategorized"
+                    ],
+                    "values": [
+                        1680,
+                        590,
+                        593,
+                        3014,
+                        476,
+                        165,
+                        387,
+                        112,
+                        26
+                    ],
+                    "category_value_pairs": [
+                        [
+                            1,
+                            1680
+                        ],
+                        [
+                            2,
+                            590
+                        ],
+                        [
+                            3,
+                            593
+                        ],
+                        [
+                            4,
+                            3014
+                        ],
+                        [
+                            5,
+                            476
+                        ],
+                        [
+                            6,
+                            165
+                        ],
+                        [
+                            7,
+                            387
+                        ],
+                        [
+                            8,
+                            112
+                        ],
+                        [
+                            "uncategorized",
+                            26
+                        ]
+                    ]
+                }
+            },
+            "noise_mechanism": "Geometric",
+            "epsilon": 0.21428571428571427,
+            "delta": null,
+            "bounds": {
+                "min": 1,
+                "max": 8
+            },
+            "missing_value_handling": {
+                "type": "insert_fixed",
+                "fixed_value": 2
+            },
+            "confidence_level": 0.95,
+            "confidence_level_alpha": 0.05,
+            "accuracy": {
+                "value": 23.68414447109119,
+                "message": "There is a probability of 95.0% that a count in the  DP Histogram will differ from the count in the true Histogram by at most 23.68414447109119 units. Here the units are the same units the variable maritalstatus has in the dataset."
+            },
+            "description": {
+                "html": "A differentially private <b>Histogram</b> for variable <b>maritalstatus</b> was calculated with the result <b>{&#x27;categories&#x27;: [1, 2, 3, 4, 5, 6, 7, 8, &#x27;uncategorized&#x27;], &#x27;values&#x27;: [1680, 590, 593, 3014, 476, 165, 387, 112, 26], &#x27;category_value_pairs&#x27;: [(1, 1680), (2, 590), (3, 593), (4, 3014), (5, 476), (6, 165), (7, 387), (8, 112), (&#x27;uncategorized&#x27;, 26)]}</b>. There is a probability of <b>95.0%</b> that a count in the  <b>DP Histogram</b> will differ from the count in the true Histogram by at most <b>23.68414447109119</b> units. Here the units are the same units the variable <b>maritalstatus</b> has in the dataset.",
+                "text": "A differentially private Histogram for variable \"maritalstatus\" was calculated with the result {&#x27;categories&#x27;: [1, 2, 3, 4, 5, 6, 7, 8, &#x27;uncategorized&#x27;], &#x27;values&#x27;: [1680, 590, 593, 3014, 476, 165, 387, 112, 26], &#x27;category_value_pairs&#x27;: [(1, 1680), (2, 590), (3, 593), (4, 3014), (5, 476), (6, 165), (7, 387), (8, 112), (&#x27;uncategorized&#x27;, 26)]}. There is a probability of 95.0% that a count in the  DP Histogram will differ from the count in the true Histogram by at most 23.68414447109119 units. Here the units are the same units the variable maritalstatus has in the dataset."
+            }
+        }
+    ]
+}
