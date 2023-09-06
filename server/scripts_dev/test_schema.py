@@ -18,7 +18,7 @@ SCHEMA_EXAMPLES_DIR = join(dirname(dirname(abspath(__file__))), 'opendp_apps', '
 
 def test_schema():
     """Test the schema"""
-    schema_file = join(SCHEMA_DIR, 'schema_v0.1.0.json')
+    schema_file = join(SCHEMA_DIR, 'schema_v0.2.0.json')
     #schema_file = join(SCHEMA_DIR, 'snippet_dpcreator_schema_v01.beta.json')
     schema_example_file = join(SCHEMA_EXAMPLES_DIR, 'release_test_01.json')
 

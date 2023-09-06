@@ -60,7 +60,7 @@ router.register(r'direct-upload', UploadFileSetupViewSet, basename='direct-uploa
 
 router.register(r'profile', ProfilingViewSet, basename='profile')
 router.register(r'registered-dvs', RegisteredDataverseView, basename='registered-dvs')
-router.register(r'release-schemas', ReleaseSchemaView, basename='release-schemas')
+router.register(r'schema', ReleaseSchemaView, basename='schema')
 router.register(r'release', ReleaseView, basename='release')
 router.register(r'release-download', ReleaseFileDownloadView, basename='release-download')
 

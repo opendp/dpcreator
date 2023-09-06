@@ -11,6 +11,12 @@ def validate_json_schema(value):
     except jsonschema.exceptions.SchemaError as err_obj:
         raise ValidationError(f'Error in schema: {err_obj.message}')
 
+    required_keys = ['$schema', '$id', 'version', 'title']
+
+    for req_key in required_keys:
+        if req_key not in value:
+            raise ValidationError(f'JSON schema is missing required key: "{req_key}"')
+
 
 def validate_semantic_version_number(value):
     """Validate the semanatic version number"""
@@ -21,6 +27,7 @@ def validate_semantic_version_number(value):
             _("%(value)s is not a valid version"),
             params={"value": value},
         )
+
 
 def get_sortable_semantic_version(version_number):
     """Return a sortable version of the semantic version"""
@@ -34,6 +41,7 @@ def get_sortable_semantic_version(version_number):
         vnum += '-' + str(vpart).zfill(4)
     #
     return vnum
+
 
 def format_semantic_version(version_number):
     """Return a sortable version of the semantic version"""

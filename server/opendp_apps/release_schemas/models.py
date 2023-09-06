@@ -6,6 +6,7 @@ from django.db import models
 from django.utils.safestring import mark_safe
 
 from opendp_apps.model_helpers.models import TimestampedModelWithUUID
+from opendp_apps.release_schemas import static_vals as rstatic
 from opendp_apps.release_schemas.validators import \
     (validate_semantic_version_number,
      validate_json_schema,
@@ -24,9 +25,11 @@ class ReleaseInfoSchema(TimestampedModelWithUUID):
                                help_text='Semantic version. Example: 1.4.2',
                                validators=[validate_semantic_version_number])
 
-    name = models.CharField(max_length=128,
-                            unique=True,
-                            help_text='Name of the schema. Include the "Version number" in the name.')
+    title = models.CharField(max_length=128,
+                             blank=True,
+                             help_text='(auto-generated) Value of the schema\'s "title" property.')
+
+    description = models.TextField(blank=True, help_text='Description of the schema')
 
     is_published = models.BooleanField(default=False)
 
@@ -34,30 +37,30 @@ class ReleaseInfoSchema(TimestampedModelWithUUID):
                               validators=[validate_json_schema])
 
     schema_link = models.URLField(blank=True,
-                                  help_text='(auto-filled) Link to the schema, using the keyword "$schema"')
+                                  help_text=('(auto-filled) Value of the schema\'s'
+                                             ' "$schema" property, if available'))
 
     id_link = models.URLField(blank=True,
-                              help_text='(auto-filled) Link to the "id", trying the keywords "id" and "$id"')
-
-    description = models.TextField(blank=True)
+                              help_text=('(auto-filled) Value of the schema\'s "$id"'
+                                         ' property, if available'))
 
     sortable_version = models.CharField(max_length=50,
-                                        help_text='Auto-populated. Sortable version of the schema.')
+                                        help_text=('(auto-filled) Sortable version number'
+                                                   ' of the schema.'))
 
     class Meta:
         ordering = ['-sortable_version']
 
     def __str__(self):
-        return f'{self.name} ({self.version})'
-
-
+        return f'{self.title} ({self.version})'
 
     def save(self):
         """Create a sortable version of the semantic version number"""
-        #self.version = format_semantic_version(self.version)
+        # self.version = format_semantic_version(self.version)
         self.sortable_version = get_sortable_semantic_version(self.version)
-        self.schema_link = self.get_schema_link()
-        self.id_link = self.get_id_link()
+        self.schema_link = self.get_schema_value('$schema', rstatic.SCHEMA_FIELD_NOT_SET)
+        self.title = self.get_schema_value('title', f'Version {self.version}')
+        self.id_link = self.get_schema_value('$id', rstatic.SCHEMA_FIELD_NOT_SET)
 
         super().save()
 
@@ -70,22 +73,15 @@ class ReleaseInfoSchema(TimestampedModelWithUUID):
         return '(not available)'
 
     @mark_safe
-    def get_schema_link(self):
+    def get_schema_value(self, key, default=None):
         """Return the link to the schema, using the keyword '$schema' """
         if not self.schema:
             return None
 
-        return self.schema.get('$schema', None)
+        return self.schema.get(key, default)
 
-    @mark_safe
-    def get_id_link(self):
-        """Return the link to the 'id', trying the keywords 'id' and '$id' """
+    def get_title(self):
         if not self.schema:
-            return None
+            return f'Version {self.version}'
+        return self.schema.get('title', f'Version {self.version}')
 
-        # try both "id" and "$id"
-        id_link = self.schema.get('id', None)
-        if not id_link:
-            id_link = self.schema.get('$id', None)
-
-        return id_link

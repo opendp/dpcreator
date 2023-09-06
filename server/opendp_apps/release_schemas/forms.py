@@ -15,12 +15,17 @@ class ReleaseInfoSchemaForm(ModelForm):
     def clean(self):
         """Validate the data. Check that the version number is in the name"""
         version = self.cleaned_data.get("version")
-        name = self.cleaned_data.get("name")
+        schema = self.cleaned_data.get("schema")
 
         errors = {}
-        if version and name:
-            if not version in name:
-                errors['name'] = _(f'Please include the Version number, "{version}", in the Name')
+        if version and schema:
+            schema_version = schema.get('version', None)
+            if schema_version is None:
+                errors['schema'] = _(f'The schema requires a "version" key.')
+            elif not version == schema_version:
+                errors['version'] = _((f'The version, "{version}", does not match the'
+                                       f' schema\'s "version", which has the value'
+                                       f' "{schema_version}".'))
 
         if errors:
             raise ValidationError(errors)
