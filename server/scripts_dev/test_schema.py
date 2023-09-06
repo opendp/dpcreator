@@ -12,15 +12,17 @@ from opendp_apps.release_schemas.schema_validator import SchemaValidator
 from opendp_apps.model_helpers.msg_util import msgt
 
 PROJECT_DIR = dirname(dirname(abspath(__file__)))
-SCHEMA_DIR = join(dirname(dirname(abspath(__file__))), 'opendp_apps', 'release_schemas', 'schemas')
-SCHEMA_EXAMPLES_DIR = join(dirname(dirname(abspath(__file__))), 'opendp_apps', 'release_schemas', 'schema_examples')
+SCHEMA_DIR = join(dirname(dirname(abspath(__file__))),
+                  'opendp_apps', 'release_schemas', 'schemas')
+SCHEMA_EXAMPLES_DIR = join(dirname(dirname(abspath(__file__))),
+                           'opendp_apps', 'release_schemas', 'testing', 'schema_examples')
 
 
 def test_schema():
     """Test the schema"""
     schema_file = join(SCHEMA_DIR, 'schema_v0.2.0.json')
     #schema_file = join(SCHEMA_DIR, 'snippet_dpcreator_schema_v01.beta.json')
-    schema_example_file = join(SCHEMA_EXAMPLES_DIR, 'release_test_01.json')
+    schema_example_file = join(SCHEMA_EXAMPLES_DIR, 'release_v0.2.0_test_01.json')
 
     with open(schema_file, 'r') as in_file:
         schema_dict = json.load(in_file)

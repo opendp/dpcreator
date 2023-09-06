@@ -1,10 +1,9 @@
-from django.contrib import admin
-
 # Register your models here.
 from django.contrib import admin
 
-from opendp_apps.release_schemas.models import ReleaseInfoSchema
 from opendp_apps.release_schemas.forms import ReleaseInfoSchemaForm
+from opendp_apps.release_schemas.models import ReleaseInfoSchema
+
 
 class ReleaseInfoSchemaAdmin(admin.ModelAdmin):
     form = ReleaseInfoSchemaForm
@@ -33,5 +32,7 @@ class ReleaseInfoSchemaAdmin(admin.ModelAdmin):
               'id_link',
               'schema_display',
               'created',
-              'updated',]
+              'updated', ]
+
+
 admin.site.register(ReleaseInfoSchema, ReleaseInfoSchemaAdmin)

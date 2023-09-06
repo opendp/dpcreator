@@ -177,8 +177,7 @@ server/scripts_dev/dv_test_creds.py
 !server/opendp_apps/banner_messages/fixtures/*.json
 !server/opendp_apps/release_schemas/fixtures/*.json
 !server/opendp_apps/release_schemas/schemas/*.json
-!server/opendp_apps/release_schemas/schema_examples/*.json
-!server/opendp_apps/release_schemas/testing/*.json
+!server/opendp_apps/release_schemas/testing/schema_examples/*.json
 !server/opendp_apps/dataverses/fixtures/*.json
 !server/opendp_apps/profiler/fixtures/*.json
 !server/opendp_apps/profiler/testing/test_files/*
