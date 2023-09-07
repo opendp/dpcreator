@@ -37,6 +37,7 @@ python /code/server/manage.py loaddata opendp_apps/dataverses/fixtures/terms.jso
 python /code/server/manage.py loaddata opendp_apps/dataverses/fixtures/test_dataverses_01.json
 # python /code/server/manage.py loaddata opendp_apps/dataverses/fixtures/test_user_emailaddress.json
 python /code/server/manage.py loaddata opendp_apps/banner_messages/fixtures/*.json
+python /code/server/manage.py loaddata opendp_apps/release_schemas/fixtures/*.json
 #  opendp_apps/banner_messages/fixtures/*.json
 #   opendp_apps/dataset/fixtures/*.json
 exec "$@"

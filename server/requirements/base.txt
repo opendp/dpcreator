@@ -16,7 +16,8 @@ djangorestframework>=3.12.2
 django-rest-polymorphic>=0.1.9
 django-cors-headers==3.6.0
 idna==2.10
-jsonschema==4.2.1
+jsonschema==4.19.0
+jsonschema-specifications==2023.7.1
 lxml==4.9.1
 numpy==1.22.0
 opencensus-ext-azure==1.1.3

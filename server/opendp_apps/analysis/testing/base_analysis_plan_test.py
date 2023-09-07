@@ -52,4 +52,3 @@ class BaseAnalysisPlanTest(TestCase):
                                       epsilon=0.25,
                                       expiration_date=self.expiration_date_str)
         # print(json.dumps(self.working_plan_info, indent=4))
-
