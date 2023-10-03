@@ -37,7 +37,7 @@ sendgrid==6.4.7
 simplejson==3.17.5
 six==1.15.0
 sqlparse==0.3.1
-urllib3==1.26.5
+urllib3==1.26.17
 us==2.0.2
 uuid==1.30
 webencodings==0.5.1
