@@ -4,6 +4,7 @@ import logging
 from django.conf import settings
 from django.db import models
 from django.utils.safestring import mark_safe
+from rest_framework import reverse as drf_reverse
 
 from opendp_apps.model_helpers.models import TimestampedModelWithUUID
 from opendp_apps.release_schemas import static_vals as rstatic
@@ -64,6 +65,15 @@ class ReleaseInfoSchema(TimestampedModelWithUUID):
 
         super().save()
 
+    def get_api_schema_url(self):
+        """Return the url for this schema, based on the version number. e.g. '/api/schema/0.2.0/' """
+        return drf_reverse('schema-detail', kwargs=dict(version=self.version))
+
+    @staticmethod
+    def get_latest_schema():
+        """Return the latest schema"""
+        return ReleaseInfoSchema.objects.filter(is_published=True).first()
+
     @mark_safe
     def schema_display(self):
         """Return a string representation of the schema for the admin"""
@@ -85,3 +95,12 @@ class ReleaseInfoSchema(TimestampedModelWithUUID):
             return f'Version {self.version}'
         return self.schema.get('title', f'Version {self.version}')
 
+    '''
+    def get_schema_url_for_release(self):
+        """Return the schema url for the release"""
+        release_schema = self.id_link
+        if not self.schema:
+            return None
+
+        return self.schema.get('$id', None)
+    '''

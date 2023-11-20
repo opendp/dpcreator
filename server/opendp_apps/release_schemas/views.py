@@ -37,7 +37,7 @@ class ReleaseSchemaView(viewsets.ModelViewSet):
         Retrieve the JSON schema for a given version
         Example: http://127.0.0.1:8000/api/release-download/0-2-0/json/
         """
-        release_schema = ReleaseInfoSchema.objects.filter(is_published=True).first()
+        release_schema = ReleaseInfoSchema.get_latest_schema()
         if release_schema is not None:
             serializer = ReleaseSchemaSerializer(release_schema)  # serialize the data
             logger.info(f"AnalysisPlan created: {serializer.data}")

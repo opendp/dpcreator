@@ -1,0 +1,10 @@
+[
+  {
+      "model": "sites.site",
+      "pk": 3,
+      "fields": {
+          "domain": "localhost:8000",
+          "name": "DP Creator"
+      }
+  }
+]

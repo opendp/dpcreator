@@ -100,3 +100,6 @@ urlpatterns = [
 if settings.USE_DEV_STATIC_SERVER:
     print(f'Serving directory "{settings.STATIC_ROOT}" from url "{settings.STATIC_URL}"')
     urlpatterns += staticfiles_urlpatterns()
+
+# import pprint
+# pprint.pprint(router.get_urls())

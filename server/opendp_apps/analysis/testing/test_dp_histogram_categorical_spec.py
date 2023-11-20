@@ -297,3 +297,78 @@ class HistogramCategoricalStatSpecTest(StatSpecTestCase):
 
         self.assertEqual(format_variable_info(None), None)
         self.assertEqual(format_variable_info({}), {})
+
+
+    def test_150_run_dphist_calculation_categorical2(self):
+        """(150) Categorical"""
+        msgt(self.test_150_run_dphist_calculation_categorical2.__doc__)
+
+        spec_props = {
+            'variable': 'category',
+            'col_index': 0,
+            'statistic': astatic.DP_HISTOGRAM,
+            'dataset_size': 455,
+            'epsilon': .25,
+            'delta': 0.0,
+            'cl': astatic.CL_99,
+            'fixed_value': 'Other',
+            'missing_values_handling': astatic.MISSING_VAL_INSERT_FIXED,
+            'variable_info': {
+                'categories': ['Academic researcher or faculty',
+                             'Data scientist',
+                             'Government employee',
+                             'Industry Professional',
+                             'Privacy-focused researcher or professional',
+                             'Student',
+                             'Other',
+                             'Non-technical staff'],
+                'type': pstatic.VAR_TYPE_CATEGORICAL
+            }
+        }
+
+        dp_hist = DPHistogramCategoricalSpec(spec_props)
+        if dp_hist.has_error():
+            print(f"get_error_messages(): {dp_hist.get_error_messages()}")
+
+        self.assertTrue(dp_hist.is_chain_valid())
+        # print('\nUI info:', json.dumps(dp_hist.get_success_msg_dict()))
+
+        # ------------------------------------------------------
+        # Run the actual mean
+        # ------------------------------------------------------
+        # Column indexes - We know this data has 2 columns
+        col_indexes = [idx for idx in range(0, 2)]
+
+        # File object
+        #
+
+        eye_fatigue_filepath = join(TEST_DATA_DIR, 'attendees.csv')
+        # print('eye_fatigue_filepath', eye_fatigue_filepath)
+        self.assertTrue(isfile(eye_fatigue_filepath))
+
+        file_obj = open(eye_fatigue_filepath, 'r')
+
+        # Call run_chain
+        #
+        dp_hist.run_chain(col_indexes, file_obj, sep_char=",")
+        self.assertFalse(dp_hist.has_error())
+        self.assertTrue('categories' in dp_hist.value)
+        self.assertTrue('values' in dp_hist.value)
+
+        release_dict = dp_hist.get_release_dict()
+        import json; print(json.dumps(release_dict, indent=4))
+
+        # Check that the fixed_value and list of categories are "unquoted"
+        #
+        fixed_value = release_dict['missing_value_handling']['fixed_value']
+        self.assertEqual(fixed_value, spec_props['fixed_value'])
+
+        categories = release_dict['result']['value']['categories']
+        spec_categories = spec_props['variable_info']['categories']
+        spec_categories.append('uncategorized')
+        for cat_name in categories:
+            self.assertIn(cat_name, spec_categories)
+
+        # Check that the fixed_value is in the list of categories
+        #
+        self.assertTrue(fixed_value in categories)

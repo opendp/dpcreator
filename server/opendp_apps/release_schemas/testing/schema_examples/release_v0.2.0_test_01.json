@@ -1,7 +1,6 @@
 {
     "name": "Plan 1",
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$ref": "http://localhost:8000/api/schema/0.2.0/",
+    "$schema": "http://localhost:8000/api/schema/0.2.0/",
     "version": "0.2.0",
     "created": {
         "iso": "2023-08-31T17:48:08.111656",

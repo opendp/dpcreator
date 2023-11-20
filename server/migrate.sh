@@ -38,6 +38,7 @@ python /code/server/manage.py loaddata opendp_apps/dataverses/fixtures/test_data
 # python /code/server/manage.py loaddata opendp_apps/dataverses/fixtures/test_user_emailaddress.json
 python /code/server/manage.py loaddata opendp_apps/banner_messages/fixtures/*.json
 python /code/server/manage.py loaddata opendp_apps/release_schemas/fixtures/*.json
+python /code/server/manage.py loaddata opendp_apps/content_pages/fixtures/sites-localhost.json
 #  opendp_apps/banner_messages/fixtures/*.json
 #   opendp_apps/dataset/fixtures/*.json
 exec "$@"

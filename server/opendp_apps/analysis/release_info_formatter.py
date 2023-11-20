@@ -14,7 +14,8 @@ from opendp_apps.analysis.models import ReleaseInfo
 from opendp_apps.analysis.setup_question_formatter import SetupQuestionFormatter
 from opendp_apps.dataset.dataset_formatter import DatasetFormatter
 from opendp_apps.model_helpers.basic_err_check import BasicErrCheck
-
+from opendp_apps.release_schemas.models import ReleaseInfoSchema
+from opendp_apps.utils.site_helper import get_current_site_url
 
 class ReleaseInfoFormatter(BasicErrCheck):
 
@@ -71,8 +72,18 @@ class ReleaseInfoFormatter(BasicErrCheck):
             if not setup_formatter.has_error():
                 setup_questions = setup_formatter.as_dict()
 
+        # schema and version
+        latest_schema = ReleaseInfoSchema.get_latest_schema()
+        if latest_schema is None:
+            self.add_err_msg('A published schema was not found')
+            return
+
+        schema_url = get_current_site_url() + latest_schema.get_api_schema_url() + 'testing/'
+
         self.release_dict = OrderedDict({
             "name": str(self.release_util.analysis_plan),
+            "$schema": schema_url,
+            "version": latest_schema.version,
             # "release_url": None,    # via with https://github.com/opendp/dpcreator/issues/34
             "created": {
                 "iso": current_dt.isoformat(),
