@@ -43,13 +43,17 @@ services:
   #  - Built from "server/Dockerfile"
   # ---------------------------------
   server:
+    platform: linux/amd64
     build: "./server"
     # For production we will need to set
     # these variables to point to a standalone instance
     environment:
       - DJANGO_SETTINGS_MODULE=opendp_project.settings.development
       - VUE_APP_GOOGLE_CLIENT_ID="TEST. Set in docker-compose.yml"
-      - VUE_APP_ADOBE_PDF_CLIENT_ID="TEST. Set in docker-compose.yml"
+      - VUE_APP_ADOBE_PDF_CLIENT_ID=13c79907c6144590b17e8ef044324444
+      - SKIP_PDF_CREATION_FOR_TESTS=False
+      - SKIP_EMAIL_RELEASE_FOR_TESTS=False
+      - VUE_APP_WEBSOCKET_PREFIX=ws://
     env_file:
       - .env
     command: sh -c "python manage.py show_debug_params && python manage.py runserver 0.0.0.0:8000"
