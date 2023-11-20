@@ -33,14 +33,15 @@ This page lists contains rudimentary instructions for building the development e
       docker-compose run server python manage.py shell
       ```
 4. **Access DP Creator**
-   - Open http://127.0.0.1:80 in your browser
+   - Open http://127.0.0.1:8000 in your browser
+     - (Note the port is **8000**) 
    - The following credentials are available
      - login/pw: `dev_admin`/`admin`
      
 ## Accessing the API
 
 1. Follow steps 1-4 under _Running with Docker Compose_
-2. Open `http://127.0.0.1:8000/api/` in your browser. 
+2. Open http://127.0.0.1:8000/api/ in your browser. 
 3. The following credentials provide administrative access.
      - login/pw: `dev_admin`/`admin`
 4. Note, not all APIs are traditional REST APIs and they are not full documented.
