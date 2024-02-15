@@ -1,5 +1,6 @@
 # OpenDP - App Design
 
+
 ## _A Vue.js application_
 
 This is a front-end application for the OpenDP project, powered using [Vue.js] and [Vuetify], a Material Component Framework for Vue.js.
