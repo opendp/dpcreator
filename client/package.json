@@ -29,7 +29,7 @@
     "vuex-persistedstate": "4.1.0"
   },
   "devDependencies": {
-    "@vue/cli-plugin-router": "~4.5.12",
+    "@vue/cli-plugin-router": "5.0.8",
     "@vue/cli-plugin-unit-jest": "5.0.8",
     "@vue/cli-service": "5.0.8",
     "@vue/test-utils": "1.1.4",
