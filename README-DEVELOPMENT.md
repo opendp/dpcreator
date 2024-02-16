@@ -15,21 +15,17 @@ This page lists contains rudimentary instructions for building the development e
    
    `docker-compose up --build`
 
-1. All subsequent commands should be run from the `server` directory
-   
-   `cd server`
 
 3. The first time you run (or anytime schema changes have been made), open a separate Terminal, `cd` into the `dpcreator/` directory
 and manually run this migration:
 
-    `docker-compose run server ./migrate.sh`
+    __`docker-compose run server ./migrate.sh`__
 
-    (In general, any command can be run by adding "docker-compose run server" to the beginning, 
-such as:
+4. Open `http://localhost:8000/` in your browser. You should see DP Creator running.
+5. You can login to DP Creator using the following credentials:
 
-    `docker-compose run server python manage.py shell`
-    
-which will drop you into the Django shell on the Docker container.)
+    - Username: `dev_admin`
+    - Password: `admin`
 
 ## Running without Containers (not recommended)
 
