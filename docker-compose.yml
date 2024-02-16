@@ -43,6 +43,7 @@ services:
   #  - Built from "server/Dockerfile"
   # ---------------------------------
   server:
+    platform: linux/amd64
     build: "./server"
     # For production we will need to set
     # these variables to point to a standalone instance
@@ -67,6 +68,7 @@ services:
 # ---------------------------------
   celery-queue:
     build: "./server"
+    platform: linux/amd64
     environment:
       - DJANGO_SETTINGS_MODULE=opendp_project.settings.development
     env_file:
