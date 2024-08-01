@@ -13,13 +13,13 @@ This page lists contains rudimentary instructions for building the development e
    
    If major configuration changes have been made (new dependencies, etc.) then the containers will need to be rebuilt:
    
-   `docker-compose up --build`
+   `docker compose up --build`
 
 
 3. The first time you run (or anytime schema changes have been made), open a separate Terminal, `cd` into the `dpcreator/` directory
 and manually run this migration:
 
-    __`docker-compose run server ./migrate.sh`__
+    __`docker compose run server ./migrate.sh`__
 
 4. Open `http://localhost:8000/` in your browser. You should see DP Creator running.
 5. You can login to DP Creator using the following credentials:
