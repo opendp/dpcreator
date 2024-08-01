@@ -29,9 +29,9 @@
     "vuex-persistedstate": "4.1.0"
   },
   "devDependencies": {
-    "@vue/cli-plugin-router": "5.0.8",
-    "@vue/cli-plugin-unit-jest": "5.0.8",
-    "@vue/cli-service": "5.0.8",
+    "@vue/cli-plugin-router": "4.5.19",
+    "@vue/cli-plugin-unit-jest": "4.5.19",
+    "@vue/cli-service": "4.5.19",
     "@vue/test-utils": "1.1.4",
     "cypress": "12.17.1",
     "cypress-terminal-report": "3.2.2",
