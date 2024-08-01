@@ -43,6 +43,7 @@ services:
   #  - Built from "server/Dockerfile"
   # ---------------------------------
   server:
+    # OpenDP requires a linux/amd64 platform, which may not be the default on some systems
     platform: linux/amd64
     build: "./server"
     # For production we will need to set
@@ -74,6 +75,7 @@ services:
   #   running tasks
   # ---------------------------------
   celery-queue:
+    # OpenDP requires a linux/amd64 platform, which may not be the default on some systems
     platform: linux/amd64
     build: "./server"
     environment:
