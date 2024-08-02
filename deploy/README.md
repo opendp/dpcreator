@@ -160,7 +160,7 @@ These steps document how to run a Python script which will generate a k8s specif
 ## Azure: Using the K8s file
 
 (Assumes you have an Azure account.)
-In this example, the cluster name is **DPCreatorCluster01**
+In this example, the cluster name is **dp-creator-test-cluster**
 
 1. Log into 'portal.azure.com'
 1. From the "All Resources" section, find your cluster name and click on it.
@@ -170,12 +170,14 @@ In this example, the cluster name is **DPCreatorCluster01**
    ```
    git clone git@github.com:opendp/dpcreator.git
    ```
+   - Alternately, upload the latest deployment file here: https://github.com/opendp/dpcreator/blob/develop/deploy/k8s_maker/rendered/dev.dpcreator.org_08_2022_0719.yaml
 1. (Very Infrequent) Upload the k8s secrets YAML file which contains settings such as the SECRET_KEY. (* The secrets file is not in this repository. Example name: `dpcreator-azure-secrets.yaml`)
    - The Azure cloud shell has a button to upload a file to your home directory.
    - Make the secrets available to the k8s cluster using the command:
       ```
       kc apply -f dpcreator-azure-secrets.yaml
       ```
+      - Copy of this file may be found here: https://drive.google.com/drive/folders/1WEGbmM0BZ6s1yMsTWlGuopYhahGRRJ8u
 1. Update the dpcreator repository + Start the app and related services
    ```
    cd dpcreator/deploy/k8s_maker/rendered/
