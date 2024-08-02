@@ -4,7 +4,7 @@ Checklist for Domain setup for instance + connected `RegisteredDataverse`
 
 |                 |   DP Creator (K8s deploy)   |         Dataverse (EC2)        |              toolUrl (external tools manifest)             |  
 |-----------------|:---------------------------:|:------------------------------:|:----------------------------------------------------------:|
-| Demo Deployment | `http://demo.dpcreator.org` | `demo-dataverse.dpcreator.org` | `http://demo.dpcreator.org/api/dv-handoff/dv_orig_create/` |   
+| Demo Deployment | ~~`http://demo.dpcreator.org`~~ | ~~`demo-dataverse.dpcreator.org`~~ | ~~`http://demo.dpcreator.org/api/dv-handoff/dv_orig_create/`~~ |   
 | Dev Deployment  | `http://dev.dpcreator.org`  | `dev-dataverse.dpcreator.org`  | `http://dev.dpcreator.org/api/dv-handoff/dv_orig_create/`  |   
 
 **Demo**
