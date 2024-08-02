@@ -165,7 +165,7 @@ In this example, the cluster name is **dp-creator-test-cluster**
 1. Log into 'portal.azure.com'
 1. From the "All Resources" section, find your cluster name and click on it.
 1. Click on the "Connect" icon
-   - Follow instructions 1 and 2 to open the Cloud Shell and connect to the cluster
+   - Follow the onscreen instructions to open the Cloud Shell and connect to the cluster
 1. (One time) Clone the dpcreator repository
    ```
    git clone git@github.com:opendp/dpcreator.git
